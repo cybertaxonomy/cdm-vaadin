@@ -2,4 +2,5 @@
 /.project
 /.settings
 /bin
+src/main/webapp/VAADIN/widgetsets
 /target
