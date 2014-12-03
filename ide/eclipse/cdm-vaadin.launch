@@ -11,35 +11,17 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="RunJettyRunWebAppClassPathProvider"/>
-<booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="runjettyrun.Bootstrap"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="cdm-vaadin"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx500M&#10;-XX:MaxPermSize=256M&#13;&#10;-Dlog4j.configDebug=true&#10;-Dorg.mortbay.jetty.webapp.parentLoaderPriority=true&#10;-Dspring.profiles.active=remoting"/>
-<stringAttribute key="run_jetty_run.CONTEXT_ATTR" value="/"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx500M&#13;&#10;-Dlog4j.configDebug=true&#10;-Dorg.mortbay.jetty.webapp.parentLoaderPriority=true&#10;-Dspring.profiles.active=remoting"/>
+<stringAttribute key="run_jetty_run.CONTEXT_ATTR" value="/cdm-vaadin"/>
 <booleanAttribute key="run_jetty_run.ENABLE_JNDI_ATTR" value="false"/>
 <booleanAttribute key="run_jetty_run.ENABLE_NEED_CLIENT_AUTH_ATTR" value="false"/>
 <booleanAttribute key="run_jetty_run.ENABLE_PARENT_LOADER_PRIORITY_ATTR" value="true"/>
 <booleanAttribute key="run_jetty_run.ENABLE_SCANNER_ATTR" value="true"/>
 <booleanAttribute key="run_jetty_run.ENABLE_SSL_ATTR" value="false"/>
 <booleanAttribute key="run_jetty_run.IGNORE_SCAN_CLASS_WHEN_DEBUG_MODE" value="true"/>
-<mapAttribute key="run_jetty_run.JETTY_CLASSPATH_NON_CHECKED">
-<mapEntry key="/home/cmathew/.m2/repository/org/eclipse/jetty/websocket/websocket-server/9.2.5.v20141112/websocket-server-9.2.5.v20141112.jar" value="1"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/com.sun.el-2.2.0.v201108011116.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/javax.annotation_1.1.0.v201105051105.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/javax.websocket-api-0.0.006.draft.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/org.apache.jasper.glassfish-2.2.2.v201112011158.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/org.apache.taglibs.standard.glassfish-1.2.0.v201112081803.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/org.eclipse.jdt.core-3.7.1.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/org.objectweb.asm_3.3.1.v201101071600.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/spdy-client-9.0.0.M3.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/spdy-core-9.0.0.M3.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/spdy-http-server-9.0.0.M3.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/spdy-server-9.0.0.M3.jar" value="0"/>
-<mapEntry key="/home/cmathew/Tools/eclipse-luna/configuration/org.eclipse.osgi/861/0/.cp/lib/websocket-server-9.0.0.M3.jar" value="0"/>
-<mapEntry key="Custom Jetty Classpath" value="0"/>
-</mapAttribute>
-<listAttribute key="run_jetty_run.JETTY_CUSTOM_CLASSPATH"/>
-<stringAttribute key="run_jetty_run.JETTY_XML_PATH" value=""/>
+<stringAttribute key="run_jetty_run.JETTY_XML_PATH" value="src/main/webapp/jetty.xml"/>
 <stringAttribute key="run_jetty_run.KEYSTORE_ATTR" value="/home/cmathew/.keystore"/>
 <stringAttribute key="run_jetty_run.KEY_PWD_ATTR" value="changeit"/>
 <stringAttribute key="run_jetty_run.PORT_ATTR" value="8080"/>
@@ -47,15 +29,12 @@
 <stringAttribute key="run_jetty_run.SCANINTERVALSECONDS_ATTR" value="1"/>
 <mapAttribute key="run_jetty_run.SCAN_FOLDER_NON_CHECKED">
 <mapEntry key="/home/cmathew/Development/EDIT/cdm-vaadin/target/test-classes" value="0"/>
-<mapEntry key="/home/cmathew/Development/EDIT/cdmlib-vaadin/target/test-classes" value="0"/>
 </mapAttribute>
 <stringAttribute key="run_jetty_run.SELECTED_JETTY_VERSION_ATTR" value="Jetty 9.0.0.M3"/>
 <booleanAttribute key="run_jetty_run.SHOW_ADVANCE_ATTR" value="true"/>
 <stringAttribute key="run_jetty_run.SSL_PORT_ATTR" value="8443"/>
 <stringAttribute key="run_jetty_run.WEBAPPDIR_ATTR" value="src/main/webapp"/>
 <mapAttribute key="run_jetty_run.WEB_CONTEXT_CLASSPATH_NON_CHECKED">
-<mapEntry key="/home/cmathew/.m2/repository/org/eclipse/jetty/websocket/websocket-server/9.2.5.v20141112/websocket-server-9.2.5.v20141112.jar" value="1"/>
-<mapEntry key="/home/cmathew/Development/EDIT/cdmlib-vaadin/target/test-classes" value="0"/>
+<mapEntry key="/home/cmathew/Development/EDIT/cdm-vaadin/target/test-classes" value="0"/>
 </mapAttribute>
-<listAttribute key="run_jetty_run.WEB_CONTEXT_CUSTOM_CLASSPATH"/>
 </launchConfiguration>
