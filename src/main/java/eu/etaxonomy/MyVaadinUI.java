@@ -16,7 +16,6 @@ import com.vaadin.ui.VerticalLayout;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
-
 public class MyVaadinUI extends UI
 {
 
