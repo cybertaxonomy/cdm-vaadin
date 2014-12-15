@@ -1,12 +1,12 @@
 * text=auto !eol
 ide/eclipse/cdm-vaadin.launch -text
 /pom.xml -text
-src/main/java/eu/etaxonomy/AppWidgetSet.gwt.xml -text
 src/main/java/eu/etaxonomy/MyVaadinUI.java -text
 src/main/java/eu/etaxonomy/cdm/remote/config/AbstractWebApplicationConfigurer.java -text
 src/main/java/eu/etaxonomy/cdm/remote/config/DataSourceConfigurer.java -text
 src/main/java/eu/etaxonomy/cdm/remote/config/DataSourceProperties.java -text
 src/main/java/eu/etaxonomy/cdm/remote/config/LoggingConfigurer.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/CdmAppInitializer.java.bkp -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainer.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/AuthenticationPresenter.java -text
