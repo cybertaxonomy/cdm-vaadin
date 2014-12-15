@@ -1,9 +1,7 @@
 package eu.etaxonomy;
 
-import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.VaadinRequest;
@@ -23,8 +21,8 @@ public class MyVaadinUI extends UI
 //			@WebInitParam(name="org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Jetty9AsyncSupportWithWebSocket")
 //	})
     
-    @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "eu.etaxonomy.AppWidgetSet")
+    @WebServlet(value = {"/*", "/VAADIN/*"}, asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 

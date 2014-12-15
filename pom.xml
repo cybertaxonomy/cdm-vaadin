@@ -16,29 +16,29 @@
 		<unitils.version>3.3</unitils.version>
 	</properties>
 	<repositories>
-        <!-- the cdm internal repository -->
-        <repository>
-            <id>EditRepository</id>
-            <url>http://wp5.e-taxonomy.eu/mavenrepo/</url>
-        </repository>
-        <!-- current spring source repositories -->
-        <repository>
-            <id>SpringSource Enterprise Bundle Repository - External Bundle Milestones</id>
-            <url>http://repository.springsource.com/maven/bundles/milestone</url>
-        </repository>
-        <repository>
-            <id>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</id>
-            <url>http://repository.springsource.com/maven/bundles/release</url>
-        </repository>
-        <repository>
-            <id>SpringSource Enterprise Bundle Repository - External Bundle Releases</id>
-            <url>http://repository.springsource.com/maven/bundles/external</url>
-        </repository>
+		<!-- the cdm internal repository -->
+		<repository>
+			<id>EditRepository</id>
+			<url>http://wp5.e-taxonomy.eu/mavenrepo/</url>
+		</repository>
+		<!-- current spring source repositories -->
+		<repository>
+			<id>SpringSource Enterprise Bundle Repository - External Bundle Milestones</id>
+			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+		</repository>
+		<repository>
+			<id>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</id>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+		</repository>
+		<repository>
+			<id>SpringSource Enterprise Bundle Repository - External Bundle Releases</id>
+			<url>http://repository.springsource.com/maven/bundles/external</url>
+		</repository>
 		<repository>
 			<id>vaadin-addons</id>
 			<url>http://maven.vaadin.com/vaadin-addons</url>
 		</repository>
-		
+
 		<repository>
 			<id>vaadin-snapshots</id>
 			<url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
@@ -62,6 +62,15 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>wp5.e-taxonomy.eu</id>
+			<name>Edit Maven Repository</name>
+			<url>scpexe://wp5.e-taxonomy.eu/var/www/wp5.e-taxonomy.eu/mavenrepo/</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -463,7 +472,7 @@
 				<version>2.17</version>
 				<configuration>
 					<!-- Remove the skipTests line below to run TestBench tests -->
-<!-- 					<skipTests>true</skipTests> -->
+					<!-- <skipTests>true</skipTests> -->
 				</configuration>
 				<executions>
 					<execution>

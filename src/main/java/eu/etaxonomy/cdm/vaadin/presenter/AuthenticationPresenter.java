@@ -4,13 +4,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import com.vaadin.server.VaadinSession;
-
-import eu.etaxonomy.cdm.remote.config.DataSourceConfigurer;
-import eu.etaxonomy.cdm.remote.config.DataSourceProperties;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 import eu.etaxonomy.cdm.vaadin.view.IAuthenticationComponent;
+
+
 
 public class AuthenticationPresenter implements IAuthenticationComponent.AuthenticationComponentListener{
 

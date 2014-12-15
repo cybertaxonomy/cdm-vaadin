@@ -24,7 +24,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 			Logger.getLogger(NavigatorTestUI.class.getName());
 
 	@WebServlet(value = {"/app-test/navi/*"}, asyncSupported = true)
-	@VaadinServletConfiguration(productionMode = false, ui = NavigatorTestUI.class, widgetset = "eu.etaxonomy.AppWidgetSet")
+	@VaadinServletConfiguration(productionMode = false, ui = NavigatorTestUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {
 		
 	}
