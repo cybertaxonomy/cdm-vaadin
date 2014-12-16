@@ -1,4 +1,4 @@
-package eu.etaxonomy;
+package eu.etaxonomy.cdm.vaadin.ui;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -14,15 +14,15 @@ import com.vaadin.ui.VerticalLayout;
 
 @Theme("mytheme")
 @SuppressWarnings("serial")
-public class MyVaadinUI extends UI
+public class CheckUI extends UI
 {
 
 //    @WebServlet(value = "/*", asyncSupported = true, initParams = {
 //			@WebInitParam(name="org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Jetty9AsyncSupportWithWebSocket")
 //	})
     
-    @WebServlet(value = {"/*", "/VAADIN/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
+    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
+    @VaadinServletConfiguration(productionMode = false, ui = CheckUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 

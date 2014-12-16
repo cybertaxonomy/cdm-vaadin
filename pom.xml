@@ -521,7 +521,6 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
-
 				<plugin>
 					<artifactId>maven-eclipse-plugin</artifactId>
 					<configuration>
