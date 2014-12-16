@@ -14,6 +14,11 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 
 public abstract class AbstractAuthenticatedUI extends UI {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	Navigator navigator;
 	
 	private static final String AUTHENTICATION_VIEW = "abstractAuthenticatedUI";
