@@ -19,6 +19,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionTableView.java -
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionSelectionComponent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionTableComponent.java -text
 src/main/resources/log4j.properties -text
+src/main/resources/test.txt -text
 src/main/webapp/META-INF/MANIFEST.MF -text
 src/main/webapp/META-INF/context.xml -text
 src/main/webapp/META-INF/services/javax.servlet.ServletContainerInitializer -text
