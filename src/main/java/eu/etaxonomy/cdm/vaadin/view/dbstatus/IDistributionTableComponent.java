@@ -19,10 +19,11 @@ public interface IDistributionTableComponent {
 		Set<DefinedTermBase> getChosenTerms();
 
 		List<PresenceAbsenceTerm> getPresenceAbsenceTerms();
-		
+
 		ComboBox updateDistributionField(DescriptionElementBase deb, Distribution db, BeanItemContainer<PresenceAbsenceTerm> termContainer, ComboBox box, Taxon taxon);
-		
+
 		HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon);
+
 	}
 	public void addListener(DistributionTableComponentListener listener);
 }

@@ -23,22 +23,27 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
+import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionTableComponent;
 
 
 public class DistributionTablePresenter implements IDistributionTableComponent.DistributionTableComponentListener{
 
-	private IVocabularyService vocabularyService;
-	private IDescriptionService descriptionService;
-	private ITermService termService;
-	
-	public DistributionTablePresenter(){
+	private final IVocabularyService vocabularyService;
+	private final IDescriptionService descriptionService;
+	private final ITermService termService;
+	private final DistributionTableView view;
+
+	public DistributionTablePresenter(DistributionTableView dtv){
+	    this.view = dtv;
+	    view.addListener(this);
+
 		vocabularyService = (IVocabularyService)CdmSpringContextHelper.newInstance().getBean("vocabularyServiceImpl");
 		descriptionService = (IDescriptionService)CdmSpringContextHelper.newInstance().getBean("descriptionServiceImpl");
 		termService = (ITermService)CdmSpringContextHelper.newInstance().getBean("termServiceImpl");
 	}
-	
-	
+
+
 	@Override
 	public ComboBox updateDistributionField(DescriptionElementBase deb,
 			Distribution db,
@@ -47,7 +52,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	@Override
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
@@ -74,7 +79,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
 		//TODO Better to use TermType instead of class to get the list

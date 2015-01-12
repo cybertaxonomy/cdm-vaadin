@@ -3,6 +3,9 @@ package eu.etaxonomy.cdm.vaadin.presenter.dbstatus;
 import java.util.Arrays;
 import java.util.List;
 
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
+
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
@@ -11,28 +14,35 @@ import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionSelectionView;
+import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionSelectionComponent;
 
 public class DistributionSelectionPresenter implements IDistributionSelectionComponent.DistributionSelectionComponentListener {
 
 	DistributionSelectionView view;
-	
+
 	public DistributionSelectionPresenter(DistributionSelectionView dsv) {
 		this.view = dsv;
 		view.addListener(this);
 		view.dataBinding();
 	}
-	
+
 	@Override
 	public void buttonClick(Classification classification, TermVocabulary<DefinedTermBase> term) {
-		// TODO retrieve classification.UUID and term.UUID and save this in the vaadinSession
-		// TODO move on the final table and load it
+	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
+	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
+
+	    DistributionTableView dtv = new DistributionTableView();
+	    new DistributionTablePresenter(dtv);
+	    UI.getCurrent().getNavigator().addView("table", dtv);
+	    //navigate to table view
+        UI.getCurrent().getNavigator().navigateTo("table");
 	}
 
 	@Override
 	public List<Classification> getClassificationList() {
 		IClassificationService classificationService = (IClassificationService)CdmSpringContextHelper.newInstance().getBean("classificationServiceImpl");
-		//TODO replace the list by UUID and TITLECACHE 
+		//TODO replace the list by UUID and TITLECACHE
 		//classificationService.getUuidAndTitleCache();
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());
 		return classificationList;
@@ -40,7 +50,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
-		
+
 		IVocabularyService vocabularyService = (IVocabularyService)CdmSpringContextHelper.newInstance().getBean("vocabularyServiceImpl");
 		List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
 		return termList;
