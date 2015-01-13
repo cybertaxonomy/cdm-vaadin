@@ -12,6 +12,8 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.vaadin.model.DbTableDTOS;
+import eu.etaxonomy.cdm.vaadin.model.LazyLoadedContainer;
 
 public interface IDistributionTableComponent {
 
@@ -23,6 +25,14 @@ public interface IDistributionTableComponent {
 		ComboBox updateDistributionField(DescriptionElementBase deb, Distribution db, BeanItemContainer<PresenceAbsenceTerm> termContainer, ComboBox box, Taxon taxon);
 
 		HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon);
+		
+		LazyLoadedContainer getTableContainer();
+		
+		int getSizeOfClassification();
+		
+		DbTableDTOS getDataList(int start, int end);
+
+		List<Distribution> getDistribution(Taxon taxon);
 
 	}
 	public void addListener(DistributionTableComponentListener listener);

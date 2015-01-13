@@ -4,6 +4,8 @@ ide/eclipse/cdm-vaadin.launch -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/CdmAppInitializer.java.bkp -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainer.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/model/User.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/model/Users.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/AuthenticationPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionSelectionPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionTablePresenter.java -text
