@@ -7,13 +7,14 @@ import java.util.List;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.ObjectProperty;
 
 public class Users implements Container {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
-	private List<User> users;
+	private final List<User> users;
 
 	public Users() {
 
@@ -33,31 +34,33 @@ public class Users implements Container {
 	@Override
 	public Item getItem(Object itemId) {
 		String tool = "string";
-		String bar = "foo"; 
+		String bar = "foo";
 		return null;
 	}
 
 	@Override
 	public Collection<?> getContainerPropertyIds() {
-		// TODO Auto-generated method stub
+	    Collection<String> c = new ArrayList<String>();
 		for(User user:users){
-			return user.getPropertyId();
+			c.addAll(user.getPropertyId());
 		}
-		return null;
+		return c;
 	}
 
 	@Override
 	public Collection<?> getItemIds() {
+	    Collection<String> c = new ArrayList<String>();
 		for(User user:users){
-			return user.getItemId();
+			c.addAll(user.getItemId());
 		}
-		return null;
+		return c;
 	}
 
 	@Override
 	public Property getContainerProperty(Object itemId, Object propertyId) {
 		// TODO Auto-generated method stub
-		return null;
+	    ObjectProperty<String> property = new ObjectProperty<String>((String)itemId);
+		return property;
 	}
 
 	@Override
