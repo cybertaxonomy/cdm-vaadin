@@ -24,6 +24,10 @@ public class User implements Serializable {
 	public void addProp(String column, String value) {
 		prop.put(column, value);
 	}
+	
+	public String getName(){
+		return name;
+	}
 
 	public Collection<String> getPropertyId() {
 		List<String> propertyId = new ArrayList<String>();
@@ -54,6 +58,15 @@ public class User implements Serializable {
         return null;
     }
 
+    public Object getItemProperty(Object propertyId) {
+        String item = propertyId.toString();
+        for (Map.Entry<String, String> entry : prop.entrySet()) {
+            if(item.equalsIgnoreCase(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
     /**
      * @param itemId
      * @param propertyId
@@ -62,7 +75,7 @@ public class User implements Serializable {
         if(prop.containsKey(propertyId) && prop.containsValue(itemId)){
             for (Map.Entry<String, String> entry : prop.entrySet()) {
                 if(propertyId.toString().equalsIgnoreCase(entry.getKey())) {
-                    return entry.getKey();
+                    return entry.getValue();
                 }
             }
         }

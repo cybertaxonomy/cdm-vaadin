@@ -19,10 +19,12 @@ public class Users implements Container {
 	public Users() {
 
 		User user1 = new User("first user");
+		user1.addProp("taxon", "Marmorta marmorta");
 		user1.addProp("p1", "val_b_1");
 		user1.addProp("p2", "val_b_2");
 
 		User user2 = new User("second_user");
+		user2.addProp("taxon", "Moose");
 		user2.addProp("p1", "val_a_1");
 		user2.addProp("p2", "val_a_2");
 
@@ -33,9 +35,8 @@ public class Users implements Container {
 
 	@Override
 	public Item getItem(Object itemId) {
-		String tool = "string";
-		String bar = "foo";
-		return null;
+		Item item = (Item) itemId;
+		return item;
 	}
 
 	@Override
@@ -58,8 +59,11 @@ public class Users implements Container {
 
 	@Override
 	public Property getContainerProperty(Object itemId, Object propertyId) {
-		// TODO Auto-generated method stub
-	    ObjectProperty<String> property = new ObjectProperty<String>((String)itemId);
+		ObjectProperty<String> property = null;
+		for(User user:users){
+			Object itemProperty = user.getItemProperty(propertyId);
+			property = new ObjectProperty<String>((String)itemProperty);
+		}
 		return property;
 	}
 
