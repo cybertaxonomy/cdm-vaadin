@@ -60,7 +60,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	public DistributionSelectionView(){
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
-
+		setStyleName("login");
 		button_proceed.addClickListener(this);
 		button_proceed.setClickShortcut(KeyCode.ENTER, null);
 	}

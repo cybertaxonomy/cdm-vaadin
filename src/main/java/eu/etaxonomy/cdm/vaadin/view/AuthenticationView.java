@@ -23,6 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.ui.AbstractAuthenticatedUI;
 
+
 public class AuthenticationView extends CustomComponent implements IAuthenticationComponent, ClickListener , View {
 
 	/*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
@@ -55,6 +56,7 @@ public class AuthenticationView extends CustomComponent implements IAuthenticati
 	 */
 	public AuthenticationView() {
 		buildMainLayout();
+		setStyleName("login");
 		setCompositionRoot(mainLayout);
 		userNameTF.addValidator(new StringLengthValidator("It must be 3-25 characters", 3, 25, false));
 		userNameTF.setNullRepresentation("");
