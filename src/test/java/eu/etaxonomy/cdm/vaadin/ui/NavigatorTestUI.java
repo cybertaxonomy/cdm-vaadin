@@ -14,19 +14,19 @@ import eu.etaxonomy.cdm.vaadin.view.NaviTestView;
 
 @Theme("chameleon")
 public class NavigatorTestUI extends AbstractAuthenticatedUI {
-	
+
 	Navigator navigator;
-	
+
 	private static final String FIRST_VIEW = "firstView";
 	public static final String SECOND_VIEW = "secondView";
-	
+
 	private final static Logger logger =
 			Logger.getLogger(NavigatorTestUI.class.getName());
 
 	@WebServlet(value = {"/app-test/navi/*"}, asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = NavigatorTestUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {
-		
+
 	}
 
 	@Override
@@ -34,15 +34,15 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 		getPage().setTitle("Navigation Example");
 		NaviTestView ntv1 = new NaviTestView();
 		ntv1.setText("Congratulations! you have reached the first view. If you have got here without logging in there we are in trouble :)");
-		
+
 		NaviTestView ntv2 = new NaviTestView();
-		ntv2.setText("Wow! you made it to the second view. Get yourself a beer - preferably a Krušovice Cerne");
-		
+		ntv2.setText("Wow! you made it to the second view. Get yourself a beer - preferably a Krusovice Cerne");
+
 		ntv2.removeButton();
-		
-        UI.getCurrent().getNavigator().addView(FIRST_VIEW, ntv1);  
-        UI.getCurrent().getNavigator().addView(SECOND_VIEW, ntv2);  
-		
+
+        UI.getCurrent().getNavigator().addView(FIRST_VIEW, ntv1);
+        UI.getCurrent().getNavigator().addView(SECOND_VIEW, ntv2);
+
 	}
 
 	@Override
