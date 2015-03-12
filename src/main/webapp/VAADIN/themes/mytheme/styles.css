@@ -12087,3 +12087,22 @@ div.v-layout.v-horizontal.v-widget {
 	width: 19px;
 	overflow: hidden;
 }
+
+/** 
+ * Custom settings below 
+ */
+ 
+.mytheme .v-table-cell-content-removable {
+    color: green;
+    background-image: url("icons/32/cancel.png");
+    background-repeat: no-repeat;
+    background-position: 5px;
+    text-indent: 20px;
+}
+
+.mytheme .v-gridlayout-spacing-on {
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
