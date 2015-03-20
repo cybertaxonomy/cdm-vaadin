@@ -14,6 +14,7 @@
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <cdmlib.version>${project.version}</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
+	<spring.version>3.4.2</spring.version>
   </properties>
   <repositories>
     <!-- the cdm internal repository -->
