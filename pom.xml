@@ -14,7 +14,7 @@
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <cdmlib.version>${project.version}</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
-	<spring.version>3.4.2</spring.version>
+	<spring.version>3.2.2.RELEASE</spring.version>
   </properties>
   <repositories>
     <!-- the cdm internal repository -->
@@ -175,19 +175,19 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
-      <version>3.2.2.RELEASE</version>
+      <version>${spring.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>org.springframework.web</artifactId>
-      <version>3.2.2.RELEASE</version>
+      <version>${spring.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>org.springframework.web.servlet</artifactId>
-      <version>3.2.2.RELEASE</version>
+      <version>${spring.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
