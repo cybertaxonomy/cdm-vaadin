@@ -26,6 +26,7 @@ import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 
+
 /**
  * @author cmathew
  * @date 10 Mar 2015
@@ -46,15 +47,28 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testLoadTaxa() throws SQLException {
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
+
         Collection<?> propIds = container.getContainerPropertyIds();
         Collection<?> itemIds = container.getItemIds();
         for(Object itemId : itemIds) {
             Item item = container.getItem(itemId);
             // column names need to be uppercase for h2 in the test environment
-            //String taxon = (String)item.getItemProperty("TAXON").getValue();
-            //logger.info("taxon : " + taxon);
+            String taxon = (String)item.getItemProperty("Name").getValue();
+            logger.info("taxon : " + taxon);
         }
-        Assert.assertEquals(3,itemIds.size());
+        Assert.assertEquals(4,itemIds.size());
+
+        sp.setUnplacedFilter();
+        itemIds = container.getItemIds();
+        Assert.assertEquals(1,itemIds.size());
+
+        sp.removeUnplacedFilter();
+        itemIds = container.getItemIds();
+        Assert.assertEquals(4,itemIds.size());
+
+        sp.setNameFilter("Taxon A");
+        itemIds = container.getItemIds();
+        Assert.assertEquals(1,itemIds.size());
     }
 
     @Ignore

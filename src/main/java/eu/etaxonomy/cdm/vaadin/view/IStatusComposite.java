@@ -11,8 +11,8 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import java.sql.SQLException;
 
-import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 
 /**
  * @author cmathew
@@ -24,6 +24,38 @@ public interface IStatusComposite {
     public interface StatusComponentListener {
         public LeafNodeTaxonContainer loadTaxa(int classificationId) throws SQLException;
         public CdmSQLContainer loadClassifications() throws SQLException;
+        /**
+         *
+         */
+        public void setUnplacedFilter();
+        /**
+         *
+         */
+        public void setUnpublishedFilter();
+        /**
+         *
+         */
+        public void removeUnplacedFilter();
+        /**
+         *
+         */
+        public void removeUnpublishedFilter();
+        /**
+         * @return
+         */
+        public int getCurrentSize();
+        /**
+         * @return
+         */
+        public int getSize();
+        /**
+         * @param filterString
+         */
+        public void setNameFilter(String filterString);
+        /**
+         *
+         */
+        public void removeNameFilter();
     }
 
     public void setListener(StatusComponentListener listener);

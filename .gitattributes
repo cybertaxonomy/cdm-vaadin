@@ -28,6 +28,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/ui/AbstractAuthenticatedUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/CheckUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/DbStatusUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/StatusEditorUI.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/util/CdmSQLStringDecorator.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelper.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/AuthenticationView.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/IAuthenticationComponent.java -text

@@ -11,16 +11,16 @@ package eu.etaxonomy.cdm.vaadin.statement;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
-import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 import com.vaadin.data.util.sqlcontainer.SQLUtil;
 import com.vaadin.data.util.sqlcontainer.query.FreeformStatementDelegate;
 import com.vaadin.data.util.sqlcontainer.query.OrderBy;
 import com.vaadin.data.util.sqlcontainer.query.generator.StatementHelper;
+import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
+
 
 /**
  * @author cmathew
@@ -109,7 +109,7 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         StatementHelper sh = new StatementHelper();
         StringBuffer query = new StringBuffer(select_query);
         if (filters != null) {
-            String filterString = getWhereStringForFilters(filters, sh);
+            String filterString = QueryBuilder.getWhereStringForFilters(filters, sh);
             query.append(filterString);
         }
         query.append(getOrderByString());
@@ -149,7 +149,7 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         StatementHelper sh = new StatementHelper();
         StringBuffer query = new StringBuffer(count_query);
         if (filters != null) {
-            String filterString = getWhereStringForFilters(filters, sh);
+            String filterString = QueryBuilder.getWhereStringForFilters(filters, sh);
             query.append(filterString);
         }
         sh.setQueryString(query.toString());
@@ -168,47 +168,47 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         return sh;
     }
 
-    public static String getWhereStringForFilters(List<Filter> filters,
-            StatementHelper sh) {
-        if (filters == null || filters.isEmpty()) {
-            return "";
-        }
-        StringBuilder where = new StringBuilder(" WHERE ");
-        where.append(getJoinedFilterString(filters, "AND", sh));
-        return where.toString();
-    }
-
-    public static String getJoinedFilterString(Collection<Filter> filters,
-            String joinString, StatementHelper sh) {
-        StringBuilder result = new StringBuilder();
-        for (Filter f : filters) {
-            result.append(getWhereStringForFilter(f, sh));
-            result.append(" ").append(joinString).append(" ");
-        }
-        // Remove the last instance of joinString
-        result.delete(result.length() - joinString.length() - 2,
-                result.length());
-        return result.toString();
-    }
-
-    public static String getWhereStringForFilter(Filter filter, StatementHelper sh) {
-        Compare compare = (Compare) filter;
-        sh.addParameterValue(compare.getValue());
-        String prop = compare.getPropertyId().toString();
-        switch (compare.getOperation()) {
-        case EQUAL:
-            return prop + " = ?";
-        case GREATER:
-            return prop + " > ?";
-        case GREATER_OR_EQUAL:
-            return prop + " >= ?";
-        case LESS:
-            return prop + " < ?";
-        case LESS_OR_EQUAL:
-            return prop + " <= ?";
-        default:
-            return "";
-        }
-    }
+//    public static String getWhereStringForFilters(List<Filter> filters,
+//            StatementHelper sh) {
+//        if (filters == null || filters.isEmpty()) {
+//            return "";
+//        }
+//        StringBuilder where = new StringBuilder(" WHERE ");
+//        where.append(getJoinedFilterString(filters, "AND", sh));
+//        return where.toString();
+//    }
+//
+//    public static String getJoinedFilterString(Collection<Filter> filters,
+//            String joinString, StatementHelper sh) {
+//        StringBuilder result = new StringBuilder();
+//        for (Filter f : filters) {
+//            result.append(getWhereStringForFilter(f, sh));
+//            result.append(" ").append(joinString).append(" ");
+//        }
+//        // Remove the last instance of joinString
+//        result.delete(result.length() - joinString.length() - 2,
+//                result.length());
+//        return result.toString();
+//    }
+//
+//    public static String getWhereStringForFilter(Filter filter, StatementHelper sh) {
+//        Compare compare = (Compare) filter;
+//        sh.addParameterValue(compare.getValue());
+//        String prop = compare.getPropertyId().toString();
+//        switch (compare.getOperation()) {
+//        case EQUAL:
+//            return prop + " = ?";
+//        case GREATER:
+//            return prop + " > ?";
+//        case GREATER_OR_EQUAL:
+//            return prop + " >= ?";
+//        case LESS:
+//            return prop + " < ?";
+//        case LESS_OR_EQUAL:
+//            return prop + " <= ?";
+//        default:
+//            return "";
+//        }
+//    }
 
 }
