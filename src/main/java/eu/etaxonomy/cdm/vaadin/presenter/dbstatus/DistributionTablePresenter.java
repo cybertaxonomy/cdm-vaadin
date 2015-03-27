@@ -61,6 +61,25 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 
 	
+	//for sql container
+    public static final String NAME_ID = "Name";
+    public static final String PB_ID = "Pb";
+    public static final String FN_ID = "Fn";
+    public static final String UNP_ID = "Unp";
+    public static final String UNR_ID = "Unr";
+    
+    public static String TERM = null;
+
+//    private static final String SELECT_QUERY="SELECT tb.id as taxon_id, tnb.titleCache as " + NAME_ID + " , tb.publish as " + PB_ID + " , tb.unplaced as " +  UNP_ID + FROM_QUERY;
+    private static final String SELECT_QUERY="Select tb.DTYPE, tb.id, tb.titleCache AS Taxon, deb.DTYPE, deb.id, deb.area_id, dtb.vocabulary_id, dtb1.vocabulary_id, ";
+    
+    private static final String PIVOT_QUERY = "MAX( IF(dtb1.titleCache = '"+ TERM +"', dtb.titleCache, NULL) ) as '"+ TERM +"',";
+    
+    private static final String FROM_QUERY = " From TaxonBase tb JOIN DescriptionBase db ON db.taxon_id=tb.id JOIN DescriptionElementBase deb ON deb.indescription_id=db.id Join DefinedTermBase dtb on deb.status_id=dtb.id Join DefinedTermBase dtb1 on deb.area_id=dtb1.id WHERE deb.DTYPE LIKE 'Distribution' GROUP BY tb.id";
+		
+    private static final String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
+
+	
 	public ComboBox updateDistributionField(DescriptionElementBase deb,
 			Distribution db,
 			BeanItemContainer<PresenceAbsenceTerm> termContainer, ComboBox box,
@@ -163,6 +182,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		return lz;
 		
 	}
+	
 	
 	@Override
 	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
