@@ -1,4 +1,6 @@
 * text=auto !eol
+h2/cdmTest.h2.db -text
+h2/cdmTest.trace.db -text
 ide/eclipse/cdm-vaadin.launch -text
 /pom.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
