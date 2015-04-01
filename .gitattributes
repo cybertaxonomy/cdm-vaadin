@@ -45,6 +45,10 @@ src/main/resources/test.txt -text
 src/main/webapp/META-INF/MANIFEST.MF -text
 src/main/webapp/META-INF/context.xml -text
 src/main/webapp/META-INF/services/javax.servlet.ServletContainerInitializer -text
+src/main/webapp/VAADIN/themes/edit/addons.scss -text
+src/main/webapp/VAADIN/themes/edit/edit.scss -text
+src/main/webapp/VAADIN/themes/edit/styles.css -text
+src/main/webapp/VAADIN/themes/edit/styles.scss -text
 src/main/webapp/VAADIN/themes/mytheme/addons.scss -text
 src/main/webapp/VAADIN/themes/mytheme/favicon.ico -text
 src/main/webapp/VAADIN/themes/mytheme/icons/32/Thumbs.db -text
