@@ -40,14 +40,7 @@ public interface IStatusComposite {
          *
          */
         public void removeUnpublishedFilter();
-        /**
-         * @return
-         */
-        public int getCurrentSize();
-        /**
-         * @return
-         */
-        public int getSize();
+
         /**
          * @param filterString
          */
@@ -56,6 +49,28 @@ public interface IStatusComposite {
          *
          */
         public void removeNameFilter();
+
+        /**
+         * @return
+         */
+        public int getCurrentNoOfTaxa();
+
+        /**
+         * @return
+         */
+        public int getTotalNoOfTaxa();
+        /**
+         *
+         */
+        public void refresh();
+        /**
+         *
+         */
+        public void removeFilters();
+        /**
+         * @param parentItemId
+         */
+        public void addChildren(Object parentItemId);
     }
 
     public void setListener(StatusComponentListener listener);

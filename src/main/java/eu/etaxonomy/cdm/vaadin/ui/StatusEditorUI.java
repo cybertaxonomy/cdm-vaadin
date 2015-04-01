@@ -29,7 +29,7 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.vaadin.view.StatusEditorView;
 
 
-@Theme("mytheme")
+@Theme("edit")
 public class StatusEditorUI extends AbstractAuthenticatedUI {
 
     Navigator navigator;
@@ -47,7 +47,7 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
     @Override
     protected void doInit() {
         // FIXME: remove this when testing is done
-        setIgnoreAuthentication(true);
+        //setIgnoreAuthentication(true);
 
         getPage().setTitle("Status Editor");
         StatusEditorView statusEditorView = new StatusEditorView();
