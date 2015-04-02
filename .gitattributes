@@ -1,6 +1,4 @@
 * text=auto !eol
-h2/cdmTest.h2.db -text
-h2/cdmTest.trace.db -text
 ide/eclipse/cdm-vaadin.launch -text
 /pom.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
@@ -128,11 +126,7 @@ src/test/java/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/view/NaviTestView.java -text
 src/test/resources/datasources.xml -text
 src/test/resources/dbscripts/001-cdm.h2.sql -text
-src/test/resources/dbscripts/hibernate.properties -text
 src/test/resources/etc/jetty/jetty.xml -text
-src/test/resources/eu/etaxonomy/cdm/applicationContext-securityTest.xml -text
-src/test/resources/eu/etaxonomy/cdm/applicationContext-test.xml -text
-src/test/resources/eu/etaxonomy/cdm/applicationContextSecurity.unused.xml -text
 src/test/resources/eu/etaxonomy/cdm/remote/ehcache.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/PUBLIC.xsd -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.xml -text
@@ -140,6 +134,7 @@ src/test/resources/eu/etaxonomy/cdm/vaadin/dataset.xsd -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.xml -text
 src/test/resources/h2/cdmTest.h2.db -text
+src/test/resources/h2/cdmTest.trace.db -text
 src/test/resources/log4j.properties -text
 src/test/resources/override.properties -text
 src/test/resources/unitils.properties -text
