@@ -71,6 +71,11 @@ public interface IStatusComposite {
          * @param parentItemId
          */
         public void addChildren(Object parentItemId);
+        /**
+         * @param pb
+         * @param itemId
+         */
+        public void updatePublished(boolean pb, Object itemId);
     }
 
     public void setListener(StatusComponentListener listener);

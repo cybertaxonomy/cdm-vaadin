@@ -24,6 +24,7 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 public class CdmQueryFactory {
 
     public static QueryDelegate generateTaxonBaseQuery(String id,
+            String uuid_id,
             String name_id,
             String pb_id,
             String unp_id,
@@ -34,6 +35,7 @@ public class CdmQueryFactory {
                 "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
                 "INNER JOIN DefinedTermBase dtb on tnb.rank_id=dtb.id  ";
         String SELECT_QUERY="SELECT tb.id as " + id +
+                ", tb.uuid as " + uuid_id +
                 ", tnb.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
                 ", tb.unplaced as " + unp_id +

@@ -11,6 +11,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.server.VaadinServlet;
 
+import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.vaadin.container.CdmSpringConnectionPool;
 
 public class CdmSpringContextHelper {
@@ -48,5 +49,9 @@ public class CdmSpringContextHelper {
         DataSource bean = (DataSource) newInstance().getBean("dataSource");
         JDBCConnectionPool connectionPool = new CdmSpringConnectionPool(bean.getConnection());
         return connectionPool;
+    }
+
+    public static ITaxonService getTaxonService() {
+        return (ITaxonService)CdmSpringContextHelper.newInstance().getBean("taxonServiceImpl");
     }
 }

@@ -40,6 +40,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     private static final Logger logger = Logger.getLogger(LeafNodeTaxonContainer.class);
 
     public static final String ID = "Id";
+    public static final String UUID_ID = "Uuid";
     public static final String NAME_ID = "Name";
     public static final String ACCTAXON_ID = "AccTaxonId";
     public static final String PB_ID = "Pb";
@@ -67,7 +68,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      * @throws SQLException
      */
     public LeafNodeTaxonContainer(int classificationId) throws SQLException {
-        super(CdmQueryFactory.generateTaxonBaseQuery(ID, NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
+        super(CdmQueryFactory.generateTaxonBaseQuery(ID, UUID_ID,NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
         this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(ID, NAME_ID));
         this.classificationId = classificationId;
         taxonSynonymMap = new HashMap<Object,List<Object>>();

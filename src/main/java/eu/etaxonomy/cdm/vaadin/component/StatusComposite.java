@@ -43,8 +43,6 @@ import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.Tree.ExpandEvent;
-import com.vaadin.ui.Tree.ExpandListener;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
@@ -89,6 +87,9 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
     private static final Logger logger = Logger.getLogger(StatusComposite.class);
     private StatusComponentListener listener;
 
+    private Object currentClickedTaxonItemId;
+
+
     private static final String SELECT_FILTER = "Select filter ...";
     private static final String SELECT_CLASSIFICATION = "Select classification ...";
     private static final String ADD_TAXON_SYNONYM = "Add ...";
@@ -115,16 +116,8 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         buildMainLayout();
         setCompositionRoot(mainLayout);
 
-        searchHorizontalLayout.addLayoutClickListener(new LayoutClickListener() {
-
-            @Override
-            public void layoutClick(LayoutClickEvent event) {
-                if (event.getChildComponent() == searchTextField && searchTextField.getValue().equals(FILTER_TAXA_INPUT)) {
-                   searchTextField.setValue("");
-                }
-            }
-        });
         addUIListeners();
+
         initAddComboBox();
         initSearchTextField();
         initClearSearchButton();
@@ -146,6 +139,9 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         clearSearchButton.setEnabled(enable);
     }
 
+
+
+
     private void initTaxaTable(int classificationId) {
 
         taxaTreeTable.setSelectable(true);
@@ -158,15 +154,8 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
             columnIds.add(LeafNodeTaxonContainer.PB_ID);
             taxaTreeTable.setColumnWidth(LeafNodeTaxonContainer.PB_ID, 25);
 
-            ValueChangeListener pbListener = new ValueChangeListener() {
-                @Override
-                public void valueChange(ValueChangeEvent event) {
-                    boolean value = (Boolean) event.getProperty().getValue();
-                    Notification.show("Changing Published Flag", "Implement me", Type.WARNING_MESSAGE);
-                }
 
-            };
-            taxaTreeTable.addGeneratedColumn(LeafNodeTaxonContainer.PB_ID, new BooleanCheckBoxGenerator(pbListener));
+            taxaTreeTable.addGeneratedColumn(LeafNodeTaxonContainer.PB_ID, new TaxonTableCheckBoxGenerator());
             try {
                 taxaTreeTable.setContainerDataSource(listener.loadTaxa(classificationId), columnIds);
             } catch (SQLException e) {
@@ -174,14 +163,6 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
                 e.printStackTrace();
             }
 
-            taxaTreeTable.addExpandListener(new ExpandListener() {
-
-                @Override
-                public void nodeExpand(ExpandEvent event) {
-                    //listener.addChildren(event.getItemId());
-                }
-
-            });
 
             taxaTreeTable.setCellStyleGenerator(new Table.CellStyleGenerator() {
 
@@ -189,7 +170,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
                 public String getStyle(Table source, Object itemId, Object propertyId) {
                     Property hasSynProperty = source.getItem(itemId).getItemProperty(LeafNodeTaxonContainer.HAS_SYN_ID);
                     if(hasSynProperty == null) {
-                        // this is a synonym
+                        // this is a synonym, so we activate the corresponding css class
                         return "synonym";
                     }
                     return null;
@@ -295,8 +276,9 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
                 }
             }
 
+
         };
-        filterTable.addGeneratedColumn(PROPERTY_SELECTED_ID, new BooleanCheckBoxGenerator(selectedListener));
+        filterTable.addGeneratedColumn(PROPERTY_SELECTED_ID, new CheckBoxGenerator(selectedListener));
 
     }
 
@@ -320,12 +302,22 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
     }
 
     private void initClearSearchButton() {
-        //ThemeResource resource = new ThemeResource("icons/32/cancel.png");
         clearSearchButton.setIcon(FontAwesome.REFRESH);
         clearSearchButton.setCaption("");
     }
 
     private void addUIListeners() {
+
+        searchHorizontalLayout.addLayoutClickListener(new LayoutClickListener() {
+
+            @Override
+            public void layoutClick(LayoutClickEvent event) {
+                if (event.getChildComponent() == searchTextField && searchTextField.getValue().equals(FILTER_TAXA_INPUT)) {
+                   searchTextField.setValue("");
+                }
+            }
+        });
+
         addClassificationComboBoxListener();
         addAddComboBoxListener();
         addSearchTextFieldListener();
@@ -410,26 +402,57 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
     }
 
 
-    class BooleanCheckBoxGenerator implements Table.ColumnGenerator {
+    class TaxonTableCheckBoxGenerator implements Table.ColumnGenerator {
 
-        private final ValueChangeListener listener;
-
-        public BooleanCheckBoxGenerator(ValueChangeListener listener) {
-            this.listener = listener;
-        }
 
         /**
          * Generates the cell containing an open image when boolean is true
          */
         @Override
-        public Component generateCell(Table source, Object itemId, Object columnId) {
+        public Component generateCell(Table source, final Object itemId, Object columnId) {
             if(source.getItem(itemId) != null) {
                 Property prop = source.getItem(itemId).getItemProperty(columnId);
                 if(prop == null) {
                     return null;
                 }
                 CheckBox cb = new CheckBox(null, prop);
-                cb.addValueChangeListener(listener);
+                ValueChangeListener pbListener = new ValueChangeListener() {
+                    @Override
+                    public void valueChange(ValueChangeEvent event) {
+                        boolean value = (Boolean) event.getProperty().getValue();
+                        listener.updatePublished(value, itemId);
+                    }
+                };
+                cb.addValueChangeListener(pbListener);
+                cb.setData(itemId);
+                return cb;
+            } else {
+                return null;
+            }
+
+        }
+    }
+
+    class CheckBoxGenerator implements Table.ColumnGenerator {
+
+        private final ValueChangeListener vcListener;
+
+        public CheckBoxGenerator(ValueChangeListener vcListener) {
+            this.vcListener = vcListener;
+        }
+
+        /**
+         * Generates the cell containing an open image when boolean is true
+         */
+        @Override
+        public Component generateCell(Table source, final Object itemId, Object columnId) {
+            if(source.getItem(itemId) != null) {
+                Property prop = source.getItem(itemId).getItemProperty(columnId);
+                if(prop == null) {
+                    return null;
+                }
+                CheckBox cb = new CheckBox(null, prop);
+                cb.addValueChangeListener(vcListener);
                 cb.setData(itemId);
                 return cb;
             } else {
