@@ -13,6 +13,7 @@ import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.unitils.UnitilsJUnit4;
+import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
@@ -41,6 +42,8 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
     @BeforeClass
     public static void setup() {
+        DatabaseUnitils.disableConstraints();
+
     	if(!isVaadinServletEnvCreated) {
     		createNewServletEnvironment();
     	}

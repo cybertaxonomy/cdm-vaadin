@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -33,6 +34,7 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
  *
  */
 @DataSet
+
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);
@@ -76,17 +78,29 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testLoadSynonyms() throws SQLException {
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
-        container.refresh();
+
         Collection<?> rootItemIds = container.rootItemIds();
         Assert.assertEquals(3,rootItemIds.size());
 
-        Collection<?> childIds = container.getChildren(10);
+        RowId taxonId10 = new RowId(10);
+        RowId taxonId11 = new RowId(11);
+        Collection<?> childIds = container.getChildren(taxonId10);
         Assert.assertEquals(2, childIds.size());
 
-        // FIXME : Need to check why these calls thorw a NPE
-        // in the case of h2
-        //Assert.assertEquals(true, container.areChildrenAllowed(10));
-        //Assert.assertEquals(false, container.areChildrenAllowed(11));
+        Assert.assertEquals(true, container.areChildrenAllowed(taxonId10));
+        Assert.assertEquals(false, container.areChildrenAllowed(taxonId11));
+    }
+
+    @Test
+    public void updatePublishFlag() throws SQLException {
+        LeafNodeTaxonContainer container = sp.loadTaxa(11);
+        RowId taxonId = new RowId(10);
+        boolean pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        Assert.assertTrue(pb);
+        sp.updatePublished(false, taxonId);
+        container.refresh();
+        pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        Assert.assertFalse(pb);
     }
 
     @Ignore
