@@ -1,5 +1,6 @@
 package eu.etaxonomy.cdm.vaadin.presenter.dbstatus;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	}
 
 	@Override
-	public void buttonClick(Classification classification, TermVocabulary<DefinedTermBase> term) {
+	public void buttonClick(Classification classification, TermVocabulary<DefinedTermBase> term) throws SQLException {
 	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 

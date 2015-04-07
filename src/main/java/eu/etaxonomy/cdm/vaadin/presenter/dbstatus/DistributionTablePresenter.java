@@ -1,5 +1,7 @@
 package eu.etaxonomy.cdm.vaadin.presenter.dbstatus;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,10 +29,12 @@ import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.model.CdmTaxonTableCollection;
 import eu.etaxonomy.cdm.vaadin.model.DbTableDTO;
 import eu.etaxonomy.cdm.vaadin.model.DbTableDTOS;
 import eu.etaxonomy.cdm.vaadin.model.LazyLoadedContainer;
+import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionTableComponent;
@@ -47,7 +51,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	private final DistributionTableView view;
 	private ITaxonService taxonService;
 
-	public DistributionTablePresenter(DistributionTableView dtv){
+	public DistributionTablePresenter(DistributionTableView dtv) throws SQLException{
 	    this.view = dtv;
 	    view.addListener(this);
 	    taxonService = (ITaxonService)CdmSpringContextHelper.newInstance().getBean("taxonServiceImpl");
@@ -60,26 +64,6 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	}
 
 
-	
-	//for sql container
-    public static final String NAME_ID = "Name";
-    public static final String PB_ID = "Pb";
-    public static final String FN_ID = "Fn";
-    public static final String UNP_ID = "Unp";
-    public static final String UNR_ID = "Unr";
-    
-    public static String TERM = null;
-
-//    private static final String SELECT_QUERY="SELECT tb.id as taxon_id, tnb.titleCache as " + NAME_ID + " , tb.publish as " + PB_ID + " , tb.unplaced as " +  UNP_ID + FROM_QUERY;
-    private static final String SELECT_QUERY="Select tb.DTYPE, tb.id, tb.titleCache AS Taxon, deb.DTYPE, deb.id, deb.area_id, dtb.vocabulary_id, dtb1.vocabulary_id, ";
-    
-    private static final String PIVOT_QUERY = "MAX( IF(dtb1.titleCache = '"+ TERM +"', dtb.titleCache, NULL) ) as '"+ TERM +"',";
-    
-    private static final String FROM_QUERY = " From TaxonBase tb JOIN DescriptionBase db ON db.taxon_id=tb.id JOIN DescriptionElementBase deb ON deb.indescription_id=db.id Join DefinedTermBase dtb on deb.status_id=dtb.id Join DefinedTermBase dtb1 on deb.area_id=dtb1.id WHERE deb.DTYPE LIKE 'Distribution' GROUP BY tb.id";
-		
-    private static final String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
-
-	
 	public ComboBox updateDistributionField(DescriptionElementBase deb,
 			Distribution db,
 			BeanItemContainer<PresenceAbsenceTerm> termContainer, ComboBox box,
@@ -97,6 +81,20 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		return term.getTerms();
 	}
 
+	
+	public List<String> getTermList() {
+		VaadinSession session = VaadinSession.getCurrent();
+		UUID termUUID = (UUID) session.getAttribute("selectedTerm");
+		TermVocabulary<DefinedTermBase> term = vocabularyService.load(termUUID);
+		term = CdmBase.deproxy(term, TermVocabulary.class);
+		Set<DefinedTermBase> terms = term.getTerms();
+		List<String> list = new ArrayList<String>();
+		for(DefinedTermBase dtb: terms){
+			list.add(dtb.getTitleCache());
+		}
+		return list;
+	}
+	
 	@Override
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
@@ -173,7 +171,14 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		return items;
 	}
 	
-	
+	@Override
+	public CdmSQLContainer getSQLContainer() throws SQLException{
+		Classification classification = getChosenClassification();
+		int classificationId = classification.getId();
+		List<String> termList = getTermList();
+		CdmSQLContainer container = new CdmSQLContainer(new CdmQueryFactory().generateTaxonDistributionQuery("id", termList, classificationId));
+		return container;
+	}
 	
 	@Override
 	public LazyLoadedContainer getLazyLoadedContainer(){

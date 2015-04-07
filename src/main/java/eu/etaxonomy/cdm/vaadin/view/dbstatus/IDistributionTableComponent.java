@@ -1,5 +1,6 @@
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.model.DbTableDTOS;
 import eu.etaxonomy.cdm.vaadin.model.LazyLoadedContainer;
 
@@ -63,6 +65,8 @@ public interface IDistributionTableComponent {
 		Classification getChosenClassification();
 
 		List<TaxonNode> getAllNodes(int start, int end);
+
+		CdmSQLContainer getSQLContainer() throws SQLException;
 
 	}
 	public void addListener(DistributionTableComponentListener listener);
