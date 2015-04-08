@@ -3,18 +3,16 @@ package eu.etaxonomy.cdm.vaadin;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-import javax.sql.DataSource;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.Ignore;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
 import org.unitils.UnitilsJUnit4;
 import org.unitils.database.DatabaseUnitils;
-import org.unitils.database.annotations.TestDataSource;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 
@@ -28,6 +26,7 @@ import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 
+@Ignore
 @Transactional(TransactionMode.DISABLED)
 public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
@@ -37,8 +36,6 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
     private static VaadinSession vaadinSession;
     private static boolean isVaadinServletEnvCreated = false;
 
-    @TestDataSource
-    protected DataSource dataSource;
 
     @BeforeClass
     public static void setup() {
@@ -48,7 +45,13 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
     		createNewServletEnvironment();
     	}
     	QueryBuilder.setStringDecorator(new CdmSQLStringDecorator());
+
+    	Assert.assertEquals(vaadinServlet, VaadinServlet.getCurrent());
+        Assert.assertEquals(servletContext, VaadinServlet.getCurrent().getServletContext());
+        Assert.assertEquals(vaadinSession, VaadinSession.getCurrent());
+        Assert.assertEquals(vaadinService, VaadinService.getCurrent());
     }
+
 
     public static void createNewServletEnvironment() {
 		servletContext = new MockServletContext("/webapp");
@@ -81,14 +84,5 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 		isVaadinServletEnvCreated = true;
     }
 
-    public DataSource getDataSource() {
-    	return dataSource;
-    }
-    @Test
-    public void checkVaadinVariables() {
-		Assert.assertEquals(vaadinServlet, VaadinServlet.getCurrent());
-		Assert.assertEquals(servletContext, VaadinServlet.getCurrent().getServletContext());
-		Assert.assertEquals(vaadinSession, VaadinSession.getCurrent());
-		Assert.assertEquals(vaadinService, VaadinService.getCurrent());
-    }
+
 }

@@ -118,8 +118,10 @@ src/test/java/eu/etaxonomy/cdm/remote/config/AbstractWebApplicationConfigurer.ja
 src/test/java/eu/etaxonomy/cdm/remote/config/DataSourceConfigurer.java -text
 src/test/java/eu/etaxonomy/cdm/remote/config/DataSourceProperties.java -text
 src/test/java/eu/etaxonomy/cdm/remote/config/LoggingConfigurer.java -text
+src/test/java/eu/etaxonomy/cdm/unitils/CdmTestDataSourceFactory.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/CdmVaadinBaseTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/ui/NavigatorTestUI.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.java -text
@@ -131,6 +133,7 @@ src/test/resources/eu/etaxonomy/cdm/remote/ehcache.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/PUBLIC.xsd -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/dataset.xsd -text
+src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.xml -text
 src/test/resources/h2/cdmTest.h2.db -text

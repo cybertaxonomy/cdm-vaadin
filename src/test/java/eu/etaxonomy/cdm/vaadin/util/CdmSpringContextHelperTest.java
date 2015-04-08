@@ -11,6 +11,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 
+
 @DataSet
 public class CdmSpringContextHelperTest extends CdmVaadinBaseTest {
 
@@ -18,8 +19,8 @@ public class CdmSpringContextHelperTest extends CdmVaadinBaseTest {
 
 	@Test
 	public void testTaxonService() {
-		CdmSpringContextHelper helper = CdmSpringContextHelper.newInstance();
-		ITaxonService taxonService = (ITaxonService) helper.getBean("taxonServiceImpl");
+
+		ITaxonService taxonService = CdmSpringContextHelper.getTaxonService();
 		Taxon taxon1 = CdmBase.deproxy(taxonService.find(UUID.fromString("54e767ee-894e-4540-a758-f906ecb4e2d9")),Taxon.class);
 		Assert.assertEquals(taxon1.getTitleCache(), "Sphingidae Linnaeus, 1758 sec. cate-sphingidae.org");
 

@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
  *
  */
 @DataSet
-
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);
@@ -46,19 +45,15 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         sp = new StatusPresenter(new MockStatusComposite());
     }
 
+
+
     @Test
     public void testLoadTaxa() throws SQLException {
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
 
-        Collection<?> propIds = container.getContainerPropertyIds();
-        Collection<?> itemIds = container.getItemIds();
-        for(Object itemId : itemIds) {
-            Item item = container.getItem(itemId);
-            // column names need to be uppercase for h2 in the test environment
-            String taxon = (String)item.getItemProperty("Name").getValue();
-            logger.info("taxon : " + taxon);
-        }
-        Assert.assertEquals(3,itemIds.size());
+        Collection<?> itemIds = container.rootItemIds();
+
+        Assert.assertEquals(4,itemIds.size());
 
         sp.setUnplacedFilter();
         itemIds = container.getItemIds();
@@ -66,7 +61,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
         sp.removeUnplacedFilter();
         itemIds = container.getItemIds();
-        Assert.assertEquals(3,itemIds.size());
+        Assert.assertEquals(4,itemIds.size());
 
         sp.setNameFilter("Taxon A");
         itemIds = container.getItemIds();
@@ -76,11 +71,8 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
-    public void testLoadSynonyms() throws SQLException {
+    public void testSynonyms() throws SQLException {
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
-
-        Collection<?> rootItemIds = container.rootItemIds();
-        Assert.assertEquals(3,rootItemIds.size());
 
         RowId taxonId10 = new RowId(10);
         RowId taxonId11 = new RowId(11);
