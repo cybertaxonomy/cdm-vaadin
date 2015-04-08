@@ -12,6 +12,7 @@ package eu.etaxonomy.cdm.vaadin.component;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -44,9 +45,16 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.NewTaxonBasePresenter;
+import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
+import eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener;
+import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 
 /**
@@ -54,7 +62,7 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
  * @date 11 Mar 2015
  *
  */
-public class StatusComposite extends CustomComponent implements IStatusComposite {
+public class StatusComposite extends CustomComponent implements IStatusComposite, ICdmChangeListener {
 
     /*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
 
@@ -92,7 +100,11 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
 
     private static final String SELECT_FILTER = "Select filter ...";
     private static final String SELECT_CLASSIFICATION = "Select classification ...";
-    private static final String ADD_TAXON_SYNONYM = "Add ...";
+
+    private static final String ADD_TAXON_SYNONYM_INPUT = "Add ...";
+    private static final String ADD_TAXON = "New Accepted Taxon";
+    private static final String ADD_SYNONYM = "New Synonym";
+
     private static final String PROPERTY_FILTER_ID = "filter";
     private static final String PROPERTY_SELECTED_ID = "selected";
 
@@ -116,6 +128,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         buildMainLayout();
         setCompositionRoot(mainLayout);
 
+        CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().register(this);
         addUIListeners();
 
         initAddComboBox();
@@ -145,6 +158,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
     private void initTaxaTable(int classificationId) {
 
         taxaTreeTable.setSelectable(true);
+        taxaTreeTable.setMultiSelect(true);
         taxaTreeTable.setImmediate(false);
 
         if(listener != null) {
@@ -294,10 +308,10 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
     private void initAddComboBox() {
         addComboBox.setNullSelectionAllowed(false);
         addComboBox.setImmediate(true);
-        addComboBox.addItem(ADD_TAXON_SYNONYM);
-        addComboBox.addItem("New Accepted Taxon");
-        addComboBox.addItem("New Synonym");
-        addComboBox.setValue(ADD_TAXON_SYNONYM);
+        addComboBox.addItem(ADD_TAXON_SYNONYM_INPUT);
+        addComboBox.addItem(ADD_TAXON);
+        addComboBox.addItem(ADD_SYNONYM);
+        addComboBox.setValue(ADD_TAXON_SYNONYM_INPUT);
 
     }
 
@@ -320,6 +334,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
 
         addClassificationComboBoxListener();
         addAddComboBoxListener();
+        addRemoveButtonListener();
         addSearchTextFieldListener();
         addClearSearchButtonListener();
     }
@@ -354,9 +369,49 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
             public void valueChange(ValueChangeEvent event) {
                 if (addComboBox.getValue() != null) {
                     String selected = (String)addComboBox.getValue();
-                    if(!selected.equals(ADD_TAXON_SYNONYM)) {
-                        Notification.show(selected, "Implement me", Type.WARNING_MESSAGE);
-                        addComboBox.setValue(ADD_TAXON_SYNONYM);
+                    if(!selected.equals(ADD_TAXON_SYNONYM_INPUT)) {
+                        try {
+                            String windowTitle;
+
+                            Object selectedItemId = null;
+                            IdAndUuid accTaxonIdUuid = null;
+                            if(selected.equals(ADD_SYNONYM)) {
+                                Set<Object> selectedIds = (Set<Object>)taxaTreeTable.getValue();
+                                // if zero or more than one items (taxa / synonyms) are selected
+                                // throw a warning
+                                if(selectedIds.size() == 0) {
+                                    Notification.show("Multiple or No selection", "Please select a single Taxon", Type.WARNING_MESSAGE);
+                                    return;
+                                }
+                                // if a synonym is selected then throw warning
+                                if(listener.isSynonym(selected)) {
+                                    Notification.show("Synonym selected", "Please choose a Taxon", Type.WARNING_MESSAGE);
+                                    return;
+                                }
+                                windowTitle = "Add New Synonym";
+                                selectedItemId = selectedIds.iterator().next();
+                                accTaxonIdUuid = new IdAndUuid(selectedItemId, listener.getCurrentLeafNodeTaxonContainer().getUuid(selectedItemId));
+                            } else {
+                                windowTitle = "Add New Taxon";
+                            }
+
+                            try {
+                                Window dialog = new Window(windowTitle);
+                                dialog.setModal(true);
+                                UI.getCurrent().addWindow(dialog);
+
+                                NewTaxonBaseComposite newTaxonComponent =
+                                        new NewTaxonBaseComposite(dialog,
+                                                new NewTaxonBasePresenter(),
+                                                accTaxonIdUuid);
+                                dialog.setContent(newTaxonComponent);
+                            } catch (SQLException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        } finally {
+                            addComboBox.setValue(ADD_TAXON_SYNONYM_INPUT);
+                        }
                     }
                 }
             }
@@ -386,6 +441,22 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
                listener.removeNameFilter();
                searchTextField.setValue(FILTER_TAXA_INPUT);
                updateInViewLabel();
+            }
+
+        });
+    }
+
+    private void addRemoveButtonListener() {
+        removeButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+               Set<Object> selectedItemIds = (Set)taxaTreeTable.getValue();
+               if(selectedItemIds.isEmpty()) {
+                   Notification.show("No Taxa / Synonyms selected", "Please select taxa or synonyms to delete", Type.WARNING_MESSAGE);
+               } else {
+                   Notification.show("Deleting selected Taxa / Synonyms", "Implement me", Type.WARNING_MESSAGE);
+               }
             }
 
         });
@@ -607,6 +678,41 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         searchHorizontalLayout.setComponentAlignment(clearSearchButton, new Alignment(48));
 
         return searchHorizontalLayout;
+    }
+
+    /* (non-Javadoc)
+     * @see eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener#onCreate(eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent)
+     */
+    @Override
+    public void onCreate(CdmChangeEvent event) {
+        if(event.getSourceType().equals(NewTaxonBaseComposite.class)) {
+            Object itemId = event.getChangedObjects().get(0);
+            listener.getCurrentLeafNodeTaxonContainer().removeTaxonFromCache(itemId);
+            // FIXME : not really sure at the moment how to refresh a single node (taxon)
+            //         in the tree table. As a workaround the node is explicitly collapsed
+            //         so that when the user expands the synonyms will be refreshed
+            taxaTreeTable.setCollapsed(itemId, true);
+            taxaTreeTable.setValue(itemId);
+        }
+
+    }
+
+    /* (non-Javadoc)
+     * @see eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener#onUpdate(eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent)
+     */
+    @Override
+    public void onUpdate(CdmChangeEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener#onDelete(eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent)
+     */
+    @Override
+    public void onDelete(CdmChangeEvent event) {
+        // TODO Auto-generated method stub
+
     }
 
 }

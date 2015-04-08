@@ -49,22 +49,23 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	private final ITaxonNodeService taxonNodeService;
 	private final ITermService termService;
 	private final DistributionTableView view;
-	private ITaxonService taxonService;
+	private final ITaxonService taxonService;
 
 	public DistributionTablePresenter(DistributionTableView dtv) throws SQLException{
 	    this.view = dtv;
 	    view.addListener(this);
-	    taxonService = (ITaxonService)CdmSpringContextHelper.newInstance().getBean("taxonServiceImpl");
-	    classificationService = (IClassificationService)CdmSpringContextHelper.newInstance().getBean("classificationServiceImpl");
-	    taxonNodeService = (ITaxonNodeService)CdmSpringContextHelper.newInstance().getBean("taxonNodeServiceImpl");
-		vocabularyService = (IVocabularyService)CdmSpringContextHelper.newInstance().getBean("vocabularyServiceImpl");
-		descriptionService = (IDescriptionService)CdmSpringContextHelper.newInstance().getBean("descriptionServiceImpl");
-		termService = (ITermService)CdmSpringContextHelper.newInstance().getBean("termServiceImpl");
+	    taxonService = CdmSpringContextHelper.getTaxonService();
+	    classificationService = CdmSpringContextHelper.getClassificationService();
+	    taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
+		vocabularyService = CdmSpringContextHelper.getVocabularyService();
+		descriptionService = CdmSpringContextHelper.getDescriptionService();
+		termService = CdmSpringContextHelper.getTermService();
 		view.dataBinding();
 	}
 
 
-	public ComboBox updateDistributionField(DescriptionElementBase deb,
+	@Override
+    public ComboBox updateDistributionField(DescriptionElementBase deb,
 			Distribution db,
 			BeanItemContainer<PresenceAbsenceTerm> termContainer, ComboBox box,
 			Taxon taxon) {
@@ -81,7 +82,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		return term.getTerms();
 	}
 
-	
+
 	public List<String> getTermList() {
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID termUUID = (UUID) session.getAttribute("selectedTerm");
@@ -94,7 +95,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		}
 		return list;
 	}
-	
+
 	@Override
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
@@ -116,15 +117,15 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	public List<DescriptionElementBase> listDescriptionElementsForTaxon(Taxon taxon, Set<Feature> setFeature){
 		return descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 	}
-	
+
 	@Override
 	public List<Distribution> getDistribution(Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<Distribution> listTaxonDescription = descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		return listTaxonDescription;
-		
+
 	}
-	
+
 	@Override
 	public List<TaxonNode> getAllNodes(int start, int end){
 		Classification classification = getChosenClassification();
@@ -140,13 +141,13 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		Classification classification = classificationService.load(classificationUUID);
 		return classification;
 	}
-	
+
 	@Override
 	public int getSizeOfClassification(){
 		Classification classification = getChosenClassification();
 		return taxonNodeService.countAllNodesForClassification(classification);
 	}
-	
+
 	@Override
 	public DbTableDTOS getDataList(int start, int end){
 		List<TaxonNode> nodes = getAllNodes(start, end);
@@ -163,32 +164,32 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 //						DistributionDTO distributionDTO = new DistributionDTO(db.getStatus().getTitleCache());
 //						dbTableDTO.setdDTO(distributionDTO);
 					}
-					
+
 				}
-			}	
+			}
 			items.add(dbTableDTO);
 		}
 		return items;
 	}
-	
+
 	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		Classification classification = getChosenClassification();
 		int classificationId = classification.getId();
 		List<String> termList = getTermList();
-		CdmSQLContainer container = new CdmSQLContainer(new CdmQueryFactory().generateTaxonDistributionQuery("id", termList, classificationId));
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, classificationId));
 		return container;
 	}
-	
+
 	@Override
 	public LazyLoadedContainer getLazyLoadedContainer(){
 		LazyLoadedContainer lz = new LazyLoadedContainer(CdmTaxonTableCollection.class);
 	    lz.addListener(this);
 		return lz;
-		
+
 	}
-	
-	
+
+
 	@Override
 	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
 		//TODO Better to use TermType instead of class to get the list
@@ -238,7 +239,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	public ITermService getTermService() {
 		return termService;
 	}
-	
+
 	@Override
 	public LazyLoadedContainer getTableContainer() {
 		// TODO Auto-generated method stub

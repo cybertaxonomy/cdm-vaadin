@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
+import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
@@ -35,7 +36,7 @@ public class StatusPresenter implements StatusComponentListener {
 
     private LeafNodeTaxonContainer container;
 
-    private ITaxonService taxonService;
+    private final ITaxonService taxonService;
 
     private int totalNoOfTaxa = 0;
 
@@ -46,12 +47,9 @@ public class StatusPresenter implements StatusComponentListener {
         // queries are compatible with all
         QueryBuilder.setStringDecorator(new CdmSQLStringDecorator());
 
-        initServices();
-    }
-
-    private void initServices() {
         taxonService = CdmSpringContextHelper.getTaxonService();
     }
+
 
     @Override
     public void removeFilters() {
@@ -115,8 +113,8 @@ public class StatusPresenter implements StatusComponentListener {
     }
 
     @Override
-    public void addChildren(Object parentItemId) {
-        //container.addChildren(parentItemId);
+    public boolean isSynonym(Object itemId) {
+        return container.isSynonym(itemId);
     }
 
     /* (non-Javadoc)
@@ -131,7 +129,7 @@ public class StatusPresenter implements StatusComponentListener {
 
     @Override
     public void updatePublished(boolean pb, Object itemId) {
-        UUID uuid = UUID.fromString((String)container.getItem(itemId).getItemProperty(LeafNodeTaxonContainer.UUID_ID).getValue());
+        UUID uuid = UUID.fromString((String)container.getItem(itemId).getItemProperty(CdmQueryFactory.UUID_ID).getValue());
         Taxon taxon = CdmBase.deproxy(taxonService.load(uuid), Taxon.class);
         boolean currentPb = taxon.isPublish();
         if(currentPb != pb) {
@@ -140,5 +138,13 @@ public class StatusPresenter implements StatusComponentListener {
         }
     }
 
+
+    /* (non-Javadoc)
+     * @see eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener#getCurrentLeafNodeTaxonContainer()
+     */
+    @Override
+    public LeafNodeTaxonContainer getCurrentLeafNodeTaxonContainer() {
+        return container;
+    }
 
 }

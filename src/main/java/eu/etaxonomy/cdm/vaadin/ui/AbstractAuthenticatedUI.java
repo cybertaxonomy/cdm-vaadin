@@ -12,7 +12,7 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.vaadin.presenter.AuthenticationPresenter;
 import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 
-public abstract class AbstractAuthenticatedUI extends UI {
+public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
 	/**
 	 *
@@ -31,6 +31,7 @@ public abstract class AbstractAuthenticatedUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 
+	    super.init(request);
         // Create a navigator to control the views
         navigator = new Navigator(this, this);
 

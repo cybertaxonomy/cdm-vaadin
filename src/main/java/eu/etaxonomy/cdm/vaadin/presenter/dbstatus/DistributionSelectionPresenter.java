@@ -42,9 +42,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public List<Classification> getClassificationList() {
-		IClassificationService classificationService = (IClassificationService)CdmSpringContextHelper.newInstance().getBean("classificationServiceImpl");
-		//TODO replace the list by UUID and TITLECACHE
-		//classificationService.getUuidAndTitleCache();
+		IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());
 		return classificationList;
 	}
@@ -52,7 +50,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	@Override
 	public List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
 
-		IVocabularyService vocabularyService = (IVocabularyService)CdmSpringContextHelper.newInstance().getBean("vocabularyServiceImpl");
+		IVocabularyService vocabularyService = CdmSpringContextHelper.getVocabularyService();
 		List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
 		return termList;
 	}

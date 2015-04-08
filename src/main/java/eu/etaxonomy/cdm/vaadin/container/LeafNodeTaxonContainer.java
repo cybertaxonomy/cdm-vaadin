@@ -39,8 +39,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private static final Logger logger = Logger.getLogger(LeafNodeTaxonContainer.class);
 
-    public static final String ID = "Id";
-    public static final String UUID_ID = "Uuid";
+
     public static final String NAME_ID = "Name";
     public static final String ACCTAXON_ID = "AccTaxonId";
     public static final String PB_ID = "Pb";
@@ -68,13 +67,13 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      * @throws SQLException
      */
     public LeafNodeTaxonContainer(int classificationId) throws SQLException {
-        super(CdmQueryFactory.generateTaxonBaseQuery(ID, UUID_ID,NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
-        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(ID, NAME_ID));
+        super(CdmQueryFactory.generateTaxonBaseQuery(NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
+        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(NAME_ID));
         this.classificationId = classificationId;
         taxonSynonymMap = new HashMap<Object,List<Object>>();
         initFilters();
         addContainerFilter(classificationFilter);
-        addContainerFilter(rankFilter);
+        //addContainerFilter(rankFilter);
     }
 
     private void initFilters() {
@@ -136,25 +135,19 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         if(synList != null) {
             return synList;
         }
-        //synonymContainer.disableContentsChangeEvents();
-        try {
-            Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(itemId.toString()));
-            synonymContainer.addContainerFilter(synonymOfTaxonFilter);
-            synList = new ArrayList<Object>();
-            synList.addAll(synonymContainer.getItemIds());
-            for(Object synItemId : synList) {
-                addRowItem((RowItem) synonymContainer.getItem(synItemId));
-            }
-            synonymContainer.removeAllContainerFilters();
-            // cache the synonyms for later
-            taxonSynonymMap.put(itemId, synList);
 
-            return synList;
-        } finally {
-            //synonymContainer.enableContentsChangeEvents();
+        Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(itemId.toString()));
+        synonymContainer.addContainerFilter(synonymOfTaxonFilter);
+        synList = new ArrayList<Object>();
+        synList.addAll(synonymContainer.getItemIds());
+        for(Object synItemId : synList) {
+            addTempItem((RowItem) synonymContainer.getItem(synItemId));
         }
+        synonymContainer.removeAllContainerFilters();
+        // cache the synonyms for later
+        taxonSynonymMap.put(itemId, synList);
 
-
+        return synList;
     }
 
     /* (non-Javadoc)
@@ -170,15 +163,6 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      */
     @Override
     public Collection<?> rootItemIds() {
-//
-//        disableContentsChangeEvents();
-//        try {
-//            Collection<?> taxontemIds = getItemIds();
-//            return taxontemIds;
-//        } finally {
-//            enableContentsChangeEvents();
-//        }
-
         return getItemIds();
     }
 
@@ -229,6 +213,13 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         return true;
     }
 
+    public boolean isSynonym(Object itemId) {
+        return synonymContainer.containsId(itemId);
+    }
+
+    public void removeTaxonFromCache(Object itemId) {
+        taxonSynonymMap.remove(itemId);
+    }
 
 
 }

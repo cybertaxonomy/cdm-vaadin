@@ -12,18 +12,18 @@ import eu.etaxonomy.cdm.vaadin.view.IAuthenticationComponent;
 
 public class AuthenticationPresenter implements IAuthenticationComponent.AuthenticationComponentListener{
 
-	private AuthenticationView view;
-	
+	private final AuthenticationView view;
+
 	public AuthenticationPresenter(AuthenticationView view) {
 		this.view = view;
 		view.addListener(this);
 	}
-	
+
 	@Override
 	public Authentication login(String userName, String password) {
 		UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-		AuthenticationManager authenticationManager = (AuthenticationManager) CdmSpringContextHelper.newInstance().getBean("authenticationManager");
-		Authentication authentication = authenticationManager.authenticate(token);	
+		AuthenticationManager authenticationManager = (AuthenticationManager) CdmSpringContextHelper.getCurrent().getBean("authenticationManager");
+		Authentication authentication = authenticationManager.authenticate(token);
 		return authentication;
 	}
 

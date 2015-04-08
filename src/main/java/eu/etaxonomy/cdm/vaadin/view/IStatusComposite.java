@@ -23,6 +23,9 @@ public interface IStatusComposite {
 
     public interface StatusComponentListener {
         public LeafNodeTaxonContainer loadTaxa(int classificationId) throws SQLException;
+
+        public LeafNodeTaxonContainer getCurrentLeafNodeTaxonContainer();
+
         public CdmSQLContainer loadClassifications() throws SQLException;
         /**
          *
@@ -67,15 +70,17 @@ public interface IStatusComposite {
          *
          */
         public void removeFilters();
-        /**
-         * @param parentItemId
-         */
-        public void addChildren(Object parentItemId);
+
         /**
          * @param pb
          * @param itemId
          */
         public void updatePublished(boolean pb, Object itemId);
+        /**
+         * @param itemId
+         * @return
+         */
+        public boolean isSynonym(Object itemId);
     }
 
     public void setListener(StatusComponentListener listener);

@@ -24,9 +24,10 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
  */
 public class CdmQueryFactory {
 
-    public static QueryDelegate generateTaxonBaseQuery(String id,
-            String uuid_id,
-            String name_id,
+    public static final String ID = "id";
+    public static final String UUID_ID = "uuid";
+
+    public static QueryDelegate generateTaxonBaseQuery(String name_id,
             String pb_id,
             String unp_id,
             String rank_id,
@@ -35,8 +36,8 @@ public class CdmQueryFactory {
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
                 "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
                 "INNER JOIN DefinedTermBase dtb on tnb.rank_id=dtb.id  ";
-        String SELECT_QUERY="SELECT tb.id as " + id +
-                ", tb.uuid as " + uuid_id +
+        String SELECT_QUERY="SELECT tb.id as " + ID +
+                ", tb.uuid as " + UUID_ID +
                 ", tnb.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
                 ", tb.unplaced as " + unp_id +
@@ -46,16 +47,15 @@ public class CdmQueryFactory {
         String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
         String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.id = ?";
 
-        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY, id);
+        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(String id,
-            List<String> termList, int classificationID) throws SQLException {
-        String FROM_QUERY = 
+    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, int classificationID) throws SQLException {
+        String FROM_QUERY =
         		" FROM TaxonNode tn " +
         		"INNER JOIN TaxonBase tb on tn.taxon_id = tb.id " +
         		"INNER JOIN Classification cl ON tn.classification_id = cl.id " +
-        		"LEFT OUTER JOIN TaxonNameBase tnb ON tnb.id=tb.id " + 
+        		"LEFT OUTER JOIN TaxonNameBase tnb ON tnb.id=tb.id " +
         		"LEFT OUTER JOIN DescriptionBase db ON db.taxon_id=tb.id " +
         		"LEFT OUTER JOIN (SELECT indescription_id, area_id, status_id, DTYPE, id FROM DescriptionElementBase deb WHERE deb.DTYPE LIKE 'Distribution') AS deb ON deb.indescription_id=db.id " +
         		"LEFT OUTER JOIN DefinedTermBase dtb on deb.status_id=dtb.id " +
@@ -64,7 +64,7 @@ public class CdmQueryFactory {
         		"WHERE tn.classification_id = "+ classificationID +" AND tb.DTYPE = 'Taxon'" ;
 
         String GROUP_BY = " GROUP BY tb.id ";
-       
+
         String SELECT_QUERY=
         		"SELECT tb.DTYPE," +
         		"tb.id, " +
@@ -75,41 +75,58 @@ public class CdmQueryFactory {
         		"deb.id, " +
         		"deb.area_id, "+
         		"dtb.vocabulary_id, " +
-        		"dtb1.vocabulary_id, "; 
+        		"dtb1.vocabulary_id, ";
         int count = termList.size();
         for(String term : termList){
         	if(count == 1){
-        		SELECT_QUERY= SELECT_QUERY + 
+        		SELECT_QUERY= SELECT_QUERY +
             			"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"' " ;
         	}else{
-        		SELECT_QUERY= SELECT_QUERY + 
+        		SELECT_QUERY= SELECT_QUERY +
         				"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"'," ;
         	}
         	count--;
         }
-        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY; 
+        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY;
         String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
         String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
 
-        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY, id);
+        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateSynonymofTaxonQuery(String id,
-    		String name_id) throws SQLException {
+    public static QueryDelegate generateSynonymofTaxonQuery(String name_id) throws SQLException {
     	String FROM_QUERY = " FROM TaxonBase tb " +
     			"INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
     			"INNER JOIN SynonymRelationship sr on tb.id=sr.relatedfrom_id ";
-    	String SELECT_QUERY="SELECT tb.id as " + id +
+    	String SELECT_QUERY="SELECT tb.id as " + ID +
     			", tnb.titleCache as " + name_id +
     			FROM_QUERY;
     	String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
     	String CONTAINS_QUERY = "SELECT * FROM SynonymRelationship sr WHERE sr.relatedfrom_id = ?";
-    	
-    	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY, id);
+
+    	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateQueryDelegate(String SELECT_QUERY, String COUNT_QUERY, String CONTAINS_QUERY, String id) throws SQLException {
-        FreeformQuery query = new FreeformQuery("This query is not used", CdmSpringContextHelper.getConnectionPool(), id);
+    /**
+     * Creates a FreeformQuery which mimics a TableQuery.
+     * This method works around the bug at http://dev.vaadin.com/ticket/12370
+     *
+     * @param tableName
+     * @return
+     * @throws SQLException
+     */
+    public static QueryDelegate generateTableQuery(String tableName) throws SQLException {
+        String FROM_QUERY = " FROM " + tableName;
+        String SELECT_QUERY=" SELECT * " +
+                FROM_QUERY;
+        String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
+        String CONTAINS_QUERY = "SELECT * FROM " + tableName + "  WHERE id = ?";
+
+        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
+    }
+
+    public static QueryDelegate generateQueryDelegate(String SELECT_QUERY, String COUNT_QUERY, String CONTAINS_QUERY) throws SQLException {
+        FreeformQuery query = new FreeformQuery("This query is not used", CdmSpringContextHelper.getCurrent().getConnectionPool(), ID);
         CdmStatementDelegate delegate = new CdmStatementDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
         query.setDelegate(delegate);
         return query;

@@ -23,17 +23,16 @@ public class CdmVaadinConversationalServlet extends VaadinServlet implements Ses
 	private static final Logger logger = Logger.getLogger(CdmVaadinConversationalServlet.class);
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2973231251266766766L;
 
-	private ConversationHolder conversation;   
-	CdmSpringContextHelper helper;
+	private ConversationHolder conversation;
 
 
 	@Override
 	protected void servletInitialized() throws ServletException {
-		super.servletInitialized();		
+		super.servletInitialized();
 		getService().addSessionInitListener(this);
 		getService().addSessionDestroyListener(this);
 	}
@@ -41,8 +40,7 @@ public class CdmVaadinConversationalServlet extends VaadinServlet implements Ses
 	@Override
 	public void sessionInit(SessionInitEvent event)
 			throws ServiceException {
-		helper = CdmSpringContextHelper.newInstance();
-		conversation = (ConversationHolder) helper.getBean("conversationHolder");
+		conversation = (ConversationHolder) CdmSpringContextHelper.getCurrent().getBean("conversationHolder");
 		conversation.bind();
 		VaadinSession.getCurrent().setAttribute("conversation", conversation);
 	}
@@ -56,10 +54,10 @@ public class CdmVaadinConversationalServlet extends VaadinServlet implements Ses
 	protected void service(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws ServletException, IOException {
 		if(conversation != null) {
 			logger.info("Servlet Service call - Binding Vaadin Session Conversation : " + conversation);
-			conversation.bind();							
-		} 
-		
-		super.service(request, response);		
+			conversation.bind();
+		}
+
+		super.service(request, response);
 	}
 
 
