@@ -3,6 +3,8 @@ package eu.etaxonomy.cdm.vaadin.presenter.dbstatus;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,6 +95,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		for(DefinedTermBase dtb: terms){
 			list.add(dtb.getTitleCache());
 		}
+		Collections.sort(list);
 		return list;
 	}
 

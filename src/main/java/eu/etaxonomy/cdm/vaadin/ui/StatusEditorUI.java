@@ -29,7 +29,7 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.vaadin.view.StatusEditorView;
 
 
-@Theme("edit")
+@Theme("mytheme")
 public class StatusEditorUI extends AbstractAuthenticatedUI {
 
     Navigator navigator;

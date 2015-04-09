@@ -12,7 +12,7 @@ import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionSelectionPresenter
 import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionSelectionView;
 
-@Theme("mytheme")
+@Theme("macosx")
 @Title("CDM Board")
 @SuppressWarnings("serial")
 public class DbStatusUI extends AbstractAuthenticatedUI{
