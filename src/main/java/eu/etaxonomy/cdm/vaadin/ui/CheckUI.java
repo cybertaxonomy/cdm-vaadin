@@ -12,7 +12,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@Theme("mytheme")
+@Theme("valo")
 @SuppressWarnings("serial")
 public class CheckUI extends UI
 {
