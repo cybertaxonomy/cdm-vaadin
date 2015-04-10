@@ -12,6 +12,7 @@ package eu.etaxonomy.cdm.vaadin.util;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.session.CdmDataChangeService;
+import eu.etaxonomy.cdm.vaadin.session.SelectionService;
 
 /**
  * @author cmathew
@@ -29,8 +30,19 @@ public class CdmVaadinSessionUtilities {
         }
     }
 
+    public static void initCdmDataChangeService() {
+        setCurrentAttribute(CdmDataChangeService.KEY, new CdmDataChangeService());
+    }
+
     public static CdmDataChangeService getCurrentCdmDataChangeService() {
         return (CdmDataChangeService) VaadinSession.getCurrent().getAttribute(CdmDataChangeService.KEY);
     }
 
+    public static void initSelectionService() {
+        setCurrentAttribute(SelectionService.KEY, new SelectionService());
+    }
+
+    public static SelectionService getCurrentSelectionService() {
+        return (SelectionService) VaadinSession.getCurrent().getAttribute(SelectionService.KEY);
+    }
 }
