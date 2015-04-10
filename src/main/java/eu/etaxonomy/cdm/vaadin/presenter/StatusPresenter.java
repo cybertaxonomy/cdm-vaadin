@@ -12,17 +12,13 @@ package eu.etaxonomy.cdm.vaadin.presenter;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
-
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
-import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
-import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
 
 /**
@@ -32,7 +28,7 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
  */
 public class StatusPresenter implements StatusComponentListener {
 
-    private final IStatusComposite composite;
+
 
     private LeafNodeTaxonContainer container;
 
@@ -40,13 +36,7 @@ public class StatusPresenter implements StatusComponentListener {
 
     private int totalNoOfTaxa = 0;
 
-    public StatusPresenter(IStatusComposite composite) {
-        this.composite = composite;
-        composite.setListener(this);
-        // TODO: Need to evaluate the various sql dialects and make sure that these
-        // queries are compatible with all
-        QueryBuilder.setStringDecorator(new CdmSQLStringDecorator());
-
+    public StatusPresenter() {
         taxonService = CdmSpringContextHelper.getTaxonService();
     }
 

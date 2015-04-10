@@ -47,7 +47,6 @@ src/main/java/eu/etaxonomy/cdm/vaadin/view/IAuthenticationComponent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/INewTaxonBaseComponentListener.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/INewTaxonBaseComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/IStatusComposite.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/view/StatusEditorView.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionSelectionView.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionTableView.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionSelectionComponent.java -text

@@ -11,8 +11,10 @@ package eu.etaxonomy.cdm.vaadin.component;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -26,8 +28,12 @@ import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -52,8 +58,10 @@ import com.vaadin.ui.Window;
 import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.NewTaxonBasePresenter;
+import eu.etaxonomy.cdm.vaadin.presenter.StatusPresenter;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener;
+import eu.etaxonomy.cdm.vaadin.session.SelectionEvent;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 
@@ -62,7 +70,7 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
  * @date 11 Mar 2015
  *
  */
-public class StatusComposite extends CustomComponent implements IStatusComposite, ICdmChangeListener {
+public class StatusComposite extends CustomComponent implements View, IStatusComposite, ICdmChangeListener {
 
     /*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
 
@@ -128,6 +136,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         buildMainLayout();
         setCompositionRoot(mainLayout);
 
+        this.listener = new StatusPresenter();
         CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().register(this);
         addUIListeners();
 
@@ -135,6 +144,12 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         initSearchTextField();
         initClearSearchButton();
         setEnabledAll(false);
+
+        init();
+    }
+
+    public void minimalize() {
+
     }
 
     public void init() {
@@ -333,6 +348,7 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         });
 
         addClassificationComboBoxListener();
+        addTaxaTreeTableListener();
         addAddComboBoxListener();
         addRemoveButtonListener();
         addSearchTextFieldListener();
@@ -359,6 +375,22 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
         });
     }
 
+    private void addTaxaTreeTableListener() {
+        taxaTreeTable.addItemClickListener(new ItemClickListener() {
+
+            @Override
+            public void itemClick(ItemClickEvent event) {
+
+                Object itemId = event.getItemId();
+                if(!listener.isSynonym(itemId)) {
+                    UUID taxonUuid = listener.getCurrentLeafNodeTaxonContainer().getUuid(itemId);
+                    CdmVaadinSessionUtilities.getCurrentSelectionService()
+                    .fireSelectionEvent(new SelectionEvent(Arrays.asList((Object)taxonUuid), StatusComposite.class), true);
+                }
+            }
+        });
+
+    }
 
     private void addAddComboBoxListener() {
         addComboBox.addValueChangeListener(new Property.ValueChangeListener() {
@@ -711,6 +743,15 @@ public class StatusComposite extends CustomComponent implements IStatusComposite
      */
     @Override
     public void onDelete(CdmChangeEvent event) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /* (non-Javadoc)
+     * @see com.vaadin.navigator.View#enter(com.vaadin.navigator.ViewChangeListener.ViewChangeEvent)
+     */
+    @Override
+    public void enter(ViewChangeEvent event) {
         // TODO Auto-generated method stub
 
     }

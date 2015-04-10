@@ -26,7 +26,7 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.view.StatusEditorView;
+import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
 
 
 @Theme("valo")
@@ -50,8 +50,8 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
         setIgnoreAuthentication(true);
 
         getPage().setTitle("Status Editor");
-        StatusEditorView statusEditorView = new StatusEditorView();
-        UI.getCurrent().getNavigator().addView(FIRST_VIEW, statusEditorView);
+        StatusComposite statusEditor = new StatusComposite();
+        UI.getCurrent().getNavigator().addView(FIRST_VIEW, statusEditor);
 
     }
 
