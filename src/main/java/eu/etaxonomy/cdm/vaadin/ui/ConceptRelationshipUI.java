@@ -44,7 +44,7 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
     @Override
     protected void doInit() {
         // FIXME: remove this when testing is done
-        setIgnoreAuthentication(true);
+        //setIgnoreAuthentication(true);
 
         getPage().setTitle("Concept Relationship Editor");
         ConceptRelationshipView crEditor = new ConceptRelationshipView();

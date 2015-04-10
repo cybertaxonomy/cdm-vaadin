@@ -40,14 +40,14 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
             Logger.getLogger(StatusEditorUI.class.getName());
 
     @WebServlet(value = {"/app/editstatus/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = StatusEditorUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = true, ui = StatusEditorUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
     @Override
     protected void doInit() {
         // FIXME: remove this when testing is done
-        setIgnoreAuthentication(true);
+        // setIgnoreAuthentication(true);
 
         getPage().setTitle("Status Editor");
         StatusComposite statusEditor = new StatusComposite();
