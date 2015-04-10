@@ -51,6 +51,9 @@ src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionSelectionView.ja
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionTableView.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionSelectionComponent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionTableComponent.java -text
+src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/css/d3.conceptrelationshiptree.css -text
+src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/extlib/d3.min.js -text
+src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/lib/d3.conceptrelationshiptree_connector.js -text
 src/main/resources/log4j.properties -text
 src/main/resources/test.txt -text
 src/main/webapp/META-INF/MANIFEST.MF -text
