@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
  */
 public class CdmDataChangeService {
 
-    public final static String KEY = "cdmDataChangeService";
+    public final static String KEY = "key_cdmDataChangeService";
 
     private final List<ICdmChangeListener> listeners;
 

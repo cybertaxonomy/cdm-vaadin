@@ -27,6 +27,9 @@ src/main/java/eu/etaxonomy/cdm/vaadin/servlet/CdmVaadinConversationalServlet.jav
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmChangeEvent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmDataChangeService.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/ICdmChangeListener.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/session/ISelectionListener.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/session/SelectionEvent.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/session/SelectionService.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/statement/CdmStatementDelegate.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/AbstractAuthenticatedUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/CdmBaseUI.java -text
