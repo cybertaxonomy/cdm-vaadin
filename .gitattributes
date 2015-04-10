@@ -142,8 +142,13 @@ src/test/java/eu/etaxonomy/cdm/remote/config/LoggingConfigurer.java -text
 src/test/java/eu/etaxonomy/cdm/unitils/CdmTestDataSourceFactory.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/CdmVaadinBaseTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3CTree.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3CTreeState.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/presenter/ConceptRelationshipPresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/ui/CheckTestUI.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/ui/D3CTreeUI.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/ui/NavigatorTestUI.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/view/NaviTestView.java -text
@@ -154,6 +159,10 @@ src/test/resources/eu/etaxonomy/cdm/remote/ehcache.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/PUBLIC.xsd -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/dataset.xsd -text
+src/test/resources/eu/etaxonomy/cdm/vaadin/jscomponent/css/d3.ctree.css -text
+src/test/resources/eu/etaxonomy/cdm/vaadin/jscomponent/extlib/d3.min.js -text
+src/test/resources/eu/etaxonomy/cdm/vaadin/jscomponent/lib/d3ctree_connector.js -text
+src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/ConceptRelationshipPresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.xml -text
 src/test/resources/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.xml -text

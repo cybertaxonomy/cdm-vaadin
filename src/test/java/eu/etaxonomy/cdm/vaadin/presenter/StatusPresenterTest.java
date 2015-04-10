@@ -42,7 +42,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     @BeforeClass
     public static void init() {
-        sp = new StatusPresenter(new MockStatusComposite());
+        sp = new StatusPresenter();
     }
 
 
