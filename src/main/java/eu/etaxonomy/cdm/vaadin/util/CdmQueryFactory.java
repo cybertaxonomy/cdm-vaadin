@@ -107,6 +107,15 @@ public class CdmQueryFactory {
     	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
+    public static QueryDelegate generateTaxonRelatedToQuery() throws SQLException {
+        String FROM_QUERY = " FROM TaxonRelationship tr inner join TaxonBase tb on tr.relatedto_id = tb.id";
+        String SELECT_QUERY= "SELECT tr.id, tr.uuid, tb.titleCache" + FROM_QUERY;
+        String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
+        String CONTAINS_QUERY = "SELECT * FROM TaxonRelationship tr where tr.relatedfrom_id = ?";
+
+        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
+    }
+
     /**
      * Creates a FreeformQuery which mimics a TableQuery.
      * This method works around the bug at http://dev.vaadin.com/ticket/12370

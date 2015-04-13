@@ -28,9 +28,10 @@ public interface INewTaxonBaseComponentListener {
     /**
      * @param scientificName
      * @param secRefItemId
+     * @param classificationUuid
      * @return
      */
-    public IdAndUuid newTaxon(String scientificName, Object secRefItemId);
+    public IdAndUuid newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid);
 
 
     /**
@@ -40,6 +41,9 @@ public interface INewTaxonBaseComponentListener {
      * @return
      */
     public IdAndUuid newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid);
+
+
+
 
 
 

@@ -14,15 +14,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import eu.etaxonomy.cdm.api.service.INameService;
+import org.springframework.transaction.TransactionStatus;
+
+import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
+import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.NonViralName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.SynonymRelationshipType;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.strategy.parser.NonViralNameParserImpl;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
@@ -40,9 +47,10 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final CdmSQLContainer secRefContainer;
 
     private final IReferenceService referenceService;
+    private final ITaxonNodeService taxonNodeService;
     private final ITaxonService taxonService;
-    private final INameService nameService;
-
+    private final IClassificationService classificationService;
+    private final ICdmApplicationConfiguration app;
 
 
     /* (non-Javadoc)
@@ -54,31 +62,37 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     }
 
     public NewTaxonBasePresenter() throws SQLException {
-
         secRefContainer = CdmSQLContainer.newInstance("Reference");
         referenceService = CdmSpringContextHelper.getReferenceService();
+        taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
         taxonService = CdmSpringContextHelper.getTaxonService();
-        nameService = CdmSpringContextHelper.getNameService();
-
-
+        classificationService = CdmSpringContextHelper.getClassificationService();
+        app = CdmSpringContextHelper.getApplicationConfiguration();
     }
 
-
     /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newTaxon(java.lang.String, java.lang.Object)
+     * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newTaxon(java.lang.String, java.lang.Object, java.util.UUID)
      */
     @Override
-    public IdAndUuid newTaxon(String scientificName, Object secRefItemId) {
+    public IdAndUuid newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
+        TransactionStatus tx = app.startTransaction();
         UUID uuid = secRefContainer.getUuid(secRefItemId);
+
         Reference sec = CdmBase.deproxy(referenceService.load(uuid), Reference.class);
-        NonViralName name = NonViralName.NewInstance(null);
+
+        NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
+        NonViralName name = parser.parseFullName(scientificName);
         name.setTitleCache(scientificName, true);
-        nameService.save(name);
         Taxon newTaxon = Taxon.NewInstance(name, sec);
-        // TODO : add new TaxonNode since we want to have it show up
-        // in the table
-        UUID newUuid = taxonService.save(newTaxon);
-        return new IdAndUuid(newTaxon.getId(), newUuid);
+        List<String> CLASSIFICATION_INIT_STRATEGY = Arrays.asList(new String []{
+                "rootNode.childNodes"
+        });
+        Classification classification = CdmBase.deproxy(classificationService.load(classificationUuid, CLASSIFICATION_INIT_STRATEGY), Classification.class);
+        TaxonNode newTaxonNode = classification.addChildTaxon(newTaxon, null, null);
+        UUID newUuid = taxonNodeService.saveOrUpdate(newTaxonNode);
+
+        app.commitTransaction(tx);
+        return new IdAndUuid(newTaxon.getId(), newTaxonNode.getTaxon().getUuid());
     }
 
     /* (non-Javadoc)
@@ -86,18 +100,20 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
      */
     @Override
     public IdAndUuid newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid) {
+        TransactionStatus tx = app.startTransaction();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "synonymRelations"
         });
-
         UUID refUuid = secRefContainer.getUuid(secRefItemId);
         Reference sec = CdmBase.deproxy(referenceService.load(refUuid), Reference.class);
-        NonViralName name = NonViralName.NewInstance(null);
+        NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
+        NonViralName name = parser.parseFullName(scientificName);
         name.setTitleCache(scientificName, true);
         Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, ACC_TAXON_INIT_STRATEGY), Taxon.class);
         Synonym newSynonym = Synonym.NewInstance(name, sec);
         accTaxon.addSynonym(newSynonym, SynonymRelationshipType.SYNONYM_OF());
         UUID newUuid = taxonService.save(newSynonym);
+        app.commitTransaction(tx);
         return new IdAndUuid(newSynonym.getId(), newUuid);
     }
 

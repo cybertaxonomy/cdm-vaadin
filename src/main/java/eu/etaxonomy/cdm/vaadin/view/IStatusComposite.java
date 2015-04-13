@@ -81,6 +81,11 @@ public interface IStatusComposite {
          * @return
          */
         public boolean isSynonym(Object itemId);
+
+        /**
+         * @return
+         */
+        public CdmSQLContainer getClassificationContainer();
     }
 
     public void setListener(StatusComponentListener listener);
