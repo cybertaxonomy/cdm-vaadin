@@ -4,6 +4,7 @@ ide/eclipse/cdm-vaadin.launch -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/CdmAppInitializer.java.bkp -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/ConceptRelationshipComposite.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/component/EditConceptRelationshipComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/HorizontalToolbar.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/NewTaxonBaseComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/StatusComposite.java -text
@@ -23,6 +24,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/model/StatusDTO.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/model/taxonDTO.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/AuthenticationPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/ConceptRelationshipPresenter.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/presenter/EditConceptRelationshipPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionSelectionPresenter.java -text
@@ -145,6 +147,7 @@ src/test/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainerTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3CTree.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3CTreeState.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/ConceptRelationshipPresenterTest.java -text
+src/test/java/eu/etaxonomy/cdm/vaadin/presenter/EditConceptRelationshipPresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.java -text
 src/test/java/eu/etaxonomy/cdm/vaadin/ui/CheckTestUI.java -text
