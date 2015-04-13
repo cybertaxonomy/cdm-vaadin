@@ -197,6 +197,9 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
                 @Override
                 public String getStyle(Table source, Object itemId, Object propertyId) {
+                    if(source.getItem(itemId) == null) {
+                        return null;
+                    }
                     Property hasSynProperty = source.getItem(itemId).getItemProperty(LeafNodeTaxonContainer.HAS_SYN_ID);
                     if(hasSynProperty == null) {
                         // this is a synonym, so we activate the corresponding css class
@@ -430,12 +433,17 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                             try {
                                 Window dialog = new Window(windowTitle);
                                 dialog.setModal(true);
+                                dialog.setClosable(false);
+                                dialog.setResizable(false);
                                 UI.getCurrent().addWindow(dialog);
 
+                                UUID classificationUuid = listener.getClassificationContainer().getUuid(classificationComboBox.getValue());
+                                IdAndUuid classificationIdUuid = new IdAndUuid(classificationComboBox.getValue(), classificationUuid);
                                 NewTaxonBaseComposite newTaxonComponent =
                                         new NewTaxonBaseComposite(dialog,
                                                 new NewTaxonBasePresenter(),
-                                                accTaxonIdUuid);
+                                                accTaxonIdUuid,
+                                                classificationIdUuid);
                                 dialog.setContent(newTaxonComponent);
                             } catch (SQLException e) {
                                 // TODO Auto-generated catch block
@@ -720,11 +728,13 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         if(event.getSourceType().equals(NewTaxonBaseComposite.class)) {
             Object itemId = event.getChangedObjects().get(0);
             listener.getCurrentLeafNodeTaxonContainer().removeTaxonFromCache(itemId);
-            // FIXME : not really sure at the moment how to refresh a single node (taxon)
-            //         in the tree table. As a workaround the node is explicitly collapsed
-            //         so that when the user expands the synonyms will be refreshed
-            taxaTreeTable.setCollapsed(itemId, true);
-            taxaTreeTable.setValue(itemId);
+
+            // FIXME : need to figure out how to programmatically select an item in the
+            // table
+
+            listener.getCurrentLeafNodeTaxonContainer().getItem(itemId);
+            listener.refresh();
+            taxaTreeTable.select(itemId);
         }
 
     }

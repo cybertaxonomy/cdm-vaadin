@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
  *
  */
 
-@DataSet
+@DataSet("StatusPresenterTest.xml")
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(NewTaxonBasePresenterTest.class);
@@ -50,10 +50,11 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         ntbp = new NewTaxonBasePresenter();
     }
 
+
     @Test
     public void testNewTaxonBase() throws SQLException {
         RowId refId20 = new RowId(20);
-        UUID newTaxonUuid = ntbp.newTaxon("Taxon E", refId20).getUuid();
+        UUID newTaxonUuid = ntbp.newTaxon("Taxon E", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "synonymRelations"
         });
@@ -72,14 +73,6 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         CdmSQLContainer csc = CdmSQLContainer.newInstance("TaxonBase");
     }
 
-    @Test
-    public void testTaxonContainer() throws SQLException {
-
-        //CdmSQLContainer csc = CdmSQLContainer.newInstance("TaxonBase");
-        //Collection<?> propIds = csc.getContainerPropertyIds();
-        //Collection<?> itemIds = csc.getItemIds();
-        //Assert.assertEquals(itemIds.size(),38);
-    }
 
     public static class MockNewTaxonBaseComposite implements INewTaxonBaseComposite {
 

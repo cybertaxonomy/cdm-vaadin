@@ -30,7 +30,9 @@ public class StatusPresenter implements StatusComponentListener {
 
 
 
-    private LeafNodeTaxonContainer container;
+    private LeafNodeTaxonContainer leafNodeTaxonContainer;
+
+    private CdmSQLContainer classificationContainer;
 
     private final ITaxonService taxonService;
 
@@ -53,48 +55,48 @@ public class StatusPresenter implements StatusComponentListener {
      */
     @Override
     public LeafNodeTaxonContainer loadTaxa(int classificationId) throws SQLException {
-        container = new LeafNodeTaxonContainer(classificationId);
-        totalNoOfTaxa = container.getTotalNoOfTaxa();
-        return container;
+        leafNodeTaxonContainer = new LeafNodeTaxonContainer(classificationId);
+        totalNoOfTaxa = leafNodeTaxonContainer.getTotalNoOfTaxa();
+        return leafNodeTaxonContainer;
     }
 
     @Override
     public void refresh() {
-        container.refresh();
+        leafNodeTaxonContainer.refresh();
     }
     @Override
     public void setUnplacedFilter() {
-        container.setUnplacedFilter();
+        leafNodeTaxonContainer.setUnplacedFilter();
     }
 
     @Override
     public void removeUnplacedFilter() {
-        container.removeUnplacedFilter();
+        leafNodeTaxonContainer.removeUnplacedFilter();
     }
 
     @Override
     public void setUnpublishedFilter() {
-        container.setUnpublishedFilter();
+        leafNodeTaxonContainer.setUnpublishedFilter();
     }
 
     @Override
     public void removeUnpublishedFilter() {
-        container.removeUnpublishedFilter();
+        leafNodeTaxonContainer.removeUnpublishedFilter();
     }
 
     @Override
     public void setNameFilter(String filterString) {
-        container.setNameFilter(filterString);
+        leafNodeTaxonContainer.setNameFilter(filterString);
     }
 
     @Override
     public void removeNameFilter() {
-        container.removeNameFilter();
+        leafNodeTaxonContainer.removeNameFilter();
     }
 
     @Override
     public int getCurrentNoOfTaxa() {
-        return container.size();
+        return leafNodeTaxonContainer.size();
     }
 
     @Override
@@ -104,7 +106,7 @@ public class StatusPresenter implements StatusComponentListener {
 
     @Override
     public boolean isSynonym(Object itemId) {
-        return container.isSynonym(itemId);
+        return leafNodeTaxonContainer.isSynonym(itemId);
     }
 
     /* (non-Javadoc)
@@ -112,14 +114,14 @@ public class StatusPresenter implements StatusComponentListener {
      */
     @Override
     public CdmSQLContainer loadClassifications() throws SQLException {
-        CdmSQLContainer container = CdmSQLContainer.newInstance("Classification");
-        return container;
+        classificationContainer = CdmSQLContainer.newInstance("Classification");
+        return classificationContainer;
     }
 
 
     @Override
     public void updatePublished(boolean pb, Object itemId) {
-        UUID uuid = UUID.fromString((String)container.getItem(itemId).getItemProperty(CdmQueryFactory.UUID_ID).getValue());
+        UUID uuid = UUID.fromString((String)leafNodeTaxonContainer.getItem(itemId).getItemProperty(CdmQueryFactory.UUID_ID).getValue());
         Taxon taxon = CdmBase.deproxy(taxonService.load(uuid), Taxon.class);
         boolean currentPb = taxon.isPublish();
         if(currentPb != pb) {
@@ -134,7 +136,12 @@ public class StatusPresenter implements StatusComponentListener {
      */
     @Override
     public LeafNodeTaxonContainer getCurrentLeafNodeTaxonContainer() {
-        return container;
+        return leafNodeTaxonContainer;
+    }
+
+    @Override
+    public CdmSQLContainer getClassificationContainer() {
+        return classificationContainer;
     }
 
 }
