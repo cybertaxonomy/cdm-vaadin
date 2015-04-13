@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
  *
  */
 
-@DataSet("StatusPresenterTest.xml")
+@DataSet
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(NewTaxonBasePresenterTest.class);

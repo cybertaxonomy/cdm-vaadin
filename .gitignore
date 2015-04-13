@@ -4,3 +4,4 @@
 /bin
 src/main/webapp/VAADIN/widgetsets
 /target
+/spy.log
