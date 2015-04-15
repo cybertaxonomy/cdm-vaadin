@@ -1,0 +1,145 @@
+// $Id$
+/**
+ * Copyright (C) 2015 EDIT
+ * European Distributed Institute of Taxonomy
+ * http://www.e-taxonomy.eu
+ *
+ * The contents of this file are subject to the Mozilla Public License Version 1.1
+ * See LICENSE.TXT at the top of this package for the full license terms.
+ */
+package eu.etaxonomy.cdm.vaadin.util;
+
+import org.apache.log4j.Logger;
+
+import com.vaadin.ui.UI;
+
+import eu.etaxonomy.cdm.vaadin.component.CdmProgressComponent;
+import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
+
+/**
+ * @author cmathew
+ * @date 14 Apr 2015
+ *
+ */
+public abstract class CdmVaadinOperation implements Runnable {
+    private static final Logger logger = Logger.getLogger(CdmVaadinOperation.class);
+
+    private int pollInterval = -1;
+    private CdmProgressComponent progressComponent;
+
+    public CdmVaadinOperation(int pollInterval, CdmProgressComponent progressComponent) {
+        this.pollInterval = pollInterval;
+        this.progressComponent = progressComponent;
+//        UI.getCurrent().addPollListener(new UIEvents.PollListener() {
+//            @Override
+//            public void poll(UIEvents.PollEvent event) {
+//                logger.warn("polling");
+//            }
+//        });
+    }
+
+    public CdmVaadinOperation() {
+
+    }
+
+    public void setProgress(final String progressText) {
+        if(progressComponent == null) {
+            return;
+        }
+        if(isAsync()) {
+            UI.getCurrent().access(new Runnable() {
+                @Override
+                public void run() {
+                    progressComponent.setProgress(progressText);
+                    //logger.warn("set progress spinner");
+                }
+            });
+        } else {
+            progressComponent.setProgress(progressText);
+        }
+
+    }
+
+    public void setProgress(final String progressText, final float progress) {
+        if(progressComponent == null) {
+            return;
+        }
+        if(isAsync()) {
+            UI.getCurrent().access(new Runnable() {
+                @Override
+                public void run() {
+                    progressComponent.setProgress(progressText, progress);
+                }
+            });
+        } else {
+            progressComponent.setProgress(progressText, progress);
+        }
+    }
+
+    public void endProgress() {
+        if(progressComponent == null) {
+            return;
+        }
+        if(isAsync()) {
+            UI.getCurrent().access(new Runnable() {
+                @Override
+                public void run() {
+                    progressComponent.setVisible(false);
+                }
+            });
+        } else {
+            progressComponent.setVisible(false);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Runnable#run()
+     */
+    @Override
+    public void run() {
+
+        UI.getCurrent().setPollInterval(pollInterval);
+        //logger.warn("set polling interval to " + UI.getCurrent().getPollInterval());
+
+
+        final boolean success = execute();
+        //logger.warn("ran execute");
+        endProgress();
+        if(isAsync()) {
+            UI.getCurrent().access(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        postOpUIUpdate(success);
+                        //logger.warn("ran postOpUIUpdate ");
+                    } finally {
+                        UI.getCurrent().setPollInterval(-1);
+                        //logger.warn("set polling interval to " + UI.getCurrent().getPollInterval());
+                    }
+                }
+            });
+        } else {
+            postOpUIUpdate(success);
+        }
+
+    }
+
+    public abstract  boolean execute();
+
+    public void postOpUIUpdate(boolean isOpSuccess) {}
+
+    public void fireEvent(CdmChangeEvent event) {
+        if(isAsync()) {
+            CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().fireChangeEvent(event, true);
+        } else {
+            CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().fireChangeEvent(event, false);
+        }
+    }
+
+    public boolean isAsync() {
+        return pollInterval > 0;
+    }
+
+
+
+}

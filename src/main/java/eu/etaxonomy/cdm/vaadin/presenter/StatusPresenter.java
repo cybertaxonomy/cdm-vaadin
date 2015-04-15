@@ -95,6 +95,21 @@ public class StatusPresenter implements StatusComponentListener {
     }
 
     @Override
+    public void setIdFilter(Object itemId) {
+       leafNodeTaxonContainer.setIdFilter(itemId);
+    }
+
+    @Override
+    public void removeIdFilter() {
+        leafNodeTaxonContainer.removeDynamicFilters();
+    }
+
+    @Override
+    public void removeDynamicFilters() {
+        leafNodeTaxonContainer.removeDynamicFilters();
+    }
+
+    @Override
     public int getCurrentNoOfTaxa() {
         return leafNodeTaxonContainer.size();
     }
@@ -107,6 +122,11 @@ public class StatusPresenter implements StatusComponentListener {
     @Override
     public boolean isSynonym(Object itemId) {
         return leafNodeTaxonContainer.isSynonym(itemId);
+    }
+
+    @Override
+    public void refreshSynonymCache() {
+        leafNodeTaxonContainer.refreshSynonymCache();
     }
 
     /* (non-Javadoc)

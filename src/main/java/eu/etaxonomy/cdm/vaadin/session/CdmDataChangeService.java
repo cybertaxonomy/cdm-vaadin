@@ -12,7 +12,7 @@ package eu.etaxonomy.cdm.vaadin.session;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
+import com.vaadin.ui.UI;
 
 /**
  * @author cmathew
@@ -67,7 +67,7 @@ public class CdmDataChangeService {
     public void fireCreateChangeEvent(final CdmChangeEvent event, boolean async) {
         for(final ICdmChangeListener listener : listeners) {
             if(async) {
-                CdmVaadinUtilities.asyncExec(new Runnable() {
+                UI.getCurrent().access(new Runnable() {
                     @Override
                     public void run() {
                         listener.onCreate(event);
@@ -82,7 +82,7 @@ public class CdmDataChangeService {
     public void fireUpdateChangeEvent(final CdmChangeEvent event, boolean async) {
         for(final ICdmChangeListener listener : listeners) {
             if(async) {
-                CdmVaadinUtilities.asyncExec(new Runnable() {
+                UI.getCurrent().access(new Runnable() {
                     @Override
                     public void run() {
                         listener.onUpdate(event);
@@ -97,7 +97,7 @@ public class CdmDataChangeService {
     public void fireDeleteChangeEvent(final CdmChangeEvent event, boolean async) {
         for(final ICdmChangeListener listener : listeners) {
             if(async) {
-                CdmVaadinUtilities.asyncExec(new Runnable() {
+                UI.getCurrent().access(new Runnable() {
                     @Override
                     public void run() {
                         listener.onDelete(event);

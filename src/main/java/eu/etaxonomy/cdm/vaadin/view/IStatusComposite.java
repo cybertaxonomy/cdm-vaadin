@@ -86,6 +86,26 @@ public interface IStatusComposite {
          * @return
          */
         public CdmSQLContainer getClassificationContainer();
+
+        /**
+         *
+         */
+        public void removeDynamicFilters();
+
+        /**
+         * @param itemId
+         */
+        public void setIdFilter(Object itemId);
+
+        /**
+         *
+         */
+        public void removeIdFilter();
+
+        /**
+         *
+         */
+        public void refreshSynonymCache();
     }
 
     public void setListener(StatusComponentListener listener);

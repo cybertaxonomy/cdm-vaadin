@@ -34,14 +34,12 @@ public class CdmQueryFactory {
             String has_syn_id) throws SQLException {
         String FROM_QUERY = " FROM TaxonBase tb " +
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
-                "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
-                "INNER JOIN DefinedTermBase dtb on tnb.rank_id=dtb.id  ";
+                "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id ";
         String SELECT_QUERY="SELECT tb.id as " + ID +
                 ", tb.uuid as " + UUID_ID +
                 ", tnb.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
                 ", tb.unplaced as " + unp_id +
-                ", dtb.titleCache as " + rank_id +
                 ", (SELECT COUNT(*) FROM  SynonymRelationship sr WHERE tb.id = sr.relatedto_id) as " + has_syn_id +
                 FROM_QUERY;
         String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;

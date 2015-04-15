@@ -21,11 +21,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.IsNull;
 import com.vaadin.data.util.filter.Not;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
@@ -52,10 +54,12 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     public Set<Filter> currentFilters;
 
 
-    private Filter nrFilter, unpFilter, unfFilter, unpbFilter, rankFilter,  classificationFilter, synonymFilter;
+    private Filter nrFilter, unpFilter, unfFilter, unpbFilter, rankFilter,  classificationFilter, synonymFilter, idFilter;
     private SimpleStringFilter nameFilter;
 
     private int classificationId = -1;
+
+    private final Map<RowId, RowItem> synItems = new HashMap<RowId, RowItem>();
 
     private final Map<Object,List<Object>> taxonSynonymMap;
 
@@ -121,6 +125,23 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         removeContainerFilter(nameFilter);
     }
 
+    public void setIdFilter(Object itemId) {
+        removeIdFilter();
+        idFilter = new Compare.Equal("tb.id", itemId.toString());
+        addContainerFilter(idFilter);
+    }
+
+    public void removeIdFilter() {
+        removeContainerFilter(idFilter);
+    }
+
+    public void removeDynamicFilters() {
+        removeUnplacedFilter();
+        removeUnpublishedFilter();
+        removeNameFilter();
+        removeIdFilter();
+
+    }
     public int getTotalNoOfTaxa() {
         return size();
     }
@@ -136,18 +157,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
             return synList;
         }
 
-        Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(itemId.toString()));
-        synonymContainer.addContainerFilter(synonymOfTaxonFilter);
-        synList = new ArrayList<Object>();
-        synList.addAll(synonymContainer.getItemIds());
-        for(Object synItemId : synList) {
-            addTempItem((RowItem) synonymContainer.getItem(synItemId));
-        }
-        synonymContainer.removeAllContainerFilters();
-        // cache the synonyms for later
-        taxonSynonymMap.put(itemId, synList);
-
-        return synList;
+        return addToSynonymCache(itemId);
     }
 
     /* (non-Javadoc)
@@ -221,5 +231,54 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         taxonSynonymMap.remove(itemId);
     }
 
+    public void refreshSynonymCache() {
+        for(Object taxonItemId  : taxonSynonymMap.keySet()) {
+            addToSynonymCache(taxonItemId);
+        }
+    }
+
+    private List<Object> addToSynonymCache(Object taxonItemId) {
+        Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(taxonItemId.toString()));
+        synonymContainer.addContainerFilter(synonymOfTaxonFilter);
+        List<Object> synList = new ArrayList<Object>();
+        synList.addAll(synonymContainer.getItemIds());
+        for(Object synItemId : synList) {
+            addSynItem((RowItem) synonymContainer.getItem(synItemId));
+        }
+        synonymContainer.removeAllContainerFilters();
+
+        taxonSynonymMap.put(taxonItemId, synList);
+
+        return synList;
+    }
+
+    @Override
+    public Item getItem(Object itemId) {
+        Item item = synItems.get(itemId);
+        if(item == null) {
+            item = super.getItem(itemId);
+        }
+        return item;
+    }
+
+
+    @Override
+    public boolean removeAllItems() throws UnsupportedOperationException {
+        taxonSynonymMap.clear();
+        synItems.clear();
+        return super.removeAllItems();
+    }
+
+    @Override
+    public void refresh() {
+        synItems.clear();
+        refreshSynonymCache();
+        super.refresh();
+    }
+
+    public void addSynItem(RowItem rowItem) {
+        synItems.put(rowItem.getId(), rowItem);
+
+    }
 
 }

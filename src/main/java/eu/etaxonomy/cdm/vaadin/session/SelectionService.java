@@ -12,7 +12,7 @@ package eu.etaxonomy.cdm.vaadin.session;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
+import com.vaadin.ui.UI;
 
 /**
  * @author cmathew
@@ -50,7 +50,7 @@ public class SelectionService {
     public void fireSelectionEvent(final SelectionEvent event, boolean async) {
         for(final ISelectionListener listener : listeners) {
             if(async) {
-                CdmVaadinUtilities.asyncExec(new Runnable() {
+                UI.getCurrent().access(new Runnable() {
                     @Override
                     public void run() {
                         listener.onSelect(event);
