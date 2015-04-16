@@ -31,7 +31,7 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.strategy.parser.NonViralNameParserImpl;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
-import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
+import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener;
 
@@ -74,7 +74,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
      * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newTaxon(java.lang.String, java.lang.Object, java.util.UUID)
      */
     @Override
-    public IdAndUuid newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
+    public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
         TransactionStatus tx = app.startTransaction();
         UUID uuid = secRefContainer.getUuid(secRefItemId);
 
@@ -92,14 +92,14 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         UUID newUuid = taxonNodeService.saveOrUpdate(newTaxonNode);
 
         app.commitTransaction(tx);
-        return new IdAndUuid(newTaxon.getId(), newTaxonNode.getTaxon().getUuid());
+        return new IdUuidName(newTaxonNode.getTaxon().getId(), newTaxonNode.getTaxon().getUuid(), newTaxonNode.getTaxon().getTitleCache());
     }
 
     /* (non-Javadoc)
      * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newSynonym(java.lang.String, java.lang.Object, java.util.UUID)
      */
     @Override
-    public IdAndUuid newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid) {
+    public IdUuidName newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid) {
         TransactionStatus tx = app.startTransaction();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "synonymRelations"
@@ -114,7 +114,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         accTaxon.addSynonym(newSynonym, SynonymRelationshipType.SYNONYM_OF());
         UUID newUuid = taxonService.save(newSynonym);
         app.commitTransaction(tx);
-        return new IdAndUuid(newSynonym.getId(), newUuid);
+        return new IdUuidName(newSynonym.getId(), newUuid, newSynonym.getTitleCache());
     }
 
 

@@ -105,9 +105,21 @@ public class CdmQueryFactory {
     	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonRelatedToQuery() throws SQLException {
-        String FROM_QUERY = " FROM TaxonRelationship tr inner join TaxonBase tb on tr.relatedto_id = tb.id";
-        String SELECT_QUERY= "SELECT tr.id, tr.uuid, tb.titleCache" + FROM_QUERY;
+    public static QueryDelegate generateTaxonRelatedToQuery(String reluuid_id,
+            String reltype_id,
+            String to_id,
+            String touuid_id,
+            String toname_id) throws SQLException {
+        String FROM_QUERY = "     FROM TaxonRelationship tr " +
+                "INNER JOIN TaxonBase tb on tr.relatedto_id = tb.id " +
+                "INNER JOIN TaxonNode tn on tb.id = tn.taxon_id ";
+        String SELECT_QUERY= "SELECT tr.id as " + ID +
+                ", tr.uuid as " + reluuid_id +
+                ", tr.type_id as " + reltype_id +
+                ", tr.relatedto_id as " + to_id +
+                ", tb.uuid as " + touuid_id +
+                ", tb.titleCache as " + toname_id +
+                FROM_QUERY;
         String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
         String CONTAINS_QUERY = "SELECT * FROM TaxonRelationship tr where tr.relatedfrom_id = ?";
 

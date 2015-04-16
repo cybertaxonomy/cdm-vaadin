@@ -32,7 +32,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
+import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent.Action;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinOperation;
@@ -77,8 +77,8 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
 
 
     private final Window dialog;
-    private final IdAndUuid accTaxonIdUuid;
-    private final IdAndUuid classificationIdUuid;
+    private final IdUuidName accTaxonIdUuid;
+    private final IdUuidName classificationIdUuid;
 
     private static final Logger logger = Logger.getLogger(NewTaxonBaseComposite.class);
 
@@ -91,9 +91,9 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
      */
     public NewTaxonBaseComposite(Window dialog,
             INewTaxonBaseComponentListener listener,
-            IdAndUuid accTaxonIdUuid,
+            IdUuidName accTaxonIdUuid,
             String accTaxonName,
-            IdAndUuid classificationIdUuid) {
+            IdUuidName classificationIdUuid) {
         buildMainLayout();
         setCompositionRoot(mainLayout);
 
@@ -158,7 +158,7 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
                     @Override
                     public boolean execute() {
                         setProgress("Saving Taxon " + nameTextField.getValue());
-                        IdAndUuid taxonBaseIdUuid;
+                        IdUuidName taxonBaseIdUuid;
                         if(accTaxonIdUuid == null) {
                             taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),secComboBox.getValue(), classificationIdUuid.getUuid());
                         } else {

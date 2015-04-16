@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
 public class StatusPresenter implements StatusComponentListener {
 
 
+    public final static String C_TCACHE_ID = "titleCache";
 
     private LeafNodeTaxonContainer leafNodeTaxonContainer;
 

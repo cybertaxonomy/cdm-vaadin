@@ -16,18 +16,20 @@ import java.util.UUID;
  * @date 7 Apr 2015
  *
  */
-public class IdAndUuid {
+public class IdUuidName {
 
     private final Object id;
     private final UUID uuid;
+    private final String name;
 
-    public IdAndUuid(Object id, UUID uuid) {
+    public IdUuidName(Object id, UUID uuid, String name) {
 
         if(id == null || uuid == null) {
             throw new IllegalArgumentException("Neither Id nor Uuid can be null");
         }
         this.id = id;
         this.uuid = uuid;
+        this.name = name;
     }
 
     /**
@@ -42,6 +44,13 @@ public class IdAndUuid {
      */
     public UUID getUuid() {
         return uuid;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
     }
 
 }

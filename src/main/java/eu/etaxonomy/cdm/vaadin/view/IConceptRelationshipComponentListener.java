@@ -24,6 +24,6 @@ public interface IConceptRelationshipComponentListener {
      * @param taxonUuid
      * @throws JSONException
      */
-    public void updateConceptRelationship(UUID taxonUuid) throws JSONException;
+    public void refreshRelationshipView(UUID taxonUuid) throws JSONException;
 
 }

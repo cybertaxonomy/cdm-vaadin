@@ -27,7 +27,6 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
-import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener;
 import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
@@ -69,8 +68,6 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
         Synonym synonym = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newSynonymUuid),Synonym.class);
         Assert.assertEquals(synonym, synonymOfTaxon);
-
-        CdmSQLContainer csc = CdmSQLContainer.newInstance("TaxonBase");
     }
 
 

@@ -12,7 +12,7 @@ package eu.etaxonomy.cdm.vaadin.view;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
-import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
+import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 
 /**
  * @author cmathew
@@ -31,7 +31,7 @@ public interface INewTaxonBaseComponentListener {
      * @param classificationUuid
      * @return
      */
-    public IdAndUuid newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid);
+    public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid);
 
 
     /**
@@ -40,7 +40,7 @@ public interface INewTaxonBaseComponentListener {
      * @param accTaxonUuid
      * @return
      */
-    public IdAndUuid newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid);
+    public IdUuidName newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid);
 
 
 

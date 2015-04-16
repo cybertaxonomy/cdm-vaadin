@@ -55,7 +55,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.container.IdAndUuid;
+import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.NewTaxonBasePresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.StatusPresenter;
@@ -240,7 +240,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         classificationComboBox.setNewItemsAllowed(false);
         classificationComboBox.setNullSelectionAllowed(false);
         classificationComboBox.setImmediate(true);
-        classificationComboBox.setItemCaptionPropertyId("titleCache");
+        classificationComboBox.setItemCaptionPropertyId(StatusPresenter.C_TCACHE_ID);
         classificationComboBox.setInputPrompt(SELECT_CLASSIFICATION);
         if(listener != null) {
             try {
@@ -413,7 +413,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                             String windowTitle;
 
                             Object selectedItemId = null;
-                            IdAndUuid accTaxonIdUuid = null;
+                            IdUuidName accTaxonIdUuid = null;
                             String accTaxonName = null;
                             if(selected.equals(ADD_SYNONYM)) {
                                 Set<Object> selectedIds = (Set<Object>)taxaTreeTable.getValue();
@@ -430,7 +430,9 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                                     return;
                                 }
                                 windowTitle = "Add New Synonym";
-                                accTaxonIdUuid = new IdAndUuid(selectedItemId, listener.getCurrentLeafNodeTaxonContainer().getUuid(selectedItemId));
+                                accTaxonIdUuid = new IdUuidName(selectedItemId,
+                                        listener.getCurrentLeafNodeTaxonContainer().getUuid(selectedItemId),
+                                        (String) listener.getCurrentLeafNodeTaxonContainer().getProperty(selectedItemId, LeafNodeTaxonContainer.NAME_ID).getValue());
                                 accTaxonName = (String)listener.getCurrentLeafNodeTaxonContainer().getProperty(selectedItemId, LeafNodeTaxonContainer.NAME_ID).getValue();
                             } else {
                                 windowTitle = "Add New Taxon";
@@ -442,9 +444,11 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                                 dialog.setClosable(false);
                                 dialog.setResizable(false);
                                 UI.getCurrent().addWindow(dialog);
-
-                                UUID classificationUuid = listener.getClassificationContainer().getUuid(classificationComboBox.getValue());
-                                IdAndUuid classificationIdUuid = new IdAndUuid(classificationComboBox.getValue(), classificationUuid);
+                                Object cId = classificationComboBox.getValue();
+                                UUID classificationUuid = listener.getClassificationContainer().getUuid(cId);
+                                IdUuidName classificationIdUuid = new IdUuidName(classificationComboBox.getValue(),
+                                        classificationUuid,
+                                        (String) listener.getClassificationContainer().getProperty(cId, StatusPresenter.C_TCACHE_ID).getValue());
                                 NewTaxonBaseComposite newTaxonComponent =
                                         new NewTaxonBaseComposite(dialog,
                                                 new NewTaxonBasePresenter(),
