@@ -56,7 +56,8 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
 
     }
 
-    public void updateConceptRelationshipTree(Taxon fromTaxon) throws JSONException {
+
+    public void update(Taxon fromTaxon) throws JSONException {
         Set<TaxonRelationship> relationsFromThisTaxon = fromTaxon.getRelationsFromThisTaxon();
 
         Map<TaxonRelationshipType, List<Taxon>> relToTaxonMap = new HashMap<TaxonRelationshipType, List<Taxon>>();
@@ -107,7 +108,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         }
 
 
-        setConceptRelationshipTree(fromTaxonJO.toString());;
+        setConceptRelationshipTree(fromTaxonJO.toString());
     }
 
     public void setConceptRelationshipTree(String conceptRelationshipTree) {

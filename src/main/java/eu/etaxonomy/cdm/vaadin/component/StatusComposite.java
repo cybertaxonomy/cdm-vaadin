@@ -49,6 +49,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.UI;
@@ -176,7 +177,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         taxaTreeTable.setSelectable(true);
         taxaTreeTable.setMultiSelect(taxaTreeTableMultiSelectMode);
         taxaTreeTable.setImmediate(false);
-
+        taxaTreeTable.setDragMode(TableDragMode.ROW);
         if(listener != null) {
             List<String> columnIds = new ArrayList<String>();
             columnIds.add(LeafNodeTaxonContainer.NAME_ID);
@@ -184,12 +185,11 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             columnIds.add(LeafNodeTaxonContainer.PB_ID);
             taxaTreeTable.setColumnWidth(LeafNodeTaxonContainer.PB_ID, 25);
 
-
             taxaTreeTable.addGeneratedColumn(LeafNodeTaxonContainer.PB_ID, new TaxonTableCheckBoxGenerator());
             try {
                 taxaTreeTable.setContainerDataSource(listener.loadTaxa(classificationId), columnIds);
             } catch (SQLException e) {
-              //TODO : throw up warning dialog
+                //TODO : throw up warning dialog
                 e.printStackTrace();
             }
 
@@ -223,7 +223,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         taxaTreeTable.addActionHandler(new Action.Handler() {
             @Override
             public Action[] getActions(final Object target, final Object sender) {
-                    return new Action[] { changeAcceptedTaxonToSynonymAction };
+                return new Action[] { changeAcceptedTaxonToSynonymAction };
             }
 
             @Override
@@ -346,7 +346,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             @Override
             public void layoutClick(LayoutClickEvent event) {
                 if (event.getChildComponent() == searchTextField && searchTextField.getValue().equals(FILTER_TAXA_INPUT)) {
-                   searchTextField.setValue("");
+                    searchTextField.setValue("");
                 }
             }
         });
@@ -388,8 +388,10 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                 Object itemId = event.getItemId();
                 if(!listener.isSynonym(itemId)) {
                     UUID taxonUuid = listener.getCurrentLeafNodeTaxonContainer().getUuid(itemId);
+                    String taxonName = (String)listener.getCurrentLeafNodeTaxonContainer().getProperty(itemId, LeafNodeTaxonContainer.NAME_ID).getValue();
+                    Object idUuidName = new IdUuidName(itemId, taxonUuid, taxonName);
                     CdmVaadinSessionUtilities.getCurrentSelectionService()
-                    .fireSelectionEvent(new SelectionEvent(Arrays.asList((Object)taxonUuid), StatusComposite.class), true);
+                    .fireSelectionEvent(new SelectionEvent(Arrays.asList(idUuidName), StatusComposite.class), true);
                 }
                 taxaTreeTable.setValue(itemId);
             }
@@ -476,8 +478,8 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
             @Override
             public void textChange(TextChangeEvent event) {
-               listener.setNameFilter(event.getText());
-               updateInViewLabel();
+                listener.setNameFilter(event.getText());
+                updateInViewLabel();
             }
 
         });
@@ -489,8 +491,8 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
             @Override
             public void buttonClick(ClickEvent event) {
-               clearDynamicFilters();
-               updateInViewLabel();
+                clearDynamicFilters();
+                updateInViewLabel();
             }
 
         });
@@ -509,12 +511,12 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
             @Override
             public void buttonClick(ClickEvent event) {
-               Set<Object> selectedItemIds = (Set)taxaTreeTable.getValue();
-               if(selectedItemIds.isEmpty()) {
-                   Notification.show("No Taxa / Synonyms selected", "Please select taxa or synonyms to delete", Type.WARNING_MESSAGE);
-               } else {
-                   Notification.show("Deleting selected Taxa / Synonyms", "Implement me", Type.WARNING_MESSAGE);
-               }
+                Set<Object> selectedItemIds = (Set)taxaTreeTable.getValue();
+                if(selectedItemIds.isEmpty()) {
+                    Notification.show("No Taxa / Synonyms selected", "Please select taxa or synonyms to delete", Type.WARNING_MESSAGE);
+                } else {
+                    Notification.show("Deleting selected Taxa / Synonyms", "Implement me", Type.WARNING_MESSAGE);
+                }
             }
 
         });

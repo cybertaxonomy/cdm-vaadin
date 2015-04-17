@@ -114,11 +114,8 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
     }
 
     public void init() {
-
         initSecComboBox();
-
     }
-
 
     private void initSecComboBox() {
 

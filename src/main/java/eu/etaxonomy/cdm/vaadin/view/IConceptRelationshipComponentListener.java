@@ -9,9 +9,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
-import java.util.UUID;
-
 import org.json.JSONException;
+
+import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 
 /**
  * @author cmathew
@@ -24,6 +24,7 @@ public interface IConceptRelationshipComponentListener {
      * @param taxonUuid
      * @throws JSONException
      */
-    public void refreshRelationshipView(UUID taxonUuid) throws JSONException;
+    public void refreshRelationshipView(IdUuidName taxonUuid) throws JSONException;
+
 
 }
