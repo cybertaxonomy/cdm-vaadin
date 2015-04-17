@@ -41,10 +41,13 @@ public class CdmDataChangeService {
     }
 
     public void fireCurrentChangeEvents(boolean async) {
-        for(CdmChangeEvent event : currentEvents) {
-            fireChangeEvent(event,async);
+        try {
+            for(CdmChangeEvent event : currentEvents) {
+                fireChangeEvent(event,async);
+            }
+        } finally {
+            currentEvents.clear();
         }
-        currentEvents.clear();
     }
 
     public void fireChangeEvent(CdmChangeEvent event, boolean async) {

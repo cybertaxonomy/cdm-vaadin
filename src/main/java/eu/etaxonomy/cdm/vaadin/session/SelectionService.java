@@ -41,10 +41,13 @@ public class SelectionService {
     }
 
     public void fireCurrentSelectionEvents(boolean async) {
-        for(SelectionEvent event : currentEvents) {
-            fireSelectionEvent(event,async);
+        try {
+            for(SelectionEvent event : currentEvents) {
+                fireSelectionEvent(event,async);
+            }
+        } finally {
+            currentEvents.clear();
         }
-        currentEvents.clear();
     }
 
     public void fireSelectionEvent(final SelectionEvent event, boolean async) {

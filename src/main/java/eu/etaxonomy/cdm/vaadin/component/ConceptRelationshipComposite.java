@@ -60,7 +60,7 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
 
     private IdUuidName fromTaxonIun;
 
-    private static final String CREATE_NEW_CR_TITLE = "Create New Concept Relationship";
+    public static final String CREATE_NEW_CR_TITLE = "Create New Concept Relationship";
 
     /**
      * The constructor should first build the main layout, set the
@@ -100,19 +100,22 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
 
             @Override
             public void buttonClick(ClickEvent event) {
-                showEditConceptRelationshipWindow(CREATE_NEW_CR_TITLE);
+                showEditConceptRelationshipWindow(CREATE_NEW_CR_TITLE, fromTaxonIun, null, null);
             }
         });
     }
 
-    private void showEditConceptRelationshipWindow(String windowTitle) {
+    public static void showEditConceptRelationshipWindow(String windowTitle,
+            IdUuidName fromTaxonIun,
+            IdUuidName taxonRTypeIun,
+            IdUuidName toTaxonIun) {
         Window dialog = new Window(windowTitle);
         dialog.setModal(false);
         dialog.setClosable(false);
         dialog.setResizable(false);
         UI.getCurrent().addWindow(dialog);
 
-        EditConceptRelationshipComposite ecrc = new EditConceptRelationshipComposite(dialog,fromTaxonIun, null, null);
+        EditConceptRelationshipComposite ecrc = new EditConceptRelationshipComposite(dialog,fromTaxonIun, taxonRTypeIun, toTaxonIun);
         dialog.setContent(ecrc);
     }
 
