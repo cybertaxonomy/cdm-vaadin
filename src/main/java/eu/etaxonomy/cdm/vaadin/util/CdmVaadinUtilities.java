@@ -51,7 +51,7 @@ public class CdmVaadinUtilities {
     }
 
 
-    public static void setEnabled(Component root, boolean isEnabled, List<Component> exceptions) {
+    public static void setEnabled(Component root, boolean isEnabled, List<? extends Component> exceptions) {
         if(exceptions != null && exceptions.contains(root)) {
             return;
         }

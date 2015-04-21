@@ -27,7 +27,7 @@ public class CdmSQLContainer extends SQLContainer {
 
     public CdmSQLContainer(QueryDelegate delegate) throws SQLException {
         super(delegate);
-        databaseMetaData = CdmSpringContextHelper.getCurrent().getConnection().getMetaData();
+        databaseMetaData = CdmSpringContextHelper.getCurrent().getDatabaseMetaData();
     }
 
     public static CdmSQLContainer newInstance(String tableName) throws SQLException {

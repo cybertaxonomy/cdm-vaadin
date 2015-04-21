@@ -20,9 +20,9 @@ public class CheckUI extends UI
 //    @WebServlet(value = "/*", asyncSupported = true, initParams = {
 //			@WebInitParam(name="org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Jetty9AsyncSupportWithWebSocket")
 //	})
-    
+
     @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = CheckUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = true, ui = CheckUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
@@ -31,9 +31,10 @@ public class CheckUI extends UI
         final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
-        
+
         Button button = new Button("Click Me");
         button.addClickListener(new Button.ClickListener() {
+            @Override
             public void buttonClick(ClickEvent event) {
                 layout.addComponent(new Label("Thank you for clicking"));
             }

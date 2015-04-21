@@ -22,14 +22,14 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
-    
+
+    var selectedNode;
     this.onStateChange = function() {
         crTree = this.getState().conceptRelationshipTree;
-       
+
         if(crTree) {
             root = JSON.parse(connector.getState().conceptRelationshipTree);
-           
+
             root.x0 = height / 2;
             root.y0 = 0;
 
@@ -41,14 +41,14 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
                 }
             }
 
-            root.children.forEach(collapse);
+            //root.children.forEach(collapse);
             update(root);
 
 
             d3.select(self.frameElement).style("height", "800px");
         }               
     }
-    
+
     function update(source) {
 
         // Compute the new tree layout.
@@ -70,12 +70,18 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         .on("click", click);
 
         nodeEnter.append("circle")
-        .attr("r", 5)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .attr("r", function(d) { return d.type === "taxon" ? 5 : 10; })
+        .style("fill", function(d) { return d === source && d.type === "conceptr" ? "#DF7401" : "#fff"; });
 
         nodeEnter.append("text")
-        .attr("x", function(d) { return d.children || d._children ? 5 : 10; })
-        .attr("y", "-15")
+        .attr("x", function(d) { 
+            if(d.type === "conceptr") { 
+                return 50;
+            } else {
+                return d.children || d._children ? -10 : 10; 
+            }
+        })
+        .attr("y", function(d) { return d.type === "conceptr" ? -20 : 0; })
         .attr("dy", ".35em")
         .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
         .text(function(d) { return d.name; })
@@ -87,8 +93,8 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
         nodeUpdate.select("circle")
-        .attr("r", 5)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .attr("r", function(d) { return d.type === "taxon" ? 5 : 10; })
+        .style("fill", function(d) { return d === selectedNode && d.type === "conceptr" ? "#DF7401" : "#fff"; });
 
         nodeUpdate.select("text")
         .style("fill-opacity", 1);
@@ -136,21 +142,18 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
             d.x0 = d.x;
             d.y0 = d.y;
         });
-        
+
     }
 
 //  Toggle children on click.
     function click(d) {
         //root.children.forEach(collapse);
-        
-        connector.test(d.uuid);        
-        if (d.children) {
-            d._children = d.children;
-            d.children = null;
-        } else {
-            d.children = d._children;
-            d._children = null;
+
+        if(d.type === "conceptr") {
+            connector.select(d.uuid);
         }
+
+        selectedNode = d;
         update(d);
     }
 }

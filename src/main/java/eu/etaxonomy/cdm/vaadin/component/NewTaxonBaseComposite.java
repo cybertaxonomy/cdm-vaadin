@@ -137,8 +137,6 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
 
             @Override
             public void buttonClick(ClickEvent event) {
-
-
                 try {
                     nameTextField.validate();
                     secComboBox.validate();
@@ -161,10 +159,8 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
                         } else {
                             taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),secComboBox.getValue(), accTaxonIdUuid.getUuid());
                         }
-
                         Object rowId = new RowId(taxonBaseIdUuid.getId());
-                        fireEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId), NewTaxonBaseComposite.class));
-
+                        registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId), NewTaxonBaseComposite.class));
                         return true;
                     }
 

@@ -1,6 +1,7 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
@@ -32,6 +33,8 @@ public class CdmSpringContextHelper {
 
     private final JDBCConnectionPool connPool;
     private static CdmSpringContextHelper contextHelper;
+
+    private static DatabaseMetaData databaseMetaData;
 
     private CdmSpringContextHelper(ServletContext servletContext) throws SQLException {
         context = WebApplicationContextUtils.
@@ -92,6 +95,15 @@ public class CdmSpringContextHelper {
 
     public static Connection getConnection() throws SQLException {
         return getCurrent().getDataSource().getConnection();
+    }
+
+    public static DatabaseMetaData getDatabaseMetaData() throws SQLException {
+        if(databaseMetaData == null) {
+            Connection conn = getConnection();
+            databaseMetaData = conn.getMetaData();
+            conn.close();
+        }
+        return databaseMetaData;
     }
 
     public static ICdmApplicationConfiguration getApplicationConfiguration() {

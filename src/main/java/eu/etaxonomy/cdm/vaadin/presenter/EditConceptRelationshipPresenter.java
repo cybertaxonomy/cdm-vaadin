@@ -10,6 +10,8 @@
 package eu.etaxonomy.cdm.vaadin.presenter;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -41,6 +43,9 @@ public class EditConceptRelationshipPresenter {
     private final ITaxonService taxonService;
     private final ITermService termService;
     private final ICdmApplicationConfiguration app;
+
+    public final static String REL_TYPE_KEY = "relTypeIun";
+    public final static String TO_TAXON_KEY = "toTaxonIun";
 
     public EditConceptRelationshipPresenter() {
         taxonService = CdmSpringContextHelper.getTaxonService();
@@ -113,6 +118,24 @@ public class EditConceptRelationshipPresenter {
             trList.remove(trToDelete);
         }
         app.commitTransaction(tx);
+    }
+
+
+
+    public Map<String, IdUuidName> getRelTypeToTaxonIunMap(UUID fromTaxonUuid, UUID taxonRelUuid) {
+        Map<String, IdUuidName> relTypeToTaxonIunMap = new HashMap<String, IdUuidName>();
+        TransactionStatus tx = app.startTransaction();
+        Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
+        for(TaxonRelationship tr : fromTaxon.getRelationsFromThisTaxon()) {
+            if(tr.getUuid().equals(taxonRelUuid)) {
+                relTypeToTaxonIunMap.put(REL_TYPE_KEY,
+                        new IdUuidName(tr.getType().getId(),tr.getType().getUuid(), tr.getType().getTitleCache()));
+                relTypeToTaxonIunMap.put(TO_TAXON_KEY,
+                        new IdUuidName(tr.getToTaxon().getId(), tr.getToTaxon().getUuid(), tr.getToTaxon().getName().getTitleCache()));
+            }
+        }
+        app.commitTransaction(tx);
+        return relTypeToTaxonIunMap;
     }
 
 }

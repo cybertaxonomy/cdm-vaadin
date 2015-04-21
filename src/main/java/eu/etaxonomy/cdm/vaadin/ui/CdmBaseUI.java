@@ -35,6 +35,8 @@ public class CdmBaseUI extends UI {
         CdmVaadinSessionUtilities.initCdmDataChangeService();
 
         CdmVaadinSessionUtilities.initSelectionService();
+
+        CdmVaadinSessionUtilities.initBasicEventService();
     }
 
 }

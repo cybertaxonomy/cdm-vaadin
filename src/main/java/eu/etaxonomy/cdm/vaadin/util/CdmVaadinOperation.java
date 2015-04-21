@@ -9,6 +9,10 @@
  */
 package eu.etaxonomy.cdm.vaadin.util;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import com.vaadin.ui.UI;
@@ -27,13 +31,24 @@ public abstract class CdmVaadinOperation implements Runnable {
     private int pollInterval = -1;
     private CdmProgressComponent progressComponent;
 
+    private boolean opDone = false;
+
+    List<CdmChangeEvent> events = new ArrayList<CdmChangeEvent>();
+
+    private Date now = new java.util.Date();
+
     public CdmVaadinOperation(int pollInterval, CdmProgressComponent progressComponent) {
         this.pollInterval = pollInterval;
         this.progressComponent = progressComponent;
+
+        UI.getCurrent().setPollInterval(pollInterval);
+
+        // comment out below for debugging
+//        logger.warn(new Timestamp(now.getTime()) + " : set polling interval to " + pollInterval);
 //        UI.getCurrent().addPollListener(new UIEvents.PollListener() {
 //            @Override
 //            public void poll(UIEvents.PollEvent event) {
-//                logger.warn("polling");
+//                logger.warn( new Timestamp(now.getTime()) + " : polling");
 //            }
 //        });
     }
@@ -41,6 +56,8 @@ public abstract class CdmVaadinOperation implements Runnable {
     public CdmVaadinOperation() {
 
     }
+
+
 
     public void setProgress(final String progressText) {
         if(progressComponent == null) {
@@ -57,6 +74,7 @@ public abstract class CdmVaadinOperation implements Runnable {
         } else {
             progressComponent.setProgress(progressText);
         }
+
 
     }
 
@@ -98,23 +116,24 @@ public abstract class CdmVaadinOperation implements Runnable {
     @Override
     public void run() {
 
-        UI.getCurrent().setPollInterval(pollInterval);
-        //logger.warn("set polling interval to " + UI.getCurrent().getPollInterval());
-
-
         final boolean success = execute();
-        //logger.warn("ran execute");
+        //logger.warn(new Timestamp(now.getTime()) + " : ran execute");
         endProgress();
+
         if(isAsync()) {
             UI.getCurrent().access(new Runnable() {
                 @Override
                 public void run() {
                     try {
+                        if(success) {
+                            fireDelayedEvents();
+                        }
                         postOpUIUpdate(success);
-                        //logger.warn("ran postOpUIUpdate ");
+                        //logger.warn(new Timestamp(now.getTime()) + " : ran postOpUIUpdate ");
                     } finally {
                         UI.getCurrent().setPollInterval(-1);
-                        //logger.warn("set polling interval to " + UI.getCurrent().getPollInterval());
+                        opDone = true;
+                        //logger.warn(new Timestamp(now.getTime()) + " : switched off pollling");
                     }
                 }
             });
@@ -128,12 +147,19 @@ public abstract class CdmVaadinOperation implements Runnable {
 
     public void postOpUIUpdate(boolean isOpSuccess) {}
 
-    public void fireEvent(CdmChangeEvent event) {
-        if(isAsync()) {
-            CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().fireChangeEvent(event, true);
-        } else {
-            CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().fireChangeEvent(event, false);
+    public void fireEvent(CdmChangeEvent event, boolean async) {
+        CdmVaadinSessionUtilities.getCurrentCdmDataChangeService().fireChangeEvent(event, async);
+    }
+
+    public void registerDelayedEvent(CdmChangeEvent event) {
+        events.add(event);
+    }
+
+    private void fireDelayedEvents() {
+        for(CdmChangeEvent event : events) {
+            fireEvent(event, false);
         }
+        events.clear();
     }
 
     public boolean isAsync() {

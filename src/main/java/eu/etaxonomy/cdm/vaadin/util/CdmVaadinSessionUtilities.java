@@ -9,8 +9,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.util;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.vaadin.session.BasicEventService;
 import eu.etaxonomy.cdm.vaadin.session.CdmDataChangeService;
 import eu.etaxonomy.cdm.vaadin.session.SelectionService;
 
@@ -20,6 +23,8 @@ import eu.etaxonomy.cdm.vaadin.session.SelectionService;
  *
  */
 public class CdmVaadinSessionUtilities {
+
+    private static final Logger logger = Logger.getLogger(CdmVaadinSessionUtilities.class);
 
     public static void setCurrentAttribute(String name, Object value) {
         try {
@@ -31,6 +36,9 @@ public class CdmVaadinSessionUtilities {
     }
 
     public static void initCdmDataChangeService() {
+        if(getCurrentCdmDataChangeService() != null) {
+           logger.warn("replacing data change service with new one");
+        }
         setCurrentAttribute(CdmDataChangeService.KEY, new CdmDataChangeService());
     }
 
@@ -39,10 +47,24 @@ public class CdmVaadinSessionUtilities {
     }
 
     public static void initSelectionService() {
+        if(getCurrentSelectionService() != null) {
+            logger.warn("replacing selection service with new one");
+        }
         setCurrentAttribute(SelectionService.KEY, new SelectionService());
     }
 
     public static SelectionService getCurrentSelectionService() {
         return (SelectionService) VaadinSession.getCurrent().getAttribute(SelectionService.KEY);
+    }
+
+    public static void initBasicEventService() {
+        if(getCurrentBasicEventService() != null) {
+            logger.warn("replacing basic event service with new one");
+        }
+        setCurrentAttribute(BasicEventService.KEY, new BasicEventService());
+    }
+
+    public static BasicEventService getCurrentBasicEventService() {
+        return (BasicEventService) VaadinSession.getCurrent().getAttribute(BasicEventService.KEY);
     }
 }
