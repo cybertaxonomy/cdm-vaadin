@@ -48,7 +48,7 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
     @Override
     protected void doInit() {
         // FIXME: remove this when testing is done
-        setIgnoreAuthentication(true);
+        //setIgnoreAuthentication(true);
 
         getPage().setTitle("Status Editor");
         StatusComposite statusEditor = new StatusComposite();
