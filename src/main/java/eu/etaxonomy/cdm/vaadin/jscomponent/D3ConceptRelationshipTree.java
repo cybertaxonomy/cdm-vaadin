@@ -49,15 +49,37 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
 
     private Mode mode;
 
+    public enum Direction {
+        LEFT_RIGHT("left-right"),
+        RIGHT_LEFT("right-left");
+
+        private final String name;
+
+        private Direction(String s) {
+            name = s;
+        }
+
+        @Override
+        public String toString(){
+           return name;
+        }
+    }
+
+    private Direction direction;
+
     private ConceptRelationshipComposite conceptRelComposite;
 
     public D3ConceptRelationshipTree() {
-        this(Mode.OneToOne);
+        this(Mode.OneToOne, Direction.LEFT_RIGHT);
     }
 
-    public D3ConceptRelationshipTree(Mode mode) {
-        this.mode = mode;
+    public D3ConceptRelationshipTree(Direction direction) {
+        this(Mode.OneToOne, direction);
+    }
 
+    public D3ConceptRelationshipTree(Mode mode, Direction direction) {
+        this.mode = mode;
+        this.direction = direction;
         addFunction("select", new JavaScriptFunction() {
 
             @Override
@@ -78,7 +100,8 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
     }
 
 
-    public void update(Taxon fromTaxon) throws JSONException {
+    public void update(Taxon fromTaxon, Direction direction) throws JSONException {
+        this.direction = direction;
         switch(mode) {
         case OneToOne:
             updateForOneToOne(fromTaxon);
@@ -101,6 +124,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         fromTaxonJO.put("name", fromTaxon.getName().getTitleCache());
         fromTaxonJO.put("uuid", fromTaxon.getUuid().toString());
         fromTaxonJO.put("type", "taxon");
+        fromTaxonJO.put("direction", direction.toString());
 
         JSONArray ftChildren = new JSONArray();
         fromTaxonJO.put("children", ftChildren);

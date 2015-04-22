@@ -27,7 +27,7 @@ import eu.etaxonomy.cdm.vaadin.jscomponent.D3CTree;
  * @date 8 Apr 2015
  *
  */
-@Theme("mytheme")
+@Theme("edit")
 public class D3CTreeUI extends UI {
 
     private final static Logger logger =

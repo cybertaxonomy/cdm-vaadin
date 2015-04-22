@@ -12,6 +12,7 @@ package eu.etaxonomy.cdm.vaadin.view;
 import org.json.JSONException;
 
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
+import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
 
 /**
  * @author cmathew
@@ -21,10 +22,11 @@ import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 public interface IConceptRelationshipComponentListener {
 
     /**
-     * @param taxonUuid
+     * @param taxonIun
+     * @param direction
      * @throws JSONException
      */
-    public void refreshRelationshipView(IdUuidName taxonUuid) throws JSONException;
+    public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) throws JSONException;
 
 
 

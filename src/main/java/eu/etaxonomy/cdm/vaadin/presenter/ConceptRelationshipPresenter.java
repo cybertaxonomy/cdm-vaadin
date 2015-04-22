@@ -18,6 +18,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
+import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.IConceptRelationshipComponentListener;
 
@@ -43,10 +44,10 @@ public class ConceptRelationshipPresenter implements IConceptRelationshipCompone
     }
 
     @Override
-    public void refreshRelationshipView(IdUuidName taxonIun) throws JSONException {
+    public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) throws JSONException {
         TransactionStatus tx = app.startTransaction();
         Taxon taxon = CdmBase.deproxy(taxonService.load(taxonIun.getUuid()), Taxon.class);
-        crTree.update(taxon);
+        crTree.update(taxon, direction);
         app.commitTransaction(tx);
     }
 

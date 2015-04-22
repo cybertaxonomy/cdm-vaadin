@@ -26,6 +26,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
+import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
 import eu.etaxonomy.cdm.vaadin.presenter.ConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.session.BasicEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
@@ -160,10 +161,10 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     }
 
 
-    private void refreshRelationshipView() {
+    private void refreshRelationshipView(Direction direction) {
         if(fromTaxonIun != null) {
             try {
-                listener.refreshRelationshipView(fromTaxonIun);
+                listener.refreshRelationshipView(fromTaxonIun, direction);
             } catch (JSONException e) {
                 Notification.show("Error generating concept relation JSON",  e.getMessage(), Type.WARNING_MESSAGE);
             }
@@ -188,8 +189,8 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     public void onSelect(SelectionEvent event) {
         if(event.getSourceType().equals(StatusComposite.class)) {
             fromTaxonIun = (IdUuidName)event.getSelectedObjects().get(0);
-            view.setPrimaryStatusComposite((UUID)event.getSelectedObjects().get(1));
-            refreshRelationshipView();
+            view.setPrimaryStatusCompositeUuid((UUID)event.getSelectedObjects().get(1));
+            refreshRelationshipView(view.getDirection());
         }
     }
 
@@ -202,7 +203,7 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     public void onCreate(CdmChangeEvent event) {
         if(event.getSourceType().equals(EditConceptRelationshipComposite.class)) {
             setSelectedTaxonRelUuid(null);
-            refreshRelationshipView();
+            refreshRelationshipView(view.getDirection());
 
         }
 
@@ -216,7 +217,7 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     public void onUpdate(CdmChangeEvent event) {
         if(event.getSourceType().equals(EditConceptRelationshipComposite.class)) {
             setSelectedTaxonRelUuid(null);
-            refreshRelationshipView();
+            refreshRelationshipView(view.getDirection());
         }
 
     }
@@ -229,7 +230,7 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     public void onDelete(CdmChangeEvent event) {
         if(event.getSourceType().equals(EditConceptRelationshipComposite.class)) {
             setSelectedTaxonRelUuid(null);
-            refreshRelationshipView();
+            refreshRelationshipView(view.getDirection());
         }
 
     }

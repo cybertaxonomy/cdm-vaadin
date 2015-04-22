@@ -20,6 +20,7 @@ import com.vaadin.ui.HorizontalLayout;
 
 import eu.etaxonomy.cdm.vaadin.component.ConceptRelationshipComposite;
 import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
+import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
 import eu.etaxonomy.cdm.vaadin.session.BasicEvent;
 import eu.etaxonomy.cdm.vaadin.session.IBasicEventListener;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
@@ -43,6 +44,8 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
     private StatusComposite statusCompositeLeft;
 
     private StatusComposite primaryStatusComposite, secondaryStatusComposite;
+
+    private Direction direction;
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -58,8 +61,8 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
         conceptRelationshipComposite.setView(this);
         conceptRelationshipComposite.setSizeFull();
 
-        setPrimaryStatusComposite(statusCompositeLeft.getSelectedClassificationUuid());
-
+        setPrimaryStatusCompositeUuid(statusCompositeLeft.getSelectedClassificationUuid());
+        direction = Direction.LEFT_RIGHT;
         CdmVaadinSessionUtilities.getCurrentBasicEventService().register(this);
     }
 
@@ -72,14 +75,21 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
 
     }
 
-    public void setPrimaryStatusComposite(UUID scUuid) {
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setPrimaryStatusCompositeUuid(UUID scUuid) {
         if(scUuid != null) {
-            if(statusCompositeLeft.getSelectedClassificationUuid().equals(scUuid)) {
+            if(scUuid.equals(statusCompositeLeft.getSelectedClassificationUuid())) {
                 primaryStatusComposite = statusCompositeLeft;
                 secondaryStatusComposite = statusCompositeRight;
-            } else {
+                direction = Direction.LEFT_RIGHT;
+            }
+            if(scUuid.equals(statusCompositeRight.getSelectedClassificationUuid())) {
                 secondaryStatusComposite = statusCompositeLeft;
                 primaryStatusComposite = statusCompositeRight;
+                direction = Direction.RIGHT_LEFT;
             }
             secondaryStatusComposite.clearTaxaTableSelections();
         }
