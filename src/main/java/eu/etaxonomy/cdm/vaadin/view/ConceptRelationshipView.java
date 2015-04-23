@@ -123,11 +123,11 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
      */
     @Override
     public void onAction(BasicEvent event) {
-        if(event.getEventId().equals(ConceptRelationshipComposite.UPDATE_START_ID)) {
+        if(ConceptRelationshipComposite.UPDATE_START_ID.equals(event.getEventId())) {
             primaryStatusComposite.setTaxaTableEnabled(false);
             secondaryStatusComposite.setTaxaTableSelectable(false);
         }
-        if(event.getEventId().equals(ConceptRelationshipComposite.UPDATE_END_ID)) {
+        if(ConceptRelationshipComposite.UPDATE_END_ID.equals(event.getEventId())) {
             primaryStatusComposite.setTaxaTableEnabled(true);
             secondaryStatusComposite.setTaxaTableSelectable(true);
         }
