@@ -5896,3 +5896,8 @@ body .edit.v-app .v-app-loading {
 .edit .v-table-cell-content-synonym {
 	font-style: italic;
 }
+
+.edit .cr-arrow .v-icon {
+	color: #006666;
+	font-size: 40px;
+}

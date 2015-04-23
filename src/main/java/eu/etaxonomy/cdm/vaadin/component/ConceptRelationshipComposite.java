@@ -28,7 +28,6 @@ import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
 import eu.etaxonomy.cdm.vaadin.presenter.ConceptRelationshipPresenter;
-import eu.etaxonomy.cdm.vaadin.session.BasicEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent.Action;
 import eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener;
@@ -123,9 +122,8 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
                        fromTaxonIun,
                        null,
                        null,
-                       Action.Create);
-               CdmVaadinSessionUtilities.getCurrentBasicEventService()
-               .fireBasicEvent(new BasicEvent(UPDATE_START_ID, ConceptRelationshipComposite.class), false);
+                       Action.Create,
+                       view.getDirection());
             }
         });
     }
@@ -138,9 +136,8 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
                 EditConceptRelationshipComposite.showInDialog(EDIT_CR_TITLE,
                         fromTaxonIun,
                         selectedTaxonRelUuid,
-                        Action.Update);
-                CdmVaadinSessionUtilities.getCurrentBasicEventService()
-                .fireBasicEvent(new BasicEvent(UPDATE_START_ID, ConceptRelationshipComposite.class), false);
+                        Action.Update,
+                        view.getDirection());
             }
         });
     }
@@ -153,9 +150,8 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
                 EditConceptRelationshipComposite.showInDialog(DELETE_CR_TITLE,
                         fromTaxonIun,
                         selectedTaxonRelUuid,
-                        Action.Delete);
-                CdmVaadinSessionUtilities.getCurrentBasicEventService()
-                .fireBasicEvent(new BasicEvent(UPDATE_START_ID, ConceptRelationshipComposite.class), false);
+                        Action.Delete,
+                        view.getDirection());
             }
         });
     }
