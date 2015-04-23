@@ -89,7 +89,6 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
      */
     @Override
     public void enter(ViewChangeEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
