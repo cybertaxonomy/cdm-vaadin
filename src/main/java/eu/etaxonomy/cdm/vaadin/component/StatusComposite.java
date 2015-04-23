@@ -156,10 +156,20 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
 
 
+    public void setClassification(String classification) {
+        if(classification == null) {
+            return;
+        }
+        Object selectedClassificationId = listener.getClassificationId(classification);
+        if(selectedClassificationId == null) {
+            Notification.show("Classification named " + classification + " does not exist.");
+        } else {
+            classificationComboBox.setValue(selectedClassificationId);
+        }
+    }
 
     public void init() {
         taxaTreeTable.setSelectable(true);
-
         initClassificationComboBox();
     }
 
@@ -168,13 +178,13 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     }
 
 
-    public void setTaxaTableEnabled(boolean enabled) {
-        taxaTreeTable.setEnabled(enabled);
-    }
-
-    public void setTaxaTableSelectable(boolean isTaxaTableSelectable) {
-        taxaTreeTable.setSelectable(isTaxaTableSelectable);
-    }
+//    public void setTaxaTableEnabled(boolean enabled) {
+//        taxaTreeTable.setEnabled(enabled);
+//    }
+//
+//    public void setTaxaTableSelectable(boolean isTaxaTableSelectable) {
+//        taxaTreeTable.setSelectable(isTaxaTableSelectable);
+//    }
 
     public TreeTable getTaxaTreeTable() {
         return taxaTreeTable;

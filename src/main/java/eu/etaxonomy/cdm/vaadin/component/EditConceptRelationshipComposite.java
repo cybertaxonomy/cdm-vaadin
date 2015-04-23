@@ -339,7 +339,7 @@ public class EditConceptRelationshipComposite extends CustomComponent {
                 CdmVaadinUtilities.setEnabled(mainLayout, false, null);
 
                 try {
-                    CdmVaadinUtilities.exec(new CdmVaadinOperation(200, cdmProgressComponent) {
+                    CdmVaadinUtilities.exec(new CdmVaadinOperation(1000, cdmProgressComponent) {
                         @Override
                         public boolean execute() {
                             UUID relTypeUuid = presenter.getTaxonRTypeContainer().getUuid(conceptRComboBox.getValue());

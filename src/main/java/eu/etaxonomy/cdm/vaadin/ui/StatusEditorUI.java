@@ -23,6 +23,7 @@ import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
@@ -46,7 +47,7 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
     }
 
     @Override
-    protected void doInit() {
+    protected void doInit(VaadinRequest request) {
         // FIXME: remove this when testing is done
         //setIgnoreAuthentication(true);
 

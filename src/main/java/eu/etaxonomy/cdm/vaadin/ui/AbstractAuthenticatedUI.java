@@ -43,7 +43,7 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
         // Create and register the views
         Authentication authentication = (Authentication) VaadinSession.getCurrent().getAttribute("authentication");
 
-        doInit();
+        doInit(request);
 
         if(ignoreAuthentication || (authentication != null && authentication.isAuthenticated())) {
         	UI.getCurrent().getNavigator().navigateTo(getFirstViewName());
@@ -52,7 +52,7 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
         }
 	}
 
-	protected abstract void doInit();
+	protected abstract void doInit(VaadinRequest request);
 
 	public abstract String getFirstViewName();
 

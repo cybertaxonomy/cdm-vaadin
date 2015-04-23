@@ -9,13 +9,15 @@
 */
 package eu.etaxonomy.cdm.vaadin.ui;
 
-import java.util.logging.Logger;
 
 import javax.servlet.annotation.WebServlet;
+
+import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
@@ -33,21 +35,25 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     private static final String FIRST_VIEW = "editcr";
 
-    private final static Logger logger =
-            Logger.getLogger(ConceptRelationshipUI.class.getName());
+    private final static Logger logger = Logger.getLogger(ConceptRelationshipUI.class);
 
     @WebServlet(value = {"/app/editcr/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = ConceptRelationshipUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
+    @VaadinServletConfiguration(productionMode = true, ui = ConceptRelationshipUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
 
     @Override
-    protected void doInit() {
+    protected void doInit(VaadinRequest request) {
         // FIXME: remove this when testing is done
-        //setIgnoreAuthentication(true);
+        setIgnoreAuthentication(true);
 
         getPage().setTitle("Concept Relationship Editor");
-        ConceptRelationshipView crEditor = new ConceptRelationshipView();
+        logger.warn("original classification : " + request.getParameter("oc"));
+        logger.warn("copy classification : " + request.getParameter("cc"));
+        String oc = request.getParameter("oc");
+        String cc = request.getParameter("cc");
+
+        ConceptRelationshipView crEditor = new ConceptRelationshipView(oc,cc);
         UI.getCurrent().getNavigator().addView(FIRST_VIEW, crEditor);
 
     }

@@ -8,8 +8,8 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
     var connector = this;
     var diagramElement = connector.getElement();
     var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
-    height = 800 - margin.top - margin.bottom;
+    width = 740 - margin.right - margin.left,
+    height = 600 - margin.top - margin.bottom;
 
     var i = 0,
     duration = 750,
