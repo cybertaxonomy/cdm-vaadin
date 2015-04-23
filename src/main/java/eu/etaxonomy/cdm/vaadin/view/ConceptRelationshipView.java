@@ -229,10 +229,7 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
                                 direction);
                     }
                 }
-
             }
-
         }
-
     }
 }
