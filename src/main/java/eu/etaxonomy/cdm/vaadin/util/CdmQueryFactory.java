@@ -66,14 +66,11 @@ public class CdmQueryFactory {
         String SELECT_QUERY=
         		"SELECT tb.DTYPE," +
         		"tb.id, " +
+        		"tb.uuid, " +
         		"tn.classification_id, " +
         		"tb.titleCache AS Taxon, " +
-        		"dtb2.titleCache AS Rank, " +
-        		"deb.DTYPE," +
-        		"deb.id, " +
-        		"deb.area_id, "+
-        		"dtb.vocabulary_id, " +
-        		"dtb1.vocabulary_id, ";
+        		"dtb2.titleCache AS Rank, ";
+
         int count = termList.size();
         for(String term : termList){
         	if(count == 1){
@@ -87,7 +84,8 @@ public class CdmQueryFactory {
         }
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY;
         String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
-        String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
+//        String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
+        String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.uuid = ?";
 
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }

@@ -4,6 +4,8 @@ ide/eclipse/cdm-vaadin.launch -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/CdmAppInitializer.java.bkp -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/ConceptRelationshipComposite.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/component/ConfigWindow.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/component/DetailWindow.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/EditConceptRelationshipComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/HorizontalToolbar.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/NewTaxonBaseComposite.java -text
@@ -29,6 +31,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionSelectionPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionTablePresenter.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/settings/SettingsPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/servlet/CdmVaadinConversationalServlet.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmChangeEvent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmDataChangeService.java -text
@@ -114,6 +117,7 @@ src/main/webapp/VAADIN/themes/macosx/icons/32/note.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/ok.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/reload.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/settings.png -text
+src/main/webapp/VAADIN/themes/macosx/icons/32/settings_1.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/top-left.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/top-right.png -text
 src/main/webapp/VAADIN/themes/macosx/icons/32/trash-full.png -text
