@@ -45,7 +45,7 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
     @Override
     protected void doInit(VaadinRequest request) {
         // FIXME: remove this when testing is done
-        setIgnoreAuthentication(true);
+        //setIgnoreAuthentication(true);
 
         getPage().setTitle("Concept Relationship Editor");
         logger.warn("original classification : " + request.getParameter("oc"));
