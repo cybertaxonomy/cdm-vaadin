@@ -5895,6 +5895,7 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-table-cell-content-synonym {
 	font-style: italic;
+	text-indent: 10px;
 }
 
 .edit .cr-arrow .v-icon {
