@@ -178,14 +178,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     }
 
 
-//    public void setTaxaTableEnabled(boolean enabled) {
-//        taxaTreeTable.setEnabled(enabled);
-//    }
-//
-//    public void setTaxaTableSelectable(boolean isTaxaTableSelectable) {
-//        taxaTreeTable.setSelectable(isTaxaTableSelectable);
-//    }
-
     public TreeTable getTaxaTreeTable() {
         return taxaTreeTable;
     }
@@ -235,16 +227,17 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                     if(source.getItem(itemId) == null) {
                         return null;
                     }
-                    Property hasSynProperty = source.getItem(itemId).getItemProperty(LeafNodeTaxonContainer.HAS_SYN_ID);
-                    if(hasSynProperty == null) {
+                    if(listener.isSynonym(itemId)) {
                         // this is a synonym, so we activate the corresponding css class
                         return "synonym";
+                    } else {
+                        return "taxon";
                     }
-                    return null;
+
                 }
             });
 
-
+            taxaTreeTable.setSortContainerPropertyId(LeafNodeTaxonContainer.NAME_ID);
 
             // NOTE : Not really sure why we need to refresh the container here.
             // in the case of 'Table' this is not required
@@ -426,7 +419,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             public void itemClick(ItemClickEvent event) {
                 Object itemId = event.getItemId();
                 if(taxaTreeTable.isSelectable()) {
-                    if(!listener.isSynonym(itemId)) {
+                    if(!CdmVaadinUtilities.isSelected(taxaTreeTable, itemId) && !listener.isSynonym(itemId)) {
                         UUID taxonUuid = listener.getCurrentLeafNodeTaxonContainer().getUuid(itemId);
                         String taxonName = (String)listener.getCurrentLeafNodeTaxonContainer().getProperty(itemId, LeafNodeTaxonContainer.NAME_ID).getValue();
                         Object idUuidName = new IdUuidName(itemId, taxonUuid, taxonName);

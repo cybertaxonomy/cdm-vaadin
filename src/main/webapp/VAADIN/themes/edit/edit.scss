@@ -37,7 +37,11 @@
     /* Style specifically for the row header cells. */
     .v-table-cell-content-synonym {
        font-style: italic;
-        text-indent: 10px
+       text-indent: 10px
+    }
+    
+    .v-table-cell-content-taxon {
+       font-style: italic;        
     }
 
     .cr-arrow .v-icon {

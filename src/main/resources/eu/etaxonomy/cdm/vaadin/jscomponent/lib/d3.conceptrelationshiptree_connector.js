@@ -35,7 +35,8 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
             "rightleft": {
                 size: [height, width],
                 x: function(d) { return width - d.y; },
-                y: function(d) { return d.x; }
+                y: function(d) { return d.x; },
+                xend: function(d) { return d.y; },
             },
             "bottomtop": {
                 size: [width, height],
@@ -45,7 +46,8 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
             "leftright": {
                 size: [height, width],
                 x: function(d) { return d.y; },
-                y: function(d) { return d.x; }
+                y: function(d) { return d.x; },
+                xend: function(d) { return width - d.y; },
             }
     };
     // default setting is left-right
@@ -133,7 +135,7 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         // Transition exiting nodes to the parent's new position.
         var nodeExit = node.exit().transition()
             .duration(duration)
-            .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+            .attr("transform", function(d) { return "translate(" + orientation.xend(source) + "," + orientation.y(source) + ")"; })
             .remove();
 
         nodeExit.select("circle")
@@ -146,14 +148,8 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         var link = svg.selectAll("path.link")
         .data(links, function(d) { return d.target.id; });
 
-        // Transition exiting nodes to the parent's new position.
-        link.exit().transition()
-            .duration(duration)
-            .attr("d", function(d) {
-              var o = {x: source.x, y: source.y};
-              return diagonal({source: o, target: o});
-            })
-            .remove();
+        // Remove links without transition
+        link.exit().remove();
         
         // Enter any new links at the parent's previous position.
         link.enter().insert("path", "g")

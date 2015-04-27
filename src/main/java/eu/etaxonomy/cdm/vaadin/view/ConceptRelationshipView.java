@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.IBasicEventListener;
 import eu.etaxonomy.cdm.vaadin.session.SelectionEvent;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
+import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 
 /**
  * @author cmathew
@@ -180,8 +181,11 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
                         toTaxonIun = new IdUuidName(targetItemId,
                                 targetContainer.getUuid(targetItemId),
                                 toName);
-                        CdmVaadinSessionUtilities.getCurrentSelectionService()
+                        if(!CdmVaadinUtilities.isSelected(sourceTable, sourceItemId)) {
+                            CdmVaadinSessionUtilities.getCurrentSelectionService()
                         .fireSelectionEvent(new SelectionEvent(Arrays.asList(fromTaxonIun, sourceSc.getSelectedClassificationUuid()), StatusComposite.class), false);
+                        }
+                        sourceTable.setValue(Arrays.asList(sourceItemId));
                         EditConceptRelationshipComposite.showInDialog(ConceptRelationshipComposite.CREATE_NEW_CR_TITLE,
                                 fromTaxonIun,
                                 null,

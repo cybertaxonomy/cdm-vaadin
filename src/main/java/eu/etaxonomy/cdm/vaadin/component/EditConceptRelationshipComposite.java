@@ -170,6 +170,10 @@ public class EditConceptRelationshipComposite extends CustomComponent {
         this.window = window;
     }
 
+    public boolean canCreateRelationship() {
+        return presenter.canCreateRelationship(fromTaxonIun.getUuid());
+    }
+
     private void initFromTaxon() {
         if(fromTaxonIun != null) {
             fromTaxonTextField.setReadOnly(false);
@@ -401,6 +405,11 @@ public class EditConceptRelationshipComposite extends CustomComponent {
 
     private static void showInDialog(String windowTitle,
             EditConceptRelationshipComposite ecrc) {
+        //FIXME : hack for the moment to demonstrate checking of concept relationship rules
+        if(!ecrc.canCreateRelationship()) {
+            Notification.show("Cannot create relationship for a taxon which is already congruent to another taxon", Type.WARNING_MESSAGE);
+            return;
+        }
         Window dialog = new Window(windowTitle);
         dialog.setModal(false);
         dialog.setClosable(false);

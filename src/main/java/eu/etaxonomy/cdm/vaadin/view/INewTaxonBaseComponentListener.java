@@ -43,6 +43,20 @@ public interface INewTaxonBaseComponentListener {
     public IdUuidName newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid);
 
 
+    /**
+     * @param accTaxonUuid
+     * @return
+     */
+    public Object getAcceptedTaxonRefId(UUID accTaxonUuid);
+
+
+    /**
+     * @param classificationUuid
+     * @return
+     */
+    public Object getClassificationRefId(UUID classificationUuid);
+
+
 
 
 
