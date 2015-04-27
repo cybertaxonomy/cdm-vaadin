@@ -9,6 +9,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.description.CategoricalData;
 import eu.etaxonomy.cdm.model.description.CommonTaxonName;
@@ -60,8 +61,8 @@ public class DetailWindow extends CustomComponent{
 			tree.setParent(deb.getFeature(), parent);
 			tree.setChildrenAllowed(deb.getFeature(), true);
 
-			if(deb instanceof CategoricalData){
-				CategoricalData cd = (CategoricalData) deb;
+			if(deb.isInstanceOf(CategoricalData.class)){
+				CategoricalData cd = CdmBase.deproxy(deb, CategoricalData.class);
 				if(cd.getStatesOnly().size() <= 1){
 					for(StateData st  : cd.getStateData()){
 						tree.addItem(st);
@@ -72,25 +73,23 @@ public class DetailWindow extends CustomComponent{
 				}else{
 					//TODO: implement recursion
 				}
-			}else if(deb instanceof TextData){
-				TextData td = (TextData) deb;
+			}else if(deb.isInstanceOf(TextData.class)){
+				TextData td = CdmBase.deproxy(deb,TextData.class);
 				tree.addItem(td);
 				tree.setItemCaption(td, td.getText(Language.GERMAN()));
 				tree.setParent(td, deb.getFeature());
 				tree.setChildrenAllowed(td, false);
-			}else if(deb instanceof CommonTaxonName){
-			    CommonTaxonName td = (CommonTaxonName) deb;
+			}else if(deb.isInstanceOf(CommonTaxonName.class)){
+			    CommonTaxonName td = CdmBase.deproxy(deb, CommonTaxonName.class);
 			    tree.addItem(td);
 			    tree.setItemCaption(td, td.getName());
 			    tree.setParent(td, deb.getFeature());
 			    tree.setChildrenAllowed(td, false);
-			}else if(deb instanceof Distribution){
-				Distribution db = (Distribution) deb;
-
+			}else if(deb.isInstanceOf(Distribution.class)){
+				Distribution db = CdmBase.deproxy(deb, Distribution.class);
 				tree.addItem(db.toString());
 				tree.setParent(db.toString(), deb.getFeature());
 				tree.setChildrenAllowed(db.toString(), true);
-
 				tree.addItem(db.getStatus().toString());
 				tree.setParent(db.getStatus().toString(), db.toString());
 				tree.setChildrenAllowed(db.getStatus().toString(), false);
