@@ -9,7 +9,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter;
 
-import org.json.JSONException;
 import org.springframework.transaction.TransactionStatus;
 
 import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
@@ -44,7 +43,7 @@ public class ConceptRelationshipPresenter implements IConceptRelationshipCompone
     }
 
     @Override
-    public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) throws JSONException {
+    public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) {
         TransactionStatus tx = app.startTransaction();
         Taxon taxon = CdmBase.deproxy(taxonService.load(taxonIun.getUuid()), Taxon.class);
         crTree.update(taxon, direction);

@@ -29,7 +29,7 @@
 	}
 
 .v-vaadin-version:after {
-	content: "7.3.5";
+	content: "7.4.4";
 }
 
 .v-generated-body {
@@ -415,6 +415,10 @@
 .edit .v-colorpicker-area {
 	border: 1px solid silver;
 	margin: 1px auto;
+}
+
+.edit .v-colorpicker.v-default-caption-width {
+	width: 100px;
 }
 
 .edit .v-colorpicker-history {
@@ -1774,6 +1778,129 @@ body .edit.v-app .v-app-loading {
 	display: inline-block;
 }
 
+.edit .v-escalator {
+	position: relative;
+}
+
+.edit .v-escalator-scroller {
+	position: absolute;
+	z-index: 1;
+	outline: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-scroller-horizontal {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: hidden;
+	-ms-overflow-y: hidden;
+}
+
+.edit .v-escalator-scroller-vertical {
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	-ms-overflow-x: hidden;
+}
+
+.edit .v-escalator-tablewrapper {
+	position: absolute;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 5;
+}
+
+.edit .v-escalator-tablewrapper > table {
+	border-spacing: 0;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.edit .v-escalator-header-deco, .edit .v-escalator-footer-deco {
+	position: absolute;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-horizontal-scrollbar-deco {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-header, .edit .v-escalator-body, .edit .v-escalator-footer {
+	position: absolute;
+	left: 0;
+	width: inherit;
+	z-index: 10;
+}
+
+.edit .v-escalator-header, .edit .v-escalator-header-deco {
+	top: 0;
+}
+
+.edit .v-escalator-footer, .edit .v-escalator-footer-deco {
+	bottom: 0;
+}
+
+.edit .v-escalator-body {
+	z-index: 0;
+	top: 0;
+}
+
+.edit .v-escalator-body .v-escalator-row {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.edit .v-escalator-row {
+	display: block;
+}
+
+.v-ie8 .edit .v-escalator-row, .v-ie9 .edit .v-escalator-row {
+	float: left;
+	clear: left;
+	margin-top: 0;
+}
+
+.edit .v-escalator-row  > td, .edit .v-escalator-row  > th {
+	background-color: #fff;
+}
+
+.edit .v-escalator-row {
+	width: inherit;
+}
+
+.edit .v-escalator-cell {
+	display: block;
+	float: left;
+	padding: 2px;
+	white-space: nowrap;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	font-size: 13px;
+}
+
+.edit .v-escalator-cell.frozen {
+	position: relative;
+	z-index: 1;
+}
+
 .edit .v-formlayout.v-has-width > table {
 	width: 100%;
 }
@@ -1829,6 +1956,395 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-formlayout-captioncell .v-caption .v-required-field-indicator {
 	float: none;
+}
+
+.edit .v-grid {
+	position: relative;
+}
+
+.edit .v-grid-scroller {
+	position: absolute;
+	z-index: 1;
+	outline: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-scroller-horizontal {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: hidden;
+	-ms-overflow-y: hidden;
+}
+
+.edit .v-grid-scroller-vertical {
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	-ms-overflow-x: hidden;
+}
+
+.edit .v-grid-tablewrapper {
+	position: absolute;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 5;
+}
+
+.edit .v-grid-tablewrapper > table {
+	border-spacing: 0;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.edit .v-grid-header-deco, .edit .v-grid-footer-deco {
+	position: absolute;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-horizontal-scrollbar-deco {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-header, .edit .v-grid-body, .edit .v-grid-footer {
+	position: absolute;
+	left: 0;
+	width: inherit;
+	z-index: 10;
+}
+
+.edit .v-grid-header, .edit .v-grid-header-deco {
+	top: 0;
+}
+
+.edit .v-grid-footer, .edit .v-grid-footer-deco {
+	bottom: 0;
+}
+
+.edit .v-grid-body {
+	z-index: 0;
+	top: 0;
+}
+
+.edit .v-grid-body .v-grid-row {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.edit .v-grid-row {
+	display: block;
+}
+
+.v-ie8 .edit .v-grid-row, .v-ie9 .edit .v-grid-row {
+	float: left;
+	clear: left;
+	margin-top: 0;
+}
+
+.edit .v-grid-row  > td, .edit .v-grid-row  > th {
+	background-color: #fff;
+}
+
+.edit .v-grid-row {
+	width: inherit;
+}
+
+.edit .v-grid-cell {
+	display: block;
+	float: left;
+	padding: 2px;
+	white-space: nowrap;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	font-size: 13px;
+}
+
+.edit .v-grid-cell.frozen {
+	position: relative;
+	z-index: 1;
+}
+
+.edit .v-grid {
+	outline: none;
+}
+
+.edit .v-grid-scroller-vertical, .edit .v-grid-scroller-horizontal {
+	border: 1px solid #b6bbbc;
+}
+
+.edit .v-grid-scroller-vertical {
+	border-left: none;
+}
+
+.edit .v-grid-scroller-horizontal {
+	border-top: none;
+}
+
+.edit .v-grid-tablewrapper {
+	border: 1px solid #b6bbbc;
+}
+
+.edit .v-grid-cell {
+	background-color: #fff;
+	padding: 0 5px;
+	line-height: 26px;
+	text-overflow: ellipsis;
+}
+
+.edit .v-grid-cell  > * {
+	line-height: 18px;
+	vertical-align: middle;
+}
+
+.edit .v-grid-cell  > div {
+	display: inline-block;
+}
+
+.edit .v-grid-cell.frozen {
+	-webkit-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	border-right: none;
+}
+
+.edit .v-grid-row > td, .edit .v-grid-editor-cells > div {
+	border-left: none;
+	border-bottom: none;
+}
+
+.edit .v-grid-row > td:first-child, .edit .v-grid-editor-cells > div:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-row-stripe > td {
+	background-color: #eff0f1;
+}
+
+.edit .v-grid-row-selected > td {
+	background: #57a7ed;
+}
+
+.edit .v-grid-row-focused > td {
+	
+}
+
+.edit .v-grid-header th {
+	position: relative;
+	background-color: #e7e9ea;
+	font-size: 15px;
+	font-weight: inherit;
+	border-left: 1px solid #b6bbbc;
+	border-bottom: 1px solid #b6bbbc;
+	line-height: 36px;
+	text-align: left;
+}
+
+.edit .v-grid-header th:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-header .sort-asc, .edit .v-grid-header .sort-desc {
+	padding-right: 23px;
+}
+
+.edit .v-grid-header .sort-asc:after, .edit .v-grid-header .sort-desc:after {
+	font-family: FontAwesome, sans-serif;
+	content: "\f0de" " " attr(sort-order);
+	position: absolute;
+	right: 5px;
+	font-size: 13px;
+}
+
+.edit .v-grid-header .sort-desc:after {
+	content: "\f0dd" " " attr(sort-order);
+}
+
+.edit .v-grid-footer td {
+	background-color: #e7e9ea;
+	font-size: 15px;
+	font-weight: inherit;
+	border-left: 1px solid #b6bbbc;
+	border-top: 1px solid #b6bbbc;
+	border-bottom: none;
+	line-height: 36px;
+}
+
+.edit .v-grid-footer td:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-header-deco {
+	border-top: 1px solid #b6bbbc;
+	border-right: 1px solid #b6bbbc;
+	background-color: #e7e9ea;
+}
+
+.edit .v-grid-footer-deco {
+	border-bottom: 1px solid #b6bbbc;
+	border-right: 1px solid #b6bbbc;
+	background-color: #e7e9ea;
+}
+
+.edit .v-grid-horizontal-scrollbar-deco {
+	background-color: #e7e9ea;
+	border: 1px solid #b6bbbc;
+	border-top: none;
+}
+
+.edit .v-grid-cell-focused {
+	position: relative;
+}
+
+.edit .v-grid-cell-focused:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: 1px solid #57a7ed;
+	display: none;
+	pointer-events: none;
+}
+
+.ie8 .edit .v-grid-cell-focused:before, .ie9 .edit .v-grid-cell-focused:before, .ie10 .edit .v-grid-cell-focused:before {
+	content: url(data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==);
+}
+
+.edit .v-grid:focus .v-grid-cell-focused:before {
+	display: block;
+}
+
+.edit .v-grid.v-disabled:focus .v-grid-cell-focused:before {
+	display: none;
+}
+
+.edit .v-grid-editor {
+	position: absolute;
+	z-index: 20;
+	overflow: hidden;
+	left: 0;
+	right: 0;
+	border: 1px solid #b6bbbc;
+	margin-top: -1px;
+	-webkit-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+}
+
+.edit .v-grid-editor-cells {
+	position: relative;
+	white-space: nowrap;
+}
+
+.edit .v-grid-editor-cells  > div {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	vertical-align: middle;
+	background: #fff;
+}
+
+.edit .v-grid-editor-cells  > div:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-editor-cells  > div  > * {
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.edit .v-grid-editor-cells  > div .v-textfield, .edit .v-grid-editor-cells  > div .v-datefield, .edit .v-grid-editor-cells  > div .v-filterselect {
+	min-width: 100%;
+	max-width: 100%;
+	min-height: 100%;
+	max-height: 100%;
+}
+
+.edit .v-grid-editor-cells  > div .v-select, .edit .v-grid-editor-cells  > div .v-select-select {
+	min-width: 100%;
+	max-width: 100%;
+}
+
+.edit .v-grid-editor-cells .error::before {
+	position: absolute;
+	display: block;
+	height: 0;
+	width: 0;
+	content: "";
+	border-top: 5px solid red;
+	border-right: 5px solid transparent;
+}
+
+.edit .v-grid-editor-cells .error, .edit .v-grid-editor-cells .error > input {
+	background-color: #fee;
+}
+
+.edit .v-grid-editor-footer {
+	display: table;
+	height: 26px;
+	border-top: none;
+	margin-top: none;
+	background: #fff;
+	padding: 0 5px;
+}
+
+.edit .v-grid-editor-footer  + .v-grid-editor-cells > div {
+	border-bottom: none;
+	border-top: none;
+}
+
+.edit .v-grid-editor-footer:first-child {
+	border-top: none;
+	margin-top: 0;
+	border-bottom: none;
+	margin-bottom: none;
+}
+
+.edit .v-grid-editor-message, .edit .v-grid-editor-buttons {
+	display: table-cell;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.edit .v-grid-editor-message {
+	width: 100%;
+	position: relative;
+}
+
+.edit .v-grid-editor-message  > div {
+	position: absolute;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 26px;
+	top: 0;
+}
+
+.edit .v-grid-editor-save {
+	margin-right: 4px;
+}
+
+.edit .v-grid-cell > .v-progressbar {
+	width: 100%;
 }
 
 .edit .v-gridlayout {
@@ -2855,6 +3371,10 @@ body .edit.v-app .v-app-loading {
 	color: #ddd;
 }
 
+.edit .v-table .v-checkbox {
+	display: inline-block;
+}
+
 .edit .v-table-drag .v-table-body {
 	border-color: #1d9dff;
 }
@@ -3458,7 +3978,7 @@ body .edit.v-app .v-app-loading {
 	height: 0;
 }
 
-.edit .v-window-resizebox-disabled, .edit .v-window-restorebox-disabled, .edit .v-window-maximizebox-disabled {
+.edit .v-window-resizebox-disabled, .edit .v-window-closebox-disabled, .edit .v-window-restorebox-disabled, .edit .v-window-maximizebox-disabled {
 	cursor: default;
 	display: none;
 }
@@ -4322,6 +4842,51 @@ body .edit.v-app .v-app-loading {
 	color: #464f52;
 }
 
+.edit .v-grid-header .v-grid-cell, .edit .v-grid-footer .v-grid-cell {
+	background-image: url(../runo/grid/img/header-bg.png);
+	color: #393a3c;
+	text-shadow: #fff 0 1px 0;
+	-webkit-box-shadow: inset 1px 0 0 #fff;
+	-moz-box-shadow: inset 1px 0 0 #fff;
+	box-shadow: inset 1px 0 0 #fff;
+}
+
+.edit .v-grid-header-deco, .edit .v-grid-footer-deco, .edit .v-grid-horizontal-scrollbar-deco {
+	background-image: url(../runo/grid/img/header-bg.png);
+}
+
+.edit .v-grid-row-selected {
+	color: #fff;
+}
+
+.edit .v-grid-row-selected  > .v-grid-cell-focused:before {
+	border-color: #b3d7f7;
+}
+
+.edit .v-grid th.sort-asc, .edit .v-grid th.sort-desc {
+	padding-right: 35px;
+}
+
+.edit .v-grid th.sort-asc:after, .edit .v-grid th.sort-desc:after {
+	content: attr(sort-order);
+	background: transparent no-repeat right 50%;
+	width: 30px;
+	height: 36px;
+	top: 0;
+}
+
+.edit .v-grid th.sort-asc:after {
+	background-image: url(../runo/grid/img/sort-asc.png);
+}
+
+.edit .v-grid th.sort-desc:after {
+	background-image: url(../runo/grid/img/sort-desc.png);
+}
+
+.edit .v-grid-editor-footer {
+	background: #e7e9ea;
+}
+
 .edit .v-gridlayout-margin-top {
 	padding-top: 15px;
 }
@@ -4743,6 +5308,10 @@ body .edit.v-app .v-app-loading {
 	background: #dfe2e4;
 }
 
+.edit .v-progressbar-static .v-progressbar-wrapper {
+	background: #dfe2e4 url(../runo/progressindicator/img/base-static.gif) repeat-x;
+}
+
 .edit .v-progressindicator-wrapper {
 	background: #dfe2e4 url(../runo/progressindicator/img/base.gif) repeat-x;
 	border: 1px solid #b6bbbc;
@@ -4766,6 +5335,10 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-progressindicator-indeterminate-disabled {
 	background: #dfe2e4;
+}
+
+.edit .v-progressindicator-static .v-progressindicator-wrapper {
+	background: #dfe2e4 url(../runo/progressindicator/img/base-static.gif) repeat-x;
 }
 
 .edit .v-select-select {
