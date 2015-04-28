@@ -75,7 +75,7 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
         setCompositionRoot(mainLayout);
 
         conceptRelationshipComposite.setView(this);
-        //mainLayout.setSizeUndefined();
+
         setPrimaryStatusCompositeUuid(statusCompositeLeft.getSelectedClassificationUuid());
         direction = Direction.LEFT_RIGHT;
         CdmVaadinSessionUtilities.getCurrentBasicEventService().register(this);
