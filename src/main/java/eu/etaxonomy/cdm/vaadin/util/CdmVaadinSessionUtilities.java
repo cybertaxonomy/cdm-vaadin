@@ -9,6 +9,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.util;
 
+import java.util.concurrent.locks.Lock;
+
 import org.apache.log4j.Logger;
 
 import com.vaadin.server.VaadinSession;
@@ -27,11 +29,16 @@ public class CdmVaadinSessionUtilities {
     private static final Logger logger = Logger.getLogger(CdmVaadinSessionUtilities.class);
 
     public static void setCurrentAttribute(String name, Object value) {
+        Lock sessionLock = VaadinSession.getCurrent().getLockInstance();
         try {
-            VaadinSession.getCurrent().getLockInstance().lock();
+            if(sessionLock != null) {
+                sessionLock.lock();
+            }
             VaadinSession.getCurrent().setAttribute(name, value);
         } finally {
-            VaadinSession.getCurrent().getLockInstance().unlock();
+            if(sessionLock != null) {
+                sessionLock.unlock();
+            }
         }
     }
 

@@ -46,9 +46,16 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
     	}
     	QueryBuilder.setStringDecorator(new CdmSQLStringDecorator());
 
+    	Assert.assertNotNull(vaadinServlet);
     	Assert.assertEquals(vaadinServlet, VaadinServlet.getCurrent());
+
+    	Assert.assertNotNull(servletContext);
         Assert.assertEquals(servletContext, VaadinServlet.getCurrent().getServletContext());
+
+        Assert.assertNotNull(vaadinSession);
         Assert.assertEquals(vaadinSession, VaadinSession.getCurrent());
+
+        Assert.assertNotNull(vaadinService);
         Assert.assertEquals(vaadinService, VaadinService.getCurrent());
     }
 
@@ -78,11 +85,20 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 		}
 		VaadinService.setCurrent(vaadinService);
 
-		vaadinSession = new VaadinSession(vaadinService);
+		vaadinSession = new MockVaadinSession(vaadinService);
 		VaadinSession.setCurrent(vaadinSession);
 
 		isVaadinServletEnvCreated = true;
     }
 
+    public static  class MockVaadinSession extends VaadinSession {
+        MockVaadinSession(VaadinService service) {
+            super(service);
+        }
 
+        @Override
+        public boolean hasLock() {
+            return true;
+        }
+    }
 }
