@@ -6,6 +6,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionSelectionPresenter;
@@ -31,7 +32,7 @@ public class DbStatusUI extends AbstractAuthenticatedUI{
 
 
 	@Override
-	protected void doInit() {
+	protected void doInit(VaadinRequest request) {
 		Navigator navigator = UI.getCurrent().getNavigator();
 		DistributionSelectionView dsv = new DistributionSelectionView();
 		new DistributionSelectionPresenter(dsv);

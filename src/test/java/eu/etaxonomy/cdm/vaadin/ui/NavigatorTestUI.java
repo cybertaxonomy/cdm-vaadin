@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
@@ -30,7 +31,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 	}
 
 	@Override
-	protected void doInit() {
+	protected void doInit(VaadinRequest request) {
 		getPage().setTitle("Navigation Example");
 		NaviTestView ntv1 = new NaviTestView();
 		ntv1.setText("Congratulations! you have reached the first view. If you have got here without logging in there we are in trouble :)");

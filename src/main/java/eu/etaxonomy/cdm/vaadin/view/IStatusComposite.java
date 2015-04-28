@@ -106,6 +106,12 @@ public interface IStatusComposite {
          *
          */
         public void refreshSynonymCache();
+
+        /**
+         * @param classification
+         * @return
+         */
+        public Object getClassificationId(String classification);
     }
 
     public void setListener(StatusComponentListener listener);

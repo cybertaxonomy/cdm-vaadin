@@ -10,7 +10,11 @@
 package eu.etaxonomy.cdm.vaadin.presenter;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.UUID;
+
+import com.vaadin.data.util.filter.Compare;
+import com.vaadin.data.util.filter.Compare.Equal;
 
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -59,6 +63,22 @@ public class StatusPresenter implements StatusComponentListener {
         leafNodeTaxonContainer = new LeafNodeTaxonContainer(classificationId);
         totalNoOfTaxa = leafNodeTaxonContainer.getTotalNoOfTaxa();
         return leafNodeTaxonContainer;
+    }
+
+    @Override
+    public Object getClassificationId(String classification) {
+        if(classification == null) {
+            return null;
+        }
+        Equal cnameFilter = new Compare.Equal("titleCache", classification);
+        classificationContainer.addContainerFilter(cnameFilter);
+        Collection<?> itemIds = classificationContainer.getItemIds();
+        Object itemId = null;
+        if(!itemIds.isEmpty()) {
+            itemId = itemIds.iterator().next();
+        }
+        classificationContainer.removeContainerFilter(cnameFilter);
+        return itemId;
     }
 
     @Override

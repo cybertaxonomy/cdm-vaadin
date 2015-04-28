@@ -138,4 +138,19 @@ public class EditConceptRelationshipPresenter {
         return relTypeToTaxonIunMap;
     }
 
+    public boolean canCreateRelationship(UUID fromTaxonUuid) {
+        TransactionStatus tx = app.startTransaction();
+        Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
+        boolean canCreateRelationship = true;
+        Set<TaxonRelationship> trList = fromTaxon.getRelationsFromThisTaxon();
+        for(TaxonRelationship tr : trList) {
+            if(tr.getType() != null && tr.getType().equals(TaxonRelationshipType.CONGRUENT_TO())) {
+                canCreateRelationship = false;
+                break;
+            }
+        }
+        app.commitTransaction(tx);
+        return canCreateRelationship;
+    }
+
 }

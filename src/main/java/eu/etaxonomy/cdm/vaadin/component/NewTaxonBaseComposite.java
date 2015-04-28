@@ -77,10 +77,12 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
 
 
     private final Window dialog;
-    private final IdUuidName accTaxonIdUuid;
-    private final IdUuidName classificationIdUuid;
+    private final IdUuidName accTaxonIun;
+    private final IdUuidName classificationIun;
 
     private static final Logger logger = Logger.getLogger(NewTaxonBaseComposite.class);
+
+    private static final String CHOOSE_SECUNDUM_PROMPT = "Choose Secundum ....";
 
     /**
      * The constructor should first build the main layout, set the
@@ -91,16 +93,16 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
      */
     public NewTaxonBaseComposite(Window dialog,
             INewTaxonBaseComponentListener listener,
-            IdUuidName accTaxonIdUuid,
+            IdUuidName accTaxonIun,
             String accTaxonName,
-            IdUuidName classificationIdUuid) {
+            IdUuidName classificationIun) {
         buildMainLayout();
         setCompositionRoot(mainLayout);
 
         this.listener = listener;
         this.dialog = dialog;
-        this.accTaxonIdUuid = accTaxonIdUuid;
-        this.classificationIdUuid = classificationIdUuid;
+        this.accTaxonIun = accTaxonIun;
+        this.classificationIun = classificationIun;
 
         addUIListeners();
 
@@ -124,6 +126,20 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
         secComboBox.setImmediate(true);
         if(listener != null) {
             secComboBox.setContainerDataSource(listener.getSecRefContainer());
+            Object selectedSecItemId = null;
+            // if accTaxonIun is null then we are creating a new taxon
+            // else a new synonym
+            if(accTaxonIun == null) {
+                selectedSecItemId = listener.getClassificationRefId(classificationIun.getUuid());
+            } else {
+                selectedSecItemId = listener.getAcceptedTaxonRefId(accTaxonIun.getUuid());
+            }
+
+            if(selectedSecItemId != null) {
+                secComboBox.setValue(selectedSecItemId);
+            } else {
+                secComboBox.setInputPrompt(CHOOSE_SECUNDUM_PROMPT);
+            }
         }
     }
 
@@ -154,10 +170,10 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
                     public boolean execute() {
                         setProgress("Saving Taxon " + nameTextField.getValue());
                         IdUuidName taxonBaseIdUuid;
-                        if(accTaxonIdUuid == null) {
-                            taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),secComboBox.getValue(), classificationIdUuid.getUuid());
+                        if(accTaxonIun == null) {
+                            taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),secComboBox.getValue(), classificationIun.getUuid());
                         } else {
-                            taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),secComboBox.getValue(), accTaxonIdUuid.getUuid());
+                            taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),secComboBox.getValue(), accTaxonIun.getUuid());
                         }
                         Object rowId = new RowId(taxonBaseIdUuid.getId());
                         registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId), NewTaxonBaseComposite.class));

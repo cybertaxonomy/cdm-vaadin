@@ -95,6 +95,15 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         Assert.assertFalse(pb);
     }
 
+    @Test
+    public void testGetClassificationId() throws SQLException {
+        CdmSQLContainer container = sp.loadClassifications();
+        Object classificationId = sp.getClassificationId("Classification1");
+        Assert.assertEquals("11", classificationId.toString());
+        classificationId = sp.getClassificationId("ClassificationDoesNotExist");
+        Assert.assertNull(classificationId);
+    }
+
     @Ignore
     @Test
     public void testLoadClassifications() throws SQLException {

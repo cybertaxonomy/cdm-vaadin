@@ -1,17 +1,19 @@
 // $Id$
 /**
-* Copyright (C) 2015 EDIT
-* European Distributed Institute of Taxonomy
-* http://www.e-taxonomy.eu
-*
-* The contents of this file are subject to the Mozilla Public License Version 1.1
-* See LICENSE.TXT at the top of this package for the full license terms.
-*/
+ * Copyright (C) 2015 EDIT
+ * European Distributed Institute of Taxonomy
+ * http://www.e-taxonomy.eu
+ *
+ * The contents of this file are subject to the Mozilla Public License Version 1.1
+ * See LICENSE.TXT at the top of this package for the full license terms.
+ */
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.UI;
@@ -80,6 +82,22 @@ public class CdmVaadinUtilities {
         } else {
             component.setEnabled(false);
         }
+    }
+
+    public static boolean isSelected(AbstractSelect select, Object itemId) {
+        if(select.getValue() != null) {
+            if(select.isMultiSelect()) {
+                Set<Object> selectedItemIds = (Set<Object>)select.getValue();
+                for(Object selectedItemId : selectedItemIds) {
+                    if(selectedItemId.equals(itemId)) {
+                        return true;
+                    }
+                }
+            } else {
+                return (select.getValue().equals(itemId));
+            }
+        }
+        return false;
     }
 
 

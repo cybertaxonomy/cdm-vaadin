@@ -1,12 +1,12 @@
 // $Id$
 /**
-* Copyright (C) 2015 EDIT
-* European Distributed Institute of Taxonomy
-* http://www.e-taxonomy.eu
-*
-* The contents of this file are subject to the Mozilla Public License Version 1.1
-* See LICENSE.TXT at the top of this package for the full license terms.
-*/
+ * Copyright (C) 2015 EDIT
+ * European Distributed Institute of Taxonomy
+ * http://www.e-taxonomy.eu
+ *
+ * The contents of this file are subject to the Mozilla Public License Version 1.1
+ * See LICENSE.TXT at the top of this package for the full license terms.
+ */
 package eu.etaxonomy.cdm.vaadin.presenter;
 
 import java.sql.SQLException;
@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.transaction.TransactionStatus;
+
+import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
@@ -84,6 +86,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         NonViralName name = parser.parseFullName(scientificName);
         name.setTitleCache(scientificName, true);
         Taxon newTaxon = Taxon.NewInstance(name, sec);
+        newTaxon.setUnplaced(true);
         List<String> CLASSIFICATION_INIT_STRATEGY = Arrays.asList(new String []{
                 "rootNode.childNodes"
         });
@@ -116,6 +119,30 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         app.commitTransaction(tx);
         return new IdUuidName(newSynonym.getId(), newUuid, newSynonym.getTitleCache());
     }
+
+
+    @Override
+    public Object getAcceptedTaxonRefId(UUID accTaxonUuid) {
+        Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid), Taxon.class);
+        if(accTaxon.getSec() != null) {
+            int refId = accTaxon.getSec().getId();
+            RowId itemId = new RowId(refId);
+            return itemId;
+        }
+        return null;
+    }
+
+    @Override
+    public Object getClassificationRefId(UUID classificationUuid) {
+        Classification classification = CdmBase.deproxy(classificationService.load(classificationUuid), Classification.class);
+        if(classification.getReference() != null) {
+            int refId = classification.getReference().getId();
+            RowId itemId = new RowId(refId);
+            return itemId;
+        }
+        return null;
+    }
+
 
 
 }
