@@ -24,7 +24,7 @@ public class DbStatusUI extends AbstractAuthenticatedUI{
 	private static final String FIRST_VIEW = "selection";
 
 
-	@WebServlet(value = {"/app/dbstatus/*"}, asyncSupported = true)
+	@WebServlet(value = {"/app/dbstatus/*"}, asyncSupported = false)
 	@VaadinServletConfiguration(productionMode = true, ui = DbStatusUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {
 	}
