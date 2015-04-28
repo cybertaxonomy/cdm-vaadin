@@ -14,7 +14,7 @@
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <cdmlib.version>${project.version}</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
-	<spring.version>3.2.2.RELEASE</spring.version>
+    <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
   <repositories>
     <!-- the cdm internal repository -->
@@ -196,7 +196,12 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-
+    <!-- vaadin addons / extensions -->
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>contextmenu</artifactId>
+      <version>4.5</version>
+    </dependency>
 
     <!-- unitils dependencies - start -->
     <dependency>
