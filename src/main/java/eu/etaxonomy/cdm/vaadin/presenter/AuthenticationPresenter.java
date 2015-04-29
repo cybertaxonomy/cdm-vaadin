@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.server.VaadinSession;
 
@@ -23,6 +24,7 @@ public class AuthenticationPresenter implements IAuthenticationComponent.Authent
         AuthenticationManager authenticationManager = (AuthenticationManager) CdmSpringContextHelper.getCurrent().getBean("authenticationManager");
         Authentication authentication = authenticationManager.authenticate(token);
         if(authentication != null && authentication.isAuthenticated()) {
+            SecurityContextHolder.getContext().setAuthentication(authentication);
             CdmVaadinAuthentication cvAuthentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
             if(cvAuthentication == null) {
                 cvAuthentication = new CdmVaadinAuthentication();

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author cmathew
@@ -53,10 +54,23 @@ public class CdmVaadinAuthentication {
         return false;
     }
 
+    public boolean setSecurityContextAuthentication(URI uri, String context) {
+        if(uri != null && context != null && !context.isEmpty()) {
+            Authentication authentication = hostAuthenticationMap.get(getRequestSource(uri, context));
+            if(authentication != null && authentication.isAuthenticated()) {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String getRequestSource(URI uri, String context) {
         String source = uri.getHost() + ":" + String.valueOf(uri.getPort()) + context;
         logger.warn(" request source : " + source);
         return source;
     }
+
+
 
 }

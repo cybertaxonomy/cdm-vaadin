@@ -48,6 +48,9 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
         URI uri = Page.getCurrent().getLocation();
         String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
         if(ignoreAuthentication || (cvAuthentication != null && cvAuthentication.isAuthenticated(uri, context))) {
+            if(cvAuthentication != null) {
+                cvAuthentication.setSecurityContextAuthentication(uri, context);
+            }
             UI.getCurrent().getNavigator().navigateTo(getFirstViewName());
         } else {
             UI.getCurrent().getNavigator().navigateTo(AUTHENTICATION_VIEW);
