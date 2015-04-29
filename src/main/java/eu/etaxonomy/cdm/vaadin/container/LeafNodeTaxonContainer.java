@@ -73,6 +73,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     public LeafNodeTaxonContainer(int classificationId) throws SQLException {
         super(CdmQueryFactory.generateTaxonBaseQuery(NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
         this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(NAME_ID));
+        this.synonymContainer.sort(new String[]{NAME_ID}, new boolean[]{true});
         this.classificationId = classificationId;
         taxonSynonymMap = new HashMap<Object,List<Object>>();
         initFilters();
