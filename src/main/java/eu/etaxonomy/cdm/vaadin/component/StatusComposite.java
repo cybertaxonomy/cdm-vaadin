@@ -106,11 +106,13 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
     private final boolean taxaTreeTableMultiSelectMode = true;
 
-    private static final String SELECT_FILTER = "Select filter ...";
     private static final String SELECT_CLASSIFICATION = "Select classification ...";
 
-    private static final String ADD_TAXON_SYNONYM_INPUT = "Add ...";
+
     private static final String CREATE_ACC_TAXON = "Create Accepted Taxon";
+    private static final String CHANGE_TO_ACC_TAXON = "Change to Accepted Taxon";
+    private static final String REPLACE_ACC_TAXON = "Replace Accepted Taxon";
+    private static final String CHANGE_TO_SYNONYM = "Change to Synonym";
     private static final String CREATE_SYNONYM = "Create Synonym";
     private static final String SET_AS_DELETED = "Set as Deleted";
     private static final String SET_AS_EXCLUDED = "Set as Excluded";
@@ -282,14 +284,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         container.addContainerProperty("filter", String.class, "");
         container.addContainerProperty("selected", Boolean.class, "");
 
-//        Item item = container.addItem(FILTER_NOT_RESOLVED);
-//        item.getItemProperty(PROPERTY_FILTER_ID).setValue(FILTER_NOT_RESOLVED);
-//        item.getItemProperty(PROPERTY_SELECTED_ID).setValue(false);
-//
-//        item = container.addItem(FILTER_UNPLACED);
-//        item.getItemProperty(PROPERTY_FILTER_ID).setValue(FILTER_UNPLACED);
-//        item.getItemProperty(PROPERTY_SELECTED_ID).setValue(false);
-
         Item item = container.addItem(FILTER_UNFINISHED);
         item.getItemProperty(PROPERTY_FILTER_ID).setValue(FILTER_UNFINISHED);
         item.getItemProperty(PROPERTY_SELECTED_ID).setValue(false);
@@ -409,7 +403,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                         .fireSelectionEvent(new SelectionEvent(Arrays.asList(idUuidName, getSelectedClassificationUuid()), StatusComposite.class), true);
                     }
                     taxaTreeTable.setValue(Arrays.asList(itemId));
-                    generateTaxaTreeTableContextMenu(!isSynonym);
+                    generateTaxaTreeTableContextMenu(isSynonym);
 
                 }
             }
@@ -424,9 +418,25 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
         taxaTableContextMenu.removeAllItems();
         if(isSynonym) {
+
+
+            ContextMenuItem changeToAccTaxonMenuItem = taxaTableContextMenu.addItem(CHANGE_TO_ACC_TAXON);
+            changeToAccTaxonMenuItem.setData(CHANGE_TO_ACC_TAXON);
+
+            ContextMenuItem replaceAccTaxonMenuItem = taxaTableContextMenu.addItem(REPLACE_ACC_TAXON);
+            replaceAccTaxonMenuItem.setData(REPLACE_ACC_TAXON);
+
+            replaceAccTaxonMenuItem.setSeparatorVisible(true);
+        } else {
             ContextMenuItem createSynMenuItem = taxaTableContextMenu.addItem(CREATE_SYNONYM);
             createSynMenuItem.setData(CREATE_SYNONYM);
+
+            ContextMenuItem changeToSynMenuItem = taxaTableContextMenu.addItem(CHANGE_TO_SYNONYM);
+            changeToSynMenuItem.setData(CHANGE_TO_SYNONYM);
+
+            changeToSynMenuItem.setSeparatorVisible(true);
         }
+
         ContextMenuItem setDeletedMenuItem = taxaTableContextMenu.addItem(SET_AS_DELETED);
         setDeletedMenuItem.setData(SET_AS_DELETED);
 
@@ -435,8 +445,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
         ContextMenuItem setOutOfScopeMenuItem = taxaTableContextMenu.addItem(SET_AS_OUT_OF_SCOPE);
         setOutOfScopeMenuItem.setData(SET_AS_OUT_OF_SCOPE);
-
-        setOutOfScopeMenuItem.setSeparatorVisible(true);
 
         ContextMenuItem createAccTaxonMenuItem = taxaTableContextMenu.addItem(CREATE_ACC_TAXON);
         createAccTaxonMenuItem.setData(CREATE_ACC_TAXON);

@@ -22,7 +22,6 @@ import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 public interface INewTaxonBaseComponentListener {
 
 
-    public CdmSQLContainer getSecRefContainer();
 
 
     /**
@@ -36,11 +35,12 @@ public interface INewTaxonBaseComponentListener {
 
     /**
      * @param scientificName
-     * @param secRefItemId
+     * @param synSecRefItemId
+     * @param accTaxonSecRefItemId
      * @param accTaxonUuid
      * @return
      */
-    public IdUuidName newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid);
+    public IdUuidName newSynonym(String scientificName, Object synSecRefItemId, Object accTaxonSecRefItemId, UUID accTaxonUuid);
 
 
     /**
@@ -55,6 +55,21 @@ public interface INewTaxonBaseComponentListener {
      * @return
      */
     public Object getClassificationRefId(UUID classificationUuid);
+
+
+    /**
+     * @return
+     */
+    public CdmSQLContainer getAccTaxonSecRefContainer();
+
+
+    /**
+     * @return
+     */
+    public CdmSQLContainer getSynSecRefContainer();
+
+
+
 
 
 

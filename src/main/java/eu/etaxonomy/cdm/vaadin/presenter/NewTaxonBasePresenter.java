@@ -46,7 +46,8 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
 
 
-    private final CdmSQLContainer secRefContainer;
+    private final CdmSQLContainer accTaxonSecRefContainer;
+    private final CdmSQLContainer synSecRefContainer;
 
     private final IReferenceService referenceService;
     private final ITaxonNodeService taxonNodeService;
@@ -55,16 +56,20 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final ICdmApplicationConfiguration app;
 
 
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#getSecRefContainer()
-     */
+
     @Override
-    public CdmSQLContainer getSecRefContainer() {
-        return secRefContainer;
+    public CdmSQLContainer getAccTaxonSecRefContainer() {
+        return accTaxonSecRefContainer;
+    }
+
+    @Override
+    public CdmSQLContainer getSynSecRefContainer() {
+        return synSecRefContainer;
     }
 
     public NewTaxonBasePresenter() throws SQLException {
-        secRefContainer = CdmSQLContainer.newInstance("Reference");
+        accTaxonSecRefContainer = CdmSQLContainer.newInstance("Reference");
+        synSecRefContainer = CdmSQLContainer.newInstance("Reference");
         referenceService = CdmSpringContextHelper.getReferenceService();
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
         taxonService = CdmSpringContextHelper.getTaxonService();
@@ -78,7 +83,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     @Override
     public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
         TransactionStatus tx = app.startTransaction();
-        UUID uuid = secRefContainer.getUuid(secRefItemId);
+        UUID uuid = accTaxonSecRefContainer.getUuid(secRefItemId);
 
         Reference sec = CdmBase.deproxy(referenceService.load(uuid), Reference.class);
 
@@ -102,19 +107,27 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
      * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newSynonym(java.lang.String, java.lang.Object, java.util.UUID)
      */
     @Override
-    public IdUuidName newSynonym(String scientificName, Object secRefItemId, UUID accTaxonUuid) {
+    public IdUuidName newSynonym(String scientificName, Object synSecRefItemId, Object accTaxonSecRefItemId, UUID accTaxonUuid) {
         TransactionStatus tx = app.startTransaction();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "synonymRelations"
         });
-        UUID refUuid = secRefContainer.getUuid(secRefItemId);
-        Reference sec = CdmBase.deproxy(referenceService.load(refUuid), Reference.class);
+
+        UUID synRefUuid = synSecRefContainer.getUuid(synSecRefItemId);
+        Reference synSec = CdmBase.deproxy(referenceService.load(synRefUuid), Reference.class);
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
         NonViralName name = parser.parseFullName(scientificName);
         name.setTitleCache(scientificName, true);
+        Synonym newSynonym = Synonym.NewInstance(name, synSec);
+
+
+        UUID accTaxonRefUuid = accTaxonSecRefContainer.getUuid(accTaxonSecRefItemId);
+        Reference accTaxonSec = CdmBase.deproxy(referenceService.load(accTaxonRefUuid), Reference.class);
         Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, ACC_TAXON_INIT_STRATEGY), Taxon.class);
-        Synonym newSynonym = Synonym.NewInstance(name, sec);
+        accTaxon.setSec(accTaxonSec);
+
         accTaxon.addSynonym(newSynonym, SynonymRelationshipType.SYNONYM_OF());
+
         UUID newUuid = taxonService.save(newSynonym);
         app.commitTransaction(tx);
         return new IdUuidName(newSynonym.getId(), newUuid, newSynonym.getTitleCache());

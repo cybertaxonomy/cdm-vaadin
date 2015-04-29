@@ -53,13 +53,15 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testNewTaxonBase() throws SQLException {
         RowId refId20 = new RowId(20);
+        RowId refId21 = new RowId(21);
         UUID newTaxonUuid = ntbp.newTaxon("Taxon E", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
+                "sec",
                 "synonymRelations"
         });
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
-        UUID newSynonymUuid = ntbp.newSynonym("Synonym OfE", refId20, newTaxonUuid).getUuid();
+        UUID newSynonymUuid = ntbp.newSynonym("Synonym OfE", refId20, refId21, newTaxonUuid).getUuid();
         taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
         Set<Synonym> synonyms = taxon.getSynonyms();
@@ -68,6 +70,12 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
         Synonym synonym = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newSynonymUuid),Synonym.class);
         Assert.assertEquals(synonym, synonymOfTaxon);
+
+        Assert.assertEquals(synonym.getSec().getId(), 20);
+
+        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+
+        Assert.assertEquals(taxon.getSec().getId(), 21);
     }
 
 

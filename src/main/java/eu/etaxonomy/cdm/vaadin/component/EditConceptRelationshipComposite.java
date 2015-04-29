@@ -406,7 +406,7 @@ public class EditConceptRelationshipComposite extends CustomComponent {
     private static void showInDialog(String windowTitle,
             EditConceptRelationshipComposite ecrc) {
         //FIXME : hack for the moment to demonstrate checking of concept relationship rules
-        if(!ecrc.canCreateRelationship()) {
+        if(ecrc.action.equals(Action.Create) && !ecrc.canCreateRelationship()) {
             Notification.show("Cannot create relationship for a taxon which is already congruent to another taxon", Type.WARNING_MESSAGE);
             return;
         }
