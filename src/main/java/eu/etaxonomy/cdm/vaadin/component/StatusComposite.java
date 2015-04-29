@@ -116,6 +116,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private static final String CREATE_SYNONYM = "Create Synonym";
     private static final String SET_AS_DELETED = "Set as Deleted";
     private static final String SET_AS_EXCLUDED = "Set as Excluded";
+    private static final String SET_AS_UNRESOLVED = "Set as Unresolved";
     private static final String SET_AS_OUT_OF_SCOPE = "Set as Out Of Scope";
 
     private static final String PROPERTY_FILTER_ID = "filter";
@@ -442,6 +443,10 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
         ContextMenuItem setExcludedMenuItem = taxaTableContextMenu.addItem(SET_AS_EXCLUDED);
         setExcludedMenuItem.setData(SET_AS_EXCLUDED);
+
+        ContextMenuItem setUnresolvedMenuItem = taxaTableContextMenu.addItem(SET_AS_UNRESOLVED);
+        setUnresolvedMenuItem.setData(SET_AS_UNRESOLVED);
+
 
         ContextMenuItem setOutOfScopeMenuItem = taxaTableContextMenu.addItem(SET_AS_OUT_OF_SCOPE);
         setOutOfScopeMenuItem.setData(SET_AS_OUT_OF_SCOPE);
