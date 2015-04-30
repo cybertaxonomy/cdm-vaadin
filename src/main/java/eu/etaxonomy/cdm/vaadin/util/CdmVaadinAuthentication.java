@@ -54,6 +54,10 @@ public class CdmVaadinAuthentication {
         return false;
     }
 
+    public Authentication getAuthentication(URI uri, String context){
+        return hostAuthenticationMap.get(getRequestSource(uri, context));
+    }
+
     public boolean setSecurityContextAuthentication(URI uri, String context) {
         if(uri != null && context != null && !context.isEmpty()) {
             Authentication authentication = hostAuthenticationMap.get(getRequestSource(uri, context));

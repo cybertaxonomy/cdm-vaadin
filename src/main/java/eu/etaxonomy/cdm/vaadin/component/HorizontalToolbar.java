@@ -6,7 +6,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -16,6 +18,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
+
+import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 
 public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
@@ -40,7 +44,9 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 //	private ExcelExporter exporter = new ExcelExporter();
 
 	public HorizontalToolbar() {
-		authentication = (Authentication) VaadinSession.getCurrent().getAttribute("authentication");
+//		authentication = (Authentication) VaadinSession.getCurrent().getAttribute("authentication");
+		CdmVaadinAuthentication authentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
+		this.authentication = authentication.getAuthentication(Page.getCurrent().getLocation(), VaadinServlet.getCurrent().getServletContext().getContextPath());
 		init();
 	}
 
