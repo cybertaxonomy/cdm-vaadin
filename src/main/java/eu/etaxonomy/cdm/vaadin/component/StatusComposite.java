@@ -132,11 +132,14 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private static final String IN_VIEW_PREFIX = "in view : ";
 
     private boolean isTaxaTableInitialised = false;
+
     private boolean isFiltertableInitialised = false;
 
     private String selectedTaxaTableMenuItem = null;
 
     ContextMenu taxaTableContextMenu;
+
+    private List<String> columnIds;
 
     /**
      * The constructor should first build the main layout, set the
@@ -204,59 +207,65 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         return null;
     }
 
-    private void initTaxaTable(int classificationId) {
+    private void initTaxaTable() {
         taxaTreeTable.setMultiSelect(taxaTreeTableMultiSelectMode);
         taxaTreeTable.setImmediate(false);
         taxaTreeTable.setDragMode(TableDragMode.ROW);
-        if(listener != null) {
-            List<String> columnIds = new ArrayList<String>();
-            columnIds.add(LeafNodeTaxonContainer.NAME_ID);
-            taxaTreeTable.setColumnExpandRatio(LeafNodeTaxonContainer.NAME_ID, 1);
-            columnIds.add(LeafNodeTaxonContainer.PB_ID);
-            taxaTreeTable.setColumnWidth(LeafNodeTaxonContainer.PB_ID, 25);
-
-            if(!isTaxaTableInitialised) {
-                taxaTreeTable.addGeneratedColumn(LeafNodeTaxonContainer.PB_ID, new TaxonTableCheckBoxGenerator());
-            }
-
-            try {
-                taxaTreeTable.setContainerDataSource(listener.loadTaxa(classificationId), columnIds);
-            } catch (SQLException e) {
-                //TODO : throw up warning dialog
-                e.printStackTrace();
-            }
+        columnIds = new ArrayList<String>();
+        columnIds.add(LeafNodeTaxonContainer.NAME_ID);
+        taxaTreeTable.setColumnExpandRatio(LeafNodeTaxonContainer.NAME_ID, 1);
+        columnIds.add(LeafNodeTaxonContainer.PB_ID);
+        taxaTreeTable.setColumnWidth(LeafNodeTaxonContainer.PB_ID, 25);
 
 
-            taxaTreeTable.setCellStyleGenerator(new Table.CellStyleGenerator() {
+        taxaTreeTable.addGeneratedColumn(LeafNodeTaxonContainer.PB_ID, new TaxonTableCheckBoxGenerator());
 
-                @Override
-                public String getStyle(Table source, Object itemId, Object propertyId) {
-                    if(source.getItem(itemId) == null) {
-                        return null;
-                    }
-                    if(listener.isSynonym(itemId)) {
-                        // this is a synonym, so we activate the corresponding css class
-                        return "synonym";
-                    } else {
-                        return "taxon";
-                    }
+        taxaTreeTable.setCellStyleGenerator(new Table.CellStyleGenerator() {
 
+            @Override
+            public String getStyle(Table source, Object itemId, Object propertyId) {
+                if(source.getItem(itemId) == null) {
+                    return null;
                 }
-            });
+                if(listener.isSynonym(itemId)) {
+                    // this is a synonym, so we activate the corresponding css class
+                    return "synonym";
+                } else {
+                    return "taxon";
+                }
 
-            taxaTreeTable.setSortContainerPropertyId(LeafNodeTaxonContainer.NAME_ID);
-
-            // NOTE : Not really sure why we need to refresh the container here.
-            // in the case of 'Table' this is not required
-            listener.refresh();
-            updateInViewLabel();
-            isTaxaTableInitialised = true;
-        }
+            }
+        });
 
         taxaTableContextMenu = new ContextMenu();
         taxaTableContextMenu.setAsContextMenuOf(taxaTreeTable);
         addTaxaTreeContextMenuItemListener();
+        isTaxaTableInitialised = true;
+    }
 
+    private void refreshTaxaTable(int classificationId) {
+        if(!isTaxaTableInitialised) {
+            initTaxaTable();
+        }
+
+        try {
+            // Cannot use the setContainerDataSource method which has the column ids as
+            // second argument, since this method is taken from the Table class and
+            // hence the container strategy is not set to null, implying that the old
+            // preorder list is not cleaned up - potential bug in the tree table api ?
+            taxaTreeTable.setContainerDataSource(listener.loadTaxa(classificationId));
+            taxaTreeTable.setVisibleColumns(LeafNodeTaxonContainer.NAME_ID, LeafNodeTaxonContainer.PB_ID);
+        } catch (SQLException e) {
+            //TODO : throw up warning dialog
+            e.printStackTrace();
+        }
+        // We need to set the sort property id to null and then
+        // reset it to the name column else the sort is not performed
+        // since the sort property id has not changed - potential bug
+        // in the tree table api ?
+        taxaTreeTable.setSortContainerPropertyId(null);
+        taxaTreeTable.setSortContainerPropertyId(LeafNodeTaxonContainer.NAME_ID);
+        updateInViewLabel();
 
     }
 
@@ -276,8 +285,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             }
         }
     }
-
-
 
     private void initFilterTable() {
         filterTable.setNullSelectionAllowed(false);
@@ -380,7 +387,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                 if (classificationComboBox.getValue() != null) {
                     Object selected = classificationComboBox.getValue();
                     int classificationId = (Integer)((RowId)selected).getId()[0];
-                    initTaxaTable(classificationId);
+                    refreshTaxaTable(classificationId);
                     initFilterTable();
                     setEnabledAll(true);
                 }

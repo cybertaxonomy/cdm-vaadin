@@ -78,6 +78,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         taxonSynonymMap = new HashMap<Object,List<Object>>();
         initFilters();
         addContainerFilter(classificationFilter);
+        enableCacheFlushNotifications();
         //addContainerFilter(rankFilter);
     }
 
@@ -190,14 +191,11 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      */
     @Override
     public boolean areChildrenAllowed(Object itemId) {
-
         Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
         if(hasSynProperty == null) {
             return false;
         }
-        return (Long)hasSynProperty.getValue() > 0;
-
-
+       return (Long)hasSynProperty.getValue() > 0;
     }
 
     /* (non-Javadoc)
@@ -225,7 +223,8 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     public boolean isSynonym(Object itemId) {
-        return synonymContainer.containsId(itemId);
+        Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
+        return hasSynProperty == null;
     }
 
     public void removeTaxonFromCache(Object itemId) {
