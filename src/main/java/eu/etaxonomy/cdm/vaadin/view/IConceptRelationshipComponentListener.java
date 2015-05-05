@@ -28,6 +28,11 @@ public interface IConceptRelationshipComponentListener {
      */
     public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) throws JSONException;
 
+    /**
+     *
+     */
+    public void clearRelationshipView();
+
 
 
 }

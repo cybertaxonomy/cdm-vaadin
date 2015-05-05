@@ -114,6 +114,10 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         }
     }
 
+    public void clear() {
+        setConceptRelationshipTree("{}");
+    }
+
     private void updateForOneToOne(Taxon fromTaxon) throws JSONException {
         Set<TaxonRelationship> relationsFromThisTaxon = fromTaxon.getRelationsFromThisTaxon();
 

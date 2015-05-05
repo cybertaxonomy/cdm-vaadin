@@ -51,6 +51,11 @@ public class ConceptRelationshipPresenter implements IConceptRelationshipCompone
         app.commitTransaction(tx);
     }
 
+    @Override
+    public void clearRelationshipView() {
+        crTree.clear();
+    }
+
 
 
 }

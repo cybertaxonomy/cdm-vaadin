@@ -200,10 +200,15 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
     public void onSelect(SelectionEvent event) {
         if(event.getSourceType().equals(StatusComposite.class)) {
             fromTaxonIun = (IdUuidName)event.getSelectedObjects().get(0);
-            view.setPrimaryStatusCompositeUuid((UUID)event.getSelectedObjects().get(1));
-            refreshRelationshipView(view.getDirection());
-            setSelectedTaxonRelUuid(null);
+            if(fromTaxonIun != null) {
+                view.setPrimaryStatusCompositeUuid((UUID)event.getSelectedObjects().get(1));
+                refreshRelationshipView(view.getDirection());
+                setSelectedTaxonRelUuid(null);
+            } else {
+                listener.clearRelationshipView();
+            }
             updateControls();
+
         }
     }
 

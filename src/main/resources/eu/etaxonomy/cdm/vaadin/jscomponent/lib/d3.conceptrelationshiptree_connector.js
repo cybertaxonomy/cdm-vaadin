@@ -57,7 +57,7 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
     var dirMult = 1;
     this.onStateChange = function() {
         crTree = this.getState().conceptRelationshipTree;
-
+       
         if(crTree) {
             root = JSON.parse(connector.getState().conceptRelationshipTree);
                         
@@ -78,7 +78,7 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
             tree = d3.layout.tree().size(orientation.size);
             update(root);
             d3.select(self.frameElement).style("height", "800px");
-        }           
+        }       
     }
 
     
@@ -103,7 +103,7 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         .on("click", click);
 
         nodeEnter.append("circle")
-        .attr("r", function(d) { return d.type === "taxon" ? 5 : 10; })
+        .attr("r", function(d) { return d.type === "taxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
         .style("fill", function(d) { return d === source && d.type === "conceptr" ? "#DF7401" : "#fff"; });
         
         nodeEnter.append("text")
@@ -126,7 +126,7 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         .attr("transform", function(d) { return "translate(" + orientation.x(d) + "," + orientation.y(d) + ")"; });
 
         nodeUpdate.select("circle")
-        .attr("r", function(d) { return d.type === "taxon" ? 5 : 10; })
+        .attr("r", function(d) { return d.type === "taxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
         .style("fill", function(d) { return d === selectedNode && d.type === "conceptr" ? "#DF7401" : "#fff"; });
 
         nodeUpdate.select("text")

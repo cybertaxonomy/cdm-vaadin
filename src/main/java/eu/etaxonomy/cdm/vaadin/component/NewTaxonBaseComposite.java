@@ -192,16 +192,19 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
                     public boolean execute() {
                         setProgress("Saving Taxon " + nameTextField.getValue());
                         IdUuidName taxonBaseIdUuid;
+                        boolean newTaxon = false;
                         if(accTaxonIun == null) {
                             taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),accTaxonSecComboBox.getValue(), classificationIun.getUuid());
+                            newTaxon = true;
                         } else {
                             taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),
                                     accTaxonSecComboBox.getValue(),
                                     accTaxonSecComboBox.getValue(),
                                     accTaxonIun.getUuid());
+                            newTaxon = false;
                         }
                         Object rowId = new RowId(taxonBaseIdUuid.getId());
-                        registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId), NewTaxonBaseComposite.class));
+                        registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId, newTaxon), NewTaxonBaseComposite.this));
                         return true;
                     }
 

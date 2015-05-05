@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.component;
 
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -102,12 +101,12 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private StatusComponentListener listener;
 
 
-    private final boolean taxaTreeTableMultiSelectMode = true;
+
 
     private static final String SELECT_CLASSIFICATION = "Select classification ...";
 
 
-    private static final String CREATE_ACC_TAXON = "Create Accepted Taxon";
+    private static final String CREATE_NEW_TAXON = "Create New Taxon";
     private static final String CHANGE_TO_ACC_TAXON = "Change to Accepted Taxon";
     private static final String REPLACE_ACC_TAXON = "Replace Accepted Taxon";
     private static final String CHANGE_TO_SYNONYM = "Change to Synonym";
@@ -133,8 +132,8 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private boolean isFiltertableInitialised = false;
 
 
-
-    ContextMenu taxaTableContextMenu;
+    private NewTaxonBaseComposite currentNewTaxonBaseComponent;
+    private ContextMenu taxaTableContextMenu;
 
 
     /**
@@ -213,7 +212,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
     private void initTaxaTable() {
         taxaTreeTable.setSelectable(true);
-        taxaTreeTable.setMultiSelect(taxaTreeTableMultiSelectMode);
         taxaTreeTable.setImmediate(true);
         taxaTreeTable.setDragMode(TableDragMode.ROW);
 
@@ -421,29 +419,37 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
     private void addTaxaTreeTableListener() {
 
-        taxaTreeTable.addItemClickListener(new ItemClickListener() {
+        taxaTreeTable.addValueChangeListener(new ValueChangeListener() {
+
             @Override
-            public void itemClick(ItemClickEvent event) {
-                Object itemId = event.getItemId();
-                if(taxaTreeTable.isSelectable()) {
+            public void valueChange(ValueChangeEvent event) {
+                Object itemId = taxaTreeTable.getValue();
+                Object taxonIun = null;
+                if(taxaTreeTable.isSelectable() && itemId != null) {
                     boolean isSynonym = listener.isSynonym(itemId);
-                    if(!CdmVaadinUtilities.isSelected(taxaTreeTable, itemId) && !isSynonym) {
+                    if(!isSynonym) {
                         UUID taxonUuid = listener.getCurrentLeafNodeTaxonContainer().getUuid(itemId);
                         String taxonName = (String)listener.getCurrentLeafNodeTaxonContainer().getProperty(itemId, LeafNodeTaxonContainer.NAME_ID).getValue();
-                        Object idUuidName = new IdUuidName(itemId, taxonUuid, taxonName);
-                        CdmVaadinSessionUtilities.getCurrentSelectionService()
-                        .fireSelectionEvent(new SelectionEvent(Arrays.asList(idUuidName, getSelectedClassificationUuid()), StatusComposite.class), true);
-                    }
-                    taxaTreeTable.setValue(Arrays.asList(itemId));
-                    generateTaxaTreeTableContextMenu(isSynonym);
+                        taxonIun = new IdUuidName(itemId, taxonUuid, taxonName);
 
+                    }
+                    CdmVaadinSessionUtilities.getCurrentSelectionService()
+                    .fireSelectionEvent(new SelectionEvent(Arrays.asList(taxonIun, getSelectedClassificationUuid()), StatusComposite.class), true);
                 }
             }
         });
 
-        //taxaTreeTable.add
-
-
+        taxaTreeTable.addItemClickListener(new ItemClickListener() {
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                Object itemId = event.getItemId();
+                if(taxaTreeTable.isSelectable() && itemId != null) {
+                    boolean isSynonym = listener.isSynonym(itemId);
+                    taxaTreeTable.setValue(itemId);
+                    generateTaxaTreeTableContextMenu(isSynonym);
+                }
+            }
+        });
     }
 
     private void generateTaxaTreeTableContextMenu(boolean isSynonym) {
@@ -465,8 +471,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
             ContextMenuItem changeToSynMenuItem = taxaTableContextMenu.addItem(CHANGE_TO_SYNONYM);
             changeToSynMenuItem.setData(CHANGE_TO_SYNONYM);
-
-            changeToSynMenuItem.setSeparatorVisible(true);
         }
 
         ContextMenuItem setDeletedMenuItem = taxaTableContextMenu.addItem(SET_AS_DELETED);
@@ -482,8 +486,10 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         ContextMenuItem setOutOfScopeMenuItem = taxaTableContextMenu.addItem(SET_AS_OUT_OF_SCOPE);
         setOutOfScopeMenuItem.setData(SET_AS_OUT_OF_SCOPE);
 
-        ContextMenuItem createAccTaxonMenuItem = taxaTableContextMenu.addItem(CREATE_ACC_TAXON);
-        createAccTaxonMenuItem.setData(CREATE_ACC_TAXON);
+        setOutOfScopeMenuItem.setSeparatorVisible(true);
+
+        ContextMenuItem createAccTaxonMenuItem = taxaTableContextMenu.addItem(CREATE_NEW_TAXON);
+        createAccTaxonMenuItem.setData(CREATE_NEW_TAXON);
 
     }
 
@@ -497,7 +503,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                     if(source instanceof ContextMenuItem) {
                         ContextMenuItem menuItem = (ContextMenuItem) source;
                         String action = (String)menuItem.getData();
-                        if(CREATE_ACC_TAXON.equals(action) || CREATE_SYNONYM.equals(action)) {
+                        if(CREATE_NEW_TAXON.equals(action) || CREATE_SYNONYM.equals(action)) {
                             showAddTaxonBaseWindow(action);
                         } else {
                             Notification.show(action + " to be implemented", Type.WARNING_MESSAGE);
@@ -517,14 +523,8 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             IdUuidName accTaxonIdUuid = null;
             String accTaxonName = null;
             if(action.equals(CREATE_SYNONYM)) {
-                Set<Object> selectedIds = (Set<Object>)taxaTreeTable.getValue();
-                // if zero or more than one items (taxa / synonyms) are selected
-                // throw a warning
-                if(selectedIds.size() != 1) {
-                    Notification.show("Multiple or No selection", "Please select a single Taxon", Type.WARNING_MESSAGE);
-                    return;
-                }
-                selectedItemId = selectedIds.iterator().next();
+                selectedItemId = taxaTreeTable.getValue();
+
                 // if a synonym is selected then throw warning
                 if(listener.isSynonym(selectedItemId)) {
                     Notification.show("Synonym selected", "Please choose a Taxon", Type.WARNING_MESSAGE);
@@ -550,13 +550,12 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
                 IdUuidName classificationIdUuid = new IdUuidName(classificationComboBox.getValue(),
                         classificationUuid,
                         (String) listener.getClassificationContainer().getProperty(cId, StatusPresenter.C_TCACHE_ID).getValue());
-                NewTaxonBaseComposite newTaxonComponent =
-                        new NewTaxonBaseComposite(dialog,
+                 currentNewTaxonBaseComponent = new NewTaxonBaseComposite(dialog,
                                 new NewTaxonBasePresenter(),
                                 accTaxonIdUuid,
                                 accTaxonName,
                                 classificationIdUuid);
-                dialog.setContent(newTaxonComponent);
+                dialog.setContent(currentNewTaxonBaseComponent);
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -677,22 +676,24 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
      */
     @Override
     public void onCreate(CdmChangeEvent event) {
-        if(event.getSourceType().equals(NewTaxonBaseComposite.class)) {
+        if(event.getSource() != null && event.getSource() == currentNewTaxonBaseComponent) {
             Object itemId = event.getChangedObjects().get(0);
-            try {
-                taxaTreeTable.setMultiSelect(false);
-                if(listener.getCurrentLeafNodeTaxonContainer().isSynonym(itemId)) {
-                    taxaTreeTable.setCollapsed(taxaTreeTable.getValue(), false);
-                    listener.refresh();
-                    taxaTreeTable.setValue(itemId);
-                } else {
-                    clearDynamicFilters();
-                    listener.setIdFilter(itemId);
-                    taxaTreeTable.setValue(itemId);
-                }
-            } finally {
-                taxaTreeTable.setMultiSelect(taxaTreeTableMultiSelectMode);
+            boolean newTaxon= (Boolean) event.getChangedObjects().get(1);
+
+            if(newTaxon) {
+                // after creating a new taxon we clear all filters and
+                // filter in only the newly created taxon and select it
+                clearDynamicFilters();
+                listener.setIdFilter(itemId);
+                taxaTreeTable.setValue(itemId);
+            } else {
+                // after creating a new synonym we expand the selected taxon
+                // and select the newly created synonym
+                taxaTreeTable.setCollapsed(taxaTreeTable.getValue(), false);
+                listener.refresh();
+                taxaTreeTable.setValue(itemId);
             }
+
         }
     }
 

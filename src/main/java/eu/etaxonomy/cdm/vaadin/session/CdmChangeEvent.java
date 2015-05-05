@@ -28,7 +28,8 @@ public class CdmChangeEvent {
 
     private final Action action;
     private final List<Object> changedObjects;
-    private final Class<? extends Component> sourceType;
+    private Class<? extends Component> sourceType;
+    private Object source;
 
     public CdmChangeEvent(Action action, List<Object> changedObjects, Class<? extends Component> sourceType) {
         this.action = action;
@@ -40,6 +41,19 @@ public class CdmChangeEvent {
         if(sourceType == null) {
             throw new IllegalArgumentException("Source type cannot be null");
         }
+    }
+
+    public CdmChangeEvent(Action action, List<Object> changedObjects, Component source) {
+        this.action = action;
+        this.changedObjects = changedObjects;
+        if(changedObjects == null || changedObjects.isEmpty()) {
+            throw new IllegalArgumentException("Changed objects cannot be empty");
+        }
+        this.source= source;
+        if(source == null) {
+            throw new IllegalArgumentException("Source cannot be null");
+        }
+        this.sourceType = source.getClass();
     }
 
     /**
@@ -61,6 +75,14 @@ public class CdmChangeEvent {
      */
     public Class<? extends Component> getSourceType() {
         return sourceType;
+    }
+
+
+    /**
+     * @return the source
+     */
+    public Object getSource() {
+        return source;
     }
 
 }
