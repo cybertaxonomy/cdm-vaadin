@@ -10,9 +10,7 @@
 package eu.etaxonomy.cdm.vaadin.component;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -66,6 +64,7 @@ import eu.etaxonomy.cdm.vaadin.presenter.StatusPresenter;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.ICdmChangeListener;
 import eu.etaxonomy.cdm.vaadin.session.SelectionEvent;
+import eu.etaxonomy.cdm.vaadin.util.CdmVaadinOperation;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
@@ -102,7 +101,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private static final Logger logger = Logger.getLogger(StatusComposite.class);
     private StatusComponentListener listener;
 
-    private Object currentClickedTaxonItemId;
 
     private final boolean taxaTreeTableMultiSelectMode = true;
 
@@ -122,7 +120,6 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     private static final String PROPERTY_FILTER_ID = "filter";
     private static final String PROPERTY_SELECTED_ID = "selected";
 
-    private static final String FILTER_NOT_RESOLVED = "not resolved";
     private static final String FILTER_UNPLACED = "unplaced";
     private static final String FILTER_UNFINISHED = "unfinished";
     private static final String FILTER_UNPUBLISHED = "unpublished";
@@ -135,11 +132,10 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
     private boolean isFiltertableInitialised = false;
 
-    private String selectedTaxaTableMenuItem = null;
+
 
     ContextMenu taxaTableContextMenu;
 
-    private List<String> columnIds;
 
     /**
      * The constructor should first build the main layout, set the
@@ -179,8 +175,16 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     }
 
     public void init() {
-        taxaTreeTable.setSelectable(true);
         initClassificationComboBox();
+        setExpandRatios();
+    }
+
+    private void setExpandRatios() {
+        mainLayout.setRowExpandRatio(0, 1);
+        mainLayout.setRowExpandRatio(1, 5);
+        mainLayout.setRowExpandRatio(2, 1);
+        mainLayout.setRowExpandRatio(3, 35);
+        mainLayout.setRowExpandRatio(4, 1);
     }
 
     public void setEnabledAll(boolean enabled) {
@@ -208,13 +212,12 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
     }
 
     private void initTaxaTable() {
+        taxaTreeTable.setSelectable(true);
         taxaTreeTable.setMultiSelect(taxaTreeTableMultiSelectMode);
-        taxaTreeTable.setImmediate(false);
+        taxaTreeTable.setImmediate(true);
         taxaTreeTable.setDragMode(TableDragMode.ROW);
-        columnIds = new ArrayList<String>();
-        columnIds.add(LeafNodeTaxonContainer.NAME_ID);
+
         taxaTreeTable.setColumnExpandRatio(LeafNodeTaxonContainer.NAME_ID, 1);
-        columnIds.add(LeafNodeTaxonContainer.PB_ID);
         taxaTreeTable.setColumnWidth(LeafNodeTaxonContainer.PB_ID, 25);
 
 
@@ -386,10 +389,31 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
             public void valueChange(ValueChangeEvent event) {
                 if (classificationComboBox.getValue() != null) {
                     Object selected = classificationComboBox.getValue();
-                    int classificationId = (Integer)((RowId)selected).getId()[0];
-                    refreshTaxaTable(classificationId);
-                    initFilterTable();
-                    setEnabledAll(true);
+                    final int classificationId = (Integer)((RowId)selected).getId()[0];
+
+                    setEnabledAll(false);
+                    filterTable.setReadOnly(true);
+                    taxaTreeTable.setSelectable(false);
+
+                    CdmVaadinUtilities.exec(new CdmVaadinOperation(100, null) {
+
+                        @Override
+                        public boolean execute() {
+                            setProgress("loading taxa");
+                            return true;
+                        }
+
+                        @Override
+                        public void postOpUIUpdate(boolean isOpSuccess) {
+                            refreshTaxaTable(classificationId);
+                            initFilterTable();
+                            setEnabledAll(true);
+                            filterTable.setReadOnly(false);
+                            taxaTreeTable.setSelectable(true);
+                        }
+                    });
+
+
                 }
             }
         });
@@ -705,19 +729,20 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         mainLayout = new GridLayout();
         mainLayout.setImmediate(false);
         mainLayout.setWidth("340px");
-        mainLayout.setHeight("840px");
+        mainLayout.setHeight("100%");
         mainLayout.setMargin(true);
-        mainLayout.setRows(6);
+        mainLayout.setSpacing(true);
+        mainLayout.setRows(5);
 
         // top-level component properties
         setWidth("340px");
-        setHeight("840px");
+        setHeight("100.0%");
 
         // classificationComboBox
         classificationComboBox = new ComboBox();
         classificationComboBox.setImmediate(false);
         classificationComboBox.setWidth("100.0%");
-        classificationComboBox.setHeight("-1px");
+        classificationComboBox.setHeight("100.0%");
         mainLayout.addComponent(classificationComboBox, 0, 0);
 
         // filterVerticalLayout
@@ -727,24 +752,24 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
         // searchHorizontalLayout
         searchHorizontalLayout = buildSearchHorizontalLayout();
-        mainLayout.addComponent(searchHorizontalLayout, 0, 3);
+        mainLayout.addComponent(searchHorizontalLayout, 0, 2);
         mainLayout.setComponentAlignment(searchHorizontalLayout, new Alignment(48));
 
         // taxaTreeTable
         taxaTreeTable = new TreeTable();
         taxaTreeTable.setImmediate(false);
         taxaTreeTable.setWidth("100.0%");
-        taxaTreeTable.setHeight("614px");
-        mainLayout.addComponent(taxaTreeTable, 0, 4);
+        taxaTreeTable.setHeight("100.0%");
+        mainLayout.addComponent(taxaTreeTable, 0, 3);
         mainLayout.setComponentAlignment(taxaTreeTable, new Alignment(20));
 
         // inViewLabel
         inViewLabel = new Label();
         inViewLabel.setImmediate(false);
         inViewLabel.setWidth("100.0%");
-        inViewLabel.setHeight("-1px");
+        inViewLabel.setHeight("100.0%");
         inViewLabel.setValue("in view : ");
-        mainLayout.addComponent(inViewLabel, 0, 5);
+        mainLayout.addComponent(inViewLabel, 0, 4);
 
         return mainLayout;
     }
@@ -757,7 +782,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         filterVerticalLayout = new VerticalLayout();
         filterVerticalLayout.setImmediate(false);
         filterVerticalLayout.setWidth("100.0%");
-        filterVerticalLayout.setHeight("-1px");
+        filterVerticalLayout.setHeight("100.0%");
         filterVerticalLayout.setMargin(false);
 
         // filterLabel
@@ -772,8 +797,9 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         filterTable = new Table();
         filterTable.setImmediate(false);
         filterTable.setWidth("100.0%");
-        filterTable.setHeight("74px");
+        filterTable.setHeight("100.0%");
         filterVerticalLayout.addComponent(filterTable);
+        filterVerticalLayout.setExpandRatio(filterTable, 1.0f);
         filterVerticalLayout.setComponentAlignment(filterTable, new Alignment(48));
 
         return filterVerticalLayout;
@@ -787,7 +813,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         searchHorizontalLayout = new HorizontalLayout();
         searchHorizontalLayout.setImmediate(false);
         searchHorizontalLayout.setWidth("100.0%");
-        searchHorizontalLayout.setHeight("-1px");
+        searchHorizontalLayout.setHeight("100.0%");
         searchHorizontalLayout.setMargin(false);
         searchHorizontalLayout.setSpacing(true);
 

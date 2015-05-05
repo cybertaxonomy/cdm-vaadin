@@ -284,7 +284,7 @@ public class ConceptRelationshipComposite extends CustomComponent implements ISe
         // d3ConceptRelationShipTree
         d3ConceptRelationShipTree = new D3ConceptRelationshipTree();
         d3ConceptRelationShipTree.setImmediate(false);
-        d3ConceptRelationShipTree.setWidth("-1px");
+        d3ConceptRelationShipTree.setWidth("100.0%");
         d3ConceptRelationShipTree.setHeight("-1px");
         mainLayout.addComponent(d3ConceptRelationShipTree);
         mainLayout.setExpandRatio(d3ConceptRelationShipTree, 1.0f);

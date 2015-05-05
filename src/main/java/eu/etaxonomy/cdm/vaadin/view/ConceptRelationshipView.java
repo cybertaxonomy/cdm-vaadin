@@ -215,24 +215,27 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
         statusCompositeLeft = new StatusComposite();
         statusCompositeLeft.setImmediate(false);
         statusCompositeLeft.setWidth("-1px");
-        statusCompositeLeft.setHeight("-1px");
+        statusCompositeLeft.setHeight("100.0%");
         mainLayout.addComponent(statusCompositeLeft);
+        mainLayout.setExpandRatio(statusCompositeLeft, 1.0f);
 
         // conceptRelationshipComposite
         conceptRelationshipComposite = new ConceptRelationshipComposite();
         conceptRelationshipComposite.setImmediate(false);
         conceptRelationshipComposite.setWidth("-1px");
-        conceptRelationshipComposite.setHeight("-1px");
+        conceptRelationshipComposite.setHeight("100.0%");
         mainLayout.addComponent(conceptRelationshipComposite);
-        mainLayout.setExpandRatio(conceptRelationshipComposite, 1.0f);
+        mainLayout.setExpandRatio(conceptRelationshipComposite, 2.0f);
         mainLayout.setComponentAlignment(conceptRelationshipComposite, new Alignment(20));
 
         // statusCompositeRight
         statusCompositeRight = new StatusComposite();
         statusCompositeRight.setImmediate(false);
         statusCompositeRight.setWidth("-1px");
-        statusCompositeRight.setHeight("-1px");
+        statusCompositeRight.setHeight("100.0%");
         mainLayout.addComponent(statusCompositeRight);
+        mainLayout.setExpandRatio(statusCompositeRight, 1.0f);
+        mainLayout.setComponentAlignment(statusCompositeRight, new Alignment(6));
 
         return mainLayout;
     }
