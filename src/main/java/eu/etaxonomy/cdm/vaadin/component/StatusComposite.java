@@ -434,7 +434,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
 
                     }
                     CdmVaadinSessionUtilities.getCurrentSelectionService()
-                    .fireSelectionEvent(new SelectionEvent(Arrays.asList(taxonIun, getSelectedClassificationUuid()), StatusComposite.class), true);
+                    .fireSelectionEvent(new SelectionEvent(Arrays.asList(taxonIun), StatusComposite.this), true);
                 }
             }
         });

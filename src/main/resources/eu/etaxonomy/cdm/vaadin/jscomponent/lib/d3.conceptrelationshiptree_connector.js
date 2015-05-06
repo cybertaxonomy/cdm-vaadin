@@ -7,7 +7,7 @@
 window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function() {
     var connector = this;
     var diagramElement = connector.getElement();
-    var margin = {top: 20, right: 120, bottom: 20, left: 120},
+    var margin = {top: 20, right: 40, bottom: 20, left: 40},
     width = 740 - margin.right - margin.left,
     height = 600 - margin.top - margin.bottom;
 
@@ -52,8 +52,9 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
     };
     // default setting is left-right
     var orientation = orientations.rightleft;    
-    var tAnchorWithChildren = "end";
-    var tAnchorWithoutChildren = "start";
+    var tAnchorToTaxon = "start";
+    var tAnchorConceptR = "end";
+    var tAnchorFromTaxon = "start";
     var dirMult = 1;
     this.onStateChange = function() {
         crTree = this.getState().conceptRelationshipTree;
@@ -63,14 +64,16 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
                         
             if(root.direction === "left-right") {               
                 orientation = orientations.leftright;       
-                tAnchorWithChildren = "end";
-                tAnchorWithoutChildren = "start";
+                tAnchorToTaxon = "start";
+                tAnchorConceptR = "end";
+                tAnchorFromTaxon = "start";
                 dirMult = 1;
             }
             if(root.direction === "right-left") {                
                 orientation = orientations.rightleft;      
-                tAnchorWithChildren = "start";
-                tAnchorWithoutChildren = "end";
+                tAnchorToTaxon = "end";
+                tAnchorConceptR = "start";
+                tAnchorFromTaxon = "end";
                 dirMult = -1;
             }
                         
@@ -103,30 +106,51 @@ window.eu_etaxonomy_cdm_vaadin_jscomponent_D3ConceptRelationshipTree = function(
         .on("click", click);
 
         nodeEnter.append("circle")
-        .attr("r", function(d) { return d.type === "taxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
-        .style("fill", function(d) { return d === source && d.type === "conceptr" ? "#DF7401" : "#fff"; });
+        .attr("r", function(d) { return d.type === "ftaxon" || d.type === "ttaxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
+        .style("fill", function(d) { return d === selectedNode && d.type === "conceptr" ? "#DF7401" : "#fff"; });
         
         nodeEnter.append("text")
         .attr("x", function(d) { 
             if(d.type === "conceptr") { 
                 return dirMult*50;
             } else {
-                return d.children || d._children ? -1*dirMult*10 : dirMult*10; 
+                return d.type === "ttaxon" ? 1*dirMult*10 : -dirMult*40; 
             }
         })
-        .attr("y", function(d) { return d.type === "conceptr" ? -20 : 0; })
+        .attr("y", function(d) { return d.type === "conceptr" ? -20 : d.type === "ftaxon" ? 20: 0; })
         .attr("dy", ".35em")
-        .attr("text-anchor", function(d) { return d.children || d._children ? tAnchorWithChildren : tAnchorWithoutChildren; })
+        .attr("text-anchor",function(d) { 
+            if(d.type === "ftaxon") {
+                return tAnchorFromTaxon;
+            }; 
+            if(d.type === "conceptr") {
+                return tAnchorConceptR;
+            };
+            if(d.type === "ttaxon") {
+                return tAnchorToTaxon;
+            };             
+        })
+        
         .text(function(d) { return d.name; })
+        .style("font-style", function(d){return d.type === "conceptr" ? "normal" : "italic"})
+        .style("font-weight", function(d){return d.type === "conceptr" ? "bold" : "normal"})
+        .style("fill", function(d){return d.type === "conceptr" ? "#000000" : "#005C5C"})
         .style("fill-opacity", 1e-6);
 
+        
         // Transition nodes to their new position.
         var nodeUpdate = node.transition()
         .duration(duration)
-        .attr("transform", function(d) { return "translate(" + orientation.x(d) + "," + orientation.y(d) + ")"; });
+        .attr("transform", function(d) { 
+            if(d.type === "conceptr") {
+                return "translate(" + (orientation.x(d) + 20)  + "," + orientation.y(d) + ")";
+            } else {
+                return "translate(" + orientation.x(d)  + "," + orientation.y(d) + ")";
+            }
+        });
 
         nodeUpdate.select("circle")
-        .attr("r", function(d) { return d.type === "taxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
+        .attr("r", function(d) { return d.type === "ftaxon" || d.type === "ttaxon" ? 5 : d.type === "conceptr" ? 10 : 0; })
         .style("fill", function(d) { return d === selectedNode && d.type === "conceptr" ? "#DF7401" : "#fff"; });
 
         nodeUpdate.select("text")

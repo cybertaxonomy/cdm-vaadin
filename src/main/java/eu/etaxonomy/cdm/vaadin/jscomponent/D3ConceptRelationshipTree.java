@@ -26,9 +26,11 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 
+import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationshipType;
+import eu.etaxonomy.cdm.strategy.cache.TaggedText;
 import eu.etaxonomy.cdm.vaadin.component.ConceptRelationshipComposite;
 
 /**
@@ -125,9 +127,9 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
 
 
         JSONObject fromTaxonJO = new JSONObject();
-        fromTaxonJO.put("name", fromTaxon.getName().getTitleCache());
+        fromTaxonJO.put("name", getAbbreviatedName(fromTaxon.getName()));
         fromTaxonJO.put("uuid", fromTaxon.getUuid().toString());
-        fromTaxonJO.put("type", "taxon");
+        fromTaxonJO.put("type", "ftaxon");
         fromTaxonJO.put("direction", direction.toString());
 
         JSONArray ftChildren = new JSONArray();
@@ -154,7 +156,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
                     JSONObject toTaxonJO = new JSONObject();
                     toTaxonJO.put("name", toTaxon.getName().getTitleCache());
                     toTaxonJO.put("uuid", toTaxon.getUuid());
-                    toTaxonJO.put("type", "taxon");
+                    toTaxonJO.put("type", "ttaxon");
 
                     crChildrenJA.put(0, toTaxonJO);
                     typeIndex++;
@@ -217,6 +219,31 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         setConceptRelationshipTree(fromTaxonJO.toString());
     }
 
+
+    public String getAbbreviatedName(TaxonNameBase tnb) {
+        List<TaggedText> taggedTextList = tnb.getTaggedName();
+        StringBuffer nameSb = new StringBuffer();
+        boolean foundGenusOrUninomial = false;
+        boolean previousTagSeparator = false;
+        for(TaggedText tt: taggedTextList) {
+            if(!tt.isYear() &&!tt.isReference() && !tt.isAuthors()) {
+                if(tt.isName() && !foundGenusOrUninomial) {
+                    nameSb.append(tt.getText().charAt(0) + ".");
+                    foundGenusOrUninomial = true;
+                } else {
+                    if(!previousTagSeparator) {
+                        nameSb.append(" ");
+                    }
+                    nameSb.append(tt.getText());
+                    previousTagSeparator = false;
+                    if(tt.isSeparator()) {
+                        previousTagSeparator = true;
+                    }
+                }
+            }
+        }
+        return nameSb.toString();
+    }
 
     public void setConceptRelationshipTree(String conceptRelationshipTree) {
         getState().setConceptRelationshipTree(conceptRelationshipTree);;

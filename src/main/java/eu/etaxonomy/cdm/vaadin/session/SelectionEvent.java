@@ -21,7 +21,8 @@ import com.vaadin.ui.Component;
 public class SelectionEvent {
 
     private final List<Object> selectedObjects;
-    private final Class<? extends Component> sourceType;
+    private Component source;
+    private Class<? extends Component> sourceType;
 
     public SelectionEvent(List<Object> selectedObjects, Class<? extends Component> sourceType) {
         this.selectedObjects = selectedObjects;
@@ -34,6 +35,18 @@ public class SelectionEvent {
         }
     }
 
+    public SelectionEvent(List<Object> selectedObjects, Component source) {
+        this.selectedObjects = selectedObjects;
+        if(selectedObjects == null || selectedObjects.isEmpty()) {
+            throw new IllegalArgumentException("Changed objects cannot be empty");
+        }
+        this.source = source;
+        if(source == null) {
+            throw new IllegalArgumentException("Source  cannot be null");
+        }
+        this.sourceType = source.getClass();
+    }
+
     /**
      * @return the selectedObjects
      */
@@ -42,9 +55,18 @@ public class SelectionEvent {
     }
 
     /**
+     * @return the source
+     */
+    public Component getSource() {
+        return source;
+    }
+
+    /**
      * @return the sourceType
      */
     public Class<? extends Component> getSourceType() {
         return sourceType;
     }
+
+
 }

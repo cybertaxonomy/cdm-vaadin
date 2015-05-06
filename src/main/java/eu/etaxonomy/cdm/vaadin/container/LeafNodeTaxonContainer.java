@@ -232,8 +232,10 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     public void refreshSynonymCache() {
-        for(Object taxonItemId  : taxonSynonymMap.keySet()) {
-            addToSynonymCache(taxonItemId);
+        if(taxonSynonymMap != null) {
+            for(Object taxonItemId  : taxonSynonymMap.keySet()) {
+                addToSynonymCache(taxonItemId);
+            }
         }
     }
 
@@ -271,7 +273,9 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     @Override
     public void refresh() {
-        synItems.clear();
+        if(synItems != null) {
+            synItems.clear();
+        }
         refreshSynonymCache();
         super.refresh();
     }
