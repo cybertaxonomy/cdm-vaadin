@@ -23,11 +23,13 @@ public class CdmSQLContainer extends SQLContainer {
 
     DatabaseMetaData databaseMetaData;
 
+    public static final int DEFAULT_LIMIT = 5000;
     boolean checkPropertyIdCase = false;
 
     public CdmSQLContainer(QueryDelegate delegate) throws SQLException {
         super(delegate);
         databaseMetaData = CdmSpringContextHelper.getCurrent().getDatabaseMetaData();
+        setPageLength(DEFAULT_LIMIT);
     }
 
     public static CdmSQLContainer newInstance(String tableName) throws SQLException {
