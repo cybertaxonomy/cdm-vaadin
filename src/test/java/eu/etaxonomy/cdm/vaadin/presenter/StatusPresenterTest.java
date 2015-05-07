@@ -53,7 +53,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
         Collection<?> itemIds = container.rootItemIds();
 
-        Assert.assertEquals(4,itemIds.size());
+        Assert.assertEquals(3,itemIds.size());
 
         sp.setUnplacedFilter();
         itemIds = container.getItemIds();
@@ -61,7 +61,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
         sp.removeUnplacedFilter();
         itemIds = container.getItemIds();
-        Assert.assertEquals(4,itemIds.size());
+        Assert.assertEquals(3,itemIds.size());
 
         sp.setNameFilter("Taxon A");
         itemIds = container.getItemIds();
