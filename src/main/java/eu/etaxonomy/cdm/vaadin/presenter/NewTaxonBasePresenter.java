@@ -20,17 +20,21 @@ import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
+import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.NonViralName;
+import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.SynonymRelationshipType;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.strategy.parser.NonViralNameParserImpl;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
@@ -53,6 +57,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final ITaxonNodeService taxonNodeService;
     private final ITaxonService taxonService;
     private final IClassificationService classificationService;
+    private final INameService nameService;
     private final ICdmApplicationConfiguration app;
 
 
@@ -73,23 +78,42 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         referenceService = CdmSpringContextHelper.getReferenceService();
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
         taxonService = CdmSpringContextHelper.getTaxonService();
+        nameService = CdmSpringContextHelper.getNameService();
+
         classificationService = CdmSpringContextHelper.getClassificationService();
         app = CdmSpringContextHelper.getApplicationConfiguration();
     }
 
+    private boolean checkIfNameExists(NonViralName name) {
+        Pager<TaxonNameBase> names = nameService.findByName(name.getClass(),
+                name.getNameCache(),
+                MatchMode.EXACT,
+                null,
+                null,
+                -1,
+                null,
+                null);
+        if(names.getCount() > 0) {
+            return true;
+        }
+        return false;
+    }
     /* (non-Javadoc)
      * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newTaxon(java.lang.String, java.lang.Object, java.util.UUID)
      */
     @Override
     public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
-        TransactionStatus tx = app.startTransaction();
-        UUID uuid = accTaxonSecRefContainer.getUuid(secRefItemId);
-
-        Reference sec = CdmBase.deproxy(referenceService.load(uuid), Reference.class);
-
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
         NonViralName name = parser.parseFullName(scientificName);
-        name.setTitleCache(scientificName, true);
+
+        if(checkIfNameExists(name)) {
+            throw new IllegalArgumentException("Given name already exists");
+        }
+        TransactionStatus tx = app.startTransaction();
+        UUID uuid = accTaxonSecRefContainer.getUuid(secRefItemId);
+        Reference sec = CdmBase.deproxy(referenceService.load(uuid), Reference.class);
+
+        //name.setTitleCache(scientificName, true);
         Taxon newTaxon = Taxon.NewInstance(name, sec);
         newTaxon.setUnplaced(true);
         List<String> CLASSIFICATION_INIT_STRATEGY = Arrays.asList(new String []{
@@ -108,6 +132,12 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
      */
     @Override
     public IdUuidName newSynonym(String scientificName, Object synSecRefItemId, Object accTaxonSecRefItemId, UUID accTaxonUuid) {
+        NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
+        NonViralName name = parser.parseFullName(scientificName);
+
+        if(checkIfNameExists(name)) {
+            throw new IllegalArgumentException("Given name already exists");
+        }
         TransactionStatus tx = app.startTransaction();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "synonymRelations"
@@ -115,9 +145,8 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
         UUID synRefUuid = synSecRefContainer.getUuid(synSecRefItemId);
         Reference synSec = CdmBase.deproxy(referenceService.load(synRefUuid), Reference.class);
-        NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
-        NonViralName name = parser.parseFullName(scientificName);
-        name.setTitleCache(scientificName, true);
+
+        //name.setTitleCache(scientificName, true);
         Synonym newSynonym = Synonym.NewInstance(name, synSec);
 
 

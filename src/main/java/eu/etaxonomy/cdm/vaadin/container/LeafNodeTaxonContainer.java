@@ -30,6 +30,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 /**
@@ -79,7 +80,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         initFilters();
         addContainerFilter(classificationFilter);
         enableCacheFlushNotifications();
-        //addContainerFilter(rankFilter);
+        addContainerFilter(rankFilter);
     }
 
     private void initFilters() {
@@ -88,7 +89,11 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         //unfFilter = new Compare.Equal(StatusPresenter.FN_ID, false);
         unpbFilter = new Compare.Equal("tb.publish", false);
         classificationFilter = new Compare.Equal("tn.classification_id",classificationId);
-        rankFilter = new Compare.Equal("dtb.titleCache","Species");
+
+        // get species aggregate rank order index
+        int saoIndex = Rank.SPECIESAGGREGATE().getOrderIndex();
+        rankFilter = new Compare.GreaterOrEqual("dtb.orderindex", saoIndex);
+
         synonymFilter = new Not(new IsNull("sr.relatedto_id"));
 
         currentFilters = new HashSet<Filter>();

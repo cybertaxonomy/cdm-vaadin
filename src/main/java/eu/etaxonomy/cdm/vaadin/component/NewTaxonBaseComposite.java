@@ -180,31 +180,35 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
                     }
                 } catch (EmptyValueException e) {
                     Notification notification = new Notification("Invalid input", "Neither Name or Secundum can be empty", Type.WARNING_MESSAGE);
-                    notification.setDelayMsec(2000);
                     notification.show(Page.getCurrent());
                     return;
                 }
 
                 CdmVaadinUtilities.setEnabled(mainLayout, false, null);
 
-                CdmVaadinUtilities.exec(new CdmVaadinOperation(1000, cdmProgressComponent) {
+                CdmVaadinUtilities.exec(new CdmVaadinOperation(500, cdmProgressComponent) {
                     @Override
                     public boolean execute() {
                         setProgress("Saving Taxon " + nameTextField.getValue());
                         IdUuidName taxonBaseIdUuid;
                         boolean newTaxon = false;
-                        if(accTaxonIun == null) {
-                            taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),accTaxonSecComboBox.getValue(), classificationIun.getUuid());
-                            newTaxon = true;
-                        } else {
-                            taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),
-                                    accTaxonSecComboBox.getValue(),
-                                    accTaxonSecComboBox.getValue(),
-                                    accTaxonIun.getUuid());
-                            newTaxon = false;
+                        try {
+                            if(accTaxonIun == null) {
+                                taxonBaseIdUuid = listener.newTaxon(nameTextField.getValue(),accTaxonSecComboBox.getValue(), classificationIun.getUuid());
+                                newTaxon = true;
+                            } else {
+                                taxonBaseIdUuid = listener.newSynonym(nameTextField.getValue(),
+                                        accTaxonSecComboBox.getValue(),
+                                        accTaxonSecComboBox.getValue(),
+                                        accTaxonIun.getUuid());
+                                newTaxon = false;
+                            }
+                            Object rowId = new RowId(taxonBaseIdUuid.getId());
+                            registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId, newTaxon), NewTaxonBaseComposite.this));
+                        } catch (IllegalArgumentException iae) {
+                            setException(iae);
+                            return false;
                         }
-                        Object rowId = new RowId(taxonBaseIdUuid.getId());
-                        registerDelayedEvent(new CdmChangeEvent(Action.Create, Arrays.asList(rowId, newTaxon), NewTaxonBaseComposite.this));
                         return true;
                     }
 

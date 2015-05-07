@@ -54,14 +54,14 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
     public void testNewTaxonBase() throws SQLException {
         RowId refId20 = new RowId(20);
         RowId refId21 = new RowId(21);
-        UUID newTaxonUuid = ntbp.newTaxon("Taxon E", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
+        UUID newTaxonUuid = ntbp.newTaxon("Taxon  h", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "sec",
                 "synonymRelations"
         });
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
-        UUID newSynonymUuid = ntbp.newSynonym("Synonym OfE", refId20, refId21, newTaxonUuid).getUuid();
+        UUID newSynonymUuid = ntbp.newSynonym("Synonym ofe", refId20, refId21, newTaxonUuid).getUuid();
         taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
         Set<Synonym> synonyms = taxon.getSynonyms();
@@ -78,6 +78,59 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         Assert.assertEquals(taxon.getSec().getId(), 21);
     }
 
+    @Test
+    public void testNewTaxonBaseWhenNameAlreadyExists() {
+        RowId refId20 = new RowId(20);
+        // test taxa
+        try {
+            ntbp.newTaxon("Taxon e", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+
+        try {
+            ntbp.newTaxon("Taxon  e", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+        try{
+            ntbp.newTaxon("Taxon e Me.", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+
+        // test synonym
+        RowId refId21 = new RowId(21);
+        UUID newTaxonUuid = ntbp.newTaxon("Taxon  h", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
+        List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
+                "sec",
+                "synonymRelations"
+        });
+        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+        try {
+            ntbp.newSynonym("Htsynonym bofa", refId20, refId21, newTaxonUuid);
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+
+        try {
+            ntbp.newSynonym("Htsynonym  bofa", refId20, refId21, newTaxonUuid);
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+        try{
+            ntbp.newSynonym("Htsynonym bofa Me.", refId20, refId21, newTaxonUuid);
+            Assert.fail("Exception should be thrown as name already exists");;
+        } catch (IllegalArgumentException iae) {
+
+        }
+
+    }
 
     public static class MockNewTaxonBaseComposite implements INewTaxonBaseComposite {
 

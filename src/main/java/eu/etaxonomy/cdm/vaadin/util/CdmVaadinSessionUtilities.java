@@ -43,9 +43,9 @@ public class CdmVaadinSessionUtilities {
     }
 
     public static void initCdmDataChangeService() {
-        if(getCurrentCdmDataChangeService() != null) {
-           logger.info("replacing data change service with new one");
-        }
+//        if(getCurrentCdmDataChangeService() != null) {
+//           logger.info("replacing data change service with new one");
+//        }
         setCurrentAttribute(CdmDataChangeService.KEY, new CdmDataChangeService());
     }
 
@@ -54,9 +54,9 @@ public class CdmVaadinSessionUtilities {
     }
 
     public static void initSelectionService() {
-        if(getCurrentSelectionService() != null) {
-            logger.info("replacing selection service with new one");
-        }
+//        if(getCurrentSelectionService() != null) {
+//            logger.info("replacing selection service with new one");
+//        }
         setCurrentAttribute(SelectionService.KEY, new SelectionService());
     }
 
@@ -65,9 +65,9 @@ public class CdmVaadinSessionUtilities {
     }
 
     public static void initBasicEventService() {
-        if(getCurrentBasicEventService() != null) {
-            logger.info("replacing basic event service with new one");
-        }
+//        if(getCurrentBasicEventService() != null) {
+//            logger.info("replacing basic event service with new one");
+//        }
         setCurrentAttribute(BasicEventService.KEY, new BasicEventService());
     }
 
