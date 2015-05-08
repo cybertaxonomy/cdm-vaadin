@@ -504,6 +504,7 @@
           <pushReleases>true</pushReleases>
           <enableSshAgent>true</enableSshAgent>
           <allowSnapshots>true</allowSnapshots>
+          <allowUntracked>true</allowUntracked>
         </configuration>
       </plugin>
     </plugins>
