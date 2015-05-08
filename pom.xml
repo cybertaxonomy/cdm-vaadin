@@ -4,7 +4,7 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>3.5.2-SNAPSHOT</version>
+  <version>3.5.2</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
