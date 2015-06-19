@@ -14,6 +14,11 @@
     <unitils.version>3.4.2</unitils.version>
     <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
+  
+  <prerequisites>
+    <maven>3.0.5</maven>
+  </prerequisites>
+  
   <repositories>
     <!-- the cdm internal repository -->
     <repository>
