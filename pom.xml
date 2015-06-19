@@ -10,15 +10,13 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.3.5</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>3.6.1-SNAPSHOT</cdmlib.version>    
+    <cdmlib.version>3.6.2-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
-  
   <prerequisites>
     <maven>3.0.5</maven>
   </prerequisites>
-  
   <repositories>
     <!-- the cdm internal repository -->
     <repository>
@@ -510,16 +508,16 @@
           <allowSnapshots>true</allowSnapshots>
           <allowUntracked>true</allowUntracked>
         </configuration>
-        <dependencies>           
-            <!-- 
+        <dependencies>
+          <!-- 
                 upgrading dependency jsch.agent.version of jgit-flow plugin to 0.1.53 
                 in order have ssl key exchange algorithms compatible with openssh 6.7 
              -->
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>0.1.53</version>
-            </dependency>
+          <dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.53</version>
+          </dependency>
         </dependencies>
       </plugin>
     </plugins>
