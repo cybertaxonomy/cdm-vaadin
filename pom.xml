@@ -505,11 +505,22 @@
         <version>1.0-m5.1</version>
         <configuration>
           <pushHotfixes>true</pushHotfixes>
-          <pushReleases>true</pushReleases>
+          <pushReleases>false</pushReleases>
           <enableSshAgent>true</enableSshAgent>
           <allowSnapshots>true</allowSnapshots>
           <allowUntracked>true</allowUntracked>
         </configuration>
+        <dependencies>           
+            <!-- 
+                upgrading dependency jsch.agent.version of jgit-flow plugin to 0.1.53 
+                in order have ssl key exchange algorithms compatible with openssh 6.7 
+             -->
+            <dependency>
+                <groupId>com.jcraft</groupId>
+                <artifactId>jsch</artifactId>
+                <version>0.1.53</version>
+            </dependency>
+        </dependencies>
       </plugin>
     </plugins>
     <extensions>
