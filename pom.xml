@@ -503,7 +503,7 @@
         <version>1.0-m5.1</version>
         <configuration>
           <pushHotfixes>true</pushHotfixes>
-          <pushReleases>true</pushReleases>
+          <!-- <pushReleases>true</pushReleases> -->
           <enableSshAgent>true</enableSshAgent>
           <allowSnapshots>true</allowSnapshots>
           <allowUntracked>true</allowUntracked>
