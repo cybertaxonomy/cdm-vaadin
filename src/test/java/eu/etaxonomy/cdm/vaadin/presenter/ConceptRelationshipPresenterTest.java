@@ -57,6 +57,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
 
     @Test
+    @Ignore
     public void testRefreshRelationshipView() throws JSONException {
         UUID taxonUuid = UUID.fromString("5f713f69-e03e-4a11-8a55-700fbbf44805");
         crp.refreshRelationshipView(new IdUuidName(30, taxonUuid, null), Direction.LEFT_RIGHT);
