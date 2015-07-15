@@ -4,13 +4,13 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>3.6.2</version>
+  <version>3.7.0</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.3.5</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>3.6.2</cdmlib.version>
+    <cdmlib.version>3.7.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
@@ -360,6 +360,38 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>align-cdmlib-version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <version>1.5.3</version>
+            <executions>
+              <execution>
+                <phase>process-sources</phase>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <file>pom.xml</file>
+              <!-- \u003C = < , \u003E = >  -->
+              <token>(\u003Ccdmlib\.version\u003E)[^\u003C]*</token>
+              <value>$1${project.version}</value>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <build>
     <plugins>
       <plugin>
@@ -500,10 +532,10 @@
       <plugin>
         <groupId>external.atlassian.jgitflow</groupId>
         <artifactId>jgitflow-maven-plugin</artifactId>
-        <version>1.0-m5.1</version>
+        <version>1.0-m6</version>
         <configuration>
           <pushHotfixes>true</pushHotfixes>
-          <!-- <pushReleases>true</pushReleases> -->
+          <pushReleases>true</pushReleases>
           <enableSshAgent>true</enableSshAgent>
           <allowSnapshots>true</allowSnapshots>
           <allowUntracked>true</allowUntracked>
