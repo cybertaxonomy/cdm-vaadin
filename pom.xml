@@ -10,7 +10,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.3.5</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>3.7.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>3.9.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>3.2.2.RELEASE</spring.version>
   </properties>
@@ -362,34 +362,34 @@
   </dependencies>
   <profiles>
     <profile>
-        <activation>
-            <property>
-                <name>align-cdmlib-version</name>
-            </property>
-        </activation>
-        <build>
-            <plugins>
-                <plugin>
-                   <groupId>com.google.code.maven-replacer-plugin</groupId>
-                   <artifactId>replacer</artifactId>
-                   <version>1.5.3</version>
-                   <executions>
-                       <execution>
-                           <phase>process-sources</phase>
-                           <goals>
-                               <goal>replace</goal>
-                           </goals>                   
-                       </execution>
-                   </executions>
-                   <configuration>
-                       <file>pom.xml</file>
-                       <!-- \u003C = < , \u003E = >  -->
-                       <token>(\u003Ccdmlib\.version\u003E)[^\u003C]*</token>
-                       <value>$1${project.version}</value>
-                   </configuration>
-                </plugin> 
-            </plugins>
-        </build>
+      <activation>
+        <property>
+          <name>align-cdmlib-version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <version>1.5.3</version>
+            <executions>
+              <execution>
+                <phase>process-sources</phase>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <file>pom.xml</file>
+              <!-- \u003C = < , \u003E = >  -->
+              <token>(\u003Ccdmlib\.version\u003E)[^\u003C]*</token>
+              <value>$1${project.version}</value>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
   <build>
