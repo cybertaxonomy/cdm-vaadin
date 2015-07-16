@@ -157,7 +157,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
         accTaxon.addSynonym(newSynonym, SynonymRelationshipType.SYNONYM_OF());
 
-        UUID newUuid = taxonService.save(newSynonym);
+        UUID newUuid = taxonService.save(newSynonym).getUuid();
         app.commitTransaction(tx);
         return new IdUuidName(newSynonym.getId(), newUuid, newSynonym.getTitleCache());
     }

@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
@@ -57,6 +58,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
 
     @Test
+    @Ignore
     public void testRefreshRelationshipView() throws JSONException {
         UUID taxonUuid = UUID.fromString("5f713f69-e03e-4a11-8a55-700fbbf44805");
         crp.refreshRelationshipView(new IdUuidName(30, taxonUuid, null), Direction.LEFT_RIGHT);
