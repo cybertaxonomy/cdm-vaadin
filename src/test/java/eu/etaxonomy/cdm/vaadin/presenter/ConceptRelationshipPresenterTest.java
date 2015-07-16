@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
