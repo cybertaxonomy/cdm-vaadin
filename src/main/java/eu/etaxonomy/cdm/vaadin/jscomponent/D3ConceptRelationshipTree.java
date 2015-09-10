@@ -30,6 +30,7 @@ import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationshipType;
+import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedText;
 import eu.etaxonomy.cdm.vaadin.component.ConceptRelationshipComposite;
 
@@ -226,8 +227,10 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         boolean foundGenusOrUninomial = false;
         boolean previousTagSeparator = false;
         for(TaggedText tt: taggedTextList) {
-            if(!tt.isYear() &&!tt.isReference() && !tt.isAuthors()) {
-                if(tt.isName() && !foundGenusOrUninomial) {
+            if(!(tt.getType() == TagEnum.year) &&
+                    !(tt.getType() == TagEnum.reference) &&
+                    !(tt.getType() == TagEnum.authors)) {
+                if(tt.getType() == TagEnum.name && !foundGenusOrUninomial) {
                     nameSb.append(tt.getText().charAt(0) + ".");
                     foundGenusOrUninomial = true;
                 } else {
@@ -236,7 +239,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
                     }
                     nameSb.append(tt.getText());
                     previousTagSeparator = false;
-                    if(tt.isSeparator()) {
+                    if(tt.getType() == TagEnum.separator) {
                         previousTagSeparator = true;
                     }
                 }
