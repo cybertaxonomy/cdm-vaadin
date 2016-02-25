@@ -5,3 +5,4 @@
 src/main/webapp/VAADIN/widgetsets
 /target
 /spy.log
+src/main/resources/test.txt
