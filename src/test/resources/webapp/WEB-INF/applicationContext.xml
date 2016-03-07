@@ -88,12 +88,17 @@
         <property name="passwordEncoder" ref="passwordEncoder"/>
     </bean>
     <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
-        <property name="providers">
-            <list>
-                <bean class="org.springframework.security.authentication.TestingAuthenticationProvider"/>
-                <ref local="daoAuthenticationProvider"/>
-            </list>
-        </property>
+            <constructor-arg>
+	            <list>
+	                <ref local="daoAuthenticationProvider"/>
+	            </list>
+	        </constructor-arg>
+<!--         <property name="providers"> -->
+<!--             <list> -->
+<!--                 <bean class="org.springframework.security.authentication.TestingAuthenticationProvider"/> -->
+<!--                 <ref local="daoAuthenticationProvider"/> -->
+<!--             </list> -->
+<!--         </property> -->
     </bean>
 
 </beans>
