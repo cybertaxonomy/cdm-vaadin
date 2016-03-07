@@ -26,6 +26,7 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 
+import elemental.json.JsonArray;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
@@ -86,13 +87,14 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
         addFunction("select", new JavaScriptFunction() {
 
             @Override
-            public void call(JSONArray arguments) throws JSONException {
-                //Notification.show("Store selected","uuid : " + arguments.getJSONObject(0).getString("uuid"), Type.WARNING_MESSAGE);
+			public void call(JsonArray arguments) {
+				 //Notification.show("Store selected","uuid : " + arguments.getJSONObject(0).getString("uuid"), Type.WARNING_MESSAGE);
                 if(conceptRelComposite != null) {
                     UUID relUuid = UUID.fromString(arguments.getString(0));
                     conceptRelComposite.setSelectedTaxonRelUuid(relUuid);
                 }
-            }
+				
+			}
         });
         setConceptRelationshipTree("");
 
