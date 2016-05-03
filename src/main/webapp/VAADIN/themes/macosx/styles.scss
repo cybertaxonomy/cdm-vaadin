@@ -1,0 +1,178 @@
+/**
+ * Checks if a list contains a certain value.
+ * 
+ * @param {list} $list - the list to check
+ * @param {value} $var - the value to search for
+ * @param {bool} $recursive (false) - should any contained lists be checked for the value
+ * 
+ * @return {bool} true if the value is found from the list, false otherwise
+ * 
+ * @group lists
+ */
+
+/**
+ * Cross-browser opacity.
+ *
+ * @param {number} $value - opacity value from 0 to 1
+ * @param {bool} $important (false) - should the property value be declared with !important
+ *
+ * @group util
+ */
+ 
+ 
+/*@import "";*/
+@import url(../runo/legacy-styles.css);
+
+.v-app {
+	background: url("icons/32/bg-column.jpg") repeat scroll 0 0 transparent;
+	font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+	color: #222;
+}
+
+.login {
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 10px 10px 10px 10px;
+	-moz-border-radius: 10px 10px 10px 10px;
+	-webkit-border-radius: 10px 10px 10px 10px;
+	border: 0px solid #000000;
+	-webkit-box-shadow: 5px 5px 10px -3px rgba(0, 0, 0, 0.85);
+	-moz-box-shadow: 5px 5px 10px -3px rgba(0, 0, 0, 0.85);
+	box-shadow: 5px 5px 10px -3px rgba(0, 0, 0, 0.85);
+}
+
+.v-panel {
+	background: url("icons/32/top-left.png") no-repeat scroll 0 0 transparent;
+}
+
+.login .v-panel-nocaption {
+	background: url("icons/32/top-right.png") no-repeat scroll right top transparent;
+}
+
+.login .v-panel-content {
+	border-style: none;
+	background: url("icons/32/loginpanel.png");
+}
+
+.login .v-panel-content .login .v-panel-deco:before {
+	background: url("icons/32/bottom-left.png") no-repeat scroll 0 0 transparent;
+}
+
+.login .v-panel-content .login .v-panel-deco {
+	background: url("icons/32/bottom-right.png") repeat-x scroll right top transparent;
+}
+
+.login .v-panel-content .descriptiveView .v-verticallayout-descriptiveView {
+	background: white;
+}
+
+.login .v-panel-content .taxonDetailView {
+	background: white;
+}
+
+.login .v-panel-content .descriptiveView {
+	background: white;
+}
+
+.login .v-panel-content .toolbar {
+	background: #ccc url(images/gradient.png) repeat-x bottom left;
+}
+
+.login .v-panel-content .toolbar .v-image {
+	margin-right: 30px;
+}
+
+.login .v-panel-content .toolbar .v-label {
+	display: block;
+	height: 30px;
+	color: #464f52;
+	background: transparent;
+	border: none;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 5px;
+	padding-top: 2px;
+	font-size: x-small;
+	text-shadow: #fafafa 1px 1px 0;
+}
+
+.login .v-panel-content .toolbar .v-button {
+	display: block;
+	height: 55px;
+	background: transparent;
+	border: none;
+	text-align: center;
+}
+
+.login .v-panel-content .toolbar .v-button img {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 5px;
+}
+
+.login .v-panel-content .toolbar .v-button span {
+	font-size: x-small;
+	text-shadow: #fafafa 1px 1px 0;
+}
+
+.login .v-panel-content .toolbar .v-button .v-button-wrap, .login .v-panel-content .toolbar .v-disabled.v-button .v-button-wrap {
+	background: transparent;
+	border: none;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
+.login .v-panel-content .toolbar .v-button:active .v-button-wrap, .login .v-panel-content .toolbar .v-button.v-pressed .v-button-wrap {
+	background: transparent;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+
+.login .v-panel-content .v-panel-caption-view {
+	color: #004b98;
+}
+
+.login .v-panel-content .view {
+	background: white;
+}
+
+.login .v-panel-content .v-tree {
+	padding-top: 8px;
+	padding-left: 4px;
+}
+
+.login .v-panel-content .v-tabsheet-tabs-light .v-tabsheet-tabitem-selected {
+	color: #5e5c5c;
+	font-weight: bold;
+}
+
+.login .v-panel-content .v-tabsheet-tabs-light .v-tabsheet-tabitem-selected:hover {
+	color: #5e5c5c;
+	font-weight: bold;
+}
+
+.login .v-panel-content .v-table-header-wrap {
+	height: 20px;
+	border: none;
+	border-bottom: 1px solid #555;
+	background: transparent url(images/table-header-bg.png);
+}
+
+.login .v-panel-content .v-table-sort-indicator, .login .v-panel-content .v-table-header-cell-asc .v-table-sort-indicator, .login .v-panel-content .v-table-header-cell-desc .v-table-sort-indicator {
+	height: 20px;
+}
+
+.login .v-panel-content .v-table-caption-container {
+	font-size: 11px;
+	color: #000;
+	font-weight: bold;
+	text-shadow: #fff 0 1px 0;
+	padding: 0;
+}

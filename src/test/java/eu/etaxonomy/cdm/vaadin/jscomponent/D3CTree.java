@@ -20,6 +20,8 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Notification;
 
+import elemental.json.JsonArray;
+
 /**
  * @author cmathew
  * @date 8 Apr 2015
@@ -35,9 +37,10 @@ public class D3CTree extends AbstractJavaScriptComponent {
         addFunction("select", new JavaScriptFunction() {
 
             @Override
-            public void call(JSONArray arguments) throws JSONException {
-                Notification.show("JS Rpc call : click on " + arguments.getString(0));
-            }
+			public void call(JsonArray arguments) {
+				Notification.show("JS Rpc call : click on " + arguments.getString(0));
+				
+			}
         });
 
         try {
