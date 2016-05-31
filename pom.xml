@@ -10,7 +10,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.6.3</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.2.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>4.1.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>4.2.4.RELEASE</spring.version>
   </properties>
@@ -370,6 +370,7 @@
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-services</artifactId>
       <version>${cdmlib.version}</version>
+    
     
     
     
