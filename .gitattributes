@@ -1,4 +1,5 @@
 * text=auto !eol
+pom.xml merge=ours
 ide/eclipse/cdm-vaadin.launch -text
 /pom.xml -text
 src/main/java/eu/etaxonomy/cdm/vaadin/AppWidgetSet.gwt.xml -text
