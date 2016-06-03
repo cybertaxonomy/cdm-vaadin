@@ -66,7 +66,6 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 	protected List<Field> fields = new ArrayList<Field>();
 
 	List<String> columnList;
-	ArrayList<String> headerList;
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -124,7 +123,7 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 
 
 	public void dataBinding() throws SQLException{
-		CdmSQLContainer container = listener.getSQLContainer();
+		Container container = listener.getSQLContainer();
 
 		table.setContainerDataSource(container);
 		table.setColumnReorderingAllowed(true);
@@ -134,10 +133,6 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		columnList.addAll(listener.getTermList());
 		Object[] visibleColumns = columnList.toArray();
 		table.setVisibleColumns(visibleColumns);
-
-		headerList = new ArrayList<String>(Arrays.asList(new String[]{"Taxon","Rang"}));
-		headerList.addAll(listener.getAbbreviatedTermList());
-//		table.setColumnHeaders(headerList.toArray(new String[headerList.size()]));//new String[]{"Taxon", "Rang"});// ,"Deutschland"
 
 		table.setColumnCollapsingAllowed(true);
 		table.setSelectable(true);

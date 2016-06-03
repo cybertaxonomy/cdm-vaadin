@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
@@ -33,7 +34,6 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.TaxonDescription;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -181,25 +181,11 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 
 	@Override
-	public Classification getChosenClassification() {
-		VaadinSession session = VaadinSession.getCurrent();
-		UUID classificationUUID = (UUID) session.getAttribute("classificationUUID");
-		Classification classification = classificationService.load(classificationUUID);
-		return classification;
-	}
-
-	@Override
 	public TaxonNode getChosenTaxonNode() {
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID taxonNodeUuid = (UUID) session.getAttribute("taxonNodeUuid");
 	    TaxonNode taxonNode = taxonNodeService.load(taxonNodeUuid);
 	    return taxonNode;
-	}
-
-	@Override
-	public int getSizeOfClassification(){
-		TaxonNode taxonNode = getChosenTaxonNode();
-		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
 	}
 
 	@Override
@@ -212,10 +198,25 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		TaxonNode taxonNode = getChosenTaxonNode();
-		int classificationId = taxonNode.getId();
+		List<Integer>taxonNodeIds = new ArrayList<Integer>();
+		taxonNodeIds.add(taxonNode.getId());
+		for (TaxonNode taxonNode2 : taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null)) {
+		    taxonNodeIds.add(taxonNode2.getId());
+        }
 		List<String> termList = getTermList();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, classificationId));
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, taxonNodeIds));
 		return container;
+	}
+
+	@Override
+	public Container getTaxonNodeContainer() {
+	    TaxonNode taxonNode = getChosenTaxonNode();
+	    List<TaxonNode> nodes = taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null);
+	    IndexedContainer container = new IndexedContainer();
+	    for (TaxonNode taxonNode2 : nodes) {
+            container.addItem(new Object[]{taxonNode2.getTaxon(),taxonNode2.getTaxon().getName().getRank()});
+        }
+	    return container;
 	}
 
 	@Override

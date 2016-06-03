@@ -18,34 +18,34 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 
 	DistributionTableComponentListener listener;
 
-	
+
 	public LazyLoadedContainer(Class type) throws IllegalArgumentException {
 		super(type);
 	}
-//	
+//
 //	public LazyLoadedContainer(Class type, IClassificationService classificationService, ITaxonNodeService taxonNodeService, IDescriptionService descriptionService) throws IllegalArgumentException {
 //		super(type);
 //		this.classificationService = classificationService;
 //		this.taxonNodeService = taxonNodeService;
 //		this.descriptionService = descriptionService;
-//		
+//
 //	}
-	
+
 	@Override
 	public int size(){
-		return listener.getSizeOfClassification();
+		return listener.getSizeOfTaxonNode();
 	}
-	
+
 	@Override
 	public BeanItem getItem(Object itemId){
 		TaxonNode taxonNode = ((TaxonNode) itemId);
 		CdmBase.deproxy(taxonNode, TaxonNode.class);
-		Taxon taxon = (Taxon)taxonNode.getTaxon();
+		Taxon taxon = taxonNode.getTaxon();
 		CdmBase.deproxy(taxon, Taxon.class);
 		CdmTaxonTableCollection cttc = new CdmTaxonTableCollection(taxon);
 		return new BeanItem(cttc);
 	}
-	
+
 	@Override
 	public List getItemIds(int startIndex, int numberOfIds){
 		int endIndex = startIndex + numberOfIds;
@@ -60,6 +60,6 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 		this.listener = listener;
 	}
 
-	
+
 
 }

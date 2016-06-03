@@ -31,7 +31,6 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public void buttonClick(TermVocabulary<DefinedTermBase> term, TaxonNode taxonNode) throws SQLException {
-//	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
 	    VaadinSession.getCurrent().setAttribute("taxonNodeUuid", taxonNode.getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 

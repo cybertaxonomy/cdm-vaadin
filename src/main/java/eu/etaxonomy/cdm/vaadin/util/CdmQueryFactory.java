@@ -10,6 +10,7 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
@@ -50,7 +51,57 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, int classificationID) throws SQLException {
+//    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, int classificationID) throws SQLException {
+//        String FROM_QUERY =
+//                " FROM TaxonNode tn " +
+//                        "INNER JOIN TaxonBase tb on tn.taxon_id = tb.id " +
+//                        "INNER JOIN Classification cl ON tn.classification_id = cl.id " +
+//                        "LEFT OUTER JOIN TaxonNameBase tnb ON tnb.id=tb.id " +
+//                        "LEFT OUTER JOIN DescriptionBase db ON db.taxon_id=tb.id " +
+//                        "LEFT OUTER JOIN (SELECT indescription_id, area_id, status_id, DTYPE, id FROM DescriptionElementBase deb WHERE deb.DTYPE LIKE 'Distribution') AS deb ON deb.indescription_id=db.id " +
+//                        "LEFT OUTER JOIN DefinedTermBase dtb on deb.status_id=dtb.id " +
+//                        "LEFT OUTER JOIN DefinedTermBase dtb1 on deb.area_id=dtb1.id " +
+//                        "LEFT OUTER JOIN DefinedTermBase dtb2 on tnb.rank_id = dtb2.id " +
+//                        "WHERE tn.classification_id = "+ classificationID +" AND tb.DTYPE = 'Taxon'" ;
+//
+//        String GROUP_BY = " GROUP BY tb.id ";
+//
+//        String SELECT_QUERY=
+//                "SELECT tb.DTYPE," +
+//                        "tb.id, " +
+//                        "tb.uuid, " +
+//                        "tn.classification_id, " +
+//                        "tb.titleCache AS Taxon, " +
+//                        "dtb2.titleCache AS Rank, ";
+//
+//        int count = termList.size();
+//        for(String term : termList){
+//            if(count == 1){
+//                SELECT_QUERY= SELECT_QUERY +
+//                        "MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"' " ;
+//            }else{
+//                SELECT_QUERY= SELECT_QUERY +
+//                        "MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"'," ;
+//            }
+//            count--;
+//        }
+//        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY;
+//        String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
+////        String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
+//        String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.uuid = ?";
+//
+//        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
+//    }
+
+    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds) throws SQLException {
+        String idArray = "";
+        Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
+        while (nodeIterator.hasNext()) {
+            idArray += nodeIterator.next();
+            if(nodeIterator.hasNext()){
+                idArray += ", ";
+            }
+        }
         String FROM_QUERY =
         		" FROM TaxonNode tn " +
         		"INNER JOIN TaxonBase tb on tn.taxon_id = tb.id " +
@@ -61,7 +112,7 @@ public class CdmQueryFactory {
         		"LEFT OUTER JOIN DefinedTermBase dtb on deb.status_id=dtb.id " +
         		"LEFT OUTER JOIN DefinedTermBase dtb1 on deb.area_id=dtb1.id " +
         		"LEFT OUTER JOIN DefinedTermBase dtb2 on tnb.rank_id = dtb2.id " +
-        		"WHERE tn.classification_id = "+ classificationID +" AND tb.DTYPE = 'Taxon'" ;
+        		"WHERE tn.id IN ("+ idArray +") AND tb.DTYPE = 'Taxon'" ;
 
         String GROUP_BY = " GROUP BY tb.id ";
 

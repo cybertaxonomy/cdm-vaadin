@@ -18,7 +18,6 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -34,8 +33,6 @@ public interface IDistributionTableComponent {
 		HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon);
 
 		LazyLoadedContainer getTableContainer();
-
-		int getSizeOfClassification();
 
 		int getSizeOfTaxonNode();
 
@@ -56,13 +53,13 @@ public interface IDistributionTableComponent {
 		List<DescriptionElementBase> listDescriptionElementsForTaxon(
 				Taxon taxon, Set<Feature> setFeature);
 
-		Classification getChosenClassification();
-
 		TaxonNode getChosenTaxonNode();
 
 		List<TaxonNode> getAllNodes(int start, int end);
 
 		CdmSQLContainer getSQLContainer() throws SQLException;
+
+		Container getTaxonNodeContainer();
 
 		List<String> getTermList();
 
