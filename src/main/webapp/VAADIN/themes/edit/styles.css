@@ -29,7 +29,7 @@
 	}
 
 .v-vaadin-version:after {
-	content: "7.3.5";
+	content: "7.6.3";
 }
 
 .v-generated-body {
@@ -54,6 +54,23 @@
 
 .FontAwesome {
 	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
+}
+
+@font-face {
+	font-family: ThemeIcons;
+	src: url(../base/fonts/themeicons-webfont.eot);
+	src: url(../base/fonts/themeicons-webfont.eot?#iefix) format("embedded-opentype"), url(../base/fonts/themeicons-webfont.woff) format("woff"), url(../base/fonts/themeicons-webfont.ttf) format("truetype"), url(../base/fonts/themeicons-webfont.svg) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.ThemeIcons {
+	font-family: ThemeIcons;
 	font-style: normal;
 	font-weight: normal;
 	-webkit-font-smoothing: antialiased;
@@ -349,10 +366,6 @@
 	padding: 0;
 }
 
-.edit .v-checkbox {
-	display: block;
-}
-
 .edit .v-checkbox, .edit .v-checkbox label, .edit .v-checkbox input, .edit .v-checkbox .v-icon {
 	vertical-align: middle;
 	white-space: nowrap;
@@ -415,6 +428,10 @@
 .edit .v-colorpicker-area {
 	border: 1px solid silver;
 	margin: 1px auto;
+}
+
+.edit .v-colorpicker.v-default-caption-width {
+	width: 100px;
 }
 
 .edit .v-colorpicker-history {
@@ -1164,6 +1181,37 @@ body .edit.v-app .v-app-loading {
 	height: 0;
 }
 
+.edit .v-reconnect-dialog {
+	color: white;
+	top: 12px;
+	right: 12px;
+	max-width: 100%;
+	border-radius: 0;
+	-webkit-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
+	-moz-box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
+	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.25);
+	padding: 10px;
+	background-color: #444;
+	text-align: center;
+}
+
+.edit .v-reconnect-dialog .text {
+	display: inline-block;
+	padding-left: 10px;
+}
+
+.edit .v-reconnect-dialog .spinner {
+	background-image: url(../base/common/img/reconnect-spinner.gif);
+	width: 31px;
+	height: 31px;
+	display: none;
+	vertical-align: middle;
+}
+
+.edit .v-reconnect-dialog.active .spinner {
+	display: inline-block;
+}
+
 .edit .v-vertical.v-margin-top, .edit .v-horizontal.v-margin-top {
 	padding-top: 12px;
 }
@@ -1277,7 +1325,7 @@ body .edit.v-app .v-app-loading {
 	white-space: nowrap;
 }
 
-.edit .v-align-middle > .v-widget, .edit .v-align-bottom > .v-widget {
+.edit .v-align-middle > .v-widget, .edit .v-align-right > .v-widget, .edit .v-align-center > .v-widget, .edit .v-align-bottom > .v-widget {
 	display: inline-block;
 }
 
@@ -1774,6 +1822,147 @@ body .edit.v-app .v-app-loading {
 	display: inline-block;
 }
 
+.edit .v-escalator {
+	position: relative;
+}
+
+.edit .v-escalator-scroller {
+	position: absolute;
+	z-index: 1;
+	outline: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-scroller-horizontal {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: hidden;
+	-ms-overflow-y: hidden;
+}
+
+.edit .v-escalator-scroller-vertical {
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	-ms-overflow-x: hidden;
+}
+
+.edit .v-escalator-tablewrapper {
+	position: absolute;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 5;
+}
+
+.edit .v-escalator-tablewrapper > table {
+	border-spacing: 0;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.edit .v-escalator-header-deco, .edit .v-escalator-footer-deco {
+	position: absolute;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-horizontal-scrollbar-deco {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-escalator-header, .edit .v-escalator-body, .edit .v-escalator-footer {
+	position: absolute;
+	left: 0;
+	width: inherit;
+	z-index: 10;
+}
+
+.edit .v-escalator-header, .edit .v-escalator-header-deco {
+	top: 0;
+}
+
+.edit .v-escalator-footer, .edit .v-escalator-footer-deco {
+	bottom: 0;
+}
+
+.edit .v-escalator-body {
+	z-index: 0;
+	top: 0;
+}
+
+.edit .v-escalator-body .v-escalator-row {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.edit .v-escalator-row {
+	display: block;
+}
+
+.v-ie8 .edit .v-escalator-row, .v-ie9 .edit .v-escalator-row {
+	float: left;
+	clear: left;
+	margin-top: 0;
+}
+
+.edit .v-escalator-row  > td, .edit .v-escalator-row  > th {
+	background-color: #fff;
+}
+
+.edit .v-escalator-row {
+	width: inherit;
+}
+
+.edit .v-escalator-cell {
+	display: block;
+	float: left;
+	padding: 2px;
+	white-space: nowrap;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	font-size: 13px;
+}
+
+.edit .v-escalator-cell.frozen {
+	position: relative;
+	z-index: 1;
+}
+
+.edit .v-escalator-spacer {
+	position: absolute;
+	display: block;
+	background-color: #fff;
+}
+
+.edit .v-escalator-spacer  > td {
+	width: 100%;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.v-ie8 .edit .v-escalator-spacer, .v-ie9 .edit .v-escalator-spacer {
+	margin-top: 0;
+}
+
 .edit .v-formlayout.v-has-width > table {
 	width: 100%;
 }
@@ -1797,6 +1986,7 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-formlayout-errorcell, .edit .v-formlayout-captioncell {
 	width: 1px;
+	min-width: 1px;
 }
 
 .edit .v-formlayout-captioncell .v-caption {
@@ -1829,6 +2019,630 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-formlayout-captioncell .v-caption .v-required-field-indicator {
 	float: none;
+}
+
+.edit .v-grid {
+	position: relative;
+}
+
+.edit .v-grid-scroller {
+	position: absolute;
+	z-index: 1;
+	outline: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-scroller-horizontal {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	overflow-y: hidden;
+	-ms-overflow-y: hidden;
+}
+
+.edit .v-grid-scroller-vertical {
+	right: 0;
+	top: 0;
+	bottom: 0;
+	overflow-x: hidden;
+	-ms-overflow-x: hidden;
+}
+
+.edit .v-grid-tablewrapper {
+	position: absolute;
+	overflow: hidden;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	z-index: 5;
+}
+
+.edit .v-grid-tablewrapper > table {
+	border-spacing: 0;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.edit .v-grid-header-deco, .edit .v-grid-footer-deco {
+	position: absolute;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-horizontal-scrollbar-deco {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.edit .v-grid-header, .edit .v-grid-body, .edit .v-grid-footer {
+	position: absolute;
+	left: 0;
+	width: inherit;
+	z-index: 10;
+}
+
+.edit .v-grid-header, .edit .v-grid-header-deco {
+	top: 0;
+}
+
+.edit .v-grid-footer, .edit .v-grid-footer-deco {
+	bottom: 0;
+}
+
+.edit .v-grid-body {
+	z-index: 0;
+	top: 0;
+}
+
+.edit .v-grid-body .v-grid-row {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.edit .v-grid-row {
+	display: block;
+}
+
+.v-ie8 .edit .v-grid-row, .v-ie9 .edit .v-grid-row {
+	float: left;
+	clear: left;
+	margin-top: 0;
+}
+
+.edit .v-grid-row  > td, .edit .v-grid-row  > th {
+	background-color: #fff;
+}
+
+.edit .v-grid-row {
+	width: inherit;
+}
+
+.edit .v-grid-cell {
+	display: block;
+	float: left;
+	padding: 2px;
+	white-space: nowrap;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow: hidden;
+	font-size: 13px;
+}
+
+.edit .v-grid-cell.frozen {
+	position: relative;
+	z-index: 1;
+}
+
+.edit .v-grid-spacer {
+	position: absolute;
+	display: block;
+	background-color: #fff;
+}
+
+.edit .v-grid-spacer  > td {
+	width: 100%;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.v-ie8 .edit .v-grid-spacer, .v-ie9 .edit .v-grid-spacer {
+	margin-top: 0;
+}
+
+.edit .v-grid {
+	outline: none;
+}
+
+.edit .v-grid-scroller-vertical, .edit .v-grid-scroller-horizontal {
+	border: 1px solid #b6bbbc;
+}
+
+.edit .v-grid-scroller-vertical {
+	border-left: none;
+}
+
+.edit .v-grid-scroller-horizontal {
+	border-top: none;
+}
+
+.edit .v-grid-tablewrapper {
+	border: 1px solid #b6bbbc;
+}
+
+.edit .v-grid .header-drag-table {
+	border-spacing: 0;
+	position: relative;
+	table-layout: fixed;
+	width: inherit;
+}
+
+.edit .v-grid .header-drag-table .v-grid-header {
+	position: absolute;
+}
+
+.edit .v-grid .header-drag-table .v-grid-header  > .v-grid-cell {
+	border: 1px solid #b6bbbc;
+	margin-top: -10px;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
+	z-index: 30000;
+}
+
+.edit .v-grid .header-drag-table .v-grid-header  > .v-grid-drop-marker {
+	background-color: #57a7ed;
+	position: absolute;
+	width: 3px;
+}
+
+.edit .v-grid-sidebar.v-contextmenu {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+	border-radius: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background-color: #e7e9ea;
+	border: 1px solid #b6bbbc;
+	padding: 0;
+	z-index: 5;
+}
+
+.edit .v-grid-sidebar.v-contextmenu.v-grid-sidebar-popup {
+	right: auto;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button {
+	background: transparent;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+	outline: none;
+	padding: 0 4px;
+	text-align: right;
+	line-height: 1;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button[disabled] {
+	cursor: default;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button::-moz-focus-inner {
+	border: 0;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button:after {
+	content: "\f0c9";
+	display: block;
+	font-family: ThemeIcons, sans-serif;
+	font-size: 15px;
+}
+
+.edit .v-grid-sidebar.v-contextmenu.closed {
+	border-radius: 0;
+}
+
+.edit .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-button {
+	width: 100%;
+}
+
+.edit .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-button:after {
+	content: "\f0c9";
+	font-size: 15px;
+	line-height: 1;
+}
+
+.v-ie .edit .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-button {
+	vertical-align: middle;
+}
+
+.v-ie8 .edit .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-button:after {
+	vertical-align: middle;
+	text-align: center;
+	display: inline;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content {
+	padding: 4px 0;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content .gwt-MenuBar .gwt-MenuItem .column-hiding-toggle {
+	text-shadow: none;
+}
+
+.edit .v-grid-cell {
+	background-color: #fff;
+	padding: 0 10px;
+	line-height: 26px;
+	text-overflow: ellipsis;
+}
+
+.edit .v-grid-cell  > * {
+	line-height: 18px;
+	vertical-align: middle;
+}
+
+.edit .v-grid-cell  > div {
+	display: inline-block;
+}
+
+.edit .v-grid-cell.frozen {
+	-webkit-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	border-right: 1px solid #d4d4d4;
+}
+
+.edit .v-grid-cell.frozen  + th, .edit .v-grid-cell.frozen  + td {
+	border-left: none;
+}
+
+.edit .v-grid-row > td, .edit .v-grid-editor-cells > div {
+	border-left: 1px solid #d4d4d4;
+	border-bottom: none;
+}
+
+.edit .v-grid-row > td:first-child, .edit .v-grid-editor-cells > div:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-editor-cells.frozen > div {
+	-webkit-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
+	border-right: 1px solid #d4d4d4;
+	border-left: none;
+}
+
+.edit .v-grid-row-stripe > td {
+	background-color: #eff0f1;
+}
+
+.edit .v-grid-row-selected > td {
+	background: #57a7ed;
+}
+
+.edit .v-grid-row-focused > td {
+	
+}
+
+.edit .v-grid-header th {
+	position: relative;
+	background-color: #e7e9ea;
+	font-size: 15px;
+	font-weight: inherit;
+	border-left: 1px solid #b6bbbc;
+	border-bottom: 1px solid #b6bbbc;
+	line-height: 36px;
+	text-align: left;
+}
+
+.edit .v-grid-header th:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-header .sort-asc, .edit .v-grid-header .sort-desc {
+	padding-right: 28px;
+}
+
+.edit .v-grid-header .sort-asc:after, .edit .v-grid-header .sort-desc:after {
+	font-family: ThemeIcons, sans-serif;
+	content: "\f0de" " " attr(sort-order);
+	position: absolute;
+	right: 10px;
+	font-size: 13px;
+}
+
+.edit .v-grid-header .sort-desc:after {
+	content: "\f0dd" " " attr(sort-order);
+}
+
+.edit .v-grid-column-resize-handle {
+	position: absolute;
+	width: 20px;
+	right: -10px;
+	top: 0px;
+	bottom: 0px;
+	cursor: col-resize;
+	z-index: 10;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.edit .v-grid-footer td {
+	background-color: #e7e9ea;
+	font-size: 15px;
+	font-weight: inherit;
+	border-left: 1px solid #b6bbbc;
+	border-top: 1px solid #b6bbbc;
+	border-bottom: none;
+	line-height: 36px;
+}
+
+.edit .v-grid-footer td:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-header .v-grid-cell, .edit .v-grid-footer .v-grid-cell {
+	overflow: visible;
+}
+
+.edit .v-grid-column-header-content, .edit .v-grid-column-footer-content {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 26px;
+	vertical-align: baseline;
+}
+
+.edit .v-grid-header-deco {
+	border-top: 1px solid #b6bbbc;
+	border-right: 1px solid #b6bbbc;
+	background-color: #e7e9ea;
+}
+
+.edit .v-grid-footer-deco {
+	border-bottom: 1px solid #b6bbbc;
+	border-right: 1px solid #b6bbbc;
+	background-color: #e7e9ea;
+}
+
+.edit .v-grid-horizontal-scrollbar-deco {
+	background-color: #e7e9ea;
+	border: 1px solid #b6bbbc;
+	border-top: none;
+}
+
+.edit .v-grid-cell-focused {
+	position: relative;
+}
+
+.edit .v-grid-cell-focused:before {
+	content: "";
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	border: 1px solid #57a7ed;
+	display: none;
+	pointer-events: none;
+}
+
+.ie8 .edit .v-grid-cell-focused:before, .ie9 .edit .v-grid-cell-focused:before, .ie10 .edit .v-grid-cell-focused:before {
+	content: url(data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==);
+}
+
+.edit .v-grid:focus .v-grid-cell-focused:before {
+	display: block;
+}
+
+.edit .v-grid.v-disabled:focus .v-grid-cell-focused:before {
+	display: none;
+}
+
+.edit .v-grid-editor {
+	position: absolute;
+	z-index: 20;
+	overflow: hidden;
+	left: 0;
+	right: 0;
+	border: 1px solid #b6bbbc;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	margin-top: -1px;
+	-webkit-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 9px rgba(0, 0, 0, 0.2);
+}
+
+.edit .v-grid-editor.unbuffered .v-grid-editor-footer {
+	width: 100%;
+}
+
+.edit .v-grid-editor-cells {
+	position: relative;
+	white-space: nowrap;
+}
+
+.edit .v-grid-editor-cells.frozen {
+	z-index: 2;
+}
+
+.edit .v-grid-editor-cells  > div {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	vertical-align: middle;
+	background: #fff;
+}
+
+.edit .v-grid-editor-cells  > div:first-child {
+	border-left: none;
+}
+
+.edit .v-grid-editor-cells  > div  > * {
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.edit .v-grid-editor-cells  > div .v-filterselect {
+	padding-left: 0;
+}
+
+.edit .v-grid-editor-cells  > div input[type="text"], .edit .v-grid-editor-cells  > div input[type="text"].v-filterselect-input, .edit .v-grid-editor-cells  > div input[type="password"] {
+	padding-left: 10px;
+}
+
+.edit .v-grid-editor-cells  > div input[type="text"]:not(.v-filterselect-input), .edit .v-grid-editor-cells  > div input[type="password"] {
+	padding-right: 5px;
+}
+
+.edit .v-grid-editor-cells  > div input[type="checkbox"] {
+	margin-left: 10px;
+}
+
+.edit .v-grid-editor-cells  > div .v-textfield, .edit .v-grid-editor-cells  > div .v-datefield, .edit .v-grid-editor-cells  > div .v-filterselect {
+	min-width: 100%;
+	max-width: 100%;
+	min-height: 100%;
+	max-height: 100%;
+}
+
+.v-ie8 .edit .v-grid-editor-cells  > div .v-datefield-button {
+	margin-left: -37px;
+}
+
+.v-ie8 .edit .v-grid-editor-cells  > div .v-filterselect-button {
+	margin-left: -25px;
+}
+
+.edit .v-grid-editor-cells  > div .v-select, .edit .v-grid-editor-cells  > div .v-select-select {
+	min-width: 100%;
+	max-width: 100%;
+}
+
+.edit .v-grid-editor-cells  > div.not-editable.v-grid-cell {
+	float: none;
+}
+
+.edit .v-grid-editor-cells .error::before {
+	position: absolute;
+	display: block;
+	height: 0;
+	width: 0;
+	content: "";
+	border-top: 5px solid red;
+	border-right: 5px solid transparent;
+}
+
+.edit .v-grid-editor-cells .error, .edit .v-grid-editor-cells .error > input {
+	background-color: #fee;
+}
+
+.edit .v-grid-editor-footer {
+	display: table;
+	height: 26px;
+	border-top: none;
+	margin-top: none;
+	background: #fff;
+	padding: 0 5px;
+}
+
+.edit .v-grid-editor-footer  + .v-grid-editor-cells > div {
+	border-bottom: none;
+	border-top: none;
+}
+
+.edit .v-grid-editor-footer:first-child {
+	border-top: none;
+	margin-top: 0;
+	border-bottom: none;
+	margin-bottom: none;
+}
+
+.edit .v-grid-editor-message, .edit .v-grid-editor-buttons {
+	display: table-cell;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.edit .v-grid-editor-message {
+	width: 100%;
+	position: relative;
+}
+
+.edit .v-grid-editor-message  > div {
+	position: absolute;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 26px;
+	top: 0;
+}
+
+.edit .v-grid-editor-save {
+	margin-right: 4px;
+}
+
+.edit .v-grid-spacer {
+	padding-left: 1px;
+}
+
+.edit .v-grid-spacer > td {
+	display: block;
+	padding: 0;
+	background-color: #fff;
+	border-top: none;
+	border-bottom: 1px solid #d4d7d9;
+}
+
+.edit .v-grid-spacer.stripe > td {
+	background-color: #eff0f1;
+	border-top: none;
+	border-bottom: 1px solid #e6e6e6;
+}
+
+.edit .v-grid-spacer-deco-container {
+	border-top: 1px solid transparent;
+	position: relative;
+	top: 0;
+	z-index: 5;
+}
+
+.edit .v-grid-spacer-deco {
+	top: 0;
+	left: 0;
+	width: 2px;
+	background-color: #57a7ed;
+	position: absolute;
+	height: 100%;
+	pointer-events: none;
+}
+
+.ie8 .edit .v-grid-spacer-deco:before, .ie9 .edit .v-grid-spacer-deco:before, .ie10 .edit .v-grid-spacer-deco:before {
+	content: url(data:image/svg+xml;charset=utf-8;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjwvc3ZnPg==);
+}
+
+.edit .v-grid-cell > .v-progressbar {
+	width: 100%;
 }
 
 .edit .v-gridlayout {
@@ -1969,7 +2783,17 @@ body .edit.v-app .v-app-loading {
 }
 
 .edit .v-menubar-menuitem-disabled, .edit .v-menubar span.v-menubar-menuitem-disabled:hover, .edit .v-menubar span.v-menubar-menuitem-disabled:focus, .edit .v-menubar span.v-menubar-menuitem-disabled:active {
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}
+
+.v-ie8 .edit .v-menubar-menuitem-disabled, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:hover, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:focus, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:active {
+	filter: none;
 	color: #999;
+}
+
+.v-ie8 .edit .v-menubar-menuitem-disabled img, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:hover img, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:focus img, .v-ie8 .edit .v-menubar span.v-menubar-menuitem-disabled:active img {
+	filter: alpha(opacity=50);
 }
 
 .edit .v-menubar-more-menuitem {
@@ -2021,7 +2845,7 @@ body .edit.v-app .v-app-loading {
 	filter: alpha(opacity=90);
 }
 
-.edit .v-Notification h1, .edit .v-Notification p, .edit .v-Notification-error h1, .edit .v-Notification-error p, .edit .v-Notification-warning h1, .edit .v-Notification-warning p {
+.edit .v-Notification-caption, .edit .v-Notification-description, .edit .v-Notification-details {
 	display: inline;
 	margin: 0 0.5em 0 0;
 }
@@ -2034,11 +2858,7 @@ body .edit.v-app .v-app-loading {
 	background: red;
 }
 
-.edit .v-Notification-tray h1 {
-	display: block;
-}
-
-.edit .v-Notification-tray p {
+.edit .v-Notification-tray .v-Notification-caption, .edit .v-Notification-tray .v-Notification-description {
 	display: block;
 }
 
@@ -2046,7 +2866,7 @@ body .edit.v-app .v-app-loading {
 	background-color: red;
 }
 
-.edit .v-Notification-system h1 {
+.edit .v-Notification-system .v-Notification-caption {
 	display: block;
 	margin: 0;
 }
@@ -2855,6 +3675,10 @@ body .edit.v-app .v-app-loading {
 	color: #ddd;
 }
 
+.edit .v-table .v-checkbox {
+	display: inline-block;
+}
+
 .edit .v-table-drag .v-table-body {
 	border-color: #1d9dff;
 }
@@ -3458,7 +4282,7 @@ body .edit.v-app .v-app-loading {
 	height: 0;
 }
 
-.edit .v-window-resizebox-disabled, .edit .v-window-restorebox-disabled, .edit .v-window-maximizebox-disabled {
+.edit .v-window-resizebox-disabled, .edit .v-window-closebox-disabled, .edit .v-window-restorebox-disabled, .edit .v-window-maximizebox-disabled {
 	cursor: default;
 	display: none;
 }
@@ -4322,6 +5146,69 @@ body .edit.v-app .v-app-loading {
 	color: #464f52;
 }
 
+.edit .v-grid-header .v-grid-cell, .edit .v-grid-footer .v-grid-cell {
+	background-image: url(../runo/grid/img/header-bg.png);
+	color: #393a3c;
+	text-shadow: #fff 0 1px 0;
+	-webkit-box-shadow: inset 1px 0 0 #fff;
+	-moz-box-shadow: inset 1px 0 0 #fff;
+	box-shadow: inset 1px 0 0 #fff;
+}
+
+.edit .v-grid-header-deco, .edit .v-grid-footer-deco, .edit .v-grid-horizontal-scrollbar-deco {
+	background-image: url(../runo/grid/img/header-bg.png);
+}
+
+.edit .v-grid-row-selected {
+	color: #fff;
+}
+
+.edit .v-grid-row-selected  > .v-grid-cell-focused:before {
+	border-color: #b3d7f7;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content {
+	background-color: transparent;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content .gwt-MenuBar {
+	border: none;
+}
+
+.edit .v-grid-sidebar.v-contextmenu .v-on:before, .edit .v-grid-sidebar.v-contextmenu .v-off:before {
+	content: none;
+	font-size: 0;
+	margin-right: 0;
+}
+
+.edit .v-grid th.sort-asc, .edit .v-grid th.sort-desc {
+	padding-right: 40px;
+}
+
+.edit .v-grid th.sort-asc:after, .edit .v-grid th.sort-desc:after {
+	content: attr(sort-order);
+	background: transparent no-repeat right 50%;
+	width: 30px;
+	height: 36px;
+	top: 0;
+}
+
+.edit .v-grid th.sort-asc:after {
+	background-image: url(../runo/grid/img/sort-asc.png);
+}
+
+.edit .v-grid th.sort-desc:after {
+	background-image: url(../runo/grid/img/sort-desc.png);
+}
+
+.edit .v-grid-editor-footer {
+	background: #e7e9ea;
+}
+
+.edit .v-grid-column-header-content, .edit .v-grid-column-footer-content {
+	line-height: 36px;
+}
+
 .edit .v-gridlayout-margin-top {
 	padding-top: 15px;
 }
@@ -4469,7 +5356,7 @@ body .edit.v-app .v-app-loading {
 	margin: 10px;
 }
 
-.edit .v-Notification h1, .edit .v-Notification p, .edit .v-Notification-error h1, .edit .v-Notification-error p, .edit .v-Notification-warning h1, .edit .v-Notification-warning p {
+.edit .v-Notification-caption, .edit .v-Notification-description, .edit .v-Notification-system .v-Notification-caption, .edit .v-Notification-system .v-Notification-description {
 	display: inline;
 	font-weight: normal;
 	line-height: normal;
@@ -4496,7 +5383,7 @@ body .edit.v-app .v-app-loading {
 	max-width: 17em;
 }
 
-.edit .v-Notification-tray h1 {
+.edit .v-Notification-tray .v-Notification-caption {
 	display: block;
 	font-weight: bold;
 	font-size: 11.7px;
@@ -4509,7 +5396,7 @@ body .edit.v-app .v-app-loading {
 	border-radius: 2px;
 }
 
-.edit .v-Notification-tray p {
+.edit .v-Notification-tray .v-Notification-description {
 	display: block;
 	font-size: 10.4px;
 	line-height: 1.2;
@@ -4743,6 +5630,10 @@ body .edit.v-app .v-app-loading {
 	background: #dfe2e4;
 }
 
+.edit .v-progressbar-static .v-progressbar-wrapper {
+	background: #dfe2e4 url(../runo/progressindicator/img/base-static.gif) repeat-x;
+}
+
 .edit .v-progressindicator-wrapper {
 	background: #dfe2e4 url(../runo/progressindicator/img/base.gif) repeat-x;
 	border: 1px solid #b6bbbc;
@@ -4766,6 +5657,10 @@ body .edit.v-app .v-app-loading {
 
 .edit .v-progressindicator-indeterminate-disabled {
 	background: #dfe2e4;
+}
+
+.edit .v-progressindicator-static .v-progressindicator-wrapper {
+	background: #dfe2e4 url(../runo/progressindicator/img/base-static.gif) repeat-x;
 }
 
 .edit .v-select-select {
