@@ -75,7 +75,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if(taxonNodeBox != null && distributionAreaBox != null){
-			TaxonNode taxonNode = (TaxonNode) taxonNodeBox.getValue();
+			TaxonNode taxonNode = ((TaxonNodeProperty) taxonNodeBox.getValue()).getValue();
 			TermVocabulary<DefinedTermBase> term = (TermVocabulary<DefinedTermBase>)distributionAreaBox.getValue();
 			try {
 				distListener.buttonClick(term, taxonNode);

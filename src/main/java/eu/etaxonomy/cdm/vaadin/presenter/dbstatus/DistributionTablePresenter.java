@@ -174,9 +174,9 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	@Override
 	public List<TaxonNode> getAllNodes(int start, int end){
-		Classification classification = getChosenClassification();
-		List<TaxonNode> nodesForClassification = taxonNodeService.listAllNodesForClassification(classification, start, end);
-		return nodesForClassification;
+		TaxonNode taxonNode = getChosenTaxonNode();
+		List<TaxonNode> nodes = taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null);
+		return nodes;
 	}
 
 
@@ -189,16 +189,30 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	}
 
 	@Override
+	public TaxonNode getChosenTaxonNode() {
+	    VaadinSession session = VaadinSession.getCurrent();
+	    UUID taxonNodeUuid = (UUID) session.getAttribute("taxonNodeUuid");
+	    TaxonNode taxonNode = taxonNodeService.load(taxonNodeUuid);
+	    return taxonNode;
+	}
+
+	@Override
 	public int getSizeOfClassification(){
-		Classification classification = getChosenClassification();
-		return taxonNodeService.countAllNodesForClassification(classification);
+		TaxonNode taxonNode = getChosenTaxonNode();
+		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
+	}
+
+	@Override
+	public int getSizeOfTaxonNode(){
+	    TaxonNode taxonNode = getChosenTaxonNode();
+	    return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
 	}
 
 
 	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
-		Classification classification = getChosenClassification();
-		int classificationId = classification.getId();
+		TaxonNode taxonNode = getChosenTaxonNode();
+		int classificationId = taxonNode.getId();
 		List<String> termList = getTermList();
 		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, classificationId));
 		return container;

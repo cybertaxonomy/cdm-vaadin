@@ -37,6 +37,8 @@ public interface IDistributionTableComponent {
 
 		int getSizeOfClassification();
 
+		int getSizeOfTaxonNode();
+
 		List<Distribution> getDistribution(Taxon taxon);
 
 		IClassificationService getClassificationService();
@@ -55,6 +57,8 @@ public interface IDistributionTableComponent {
 				Taxon taxon, Set<Feature> setFeature);
 
 		Classification getChosenClassification();
+
+		TaxonNode getChosenTaxonNode();
 
 		List<TaxonNode> getAllNodes(int start, int end);
 
