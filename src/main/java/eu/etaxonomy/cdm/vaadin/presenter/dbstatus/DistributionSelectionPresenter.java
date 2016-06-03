@@ -13,6 +13,7 @@ import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.Classification;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionSelectionView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
@@ -29,8 +30,9 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	}
 
 	@Override
-	public void buttonClick(Classification classification, TermVocabulary<DefinedTermBase> term) throws SQLException {
-	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
+	public void buttonClick(TermVocabulary<DefinedTermBase> term, TaxonNode taxonNode) throws SQLException {
+//	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
+	    VaadinSession.getCurrent().setAttribute("taxonNodeUuid", taxonNode.getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 
 	    DistributionTableView dtv = new DistributionTableView();
