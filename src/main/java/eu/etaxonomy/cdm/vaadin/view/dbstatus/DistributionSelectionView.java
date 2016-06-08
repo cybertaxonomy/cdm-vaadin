@@ -83,7 +83,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	}
 
 	public void dataBinding(){
-		List<TaxonNode> classificationList = distListener.getClassificationList();
+		List<TaxonNode> classificationList = distListener.getTaxonNodeList();
 		List<TermVocabulary<DefinedTermBase>> namedAreaList = distListener.getNamedAreaList();
 		Container c = new IndexedContainer(classificationList);
 		classificationBox.setContainerDataSource(c);

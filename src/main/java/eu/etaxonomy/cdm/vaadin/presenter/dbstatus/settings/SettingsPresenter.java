@@ -53,7 +53,7 @@ public class SettingsPresenter {
      *
      */
     private void init() {
-        clUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("classificationUUID").toString());
+        clUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("taxonNodeUUID").toString());
         termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("selectedTerm").toString());
         classificationContainer = new IndexedContainer(getClassificationList());
         distributionContainer = new IndexedContainer(getNamedAreaList());

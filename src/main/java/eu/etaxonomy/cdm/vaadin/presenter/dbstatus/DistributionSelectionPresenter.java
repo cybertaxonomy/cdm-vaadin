@@ -34,8 +34,8 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	}
 
 	@Override
-	public void buttonClick(TaxonNode classification, TermVocabulary<DefinedTermBase> term) throws SQLException {
-	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
+	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term) throws SQLException {
+	    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 
 	    DistributionTableView dtv = new DistributionTableView();
@@ -46,7 +46,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	}
 
 	@Override
-	public List<TaxonNode> getClassificationList() {
+	public List<TaxonNode> getTaxonNodeList() {
 		IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
 		ITaxonNodeService taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());

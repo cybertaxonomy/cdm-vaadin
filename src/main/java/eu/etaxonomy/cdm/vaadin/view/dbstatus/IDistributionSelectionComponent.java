@@ -12,7 +12,7 @@ public interface IDistributionSelectionComponent {
 	public interface DistributionSelectionComponentListener{
 		void buttonClick(TaxonNode classification, TermVocabulary<DefinedTermBase> term) throws SQLException;
 		
-		List<TaxonNode> getClassificationList();
+		List<TaxonNode> getTaxonNodeList();
 		
 		List<TermVocabulary<DefinedTermBase>> getNamedAreaList();
 		
