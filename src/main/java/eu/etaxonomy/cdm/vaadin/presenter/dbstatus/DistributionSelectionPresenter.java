@@ -30,7 +30,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public void buttonClick(Classification classification, TermVocabulary<DefinedTermBase> term) throws SQLException {
-	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getUuid());
+	    VaadinSession.getCurrent().setAttribute("classificationUUID", classification.getRootNode().getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 
 	    DistributionTableView dtv = new DistributionTableView();
