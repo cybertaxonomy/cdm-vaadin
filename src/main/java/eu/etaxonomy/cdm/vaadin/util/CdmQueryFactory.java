@@ -10,6 +10,7 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
@@ -50,7 +51,16 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, int classificationID) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds) throws SQLException {
+    	String idString = "";
+    	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
+    	while (nodeIterator.hasNext()) {
+			Integer integer = (Integer) nodeIterator.next();
+			idString += String.valueOf(integer);
+			if(nodeIterator.hasNext()){
+				idString += ", ";
+			}
+		}
         String FROM_QUERY =
         		" FROM TaxonNode tn " +
         		"INNER JOIN TaxonBase tb on tn.taxon_id = tb.id " +
@@ -61,7 +71,7 @@ public class CdmQueryFactory {
         		"LEFT OUTER JOIN DefinedTermBase dtb on deb.status_id=dtb.id " +
         		"LEFT OUTER JOIN DefinedTermBase dtb1 on deb.area_id=dtb1.id " +
         		"LEFT OUTER JOIN DefinedTermBase dtb2 on tnb.rank_id = dtb2.id " +
-        		"WHERE tn.classification_id = "+ classificationID +" AND tb.DTYPE = 'Taxon'" ;
+        		"WHERE tn.id IN ("+ idString +") AND tb.DTYPE = 'Taxon'" ;
 
         String GROUP_BY = " GROUP BY tb.id ";
 
