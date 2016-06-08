@@ -16,6 +16,7 @@ import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
@@ -47,12 +48,22 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public List<TaxonNode> getTaxonNodeList() {
+		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
+
 		IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
 		ITaxonNodeService taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());
-		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 		for (Classification classification : classificationList) {
-			nodes.addAll(taxonNodeService.listAllNodesForClassification(classification, null, null));
+			nodes.add(classification.getRootNode());
+			List<TaxonNode> allNodesForClassification = taxonNodeService.listAllNodesForClassification(classification, null, null);
+			for (TaxonNode taxonNode : allNodesForClassification) {
+				if(taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null && taxonNode.getTaxon().getName().getRank()!=null){
+					Rank rank = taxonNode.getTaxon().getName().getRank();
+					if(rank.isHigher(Rank.SPECIES()) || rank.equals(Rank.SPECIES())){
+						nodes.add(taxonNode);
+					}
+				}
+			}
 		}
 		return nodes;
 	}
