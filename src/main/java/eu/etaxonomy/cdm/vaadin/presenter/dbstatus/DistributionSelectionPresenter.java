@@ -55,6 +55,8 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());
 		for (Classification classification : classificationList) {
 			nodes.add(classification.getRootNode());
+		}
+		for (Classification classification : classificationList) {
 			List<TaxonNode> allNodesForClassification = taxonNodeService.listAllNodesForClassification(classification, null, null);
 			for (TaxonNode taxonNode : allNodesForClassification) {
 				if(taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null && taxonNode.getTaxon().getName().getRank()!=null){
