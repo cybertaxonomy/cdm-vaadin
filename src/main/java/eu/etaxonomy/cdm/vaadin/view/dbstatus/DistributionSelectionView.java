@@ -22,6 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.Classification;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 
 public class DistributionSelectionView extends CustomComponent implements IDistributionSelectionComponent, View, ClickListener{
 
@@ -70,7 +71,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	@Override
 	public void buttonClick(ClickEvent event) {
 		if(classificationBox != null && distributionAreaBox != null){
-			Classification classification = (Classification) classificationBox.getValue();
+			TaxonNode classification = (TaxonNode) classificationBox.getValue();
 			TermVocabulary<DefinedTermBase> term = (TermVocabulary<DefinedTermBase>)distributionAreaBox.getValue();
 			try {
 				distListener.buttonClick(classification, term);
@@ -82,7 +83,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	}
 
 	public void dataBinding(){
-		List<Classification> classificationList = distListener.getClassificationList();
+		List<TaxonNode> classificationList = distListener.getClassificationList();
 		List<TermVocabulary<DefinedTermBase>> namedAreaList = distListener.getNamedAreaList();
 		Container c = new IndexedContainer(classificationList);
 		classificationBox.setContainerDataSource(c);

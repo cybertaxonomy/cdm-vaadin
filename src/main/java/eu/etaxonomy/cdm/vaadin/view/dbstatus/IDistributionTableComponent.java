@@ -54,7 +54,7 @@ public interface IDistributionTableComponent {
 		List<DescriptionElementBase> listDescriptionElementsForTaxon(
 				Taxon taxon, Set<Feature> setFeature);
 
-		Classification getChosenClassification();
+		TaxonNode getChosenClassification();
 
 		List<TaxonNode> getAllNodes(int start, int end);
 

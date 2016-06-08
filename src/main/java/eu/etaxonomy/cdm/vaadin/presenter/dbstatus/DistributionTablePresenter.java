@@ -175,8 +175,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	@Override
 	public List<TaxonNode> getAllNodes(int start, int end){
-		Classification classification = getChosenClassification();
-		TaxonNode taxonNode = classification.getRootNode();
+		TaxonNode taxonNode = getChosenClassification();
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 		if(taxonNode.getTaxon()!=null){
 			nodes.add(taxonNode);
@@ -187,17 +186,17 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 
 	@Override
-	public Classification getChosenClassification() {
+	public TaxonNode getChosenClassification() {
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID classificationUUID = (UUID) session.getAttribute("classificationUUID");
 		TaxonNode classificationNode = taxonNodeService.load(classificationUUID);
-		return classificationNode.getClassification();
+		return classificationNode;
 	}
 
 	@Override
 	public int getSizeOfClassification(){
-		Classification classification = getChosenClassification();
-		return taxonNodeService.countAllNodesForClassification(classification);
+		TaxonNode taxonNode = getChosenClassification();
+		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
 	}
 
 
