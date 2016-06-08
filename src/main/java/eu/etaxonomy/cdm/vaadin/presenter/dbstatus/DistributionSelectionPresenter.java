@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.bcel.generic.ARRAYLENGTH;
-
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
