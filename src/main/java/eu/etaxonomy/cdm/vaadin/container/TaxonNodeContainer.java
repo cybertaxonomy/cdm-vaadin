@@ -2,13 +2,13 @@ package eu.etaxonomy.cdm.vaadin.container;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
-import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
@@ -19,9 +19,9 @@ public class TaxonNodeContainer extends IndexedContainer {
 	public static final String LABEL = "label";
 
 	public TaxonNodeContainer() {
-		List<TaxonNode> classificationList = getTaxonNodeList();
+		List<TaxonNode> taxonNodeList = getTaxonNodeList();
 		addContainerProperty(LABEL, String.class, "[no taxon]");
-		for (TaxonNode taxonNode : classificationList) {
+		for (TaxonNode taxonNode : taxonNodeList) {
 			Item item = addItem(taxonNode);
 			if(taxonNode.getTaxon()!=null){
 				item.getItemProperty(LABEL).setValue(taxonNode.getTaxon().getName().getTitleCache());
@@ -42,19 +42,24 @@ public class TaxonNodeContainer extends IndexedContainer {
 	    });
 
 		IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
-		ITaxonNodeService taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
 		List<Classification> classificationList = classificationService.listClassifications(null, null, null, nodeInitStrategy);
 		for (Classification classification : classificationList) {
 			nodes.add(classification.getRootNode());
 		}
 		for (Classification classification : classificationList) {
-			List<TaxonNode> allNodesForClassification = taxonNodeService.listAllNodesForClassification(classification, null, null);
-			for (TaxonNode taxonNode : allNodesForClassification) {
-				if(taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null && taxonNode.getTaxon().getName().getRank()!=null){
-					Rank rank = taxonNode.getTaxon().getName().getRank();
-					if(rank.isHigher(Rank.SPECIES()) || rank.equals(Rank.SPECIES())){
-						nodes.add(taxonNode);
-					}
+			nodes.addAll(addChildNodes(classification.getRootNode()));
+		}
+		return nodes;
+	}
+
+	private Collection<? extends TaxonNode> addChildNodes(TaxonNode parentNode) {
+		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
+		for (TaxonNode taxonNode : parentNode.getChildNodes()) {
+			if(taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null){
+				Rank rank = taxonNode.getTaxon().getName().getRank();
+				if(rank!=null && rank.isHigher(Rank.SPECIES())){
+					nodes.add(taxonNode);
+					addChildNodes(taxonNode);
 				}
 			}
 		}
