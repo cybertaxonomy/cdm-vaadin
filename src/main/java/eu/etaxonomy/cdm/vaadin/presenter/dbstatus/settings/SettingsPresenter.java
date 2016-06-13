@@ -88,36 +88,14 @@ public class SettingsPresenter {
         return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
     }
 
-     private List<String> NODE_INIT_STRATEGY(){
-            return Arrays.asList(new String[]{
-                "taxon.sec",
-                "taxon.name",
-                "classification"
-     });}
-
-     protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
-             "$",
-             "elements.*",
-             "elements.sources.citation.authorship.$",
-             "elements.sources.nameUsedInSource.originalNameString",
-             "elements.area.level",
-             "elements.modifyingText",
-             "elements.states.*",
-             "elements.media",
-             "elements.multilanguageText",
-             "multilanguageText",
-             "stateData.$",
-             "annotations",
-             "markers",
-             "sources.citation.authorship",
-             "sources.nameUsedInSource",
-             "multilanguageText",
-             "media",
-             "name.$",
-             "name.rank.representations",
-             "name.status.type.representations",
-             "taxon2.name"
-     });
+    protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
+    		"$",
+    		"annotations",
+    		"markers",
+    		"sources.citation.authorship",
+    		"sources.nameUsedInSource",
+    		"media",
+    });
 
 
 }
