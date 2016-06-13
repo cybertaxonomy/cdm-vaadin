@@ -33,7 +33,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  */
 public class SettingsPresenter {
 
-    private Container classificationContainer;
     private Container distributionContainer;
     private Container distributionStatusContainer;
     private IVocabularyService vocabularyService;
@@ -53,12 +52,11 @@ public class SettingsPresenter {
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
         taxonNodeUuid = UUID.fromString(VaadinSession.getCurrent().getAttribute("taxonNodeUUID").toString());
         termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("selectedTerm").toString());
-        classificationContainer = new IndexedContainer(getClassificationList());
         distributionContainer = new IndexedContainer(getNamedAreaList());
         distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
     }
 
-    public TaxonNode getChosenClassification(){
+    public TaxonNode getChosenTaxonNode(){
         return taxonNodeService.load(taxonNodeUuid);
     }
 
@@ -66,12 +64,6 @@ public class SettingsPresenter {
         return vocabularyService.load(termUUID);
     }
 
-    public Container getClassificationContainer() {
-        return classificationContainer;
-    }
-    public void setClassificationContainer(Container classificationContainer) {
-        this.classificationContainer = classificationContainer;
-    }
     public Container getDistributionContainer() {
         return distributionContainer;
     }
@@ -84,13 +76,6 @@ public class SettingsPresenter {
     public void setDistributionStatusContainer(Container distributionStatusContainer) {
         this.distributionStatusContainer = distributionStatusContainer;
     }
-
-    private List<TaxonNode> getClassificationList() {
-        List<TaxonNode> classificationList = taxonNodeService.loadChildNodesOfTaxonNode(getChosenClassification(), null, true, null);
-        classificationList.add(getChosenClassification());
-        return classificationList;
-    }
-
 
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
 
