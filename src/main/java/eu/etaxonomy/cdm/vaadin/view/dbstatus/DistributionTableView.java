@@ -42,7 +42,6 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonBase;
-import eu.etaxonomy.cdm.vaadin.component.ConfigWindow;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -176,7 +175,7 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 
             @Override
             public void buttonClick(ClickEvent event) {
-                ConfigWindow cw = new ConfigWindow();
+                SettingsConfigWindow cw = new SettingsConfigWindow();
                 Window window  = cw.createWindow();
                 getUI().addWindow(window);
             }

@@ -33,7 +33,7 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 	
 	@Override
 	public int size(){
-		return listener.getSizeOfClassification();
+		return listener.getSizeOfTaxonNode();
 	}
 	
 	@Override

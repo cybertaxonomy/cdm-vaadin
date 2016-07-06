@@ -35,7 +35,7 @@ public interface IDistributionTableComponent {
 
 		LazyLoadedContainer getTableContainer();
 
-		int getSizeOfClassification();
+		int getSizeOfTaxonNode();
 
 		List<Distribution> getDistribution(Taxon taxon);
 
@@ -54,7 +54,7 @@ public interface IDistributionTableComponent {
 		List<DescriptionElementBase> listDescriptionElementsForTaxon(
 				Taxon taxon, Set<Feature> setFeature);
 
-		Classification getChosenClassification();
+		TaxonNode getChosenTaxonNode();
 
 		List<TaxonNode> getAllNodes(int start, int end);
 

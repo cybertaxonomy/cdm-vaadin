@@ -22,6 +22,7 @@ import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
+import eu.etaxonomy.cdm.api.service.NodeSortMode;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -174,33 +175,39 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	@Override
 	public List<TaxonNode> getAllNodes(int start, int end){
-		Classification classification = getChosenClassification();
-		List<TaxonNode> nodesForClassification = taxonNodeService.listAllNodesForClassification(classification, start, end);
-		return nodesForClassification;
+		TaxonNode taxonNode = getChosenTaxonNode();
+		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
+		if(taxonNode.getTaxon()!=null){
+			nodes.add(taxonNode);
+		}
+		nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, NodeSortMode.NaturalOrder));
+		return nodes;
 	}
 
 
 	@Override
-	public Classification getChosenClassification() {
+	public TaxonNode getChosenTaxonNode() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID classificationUUID = (UUID) session.getAttribute("classificationUUID");
-		Classification classification = classificationService.load(classificationUUID);
-		return classification;
+		UUID taxonNodeUUID = (UUID) session.getAttribute("taxonNodeUUID");
+		TaxonNode classificationNode = taxonNodeService.load(taxonNodeUUID);
+		return classificationNode;
 	}
 
 	@Override
-	public int getSizeOfClassification(){
-		Classification classification = getChosenClassification();
-		return taxonNodeService.countAllNodesForClassification(classification);
+	public int getSizeOfTaxonNode(){
+		TaxonNode taxonNode = getChosenTaxonNode();
+		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
 	}
 
 
 	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
-		Classification classification = getChosenClassification();
-		int classificationId = classification.getId();
+		List<Integer> nodeIds = new ArrayList<Integer>();
+		for (TaxonNode taxonNode : getAllNodes(0, 0)) {
+			nodeIds.add(taxonNode.getId());
+		}
 		List<String> termList = getTermList();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, classificationId));
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds));
 		return container;
 	}
 

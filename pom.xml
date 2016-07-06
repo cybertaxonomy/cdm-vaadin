@@ -4,15 +4,16 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>4.1.0</version>
+  <version>4.2.0</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.6.3</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.1.0</cdmlib.version>
+    <cdmlib.version>4.2.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>4.2.4.RELEASE</spring.version>
+    <lucene.version>5.4.1</lucene.version>
   </properties>
   <prerequisites>
     <maven>3.0.5</maven>
@@ -446,148 +447,6 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
-    <!-- unitils dependencies - start -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-core</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-database</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--       <exclusions> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-jdbc</artifactId> -->
-<!--         </exclusion> -->
-<!--       </exclusions> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-dbmaintainer</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--       <exclusions> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.hibernate</groupId> -->
-<!--           <artifactId>hibernate</artifactId> -->
-<!--         </exclusion> -->
-<!--       </exclusions> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-dbunit</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--       <exclusions> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-core</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-jdbc</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-beans</artifactId> -->
-<!--         </exclusion> -->
-<!--       </exclusions> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-easymock</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-mock</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-inject</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-orm</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--        <scope>test</scope> -->
-<!--       <exclusions> -->
-<!--      <exclusion> -->
-<!--        <artifactId>*</artifactId> -->
-<!--        <groupId>org.springframework</groupId> -->
-<!--      </exclusion> -->
-<!--      <exclusion> -->
-<!--        <artifactId>persistence-api</artifactId> -->
-<!--        <groupId>javax.persistence</groupId> -->
-<!--      </exclusion> -->
-<!--      <exclusion> -->
-<!--        <artifactId>hibernate</artifactId> -->
-<!--        <groupId>org.hibernate</groupId> -->
-<!--      </exclusion> -->
-<!--    </exclusions> -->
-<!--     </dependency>  -->
-<!--     <dependency> -->
-<!--       <groupId>org.unitils</groupId> -->
-<!--       <artifactId>unitils-spring</artifactId> -->
-<!--       <version>${unitils.version}</version> -->
-<!--       <scope>test</scope> -->
-<!--       <exclusions> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-core</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-context</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-beans</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-test</artifactId> -->
-<!--         </exclusion> -->
-<!--         <exclusion> -->
-<!--           <groupId>org.springframework</groupId> -->
-<!--           <artifactId>spring-tx</artifactId> -->
-<!--         </exclusion> -->
-<!--       </exclusions> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.easymock</groupId> -->
-<!--       <artifactId>easymock</artifactId> -->
-<!--       <version>3.1</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>xmlunit</groupId> -->
-<!--       <artifactId>xmlunit</artifactId> -->
-<!--       <version>1.4</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.dbunit</groupId> -->
-<!--       <artifactId>dbunit</artifactId> -->
-<!--       <version>2.4.9</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>commons-dbcp</groupId> -->
-<!--       <artifactId>commons-dbcp</artifactId> -->
-<!--       <version>1.4</version> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-    <!-- unitils dependencies - end -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
@@ -604,6 +463,62 @@
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20151123</version>
+    </dependency>
+    <!-- lucene -->
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
+      <version>5.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-suggest</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-analyzers-common</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-queryparser</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-highlighter</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-grouping</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-join</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-misc</artifactId>
+      <version>${lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-facet</artifactId>
+      <version>${lucene.version}</version>
     </dependency>
   </dependencies>
 </project>

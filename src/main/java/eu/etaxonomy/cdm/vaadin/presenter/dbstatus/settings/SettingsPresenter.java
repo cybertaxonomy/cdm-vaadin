@@ -17,13 +17,13 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.VaadinSession;
 
-import eu.etaxonomy.cdm.api.service.IClassificationService;
+import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
-import eu.etaxonomy.cdm.model.taxon.Classification;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 /**
@@ -33,13 +33,12 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  */
 public class SettingsPresenter {
 
-    private Container classificationContainer;
     private Container distributionContainer;
     private Container distributionStatusContainer;
     private IVocabularyService vocabularyService;
     private ITermService termService;
-    private IClassificationService classificationService;
-    private UUID clUUID;
+    private ITaxonNodeService taxonNodeService;
+    private UUID taxonNodeUuid;
     private UUID termUUID;
 
 
@@ -49,31 +48,22 @@ public class SettingsPresenter {
 
     }
 
-    /**
-     *
-     */
     private void init() {
-        clUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("classificationUUID").toString());
+        taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
+        taxonNodeUuid = UUID.fromString(VaadinSession.getCurrent().getAttribute("taxonNodeUUID").toString());
         termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("selectedTerm").toString());
-        classificationContainer = new IndexedContainer(getClassificationList());
         distributionContainer = new IndexedContainer(getNamedAreaList());
         distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
     }
 
-    public Classification getChosenClassification(){
-        return classificationService.load(clUUID);
+    public TaxonNode getChosenTaxonNode(){
+        return taxonNodeService.load(taxonNodeUuid);
     }
 
     public TermVocabulary getChosenArea(){
         return vocabularyService.load(termUUID);
     }
 
-    public Container getClassificationContainer() {
-        return classificationContainer;
-    }
-    public void setClassificationContainer(Container classificationContainer) {
-        this.classificationContainer = classificationContainer;
-    }
     public Container getDistributionContainer() {
         return distributionContainer;
     }
@@ -87,15 +77,6 @@ public class SettingsPresenter {
         this.distributionStatusContainer = distributionStatusContainer;
     }
 
-
-
-    private List<Classification> getClassificationList() {
-        classificationService = CdmSpringContextHelper.getClassificationService();
-        List<Classification> classificationList = classificationService.listClassifications(null, null, null, NODE_INIT_STRATEGY());
-        return classificationList;
-    }
-
-
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
 
         vocabularyService = CdmSpringContextHelper.getVocabularyService();
@@ -107,36 +88,14 @@ public class SettingsPresenter {
         return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
     }
 
-     private List<String> NODE_INIT_STRATEGY(){
-            return Arrays.asList(new String[]{
-                "taxon.sec",
-                "taxon.name",
-                "classification"
-     });}
-
-     protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
-             "$",
-             "elements.*",
-             "elements.sources.citation.authorship.$",
-             "elements.sources.nameUsedInSource.originalNameString",
-             "elements.area.level",
-             "elements.modifyingText",
-             "elements.states.*",
-             "elements.media",
-             "elements.multilanguageText",
-             "multilanguageText",
-             "stateData.$",
-             "annotations",
-             "markers",
-             "sources.citation.authorship",
-             "sources.nameUsedInSource",
-             "multilanguageText",
-             "media",
-             "name.$",
-             "name.rank.representations",
-             "name.status.type.representations",
-             "taxon2.name"
-     });
+    protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
+    		"$",
+    		"annotations",
+    		"markers",
+    		"sources.citation.authorship",
+    		"sources.nameUsedInSource",
+    		"media",
+    });
 
 
 }
