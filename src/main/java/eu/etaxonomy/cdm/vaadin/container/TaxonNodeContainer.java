@@ -55,7 +55,7 @@ public class TaxonNodeContainer extends IndexedContainer {
 	private Collection<? extends TaxonNode> addChildNodes(TaxonNode parentNode) {
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 		for (TaxonNode taxonNode : parentNode.getChildNodes()) {
-			if(taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null){
+			if(taxonNode!=null && taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null){
 				Rank rank = taxonNode.getTaxon().getName().getRank();
 				if(rank!=null && rank.isHigher(Rank.SPECIES())){
 					nodes.add(taxonNode);
