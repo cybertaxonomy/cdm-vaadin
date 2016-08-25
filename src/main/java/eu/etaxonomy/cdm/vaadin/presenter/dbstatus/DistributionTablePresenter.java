@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.TaxonDescription;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -70,32 +69,53 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 
 	@Override
-    public int updateDistributionField(String distributionArea, Object comboValue, Taxon taxon) {
+    public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
-	    NamedArea nArea = null;
-	    for(DefinedTermBase dt:chosenTerms){
-	        if(dt.getTitleCache().equalsIgnoreCase(distributionArea)){
-	            nArea = (NamedArea) dt;
+	    NamedArea namedArea = null;
+	    for(DefinedTermBase term:chosenTerms){
+	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
+	            namedArea = (NamedArea) term;
 	            break;
 	        }
 	    }
-	    List<Distribution> distribution = getDistribution(taxon);
-	    Distribution db = null;
-	    for(Distribution dist : distribution){
-	        if(dist.getArea().equals(nArea)){
-	            db = dist;
+	    List<Distribution> distributions = getDistributions(taxon);
+	    Distribution distribution = null;
+	    for(Distribution dist : distributions){
+	        if(dist.getArea().equals(namedArea)){
+	            distribution = dist;
 	            break;
 	        }
 	    }
-	    if(comboValue == null){//delete descriptionElementBase
-	        getDescriptionService().deleteDescriptionElement(db);//descriptionElementbase
+	    if(distribution==null){
+	    	//create new distribution
+	    	distribution = Distribution.NewInstance(namedArea, (PresenceAbsenceTerm) comboValue);
+			Set<TaxonDescription> descriptions = taxon.getDescriptions();
+			if (descriptions != null) {
+			    for (TaxonDescription desc : descriptions) {
+			        // add to first taxon description
+			        desc.addElement(distribution);
+				    getTaxonService().saveOrUpdate(taxon);
+			        return 0;
+			    }
+			} else {// there are no TaxonDescription yet.
+			    TaxonDescription taxonDescription = TaxonDescription.NewInstance(taxon);
+			    taxonDescription.addElement(distribution);
+			    taxon.addDescription(taxonDescription);
+			    getTaxonService().saveOrUpdate(taxon);
+			    return 0;
+			}
+	    }
+	    else if(comboValue == null){//delete descriptionElementBase
+	    	distribution.getInDescription().removeElement(distribution);
             getTaxonService().saveOrUpdate(taxon);
             return 1;
-        }else{
-           db.setStatus((PresenceAbsenceTerm)comboValue);
-           getDescriptionService().saveDescriptionElement(db);//descriptionElementbase?
+	    }
+	    else{
+           distribution.setStatus((PresenceAbsenceTerm)comboValue);
+           getTaxonService().saveOrUpdate(taxon);
            return 0;
         }
+	    return -1;
 	}
 
 	@Override
@@ -166,7 +186,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	}
 
 	@Override
-	public List<Distribution> getDistribution(Taxon taxon) {
+	public List<Distribution> getDistributions(Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<Distribution> listTaxonDescription = descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		return listTaxonDescription;
@@ -250,7 +270,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	@Override
 	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
 		//TODO Better to use TermType instead of class to get the list
-		return termService.list(PresenceAbsenceTerm.class, null, null, null, DESCRIPTION_INIT_STRATEGY);
+		return termService.list(PresenceAbsenceTerm.class, null, null, null, null);
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{

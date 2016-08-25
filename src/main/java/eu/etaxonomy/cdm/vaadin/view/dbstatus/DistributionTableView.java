@@ -3,15 +3,13 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.navigator.View;
@@ -22,12 +20,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.PopupView;
-import com.vaadin.ui.PopupView.PopupVisibilityEvent;
-import com.vaadin.ui.PopupView.PopupVisibilityListener;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Window;
@@ -36,20 +30,46 @@ import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
-import eu.etaxonomy.cdm.model.taxon.TaxonBase;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 public class DistributionTableView<E> extends CustomComponent implements IDistributionTableComponent, View{
 
-    private static final long serialVersionUID = 1L;
+    private final class AreaColumnGenerator implements ColumnGenerator {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public Object generateCell(Table source, Object itemId, Object columnId) {
+		    Property containerProperty = source.getContainerProperty(itemId, columnId);
+		    Object value = null;
+		    if(containerProperty != null){
+		        value = containerProperty.getValue();
+		    }
+		    final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
+		    final ComboBox box = new ComboBox("Occurrence Status: ", listener.getPresenceAbsenceContainer());
+		    final String area = columnId.toString();
+		    box.setImmediate(true);
+		    box.setBuffered(true);
+		    box.setValue(compareObjectToPAT(value));
+		    final Object value1 = value;
+		    box.addValueChangeListener(new ValueChangeListener() {
+		        @Override
+		        public void valueChange(ValueChangeEvent event) {
+		            Taxon taxon = (Taxon)listener.getTaxonService().load(uuid);
+		            listener.updateDistributionField(area, box.getValue(), taxon);
+		        }
+		    });
+		    return box;
+		}
+	}
+
+	private static final long serialVersionUID = 1L;
     private HorizontalToolbar toolbar;
 	private Table table;
 
 	private Taxon currentTaxon;
-
-	private ArrayList<Object> propertyList = new ArrayList<Object>();
 
 	private DistributionTableComponentListener listener;
 
@@ -99,11 +119,7 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 
     @Override
     public void enter(ViewChangeEvent event) {
-        // TODO Auto-generated method stub
-
     }
-
-
 
 	public void dataBinding() throws SQLException{
 		CdmSQLContainer container = listener.getSQLContainer();
@@ -112,21 +128,30 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		table.setColumnReorderingAllowed(true);
 		table.setSortEnabled(true);
 
-		columnList = new ArrayList<String>(Arrays.asList(new String[]{"Taxon","Rank"}));
-		columnList.addAll(listener.getTermList());
+		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
+		List<String> termList = listener.getTermList();
+		columnList.addAll(termList);
 		Object[] visibleColumns = columnList.toArray();
 		table.setVisibleColumns(visibleColumns);
 
-		headerList = new ArrayList<String>(Arrays.asList(new String[]{"Taxon","Rang"}));
+		headerList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,"Rang"}));
 		headerList.addAll(listener.getAbbreviatedTermList());
 
 		table.setColumnCollapsingAllowed(true);
 		table.setSelectable(true);
 		table.setPageLength(20);
 		table.setFooterVisible(true);
-		table.setColumnFooter("Taxon", "Total amount of Taxa displayed: " + container.size());
+		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
 
 		table.setCacheRate(20);
+		
+		//add generated columns for NamedAreas
+		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
+		for (Object object : containerPropertyIds) {
+			if(termList.contains(object)){
+				  table.addGeneratedColumn(object, new AreaColumnGenerator());
+			}
+		}
 	}
 
 
@@ -177,150 +202,10 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 				}catch(Exception stateException){
 					//TODO create Table without DTO
 				}
-				if(propertyList != null){
-					for(Object propertyId:propertyList){
-						table.removeGeneratedColumn(propertyId);
-					}
-					redrawTable();
-				}
 				Notification.show("Data saved", Notification.Type.HUMANIZED_MESSAGE);
-				propertyList = null;
-				propertyList = new ArrayList<Object>();
-				table.setEditable(false);
-				toolbar.getSaveButton().setCaption("Save Data");
 			}
 		});
 
-
-		//FIXME: Due lack of time needs to be properly done
-
-//		Button editButton = toolbar.getEditButton();
-//		editButton.setClickShortcut(KeyCode.E, ModifierKey.CTRL);
-//		editButton.setDescription("Shortcut: CTRL+e");
-//		editButton.addClickListener(new ClickListener() {
-//			private static final long serialVersionUID = 1L;
-//			@Override
-//			public void buttonClick(ClickEvent event) {
-//			    //				if(table.isEditable() == false){
-//			    //					table.setEditable(true);
-//			    for(Object prop:table.getContainerPropertyIds()){
-//			            if(!prop.equals("Taxon")&&!prop.equals("Rank")){
-//			                table.addGeneratedColumn(prop, createTableColumnGenerator());
-//			            }
-//			    }
-////				}//else{
-////					table.setEditable(false);
-////					table.refreshRowCache();
-////				}
-//			}
-//		});
-
-		/**Double Click listener for Table*/
-		table.addItemClickListener(new ItemClickListener() {
-		    private static final long serialVersionUID = 1L;
-
-		    @Override
-		    public void itemClick(ItemClickEvent event) {
-		        TaxonBase taxonBase = loadTaxonFromSelection(event);
-		        currentTaxon = (Taxon)taxonBase;
-		        if(event.isDoubleClick()){
-		            if(!(event.getPropertyId().toString().equalsIgnoreCase("Taxon")) && !(event.getPropertyId().toString().equalsIgnoreCase("Rank"))){
-		                if(!table.removeGeneratedColumn(event.getPropertyId())){
-		                    table.addGeneratedColumn(event.getPropertyId(), createTableColumnGenerator());
-		                    propertyList.add(event.getPropertyId());
-		                }else{
-		                    table.removeGeneratedColumn(event.getPropertyId());
-		                    propertyList.remove(event.getPropertyId());
-		                    redrawTable();
-		                }
-		            }
-		        }
-		    }
-		});
-	}
-
-	private TaxonBase loadTaxonFromSelection(ItemClickEvent event) {
-	    Item item = event.getItem();
-	    Property itemProperty = item.getItemProperty("uuid");
-	    UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-	    TaxonBase taxonBase = listener.getTaxonService().load(uuid);
-	    return taxonBase;
-	}
-
-	private String refreshValue(ComboBox box, Object value){
-	    if(box.getValue() == null){
-	        if(value != null){
-	            return value.toString();
-	        }else{
-	            return "click me for new Distribution Status";
-	        }
-	    }else{
-	        return box.getValue().toString();
-	    }
-	}
-
-	private ColumnGenerator createTableColumnGenerator(){
-
-	    ColumnGenerator generator = new ColumnGenerator() {
-
-	        private static final long serialVersionUID = 1L;
-
-	        @Override
-	        public Object generateCell(Table source, Object itemId, Object columnId) {
-	            Property containerProperty = source.getContainerProperty(itemId, columnId);
-	            Object value = null;
-	            if(containerProperty != null){
-	                value = containerProperty.getValue();
-	            }
-	            final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
-	            final ComboBox box = new ComboBox("Occurrence Status: ", listener.getPresenceAbsenceContainer());
-	            final String area = columnId.toString();
-	            box.setImmediate(true);
-	            final Object value1 = value;
-	            box.addValueChangeListener(new ValueChangeListener() {
-	                @Override
-	                public void valueChange(ValueChangeEvent event) {
-	                    Taxon taxon = (Taxon)listener.getTaxonService().load(uuid);
-
-	                    if(value1==null){
-	                        listener.createDistributionField(taxon, box.getValue(), area);
-	                        Notification.show("Create Status", Notification.Type.TRAY_NOTIFICATION);
-	                    }else{
-	                        int result = listener.updateDistributionField(area, box.getValue(), taxon);
-	                        if(result == 1){
-	                            Notification.show("Delete Status", Notification.Type.TRAY_NOTIFICATION);
-	                        }else if(result == 0){
-	                            Notification.show("DescriptionService wrote", Notification.Type.TRAY_NOTIFICATION);
-	                        }
-	                    }
-	                }
-	            });
-	            final PopupView popup = new PopupView(new PopupView.Content() {
-	                private static final long serialVersionUID = 1L;
-	                @Override
-	                public String getMinimizedValueAsHTML() {
-	                    return refreshValue(box, value1);
-	                }
-	                @Override
-	                public Component getPopupComponent() {
-	                    //FIXME: find a better solution
-	                    box.setValue(compareObjectToPAT(value1));
-	                    box.setBuffered(true);
-	                    return box;
-	                }
-	            });
-	            popup.addPopupVisibilityListener(new PopupVisibilityListener() {
-
-	                @Override
-	                public void popupVisibilityChange(PopupVisibilityEvent event) {
-
-	                }
-	            });
-	            popup.setHideOnMouseOut(true);
-	            return popup;
-	        }
-	    };
-	    return generator;
 	}
 
 	private PresenceAbsenceTerm compareObjectToPAT(Object object){
@@ -332,17 +217,5 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 	    }
 	    return null;
 	}
-
-	private void redrawTable(){
-	    try {
-	        CdmSQLContainer sqlContainer = listener.getSQLContainer();
-	        sqlContainer.refresh();
-	        table.setContainerDataSource(sqlContainer);
-	        table.setVisibleColumns(columnList.toArray());
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
-	}
-
 
 }

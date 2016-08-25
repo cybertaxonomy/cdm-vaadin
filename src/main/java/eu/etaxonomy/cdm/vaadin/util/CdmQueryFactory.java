@@ -25,6 +25,10 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
  */
 public class CdmQueryFactory {
 
+
+	public static final String RANK_COLUMN = "Rank";
+	public static final String TAXON_COLUMN = "Taxon";
+	
     public static final String ID = "id";
     public static final String UUID_ID = "uuid";
 
@@ -82,8 +86,8 @@ public class CdmQueryFactory {
         		"tb.id, " +
         		"tb.uuid, " +
         		"tn.classification_id, " +
-        		"tb.titleCache AS Taxon, " +
-        		"dtb2.titleCache AS Rank, ";
+        		"tb.titleCache AS "+TAXON_COLUMN+", " +
+        		"dtb2.titleCache AS "+RANK_COLUMN+", ";
 
         int count = termList.size();
         for(String term : termList){

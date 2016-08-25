@@ -37,7 +37,7 @@ public interface IDistributionTableComponent {
 
 		int getSizeOfTaxonNode();
 
-		List<Distribution> getDistribution(Taxon taxon);
+		List<Distribution> getDistributions(Taxon taxon);
 
 		IClassificationService getClassificationService();
 
