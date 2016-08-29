@@ -28,7 +28,7 @@ public class CdmQueryFactory {
 
 	public static final String RANK_COLUMN = "Rank";
 	public static final String TAXON_COLUMN = "Taxon";
-	
+
     public static final String ID = "id";
     public static final String UUID_ID = "uuid";
 
@@ -59,7 +59,7 @@ public class CdmQueryFactory {
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
     	while (nodeIterator.hasNext()) {
-			Integer integer = (Integer) nodeIterator.next();
+			Integer integer = nodeIterator.next();
 			idString += String.valueOf(integer);
 			if(nodeIterator.hasNext()){
 				idString += ", ";
@@ -77,6 +77,8 @@ public class CdmQueryFactory {
         		"LEFT OUTER JOIN DefinedTermBase dtb2 on tnb.rank_id = dtb2.id " +
         		"WHERE tn.id IN ("+ idString +") AND tb.DTYPE = 'Taxon'" ;
 
+        String GROUP_BY = " GROUP BY tn.id ";
+
         String ORDER_BY = " ORDER BY tb.titleCache ";
 
         String SELECT_QUERY=
@@ -91,14 +93,14 @@ public class CdmQueryFactory {
         for(String term : termList){
         	if(count == 1){
         		SELECT_QUERY= SELECT_QUERY +
-            			"IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) as '"+ term +"' " ;
+            			"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"' " ;
         	}else{
         		SELECT_QUERY= SELECT_QUERY +
-        				"IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) as '"+ term +"'," ;
+        				"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"'," ;
         	}
         	count--;
         }
-        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + ORDER_BY;
+        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;
         String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
 //        String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
         String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.uuid = ?";
