@@ -107,7 +107,6 @@ public class SettingsConfigWindow extends CustomComponent {
         label_1.setImmediate(false);
         label_1.setWidth("100.0%");
         label_1.setHeight("40px");
-        label_1.setValue("This is a description box for my settings");
         mainLayout.addComponent(label_1, "top:0.0px;left:0.0px;");
 
         // cancelButton
