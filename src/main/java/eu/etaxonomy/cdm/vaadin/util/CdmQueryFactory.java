@@ -70,7 +70,7 @@ public class CdmQueryFactory {
 		}
         String FROM_QUERY =
                 "FROM TaxonNameBase tnb "
-                + "INNER JOIN TaxonBase tb on tnb.id = tb.name_id and tb.DTYPE='Taxon'" + // # name<->taxon
+                + "INNER JOIN TaxonBase tb on tnb.id = tb.name_id and tb.DTYPE='Taxon' " + // # name<->taxon
         "INNER JOIN TaxonNode tn on tn.taxon_id = tb.id "+
         "INNER JOIN DefinedTermBase rank on tnb.rank_id = rank.id "+// # rank <-> name
         "LEFT OUTER JOIN DescriptionBase descr on descr.taxon_id = tb.id "+// # taxon <-> taxon description (not every taxon has a description)
