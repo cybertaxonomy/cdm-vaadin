@@ -91,7 +91,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	    	//create new distribution
 	    	distribution = Distribution.NewInstance(namedArea, (PresenceAbsenceTerm) comboValue);
 			Set<TaxonDescription> descriptions = taxon.getDescriptions();
-			if (descriptions != null) {
+			if (descriptions != null && !descriptions.isEmpty()) {
 			    for (TaxonDescription desc : descriptions) {
 			        // add to first taxon description
 			        desc.addElement(distribution);
