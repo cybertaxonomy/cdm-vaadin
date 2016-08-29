@@ -27,6 +27,7 @@ import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
+import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
@@ -56,7 +57,7 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		    box.addValueChangeListener(new ValueChangeListener() {
 		        @Override
 		        public void valueChange(ValueChangeEvent event) {
-		            Taxon taxon = (Taxon)listener.getTaxonService().load(uuid);
+		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 		            listener.updateDistributionField(area, box.getValue(), taxon);
 		        }
 		    });
@@ -67,8 +68,6 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 	private static final long serialVersionUID = 1L;
     private HorizontalToolbar toolbar;
 	private Table table;
-
-	private Taxon currentTaxon;
 
 	private DistributionTableComponentListener listener;
 
@@ -162,14 +161,13 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 			@Override
 			public void buttonClick(ClickEvent event) {
 				try{
-					if(currentTaxon != null){
-						List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(currentTaxon, null);
-						DetailWindow dw = new DetailWindow(currentTaxon, listDescriptions);
-						Window window = dw.createWindow();
-						getUI().addWindow(window);
-					}else{
-						Notification.show("Please select a Taxon.", Notification.Type.HUMANIZED_MESSAGE);
-					}
+					Object selectedItemId = DistributionTableView.this.table.getValue();
+				    final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+					List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(taxon, null);
+					DetailWindow dw = new DetailWindow(taxon, listDescriptions);
+					Window window = dw.createWindow();
+					getUI().addWindow(window);
 				}catch(Exception e){
 					Notification.show("Unexpected Error, \n\n Please log in again!", Notification.Type.WARNING_MESSAGE);
 				}
