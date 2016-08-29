@@ -18,7 +18,6 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -76,13 +75,6 @@ public interface IDistributionTableComponent {
          * @return
          */
         int updateDistributionField(String distributionArea, Object comboValue, Taxon taxon);
-
-        /**
-         * @param taxon
-         * @param comboboxValue
-         * @param area
-         */
-        void createDistributionField(Taxon taxon, Object comboboxValue, String area);
 
 	}
 	public void addListener(DistributionTableComponentListener listener);

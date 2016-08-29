@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
+import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
@@ -232,34 +233,6 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	}
 
 	@Override
-	public void createDistributionField(final Taxon taxon, Object comboboxValue, String area) {
-		Set<DefinedTermBase> chosenTerms = getChosenTerms();
-		NamedArea nArea = null;
-		for(DefinedTermBase dt:chosenTerms){
-		    if(dt.getTitleCache().equalsIgnoreCase(area)){
-		        nArea = (NamedArea) dt;
-		        break;
-		    }
-		}
-		Distribution db = Distribution.NewInstance(nArea, (PresenceAbsenceTerm) comboboxValue);
-		Set<TaxonDescription> descriptions = taxon.getDescriptions();
-		if (descriptions != null) {
-		    for (TaxonDescription desc : descriptions) {
-		        // add to first taxon description
-		        desc.addElement(db);
-		        getDescriptionService().saveOrUpdate(desc);
-		        break;
-		    }
-		} else {// there are no TaxonDescription yet.
-		    TaxonDescription td = TaxonDescription.NewInstance(taxon);
-		    td.addElement(db);
-		    taxon.addDescription(td);
-		    getTaxonService().saveOrUpdate(taxon);
-		}
-	}
-
-
-	@Override
 	public Container getPresenceAbsenceContainer(){
 		BeanItemContainer<PresenceAbsenceTerm> termContainer = new BeanItemContainer<PresenceAbsenceTerm>(PresenceAbsenceTerm.class);
 		termContainer.addAll(getPresenceAbsenceTerms());
@@ -269,8 +242,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	@Override
 	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
-		//TODO Better to use TermType instead of class to get the list
-		return termService.list(PresenceAbsenceTerm.class, null, null, null, null);
+		return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, null);
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
@@ -329,7 +301,6 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	@Override
 	public LazyLoadedContainer getTableContainer() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

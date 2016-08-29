@@ -53,7 +53,6 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		    box.setImmediate(true);
 		    box.setBuffered(true);
 		    box.setValue(compareObjectToPAT(value));
-		    final Object value1 = value;
 		    box.addValueChangeListener(new ValueChangeListener() {
 		        @Override
 		        public void valueChange(ValueChangeEvent event) {
