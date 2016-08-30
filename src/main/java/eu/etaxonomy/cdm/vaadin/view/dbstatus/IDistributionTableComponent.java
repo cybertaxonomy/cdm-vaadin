@@ -55,7 +55,7 @@ public interface IDistributionTableComponent {
 
 		TaxonNode getChosenTaxonNode();
 
-		List<TaxonNode> getAllNodes(int start, int end);
+		List<TaxonNode> getAllNodes();
 
 		CdmSQLContainer getSQLContainer() throws SQLException;
 

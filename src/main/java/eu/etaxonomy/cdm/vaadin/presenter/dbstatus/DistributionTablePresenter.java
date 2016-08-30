@@ -195,7 +195,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	}
 
 	@Override
-	public List<TaxonNode> getAllNodes(int start, int end){
+	public List<TaxonNode> getAllNodes(){
 		TaxonNode taxonNode = getChosenTaxonNode();
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 		if(taxonNode.getTaxon()!=null){
@@ -224,7 +224,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		List<Integer> nodeIds = new ArrayList<Integer>();
-		for (TaxonNode taxonNode : getAllNodes(0, 0)) {
+		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
 		List<String> termList = getTermList();
