@@ -22,7 +22,6 @@ import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
-import eu.etaxonomy.cdm.api.service.NodeSortMode;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -201,7 +200,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		if(taxonNode.getTaxon()!=null){
 			nodes.add(taxonNode);
 		}
-		nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, NodeSortMode.NaturalOrder));
+		nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		return nodes;
 	}
 
