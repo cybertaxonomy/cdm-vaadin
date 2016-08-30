@@ -17,9 +17,14 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 public class TaxonNodeContainer extends IndexedContainer {
 
 	public static final String LABEL = "label";
-
-	public TaxonNodeContainer() {
-		List<TaxonNode> taxonNodeList = getTaxonNodeList();
+	
+	/**
+	 * Creates a new taxon node container
+	 * @param parentNode the parent node which will <b>not</b> be included
+	 * in the result but only its child nodes
+	 */
+	public TaxonNodeContainer(TaxonNode parentNode) {
+		List<TaxonNode> taxonNodeList = getTaxonNodeList(parentNode);
 		addContainerProperty(LABEL, String.class, "[no taxon]");
 		for (TaxonNode taxonNode : taxonNodeList) {
 			Item item = addItem(taxonNode);
@@ -32,7 +37,7 @@ public class TaxonNodeContainer extends IndexedContainer {
 		}
 	}
 	
-	public List<TaxonNode> getTaxonNodeList() {
+	public List<TaxonNode> getTaxonNodeList(TaxonNode parentNode) {
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 		
 		List<String> nodeInitStrategy = Arrays.asList(new String[]{
@@ -41,13 +46,17 @@ public class TaxonNodeContainer extends IndexedContainer {
 	            "classification"
 	    });
 
-		IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
-		List<Classification> classificationList = classificationService.listClassifications(null, null, null, nodeInitStrategy);
-		for (Classification classification : classificationList) {
-			nodes.add(classification.getRootNode());
+		if(parentNode==null){
+			//just load classifications
+			IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
+			List<Classification> classificationList = classificationService.listClassifications(null, null, null, nodeInitStrategy);
+			for (Classification classification : classificationList) {
+				nodes.add(classification.getRootNode());
+			}
 		}
-		for (Classification classification : classificationList) {
-			nodes.addAll(addChildNodes(classification.getRootNode()));
+		else{
+			//load child nodes
+			nodes.addAll(addChildNodes(parentNode));
 		}
 		return nodes;
 	}

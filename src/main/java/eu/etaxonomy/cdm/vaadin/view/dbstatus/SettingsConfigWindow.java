@@ -69,7 +69,7 @@ public class SettingsConfigWindow extends CustomComponent {
     }
 
     private void init() {
-        Container taxonNodeContainer = new TaxonNodeContainer();
+        Container taxonNodeContainer = new TaxonNodeContainer(null);
         Container distributionContainer = presenter.getDistributionContainer();
         TermVocabulary chosenArea = presenter.getChosenArea();
         taxoNodeBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
