@@ -12,6 +12,8 @@ package eu.etaxonomy.cdm.vaadin.util;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -94,11 +96,16 @@ public class CdmQueryFactory {
         for(String term : termList){
         		SELECT_QUERY += "MAX( IF(area.titleCache = '"+ term +"', statusTerm.titleCache, NULL) ) as '"+ term +"'," ;
         }
-        SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",");
+        SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;
         String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
         String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.uuid = ?";
-
+        //Escape SQL control character '
+        Pattern p = Pattern.compile("(\\w+)'(\\w+)");
+        Matcher m = p.matcher(SELECT_QUERY);
+        if (m.find()) {
+            SELECT_QUERY = m.replaceAll("$1\\\\'$2");
+        }
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
