@@ -158,11 +158,6 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         classificationBox.setHeight("-1px");
         verticalLayout_2.addComponent(classificationBox);
 
-        // taxon tree
-        taxonTree = new Tree("Taxonomy");
-        taxonTree.setWidth("200px");
-        verticalLayout_2.addComponent(taxonTree);
-
         // distributionAreaBox
         distributionAreaBox = new ComboBox();
         distributionAreaBox.setCaption("Distribution Area");
@@ -170,6 +165,11 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         distributionAreaBox.setWidth("200px");
         distributionAreaBox.setHeight("-1px");
         verticalLayout_2.addComponent(distributionAreaBox);
+
+        // taxon tree
+        taxonTree = new Tree("Taxonomy");
+        taxonTree.setWidth("200px");
+        verticalLayout_2.addComponent(taxonTree);
 
         // button_proceed
         button_proceed = new Button();

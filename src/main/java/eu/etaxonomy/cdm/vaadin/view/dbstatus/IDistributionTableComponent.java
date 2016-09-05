@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.vaadin.data.Container;
-
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
@@ -17,7 +15,6 @@ import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.Feature;
-import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -27,8 +24,6 @@ public interface IDistributionTableComponent {
 
 	public interface DistributionTableComponentListener{
 		Set<DefinedTermBase> getChosenTerms();
-
-		List<PresenceAbsenceTerm> getPresenceAbsenceTerms();
 
 		HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon);
 
@@ -60,8 +55,6 @@ public interface IDistributionTableComponent {
 		CdmSQLContainer getSQLContainer() throws SQLException;
 
 		List<String> getTermList();
-
-		Container getPresenceAbsenceContainer();
 
         /**
          * @return

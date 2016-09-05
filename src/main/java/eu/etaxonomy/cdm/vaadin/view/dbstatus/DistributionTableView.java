@@ -29,33 +29,35 @@ import com.vaadin.ui.Window;
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
-import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
-public class DistributionTableView<E> extends CustomComponent implements IDistributionTableComponent, View{
+public class DistributionTableView extends CustomComponent implements IDistributionTableComponent, View{
 
     private final class AreaColumnGenerator implements ColumnGenerator {
 		private static final long serialVersionUID = 1L;
 
 		@Override
 		public Object generateCell(Table source, Object itemId, Object columnId) {
-		    Property containerProperty = source.getContainerProperty(itemId, columnId);
+		    Property<?> containerProperty = source.getContainerProperty(itemId, columnId);
 		    Object value = null;
 		    if(containerProperty != null){
 		        value = containerProperty.getValue();
 		    }
 		    final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
-		    final ComboBox box = new ComboBox("Occurrence Status: ", listener.getPresenceAbsenceContainer());
+		    final ComboBox box = new ComboBox("Occurrence Status: ", PresenceAbsenceTermContainer.getInstance());
 		    final String area = columnId.toString();
 		    box.setImmediate(true);
 		    box.setBuffered(true);
-		    box.setValue(compareObjectToPAT(value));
+		    box.setValue(PresenceAbsenceTermContainer.titleToTermMap.get(value));
 		    box.addValueChangeListener(new ValueChangeListener() {
-		        @Override
+				private static final long serialVersionUID = 6221534597911674067L;
+
+				@Override
 		        public void valueChange(ValueChangeEvent event) {
 		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 		            listener.updateDistributionField(area, box.getValue(), taxon);
@@ -158,6 +160,8 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		detailButton.setCaption("Detail View");
 		detailButton.addClickListener(new ClickListener() {
 
+			private static final long serialVersionUID = 1479133195403139547L;
+
 			@Override
 			public void buttonClick(ClickEvent event) {
 				try{
@@ -177,7 +181,9 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 		Button settingsButton = toolbar.getSettingsButton();
 		settingsButton.addClickListener(new ClickListener() {
 
-            @Override
+			private static final long serialVersionUID = 3834048719431837966L;
+
+			@Override
             public void buttonClick(ClickEvent event) {
                 SettingsConfigWindow cw = new SettingsConfigWindow();
                 Window window  = cw.createWindow();
@@ -203,16 +209,6 @@ public class DistributionTableView<E> extends CustomComponent implements IDistri
 			}
 		});
 
-	}
-
-	private PresenceAbsenceTerm compareObjectToPAT(Object object){
-	    List<PresenceAbsenceTerm> presenceAbsenceTerms = listener.getPresenceAbsenceTerms();
-	    for(PresenceAbsenceTerm term:presenceAbsenceTerms){
-	        if(term.getTitleCache().equals(object)){
-	            return term;
-	        }
-	    }
-	    return null;
 	}
 
 }

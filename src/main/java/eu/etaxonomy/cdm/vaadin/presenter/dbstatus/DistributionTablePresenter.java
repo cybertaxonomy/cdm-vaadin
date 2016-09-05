@@ -12,8 +12,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
@@ -26,7 +24,6 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
@@ -229,19 +226,6 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		List<String> termList = getTermList();
 		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds));
 		return container;
-	}
-
-	@Override
-	public Container getPresenceAbsenceContainer(){
-		BeanItemContainer<PresenceAbsenceTerm> termContainer = new BeanItemContainer<PresenceAbsenceTerm>(PresenceAbsenceTerm.class);
-		termContainer.addAll(getPresenceAbsenceTerms());
-		return termContainer;
-	}
-
-
-	@Override
-	public List<PresenceAbsenceTerm> getPresenceAbsenceTerms() {
-		return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, null);
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
