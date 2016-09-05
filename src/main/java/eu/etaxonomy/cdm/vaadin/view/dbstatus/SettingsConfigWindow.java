@@ -70,7 +70,7 @@ public class SettingsConfigWindow extends CustomComponent {
     }
 
     private void init() {
-        Container taxonNodeContainer = new TaxonNodeContainer(null, taxonTree);
+        Container taxonNodeContainer = new TaxonNodeContainer(null);
         Container distributionContainer = presenter.getDistributionContainer();
         TermVocabulary chosenArea = presenter.getChosenArea();
         taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
@@ -129,8 +129,6 @@ public class SettingsConfigWindow extends CustomComponent {
         // classificationBox
         taxonTree = new Tree();
         taxonTree.setImmediate(false);
-        taxonTree.setWidth("-1px");
-        taxonTree.setHeight("-1px");
         mainLayout.addComponent(taxonTree, "top:97.0px;left:258.0px;");
 
         // distAreaBox
