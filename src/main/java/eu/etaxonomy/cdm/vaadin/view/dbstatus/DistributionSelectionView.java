@@ -19,6 +19,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
@@ -34,6 +35,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
     private Button button_proceed;
     private ComboBox distributionAreaBox;
     private ComboBox classificationBox;
+    private Tree taxonTree;
     private ComboBox taxonBox;
     private Label label_1;
 
@@ -76,15 +78,19 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 
 	public void dataBinding(){
 		classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-		classificationBox.setContainerDataSource(new TaxonNodeContainer(null));
+		classificationBox.setContainerDataSource(new TaxonNodeContainer(null, taxonTree));
 		classificationBox.setImmediate(true);
 		classificationBox.addValueChangeListener(new ValueChangeListener() {
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
-				taxonBox.setContainerDataSource(new TaxonNodeContainer(parentNode));
+				taxonBox.setContainerDataSource(new TaxonNodeContainer(parentNode, taxonTree));
+				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode, taxonTree));
 			}
 		});
+
+		taxonTree.setContainerDataSource(new TaxonNodeContainer(null, taxonTree));
+		taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
 		
 		taxonBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
 		List<TermVocabulary<DefinedTermBase>> namedAreaList = distListener.getNamedAreaList();
@@ -159,6 +165,10 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         classificationBox.setWidth("200px");
         classificationBox.setHeight("-1px");
         verticalLayout_2.addComponent(classificationBox);
+
+        // taxon tree
+        taxonTree = new Tree("Taxonomy");
+        verticalLayout_2.addComponent(taxonTree);
 
         // taxonBox
         taxonBox = new ComboBox();
