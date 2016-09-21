@@ -98,6 +98,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 				@Override
                 public void buttonClick(ClickEvent event) {
 
+					VaadinSession.getCurrent().close();
 					authentication.setAuthenticated(false);
 					UI.getCurrent().getNavigator().navigateTo("abstractAuthenticatedUI");
 				}
