@@ -169,16 +169,17 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				try{
-					Object selectedItemId = DistributionTableView.this.table.getValue();
-				    final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
-		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+				Object selectedItemId = DistributionTableView.this.table.getValue();
+				if(selectedItemId!=null){
+					final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+					Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 					List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(taxon, null);
 					DetailWindow dw = new DetailWindow(taxon, listDescriptions);
 					Window window = dw.createWindow();
 					getUI().addWindow(window);
-				}catch(Exception e){
-					Notification.show("Unexpected Error, \n\n Please log in again!", Notification.Type.WARNING_MESSAGE);
+				}
+				else{
+					Notification.show("Please select a taxon", Type.HUMANIZED_MESSAGE);
 				}
 			}
 		});

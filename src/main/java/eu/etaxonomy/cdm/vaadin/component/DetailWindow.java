@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Window;
 
@@ -36,11 +37,16 @@ public class DetailWindow extends CustomComponent{
 	public Window createWindow(){
 		Window window = new Window();
 		window.setHeightUndefined();
-//		window.setHeight("600px");
-//		window.setWidth("400px");
+		window.setHeight("600px");
+		window.setWidth("400px");
 		window.setCaption(taxon.getName().getTitleCache());
 		window.setCloseShortcut(KeyCode.W, ModifierKey.CTRL);
-		window.setContent(constructDescriptionTree(taxon));
+		if(listDescriptions.isEmpty()){
+			window.setContent(new Label("No descriptive data found"));
+		}
+		else{
+			window.setContent(constructDescriptionTree(taxon));
+		}
 		return window;
 	}
 
