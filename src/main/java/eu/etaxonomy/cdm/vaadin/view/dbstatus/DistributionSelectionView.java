@@ -35,7 +35,8 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
     private ComboBox distributionAreaBox;
     private ComboBox classificationBox;
     private Tree taxonTree;
-    private Label label_1;
+    private Label labelInstruction;
+    private Label labelNoClassification;
 
     private static final long serialVersionUID = 1L;
 	private DistributionSelectionComponentListener distListener;
@@ -82,7 +83,13 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
-				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
+				if(parentNode!=null){
+					taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
+				}
+				else{
+					taxonTree.setContainerDataSource(null);
+				}
+				labelNoClassification.setVisible(parentNode==null);
 			}
 		});
 
@@ -142,13 +149,12 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         verticalLayout_2.setMargin(true);
         verticalLayout_2.setSpacing(true);
 
-        // label_1
-        label_1 = new Label();
-        label_1.setImmediate(false);
-        label_1.setWidth("213px");
-        label_1.setHeight("-1px");
-        label_1.setValue("Please choose a Classification and/or taxon and a distribution area to proceed.");
-        verticalLayout_2.addComponent(label_1);
+        labelInstruction = new Label();
+        labelInstruction.setImmediate(false);
+        labelInstruction.setWidth("213px");
+        labelInstruction.setHeight("-1px");
+        labelInstruction.setValue("Please choose a Classification and/or taxon and a distribution area to proceed.");
+        verticalLayout_2.addComponent(labelInstruction);
 
         // classificationBox
         classificationBox = new ComboBox();
@@ -170,6 +176,9 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         taxonTree = new Tree("Taxonomy");
         taxonTree.setWidth("200px");
         verticalLayout_2.addComponent(taxonTree);
+        labelNoClassification = new Label(" - Please select a classification - ");
+        verticalLayout_2.addComponent(labelNoClassification);
+        verticalLayout_2.setComponentAlignment(labelNoClassification, Alignment.BOTTOM_RIGHT);
 
         // button_proceed
         button_proceed = new Button();
