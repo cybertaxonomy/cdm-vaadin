@@ -154,6 +154,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
 		for (Object object : containerPropertyIds) {
 			if(termList.contains(object)){
+				table.removeGeneratedColumn(object);
 				table.addGeneratedColumn(object, new AreaColumnGenerator());
 			}
 		}
