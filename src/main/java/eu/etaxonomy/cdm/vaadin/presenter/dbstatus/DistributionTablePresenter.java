@@ -61,7 +61,6 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		vocabularyService = CdmSpringContextHelper.getVocabularyService();
 		descriptionService = CdmSpringContextHelper.getDescriptionService();
 		termService = CdmSpringContextHelper.getTermService();
-		view.dataBinding();
 	}
 
 

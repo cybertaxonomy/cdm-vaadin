@@ -22,6 +22,7 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.Window;
@@ -117,12 +118,16 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 	   this.listener = listener;
 	}
 
-    @Override
-    public void enter(ViewChangeEvent event) {
-    }
-
-	public void dataBinding() throws SQLException{
-		CdmSQLContainer container = listener.getSQLContainer();
+	@Override
+	public void enter(ViewChangeEvent event) {
+		CdmSQLContainer container = null;
+		try {
+			container = listener.getSQLContainer();
+		} catch (SQLException e) {
+			Notification.show("Could not acces data base", Type.ERROR_MESSAGE);
+			e.printStackTrace();
+			return;
+		}
 
 		table.setContainerDataSource(container);
 		table.setColumnReorderingAllowed(true);
@@ -144,16 +149,15 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
 
 		table.setCacheRate(20);
-		
+
 		//add generated columns for NamedAreas
 		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
 		for (Object object : containerPropertyIds) {
 			if(termList.contains(object)){
-				  table.addGeneratedColumn(object, new AreaColumnGenerator());
+				table.addGeneratedColumn(object, new AreaColumnGenerator());
 			}
 		}
 	}
-
 
 	private void createEditClickListener(){
 		Button detailButton = toolbar.getDetailButton();

@@ -9,8 +9,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
-import java.sql.SQLException;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -34,7 +32,6 @@ import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
-import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
 
 /**
@@ -112,14 +109,6 @@ public class SettingsConfigWindow extends CustomComponent {
 			    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
 			    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 
-			    DistributionTableView dtv = new DistributionTableView();
-			    try {
-					new DistributionTablePresenter(dtv);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			    UI.getCurrent().getNavigator().addView("table", dtv);
-			    //navigate to table view
 			    window.close();
 		        UI.getCurrent().getNavigator().navigateTo("table");				
 			}
