@@ -9,20 +9,32 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
+import java.sql.SQLException;
+
 import com.vaadin.data.Container;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
 
 /**
@@ -41,6 +53,7 @@ public class SettingsConfigWindow extends CustomComponent {
     private Button okButton;
     private Button cancelButton;
     private final SettingsPresenter presenter;
+	private Window window;
     
     /**
      * The constructor should first build the main layout, set the
@@ -51,7 +64,6 @@ public class SettingsConfigWindow extends CustomComponent {
      */
     public SettingsConfigWindow() {
         buildMainLayout();
-//        setCompositionRoot(mainLayout);
         presenter = new SettingsPresenter();
         init();
     }
@@ -63,16 +75,66 @@ public class SettingsConfigWindow extends CustomComponent {
         classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
         classificationBox.setContainerDataSource(taxonNodeContainer);
         classificationBox.setValue(presenter.getChosenTaxonNode().getClassification().getRootNode());
+        classificationBox.addValueChangeListener(new ValueChangeListener() {
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
+				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
+			}
+		});
+        taxonTree.setContainerDataSource(new TaxonNodeContainer((TaxonNode) classificationBox.getValue()));
         taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        taxonTree.setContainerDataSource(taxonNodeContainer);
         taxonTree.setValue(presenter.getChosenTaxonNode());
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
+        
+        okButton.addClickListener(new ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				TaxonNode taxonNode;
+				TermVocabulary<DefinedTermBase> term = null;
+				taxonNode = (TaxonNode) taxonTree.getValue();
+				if(taxonNode==null){
+					taxonNode = (TaxonNode) classificationBox.getValue();
+				}
+				term = (TermVocabulary<DefinedTermBase>) distAreaBox.getValue();
+				if(taxonNode==null){
+					Notification.show("Please choose a classification and/or taxon", Notification.Type.HUMANIZED_MESSAGE);
+					return;
+				}
+				if(term==null){
+					Notification.show("Please choose a distribution area", Notification.Type.HUMANIZED_MESSAGE);
+					return;
+				}
+
+			    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
+			    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
+
+			    DistributionTableView dtv = new DistributionTableView();
+			    try {
+					new DistributionTablePresenter(dtv);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			    UI.getCurrent().getNavigator().addView("table", dtv);
+			    //navigate to table view
+			    window.close();
+		        UI.getCurrent().getNavigator().navigateTo("table");				
+			}
+		});
+        cancelButton.addClickListener(new ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				window.close();
+			}
+		});
     }
 
     public Window createWindow(){
-        Window window = new Window();
+        window = new Window();
         window.setModal(true);
         window.setWidth("60%");
         window.setHeight("80%");
