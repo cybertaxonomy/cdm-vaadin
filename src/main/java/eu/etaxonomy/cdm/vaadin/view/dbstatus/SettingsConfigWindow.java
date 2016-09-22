@@ -12,7 +12,6 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -21,10 +20,8 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.TwinColSelect;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -33,6 +30,7 @@ import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
  * @author alex
@@ -97,20 +95,8 @@ public class SettingsConfigWindow extends CustomComponent {
 					taxonNode = (TaxonNode) classificationBox.getValue();
 				}
 				term = (TermVocabulary<DefinedTermBase>) distAreaBox.getValue();
-				if(taxonNode==null){
-					Notification.show("Please choose a classification and/or taxon", Notification.Type.HUMANIZED_MESSAGE);
-					return;
-				}
-				if(term==null){
-					Notification.show("Please choose a distribution area", Notification.Type.HUMANIZED_MESSAGE);
-					return;
-				}
-
-			    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
-			    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
-
-			    window.close();
-		        UI.getCurrent().getNavigator().navigateTo("table");				
+				DistributionEditorUtil.openDistributionView(taxonNode, term);
+				window.close();
 			}
 		});
         cancelButton.addClickListener(new ClickListener() {

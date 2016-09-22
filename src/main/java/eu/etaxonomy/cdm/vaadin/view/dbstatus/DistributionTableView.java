@@ -124,7 +124,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
-			Notification.show("Could not acces data base", Type.ERROR_MESSAGE);
+			Notification.show("Error while accessing data base", Type.ERROR_MESSAGE);
 			e.printStackTrace();
 			return;
 		}
