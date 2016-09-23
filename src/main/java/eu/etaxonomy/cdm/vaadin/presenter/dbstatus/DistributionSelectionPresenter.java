@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
@@ -18,13 +17,14 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionSelectionView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionSelectionComponent;
 
 public class DistributionSelectionPresenter implements IDistributionSelectionComponent.DistributionSelectionComponentListener {
 
-	DistributionSelectionView view;
+	private DistributionSelectionView view;
 
 	public DistributionSelectionPresenter(DistributionSelectionView dsv) {
 		this.view = dsv;
@@ -34,14 +34,11 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 
 	@Override
 	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term) throws SQLException {
-	    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
-	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
+		DistributionTableView dtv = new DistributionTableView();
+		new DistributionTablePresenter(dtv);
+		UI.getCurrent().getNavigator().addView("table", dtv);
 
-	    DistributionTableView dtv = new DistributionTableView();
-	    new DistributionTablePresenter(dtv);
-	    UI.getCurrent().getNavigator().addView("table", dtv);
-	    //navigate to table view
-        UI.getCurrent().getNavigator().navigateTo("table");
+		DistributionEditorUtil.openDistributionView(taxonNode, term);
 	}
 
 	@Override

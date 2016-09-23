@@ -47,9 +47,8 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 	}
 	
 	@Override
-	public List getItemIds(int startIndex, int numberOfIds){
-		int endIndex = startIndex + numberOfIds;
-		List<TaxonNode> listAllNodesForClassification = listener.getAllNodes(startIndex, endIndex);
+	public List getItemIds(){
+		List<TaxonNode> listAllNodesForClassification = listener.getAllNodes();
 		return listAllNodesForClassification;
 	}
 

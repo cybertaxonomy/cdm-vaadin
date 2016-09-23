@@ -12,6 +12,10 @@ package eu.etaxonomy.cdm.vaadin.util;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
@@ -24,6 +28,10 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
  *
  */
 public class CdmQueryFactory {
+
+
+	public static final String RANK_COLUMN = "Rank";
+	public static final String TAXON_COLUMN = "Taxon";
 
     public static final String ID = "id";
     public static final String UUID_ID = "uuid";
@@ -52,53 +60,52 @@ public class CdmQueryFactory {
     }
 
     public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds) throws SQLException {
+
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
     	while (nodeIterator.hasNext()) {
-			Integer integer = (Integer) nodeIterator.next();
+			Integer integer = nodeIterator.next();
 			idString += String.valueOf(integer);
 			if(nodeIterator.hasNext()){
 				idString += ", ";
 			}
 		}
         String FROM_QUERY =
-        		" FROM TaxonNode tn " +
-        		"INNER JOIN TaxonBase tb on tn.taxon_id = tb.id " +
-        		"INNER JOIN Classification cl ON tn.classification_id = cl.id " +
-        		"LEFT OUTER JOIN TaxonNameBase tnb ON tnb.id=tb.id " +
-        		"LEFT OUTER JOIN DescriptionBase db ON db.taxon_id=tb.id " +
-        		"LEFT OUTER JOIN (SELECT indescription_id, area_id, status_id, DTYPE, id FROM DescriptionElementBase deb WHERE deb.DTYPE LIKE 'Distribution') AS deb ON deb.indescription_id=db.id " +
-        		"LEFT OUTER JOIN DefinedTermBase dtb on deb.status_id=dtb.id " +
-        		"LEFT OUTER JOIN DefinedTermBase dtb1 on deb.area_id=dtb1.id " +
-        		"LEFT OUTER JOIN DefinedTermBase dtb2 on tnb.rank_id = dtb2.id " +
-        		"WHERE tn.id IN ("+ idString +") AND tb.DTYPE = 'Taxon'" ;
+                "FROM TaxonNameBase tnb "
+                + "INNER JOIN TaxonBase tb on tnb.id = tb.name_id and tb.DTYPE='Taxon' " + // # name<->taxon
+        "INNER JOIN TaxonNode tn on tn.taxon_id = tb.id "+
+        "INNER JOIN DefinedTermBase rank on tnb.rank_id = rank.id "+// # rank <-> name
+        "LEFT OUTER JOIN DescriptionBase descr on descr.taxon_id = tb.id "+// # taxon <-> taxon description (not every taxon has a description)
+        "LEFT OUTER JOIN DescriptionElementBase descrEl on descrEl.indescription_id = descr.id and descrEl.DTYPE = 'Distribution' "+// # distribution <-> description
+        "LEFT OUTER JOIN DefinedTermBase statusTerm on statusTerm.id = descrEl.status_id "+
+        "LEFT OUTER JOIN DefinedTermBase area on area.id = descrEl.area_id "+
+        "WHERE tn.id IN ("+ idString +") ";
 
-        String GROUP_BY = " GROUP BY tb.id ";
+        String GROUP_BY = " GROUP BY tb.uuid, tn.id ";
 
-        String SELECT_QUERY=
-        		"SELECT tb.DTYPE," +
-        		"tb.id, " +
-        		"tb.uuid, " +
-        		"tn.classification_id, " +
-        		"tb.titleCache AS Taxon, " +
-        		"dtb2.titleCache AS Rank, ";
+        String ORDER_BY = " ORDER BY tb.titleCache ";
 
-        int count = termList.size();
+        String SELECT_QUERY= "SELECT "
+                + "tb.DTYPE, "
+                + "tb.id, "
+                + "tb.uuid, "
+                + "tn.classification_id, "+
+        		"tb.titleCache AS "+TAXON_COLUMN+", " +
+        		"rank.titleCache AS "+RANK_COLUMN+", ";
+
         for(String term : termList){
-        	if(count == 1){
-        		SELECT_QUERY= SELECT_QUERY +
-            			"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"' " ;
-        	}else{
-        		SELECT_QUERY= SELECT_QUERY +
-        				"MAX( IF(dtb1.titleCache = '"+ term +"', dtb.titleCache, NULL) ) as '"+ term +"'," ;
-        	}
-        	count--;
+        		SELECT_QUERY += "MAX( IF(area.titleCache = '"+ term +"', statusTerm.titleCache, NULL) ) as '"+ term +"'," ;
         }
-        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY;
+        SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
+        SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;
         String COUNT_QUERY = "SELECT count(DISTINCT tb.id)" + FROM_QUERY;
-//        String CONTAINS_QUERY = "SELECT * FROM TaxonNode tn WHERE tn.id = ?";
         String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.uuid = ?";
-
+        //Escape SQL control character '
+        Pattern p = Pattern.compile("(\\w+)'(\\w+)");
+        Matcher m = p.matcher(SELECT_QUERY);
+        if (m.find()) {
+            SELECT_QUERY = m.replaceAll("$1\\\\'$2");
+        }
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 

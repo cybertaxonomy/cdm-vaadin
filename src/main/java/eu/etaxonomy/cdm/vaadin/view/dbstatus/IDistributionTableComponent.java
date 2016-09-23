@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import com.vaadin.data.Container;
-
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
@@ -17,8 +15,6 @@ import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.Feature;
-import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -29,15 +25,13 @@ public interface IDistributionTableComponent {
 	public interface DistributionTableComponentListener{
 		Set<DefinedTermBase> getChosenTerms();
 
-		List<PresenceAbsenceTerm> getPresenceAbsenceTerms();
-
 		HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon);
 
 		LazyLoadedContainer getTableContainer();
 
 		int getSizeOfTaxonNode();
 
-		List<Distribution> getDistribution(Taxon taxon);
+		List<Distribution> getDistributions(Taxon taxon);
 
 		IClassificationService getClassificationService();
 
@@ -56,13 +50,11 @@ public interface IDistributionTableComponent {
 
 		TaxonNode getChosenTaxonNode();
 
-		List<TaxonNode> getAllNodes(int start, int end);
+		List<TaxonNode> getAllNodes();
 
 		CdmSQLContainer getSQLContainer() throws SQLException;
 
 		List<String> getTermList();
-
-		Container getPresenceAbsenceContainer();
 
         /**
          * @return
@@ -76,13 +68,6 @@ public interface IDistributionTableComponent {
          * @return
          */
         int updateDistributionField(String distributionArea, Object comboValue, Taxon taxon);
-
-        /**
-         * @param taxon
-         * @param comboboxValue
-         * @param area
-         */
-        void createDistributionField(Taxon taxon, Object comboboxValue, String area);
 
 	}
 	public void addListener(DistributionTableComponentListener listener);
