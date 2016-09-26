@@ -2,6 +2,7 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -17,12 +18,14 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 
@@ -32,8 +35,9 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
     private Panel panel_1;
     private VerticalLayout verticalLayout_2;
     private Button button_proceed;
-    private ComboBox distributionAreaBox;
     private ComboBox classificationBox;
+    private ComboBox distributionAreaBox;
+    private ListSelect namedAreaList;
     private Tree taxonTree;
     private Label labelInstruction;
     private Label labelNoClassification;
@@ -68,8 +72,9 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 			taxonNode = (TaxonNode) classificationBox.getValue();
 		}
 		TermVocabulary<DefinedTermBase> term = (TermVocabulary<DefinedTermBase>)distributionAreaBox.getValue();
+		Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
 		try {
-			distListener.buttonClick(taxonNode, term);
+			distListener.buttonClick(taxonNode, term, selectedAreas);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -92,8 +97,17 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 				labelNoClassification.setVisible(parentNode==null);
 			}
 		});
-
         taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
+        
+        distributionAreaBox.addValueChangeListener(new ValueChangeListener() {
+			
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				TermVocabulary<NamedArea> voc = (TermVocabulary<NamedArea>) event.getProperty().getValue();
+				IndexedContainer indexedContainer = new IndexedContainer(voc.getTerms());
+				namedAreaList.setContainerDataSource(indexedContainer);
+			}
+		});
         
 		List<TermVocabulary<DefinedTermBase>> namedAreaList = distListener.getNamedAreaList();
 		Container d = new IndexedContainer(namedAreaList);
@@ -167,10 +181,17 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
         // distributionAreaBox
         distributionAreaBox = new ComboBox();
         distributionAreaBox.setCaption("Distribution Area");
-        distributionAreaBox.setImmediate(false);
         distributionAreaBox.setWidth("200px");
         distributionAreaBox.setHeight("-1px");
         verticalLayout_2.addComponent(distributionAreaBox);
+
+        // named areas
+        namedAreaList = new ListSelect();
+        namedAreaList.setCaption("Areas");
+        namedAreaList.setWidth("200px");
+        namedAreaList.setHeight("-1px");
+        namedAreaList.setMultiSelect(true);
+        verticalLayout_2.addComponent(namedAreaList);
 
         // taxon tree
         taxonTree = new Tree("Taxonomy");

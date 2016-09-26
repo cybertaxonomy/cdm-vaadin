@@ -59,7 +59,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds, List<String> namesAreaUuids) throws SQLException {
 
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();

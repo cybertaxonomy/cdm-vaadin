@@ -147,6 +147,11 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 //      Collections.sort(list);
         return list;
     }
+    
+    private List<String> getNamedAreas(){
+    	String selectedAreas = (String) VaadinSession.getCurrent().getAttribute("selectedAreas");
+    	return Arrays.asList(selectedAreas.split(","));
+    }
 
 
 	private SortedSet<DefinedTermBase> getTermSet(){
@@ -223,7 +228,8 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 			nodeIds.add(taxonNode.getId());
 		}
 		List<String> termList = getTermList();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds));
+		List<String> namesAreaUuids = getNamedAreas();
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds, namesAreaUuids));
 		return container;
 	}
 

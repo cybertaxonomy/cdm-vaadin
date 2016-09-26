@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.vaadin.ui.UI;
 
@@ -13,6 +14,7 @@ import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
@@ -33,12 +35,12 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 	}
 
 	@Override
-	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term) throws SQLException {
+	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term, Set<NamedArea> selectedAreas) throws SQLException {
 		DistributionTableView dtv = new DistributionTableView();
 		new DistributionTablePresenter(dtv);
 		UI.getCurrent().getNavigator().addView("table", dtv);
 
-		DistributionEditorUtil.openDistributionView(taxonNode, term);
+		DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
 	}
 
 	@Override

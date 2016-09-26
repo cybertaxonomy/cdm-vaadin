@@ -9,6 +9,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
+import java.util.HashSet;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -27,6 +29,7 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
@@ -95,7 +98,7 @@ public class SettingsConfigWindow extends CustomComponent {
 					taxonNode = (TaxonNode) classificationBox.getValue();
 				}
 				term = (TermVocabulary<DefinedTermBase>) distAreaBox.getValue();
-				DistributionEditorUtil.openDistributionView(taxonNode, term);
+				DistributionEditorUtil.openDistributionView(taxonNode, term, new HashSet<NamedArea>());
 				window.close();
 			}
 		});
