@@ -17,6 +17,8 @@ import eu.etaxonomy.cdm.vaadin.util.SQLUtils;
 
 public class CdmSQLContainer extends SQLContainer {
 
+    private static final long serialVersionUID = 2828992538007070061L;
+
     private static final Logger logger = Logger.getLogger(CdmSQLContainer.class);
 
     JDBCConnectionPool pool;
