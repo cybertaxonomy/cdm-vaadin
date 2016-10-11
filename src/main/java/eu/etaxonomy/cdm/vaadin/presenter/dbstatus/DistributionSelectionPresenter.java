@@ -32,7 +32,7 @@ public class DistributionSelectionPresenter {
 		view.dataBinding();
 	}
 
-	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term, Set<NamedArea> selectedAreas) {
+	public void buttonClick(TaxonNode taxonNode, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas) {
 		DistributionTableView dtv = new DistributionTableView();
 		new DistributionTablePresenter(dtv);
 		UI.getCurrent().getNavigator().addView("table", dtv);

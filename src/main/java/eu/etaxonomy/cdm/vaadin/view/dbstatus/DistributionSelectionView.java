@@ -71,7 +71,7 @@ public class DistributionSelectionView extends CustomComponent implements View, 
 		if(taxonNode==null){
 			taxonNode = (TaxonNode) classificationBox.getValue();
 		}
-		TermVocabulary<DefinedTermBase> term = (TermVocabulary<DefinedTermBase>)distributionAreaBox.getValue();
+		TermVocabulary<NamedArea> term = (TermVocabulary<NamedArea>)distributionAreaBox.getValue();
 		Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
 		distListener.buttonClick(taxonNode, term, selectedAreas);
 	}

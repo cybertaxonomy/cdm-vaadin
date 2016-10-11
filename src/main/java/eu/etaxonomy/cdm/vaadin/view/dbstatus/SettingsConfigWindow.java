@@ -27,7 +27,6 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
@@ -52,7 +51,7 @@ public class SettingsConfigWindow extends CustomComponent {
     private Button cancelButton;
     private final SettingsPresenter presenter;
 	private Window window;
-    
+
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -86,24 +85,24 @@ public class SettingsConfigWindow extends CustomComponent {
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
-        
+
         okButton.addClickListener(new ClickListener() {
-			
+
 			@Override
 			public void buttonClick(ClickEvent event) {
 				TaxonNode taxonNode;
-				TermVocabulary<DefinedTermBase> term = null;
+				TermVocabulary<NamedArea> term = null;
 				taxonNode = (TaxonNode) taxonTree.getValue();
 				if(taxonNode==null){
 					taxonNode = (TaxonNode) classificationBox.getValue();
 				}
-				term = (TermVocabulary<DefinedTermBase>) distAreaBox.getValue();
+				term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
 				DistributionEditorUtil.openDistributionView(taxonNode, term, new HashSet<NamedArea>());
 				window.close();
 			}
 		});
         cancelButton.addClickListener(new ClickListener() {
-			
+
 			@Override
 			public void buttonClick(ClickEvent event) {
 				window.close();
@@ -128,7 +127,7 @@ public class SettingsConfigWindow extends CustomComponent {
         mainLayout.setSizeFull();
         mainLayout.setMargin(true);
         mainLayout.setSpacing(true);
-        
+
         HorizontalLayout topContainer = new HorizontalLayout();
         topContainer.setImmediate(false);
         topContainer.setSizeFull();
@@ -136,7 +135,7 @@ public class SettingsConfigWindow extends CustomComponent {
 
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setImmediate(false);
-        
+
         //classification and term
         classificationBox = new ComboBox("Classification");
         classificationBox.setImmediate(true);
@@ -145,7 +144,7 @@ public class SettingsConfigWindow extends CustomComponent {
         distAreaBox = new ComboBox("Distribution Area:");
         distAreaBox.setImmediate(false);
         distAreaBox.setWidth("100%");
-        
+
         //distribution status
         distStatusSelect = new TwinColSelect("Distribution Status:");
         distStatusSelect.setImmediate(false);
@@ -154,13 +153,13 @@ public class SettingsConfigWindow extends CustomComponent {
         //taxonomy
         taxonTree = new Tree("Taxonomy");
         taxonTree.setImmediate(false);
-        
+
         verticalLayout.addComponent(classificationBox);
         verticalLayout.addComponent(distAreaBox);
         verticalLayout.addComponent(distStatusSelect);
         verticalLayout.setExpandRatio(distStatusSelect, 1);
         verticalLayout.setSizeFull();
-        
+
         topContainer.addComponent(verticalLayout);
         topContainer.addComponent(taxonTree);
         topContainer.setExpandRatio(taxonTree, 1);

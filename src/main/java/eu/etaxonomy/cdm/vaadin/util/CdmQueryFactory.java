@@ -10,6 +10,7 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -20,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
+import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 
 /**
@@ -59,7 +62,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, List<String> namedAreas) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, Collection<NamedArea> namedAreas, boolean abbreviatedLabels) throws SQLException {
 
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
@@ -93,8 +96,15 @@ public class CdmQueryFactory {
         		"tb.titleCache AS "+TAXON_COLUMN+", " +
         		"rank.titleCache AS "+RANK_COLUMN+", ";
 
-        for(String namedArea : namedAreas){
-            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ namedArea +"', statusTerm.titleCache, NULL) ) as '"+ namedArea +"'," ;
+        for(NamedArea namedArea : namedAreas){
+            String label;
+            if(abbreviatedLabels){
+                label = namedArea.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel();
+            }
+            else{
+                label = namedArea.getTitleCache();
+            }
+            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ label +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
         }
         SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;

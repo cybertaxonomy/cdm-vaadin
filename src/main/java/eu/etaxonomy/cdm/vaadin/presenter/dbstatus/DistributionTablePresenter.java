@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
@@ -20,7 +19,6 @@ import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
-import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -42,7 +40,7 @@ import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 
 public class DistributionTablePresenter {
 
-	private final IClassificationService classificationService;
+    private final IClassificationService classificationService;
 	private final IVocabularyService vocabularyService;
 	private final IDescriptionService descriptionService;
 	private final ITaxonNodeService taxonNodeService;
@@ -119,7 +117,7 @@ public class DistributionTablePresenter {
 	}
 
 	public List<String> getAbbreviatedTermList() {
-		SortedSet<DefinedTermBase> terms = getTermSet();
+		Set<NamedArea> terms = getTermSet();
 		List<String> list = new ArrayList<String>();
 		for(DefinedTermBase dtb: terms){
 		    for(Representation r : dtb.getRepresentations()){
@@ -129,25 +127,34 @@ public class DistributionTablePresenter {
 		return list;
 	}
 
-    public List<String> getNamedAreas(){
-    	String selectedAreas = (String) VaadinSession.getCurrent().getAttribute("selectedAreas");
-    	if(CdmUtils.isBlank(selectedAreas)){
-    	    SortedSet<DefinedTermBase> terms = getTermSet();
-            List<String> list = new ArrayList<String>();
-            for(DefinedTermBase dtb: terms){
-               list.add(dtb.getTitleCache());
-            }
-    	    return list;
-    	}
-    	return Arrays.asList(selectedAreas.split(","));
+	public Set<NamedArea> getNamedAreas(){
+	    Set<NamedArea> namedAreas = (Set<NamedArea>) VaadinSession.getCurrent().getAttribute("selectedAreas");
+	    if(namedAreas.isEmpty()){
+	        return getTermSet();
+	    }
+        return namedAreas;
+	}
+
+    public List<String> getNamedAreasLabels(boolean abbreviated){
+        Set<NamedArea> selectedAreas = getNamedAreas();
+    	List<String> namedAreaTitles = new ArrayList<>();
+    	for (NamedArea namedArea : selectedAreas) {
+    	    if(abbreviated){
+    	        namedAreaTitles.add(namedArea.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
+    	    }
+    	    else{
+    	        namedAreaTitles.add(namedArea.getRepresentation(Language.DEFAULT()).getLabel());
+    	    }
+        }
+    	return namedAreaTitles;
     }
 
-	private SortedSet<DefinedTermBase> getTermSet(){
+	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID termUUID = (UUID) session.getAttribute("selectedTerm");
-	    TermVocabulary<DefinedTermBase> term = vocabularyService.load(termUUID);
-	    term = CdmBase.deproxy(term, TermVocabulary.class);
-	    return term.getTermsOrderedByLabels(Language.DEFAULT());
+	    TermVocabulary<NamedArea> vocabulary = vocabularyService.load(termUUID);
+	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
+	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
 	}
 
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
@@ -209,8 +216,8 @@ public class DistributionTablePresenter {
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
-		List<String> namesAreaUuids = getNamedAreas();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreaUuids));
+		Set<NamedArea> namesAreas = getNamedAreas();
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreas, true));
 		return container;
 	}
 

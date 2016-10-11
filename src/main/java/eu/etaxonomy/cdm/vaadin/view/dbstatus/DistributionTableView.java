@@ -106,14 +106,16 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setSortEnabled(true);
 
 		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
-		List<String> termList = listener.getNamedAreas();
-		columnList.addAll(termList);
-		Object[] visibleColumns = columnList.toArray();
-		table.setVisibleColumns(visibleColumns);
+		List<String> namedAreas = listener.getNamedAreasLabels(true);
+		columnList.addAll(namedAreas);
+		table.setVisibleColumns(columnList.toArray());
 
 		headerList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,"Rang"}));
-		headerList.addAll(listener.getAbbreviatedTermList());
+		headerList.addAll(listener.getNamedAreasLabels(true));
+		String[] string = new String[headerList.size()];
+		table.setColumnHeaders(headerList.toArray(string));
 
+//		table.setColumnExpandRatio(propertyId, expandRatio);
 		table.setColumnCollapsingAllowed(true);
 		table.setSelectable(true);
 		table.setPageLength(20);
@@ -125,7 +127,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		//add generated columns for NamedAreas
 		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
 		for (Object object : containerPropertyIds) {
-			if(termList.contains(object)){
+			if(namedAreas.contains(object)){
 				table.removeGeneratedColumn(object);
 				table.addGeneratedColumn(object, new AreaColumnGenerator());
 			}
@@ -204,6 +206,7 @@ public class DistributionTableView extends CustomComponent implements View{
             final String area = columnId.toString();
             box.setImmediate(true);
             box.setBuffered(true);
+            box.setSizeFull();
             box.setValue(TermCacher.getInstance().getPresenceAbsenceTerm((String)value));
             box.addValueChangeListener(new ValueChangeListener() {
                 private static final long serialVersionUID = 6221534597911674067L;
