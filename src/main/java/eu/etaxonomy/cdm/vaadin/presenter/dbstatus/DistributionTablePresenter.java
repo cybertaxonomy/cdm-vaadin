@@ -20,6 +20,7 @@ import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
+import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -147,9 +148,12 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 //      Collections.sort(list);
         return list;
     }
-    
-    private List<String> getNamedAreas(){
+
+    public List<String> getNamedAreas(){
     	String selectedAreas = (String) VaadinSession.getCurrent().getAttribute("selectedAreas");
+    	if(CdmUtils.isBlank(selectedAreas)){
+    	    return getTermList();
+    	}
     	return Arrays.asList(selectedAreas.split(","));
     }
 
@@ -227,9 +231,8 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
-		List<String> termList = getTermList();
 		List<String> namesAreaUuids = getNamedAreas();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds, namesAreaUuids));
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreaUuids));
 		return container;
 	}
 

@@ -59,7 +59,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<String> termList, List<Integer> taxonNodeIds, List<String> namesAreaUuids) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, List<String> namedAreas) throws SQLException {
 
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
@@ -93,8 +93,8 @@ public class CdmQueryFactory {
         		"tb.titleCache AS "+TAXON_COLUMN+", " +
         		"rank.titleCache AS "+RANK_COLUMN+", ";
 
-        for(String term : termList){
-        		SELECT_QUERY += "MAX( IF(area.titleCache = '"+ term +"', statusTerm.titleCache, NULL) ) as '"+ term +"'," ;
+        for(String namedArea : namedAreas){
+            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ namedArea +"', statusTerm.titleCache, NULL) ) as '"+ namedArea +"'," ;
         }
         SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;

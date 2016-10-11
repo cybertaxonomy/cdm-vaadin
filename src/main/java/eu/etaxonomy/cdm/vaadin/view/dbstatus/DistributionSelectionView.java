@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 
 public class DistributionSelectionView extends CustomComponent implements IDistributionSelectionComponent, View, ClickListener{
@@ -98,17 +99,17 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 			}
 		});
         taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        
+
         distributionAreaBox.addValueChangeListener(new ValueChangeListener() {
-			
+
 			@Override
 			public void valueChange(ValueChangeEvent event) {
-				TermVocabulary<NamedArea> voc = (TermVocabulary<NamedArea>) event.getProperty().getValue();
-				IndexedContainer indexedContainer = new IndexedContainer(voc.getTerms());
-				namedAreaList.setContainerDataSource(indexedContainer);
+				TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) event.getProperty().getValue();
+				NamedAreaContainer container = new NamedAreaContainer(vocabulary);
+				namedAreaList.setContainerDataSource(container);
 			}
 		});
-        
+
 		List<TermVocabulary<DefinedTermBase>> namedAreaList = distListener.getNamedAreaList();
 		Container d = new IndexedContainer(namedAreaList);
 		distributionAreaBox.setContainerDataSource(d);

@@ -2,6 +2,8 @@ package eu.etaxonomy.cdm.vaadin.util;
 
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
@@ -26,10 +28,11 @@ public class DistributionEditorUtil {
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
 	    String selectedAreaUuids = "";
 	    for (NamedArea namedArea : selectedAreas) {
-			selectedAreaUuids += namedArea.getUuid().toString()+",";
+			selectedAreaUuids += namedArea.getTitleCache()+",";
 		}
+	    selectedAreaUuids = StringUtils.stripEnd(selectedAreaUuids, ",");
 	    VaadinSession.getCurrent().setAttribute("selectedAreas", selectedAreaUuids);
-	
+
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo("table");
 	}

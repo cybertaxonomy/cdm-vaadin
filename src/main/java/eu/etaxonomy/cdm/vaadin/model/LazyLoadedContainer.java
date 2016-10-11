@@ -9,6 +9,7 @@ import com.vaadin.data.util.BeanItem;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionTableComponent;
 
 public class LazyLoadedContainer extends BeanContainer implements Serializable, IDistributionTableComponent {
@@ -18,34 +19,34 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 
 	DistributionTableComponentListener listener;
 
-	
+
 	public LazyLoadedContainer(Class type) throws IllegalArgumentException {
 		super(type);
 	}
-//	
+//
 //	public LazyLoadedContainer(Class type, IClassificationService classificationService, ITaxonNodeService taxonNodeService, IDescriptionService descriptionService) throws IllegalArgumentException {
 //		super(type);
 //		this.classificationService = classificationService;
 //		this.taxonNodeService = taxonNodeService;
 //		this.descriptionService = descriptionService;
-//		
+//
 //	}
-	
+
 	@Override
 	public int size(){
 		return listener.getSizeOfTaxonNode();
 	}
-	
+
 	@Override
 	public BeanItem getItem(Object itemId){
 		TaxonNode taxonNode = ((TaxonNode) itemId);
 		CdmBase.deproxy(taxonNode, TaxonNode.class);
-		Taxon taxon = (Taxon)taxonNode.getTaxon();
+		Taxon taxon = taxonNode.getTaxon();
 		CdmBase.deproxy(taxon, Taxon.class);
 		CdmTaxonTableCollection cttc = new CdmTaxonTableCollection(taxon);
 		return new BeanItem(cttc);
 	}
-	
+
 	@Override
 	public List getItemIds(){
 		List<TaxonNode> listAllNodesForClassification = listener.getAllNodes();
@@ -55,10 +56,10 @@ public class LazyLoadedContainer extends BeanContainer implements Serializable, 
 
 
 	@Override
-	public void addListener(DistributionTableComponentListener listener) {
+	public void addListener(DistributionTablePresenter listener) {
 		this.listener = listener;
 	}
 
-	
+
 
 }

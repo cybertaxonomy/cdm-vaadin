@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.model.LazyLoadedContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 
 public interface IDistributionTableComponent {
 
@@ -70,5 +71,5 @@ public interface IDistributionTableComponent {
         int updateDistributionField(String distributionArea, Object comboValue, Taxon taxon);
 
 	}
-	public void addListener(DistributionTableComponentListener listener);
+	public void addListener(DistributionTablePresenter listener);
 }

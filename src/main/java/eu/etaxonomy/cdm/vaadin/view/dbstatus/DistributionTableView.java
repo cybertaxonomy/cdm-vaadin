@@ -35,6 +35,7 @@ import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 public class DistributionTableView extends CustomComponent implements IDistributionTableComponent, View{
@@ -72,7 +73,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
     private HorizontalToolbar toolbar;
 	private Table table;
 
-	private DistributionTableComponentListener listener;
+	private DistributionTablePresenter listener;
 
 	private List<String> columnList;
 	private ArrayList<String> headerList;
@@ -96,14 +97,14 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		mainLayout.setImmediate(false);
 		mainLayout.setWidth("100%");
 		mainLayout.setHeight("100%");
-		
+
 		setWidth("100.0%");
 		setHeight("100.0%");
 
 		//Horizontal Toolbar
 		toolbar = new HorizontalToolbar();
 		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;");
-		
+
 		// table
 		table = new Table();
 		table.setImmediate(false);
@@ -114,7 +115,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 	}
 
 	@Override
-	public void addListener(DistributionTableComponentListener listener) {
+	public void addListener(DistributionTablePresenter listener) {
 	   this.listener = listener;
 	}
 
@@ -134,7 +135,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		table.setSortEnabled(true);
 
 		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
-		List<String> termList = listener.getTermList();
+		List<String> termList = listener.getNamedAreas();
 		columnList.addAll(termList);
 		Object[] visibleColumns = columnList.toArray();
 		table.setVisibleColumns(visibleColumns);
