@@ -29,7 +29,10 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
@@ -37,6 +40,7 @@ import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
 public class DistributionTableView extends CustomComponent implements View{
@@ -207,7 +211,24 @@ public class DistributionTableView extends CustomComponent implements View{
             box.setImmediate(true);
             box.setBuffered(true);
             box.setSizeFull();
-            box.setValue(TermCacher.getInstance().getPresenceAbsenceTerm((String)value));
+            PresenceAbsenceTerm presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String)value);
+			box.setValue(presenceAbsenceTerm);
+			if(presenceAbsenceTerm!=null){
+				String itemCaption = null;
+				Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
+				if(representation!=null){
+					if((Boolean)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SESSION_ABBREVIATED_LABELS)){
+						itemCaption = representation.getAbbreviatedLabel();
+					}
+					else{
+						itemCaption = representation.getLabel();
+					}
+				}
+				if(itemCaption==null){
+					itemCaption = presenceAbsenceTerm.getTitleCache();
+				}
+				box.setItemCaption(presenceAbsenceTerm, itemCaption);
+			}
             box.addValueChangeListener(new ValueChangeListener() {
                 private static final long serialVersionUID = 6221534597911674067L;
 

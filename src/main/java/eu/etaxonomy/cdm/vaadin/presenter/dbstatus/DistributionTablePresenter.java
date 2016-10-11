@@ -63,15 +63,19 @@ public class DistributionTablePresenter {
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
-	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
+	        if(term.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel().equalsIgnoreCase(distributionAreaString)){
 	            namedArea = (NamedArea) term;
 	            break;
+	        }
+	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
+	        	namedArea = (NamedArea) term;
+	        	break;
 	        }
 	    }
 	    List<Distribution> distributions = getDistributions(taxon);
 	    Distribution distribution = null;
 	    for(Distribution dist : distributions){
-	        if(dist.getArea().equals(namedArea)){
+	        if(dist.getArea()!=null && dist.getArea().equals(namedArea)){
 	            distribution = dist;
 	            break;
 	        }
@@ -139,12 +143,20 @@ public class DistributionTablePresenter {
         Set<NamedArea> selectedAreas = getNamedAreas();
     	List<String> namedAreaTitles = new ArrayList<>();
     	for (NamedArea namedArea : selectedAreas) {
-    	    if(abbreviated){
-    	        namedAreaTitles.add(namedArea.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
+    		String title = null;
+    	    Representation representation = namedArea.getRepresentation(Language.DEFAULT());
+    	    if(representation!=null){
+    	    	if(abbreviated){
+    	    		title = representation.getAbbreviatedLabel();
+    	    	}
+    	    	else{
+    	    		title = representation.getLabel();
+    	    	}
     	    }
-    	    else{
-    	        namedAreaTitles.add(namedArea.getRepresentation(Language.DEFAULT()).getLabel());
+    	    if(title==null){
+    	    	title = namedArea.getTitleCache();
     	    }
+    	    namedAreaTitles.add(title);
         }
     	return namedAreaTitles;
     }

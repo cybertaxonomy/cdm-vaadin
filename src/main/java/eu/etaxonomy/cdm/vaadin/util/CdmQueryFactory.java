@@ -22,6 +22,7 @@ import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 
@@ -97,14 +98,20 @@ public class CdmQueryFactory {
         		"rank.titleCache AS "+RANK_COLUMN+", ";
 
         for(NamedArea namedArea : namedAreas){
-            String label;
-            if(abbreviatedLabels){
-                label = namedArea.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel();
+            String label = null;
+            Representation representation = namedArea.getRepresentation(Language.DEFAULT());
+            if(representation!=null){
+            	if(abbreviatedLabels){
+            		label = representation.getAbbreviatedLabel();
+            	}
+            	else{
+            		label = representation.getLabel();
+            	}
             }
-            else{
-                label = namedArea.getTitleCache();
+            if(label==null){
+            	label = namedArea.getTitleCache();
             }
-            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ label +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
+            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ namedArea.getTitleCache() +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
         }
         SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;

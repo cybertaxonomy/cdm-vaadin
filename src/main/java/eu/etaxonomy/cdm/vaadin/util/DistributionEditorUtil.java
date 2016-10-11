@@ -14,6 +14,8 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
+    public static final String SESSION_ABBREVIATED_LABELS = "abbreviatedLabels";
+
     public static void openDistributionView(TaxonNode taxonNode, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas) {
 		if(taxonNode==null){
 			Notification.show("Please choose a classification and/or taxon", Notification.Type.HUMANIZED_MESSAGE);
@@ -25,15 +27,11 @@ public class DistributionEditorUtil {
 		}
 	    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
 	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
-//	    String selectedAreaUuids = "";
-//	    for (NamedArea namedArea : selectedAreas) {
-//			selectedAreaUuids += namedArea.getTitleCache()+SEPARATOR;
-//		}
-//	    selectedAreaUuids = StringUtils.stripEnd(selectedAreaUuids, SEPARATOR);
 	    VaadinSession.getCurrent().setAttribute("selectedAreas", selectedAreas);
 
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo("table");
 	}
+
 
 }
