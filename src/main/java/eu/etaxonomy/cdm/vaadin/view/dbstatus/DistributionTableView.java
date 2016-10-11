@@ -37,6 +37,7 @@ import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
+import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
 public class DistributionTableView extends CustomComponent implements IDistributionTableComponent, View{
 
@@ -55,7 +56,7 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		    final String area = columnId.toString();
 		    box.setImmediate(true);
 		    box.setBuffered(true);
-		    box.setValue(PresenceAbsenceTermContainer.titleToTermMap.get(value));
+		    box.setValue(TermCacher.getInstance().getPresenceAbsenceTerm((String)value));
 		    box.addValueChangeListener(new ValueChangeListener() {
 				private static final long serialVersionUID = 6221534597911674067L;
 
