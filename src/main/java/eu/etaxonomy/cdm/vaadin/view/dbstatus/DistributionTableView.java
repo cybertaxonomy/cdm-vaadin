@@ -39,36 +39,7 @@ import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
-public class DistributionTableView extends CustomComponent implements IDistributionTableComponent, View{
-
-    private final class AreaColumnGenerator implements ColumnGenerator {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Object generateCell(Table source, Object itemId, Object columnId) {
-		    Property<?> containerProperty = source.getContainerProperty(itemId, columnId);
-		    Object value = null;
-		    if(containerProperty != null){
-		        value = containerProperty.getValue();
-		    }
-		    final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
-		    final ComboBox box = new ComboBox("Occurrence Status: ", PresenceAbsenceTermContainer.getInstance());
-		    final String area = columnId.toString();
-		    box.setImmediate(true);
-		    box.setBuffered(true);
-		    box.setValue(TermCacher.getInstance().getPresenceAbsenceTerm((String)value));
-		    box.addValueChangeListener(new ValueChangeListener() {
-				private static final long serialVersionUID = 6221534597911674067L;
-
-				@Override
-		        public void valueChange(ValueChangeEvent event) {
-		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
-		            listener.updateDistributionField(area, box.getValue(), taxon);
-		        }
-		    });
-		    return box;
-		}
-	}
+public class DistributionTableView extends CustomComponent implements View{
 
 	private static final long serialVersionUID = 1L;
     private HorizontalToolbar toolbar;
@@ -115,7 +86,6 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		return mainLayout;
 	}
 
-	@Override
 	public void addListener(DistributionTablePresenter listener) {
 	   this.listener = listener;
 	}
@@ -218,5 +188,34 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		});
 
 	}
+
+    private final class AreaColumnGenerator implements ColumnGenerator {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public Object generateCell(Table source, Object itemId, Object columnId) {
+            Property<?> containerProperty = source.getContainerProperty(itemId, columnId);
+            Object value = null;
+            if(containerProperty != null){
+                value = containerProperty.getValue();
+            }
+            final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
+            final ComboBox box = new ComboBox("Occurrence Status: ", PresenceAbsenceTermContainer.getInstance());
+            final String area = columnId.toString();
+            box.setImmediate(true);
+            box.setBuffered(true);
+            box.setValue(TermCacher.getInstance().getPresenceAbsenceTerm((String)value));
+            box.addValueChangeListener(new ValueChangeListener() {
+                private static final long serialVersionUID = 6221534597911674067L;
+
+                @Override
+                public void valueChange(ValueChangeEvent event) {
+                    Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+                    listener.updateDistributionField(area, box.getValue(), taxon);
+                }
+            });
+            return box;
+        }
+    }
 
 }

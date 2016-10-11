@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.sqlcontainer.SQLContainer;
-import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
@@ -21,16 +20,14 @@ public class CdmSQLContainer extends SQLContainer {
 
     private static final Logger logger = Logger.getLogger(CdmSQLContainer.class);
 
-    JDBCConnectionPool pool;
-
-    DatabaseMetaData databaseMetaData;
+    private DatabaseMetaData databaseMetaData;
 
     public static final int DEFAULT_LIMIT = 5000;
     boolean checkPropertyIdCase = false;
 
     public CdmSQLContainer(QueryDelegate delegate) throws SQLException {
         super(delegate);
-        databaseMetaData = CdmSpringContextHelper.getCurrent().getDatabaseMetaData();
+        databaseMetaData = CdmSpringContextHelper.getDatabaseMetaData();
         setPageLength(DEFAULT_LIMIT);
     }
 
@@ -43,8 +40,6 @@ public class CdmSQLContainer extends SQLContainer {
         container.checkPropertyIdCase = true;
         return container;
     }
-
-
 
     public UUID getUuid(Object itemId) {
         return UUID.fromString((String)getProperty(itemId,CdmQueryFactory.UUID_ID).getValue());

@@ -1,6 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.presenter.dbstatus;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,9 +21,8 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionSelectionView;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
-import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionSelectionComponent;
 
-public class DistributionSelectionPresenter implements IDistributionSelectionComponent.DistributionSelectionComponentListener {
+public class DistributionSelectionPresenter {
 
 	private DistributionSelectionView view;
 
@@ -34,8 +32,7 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 		view.dataBinding();
 	}
 
-	@Override
-	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term, Set<NamedArea> selectedAreas) throws SQLException {
+	public void buttonClick(TaxonNode taxonNode, TermVocabulary<DefinedTermBase> term, Set<NamedArea> selectedAreas) {
 		DistributionTableView dtv = new DistributionTableView();
 		new DistributionTablePresenter(dtv);
 		UI.getCurrent().getNavigator().addView("table", dtv);
@@ -43,7 +40,6 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 		DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
 	}
 
-	@Override
 	public List<TaxonNode> getTaxonNodeList() {
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
 
@@ -67,7 +63,6 @@ public class DistributionSelectionPresenter implements IDistributionSelectionCom
 		return nodes;
 	}
 
-	@Override
 	public List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
 
 		IVocabularyService vocabularyService = CdmSpringContextHelper.getVocabularyService();

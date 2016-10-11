@@ -1,6 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -29,8 +28,9 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionSelectionPresenter;
 
-public class DistributionSelectionView extends CustomComponent implements IDistributionSelectionComponent, View, ClickListener{
+public class DistributionSelectionView extends CustomComponent implements View, ClickListener{
 
     private VerticalLayout mainLayout;
     private Panel panel_1;
@@ -44,7 +44,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
     private Label labelNoClassification;
 
     private static final long serialVersionUID = 1L;
-	private DistributionSelectionComponentListener distListener;
+	private DistributionSelectionPresenter distListener;
 	/**
 	 * The constructor should first build the main layout, set the
 	 * composition root and then do any custom initialization.
@@ -61,8 +61,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 	}
 
 
-	@Override
-	public void addListener(DistributionSelectionComponentListener listener) {
+	public void addListener(DistributionSelectionPresenter listener) {
 		distListener = listener;
 	}
 
@@ -74,11 +73,7 @@ public class DistributionSelectionView extends CustomComponent implements IDistr
 		}
 		TermVocabulary<DefinedTermBase> term = (TermVocabulary<DefinedTermBase>)distributionAreaBox.getValue();
 		Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-		try {
-			distListener.buttonClick(taxonNode, term, selectedAreas);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		distListener.buttonClick(taxonNode, term, selectedAreas);
 	}
 
 	public void dataBinding(){
