@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
  * @author alex
@@ -50,8 +51,8 @@ public class SettingsPresenter {
 
     private void init() {
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
-        taxonNodeUuid = UUID.fromString(VaadinSession.getCurrent().getAttribute("taxonNodeUUID").toString());
-        termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute("selectedTerm").toString());
+        taxonNodeUuid = UUID.fromString(VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID).toString());
+        termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID).toString());
         distributionContainer = new IndexedContainer(getNamedAreaList());
         distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
     }

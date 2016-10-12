@@ -16,15 +16,13 @@ import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 
 public class CdmVaadinConversationalServlet extends VaadinServlet implements SessionInitListener, SessionDestroyListener {
 
 	private static final Logger logger = Logger.getLogger(CdmVaadinConversationalServlet.class);
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -2973231251266766766L;
 
 	private ConversationHolder conversation;
@@ -42,7 +40,7 @@ public class CdmVaadinConversationalServlet extends VaadinServlet implements Ses
 			throws ServiceException {
 		conversation = (ConversationHolder) CdmSpringContextHelper.getCurrent().getBean("conversationHolder");
 		conversation.bind();
-		VaadinSession.getCurrent().setAttribute("conversation", conversation);
+		VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_CONVERSATION, conversation);
 	}
 
 	@Override

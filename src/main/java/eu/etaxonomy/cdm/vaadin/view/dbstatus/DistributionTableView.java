@@ -183,7 +183,7 @@ public class DistributionTableView extends CustomComponent implements View{
 			private static final long serialVersionUID = 1L;
 			@Override
 			public void buttonClick(ClickEvent event) {
-				ConversationHolder conversationHolder = (ConversationHolder) VaadinSession.getCurrent().getAttribute("conversation");
+				ConversationHolder conversationHolder = (ConversationHolder) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_CONVERSATION);
 				try{
 					conversationHolder.commit();
 				}catch(Exception stateException){
@@ -217,7 +217,7 @@ public class DistributionTableView extends CustomComponent implements View{
 				String itemCaption = null;
 				Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
 				if(representation!=null){
-					if((Boolean)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SESSION_ABBREVIATED_LABELS)){
+					if((Boolean)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS)){
 						itemCaption = representation.getAbbreviatedLabel();
 					}
 					else{

@@ -12,9 +12,17 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 
 public class DistributionEditorUtil {
 
-    public static final String SEPARATOR = ";;";
+	public static final String VIEW_TABLE = "table";
 
-    public static final String SESSION_ABBREVIATED_LABELS = "abbreviatedLabels";
+	public static final String SATTR_SELECTED_AREAS = "selectedAreas";
+
+    public static final String SATTR_SELECTED_VOCABULARY_UUID = "selectedVocabularyUuid";
+
+	public static final String SATTR_TAXON_NODE_UUID = "taxonNodeUUID";
+
+    public static final String SATTR_ABBREVIATED_LABELS = "abbreviatedLabels";
+
+    public static final String SEPARATOR = ";;";
 
     public static void openDistributionView(TaxonNode taxonNode, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas) {
 		if(taxonNode==null){
@@ -25,13 +33,15 @@ public class DistributionEditorUtil {
 			Notification.show("Please choose a distribution area", Notification.Type.HUMANIZED_MESSAGE);
 			return;
 		}
-	    VaadinSession.getCurrent().setAttribute("taxonNodeUUID", taxonNode.getUuid());
-	    VaadinSession.getCurrent().setAttribute("selectedTerm", term.getUuid());
-	    VaadinSession.getCurrent().setAttribute("selectedAreas", selectedAreas);
+	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODE_UUID, taxonNode.getUuid());
+	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_VOCABULARY_UUID, term.getUuid());
+	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, selectedAreas);
 
 	    //navigate to table view
-	    UI.getCurrent().getNavigator().navigateTo("table");
+	    UI.getCurrent().getNavigator().navigateTo(VIEW_TABLE);
 	}
+
+	public static final String SATTR_CONVERSATION = "conversation";
 
 
 }
