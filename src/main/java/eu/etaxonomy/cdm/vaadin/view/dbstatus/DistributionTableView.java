@@ -3,15 +3,10 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.ContextClickEvent;
-import com.vaadin.event.ContextClickEvent.ContextClickListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -20,23 +15,22 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbsoluteLayout;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
-import eu.etaxonomy.cdm.model.common.Language;
-import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
-import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
@@ -45,7 +39,6 @@ import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
-import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
 public class DistributionTableView extends CustomComponent implements View{
 
@@ -132,14 +125,37 @@ public class DistributionTableView extends CustomComponent implements View{
 
 		table.setCacheRate(20);
 		
-		//add generated columns for NamedAreas
-		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
-		for (Object object : containerPropertyIds) {
-			if(namedAreas.contains(object)){
-				table.removeGeneratedColumn(object);
-				table.addGeneratedColumn(object, new AreaColumnGenerator());
+		table.addItemClickListener(new ItemClickListener() {
+			private static final long serialVersionUID = 2743935539139014771L;
+			@Override
+			public void itemClick(ItemClickEvent event) {
+				if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN)) && !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
+					Property<?> itemProperty = event.getItem().getItemProperty("uuid");
+					UUID uuid = UUID.fromString(itemProperty.getValue().toString());
+					final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+					final String areaID = (String) event.getPropertyId();
+
+					//popup window
+					final Window popup = new Window("Choose terms");
+					final ListSelect termSelect = new ListSelect();
+					termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
+					Button btnOk = new Button("OK", new ClickListener() {
+						private static final long serialVersionUID = -3732219609337335697L;
+						@Override
+						public void buttonClick(ClickEvent event) {
+							listener.updateDistributionField(areaID, termSelect.getValue(), taxon);
+							popup.close();
+						}
+					});
+					VerticalLayout layout = new VerticalLayout(termSelect, btnOk);
+					layout.setComponentAlignment(btnOk, Alignment.BOTTOM_RIGHT);
+					popup.setContent(layout);
+					popup.setModal(true);
+					popup.center();
+					UI.getCurrent().addWindow(popup);
+				}
 			}
-		}
+		});
 	}
 
 	private void createEditClickListener(){
@@ -198,52 +214,5 @@ public class DistributionTableView extends CustomComponent implements View{
 		});
 
 	}
-
-    private final class AreaColumnGenerator implements ColumnGenerator {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public Object generateCell(Table source, Object itemId, Object columnId) {
-            Property<?> containerProperty = source.getContainerProperty(itemId, columnId);
-            Object value = null;
-            if(containerProperty != null){
-                value = containerProperty.getValue();
-            }
-            final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
-            final ComboBox box = new ComboBox("Occurrence Status: ", PresenceAbsenceTermContainer.getInstance());
-            final String area = columnId.toString();
-            box.setImmediate(true);
-            box.setBuffered(true);
-            box.setSizeFull();
-            PresenceAbsenceTerm presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String)value);
-			box.setValue(presenceAbsenceTerm);
-			if(presenceAbsenceTerm!=null){
-				String itemCaption = null;
-				Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
-				if(representation!=null){
-					if(DistributionEditorUtil.isAbbreviatedLabels()){
-						itemCaption = representation.getAbbreviatedLabel();
-					}
-					else{
-						itemCaption = representation.getLabel();
-					}
-				}
-				if(itemCaption==null){
-					itemCaption = presenceAbsenceTerm.getTitleCache();
-				}
-				box.setItemCaption(presenceAbsenceTerm, itemCaption);
-			}
-            box.addValueChangeListener(new ValueChangeListener() {
-                private static final long serialVersionUID = 6221534597911674067L;
-
-                @Override
-                public void valueChange(ValueChangeEvent event) {
-                    Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
-                    listener.updateDistributionField(area, box.getValue(), taxon);
-                }
-            });
-            return box;
-        }
-    }
 
 }

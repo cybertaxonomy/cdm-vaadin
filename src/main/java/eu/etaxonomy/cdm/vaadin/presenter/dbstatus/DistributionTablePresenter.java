@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
@@ -64,14 +65,29 @@ public class DistributionTablePresenter {
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
-	        if(term.getRepresentation(Language.DEFAULT()).getAbbreviatedLabel().equalsIgnoreCase(distributionAreaString)){
-	            namedArea = (NamedArea) term;
-	            break;
-	        }
+	    	Representation representation = term.getRepresentation(Language.DEFAULT());
+	    	if(representation!=null){
+	    		if(DistributionEditorUtil.isAbbreviatedLabels()){
+	    			String label = representation.getLabel();
+	    			String abbreviatedLabel = representation.getAbbreviatedLabel();
+					if(abbreviatedLabel!=null && abbreviatedLabel.equalsIgnoreCase(distributionAreaString)){
+	    				namedArea = (NamedArea) term;
+	    				break;
+	    			}
+					else if(label!=null && label.equalsIgnoreCase(distributionAreaString)){
+						namedArea = (NamedArea) term;
+						break;
+					}
+	    		}
+	    	}
 	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
 	        	namedArea = (NamedArea) term;
 	        	break;
 	        }
+	    }
+	    if(namedArea==null){
+	    	Notification.show("Error during update of distribution term!");
+	    	return -1;
 	    }
 	    List<Distribution> distributions = getDistributions(taxon);
 	    Distribution distribution = null;
