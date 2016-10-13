@@ -150,7 +150,7 @@ public class DistributionTablePresenter {
 
 	public Set<NamedArea> getNamedAreas(){
 	    Set<NamedArea> namedAreas = (Set<NamedArea>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
-	    if(namedAreas.isEmpty()){
+	    if(namedAreas!=null && namedAreas.isEmpty()){
 	        return getTermSet();
 	    }
         return namedAreas;
@@ -219,10 +219,12 @@ public class DistributionTablePresenter {
 	public List<TaxonNode> getAllNodes(){
 		TaxonNode taxonNode = getChosenTaxonNode();
 		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
-		if(taxonNode.getTaxon()!=null){
-			nodes.add(taxonNode);
+		if(taxonNode!=null){
+			if(taxonNode.getTaxon()!=null){
+				nodes.add(taxonNode);
+			}
+			nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		}
-		nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		return nodes;
 	}
 
@@ -245,9 +247,11 @@ public class DistributionTablePresenter {
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
-		Set<NamedArea> namesAreas = getNamedAreas();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreas));
-		return container;
+		Set<NamedArea> namedAreas = getNamedAreas();
+		if(namedAreas!=null){
+			return new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namedAreas));
+		}
+		return null;
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{

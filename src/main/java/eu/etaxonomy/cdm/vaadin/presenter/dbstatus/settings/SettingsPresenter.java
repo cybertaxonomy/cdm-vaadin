@@ -45,16 +45,17 @@ public class SettingsPresenter {
 
 
     public SettingsPresenter(){
-        init();
-
-    }
-
-    private void init() {
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
-        taxonNodeUuid = UUID.fromString(VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID).toString());
-        termUUID = UUID.fromString(VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID).toString());
-        distributionContainer = new IndexedContainer(getNamedAreaList());
-        distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
+		Object taxonNodeUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID);
+		Object selectedVocabularyUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
+		if(taxonNodeUuidString!=null){
+			taxonNodeUuid = UUID.fromString(taxonNodeUuidString.toString());
+		}
+		if(selectedVocabularyUuidString!=null){
+			termUUID = UUID.fromString(selectedVocabularyUuidString.toString());
+		}
+		distributionContainer = new IndexedContainer(getNamedAreaList());
+		distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
     }
 
     public TaxonNode getChosenTaxonNode(){
@@ -68,22 +69,25 @@ public class SettingsPresenter {
     public Container getDistributionContainer() {
         return distributionContainer;
     }
+    
     public void setDistributionContainer(Container distributionContainer) {
         this.distributionContainer = distributionContainer;
     }
+    
     public Container getDistributionStatusContainer() {
         return distributionStatusContainer;
     }
+    
     public void setDistributionStatusContainer(Container distributionStatusContainer) {
         this.distributionStatusContainer = distributionStatusContainer;
     }
 
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
-
         vocabularyService = CdmSpringContextHelper.getVocabularyService();
         List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
         return termList;
     }
+    
     private List<DefinedTermBase<?>> getPresenceAbsenceVocabulary(){
         termService = CdmSpringContextHelper.getTermService();
         return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
@@ -97,6 +101,5 @@ public class SettingsPresenter {
     		"sources.nameUsedInSource",
     		"media",
     });
-
 
 }

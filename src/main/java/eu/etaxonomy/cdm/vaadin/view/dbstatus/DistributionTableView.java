@@ -102,6 +102,9 @@ public class DistributionTableView extends CustomComponent implements View{
 			e.printStackTrace();
 			return;
 		}
+		if(container==null){
+			return;
+		}
 
 		table.setContainerDataSource(container);
 		table.setColumnReorderingAllowed(true);
@@ -192,9 +195,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
 			@Override
             public void buttonClick(ClickEvent event) {
-                SettingsConfigWindow cw = new SettingsConfigWindow();
-                Window window  = cw.createWindow();
-                getUI().addWindow(window);
+                openSettings();
             }
         });
 
@@ -216,6 +217,12 @@ public class DistributionTableView extends CustomComponent implements View{
 			}
 		});
 
+	}
+	
+	public void openSettings() {
+		SettingsConfigWindow cw = new SettingsConfigWindow();
+        Window window  = cw.createWindow();
+        getUI().addWindow(window);
 	}
 
 }

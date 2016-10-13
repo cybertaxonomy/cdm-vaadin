@@ -9,9 +9,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinSession;
@@ -24,6 +25,9 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
@@ -32,6 +36,7 @@ import com.vaadin.ui.Window;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -41,14 +46,16 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
  * @date 22.04.2015
  *
  */
-public class SettingsConfigWindow extends CustomComponent {
+public class SettingsConfigWindow extends CustomComponent implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
     private VerticalLayout mainLayout;
     private TwinColSelect distStatusSelect;
     private ComboBox classificationBox;
     private ComboBox distAreaBox;
+    private ListSelect namedAreaList;
     private Tree taxonTree;
+    private Label labelNoClassification;
     private CheckBox boxToggleAbbreviatedLabels;
     private Button okButton;
     private Button cancelButton;
@@ -69,64 +76,36 @@ public class SettingsConfigWindow extends CustomComponent {
     }
 
     private void init() {
-        Container taxonNodeContainer = new TaxonNodeContainer(null);
         Container distributionContainer = presenter.getDistributionContainer();
-        TermVocabulary<?> chosenArea = presenter.getChosenArea();
+        TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
+        
         classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        classificationBox.setContainerDataSource(taxonNodeContainer);
-        classificationBox.setValue(presenter.getChosenTaxonNode().getClassification().getRootNode());
-        classificationBox.addValueChangeListener(new ValueChangeListener() {
-			private static final long serialVersionUID = -8159622506131474118L;
-
-			@Override
-			public void valueChange(ValueChangeEvent event) {
-				TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
-				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
-			}
-		});
-        taxonTree.setContainerDataSource(new TaxonNodeContainer((TaxonNode) classificationBox.getValue()));
+        classificationBox.setContainerDataSource(new TaxonNodeContainer(null));
+		classificationBox.setImmediate(true);
+        TaxonNode chosenTaxonNode = presenter.getChosenTaxonNode();
+		classificationBox.addValueChangeListener(this);
+        if(chosenTaxonNode!=null){
+        	classificationBox.setValue(chosenTaxonNode.getClassification().getRootNode());
+        	taxonTree.setContainerDataSource(new TaxonNodeContainer((TaxonNode) classificationBox.getValue()));
+        	taxonTree.setValue(chosenTaxonNode);
+        }
         taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        taxonTree.setValue(presenter.getChosenTaxonNode());
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
-        boxToggleAbbreviatedLabels.addValueChangeListener(new ValueChangeListener() {
-			
-			private static final long serialVersionUID = 5734502056399266546L;
-
-			@Override
-			public void valueChange(ValueChangeEvent event) {
-				VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS, event.getProperty().getValue());
-				
-			}
-		});
+        distAreaBox.addValueChangeListener(this);
+        
+        if(chosenArea!=null){
+        	NamedAreaContainer container = new NamedAreaContainer(chosenArea);
+        	namedAreaList.setContainerDataSource(container);
+        }
+        Object selectedAreas = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
+        namedAreaList.setValue(selectedAreas);
+        
+        boxToggleAbbreviatedLabels.addValueChangeListener(this);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
 
-        okButton.addClickListener(new ClickListener() {
-
-			private static final long serialVersionUID = -2554281233796070939L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				TaxonNode taxonNode;
-				TermVocabulary<NamedArea> term = null;
-				taxonNode = (TaxonNode) taxonTree.getValue();
-				if(taxonNode==null){
-					taxonNode = (TaxonNode) classificationBox.getValue();
-				}
-				term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
-				DistributionEditorUtil.openDistributionView(taxonNode, term, new HashSet<NamedArea>());
-				window.close();
-			}
-		});
-        cancelButton.addClickListener(new ClickListener() {
-
-			private static final long serialVersionUID = -99532405408235383L;
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				window.close();
-			}
-		});
+        okButton.addClickListener(this);
+        cancelButton.addClickListener(this);
     }
 
     public Window createWindow(){
@@ -160,9 +139,16 @@ public class SettingsConfigWindow extends CustomComponent {
         classificationBox.setImmediate(true);
         classificationBox.setWidth("100%");
 
+        //distribution area box
         distAreaBox = new ComboBox("Distribution Area:");
-        distAreaBox.setImmediate(false);
+        distAreaBox.setImmediate(true);
         distAreaBox.setWidth("100%");
+
+        // named areas
+        namedAreaList = new ListSelect();
+        namedAreaList.setCaption("Areas");
+        namedAreaList.setWidth("100%");
+        namedAreaList.setMultiSelect(true);
 
         //distribution status
         distStatusSelect = new TwinColSelect("Distribution Status:");
@@ -176,9 +162,13 @@ public class SettingsConfigWindow extends CustomComponent {
         //taxonomy
         taxonTree = new Tree("Taxonomy");
         taxonTree.setImmediate(false);
+        
+        //no classification selected label
+        labelNoClassification = new Label(" - Please select a classification - ");
 
         verticalLayout.addComponent(classificationBox);
         verticalLayout.addComponent(distAreaBox);
+        verticalLayout.addComponent(namedAreaList);
         verticalLayout.addComponent(boxToggleAbbreviatedLabels);
         verticalLayout.addComponent(distStatusSelect);
         verticalLayout.setExpandRatio(distStatusSelect, 1);
@@ -187,6 +177,8 @@ public class SettingsConfigWindow extends CustomComponent {
         topContainer.addComponent(verticalLayout);
         topContainer.addComponent(taxonTree);
         topContainer.setExpandRatio(taxonTree, 1);
+        topContainer.addComponent(labelNoClassification);
+        topContainer.setComponentAlignment(labelNoClassification, Alignment.BOTTOM_RIGHT);
         topContainer.setExpandRatio(verticalLayout, 1);
 
         //button toolbar
@@ -209,5 +201,57 @@ public class SettingsConfigWindow extends CustomComponent {
 
         return mainLayout;
     }
+
+	@Override
+	public void valueChange(ValueChangeEvent event) {
+		Property property = event.getProperty();
+		if(property==classificationBox){
+			TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
+			if(parentNode!=null){
+				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
+			}
+			else{
+				taxonTree.setContainerDataSource(null);
+			}
+			labelNoClassification.setVisible(parentNode==null);
+		}
+
+		else if(property==distAreaBox){
+			TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) event.getProperty().getValue();
+			NamedAreaContainer container = new NamedAreaContainer(vocabulary);
+			namedAreaList.setContainerDataSource(container);
+		}
+		else if(property==boxToggleAbbreviatedLabels){
+			VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS, event.getProperty().getValue());
+		}
+	}
+
+	@Override
+	public void buttonClick(ClickEvent event) {
+		Object source = event.getSource();
+		if(source==okButton){
+			TaxonNode taxonNode;
+			TermVocabulary<NamedArea> term = null;
+			taxonNode = (TaxonNode) taxonTree.getValue();
+			if(taxonNode==null){
+				taxonNode = (TaxonNode) classificationBox.getValue();
+			}
+			term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
+			Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
+			if(taxonNode==null){
+				Notification.show("Please choose a classification and/or taxon", Notification.Type.HUMANIZED_MESSAGE);
+				return;
+			}
+			if(term==null){
+				Notification.show("Please choose a distribution area", Notification.Type.HUMANIZED_MESSAGE);
+				return;
+			}
+			DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
+			window.close();
+		}
+		else if(source==cancelButton){
+			window.close();
+		}
+	}
 
 }
