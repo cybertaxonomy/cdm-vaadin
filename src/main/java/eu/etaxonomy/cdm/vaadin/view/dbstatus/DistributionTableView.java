@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
@@ -93,7 +94,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		CdmSQLContainer container = null;
+		final CdmSQLContainer container;
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
@@ -122,7 +123,6 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setPageLength(20);
 		table.setFooterVisible(true);
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
-
 		table.setCacheRate(20);
 		
 		table.addItemClickListener(new ItemClickListener() {
@@ -130,20 +130,23 @@ public class DistributionTableView extends CustomComponent implements View{
 			@Override
 			public void itemClick(ItemClickEvent event) {
 				if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN)) && !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
-					Property<?> itemProperty = event.getItem().getItemProperty("uuid");
+					final Item item = event.getItem();
+					Property<?> itemProperty = item.getItemProperty("uuid");
 					UUID uuid = UUID.fromString(itemProperty.getValue().toString());
 					final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 					final String areaID = (String) event.getPropertyId();
 
 					//popup window
-					final Window popup = new Window("Choose terms");
+					final Window popup = new Window("Choose distribution status");
 					final ListSelect termSelect = new ListSelect();
 					termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
 					Button btnOk = new Button("OK", new ClickListener() {
 						private static final long serialVersionUID = -3732219609337335697L;
 						@Override
 						public void buttonClick(ClickEvent event) {
-							listener.updateDistributionField(areaID, termSelect.getValue(), taxon);
+							Object distributionStatus = termSelect.getValue();
+							listener.updateDistributionField(areaID, distributionStatus, taxon);
+							container.refresh();
 							popup.close();
 						}
 					});
