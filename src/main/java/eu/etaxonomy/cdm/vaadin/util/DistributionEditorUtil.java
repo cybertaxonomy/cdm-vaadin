@@ -40,6 +40,11 @@ public class DistributionEditorUtil {
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo(VIEW_TABLE);
 	}
+    
+    public static boolean isAbbreviatedLabels(){
+    	Object isAbbreviated = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS);
+		return (isAbbreviated==null || (boolean) isAbbreviated);
+    }
 
 	public static final String SATTR_CONVERSATION = "conversation";
 

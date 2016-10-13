@@ -10,6 +10,10 @@ import java.util.UUID;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.ContextClickEvent;
+import com.vaadin.event.ContextClickEvent.ContextClickListener;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.navigator.View;
@@ -110,12 +114,12 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setSortEnabled(true);
 
 		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
-		List<String> namedAreas = listener.getNamedAreasLabels(true);
+		List<String> namedAreas = listener.getNamedAreasLabels();
 		columnList.addAll(namedAreas);
 		table.setVisibleColumns(columnList.toArray());
 
 		headerList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,"Rang"}));
-		headerList.addAll(listener.getNamedAreasLabels(true));
+		headerList.addAll(listener.getNamedAreasLabels());
 		String[] string = new String[headerList.size()];
 		table.setColumnHeaders(headerList.toArray(string));
 
@@ -127,7 +131,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
 
 		table.setCacheRate(20);
-
+		
 		//add generated columns for NamedAreas
 		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
 		for (Object object : containerPropertyIds) {
@@ -217,7 +221,7 @@ public class DistributionTableView extends CustomComponent implements View{
 				String itemCaption = null;
 				Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
 				if(representation!=null){
-					if((Boolean)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS)){
+					if(DistributionEditorUtil.isAbbreviatedLabels()){
 						itemCaption = representation.getAbbreviatedLabel();
 					}
 					else{

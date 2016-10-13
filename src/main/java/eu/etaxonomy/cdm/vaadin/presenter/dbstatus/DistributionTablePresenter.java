@@ -115,7 +115,7 @@ public class DistributionTablePresenter {
 
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID termUUID = (UUID) session.getAttribute("selectedTerm");
+		UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
 		TermVocabulary<DefinedTermBase> term = vocabularyService.load(termUUID);
 		term = CdmBase.deproxy(term, TermVocabulary.class);
 		return term.getTerms();
@@ -140,14 +140,14 @@ public class DistributionTablePresenter {
         return namedAreas;
 	}
 
-    public List<String> getNamedAreasLabels(boolean abbreviated){
+    public List<String> getNamedAreasLabels(){
         Set<NamedArea> selectedAreas = getNamedAreas();
     	List<String> namedAreaTitles = new ArrayList<>();
     	for (NamedArea namedArea : selectedAreas) {
     		String title = null;
     	    Representation representation = namedArea.getRepresentation(Language.DEFAULT());
     	    if(representation!=null){
-    	    	if(abbreviated){
+    	    	if(DistributionEditorUtil.isAbbreviatedLabels()){
     	    		title = representation.getAbbreviatedLabel();
     	    	}
     	    	else{
@@ -164,7 +164,7 @@ public class DistributionTablePresenter {
 
 	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
-	    UUID termUUID = (UUID) session.getAttribute("selectedTerm");
+	    UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
 	    TermVocabulary<NamedArea> vocabulary = vocabularyService.load(termUUID);
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
@@ -213,7 +213,7 @@ public class DistributionTablePresenter {
 
 	public TaxonNode getChosenTaxonNode() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID taxonNodeUUID = (UUID) session.getAttribute("taxonNodeUUID");
+		UUID taxonNodeUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID);
 		TaxonNode classificationNode = taxonNodeService.load(taxonNodeUUID);
 		return classificationNode;
 	}
@@ -230,7 +230,7 @@ public class DistributionTablePresenter {
 			nodeIds.add(taxonNode.getId());
 		}
 		Set<NamedArea> namesAreas = getNamedAreas();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreas, true));
+		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namesAreas));
 		return container;
 	}
 

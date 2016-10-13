@@ -63,7 +63,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, Collection<NamedArea> namedAreas, boolean abbreviatedLabels) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, Collection<NamedArea> namedAreas) throws SQLException {
 
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
@@ -101,7 +101,7 @@ public class CdmQueryFactory {
             String label = null;
             Representation representation = namedArea.getRepresentation(Language.DEFAULT());
             if(representation!=null){
-            	if(abbreviatedLabels){
+				if(DistributionEditorUtil.isAbbreviatedLabels()){
             		label = representation.getAbbreviatedLabel();
             	}
             	else{

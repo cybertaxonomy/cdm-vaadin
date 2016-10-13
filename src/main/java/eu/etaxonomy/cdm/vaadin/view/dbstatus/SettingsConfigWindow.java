@@ -14,11 +14,13 @@ import java.util.HashSet;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
@@ -47,6 +49,7 @@ public class SettingsConfigWindow extends CustomComponent {
     private ComboBox classificationBox;
     private ComboBox distAreaBox;
     private Tree taxonTree;
+    private CheckBox boxToggleAbbreviatedLabels;
     private Button okButton;
     private Button cancelButton;
     private final SettingsPresenter presenter;
@@ -73,6 +76,8 @@ public class SettingsConfigWindow extends CustomComponent {
         classificationBox.setContainerDataSource(taxonNodeContainer);
         classificationBox.setValue(presenter.getChosenTaxonNode().getClassification().getRootNode());
         classificationBox.addValueChangeListener(new ValueChangeListener() {
+			private static final long serialVersionUID = -8159622506131474118L;
+
 			@Override
 			public void valueChange(ValueChangeEvent event) {
 				TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
@@ -84,9 +89,21 @@ public class SettingsConfigWindow extends CustomComponent {
         taxonTree.setValue(presenter.getChosenTaxonNode());
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
+        boxToggleAbbreviatedLabels.addValueChangeListener(new ValueChangeListener() {
+			
+			private static final long serialVersionUID = 5734502056399266546L;
+
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS, event.getProperty().getValue());
+				
+			}
+		});
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
 
         okButton.addClickListener(new ClickListener() {
+
+			private static final long serialVersionUID = -2554281233796070939L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -102,6 +119,8 @@ public class SettingsConfigWindow extends CustomComponent {
 			}
 		});
         cancelButton.addClickListener(new ClickListener() {
+
+			private static final long serialVersionUID = -99532405408235383L;
 
 			@Override
 			public void buttonClick(ClickEvent event) {
@@ -149,6 +168,10 @@ public class SettingsConfigWindow extends CustomComponent {
         distStatusSelect = new TwinColSelect("Distribution Status:");
         distStatusSelect.setImmediate(false);
         distStatusSelect.setWidth("100%");
+        
+        //toggle abbreviated labels
+        boxToggleAbbreviatedLabels = new CheckBox("Show abbreviated labels", DistributionEditorUtil.isAbbreviatedLabels());
+        boxToggleAbbreviatedLabels.setImmediate(true);
 
         //taxonomy
         taxonTree = new Tree("Taxonomy");
@@ -156,6 +179,7 @@ public class SettingsConfigWindow extends CustomComponent {
 
         verticalLayout.addComponent(classificationBox);
         verticalLayout.addComponent(distAreaBox);
+        verticalLayout.addComponent(boxToggleAbbreviatedLabels);
         verticalLayout.addComponent(distStatusSelect);
         verticalLayout.setExpandRatio(distStatusSelect, 1);
         verticalLayout.setSizeFull();
