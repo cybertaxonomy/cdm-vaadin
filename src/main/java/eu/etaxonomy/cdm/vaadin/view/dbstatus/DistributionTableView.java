@@ -178,8 +178,9 @@ public class DistributionTableView extends CustomComponent implements View{
 					final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
 					Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 					List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(taxon, null);
-					DetailWindow dw = new DetailWindow(taxon, listDescriptions);
-					Window window = dw.createWindow();
+					DetailWindow detailWindow = new DetailWindow(taxon, listDescriptions);
+					Window window = detailWindow.createWindow();
+					window.center();
 					getUI().addWindow(window);
 				}
 				else{
