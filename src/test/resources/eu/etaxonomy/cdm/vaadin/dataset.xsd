@@ -15,7 +15,6 @@
 				<xsd:element name="COLLECTION_EXTENSION" type="dflt:COLLECTION_EXTENSION__type" />
 				<xsd:element name="AGENTBASE_CONTACT_URLS_AUD" type="dflt:AGENTBASE_CONTACT_URLS_AUD__type" />
 				<xsd:element name="STATISTICALMEASUREMENTVALUE_DEFINEDTERMBASE_AUD" type="dflt:STATISTICALMEASUREMENTVALUE_DEFINEDTERMBASE_AUD__type" />
-				<xsd:element name="WORKINGSET_TAXONBASE_AUD" type="dflt:WORKINGSET_TAXONBASE_AUD__type" />
 				<xsd:element name="COLLECTION_MEDIA_AUD" type="dflt:COLLECTION_MEDIA_AUD__type" />
 				<xsd:element name="REFERENCE_EXTENSION" type="dflt:REFERENCE_EXTENSION__type" />
 				<xsd:element name="TAXONNAMEBASE_RIGHTSINFO" type="dflt:TAXONNAMEBASE_RIGHTSINFO__type" />
@@ -26,6 +25,7 @@
 				<xsd:element name="TERMVOCABULARY_MARKER" type="dflt:TERMVOCABULARY_MARKER__type" />
 				<xsd:element name="TAXONRELATIONSHIP_ANNOTATION_AUD" type="dflt:TAXONRELATIONSHIP_ANNOTATION_AUD__type" />
 				<xsd:element name="MEDIA_MARKER_AUD" type="dflt:MEDIA_MARKER_AUD__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION_MARKER" type="dflt:TAXONNODEAGENTRELATION_MARKER__type" />
 				<xsd:element name="MATERIALORMETHODEVENT_MARKER" type="dflt:MATERIALORMETHODEVENT_MARKER__type" />
 				<xsd:element name="FEATURENODE_AUD" type="dflt:FEATURENODE_AUD__type" />
 				<xsd:element name="ADDRESS_AUD" type="dflt:ADDRESS_AUD__type" />
@@ -42,12 +42,13 @@
 				<xsd:element name="DESCRIPTIONBASE_MARKER" type="dflt:DESCRIPTIONBASE_MARKER__type" />
 				<xsd:element name="REFERENCE_CREDIT_AUD" type="dflt:REFERENCE_CREDIT_AUD__type" />
 				<xsd:element name="CLASSIFICATION_MARKER_AUD" type="dflt:CLASSIFICATION_MARKER_AUD__type" />
-				<xsd:element name="REFERENCE_ORIGINALSOURCEBASE_AUD" type="dflt:REFERENCE_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY_SCOPE_AUD" type="dflt:POLYTOMOUSKEY_SCOPE_AUD__type" />
+				<xsd:element name="REFERENCE_ORIGINALSOURCEBASE_AUD" type="dflt:REFERENCE_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="TAXONRELATIONSHIP_ANNOTATION" type="dflt:TAXONRELATIONSHIP_ANNOTATION__type" />
 				<xsd:element name="FEATURETREE_MARKER" type="dflt:FEATURETREE_MARKER__type" />
 				<xsd:element name="REFERENCE_MARKER_AUD" type="dflt:REFERENCE_MARKER_AUD__type" />
 				<xsd:element name="PERMISSIONGROUP" type="dflt:PERMISSIONGROUP__type" />
+				<xsd:element name="MEDIAKEY_COVEREDTAXON" type="dflt:MEDIAKEY_COVEREDTAXON__type" />
 				<xsd:element name="TAXONINTERACTION_LANGUAGESTRING_AUD" type="dflt:TAXONINTERACTION_LANGUAGESTRING_AUD__type" />
 				<xsd:element name="ORIGINALSOURCEBASE_ANNOTATION" type="dflt:ORIGINALSOURCEBASE_ANNOTATION__type" />
 				<xsd:element name="HOMOTYPICALGROUP_MARKER_AUD" type="dflt:HOMOTYPICALGROUP_MARKER_AUD__type" />
@@ -63,6 +64,7 @@
 				<xsd:element name="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE" type="dflt:DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="ANNOTATION_MARKER" type="dflt:ANNOTATION_MARKER__type" />
 				<xsd:element name="DESCRIPTIONELEMENTBASE_MODIFYINGTEXT_AUD" type="dflt:DESCRIPTIONELEMENTBASE_MODIFYINGTEXT_AUD__type" />
+				<xsd:element name="INTEXTREFERENCE" type="dflt:INTEXTREFERENCE__type" />
 				<xsd:element name="RIGHTSINFO_MARKER_AUD" type="dflt:RIGHTSINFO_MARKER_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY_ANNOTATION" type="dflt:POLYTOMOUSKEY_ANNOTATION__type" />
 				<xsd:element name="GATHERINGEVENT_DEFINEDTERMBASE_AUD" type="dflt:GATHERINGEVENT_DEFINEDTERMBASE_AUD__type" />
@@ -97,14 +99,13 @@
 				<xsd:element name="POLYTOMOUSKEY_ANNOTATION_AUD" type="dflt:POLYTOMOUSKEY_ANNOTATION_AUD__type" />
 				<xsd:element name="DESCRIPTIONBASE_ANNOTATION_AUD" type="dflt:DESCRIPTIONBASE_ANNOTATION_AUD__type" />
 				<xsd:element name="ANNOTATION_ANNOTATION_AUD" type="dflt:ANNOTATION_ANNOTATION_AUD__type" />
-				<xsd:element name="FEATURETREE_EXTENSION" type="dflt:FEATURETREE_EXTENSION__type" />
 				<xsd:element name="GATHERINGEVENT_AUD" type="dflt:GATHERINGEVENT_AUD__type" />
+				<xsd:element name="FEATURETREE_EXTENSION" type="dflt:FEATURETREE_EXTENSION__type" />
 				<xsd:element name="PRIMER_MARKER_AUD" type="dflt:PRIMER_MARKER_AUD__type" />
 				<xsd:element name="TAXONBASE" type="dflt:TAXONBASE__type" />
 				<xsd:element name="AGENTBASE_MARKER_AUD" type="dflt:AGENTBASE_MARKER_AUD__type" />
 				<xsd:element name="REPRESENTATION" type="dflt:REPRESENTATION__type" />
 				<xsd:element name="MEDIAREPRESENTATION_MEDIAREPRESENTATIONPART_AUD" type="dflt:MEDIAREPRESENTATION_MEDIAREPRESENTATIONPART_AUD__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP_AUD" type="dflt:SYNONYMRELATIONSHIP_AUD__type" />
 				<xsd:element name="CLASSIFICATION_IDENTIFIER_AUD" type="dflt:CLASSIFICATION_IDENTIFIER_AUD__type" />
 				<xsd:element name="MEDIA_LANGUAGESTRING" type="dflt:MEDIA_LANGUAGESTRING__type" />
 				<xsd:element name="DEFINEDTERMBASE" type="dflt:DEFINEDTERMBASE__type" />
@@ -120,6 +121,7 @@
 				<xsd:element name="MEDIAREPRESENTATIONPART" type="dflt:MEDIAREPRESENTATIONPART__type" />
 				<xsd:element name="HYBRIDRELATIONSHIP_ANNOTATION" type="dflt:HYBRIDRELATIONSHIP_ANNOTATION__type" />
 				<xsd:element name="POLYTOMOUSKEY_AUD" type="dflt:POLYTOMOUSKEY_AUD__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION" type="dflt:TAXONNODEAGENTRELATION__type" />
 				<xsd:element name="CLASSIFICATION_CREDIT_AUD" type="dflt:CLASSIFICATION_CREDIT_AUD__type" />
 				<xsd:element name="SEQUENCE_MARKER" type="dflt:SEQUENCE_MARKER__type" />
 				<xsd:element name="DNAQUALITY" type="dflt:DNAQUALITY__type" />
@@ -131,6 +133,8 @@
 				<xsd:element name="DEFINEDTERMBASE_RIGHTSINFO_AUD" type="dflt:DEFINEDTERMBASE_RIGHTSINFO_AUD__type" />
 				<xsd:element name="NAMERELATIONSHIP_MARKER_AUD" type="dflt:NAMERELATIONSHIP_MARKER_AUD__type" />
 				<xsd:element name="CLASSIFICATION_GEOSCOPE_AUD" type="dflt:CLASSIFICATION_GEOSCOPE_AUD__type" />
+				<xsd:element name="MULTIACCESSKEY_COVEREDTAXON_AUD" type="dflt:MULTIACCESSKEY_COVEREDTAXON_AUD__type" />
+				<xsd:element name="MEDIAKEY_COVEREDTAXON_AUD" type="dflt:MEDIAKEY_COVEREDTAXON_AUD__type" />
 				<xsd:element name="MEDIA_REPRESENTATION" type="dflt:MEDIA_REPRESENTATION__type" />
 				<xsd:element name="TAXONBASE_EXTENSION" type="dflt:TAXONBASE_EXTENSION__type" />
 				<xsd:element name="COLLECTION_IDENTIFIER" type="dflt:COLLECTION_IDENTIFIER__type" />
@@ -138,6 +142,7 @@
 				<xsd:element name="AGENTBASE_RIGHTSINFO_AUD" type="dflt:AGENTBASE_RIGHTSINFO_AUD__type" />
 				<xsd:element name="DESCRIPTIONELEMENTBASE_MODIFIER_AUD" type="dflt:DESCRIPTIONELEMENTBASE_MODIFIER_AUD__type" />
 				<xsd:element name="CLASSIFICATION_ORIGINALSOURCEBASE_AUD" type="dflt:CLASSIFICATION_ORIGINALSOURCEBASE_AUD__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION_ANNOTATION_AUD" type="dflt:TAXONNODEAGENTRELATION_ANNOTATION_AUD__type" />
 				<xsd:element name="AGENTBASE_CONTACT_PHONENUMBERS_AUD" type="dflt:AGENTBASE_CONTACT_PHONENUMBERS_AUD__type" />
 				<xsd:element name="MARKER_AUD" type="dflt:MARKER_AUD__type" />
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_AUD" type="dflt:SPECIMENOROBSERVATIONBASE_AUD__type" />
@@ -145,6 +150,7 @@
 				<xsd:element name="CREDIT_MARKER_AUD" type="dflt:CREDIT_MARKER_AUD__type" />
 				<xsd:element name="DESCRIPTIONBASE_SCOPE" type="dflt:DESCRIPTIONBASE_SCOPE__type" />
 				<xsd:element name="POLYTOMOUSKEY_MARKER_AUD" type="dflt:POLYTOMOUSKEY_MARKER_AUD__type" />
+				<xsd:element name="MULTIACCESSKEY_COVEREDTAXON" type="dflt:MULTIACCESSKEY_COVEREDTAXON__type" />
 				<xsd:element name="DETERMINATIONEVENT_ANNOTATION_AUD" type="dflt:DETERMINATIONEVENT_ANNOTATION_AUD__type" />
 				<xsd:element name="MATERIALORMETHODEVENT_ANNOTATION" type="dflt:MATERIALORMETHODEVENT_ANNOTATION__type" />
 				<xsd:element name="TAXONBASE_MARKER" type="dflt:TAXONBASE_MARKER__type" />
@@ -156,14 +162,13 @@
 				<xsd:element name="TAXONNAMEBASE_NOMENCLATURALSTATUS" type="dflt:TAXONNAMEBASE_NOMENCLATURALSTATUS__type" />
 				<xsd:element name="LANGUAGESTRING_ANNOTATION" type="dflt:LANGUAGESTRING_ANNOTATION__type" />
 				<xsd:element name="LSIDAUTHORITY_NAMESPACES" type="dflt:LSIDAUTHORITY_NAMESPACES__type" />
-				<xsd:element name="MULTIACCESSKEY_TAXON" type="dflt:MULTIACCESSKEY_TAXON__type" />
 				<xsd:element name="CLASSIFICATION_ANNOTATION_AUD" type="dflt:CLASSIFICATION_ANNOTATION_AUD__type" />
 				<xsd:element name="CLASSIFICATION_AUD" type="dflt:CLASSIFICATION_AUD__type" />
 				<xsd:element name="SEQUENCE_ANNOTATION_AUD" type="dflt:SEQUENCE_ANNOTATION_AUD__type" />
 				<xsd:element name="FEATURETREE_CREDIT_AUD" type="dflt:FEATURETREE_CREDIT_AUD__type" />
 				<xsd:element name="TAXONNAMEBASE_ORIGINALSOURCEBASE_AUD" type="dflt:TAXONNAMEBASE_ORIGINALSOURCEBASE_AUD__type" />
-				<xsd:element name="REFERENCE_ORIGINALSOURCEBASE" type="dflt:REFERENCE_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="DERIVATIONEVENT_ANNOTATION_AUD" type="dflt:DERIVATIONEVENT_ANNOTATION_AUD__type" />
+				<xsd:element name="REFERENCE_ORIGINALSOURCEBASE" type="dflt:REFERENCE_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="TERMVOCABULARY_ORIGINALSOURCEBASE" type="dflt:TERMVOCABULARY_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="MARKER" type="dflt:MARKER__type" />
 				<xsd:element name="COLLECTION_RIGHTSINFO" type="dflt:COLLECTION_RIGHTSINFO__type" />
@@ -191,23 +196,23 @@
 				<xsd:element name="POLYTOMOUSKEY_CREDIT_AUD" type="dflt:POLYTOMOUSKEY_CREDIT_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_EXTENSION_AUD" type="dflt:DEFINEDTERMBASE_EXTENSION_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_SUPPORTEDCATEGORICALENUMERATION_AUD" type="dflt:DEFINEDTERMBASE_SUPPORTEDCATEGORICALENUMERATION_AUD__type" />
-				<xsd:element name="DEFINEDTERMBASE_EXTENSION" type="dflt:DEFINEDTERMBASE_EXTENSION__type" />
 				<xsd:element name="DEFINEDTERMBASE_STATISTICALMEASURE" type="dflt:DEFINEDTERMBASE_STATISTICALMEASURE__type" />
-				<xsd:element name="COLLECTION_ORIGINALSOURCEBASE" type="dflt:COLLECTION_ORIGINALSOURCEBASE__type" />
+				<xsd:element name="DEFINEDTERMBASE_EXTENSION" type="dflt:DEFINEDTERMBASE_EXTENSION__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION_ANNOTATION" type="dflt:TAXONNODEAGENTRELATION_ANNOTATION__type" />
 				<xsd:element name="SINGLEREAD_ANNOTATION" type="dflt:SINGLEREAD_ANNOTATION__type" />
+				<xsd:element name="COLLECTION_ORIGINALSOURCEBASE" type="dflt:COLLECTION_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="GATHERINGEVENT" type="dflt:GATHERINGEVENT__type" />
 				<xsd:element name="AMPLIFICATION_AUD" type="dflt:AMPLIFICATION_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_ORIGINALSOURCEBASE_AUD" type="dflt:DEFINEDTERMBASE_ORIGINALSOURCEBASE_AUD__type" />
+				<xsd:element name="MEDIAKEY_TAXONSCOPE_AUD" type="dflt:MEDIAKEY_TAXONSCOPE_AUD__type" />
 				<xsd:element name="TAXONNAMEBASE_ANNOTATION_AUD" type="dflt:TAXONNAMEBASE_ANNOTATION_AUD__type" />
 				<xsd:element name="DESCRIPTIONELEMENTBASE_LANGUAGESTRING_AUD" type="dflt:DESCRIPTIONELEMENTBASE_LANGUAGESTRING_AUD__type" />
-				<xsd:element name="INDIVIDUALASSOCIATION_LANGUAGESTRING" type="dflt:INDIVIDUALASSOCIATION_LANGUAGESTRING__type" />
+				<xsd:element name="ENTITYVALIDATION" type="dflt:ENTITYVALIDATION__type" />
 				<xsd:element name="AGENTBASE_DEFINEDTERMBASE_AUD" type="dflt:AGENTBASE_DEFINEDTERMBASE_AUD__type" />
-				<xsd:element name="INDIVIDUALASSOCIATION_LANGUAGESTRING_AUD" type="dflt:INDIVIDUALASSOCIATION_LANGUAGESTRING_AUD__type" />
 				<xsd:element name="SINGLEREAD_ANNOTATION_AUD" type="dflt:SINGLEREAD_ANNOTATION_AUD__type" />
 				<xsd:element name="WORKINGSET_DESCRIPTIONBASE" type="dflt:WORKINGSET_DESCRIPTIONBASE__type" />
 				<xsd:element name="RIGHTSINFO_ANNOTATION" type="dflt:RIGHTSINFO_ANNOTATION__type" />
 				<xsd:element name="POLYTOMOUSKEY_EXTENSION_AUD" type="dflt:POLYTOMOUSKEY_EXTENSION_AUD__type" />
-				<xsd:element name="DESCRIPTIONELEMENTBASE_STATEDATA_AUD" type="dflt:DESCRIPTIONELEMENTBASE_STATEDATA_AUD__type" />
 				<xsd:element name="WORKINGSET_ANNOTATION" type="dflt:WORKINGSET_ANNOTATION__type" />
 				<xsd:element name="CLASSIFICATION_DESCRIPTION_AUD" type="dflt:CLASSIFICATION_DESCRIPTION_AUD__type" />
 				<xsd:element name="FEATURETREE_ORIGINALSOURCEBASE" type="dflt:FEATURETREE_ORIGINALSOURCEBASE__type" />
@@ -220,6 +225,7 @@
 				<xsd:element name="KEYSTATEMENT_LANGUAGESTRING" type="dflt:KEYSTATEMENT_LANGUAGESTRING__type" />
 				<xsd:element name="DEFINEDTERMBASE_STATISTICALMEASURE_AUD" type="dflt:DEFINEDTERMBASE_STATISTICALMEASURE_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_ANNOTATION_AUD" type="dflt:DEFINEDTERMBASE_ANNOTATION_AUD__type" />
+				<xsd:element name="MULTIACCESSKEY_TAXONSCOPE_AUD" type="dflt:MULTIACCESSKEY_TAXONSCOPE_AUD__type" />
 				<xsd:element name="TAXONBASE_IDENTIFIER_AUD" type="dflt:TAXONBASE_IDENTIFIER_AUD__type" />
 				<xsd:element name="AGENTBASE_EXTENSION" type="dflt:AGENTBASE_EXTENSION__type" />
 				<xsd:element name="AMPLIFICATION_MARKER_AUD" type="dflt:AMPLIFICATION_MARKER_AUD__type" />
@@ -244,7 +250,6 @@
 				<xsd:element name="SINGLEREAD_MARKER_AUD" type="dflt:SINGLEREAD_MARKER_AUD__type" />
 				<xsd:element name="GATHERINGEVENT_DEFINEDTERMBASE" type="dflt:GATHERINGEVENT_DEFINEDTERMBASE__type" />
 				<xsd:element name="ANNOTATION_AUD" type="dflt:ANNOTATION_AUD__type" />
-				<xsd:element name="MEDIAKEY_TAXON_AUD" type="dflt:MEDIAKEY_TAXON_AUD__type" />
 				<xsd:element name="ORIGINALSOURCEBASE" type="dflt:ORIGINALSOURCEBASE__type" />
 				<xsd:element name="HYBRIDRELATIONSHIP_ANNOTATION_AUD" type="dflt:HYBRIDRELATIONSHIP_ANNOTATION_AUD__type" />
 				<xsd:element name="TAXONNAMEBASE_MARKER" type="dflt:TAXONNAMEBASE_MARKER__type" />
@@ -258,7 +263,6 @@
 				<xsd:element name="REFERENCE_RIGHTSINFO_AUD" type="dflt:REFERENCE_RIGHTSINFO_AUD__type" />
 				<xsd:element name="ADDRESS" type="dflt:ADDRESS__type" />
 				<xsd:element name="AMPLIFICATION_MARKER" type="dflt:AMPLIFICATION_MARKER__type" />
-				<xsd:element name="WORKINGSET_TAXONBASE" type="dflt:WORKINGSET_TAXONBASE__type" />
 				<xsd:element name="TAXONBASE_AUD" type="dflt:TAXONBASE_AUD__type" />
 				<xsd:element name="COLLECTION_MARKER_AUD" type="dflt:COLLECTION_MARKER_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY_TAXON_AUD" type="dflt:POLYTOMOUSKEY_TAXON_AUD__type" />
@@ -268,7 +272,6 @@
 				<xsd:element name="AGENTBASE_EXTENSION_AUD" type="dflt:AGENTBASE_EXTENSION_AUD__type" />
 				<xsd:element name="CLASSIFICATION_RIGHTSINFO" type="dflt:CLASSIFICATION_RIGHTSINFO__type" />
 				<xsd:element name="DESCRIPTIONELEMENTBASE_MODIFYINGTEXT" type="dflt:DESCRIPTIONELEMENTBASE_MODIFYINGTEXT__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP_ANNOTATION" type="dflt:SYNONYMRELATIONSHIP_ANNOTATION__type" />
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_EXTENSION_AUD" type="dflt:SPECIMENOROBSERVATIONBASE_EXTENSION_AUD__type" />
 				<xsd:element name="RIGHTSINFO_AUD" type="dflt:RIGHTSINFO_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY" type="dflt:POLYTOMOUSKEY__type" />
@@ -286,9 +289,7 @@
 				<xsd:element name="CLASSIFICATION_MARKER" type="dflt:CLASSIFICATION_MARKER__type" />
 				<xsd:element name="STATISTICALMEASUREMENTVALUE" type="dflt:STATISTICALMEASUREMENTVALUE__type" />
 				<xsd:element name="NAMERELATIONSHIP_MARKER" type="dflt:NAMERELATIONSHIP_MARKER__type" />
-				<xsd:element name="DESCRIPTIONELEMENTBASE_STATISTICALMEASUREMENTVALUE" type="dflt:DESCRIPTIONELEMENTBASE_STATISTICALMEASUREMENTVALUE__type" />
 				<xsd:element name="USERACCOUNT_PERMISSIONGROUP" type="dflt:USERACCOUNT_PERMISSIONGROUP__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP_MARKER" type="dflt:SYNONYMRELATIONSHIP_MARKER__type" />
 				<xsd:element name="DESCRIPTIONBASE_GEOSCOPE_AUD" type="dflt:DESCRIPTIONBASE_GEOSCOPE_AUD__type" />
 				<xsd:element name="TAXONNAMEBASE_TYPEDESIGNATIONBASE" type="dflt:TAXONNAMEBASE_TYPEDESIGNATIONBASE__type" />
 				<xsd:element name="TYPEDESIGNATIONBASE_MARKER" type="dflt:TYPEDESIGNATIONBASE_MARKER__type" />
@@ -324,14 +325,13 @@
 				<xsd:element name="DETERMINATIONEVENT_REFERENCE" type="dflt:DETERMINATIONEVENT_REFERENCE__type" />
 				<xsd:element name="ANNOTATION_MARKER_AUD" type="dflt:ANNOTATION_MARKER_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_MEASUREMENTUNIT" type="dflt:DEFINEDTERMBASE_MEASUREMENTUNIT__type" />
-				<xsd:element name="MEDIA_TAXONBASE" type="dflt:MEDIA_TAXONBASE__type" />
 				<xsd:element name="MEDIAKEY_SCOPE_AUD" type="dflt:MEDIAKEY_SCOPE_AUD__type" />
 				<xsd:element name="NOMENCLATURALSTATUS_AUD" type="dflt:NOMENCLATURALSTATUS_AUD__type" />
 				<xsd:element name="MATERIALORMETHODEVENT_ANNOTATION_AUD" type="dflt:MATERIALORMETHODEVENT_ANNOTATION_AUD__type" />
 				<xsd:element name="AGENTBASE_DEFINEDTERMBASE" type="dflt:AGENTBASE_DEFINEDTERMBASE__type" />
 				<xsd:element name="TERMVOCABULARY_IDENTIFIER" type="dflt:TERMVOCABULARY_IDENTIFIER__type" />
-				<xsd:element name="DESCRIPTIONELEMENTBASE_STATEDATA" type="dflt:DESCRIPTIONELEMENTBASE_STATEDATA__type" />
 				<xsd:element name="DESCRIPTIONBASE_EXTENSION_AUD" type="dflt:DESCRIPTIONBASE_EXTENSION_AUD__type" />
+				<xsd:element name="IDENTIFIER_ANNOTATION" type="dflt:IDENTIFIER_ANNOTATION__type" />
 				<xsd:element name="MEDIA_ANNOTATION" type="dflt:MEDIA_ANNOTATION__type" />
 				<xsd:element name="STATEDATA" type="dflt:STATEDATA__type" />
 				<xsd:element name="TAXONNAMEBASE_CREDIT" type="dflt:TAXONNAMEBASE_CREDIT__type" />
@@ -344,14 +344,12 @@
 				<xsd:element name="DERIVATIONEVENT_AUD" type="dflt:DERIVATIONEVENT_AUD__type" />
 				<xsd:element name="ANNOTATION" type="dflt:ANNOTATION__type" />
 				<xsd:element name="AGENTBASE_CONTACT_FAXNUMBERS_AUD" type="dflt:AGENTBASE_CONTACT_FAXNUMBERS_AUD__type" />
-				<xsd:element name="MEDIA_TAXONBASE_AUD" type="dflt:MEDIA_TAXONBASE_AUD__type" />
 				<xsd:element name="WORKINGSET_REPRESENTATION_AUD" type="dflt:WORKINGSET_REPRESENTATION_AUD__type" />
 				<xsd:element name="TAXONBASE_CREDIT" type="dflt:TAXONBASE_CREDIT__type" />
 				<xsd:element name="CREDIT" type="dflt:CREDIT__type" />
 				<xsd:element name="POLYTOMOUSKEY_CREDIT" type="dflt:POLYTOMOUSKEY_CREDIT__type" />
 				<xsd:element name="DESCRIPTIONBASE_ORIGINALSOURCEBASE_AUD" type="dflt:DESCRIPTIONBASE_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="COLLECTION_MARKER" type="dflt:COLLECTION_MARKER__type" />
-				<xsd:element name="MULTIACCESSKEY_TAXON_AUD" type="dflt:MULTIACCESSKEY_TAXON_AUD__type" />
 				<xsd:element name="TAXONNAMEBASE_MARKER_AUD" type="dflt:TAXONNAMEBASE_MARKER_AUD__type" />
 				<xsd:element name="FEATURETREE" type="dflt:FEATURETREE__type" />
 				<xsd:element name="SEQUENCE_MARKER_AUD" type="dflt:SEQUENCE_MARKER_AUD__type" />
@@ -361,6 +359,7 @@
 				<xsd:element name="TERMVOCABULARY_EXTENSION" type="dflt:TERMVOCABULARY_EXTENSION__type" />
 				<xsd:element name="DESCRIPTIONELEMENTBASE" type="dflt:DESCRIPTIONELEMENTBASE__type" />
 				<xsd:element name="POLYTOMOUSKEYNODE_LANGUAGESTRING_AUD" type="dflt:POLYTOMOUSKEYNODE_LANGUAGESTRING_AUD__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION_AUD" type="dflt:TAXONNODEAGENTRELATION_AUD__type" />
 				<xsd:element name="STATEDATA_DEFINEDTERMBASE_AUD" type="dflt:STATEDATA_DEFINEDTERMBASE_AUD__type" />
 				<xsd:element name="MEDIA_LANGUAGESTRING_AUD" type="dflt:MEDIA_LANGUAGESTRING_AUD__type" />
 				<xsd:element name="STATEDATA_AUD" type="dflt:STATEDATA_AUD__type" />
@@ -376,7 +375,6 @@
 				<xsd:element name="MEDIA_ORIGINALSOURCEBASE_AUD" type="dflt:MEDIA_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="MEDIA_MARKER" type="dflt:MEDIA_MARKER__type" />
 				<xsd:element name="DEFINEDTERMBASE_CREDIT" type="dflt:DEFINEDTERMBASE_CREDIT__type" />
-				<xsd:element name="ENTITYVALIDATIONRESULT" type="dflt:ENTITYVALIDATIONRESULT__type" />
 				<xsd:element name="GRANTEDAUTHORITYIMPL" type="dflt:GRANTEDAUTHORITYIMPL__type" />
 				<xsd:element name="MEDIAREPRESENTATION_AUD" type="dflt:MEDIAREPRESENTATION_AUD__type" />
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_LANGUAGESTRING" type="dflt:SPECIMENOROBSERVATIONBASE_LANGUAGESTRING__type" />
@@ -392,12 +390,15 @@
 				<xsd:element name="COLLECTION_ANNOTATION_AUD" type="dflt:COLLECTION_ANNOTATION_AUD__type" />
 				<xsd:element name="CLASSIFICATION_ANNOTATION" type="dflt:CLASSIFICATION_ANNOTATION__type" />
 				<xsd:element name="POLYTOMOUSKEY_EXTENSION" type="dflt:POLYTOMOUSKEY_EXTENSION__type" />
+				<xsd:element name="MEDIAKEY_TAXONSCOPE" type="dflt:MEDIAKEY_TAXONSCOPE__type" />
 				<xsd:element name="TAXONNAMEBASE_ANNOTATION" type="dflt:TAXONNAMEBASE_ANNOTATION__type" />
+				<xsd:element name="IDENTIFIER_ANNOTATION_AUD" type="dflt:IDENTIFIER_ANNOTATION_AUD__type" />
 				<xsd:element name="REFERENCE_MEDIA_AUD" type="dflt:REFERENCE_MEDIA_AUD__type" />
 				<xsd:element name="NOMENCLATURALSTATUS_MARKER" type="dflt:NOMENCLATURALSTATUS_MARKER__type" />
 				<xsd:element name="INSTITUTIONALMEMBERSHIP_AUD" type="dflt:INSTITUTIONALMEMBERSHIP_AUD__type" />
 				<xsd:element name="AGENTBASE_CONTACT_EMAILADDRESSES_AUD" type="dflt:AGENTBASE_CONTACT_EMAILADDRESSES_AUD__type" />
 				<xsd:element name="MEDIA_AUD" type="dflt:MEDIA_AUD__type" />
+				<xsd:element name="IDENTIFIER_MARKER" type="dflt:IDENTIFIER_MARKER__type" />
 				<xsd:element name="HOMOTYPICALGROUP_AUD" type="dflt:HOMOTYPICALGROUP_AUD__type" />
 				<xsd:element name="WORKINGSET_MARKER" type="dflt:WORKINGSET_MARKER__type" />
 				<xsd:element name="AGENTBASE_IDENTIFIER_AUD" type="dflt:AGENTBASE_IDENTIFIER_AUD__type" />
@@ -411,6 +412,7 @@
 				<xsd:element name="SEQUENCE_ANNOTATION" type="dflt:SEQUENCE_ANNOTATION__type" />
 				<xsd:element name="FEATURENODE_DEFINEDTERMBASE_INAPPLICABLEIF_AUD" type="dflt:FEATURENODE_DEFINEDTERMBASE_INAPPLICABLEIF_AUD__type" />
 				<xsd:element name="ORIGINALSOURCEBASE_MARKER" type="dflt:ORIGINALSOURCEBASE_MARKER__type" />
+				<xsd:element name="INDIVIDUALSASSOCIATION_LANGUAGESTRING" type="dflt:INDIVIDUALSASSOCIATION_LANGUAGESTRING__type" />
 				<xsd:element name="AGENTBASE_MEDIA_AUD" type="dflt:AGENTBASE_MEDIA_AUD__type" />
 				<xsd:element name="AMPLIFICATIONRESULT_ANNOTATION" type="dflt:AMPLIFICATIONRESULT_ANNOTATION__type" />
 				<xsd:element name="SINGLEREADALIGNMENT" type="dflt:SINGLEREADALIGNMENT__type" />
@@ -424,6 +426,7 @@
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_ORIGINALSOURCEBASE_AUD" type="dflt:SPECIMENOROBSERVATIONBASE_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="MEDIA_DESCRIPTION_AUD" type="dflt:MEDIA_DESCRIPTION_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY_IDENTIFIER" type="dflt:POLYTOMOUSKEY_IDENTIFIER__type" />
+				<xsd:element name="IDENTIFIER_MARKER_AUD" type="dflt:IDENTIFIER_MARKER_AUD__type" />
 				<xsd:element name="TERMVOCABULARY_RIGHTSINFO_AUD" type="dflt:TERMVOCABULARY_RIGHTSINFO_AUD__type" />
 				<xsd:element name="POLYTOMOUSKEY_IDENTIFIER_AUD" type="dflt:POLYTOMOUSKEY_IDENTIFIER_AUD__type" />
 				<xsd:element name="MEDIA" type="dflt:MEDIA__type" />
@@ -442,13 +445,10 @@
 				<xsd:element name="TAXONBASE_ORIGINALSOURCEBASE" type="dflt:TAXONBASE_ORIGINALSOURCEBASE__type" />
 				<xsd:element name="COLLECTION_MEDIA" type="dflt:COLLECTION_MEDIA__type" />
 				<xsd:element name="CLASSIFICATION_GEOSCOPE" type="dflt:CLASSIFICATION_GEOSCOPE__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP_ANNOTATION_AUD" type="dflt:SYNONYMRELATIONSHIP_ANNOTATION_AUD__type" />
 				<xsd:element name="TERMVOCABULARY_REPRESENTATION" type="dflt:TERMVOCABULARY_REPRESENTATION__type" />
 				<xsd:element name="RIGHTSINFO" type="dflt:RIGHTSINFO__type" />
 				<xsd:element name="GATHERINGEVENT_MARKER" type="dflt:GATHERINGEVENT_MARKER__type" />
 				<xsd:element name="FEATURETREE_RIGHTSINFO" type="dflt:FEATURETREE_RIGHTSINFO__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP_MARKER_AUD" type="dflt:SYNONYMRELATIONSHIP_MARKER_AUD__type" />
-				<xsd:element name="MEDIAKEY_TAXON" type="dflt:MEDIAKEY_TAXON__type" />
 				<xsd:element name="REFERENCE_MEDIA" type="dflt:REFERENCE_MEDIA__type" />
 				<xsd:element name="TAXONNODE_ANNOTATION" type="dflt:TAXONNODE_ANNOTATION__type" />
 				<xsd:element name="DEFINEDTERMBASE_MARKER" type="dflt:DEFINEDTERMBASE_MARKER__type" />
@@ -456,6 +456,7 @@
 				<xsd:element name="DESCRIPTIONELEMENTBASE_MARKER_AUD" type="dflt:DESCRIPTIONELEMENTBASE_MARKER_AUD__type" />
 				<xsd:element name="DEFINEDTERMBASE_IDENTIFIER_AUD" type="dflt:DEFINEDTERMBASE_IDENTIFIER_AUD__type" />
 				<xsd:element name="NAMERELATIONSHIP_ANNOTATION_AUD" type="dflt:NAMERELATIONSHIP_ANNOTATION_AUD__type" />
+				<xsd:element name="MULTIACCESSKEY_TAXONSCOPE" type="dflt:MULTIACCESSKEY_TAXONSCOPE__type" />
 				<xsd:element name="FEATURETREE_ANNOTATION_AUD" type="dflt:FEATURETREE_ANNOTATION_AUD__type" />
 				<xsd:element name="TAXONBASE_RIGHTSINFO" type="dflt:TAXONBASE_RIGHTSINFO__type" />
 				<xsd:element name="HYBRIDRELATIONSHIP_MARKER_AUD" type="dflt:HYBRIDRELATIONSHIP_MARKER_AUD__type" />
@@ -490,6 +491,7 @@
 				<xsd:element name="DEFINEDTERMBASE_MEDIA_AUD" type="dflt:DEFINEDTERMBASE_MEDIA_AUD__type" />
 				<xsd:element name="MEDIAKEY_SCOPE" type="dflt:MEDIAKEY_SCOPE__type" />
 				<xsd:element name="DETERMINATIONEVENT_REFERENCE_AUD" type="dflt:DETERMINATIONEVENT_REFERENCE_AUD__type" />
+				<xsd:element name="TAXONNODEAGENTRELATION_MARKER_AUD" type="dflt:TAXONNODEAGENTRELATION_MARKER_AUD__type" />
 				<xsd:element name="KEYSTATEMENT" type="dflt:KEYSTATEMENT__type" />
 				<xsd:element name="LANGUAGESTRING_ANNOTATION_AUD" type="dflt:LANGUAGESTRING_ANNOTATION_AUD__type" />
 				<xsd:element name="TERMVOCABULARY_ANNOTATION_AUD" type="dflt:TERMVOCABULARY_ANNOTATION_AUD__type" />
@@ -522,11 +524,11 @@
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT_AUD" type="dflt:SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT_AUD__type" />
 				<xsd:element name="TAXONRELATIONSHIP_MARKER_AUD" type="dflt:TAXONRELATIONSHIP_MARKER_AUD__type" />
 				<xsd:element name="REPRESENTATION_MARKER" type="dflt:REPRESENTATION_MARKER__type" />
-				<xsd:element name="DESCRIPTIONELEMENTBASE_STATISTICALMEASUREMENTVALUE_AUD" type="dflt:DESCRIPTIONELEMENTBASE_STATISTICALMEASUREMENTVALUE_AUD__type" />
 				<xsd:element name="TERMVOCABULARY_CREDIT" type="dflt:TERMVOCABULARY_CREDIT__type" />
 				<xsd:element name="REFERENCE" type="dflt:REFERENCE__type" />
 				<xsd:element name="PRIMER_MARKER" type="dflt:PRIMER_MARKER__type" />
 				<xsd:element name="KEYSTATEMENT_LANGUAGESTRING_AUD" type="dflt:KEYSTATEMENT_LANGUAGESTRING_AUD__type" />
+				<xsd:element name="INDIVIDUALSASSOCIATION_LANGUAGESTRING_AUD" type="dflt:INDIVIDUALSASSOCIATION_LANGUAGESTRING_AUD__type" />
 				<xsd:element name="AMPLIFICATION" type="dflt:AMPLIFICATION__type" />
 				<xsd:element name="DETERMINATIONEVENT_AUD" type="dflt:DETERMINATIONEVENT_AUD__type" />
 				<xsd:element name="LOCUS_AUD" type="dflt:LOCUS_AUD__type" />
@@ -542,7 +544,7 @@
 				<xsd:element name="TAXONBASE_EXTENSION_AUD" type="dflt:TAXONBASE_EXTENSION_AUD__type" />
 				<xsd:element name="STATEDATA_DEFINEDTERMBASE" type="dflt:STATEDATA_DEFINEDTERMBASE__type" />
 				<xsd:element name="CREDIT_ANNOTATION_AUD" type="dflt:CREDIT_ANNOTATION_AUD__type" />
-				<xsd:element name="SYNONYMRELATIONSHIP" type="dflt:SYNONYMRELATIONSHIP__type" />
+				<xsd:element name="INTEXTREFERENCE_AUD" type="dflt:INTEXTREFERENCE_AUD__type" />
 				<xsd:element name="SEQUENCE_REFERENCE" type="dflt:SEQUENCE_REFERENCE__type" />
 				<xsd:element name="AGENTBASE_ORIGINALSOURCEBASE_AUD" type="dflt:AGENTBASE_ORIGINALSOURCEBASE_AUD__type" />
 				<xsd:element name="SPECIMENOROBSERVATIONBASE_ANNOTATION" type="dflt:SPECIMENOROBSERVATIONBASE_ANNOTATION__type" />

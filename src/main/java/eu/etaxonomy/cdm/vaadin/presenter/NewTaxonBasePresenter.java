@@ -31,7 +31,7 @@ import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
-import eu.etaxonomy.cdm.model.taxon.SynonymRelationshipType;
+import eu.etaxonomy.cdm.model.taxon.SynonymType;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
@@ -155,7 +155,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, ACC_TAXON_INIT_STRATEGY), Taxon.class);
         accTaxon.setSec(accTaxonSec);
 
-        accTaxon.addSynonym(newSynonym, SynonymRelationshipType.SYNONYM_OF());
+        accTaxon.addSynonym(newSynonym, SynonymType.SYNONYM_OF());
 
         UUID newUuid = taxonService.save(newSynonym).getUuid();
         app.commitTransaction(tx);

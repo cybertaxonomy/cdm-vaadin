@@ -77,7 +77,7 @@ public class CdmQueryFactory {
                 ", tb.publish as " + pb_id +
                 ", tb.unplaced as " + unp_id +
                 ", dtb.titleCache as " + rank_id +
-                ", (SELECT COUNT(*) FROM  SynonymRelationship sr WHERE tb.id = sr.relatedto_id) as " + has_syn_id +
+                ", (SELECT COUNT(*) FROM  Synonym s WHERE tb.id = s.acceptedTaxon_id) as " + has_syn_id +
                 FROM_QUERY;
         String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
         String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.id = ?";
@@ -176,12 +176,12 @@ public class CdmQueryFactory {
     public static QueryDelegate generateSynonymofTaxonQuery(String name_id)  {
     	String FROM_QUERY = " FROM TaxonBase tb " +
     			"INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
-    			"INNER JOIN SynonymRelationship sr on tb.id=sr.relatedfrom_id ";
+    			"INNER JOIN Synonym s on tb.id = s.acceptedTaxon_id "; //or s.id = ?
     	String SELECT_QUERY="SELECT tb.id as " + ID +
     			", tnb.titleCache as " + name_id +
     			FROM_QUERY;
     	String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
-    	String CONTAINS_QUERY = "SELECT * FROM SynonymRelationship sr WHERE sr.relatedfrom_id = ?";
+    	String CONTAINS_QUERY = "SELECT * FROM Synonym s WHERE s.acceptedTaxon_id = ?"; //or s.id = ?
 
     	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
