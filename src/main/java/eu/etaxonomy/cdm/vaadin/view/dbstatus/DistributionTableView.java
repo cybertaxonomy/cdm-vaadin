@@ -189,16 +189,27 @@ public class DistributionTableView extends CustomComponent implements View{
 			}
 		});
 
-		Button settingsButton = toolbar.getSettingsButton();
-		settingsButton.addClickListener(new ClickListener() {
+		Button distributionSettingsButton = toolbar.getDistributionSettingsButton();
+		distributionSettingsButton.addClickListener(new ClickListener() {
 
-			private static final long serialVersionUID = 3834048719431837966L;
+			private static final long serialVersionUID = -8695281619014251132L;
 
 			@Override
             public void buttonClick(ClickEvent event) {
-                openSettings();
+                openDistributionSettings();
             }
         });
+
+		Button settingsButton = toolbar.getSettingsButton();
+		settingsButton.addClickListener(new ClickListener() {
+			
+			private static final long serialVersionUID = -147703680580181544L;
+
+			@Override
+			public void buttonClick(ClickEvent event) {
+				openSettings();
+			}
+		});
 
 		Button saveButton = toolbar.getSaveButton();
 		saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
@@ -221,7 +232,13 @@ public class DistributionTableView extends CustomComponent implements View{
 	}
 	
 	public void openSettings() {
-		SettingsConfigWindow cw = new SettingsConfigWindow();
+		SettingsConfigWindow cw = new SettingsConfigWindow(this);
+		Window window  = cw.createWindow();
+		getUI().addWindow(window);
+	}
+
+	public void openDistributionSettings() {
+		DistributionSettingsConfigWindow cw = new DistributionSettingsConfigWindow(this);
         Window window  = cw.createWindow();
         getUI().addWindow(window);
 	}
