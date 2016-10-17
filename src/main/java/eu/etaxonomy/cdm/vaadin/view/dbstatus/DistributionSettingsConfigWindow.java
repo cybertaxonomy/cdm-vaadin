@@ -131,6 +131,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         //classification and term
         classificationBox = new ComboBox("Classification");
         classificationBox.setImmediate(true);
+        classificationBox.setSizeFull();
         classificationBox.setWidth("100%");
 
         //distribution area box
@@ -152,14 +153,14 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         //no classification selected label
         labelNoClassification = new Label(" - Please select a classification - ");
 
-        leftContainer.addComponent(classificationBox);
-        leftContainer.setExpandRatio(classificationBox, 0.1f);
         leftContainer.addComponent(distAreaBox);
         leftContainer.setExpandRatio(distAreaBox, 0.1f);
         leftContainer.addComponent(namedAreaList);
-        leftContainer.setExpandRatio(namedAreaList, 0.8f);
+        leftContainer.setExpandRatio(namedAreaList, 0.9f);
         leftContainer.setSizeFull();
 
+        rightContainer.addComponent(classificationBox);
+        rightContainer.setExpandRatio(classificationBox, 0.1f);
         rightContainer.addComponent(taxonTree);
         rightContainer.setExpandRatio(taxonTree, 1);
         rightContainer.addComponent(labelNoClassification);
