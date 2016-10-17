@@ -21,6 +21,8 @@ public class DistributionEditorUtil {
 
     public static final String SATTR_ABBREVIATED_LABELS = "abbreviatedLabels";
 
+    public static final String SATTR_DISTRIBUTION_STATUS = "distributionStatus";
+
     public static final String SEPARATOR = ";;";
 
     public static void openDistributionView(TaxonNode taxonNode, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas) {
@@ -31,7 +33,7 @@ public class DistributionEditorUtil {
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo(VIEW_TABLE);
 	}
-    
+
     public static boolean isAbbreviatedLabels(){
     	Object isAbbreviated = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS);
 		return (isAbbreviated==null || (boolean) isAbbreviated);

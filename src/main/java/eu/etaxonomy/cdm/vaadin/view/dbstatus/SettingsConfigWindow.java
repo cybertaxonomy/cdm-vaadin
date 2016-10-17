@@ -133,6 +133,7 @@ public class SettingsConfigWindow extends CustomComponent implements ValueChange
 	public void buttonClick(ClickEvent event) {
 		Object source = event.getSource();
 		if(source==okButton){
+			VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_DISTRIBUTION_STATUS, distStatusSelect.getValue());
 			distributionTableView.enter(null);
 			window.close();
 		}

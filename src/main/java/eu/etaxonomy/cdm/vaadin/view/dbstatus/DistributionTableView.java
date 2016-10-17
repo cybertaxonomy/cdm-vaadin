@@ -51,6 +51,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
 	private List<String> columnList;
 	private ArrayList<String> headerList;
+    private CdmSQLContainer container;
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -84,6 +85,53 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setImmediate(false);
 		table.setWidth("100.0%");
 		table.setHeight("100.0%");
+
+        table.setColumnReorderingAllowed(true);
+        table.setSortEnabled(true);
+
+        table.setColumnCollapsingAllowed(true);
+        table.setSelectable(true);
+        table.setPageLength(20);
+        table.setFooterVisible(true);
+        table.setCacheRate(20);
+
+		table.addItemClickListener(new ItemClickListener() {
+            private static final long serialVersionUID = 2743935539139014771L;
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN)) && !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
+                    final Item item = event.getItem();
+                    Property<?> itemProperty = item.getItemProperty("uuid");
+                    UUID uuid = UUID.fromString(itemProperty.getValue().toString());
+                    final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+                    final String areaID = (String) event.getPropertyId();
+
+                    //popup window
+                    final Window popup = new Window("Choose distribution status");
+                    final ListSelect termSelect = new ListSelect();
+                    termSelect.setSizeFull();
+                    termSelect.setContainerDataSource(new PresenceAbsenceTermContainer());
+                    Button btnOk = new Button("OK", new ClickListener() {
+                        private static final long serialVersionUID = -3732219609337335697L;
+                        @Override
+                        public void buttonClick(ClickEvent event) {
+                            Object distributionStatus = termSelect.getValue();
+                            listener.updateDistributionField(areaID, distributionStatus, taxon);
+                            container.refresh();
+                            popup.close();
+                        }
+                    });
+                    VerticalLayout layout = new VerticalLayout(termSelect, btnOk);
+                    layout.setComponentAlignment(btnOk, Alignment.BOTTOM_RIGHT);
+                    popup.setContent(layout);
+                    popup.setModal(true);
+                    popup.center();
+                    UI.getCurrent().addWindow(popup);
+                }
+            }
+        });
+
+
 		mainLayout.addComponent(table, "top:75px;right:0.0px;");
 		return mainLayout;
 	}
@@ -94,7 +142,6 @@ public class DistributionTableView extends CustomComponent implements View{
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		final CdmSQLContainer container;
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
@@ -107,8 +154,6 @@ public class DistributionTableView extends CustomComponent implements View{
 		}
 
 		table.setContainerDataSource(container);
-		table.setColumnReorderingAllowed(true);
-		table.setSortEnabled(true);
 
 		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
 		List<String> namedAreas = listener.getNamedAreasLabels();
@@ -120,48 +165,9 @@ public class DistributionTableView extends CustomComponent implements View{
 		String[] string = new String[headerList.size()];
 		table.setColumnHeaders(headerList.toArray(string));
 
-//		table.setColumnExpandRatio(propertyId, expandRatio);
-		table.setColumnCollapsingAllowed(true);
-		table.setSelectable(true);
-		table.setPageLength(20);
-		table.setFooterVisible(true);
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
-		table.setCacheRate(20);
-		
-		table.addItemClickListener(new ItemClickListener() {
-			private static final long serialVersionUID = 2743935539139014771L;
-			@Override
-			public void itemClick(ItemClickEvent event) {
-				if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN)) && !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
-					final Item item = event.getItem();
-					Property<?> itemProperty = item.getItemProperty("uuid");
-					UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-					final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
-					final String areaID = (String) event.getPropertyId();
 
-					//popup window
-					final Window popup = new Window("Choose distribution status");
-					final ListSelect termSelect = new ListSelect();
-					termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
-					Button btnOk = new Button("OK", new ClickListener() {
-						private static final long serialVersionUID = -3732219609337335697L;
-						@Override
-						public void buttonClick(ClickEvent event) {
-							Object distributionStatus = termSelect.getValue();
-							listener.updateDistributionField(areaID, distributionStatus, taxon);
-							container.refresh();
-							popup.close();
-						}
-					});
-					VerticalLayout layout = new VerticalLayout(termSelect, btnOk);
-					layout.setComponentAlignment(btnOk, Alignment.BOTTOM_RIGHT);
-					popup.setContent(layout);
-					popup.setModal(true);
-					popup.center();
-					UI.getCurrent().addWindow(popup);
-				}
-			}
-		});
+
 	}
 
 	private void createEditClickListener(){
@@ -202,7 +208,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
 		Button settingsButton = toolbar.getSettingsButton();
 		settingsButton.addClickListener(new ClickListener() {
-			
+
 			private static final long serialVersionUID = -147703680580181544L;
 
 			@Override
@@ -230,7 +236,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		});
 
 	}
-	
+
 	public void openSettings() {
 		SettingsConfigWindow cw = new SettingsConfigWindow(this);
 		Window window  = cw.createWindow();
