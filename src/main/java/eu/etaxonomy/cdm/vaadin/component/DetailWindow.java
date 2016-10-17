@@ -16,6 +16,7 @@ import eu.etaxonomy.cdm.model.description.CategoricalData;
 import eu.etaxonomy.cdm.model.description.CommonTaxonName;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.StateData;
 import eu.etaxonomy.cdm.model.description.TextData;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
@@ -92,13 +93,16 @@ public class DetailWindow extends CustomComponent{
 			    tree.setParent(td, deb.getFeature());
 			    tree.setChildrenAllowed(td, false);
 			}else if(deb.isInstanceOf(Distribution.class)){
-				Distribution db = CdmBase.deproxy(deb, Distribution.class);
-				tree.addItem(db.toString());
-				tree.setParent(db.toString(), deb.getFeature());
-				tree.setChildrenAllowed(db.toString(), true);
-				tree.addItem(db.getStatus().toString());
-				tree.setParent(db.getStatus().toString(), db.toString());
-				tree.setChildrenAllowed(db.getStatus().toString(), false);
+			    Distribution db = CdmBase.deproxy(deb, Distribution.class);
+			    PresenceAbsenceTerm status = db.getStatus();
+			    if(status!=null){
+			        tree.addItem(db.toString());
+			        tree.setParent(db.toString(), deb.getFeature());
+			        tree.setChildrenAllowed(db.toString(), true);
+				    tree.addItem(status.toString());
+				    tree.setParent(status.toString(), db.toString());
+				    tree.setChildrenAllowed(status.toString(), false);
+				}
 			}
 			tree.expandItemsRecursively(parent);
 		}
