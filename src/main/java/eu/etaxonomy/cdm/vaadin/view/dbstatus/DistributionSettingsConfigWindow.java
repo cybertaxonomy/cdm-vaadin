@@ -19,6 +19,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -26,7 +27,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table.ColumnHeaderMode;
@@ -60,7 +60,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
     private Button cancelButton;
     private final SettingsPresenter presenter;
 	private Window window;
-	private HorizontalLayout mainLayout;
+	private AbstractOrderedLayout mainLayout;
 
     /**
      * The constructor should first build the main layout, set the
@@ -80,11 +80,11 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         Container distributionContainer = presenter.getDistributionContainer();
         TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
 
-        classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
         classificationBox.setContainerDataSource(new TaxonNodeContainer(null));
-		classificationBox.setImmediate(true);
+		if(classificationBox.getItemIds().size()==1){
+		    classificationBox.setValue(classificationBox.getItemIds().iterator().next());
+		}
         TaxonNode chosenTaxonNode = presenter.getChosenTaxonNode();
-		classificationBox.addValueChangeListener(this);
         if(chosenTaxonNode!=null){
         	classificationBox.setValue(chosenTaxonNode.getClassification().getRootNode());
         	try {
@@ -96,6 +96,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         	taxonTree.select(new RowId(chosenTaxonNode.getId()));
             taxonTree.setVisibleColumns("Name");
         }
+        classificationBox.addValueChangeListener(this);
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
         distAreaBox.addValueChangeListener(this);
@@ -123,11 +124,14 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 
     private AbstractLayout buildMainLayout() {
 
-    	mainLayout = new HorizontalLayout();
-        mainLayout.setImmediate(false);
+        mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
-        mainLayout.setMargin(true);
-        mainLayout.setSpacing(true);
+
+    	HorizontalLayout leftAndRightContainer = new HorizontalLayout();
+        leftAndRightContainer.setImmediate(false);
+        leftAndRightContainer.setSizeFull();
+        leftAndRightContainer.setMargin(true);
+        leftAndRightContainer.setSpacing(true);
 
         VerticalLayout leftContainer = new VerticalLayout();
         leftContainer.setImmediate(false);
@@ -141,13 +145,21 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 
         //classification and term
         classificationBox = new ComboBox("Classification");
+        classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
+        classificationBox.setInputPrompt("Please select a classification...");
         classificationBox.setImmediate(true);
+        classificationBox.setNewItemsAllowed(false);
+        classificationBox.setNullSelectionAllowed(false);
         classificationBox.setSizeFull();
         classificationBox.setWidth("100%");
 
         //distribution area box
         distAreaBox = new ComboBox("Distribution Area:");
+        distAreaBox.setInputPrompt("Please select a distribution area...");
         distAreaBox.setImmediate(true);
+        distAreaBox.setNullSelectionAllowed(false);
+        distAreaBox.setNewItemsAllowed(false);
+        distAreaBox.setSizeFull();
         distAreaBox.setWidth("100%");
 
         // named areas
@@ -161,23 +173,22 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         taxonTree.setSelectable(true);
         taxonTree.setSizeFull();
         taxonTree.setImmediate(true);
-        taxonTree.setPageLength(20);
         taxonTree.setCacheRate(20);
         taxonTree.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 
         leftContainer.addComponent(distAreaBox);
-        leftContainer.setExpandRatio(distAreaBox, 0.1f);
         leftContainer.addComponent(namedAreaList);
+        leftContainer.setExpandRatio(distAreaBox, 0.1f);
         leftContainer.setExpandRatio(namedAreaList, 0.9f);
         leftContainer.setSizeFull();
 
         rightContainer.addComponent(classificationBox);
-        rightContainer.setExpandRatio(classificationBox, 0.1f);
         rightContainer.addComponent(taxonTree);
-        rightContainer.setExpandRatio(taxonTree, 1f);
+        rightContainer.setExpandRatio(classificationBox, 0.1f);
+        rightContainer.setExpandRatio(taxonTree, 0.9f);
 
-        mainLayout.addComponent(leftContainer);
-        mainLayout.addComponent(rightContainer);
+        leftAndRightContainer.addComponent(leftContainer);
+        leftAndRightContainer.addComponent(rightContainer);
 
         //button toolbar
         HorizontalLayout buttonToolBar = new HorizontalLayout();
@@ -193,11 +204,13 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         okButton.setImmediate(true);
         buttonToolBar.addComponent(okButton);
 
-        mainLayout.addComponent(rightContainer);
+        mainLayout.addComponent(leftAndRightContainer);
         mainLayout.addComponent(buttonToolBar);
+        mainLayout.setExpandRatio(leftAndRightContainer, 0.9f);
+        mainLayout.setExpandRatio(buttonToolBar, 0.1f);
         mainLayout.setComponentAlignment(buttonToolBar, Alignment.BOTTOM_RIGHT);
 
-        return mainLayout;
+        return leftAndRightContainer;
     }
 
 	@Override
@@ -230,10 +243,12 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 	public void buttonClick(ClickEvent event) {
 		Object source = event.getSource();
 		if(source==okButton){
-			TaxonNode taxonNode;
+			TaxonNode taxonNode = null;
 			TermVocabulary<NamedArea> term = null;
 			//TODO use field converter
-			taxonNode = CdmSpringContextHelper.getTaxonNodeService().find((Integer)((RowId) taxonTree.getValue()).getId()[0]);
+			if(taxonTree.getValue()!=null){
+			    taxonNode = CdmSpringContextHelper.getTaxonNodeService().find((Integer)((RowId) taxonTree.getValue()).getId()[0]);
+			}
 			if(taxonNode==null){
 				taxonNode = (TaxonNode) classificationBox.getValue();
 			}
