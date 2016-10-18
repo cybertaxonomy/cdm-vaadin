@@ -40,6 +40,22 @@ public class CdmQueryFactory {
     public static final String ID = "id";
     public static final String UUID_ID = "uuid";
 
+    public static QueryDelegate generateTaxonTreeQuery(String name_id, String classificationId) throws SQLException {
+        String FROM_QUERY = " FROM TaxonBase tb " +
+                "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
+                "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
+                "INNER JOIN Classification cl on cl.id=tn.classification_id and cl.id='"+classificationId+"'";
+        String SELECT_QUERY="SELECT tn.id as " + ID +
+                ", tb.uuid as " + UUID_ID +
+                ", tnb.titleCache as " + name_id +
+                ", tn.parent_id as parent" +
+                FROM_QUERY;
+        String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
+        String CONTAINS_QUERY = "SELECT * FROM TaxonBase tb WHERE tb.id = ?";
+
+        return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
+    }
+
     public static QueryDelegate generateTaxonBaseQuery(String name_id,
             String pb_id,
             String unp_id,

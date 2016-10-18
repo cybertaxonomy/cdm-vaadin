@@ -9,12 +9,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
@@ -27,7 +29,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Tree;
+import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
@@ -36,7 +39,9 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
+import eu.etaxonomy.cdm.vaadin.container.TaxonTreeContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
+import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
@@ -50,8 +55,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 	private ComboBox classificationBox;
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
-    private Tree taxonTree;
-    private Label labelNoClassification;
+    private TreeTable taxonTree;
     private Button okButton;
     private Button cancelButton;
     private final SettingsPresenter presenter;
@@ -83,10 +87,15 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 		classificationBox.addValueChangeListener(this);
         if(chosenTaxonNode!=null){
         	classificationBox.setValue(chosenTaxonNode.getClassification().getRootNode());
-        	taxonTree.setContainerDataSource(new TaxonNodeContainer((TaxonNode) classificationBox.getValue()));
-        	taxonTree.setValue(chosenTaxonNode);
+        	try {
+                taxonTree.setContainerDataSource(new TaxonTreeContainer((TaxonNode) classificationBox.getValue()));
+            } catch (SQLException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        	taxonTree.select(new RowId(chosenTaxonNode.getId()));
+            taxonTree.setVisibleColumns("Name");
         }
-        taxonTree.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
         distAreaBox.setContainerDataSource(distributionContainer);
         distAreaBox.setValue(chosenArea);
         distAreaBox.addValueChangeListener(this);
@@ -123,10 +132,12 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         VerticalLayout leftContainer = new VerticalLayout();
         leftContainer.setImmediate(false);
         leftContainer.setSpacing(true);
+        leftContainer.setSizeFull();
 
         VerticalLayout rightContainer = new VerticalLayout();
         rightContainer.setImmediate(false);
         rightContainer.setSpacing(true);
+        rightContainer.setSizeFull();
 
         //classification and term
         classificationBox = new ComboBox("Classification");
@@ -142,16 +153,17 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         // named areas
         namedAreaList = new ListSelect();
         namedAreaList.setCaption("Areas");
-        namedAreaList.setWidth("100%");
         namedAreaList.setSizeFull();
         namedAreaList.setMultiSelect(true);
 
         //taxonomy
-        taxonTree = new Tree("Taxonomy");
-        taxonTree.setImmediate(false);
-
-        //no classification selected label
-        labelNoClassification = new Label(" - Please select a classification - ");
+        taxonTree = new TreeTable("Taxonomy");
+        taxonTree.setSelectable(true);
+        taxonTree.setSizeFull();
+        taxonTree.setImmediate(true);
+        taxonTree.setPageLength(20);
+        taxonTree.setCacheRate(20);
+        taxonTree.setColumnHeaderMode(ColumnHeaderMode.HIDDEN);
 
         leftContainer.addComponent(distAreaBox);
         leftContainer.setExpandRatio(distAreaBox, 0.1f);
@@ -162,9 +174,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         rightContainer.addComponent(classificationBox);
         rightContainer.setExpandRatio(classificationBox, 0.1f);
         rightContainer.addComponent(taxonTree);
-        rightContainer.setExpandRatio(taxonTree, 1);
-        rightContainer.addComponent(labelNoClassification);
-        rightContainer.setComponentAlignment(labelNoClassification, Alignment.BOTTOM_RIGHT);
+        rightContainer.setExpandRatio(taxonTree, 1f);
 
         mainLayout.addComponent(leftContainer);
         mainLayout.addComponent(rightContainer);
@@ -196,12 +206,17 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 		if(property==classificationBox){
 			TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
 			if(parentNode!=null){
-				taxonTree.setContainerDataSource(new TaxonNodeContainer(parentNode));
+			    try {
+                    taxonTree.setContainerDataSource(new TaxonTreeContainer(parentNode));
+                    taxonTree.setVisibleColumns("Name");
+                } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 			}
 			else{
 				taxonTree.setContainerDataSource(null);
 			}
-			labelNoClassification.setVisible(parentNode==null);
 		}
 
 		else if(property==distAreaBox){
@@ -217,7 +232,8 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
 		if(source==okButton){
 			TaxonNode taxonNode;
 			TermVocabulary<NamedArea> term = null;
-			taxonNode = (TaxonNode) taxonTree.getValue();
+			//TODO use field converter
+			taxonNode = CdmSpringContextHelper.getTaxonNodeService().find((Integer)((RowId) taxonTree.getValue()).getId()[0]);
 			if(taxonNode==null){
 				taxonNode = (TaxonNode) classificationBox.getValue();
 			}
