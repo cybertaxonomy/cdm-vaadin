@@ -110,7 +110,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     final Window popup = new Window("Choose distribution status");
                     final ListSelect termSelect = new ListSelect();
                     termSelect.setSizeFull();
-                    termSelect.setContainerDataSource(new PresenceAbsenceTermContainer());
+                    termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
                     Button btnOk = new Button("OK", new ClickListener() {
                         private static final long serialVersionUID = -3732219609337335697L;
                         @Override
