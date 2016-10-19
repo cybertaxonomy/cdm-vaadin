@@ -31,7 +31,10 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
@@ -40,6 +43,7 @@ import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
 public class DistributionTableView extends CustomComponent implements View{
 
@@ -80,15 +84,43 @@ public class DistributionTableView extends CustomComponent implements View{
 		toolbar = new HorizontalToolbar();
 		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;");
 
-		// table
-		table = new Table();
+		// table + formatting
+		table = new Table(){
+			private static final long serialVersionUID = -5148756917468804385L;
+
+			@Override
+			protected String formatPropertyValue(Object rowId, Object colId, Property<?> property) {
+				String formattedValue = null;
+				PresenceAbsenceTerm presenceAbsenceTerm = null;
+				Object value = property.getValue();
+				if(value instanceof String){
+					presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) value);
+				}
+				if(presenceAbsenceTerm!=null){
+					Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
+					if(representation!=null){
+						if(DistributionEditorUtil.isAbbreviatedLabels()){
+							formattedValue = representation.getAbbreviatedLabel();
+						}
+						else{
+							formattedValue = representation.getLabel();
+						}
+					}
+					if(formattedValue==null){
+						formattedValue = presenceAbsenceTerm.getTitleCache();
+					}
+					return formattedValue;
+				}
+				return super.formatPropertyValue(rowId, colId, property);
+			}
+		};
 		table.setImmediate(false);
 		table.setWidth("100.0%");
 		table.setHeight("100.0%");
 
         table.setColumnReorderingAllowed(true);
         table.setSortEnabled(true);
-
+        
         table.setColumnCollapsingAllowed(true);
         table.setSelectable(true);
         table.setPageLength(20);
@@ -110,6 +142,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     final Window popup = new Window("Choose distribution status");
                     final ListSelect termSelect = new ListSelect();
                     termSelect.setSizeFull();
+                    termSelect.setNullSelectionAllowed(false);
                     termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
                     Button btnOk = new Button("OK", new ClickListener() {
                         private static final long serialVersionUID = -3732219609337335697L;
@@ -248,5 +281,5 @@ public class DistributionTableView extends CustomComponent implements View{
         Window window  = cw.createWindow();
         getUI().addWindow(window);
 	}
-
+	
 }
