@@ -12,27 +12,22 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 import java.sql.SQLException;
 import java.util.Set;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
-import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
@@ -40,7 +35,6 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonTreeContainer;
-import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
@@ -49,19 +43,13 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
  * @author pplitzner
  *
  */
-public class DistributionSettingsConfigWindow extends CustomComponent implements ValueChangeListener, ClickListener{
+public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = 1439411115014088780L;
 	private ComboBox classificationBox;
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
-    private Button okButton;
-    private Button cancelButton;
-    private final SettingsPresenter presenter;
-	private Window window;
-	private AbstractOrderedLayout mainLayout;
-
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -71,33 +59,40 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
      * @param distributionTableView
      */
     public DistributionSettingsConfigWindow(DistributionTableView distributionTableView) {
-        buildMainLayout();
-        presenter = new SettingsPresenter();
-        init();
+    	super();
     }
 
-    private void init() {
-        Container distributionContainer = presenter.getDistributionContainer();
-        TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
+    protected void init() {
+    	//init classification and taxon selection
+        TaxonNode chosenTaxonNode = presenter.getChosenTaxonNode();
 
         classificationBox.setContainerDataSource(new TaxonNodeContainer(null));
+        Object classificationSelection = null;
 		if(classificationBox.getItemIds().size()==1){
-		    classificationBox.setValue(classificationBox.getItemIds().iterator().next());
+			//only one classification exists
+		    classificationSelection = classificationBox.getItemIds().iterator().next();
 		}
-        TaxonNode chosenTaxonNode = presenter.getChosenTaxonNode();
-        if(chosenTaxonNode!=null){
-        	classificationBox.setValue(chosenTaxonNode.getClassification().getRootNode());
+		else if(chosenTaxonNode!=null){
+			//get the classification from the selected taxon node
+			classificationSelection = chosenTaxonNode.getClassification().getRootNode();
+		}
+        if(classificationSelection!=null){
+        	classificationBox.setValue(classificationSelection);
         	try {
-                taxonTree.setContainerDataSource(new TaxonTreeContainer((TaxonNode) classificationBox.getValue()));
+                taxonTree.setContainerDataSource(new TaxonTreeContainer((TaxonNode) classificationSelection));
+                taxonTree.setVisibleColumns("Name");
             } catch (SQLException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        	taxonTree.select(new RowId(chosenTaxonNode.getId()));
-            taxonTree.setVisibleColumns("Name");
+        	if(chosenTaxonNode!=null){
+    			taxonTree.select(new RowId(chosenTaxonNode.getId()));
+        	}
         }
         classificationBox.addValueChangeListener(this);
-        distAreaBox.setContainerDataSource(distributionContainer);
+        
+        TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
+        distAreaBox.setContainerDataSource(presenter.getDistributionContainer());
         distAreaBox.setValue(chosenArea);
         distAreaBox.addValueChangeListener(this);
 
@@ -112,17 +107,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         cancelButton.addClickListener(this);
     }
 
-    public Window createWindow(){
-        window = new Window();
-        window.setModal(true);
-        window.setWidth("60%");
-        window.setHeight("80%");
-        window.setCaption("Settings");
-        window.setContent(mainLayout);
-        return window;
-    }
-
-    private AbstractLayout buildMainLayout() {
+    protected AbstractLayout buildMainLayout() {
 
         mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
@@ -191,18 +176,7 @@ public class DistributionSettingsConfigWindow extends CustomComponent implements
         leftAndRightContainer.addComponent(rightContainer);
 
         //button toolbar
-        HorizontalLayout buttonToolBar = new HorizontalLayout();
-        // cancelButton
-        cancelButton = new Button();
-        cancelButton.setCaption("Cancel");
-        cancelButton.setImmediate(true);
-        buttonToolBar.addComponent(cancelButton);
-
-        // okButton
-        okButton = new Button();
-        okButton.setCaption("OK");
-        okButton.setImmediate(true);
-        buttonToolBar.addComponent(okButton);
+        HorizontalLayout buttonToolBar = createOkCancelButtons();
 
         mainLayout.addComponent(leftAndRightContainer);
         mainLayout.addComponent(buttonToolBar);

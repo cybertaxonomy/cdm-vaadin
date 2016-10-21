@@ -15,17 +15,13 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
@@ -33,17 +29,12 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
  * @date 22.04.2015
  *
  */
-public class SettingsConfigWindow extends CustomComponent implements ValueChangeListener, ClickListener{
+public class SettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
-    private VerticalLayout mainLayout;
     private TwinColSelect distStatusSelect;
     private CheckBox boxToggleAbbreviatedLabels;
-    private Button okButton;
-    private Button cancelButton;
-    private final SettingsPresenter presenter;
-	private Window window;
-	private DistributionTableView distributionTableView;
+    private DistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -54,13 +45,11 @@ public class SettingsConfigWindow extends CustomComponent implements ValueChange
      * @param distributionTableView
      */
     public SettingsConfigWindow(DistributionTableView distributionTableView) {
+    	super();
     	this.distributionTableView = distributionTableView;
-        buildMainLayout();
-        presenter = new SettingsPresenter();
-        init();
     }
 
-    private void init() {
+    protected void init() {
         boxToggleAbbreviatedLabels.addValueChangeListener(this);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
 
@@ -68,17 +57,7 @@ public class SettingsConfigWindow extends CustomComponent implements ValueChange
         cancelButton.addClickListener(this);
     }
 
-    public Window createWindow(){
-        window = new Window();
-        window.setModal(true);
-        window.setWidth("60%");
-        window.setHeight("80%");
-        window.setCaption("Settings");
-        window.setContent(mainLayout);
-        return window;
-    }
-
-    private AbstractLayout buildMainLayout() {
+    protected AbstractLayout buildMainLayout() {
 
     	mainLayout = new VerticalLayout();
         mainLayout.setImmediate(false);
@@ -102,18 +81,7 @@ public class SettingsConfigWindow extends CustomComponent implements ValueChange
         mainLayout.setSizeFull();
 
         //button toolbar
-        HorizontalLayout buttonContainer = new HorizontalLayout();
-        // cancelButton
-        cancelButton = new Button();
-        cancelButton.setCaption("Cancel");
-        cancelButton.setImmediate(true);
-        buttonContainer.addComponent(cancelButton);
-
-        // okButton
-        okButton = new Button();
-        okButton.setCaption("OK");
-        okButton.setImmediate(true);
-        buttonContainer.addComponent(okButton);
+        HorizontalLayout buttonContainer = createOkCancelButtons();
 
         mainLayout.addComponent(buttonContainer);
         mainLayout.setComponentAlignment(buttonContainer, Alignment.BOTTOM_RIGHT);
