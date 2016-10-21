@@ -178,8 +178,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
-			Notification.show("Error while accessing data base", Type.ERROR_MESSAGE);
-			e.printStackTrace();
+			DistributionEditorUtil.showSqlError(e);
 			return;
 		}
 		if(container==null){

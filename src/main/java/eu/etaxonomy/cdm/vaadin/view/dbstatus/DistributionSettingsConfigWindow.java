@@ -82,8 +82,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
                 taxonTree.setContainerDataSource(new TaxonTreeContainer((TaxonNode) classificationSelection));
                 taxonTree.setVisibleColumns("Name");
             } catch (SQLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+    			DistributionEditorUtil.showSqlError(e);
             }
         	if(chosenTaxonNode!=null){
     			taxonTree.select(new RowId(chosenTaxonNode.getId()));
@@ -197,8 +196,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
                     taxonTree.setContainerDataSource(new TaxonTreeContainer(parentNode));
                     taxonTree.setVisibleColumns("Name");
                 } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+        			DistributionEditorUtil.showSqlError(e);
                 }
 			}
 			else{

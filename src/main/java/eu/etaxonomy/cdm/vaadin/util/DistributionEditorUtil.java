@@ -1,8 +1,11 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
@@ -38,6 +41,11 @@ public class DistributionEditorUtil {
     	Object isAbbreviated = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS);
 		return (isAbbreviated==null || (boolean) isAbbreviated);
     }
+    
+	public static void showSqlError(SQLException e) {
+		Notification.show("Error while accessing data base.","Cause: "+e.getMessage(), Type.ERROR_MESSAGE);
+		e.printStackTrace();
+	}
 
 	public static final String SATTR_CONVERSATION = "conversation";
 

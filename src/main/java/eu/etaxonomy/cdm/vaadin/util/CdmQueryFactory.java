@@ -9,7 +9,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.util;
 
-import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +39,7 @@ public class CdmQueryFactory {
     public static final String ID = "id";
     public static final String UUID_ID = "uuid";
 
-    public static QueryDelegate generateTaxonTreeQuery(String name_id, String classificationId) throws SQLException {
+    public static QueryDelegate generateTaxonTreeQuery(String name_id, String classificationId)  {
         String FROM_QUERY = " FROM TaxonBase tb " +
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
                 "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
@@ -60,7 +59,7 @@ public class CdmQueryFactory {
             String pb_id,
             String unp_id,
             String rank_id,
-            String has_syn_id) throws SQLException {
+            String has_syn_id)  {
         String FROM_QUERY = " FROM TaxonBase tb " +
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
                 "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
@@ -79,7 +78,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, Collection<NamedArea> namedAreas) throws SQLException {
+    public static QueryDelegate generateTaxonDistributionQuery(List<Integer> taxonNodeIds, Collection<NamedArea> namedAreas) {
 
     	String idString = "";
     	Iterator<Integer> nodeIterator = taxonNodeIds.iterator();
@@ -142,7 +141,7 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateSynonymofTaxonQuery(String name_id) throws SQLException {
+    public static QueryDelegate generateSynonymofTaxonQuery(String name_id)  {
     	String FROM_QUERY = " FROM TaxonBase tb " +
     			"INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
     			"INNER JOIN SynonymRelationship sr on tb.id=sr.relatedfrom_id ";
@@ -159,7 +158,7 @@ public class CdmQueryFactory {
             String reltype_id,
             String to_id,
             String touuid_id,
-            String toname_id) throws SQLException {
+            String toname_id)  {
         String FROM_QUERY = "     FROM TaxonRelationship tr " +
                 "INNER JOIN TaxonBase tb on tr.relatedto_id = tb.id " +
                 "INNER JOIN TaxonNode tn on tb.id = tn.taxon_id ";
@@ -182,9 +181,8 @@ public class CdmQueryFactory {
      *
      * @param tableName
      * @return
-     * @throws SQLException
      */
-    public static QueryDelegate generateTableQuery(String tableName) throws SQLException {
+    public static QueryDelegate generateTableQuery(String tableName) {
         String FROM_QUERY = " FROM " + tableName;
         String SELECT_QUERY=" SELECT * " +
                 FROM_QUERY;
@@ -194,11 +192,10 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateQueryDelegate(String SELECT_QUERY, String COUNT_QUERY, String CONTAINS_QUERY) throws SQLException {
+    public static QueryDelegate generateQueryDelegate(String SELECT_QUERY, String COUNT_QUERY, String CONTAINS_QUERY) {
         FreeformQuery query = new FreeformQuery("This query is not used", CdmSpringContextHelper.getCurrent().getConnectionPool(), ID);
         CdmStatementDelegate delegate = new CdmStatementDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
         query.setDelegate(delegate);
         return query;
     }
-
 }
