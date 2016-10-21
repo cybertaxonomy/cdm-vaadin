@@ -24,7 +24,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
@@ -104,6 +103,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
         okButton.addClickListener(this);
         cancelButton.addClickListener(this);
+        updateButtons();
     }
 
     protected AbstractLayout buildMainLayout() {
@@ -209,6 +209,12 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 			NamedAreaContainer container = new NamedAreaContainer(vocabulary);
 			namedAreaList.setContainerDataSource(container);
 		}
+		updateButtons();
+	}
+	
+	@Override
+	protected boolean isValid() {
+		return classificationBox.getValue()!=null && distAreaBox.getValue()!=null;
 	}
 
 	@Override
@@ -226,14 +232,6 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 			}
 			term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
 			Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-			if(taxonNode==null){
-				Notification.show("Please choose a classification and/or taxon", Notification.Type.HUMANIZED_MESSAGE);
-				return;
-			}
-			if(term==null){
-				Notification.show("Please choose a distribution area", Notification.Type.HUMANIZED_MESSAGE);
-				return;
-			}
 			DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
 			window.close();
 		}

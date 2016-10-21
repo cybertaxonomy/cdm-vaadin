@@ -55,5 +55,19 @@ public abstract class AbstractSettingsDialogWindow extends CustomComponent {
 	    window.setContent(mainLayout);
 	    return window;
 	}
+	
+	/**
+	 * Update OK/Cancel button depending on {@link #isValid()}
+	 */
+	protected void updateButtons(){
+		okButton.setEnabled(isValid());
+	}
+	
+	/**
+	 * Evaluates if this dialog has all necessary values set in 
+	 * a correct state
+	 * @return <code>true</code> if the status of this dialog is valid
+	 */
+	protected abstract boolean isValid();
 
 }

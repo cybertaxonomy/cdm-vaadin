@@ -55,6 +55,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 
         okButton.addClickListener(this);
         cancelButton.addClickListener(this);
+        updateButtons();
     }
 
     protected AbstractLayout buildMainLayout() {
@@ -87,6 +88,11 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
         mainLayout.setComponentAlignment(buttonContainer, Alignment.BOTTOM_RIGHT);
 
         return mainLayout;
+    }
+    
+    @Override
+    protected boolean isValid() {
+    	return true;
     }
 
 	@Override
