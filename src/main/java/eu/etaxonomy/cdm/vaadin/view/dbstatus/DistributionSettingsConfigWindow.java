@@ -1,17 +1,19 @@
 // $Id$
 /**
-* Copyright (C) 2015 EDIT
-* European Distributed Institute of Taxonomy
-* http://www.e-taxonomy.eu
-*
-* The contents of this file are subject to the Mozilla Public License Version 1.1
-* See LICENSE.TXT at the top of this package for the full license terms.
-*/
+ * Copyright (C) 2015 EDIT
+ * European Distributed Institute of Taxonomy
+ * http://www.e-taxonomy.eu
+ *
+ * The contents of this file are subject to the Mozilla Public License Version 1.1
+ * See LICENSE.TXT at the top of this package for the full license terms.
+ */
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
-import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -25,15 +27,18 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Table.ColumnHeaderMode;
+import com.vaadin.ui.Tree.ExpandEvent;
+import com.vaadin.ui.Tree.ExpandListener;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
 import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
 import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
-import eu.etaxonomy.cdm.vaadin.container.TaxonTreeContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
@@ -42,10 +47,10 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
  * @author pplitzner
  *
  */
-public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener{
+public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener, ExpandListener{
 
-	private static final long serialVersionUID = 1439411115014088780L;
-	private ComboBox classificationBox;
+    private static final long serialVersionUID = 1439411115014088780L;
+    private ComboBox classificationBox;
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
@@ -58,45 +63,47 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
      * @param distributionTableView
      */
     public DistributionSettingsConfigWindow(DistributionTableView distributionTableView) {
-    	super();
+        super();
     }
 
+    @Override
     protected void init() {
-    	//init classification and taxon selection
+        //init classification and taxon selection
         TaxonNode chosenTaxonNode = presenter.getChosenTaxonNode();
 
         classificationBox.setContainerDataSource(new TaxonNodeContainer(null));
         Object classificationSelection = null;
-		if(classificationBox.getItemIds().size()==1){
-			//only one classification exists
-		    classificationSelection = classificationBox.getItemIds().iterator().next();
-		}
-		else if(chosenTaxonNode!=null){
-			//get the classification from the selected taxon node
-			classificationSelection = chosenTaxonNode.getClassification().getRootNode();
-		}
+        if(classificationBox.getItemIds().size()==1){
+            //only one classification exists
+            classificationSelection = classificationBox.getItemIds().iterator().next();
+        }
+        else if(chosenTaxonNode!=null){
+            //get the classification from the selected taxon node
+            classificationSelection = chosenTaxonNode.getClassification().getRootNode();
+        }
         if(classificationSelection!=null){
-        	classificationBox.setValue(classificationSelection);
-        	try {
-                taxonTree.setContainerDataSource(new TaxonTreeContainer((TaxonNode) classificationSelection));
-                taxonTree.setVisibleColumns("Name");
-            } catch (SQLException e) {
-    			DistributionEditorUtil.showSqlError(e);
+            classificationBox.setValue(classificationSelection);
+            taxonTree.addExpandListener(this);
+
+            UUID uuid = ((CdmBase) classificationSelection).getUuid();
+            int id = ((CdmBase) classificationSelection).getId();
+            String titleCache = ((TaxonNode) classificationSelection).getClassification().getTitleCache();
+            UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
+            taxonTree.setContainerDataSource(new TaxonNodeContainer(parent));
+            if(chosenTaxonNode!=null){
+                taxonTree.select(new RowId(chosenTaxonNode.getId()));
             }
-        	if(chosenTaxonNode!=null){
-    			taxonTree.select(new RowId(chosenTaxonNode.getId()));
-        	}
         }
         classificationBox.addValueChangeListener(this);
-        
+
         TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
         distAreaBox.setContainerDataSource(presenter.getDistributionContainer());
         distAreaBox.setValue(chosenArea);
         distAreaBox.addValueChangeListener(this);
 
         if(chosenArea!=null){
-        	NamedAreaContainer container = new NamedAreaContainer(chosenArea);
-        	namedAreaList.setContainerDataSource(container);
+            NamedAreaContainer container = new NamedAreaContainer(chosenArea);
+            namedAreaList.setContainerDataSource(container);
         }
         Object selectedAreas = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
         namedAreaList.setValue(selectedAreas);
@@ -106,12 +113,13 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         updateButtons();
     }
 
+    @Override
     protected AbstractLayout buildMainLayout() {
 
         mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
 
-    	HorizontalLayout leftAndRightContainer = new HorizontalLayout();
+        HorizontalLayout leftAndRightContainer = new HorizontalLayout();
         leftAndRightContainer.setImmediate(false);
         leftAndRightContainer.setSizeFull();
         leftAndRightContainer.setMargin(true);
@@ -186,58 +194,73 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         return leftAndRightContainer;
     }
 
-	@Override
-	public void valueChange(ValueChangeEvent event) {
-		Property property = event.getProperty();
-		if(property==classificationBox){
-			TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
-			if(parentNode!=null){
-			    try {
-                    taxonTree.setContainerDataSource(new TaxonTreeContainer(parentNode));
-                    taxonTree.setVisibleColumns("Name");
-                } catch (SQLException e) {
-        			DistributionEditorUtil.showSqlError(e);
-                }
-			}
-			else{
-				taxonTree.setContainerDataSource(null);
-			}
-		}
+    @Override
+    public void valueChange(ValueChangeEvent event) {
+        Property property = event.getProperty();
+        if(property==classificationBox){
+            TaxonNode parentNode = (TaxonNode) event.getProperty().getValue();
+            if(parentNode!=null){
+                UUID uuid = parentNode.getUuid();
+                int id = parentNode.getId();
+                String titleCache = parentNode.getClassification().getTitleCache();
+                UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
+                taxonTree.setContainerDataSource(new TaxonNodeContainer(parent));
+            }
+            else{
+                taxonTree.setContainerDataSource(null);
+            }
+        }
 
-		else if(property==distAreaBox){
-			TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) event.getProperty().getValue();
-			NamedAreaContainer container = new NamedAreaContainer(vocabulary);
-			namedAreaList.setContainerDataSource(container);
-		}
-		updateButtons();
-	}
-	
-	@Override
-	protected boolean isValid() {
-		return classificationBox.getValue()!=null && distAreaBox.getValue()!=null;
-	}
+        else if(property==distAreaBox){
+            TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) event.getProperty().getValue();
+            NamedAreaContainer container = new NamedAreaContainer(vocabulary);
+            namedAreaList.setContainerDataSource(container);
+        }
+        updateButtons();
+    }
 
-	@Override
-	public void buttonClick(ClickEvent event) {
-		Object source = event.getSource();
-		if(source==okButton){
-			TaxonNode taxonNode = null;
-			TermVocabulary<NamedArea> term = null;
-			//TODO use field converter
-			if(taxonTree.getValue()!=null){
-			    taxonNode = CdmSpringContextHelper.getTaxonNodeService().find((Integer)((RowId) taxonTree.getValue()).getId()[0]);
-			}
-			if(taxonNode==null){
-				taxonNode = (TaxonNode) classificationBox.getValue();
-			}
-			term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
-			Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-			DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
-			window.close();
-		}
-		else if(source==cancelButton){
-			window.close();
-		}
-	}
+    @Override
+    protected boolean isValid() {
+        return classificationBox.getValue()!=null && distAreaBox.getValue()!=null;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event) {
+        Object source = event.getSource();
+        if(source==okButton){
+            TaxonNode taxonNode = null;
+            TermVocabulary<NamedArea> term = null;
+            //TODO use field converter
+            if(taxonTree.getValue()!=null){
+                taxonNode = CdmSpringContextHelper.getTaxonNodeService().find((Integer)((RowId) taxonTree.getValue()).getId()[0]);
+            }
+            if(taxonNode==null){
+                taxonNode = (TaxonNode) classificationBox.getValue();
+            }
+            term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
+            Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
+            DistributionEditorUtil.openDistributionView(taxonNode, term, selectedAreas);
+            window.close();
+        }
+        else if(source==cancelButton){
+            window.close();
+        }
+    }
+
+    @Override
+    public void nodeExpand(ExpandEvent event) {
+        UuidAndTitleCache<TaxonNode> parent = (UuidAndTitleCache<TaxonNode>) event.getItemId();
+        Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+        taxonTree.setChildrenAllowed(parent, !children.isEmpty());
+        for (UuidAndTitleCache<TaxonNode> child : children) {
+            Item childItem = taxonTree.addItem(child);
+            if(childItem!=null){
+                taxonTree.setParent(child, parent);
+                childItem.getItemProperty(TaxonNodeContainer.LABEL).setValue(child.getTitleCache());
+            }
+            Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
+            taxonTree.setChildrenAllowed(child, !grandChildren.isEmpty());
+        }
+    }
 
 }
