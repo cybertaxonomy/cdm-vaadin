@@ -240,7 +240,9 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
                 taxonNode = CdmSpringContextHelper.getTaxonNodeService().load(((UuidAndTitleCache<TaxonNode>)taxonTree.getValue()).getUuid());
             }
             if(taxonNode==null){
-                taxonNode = (TaxonNode) classificationBox.getValue();
+                String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue();
+                UUID uuid = UUID.fromString(uuidString);
+                taxonNode = CdmSpringContextHelper.getClassificationService().load(uuid).getRootNode();
             }
             term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
             Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
