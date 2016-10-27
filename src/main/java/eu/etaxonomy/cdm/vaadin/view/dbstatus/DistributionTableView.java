@@ -53,8 +53,6 @@ public class DistributionTableView extends CustomComponent implements View{
 
 	private DistributionTablePresenter listener;
 
-	private List<String> columnList;
-	private ArrayList<String> headerList;
     private CdmSQLContainer container;
 
 	/**
@@ -187,16 +185,18 @@ public class DistributionTableView extends CustomComponent implements View{
 
 		table.setContainerDataSource(container);
 
-		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
-		List<String> namedAreas = listener.getNamedAreasLabels();
-		columnList.addAll(namedAreas);
+		List<String> columnHeaders = new ArrayList<>(Arrays.asList(table.getColumnHeaders()));
+		columnHeaders.remove(CdmQueryFactory.DTYPE_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.ID_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.UUID_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
+
+		List<String> columnList = new ArrayList<String>(columnHeaders);
+		
+		String[] string = new String[columnList.size()];
+
 		table.setVisibleColumns(columnList.toArray());
-
-		headerList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,"Rang"}));
-		headerList.addAll(listener.getNamedAreasLabels());
-		String[] string = new String[headerList.size()];
-		table.setColumnHeaders(headerList.toArray(string));
-
+		table.setColumnHeaders(columnList.toArray(string));
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
 
 

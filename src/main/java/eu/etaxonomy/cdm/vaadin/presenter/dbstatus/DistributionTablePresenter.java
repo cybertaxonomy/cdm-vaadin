@@ -156,28 +156,6 @@ public class DistributionTablePresenter {
         return namedAreas;
 	}
 
-    public List<String> getNamedAreasLabels(){
-        Set<NamedArea> selectedAreas = getNamedAreas();
-    	List<String> namedAreaTitles = new ArrayList<>();
-    	for (NamedArea namedArea : selectedAreas) {
-    		String title = null;
-    	    Representation representation = namedArea.getRepresentation(Language.DEFAULT());
-    	    if(representation!=null){
-    	    	if(DistributionEditorUtil.isAbbreviatedLabels()){
-    	    		title = representation.getAbbreviatedLabel();
-    	    	}
-    	    	else{
-    	    		title = representation.getLabel();
-    	    	}
-    	    }
-    	    if(title==null){
-    	    	title = namedArea.getTitleCache();
-    	    }
-    	    namedAreaTitles.add(title);
-        }
-    	return namedAreaTitles;
-    }
-
 	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);

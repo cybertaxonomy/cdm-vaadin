@@ -10,8 +10,10 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +35,11 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 public class CdmQueryFactory {
 
 
-	public static final String RANK_COLUMN = "Rank";
+	public static final String DTYPE_COLUMN = "DTYPE";
+	public static final String ID_COLUMN = "id";
+	public static final String UUID_COLUMN = "uuid";
+	public static final String CLASSIFICATION_COLUMN = "classification";
+	public static final String RANK_COLUMN = "Rang";
 	public static final String TAXON_COLUMN = "Taxon";
 
     public static final String ID = "id";
@@ -105,28 +111,51 @@ public class CdmQueryFactory {
         String ORDER_BY = " ORDER BY tb.titleCache ";
 
         String SELECT_QUERY= "SELECT "
-                + "tb.DTYPE, "
-                + "tb.id, "
-                + "tb.uuid, "
-                + "tn.classification_id, "+
+                + "tb.DTYPE AS "+DTYPE_COLUMN+", "
+                + "tb.id AS "+ID_COLUMN+", "
+                + "tb.uuid AS "+UUID_COLUMN+", "
+                + "tn.classification_id AS "+CLASSIFICATION_COLUMN+", "+
         		"tb.titleCache AS "+TAXON_COLUMN+", " +
         		"rank.titleCache AS "+RANK_COLUMN+", ";
 
+        Map<String, Integer> labels = new HashMap<>();
         for(NamedArea namedArea : namedAreas){
             String label = null;
+            String fullLabel = null;
+            String abbreviatedLabel = null;
             Representation representation = namedArea.getRepresentation(Language.DEFAULT());
             if(representation!=null){
+            	fullLabel = representation.getLabel();
+				abbreviatedLabel = representation.getAbbreviatedLabel();
 				if(DistributionEditorUtil.isAbbreviatedLabels()){
-            		label = representation.getAbbreviatedLabel();
+            		label = abbreviatedLabel;
             	}
             	else{
-            		label = representation.getLabel();
+            		label = fullLabel;
             	}
             }
+            //fallback
             if(label==null){
             	label = namedArea.getTitleCache();
             }
-            SELECT_QUERY += "MAX( IF(area.titleCache = '"+ namedArea.getTitleCache() +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
+
+            //check if label already exists
+            Integer count = labels.get(label);
+            if(count!=null){
+            	//combine label and abbreviated and check again
+            	if(abbreviatedLabel!=null && fullLabel!= null){
+            		label = abbreviatedLabel+"-"+fullLabel;
+            	}
+            }
+            count = labels.get(label);
+            if(count==null){
+            	labels.put(label, 1);
+            }
+            else{
+            	labels.put(label, count+1);
+            	label += "("+count+")";
+            }
+            SELECT_QUERY += "MAX( IF(area.uuid = '"+ namedArea.getUuid() +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
         }
         SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;
