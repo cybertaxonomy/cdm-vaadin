@@ -37,7 +37,7 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUI.class);
 
-    @WebServlet(value = {"/app/editcr/*"}, asyncSupported = true)
+    @WebServlet(value = {"/app/concept/*"}, asyncSupported = true)
     @VaadinServletConfiguration(productionMode = true, ui = ConceptRelationshipUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }

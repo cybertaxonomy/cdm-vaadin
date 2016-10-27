@@ -17,9 +17,9 @@ import eu.etaxonomy.cdm.vaadin.view.dbstatus.RedirectAfterLoginView;
 @SuppressWarnings("serial")
 public class DbStatusUI extends AbstractAuthenticatedUI{
 
-	private static final String FIRST_VIEW = "redirectDbStatus";
+	private static final String FIRST_VIEW = "firstView";
 
-	@WebServlet(value = {"/app/dbstatus/*"}, asyncSupported = true)
+	@WebServlet(value = {"/app/distribution/*"}, asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = true, ui = DbStatusUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {
 	}
