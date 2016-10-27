@@ -371,16 +371,17 @@
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-services</artifactId>
       <version>${cdmlib.version}</version>
-    
-    
-    
-    
-    
 <!--       <scope>provided</scope> -->
     </dependency>
     <dependency>
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-test</artifactId>
+      <version>${cdmlib.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>eu.etaxonomy</groupId>
+      <artifactId>cdmlib-remote</artifactId>
       <version>${cdmlib.version}</version>
       <scope>test</scope>
     </dependency>
