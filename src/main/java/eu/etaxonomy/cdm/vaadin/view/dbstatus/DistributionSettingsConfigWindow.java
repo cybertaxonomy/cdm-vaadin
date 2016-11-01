@@ -10,11 +10,10 @@
 package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -96,8 +95,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
             String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
             UUID uuid = UUID.fromString(uuidString);
             UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
-            taxonTree.setContainerDataSource(new TaxonNodeContainer(parent));
-            addChildItems(parent);
+            taxonTree.setContainerDataSource(new TaxonNodeContainer(Collections.singleton(parent)));
             if(chosenTaxonNode!=null){
                 taxonTree.select(new RowId(chosenTaxonNode.getId()));
             }
@@ -212,8 +210,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
                 int id = parentNode.getId();
                 String titleCache = parentNode.getClassification().getTitleCache();
                 UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
-                taxonTree.setContainerDataSource(new TaxonNodeContainer(parent));
-                addChildItems(parent);
+                taxonTree.setContainerDataSource(new TaxonNodeContainer(Collections.singleton(parent)));
             }
         }
         else if(property==distAreaBox){
@@ -257,23 +254,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     @Override
     public void nodeExpand(ExpandEvent event) {
         UuidAndTitleCache<TaxonNode> parent = (UuidAndTitleCache<TaxonNode>) event.getItemId();
-        addChildItems(parent);
-    }
-
-    /**
-     * @param parent
-     */
-    private void addChildItems(UuidAndTitleCache<TaxonNode> parent) {
-        Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
-        taxonTree.setChildrenAllowed(parent, !children.isEmpty());
-        for (UuidAndTitleCache<TaxonNode> child : children) {
-            Item childItem = taxonTree.addItem(child);
-            if(childItem!=null){
-                taxonTree.setParent(child, parent);
-            }
-            Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
-            taxonTree.setChildrenAllowed(child, !grandChildren.isEmpty());
-        }
+        ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
 }

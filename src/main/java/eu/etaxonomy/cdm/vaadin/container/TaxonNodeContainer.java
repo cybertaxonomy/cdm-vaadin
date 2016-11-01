@@ -1,27 +1,33 @@
 package eu.etaxonomy.cdm.vaadin.container;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
+import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 public class TaxonNodeContainer extends HierarchicalContainer {
 
 	private static final long serialVersionUID = 102401340698963360L;
 	public static final String LABEL = "titleCache";
-	private Set<Object> itemCache = new HashSet<Object>();
+	private static Map<Object, Object> itemCache = new HashMap<>();
 
 	/**
 	 * Creates a new taxon node container
 	 * @param parentNode the parent node which will <b>not</b> be included
 	 * in the result but only its child nodes
 	 */
-	public TaxonNodeContainer(UuidAndTitleCache<TaxonNode> parentNode) {
-		addContainerProperty(LABEL, String.class, "[no taxon]");
+	public TaxonNodeContainer(Collection<UuidAndTitleCache<TaxonNode>> roots) {
+	    addContainerProperty(LABEL, String.class, "[no taxon]");
+	    for (UuidAndTitleCache<TaxonNode> root: roots) {
+	        addItem(root);
+            addChildItems(root);
+        }
 	}
 
 	/**
@@ -31,22 +37,38 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 	public Item addItem(Object itemId) {
 	    if(itemId instanceof UuidAndTitleCache){
 	        UuidAndTitleCache<TaxonNode> uuidAndTitleCache = (UuidAndTitleCache<TaxonNode>) itemId;
-            if(!itemCache.contains(uuidAndTitleCache.getId())){
+            if(!itemCache.keySet().contains(uuidAndTitleCache.getId())){
 	            Item item = super.addItem(itemId);
 	            item.getItemProperty(TaxonNodeContainer.LABEL).setValue(uuidAndTitleCache.getTitleCache());
+	            itemCache.put(((UuidAndTitleCache<TaxonNode>) itemId).getId(), false);
                 return item;
 	        }
         }
 	    return null;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean setParent(Object itemId, Object newParentId) {
-	    itemCache.add(((UuidAndTitleCache<TaxonNode>) itemId).getId());;
-	    return super.setParent(itemId, newParentId);
-	}
+    /**
+     * @param parent
+     */
+    public void addChildItems(UuidAndTitleCache<TaxonNode> parent) {
+        if(itemCache.get(parent.getId()).equals(Boolean.FALSE)){
+            Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+            setChildrenAllowed(parent, !children.isEmpty());
+            for (UuidAndTitleCache<TaxonNode> child : children) {
+                Item childItem = addItem(child);
+                if(childItem!=null){
+                    setParent(child, parent);
+                }
+                Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
+                setChildrenAllowed(child, !grandChildren.isEmpty());
+            }
+            itemCache.put(parent.getId(), true);
+        }
+    }
+
+    public void clearCache(){
+        //TODO: when should the cache be cleared?
+        itemCache = null;
+    }
 
 }
