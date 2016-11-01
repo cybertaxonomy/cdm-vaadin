@@ -18,15 +18,14 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 	private static Map<Object, Object> itemCache = new HashMap<>();
 
 	/**
-	 * Creates a new taxon node container
-	 * @param parentNode the parent node which will <b>not</b> be included
-	 * in the result but only its child nodes
+     * Creates a new taxon node container
+	 * @param roots the root elements of the table
 	 */
 	public TaxonNodeContainer(Collection<UuidAndTitleCache<TaxonNode>> roots) {
 	    addContainerProperty(LABEL, String.class, "[no taxon]");
 	    for (UuidAndTitleCache<TaxonNode> root: roots) {
 	        addItem(root);
-            addChildItems(root);
+	        addChildItems(root);
         }
 	}
 
@@ -37,12 +36,10 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 	public Item addItem(Object itemId) {
 	    if(itemId instanceof UuidAndTitleCache){
 	        UuidAndTitleCache<TaxonNode> uuidAndTitleCache = (UuidAndTitleCache<TaxonNode>) itemId;
-            if(!itemCache.keySet().contains(uuidAndTitleCache.getId())){
-	            Item item = super.addItem(itemId);
-	            item.getItemProperty(TaxonNodeContainer.LABEL).setValue(uuidAndTitleCache.getTitleCache());
-	            itemCache.put(((UuidAndTitleCache<TaxonNode>) itemId).getId(), false);
-                return item;
-	        }
+	        Item item = super.addItem(itemId);
+	        item.getItemProperty(TaxonNodeContainer.LABEL).setValue(uuidAndTitleCache.getTitleCache());
+	        itemCache.put(((UuidAndTitleCache<TaxonNode>) itemId).getId(), false);
+	        return item;
         }
 	    return null;
 	}
