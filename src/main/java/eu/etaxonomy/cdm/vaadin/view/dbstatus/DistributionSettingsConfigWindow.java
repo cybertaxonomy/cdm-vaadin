@@ -21,6 +21,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.sqlcontainer.RowId;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
@@ -29,11 +30,14 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree.ExpandEvent;
 import com.vaadin.ui.Tree.ExpandListener;
 import com.vaadin.ui.TreeTable;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.common.CdmUtils;
@@ -217,21 +221,26 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         }
         else if(property==taxonFilter){
             String filterText = taxonFilter.getValue();
-            if(CdmUtils.isNotBlank(filterText)){
-                List<UuidAndTitleCache<TaxonNode>> taxa = CdmSpringContextHelper.getTaxonNodeService().getUuidAndTitleCache(null, filterText);
-                if(!taxa.isEmpty()){
-                    BeanItemContainer<UuidAndTitleCache<TaxonNode>> container = new BeanItemContainer<>(UuidAndTitleCache.class);
-                    taxonTree.setContainerDataSource(container);
-                    for (UuidAndTitleCache<TaxonNode> taxon : taxa) {
-                        container.addItem(taxon);
-                        taxonTree.setChildrenAllowed(taxon, false);
-                    }
-                    taxonTree.setVisibleColumns("titleCache");
-                }
+            Property uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
+            if(uuidProperty==null){
+            	Notification.show("Please select a classification");
             }
             else{
-                UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
-                showClassificationTaxa(parent);
+            	if(CdmUtils.isNotBlank(filterText)){
+            		UUID classificationUuid = UUID.fromString((String) uuidProperty.getValue());
+            		List<UuidAndTitleCache<TaxonNode>> taxa = CdmSpringContextHelper.getTaxonNodeService().getUuidAndTitleCache(null, filterText, classificationUuid);
+            		BeanItemContainer<UuidAndTitleCache<TaxonNode>> container = new BeanItemContainer<>(UuidAndTitleCache.class);
+            		taxonTree.setContainerDataSource(container);
+            		for (UuidAndTitleCache<TaxonNode> taxon : taxa) {
+            			container.addItem(taxon);
+            			taxonTree.setChildrenAllowed(taxon, false);
+            		}
+            		taxonTree.setVisibleColumns("titleCache");
+            	}
+            	else{
+            		UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
+            		showClassificationTaxa(parent);
+            	}
             }
         }
         else if(property==distAreaBox){
@@ -278,8 +287,13 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     }
 
     private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> parent) {
-        Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
-        taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
+        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+        // Enable polling and set frequency to 0.5 seconds
+        UI.getCurrent().setPollInterval(500);
+        taxonTree.setEnabled(false);
+        Notification.show("Loading taxa...");
+
+        new TreeUpdater(children).start();
     }
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
@@ -289,5 +303,33 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
         return parent;
+    }
+    
+    private class TreeUpdater extends Thread{
+    	
+    	private Collection<UuidAndTitleCache<TaxonNode>> children;
+
+    	
+		public TreeUpdater(Collection<UuidAndTitleCache<TaxonNode>> children) {
+			this.children = children;
+		}
+
+		@Override
+    	public void run() {
+			UI.getCurrent().access(new Runnable() {
+				@Override
+				public void run() {
+					taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
+
+			        Notification notification = new Notification("Loading complete");
+			        notification.setDelayMsec(500);
+			        notification.show(Page.getCurrent());
+			        taxonTree.setEnabled(true);
+
+			        //disable polling when all taxa are loaded
+			        UI.getCurrent().setPollInterval(-1);
+				}
+			});
+    	}
     }
 }
