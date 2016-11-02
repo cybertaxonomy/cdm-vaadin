@@ -40,6 +40,13 @@ public class DistributionEditorUtil {
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo(VIEW_TABLE);
 	}
+    
+    public static void clearSessionAttributes(){
+    	VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, null);
+    	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_VOCABULARY_UUID, null);
+    	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, null);
+    	VaadinSession.getCurrent().setAttribute(SATTR_CLASSIFICATION, null);
+    }
 
     public static boolean isAbbreviatedLabels(){
     	Object isAbbreviated = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS);

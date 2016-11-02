@@ -17,9 +17,11 @@ public class RedirectAfterLoginView extends CustomComponent implements View{
 	    //navigate to table view
 		DistributionTableView distributionTableView = new DistributionTableView();
 		new DistributionTablePresenter(distributionTableView);
+		UI.getCurrent().getNavigator().removeView(DistributionEditorUtil.VIEW_TABLE);
 		UI.getCurrent().getNavigator().addView(DistributionEditorUtil.VIEW_TABLE, distributionTableView);
 	    UI.getCurrent().getNavigator().navigateTo(DistributionEditorUtil.VIEW_TABLE);
-
+	    
+	    DistributionEditorUtil.clearSessionAttributes();
 	    distributionTableView.openDistributionSettings();
 	}
 
