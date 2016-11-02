@@ -10,6 +10,7 @@
 package eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,12 +18,14 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -39,18 +42,15 @@ public class SettingsPresenter {
     private IVocabularyService vocabularyService;
     private ITermService termService;
     private ITaxonNodeService taxonNodeService;
-    private UUID taxonNodeUuid;
+    private IClassificationService classificationService;
     private UUID termUUID;
 
 
 
     public SettingsPresenter(){
         taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
-		Object taxonNodeUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID);
+        classificationService = CdmSpringContextHelper.getClassificationService();
 		Object selectedVocabularyUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
-		if(taxonNodeUuidString!=null){
-			taxonNodeUuid = UUID.fromString(taxonNodeUuidString.toString());
-		}
 		if(selectedVocabularyUuidString!=null){
 			termUUID = UUID.fromString(selectedVocabularyUuidString.toString());
 		}
@@ -58,8 +58,20 @@ public class SettingsPresenter {
 		distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
     }
 
-    public TaxonNode getChosenTaxonNode(){
-        return taxonNodeService.load(taxonNodeUuid);
+    public List<TaxonNode> getChosenTaxonNodes(){
+    	List<UUID> nodeUuids = (List<UUID>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
+    	if(nodeUuids!=null){
+    		return taxonNodeService.load(nodeUuids, null);
+    	}
+    	return Collections.emptyList();
+    }
+
+    public Classification getChosenClassification(){
+    	UUID uuid = (UUID) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
+    	if(uuid!=null){
+    		return classificationService.load(uuid);
+    	}
+    	return null;
     }
 
     public TermVocabulary getChosenArea(){

@@ -195,30 +195,32 @@ public class DistributionTablePresenter {
 	}
 
 	public List<TaxonNode> getAllNodes(){
-		TaxonNode taxonNode = getChosenTaxonNode();
-		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
-		if(taxonNode!=null){
+		List<TaxonNode> allNodes = new ArrayList<TaxonNode>();
+
+		List<TaxonNode> taxonNodes = getChosenTaxonNodes();
+		for (TaxonNode taxonNode : taxonNodes) {
 			if(taxonNode.getTaxon()!=null){
-				nodes.add(taxonNode);
+				allNodes.add(taxonNode);
 			}
-			nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
+			allNodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		}
-		return nodes;
+		return allNodes;
 	}
 
 
-	public TaxonNode getChosenTaxonNode() {
+	public List<TaxonNode> getChosenTaxonNodes() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID taxonNodeUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODE_UUID);
-		TaxonNode classificationNode = taxonNodeService.load(taxonNodeUUID);
-		return classificationNode;
+		List<UUID> taxonNodeUUIDs = (List<UUID>) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
+		UUID classificationUuid = (UUID)session.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
+		if(taxonNodeUUIDs==null && classificationUuid!=null){
+			taxonNodeUUIDs = Collections.singletonList(classificationUuid);
+		}
+		List<TaxonNode> loadedNodes = taxonNodeService.load(taxonNodeUUIDs, null);
+		if(loadedNodes!=null){
+			return loadedNodes;
+		}
+		return Collections.emptyList();
 	}
-
-	public int getSizeOfTaxonNode(){
-		TaxonNode taxonNode = getChosenTaxonNode();
-		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
-	}
-
 
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		List<Integer> nodeIds = new ArrayList<Integer>();

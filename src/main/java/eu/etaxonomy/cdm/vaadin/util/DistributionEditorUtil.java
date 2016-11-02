@@ -1,7 +1,9 @@
 package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
@@ -10,7 +12,6 @@ import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 
 public class DistributionEditorUtil {
 
@@ -20,7 +21,9 @@ public class DistributionEditorUtil {
 
     public static final String SATTR_SELECTED_VOCABULARY_UUID = "selectedVocabularyUuid";
 
-	public static final String SATTR_TAXON_NODE_UUID = "taxonNodeUUID";
+	public static final String SATTR_TAXON_NODES_UUID = "taxonNodesUUID";
+
+	public static final String SATTR_CLASSIFICATION = "classificationUUID";
 
     public static final String SATTR_ABBREVIATED_LABELS = "abbreviatedLabels";
 
@@ -28,10 +31,11 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
-    public static void openDistributionView(TaxonNode taxonNode, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas) {
-	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODE_UUID, taxonNode.getUuid());
+    public static void openDistributionView(List<UUID> taxonNodes, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas, UUID classificationUuid) {
+	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, taxonNodes);
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_VOCABULARY_UUID, term.getUuid());
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, selectedAreas);
+	    VaadinSession.getCurrent().setAttribute(SATTR_CLASSIFICATION, classificationUuid);
 
 	    //navigate to table view
 	    UI.getCurrent().getNavigator().navigateTo(VIEW_TABLE);
