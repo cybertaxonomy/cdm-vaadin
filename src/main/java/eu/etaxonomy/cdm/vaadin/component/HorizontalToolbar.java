@@ -61,7 +61,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 			setHeight("75px");
 
 //			addComponent(editButton);
-			addComponent(saveButton);
+//			addComponent(saveButton);
 			addComponent(detailButton);
 //			addComponent(exporter);
 

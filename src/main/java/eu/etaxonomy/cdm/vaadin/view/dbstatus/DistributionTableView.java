@@ -10,11 +10,8 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -29,7 +26,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
@@ -54,6 +50,7 @@ public class DistributionTableView extends CustomComponent implements View{
 	private DistributionTablePresenter listener;
 
     private CdmSQLContainer container;
+	private DistributionSettingsConfigWindow distributionSettingConfigWindow;
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -117,7 +114,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		table.setHeight("100.0%");
 
         table.setColumnReorderingAllowed(true);
-        table.setSortEnabled(true);
+        table.setSortEnabled(false);
         
         table.setColumnCollapsingAllowed(true);
         table.setSelectable(true);
@@ -248,27 +245,8 @@ public class DistributionTableView extends CustomComponent implements View{
 				openSettings();
 			}
 		});
-
-		Button saveButton = toolbar.getSaveButton();
-		saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
-		saveButton.setDescription("Shortcut: CTRL+S");
-		saveButton.setCaption("Save Data");
-		saveButton.addClickListener(new ClickListener() {
-			private static final long serialVersionUID = 1L;
-			@Override
-			public void buttonClick(ClickEvent event) {
-				ConversationHolder conversationHolder = (ConversationHolder) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_CONVERSATION);
-				try{
-					conversationHolder.commit();
-				}catch(Exception stateException){
-					//TODO create Table without DTO
-				}
-				Notification.show("Data saved", Notification.Type.HUMANIZED_MESSAGE);
-			}
-		});
-
 	}
-
+	
 	public void openSettings() {
 		SettingsConfigWindow cw = new SettingsConfigWindow(this);
 		Window window  = cw.createWindow();
@@ -276,8 +254,10 @@ public class DistributionTableView extends CustomComponent implements View{
 	}
 
 	public void openDistributionSettings() {
-		DistributionSettingsConfigWindow cw = new DistributionSettingsConfigWindow(this);
-        Window window  = cw.createWindow();
+		if(distributionSettingConfigWindow==null){
+			distributionSettingConfigWindow = new DistributionSettingsConfigWindow(this);
+		}
+        Window window  = distributionSettingConfigWindow.createWindow();
         getUI().addWindow(window);
 	}
 	

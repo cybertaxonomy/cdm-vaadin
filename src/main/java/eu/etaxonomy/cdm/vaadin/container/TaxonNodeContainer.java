@@ -15,7 +15,7 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 
 	private static final long serialVersionUID = 102401340698963360L;
 	public static final String LABEL = "titleCache";
-	private static Map<Object, Object> itemCache = new HashMap<>();
+	private Map<Object, Object> itemCache = new HashMap<>();
 
 	/**
      * Creates a new taxon node container
@@ -61,11 +61,6 @@ public class TaxonNodeContainer extends HierarchicalContainer {
             }
             itemCache.put(parent.getId(), true);
         }
-    }
-
-    public void clearCache(){
-        //TODO: when should the cache be cleared?
-        itemCache = null;
     }
 
 }

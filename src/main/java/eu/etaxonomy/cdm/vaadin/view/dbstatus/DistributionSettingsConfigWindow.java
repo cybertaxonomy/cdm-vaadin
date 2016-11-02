@@ -37,7 +37,6 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.common.CdmUtils;
-import eu.etaxonomy.cdm.model.common.ICdmBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
@@ -63,6 +62,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
+    
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -96,19 +96,6 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
             classificationBox.setValue(new RowId(parent.getId()));
             showClassificationTaxa(getUuidAndTitleCacheFromRowId(parent));
         }
-        //init taxon selection
-        List<TaxonNode> chosenTaxonNodes = presenter.getChosenTaxonNodes();
-		if(chosenTaxonNodes!=null){
-			for (TaxonNode taxonNode : chosenTaxonNodes) {
-				UuidAndTitleCache<ICdmBase> uuidAndTitleCache = new UuidAndTitleCache<>(taxonNode.getUuid(), taxonNode.getId(), null);
-				taxonTree.select(uuidAndTitleCache);
-				Object parentNode = taxonTree.getParent(uuidAndTitleCache);
-				while(parentNode!=null){
-					taxonTree.setCollapsed(parentNode, false);
-					parentNode = taxonTree.getParent(parentNode);
-				}
-			}
-		}
         
         classificationBox.addValueChangeListener(this);
         taxonFilter.addValueChangeListener(this);
