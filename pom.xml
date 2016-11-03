@@ -15,6 +15,8 @@
     <unitils.version>3.4.2</unitils.version>
     <spring.version>4.2.4.RELEASE</spring.version>
     <lucene.version>5.4.1</lucene.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <prerequisites>
     <maven>3.0.5</maven>
@@ -53,6 +55,7 @@
       </snapshots>
     </repository>
   </repositories>
+  
   <pluginRepositories>
     <pluginRepository>
       <id>vaadin-snapshots</id>
@@ -65,6 +68,19 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
+  
+  <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+  
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
@@ -107,14 +123,37 @@
     </profile>
   </profiles>
   <build>
+    <resources>
+      <resource>
+        <!-- replace the place holders like ${...} in datasources.xml -->
+        <filtering>true</filtering>
+        <directory>src/test/resources</directory>
+        <targetPath>../test-classes</targetPath>
+        <includes>
+          <include>datasources.xml</include>
+        </includes>
+      </resource>
+      <resource>
+        <!-- all other test resources without filtering -->
+        <directory>src/test/resources</directory>
+        <targetPath>../test-classes</targetPath>
+        <excludes>
+          <exclude>datasources.xml</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <!-- all main resources without filtering -->
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.3</version>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -157,10 +196,8 @@
           <!-- <runTarget>mobilemail</runTarget> -->
           <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. 
             This way compatible with Vaadin eclipse plugin. -->
-          <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets
-          </webappDirectory>
-          <hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets
-          </hostedWebapp>
+          <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
+          <hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets</hostedWebapp>
           <!-- Most Vaadin apps don't need this stuff, guide that to target -->
           <persistentunitcachedir>${project.build.directory}</persistentunitcachedir>
           <deploy>${project.build.directory}/gwt-deploy</deploy>
@@ -204,12 +241,8 @@
             which could not be easily solved.
         -->
         <configuration>
-          <stopKey>stop</stopKey>
-          <stopPort>9199</stopPort>
-          <scanIntervalSeconds>10</scanIntervalSeconds>
           <useTestScope>true</useTestScope>
-          <jettyXml>${basedir}/src/test/resources/etc/jetty/jetty.xml,${basedir}/src/test/resources/etc/jetty/jetty-http.xml</jettyXml>
-          <!-- <jettyXml>./src/test/resources/etc/jetty/jetty.xml,./src/test/resources/etc/jetty/jetty-http.xml,./src/test/resources/etc/jetty/jetty-ssl.xml,./src/test/resources/etc/jetty/jetty-https.xml</jettyXml> -->
+          <scanIntervalSeconds>2</scanIntervalSeconds>
           <systemProperties>
             <force>true</force>
             <systemProperty>
@@ -217,29 +250,32 @@
               <value>h2_cdmTest</value>
             </systemProperty>
             <systemProperty>
-              <!-- The lucene index should be placed into the target folder, 
+              <!-- 
+                The lucene index should be placed into the target folder, 
                 so user.home needs to be set to this folder. user.home needs to be overridden 
-                since it already exists, thus the force option is turned on above -->
+                since it already exists, thus the force option is turned on above 
+              -->
               <name>user.home</name>
               <value>${basedir}/target/</value>
             </systemProperty>
             <systemProperty>
-              <!-- datasources.xml is prepared by <plugins><resources>..</resources> 
-                above -->
+              <!-- 
+                datasources.xml is prepared by <plugins><resources>..</resources> above 
+               -->
               <name>cdm.beanDefinitionFile</name>
               <value>${project.build.directory}/test-classes/datasources.xml</value>
             </systemProperty>
+            <systemProperty>
+                <name>log4j.configuration</name>
+                <value>file:///home/andreas/.cdmLibrary/log4j.properties</value>
+            </systemProperty>            
           </systemProperties>
         </configuration>
         <dependencies>
-            <dependency>
-                <!-- 
-                    Shouldn't this be provided by maven?
-                    Adding it here anyway to solve jetty start up probelms
-                 -->
+          <dependency>
                 <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.21</version>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>1.6.4</version>
             </dependency>
         </dependencies>
       </plugin>
@@ -355,7 +391,7 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
       <version>${vaadin.version}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <!-- disabling push for the moment because it does not work with run-jetty-run 
       due to the fact that the latest (even nightly) version of run-jetty-run uses 
@@ -434,6 +470,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>eu.etaxonomy</groupId>
+      <artifactId>cdmlib-db</artifactId>
+      <version>${cdmlib.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <!-- adding itextpdf is required to fix dependency problems: itextpdf 
         is an managed transitive dependency of cdmlib-io without adding it here mvn 
         fails. Ev. this should be fixed by changing its scope in cdmlib-io to the 
@@ -463,25 +505,25 @@
           <artifactId>spring-mock</artifactId>
         </exclusion>
       </exclusions>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <version>1.4.7</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-mock</artifactId>
       <version>2.0.8</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context-support</artifactId>
       <version>${spring.version}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -509,13 +551,13 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.2</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.2</version>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
