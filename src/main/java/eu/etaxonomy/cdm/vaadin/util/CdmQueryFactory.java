@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import com.vaadin.data.util.sqlcontainer.query.FreeformQuery;
 import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
+import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.location.NamedArea;
@@ -103,8 +104,10 @@ public class CdmQueryFactory {
         "LEFT OUTER JOIN DescriptionBase descr on descr.taxon_id = tb.id "+// # taxon <-> taxon description (not every taxon has a description)
         "LEFT OUTER JOIN DescriptionElementBase descrEl on descrEl.indescription_id = descr.id and descrEl.DTYPE = 'Distribution' "+// # distribution <-> description
         "LEFT OUTER JOIN DefinedTermBase statusTerm on statusTerm.id = descrEl.status_id "+
-        "LEFT OUTER JOIN DefinedTermBase area on area.id = descrEl.area_id "+
-        "WHERE tn.id IN ("+ idString +") ";
+        "LEFT OUTER JOIN DefinedTermBase area on area.id = descrEl.area_id ";
+        if(CdmUtils.isNotBlank(idString)){
+        	FROM_QUERY += "WHERE tn.id IN ("+ idString +") ";
+        }
 
         String GROUP_BY = " GROUP BY tb.uuid, tn.id ";
 
