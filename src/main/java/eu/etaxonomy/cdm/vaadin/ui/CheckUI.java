@@ -21,7 +21,7 @@ public class CheckUI extends UI
 //			@WebInitParam(name="org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Jetty9AsyncSupportWithWebSocket")
 //	})
 
-    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
+    @WebServlet(value = {"/app/*"}, asyncSupported = true)
     @VaadinServletConfiguration(productionMode = true, ui = CheckUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }
