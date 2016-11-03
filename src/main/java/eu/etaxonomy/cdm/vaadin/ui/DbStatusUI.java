@@ -19,6 +19,10 @@ public class DbStatusUI extends AbstractAuthenticatedUI{
 
 	private static final String FIRST_VIEW = "firstView";
 
+    /*
+     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
+     * The is therefore set globally in the web.xml
+     */
 	@WebServlet(value = {"/app/distribution/*"}, asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = true, ui = DbStatusUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {

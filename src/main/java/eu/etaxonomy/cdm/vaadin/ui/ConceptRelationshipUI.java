@@ -37,6 +37,10 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUI.class);
 
+    /*
+     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
+     * The is therefore set globally in the web.xml
+     */
     @WebServlet(value = {"/app/concept/*"}, asyncSupported = true)
     @VaadinServletConfiguration(productionMode = true, ui = ConceptRelationshipUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
