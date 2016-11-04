@@ -173,15 +173,15 @@ public class CdmQueryFactory {
         return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }
 
-    public static QueryDelegate generateSynonymofTaxonQuery(String name_id)  {
+    public static QueryDelegate generateSynonymOfTaxonQuery(String name_id)  {
     	String FROM_QUERY = " FROM TaxonBase tb " +
     			"INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
-    			"INNER JOIN TaxonBase syn on tb.id = syn.acceptedTaxon_id "; //or s.id = ?
+    			"INNER JOIN TaxonBase acc on tb.acceptedTaxon_id = acc.id "; //or s.id = ?
     	String SELECT_QUERY="SELECT tb.id as " + ID +
     			", tnb.titleCache as " + name_id +
     			FROM_QUERY;
     	String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
-    	String CONTAINS_QUERY = "SELECT * FROM TaxonBase syn WHERE syn.acceptedTaxon_id = ?"; //or s.id = ?
+    	String CONTAINS_QUERY = "SELECT * FROM TaxonBase syn WHERE syn.id = ?"; //or s.id = ?
 
     	return generateQueryDelegate(SELECT_QUERY, COUNT_QUERY, CONTAINS_QUERY);
     }

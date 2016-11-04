@@ -31,7 +31,6 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 /**
  * @author cmathew
  * @date 10 Mar 2015
- *
  */
 @DataSet
 public class StatusPresenterTest extends CdmVaadinBaseTest {

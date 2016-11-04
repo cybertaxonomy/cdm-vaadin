@@ -73,7 +73,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      */
     public LeafNodeTaxonContainer(int classificationId) throws SQLException {
         super(CdmQueryFactory.generateTaxonBaseQuery(NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
-        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(NAME_ID));
+        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymOfTaxonQuery(NAME_ID));
         this.synonymContainer.sort(new String[]{NAME_ID}, new boolean[]{true});
         this.classificationId = classificationId;
         taxonSynonymMap = new HashMap<>();
@@ -94,7 +94,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         int saoIndex = Rank.SPECIESAGGREGATE().getOrderIndex();
         rankFilter = new Compare.GreaterOrEqual("dtb.orderindex", saoIndex);
 
-        synonymFilter = new Not(new IsNull("syn.acceptedTaxon_id"));
+        synonymFilter = new Not(new IsNull("acc.id"));
 
         currentFilters = new HashSet<>();
     }
@@ -203,7 +203,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     public boolean isSynonym(Object itemId) {
-        Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
+        Property<?> hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
         return hasSynProperty == null;
     }
 
@@ -220,9 +220,9 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     private List<Object> addToSynonymCache(Object taxonItemId) {
-        Filter synonymOfTaxonFilter = new Compare.Equal("syn.acceptedTaxon_id", Integer.valueOf(taxonItemId.toString()));
+        Filter synonymOfTaxonFilter = new Compare.Equal("acc.id", Integer.valueOf(taxonItemId.toString()));
         synonymContainer.addContainerFilter(synonymOfTaxonFilter);
-        List<Object> synList = new ArrayList<Object>();
+        List<Object> synList = new ArrayList<>();
         synList.addAll(synonymContainer.getItemIds());
         for(Object synItemId : synList) {
             addSynItem((RowItem) synonymContainer.getItem(synItemId));
