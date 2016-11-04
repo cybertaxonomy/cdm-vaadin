@@ -85,18 +85,18 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private void initFilters() {
         //nrFilter = new Compare.Equal(StatusPresenter.UNR_ID, true);
-        unpFilter = new Compare.Equal("tb.unplaced", true);
+        unpFilter = new Compare.Equal("tn.unplaced", true);
         //unfFilter = new Compare.Equal(StatusPresenter.FN_ID, false);
         unpbFilter = new Compare.Equal("tb.publish", false);
-        classificationFilter = new Compare.Equal("tn.classification_id",classificationId);
+        classificationFilter = new Compare.Equal("tn.classification_id", classificationId);
 
         // get species aggregate rank order index
         int saoIndex = Rank.SPECIESAGGREGATE().getOrderIndex();
         rankFilter = new Compare.GreaterOrEqual("dtb.orderindex", saoIndex);
 
-        synonymFilter = new Not(new IsNull("sr.relatedto_id"));
+        synonymFilter = new Not(new IsNull("syn.acceptedTaxon_id"));
 
-        currentFilters = new HashSet<Filter>();
+        currentFilters = new HashSet<>();
     }
 
 
@@ -220,7 +220,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     private List<Object> addToSynonymCache(Object taxonItemId) {
-        Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(taxonItemId.toString()));
+        Filter synonymOfTaxonFilter = new Compare.Equal("syn.acceptedTaxon_id", Integer.valueOf(taxonItemId.toString()));
         synonymContainer.addContainerFilter(synonymOfTaxonFilter);
         List<Object> synList = new ArrayList<Object>();
         synList.addAll(synonymContainer.getItemIds());

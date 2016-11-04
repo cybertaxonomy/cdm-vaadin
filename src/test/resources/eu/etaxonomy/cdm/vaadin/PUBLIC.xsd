@@ -58,6 +58,7 @@
 	<xsd:element name="AMPLIFICATIONRESULT_AUD" type="AMPLIFICATIONRESULT_AUD__type" />
 	<xsd:element name="SPECIMENOROBSERVATIONBASE_RIGHTSINFO_AUD" type="SPECIMENOROBSERVATIONBASE_RIGHTSINFO_AUD__type" />
 	<xsd:element name="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE" type="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE__type" />
+	<xsd:element name="TAXONNODE_EXCLUDEDNOTE" type="TAXONNODE_EXCLUDEDNOTE__type" />
 	<xsd:element name="ANNOTATION_MARKER" type="ANNOTATION_MARKER__type" />
 	<xsd:element name="DESCRIPTIONELEMENTBASE_MODIFYINGTEXT_AUD" type="DESCRIPTIONELEMENTBASE_MODIFYINGTEXT_AUD__type" />
 	<xsd:element name="INTEXTREFERENCE" type="INTEXTREFERENCE__type" />
@@ -151,6 +152,7 @@
 	<xsd:element name="MATERIALORMETHODEVENT_ANNOTATION" type="MATERIALORMETHODEVENT_ANNOTATION__type" />
 	<xsd:element name="TAXONBASE_MARKER" type="TAXONBASE_MARKER__type" />
 	<xsd:element name="DEFINEDTERMBASE_MARKER_AUD" type="DEFINEDTERMBASE_MARKER_AUD__type" />
+	<xsd:element name="TAXONNODE_EXCLUDEDNOTE_AUD" type="TAXONNODE_EXCLUDEDNOTE_AUD__type" />
 	<xsd:element name="WORKINGSET_DESCRIPTIONBASE_AUD" type="WORKINGSET_DESCRIPTIONBASE_AUD__type" />
 	<xsd:element name="TAXONNAMEBASE_EXTENSION_AUD" type="TAXONNAMEBASE_EXTENSION_AUD__type" />
 	<xsd:element name="DETERMINATIONEVENT_MARKER_AUD" type="DETERMINATIONEVENT_MARKER_AUD__type" />
@@ -189,8 +191,8 @@
 	<xsd:element name="TERMVOCABULARY_REPRESENTATION_AUD" type="TERMVOCABULARY_REPRESENTATION_AUD__type" />
 	<xsd:element name="ORIGINALSOURCEBASE_ANNOTATION_AUD" type="ORIGINALSOURCEBASE_ANNOTATION_AUD__type" />
 	<xsd:element name="FEATURETREE_REPRESENTATION" type="FEATURETREE_REPRESENTATION__type" />
-	<xsd:element name="POLYTOMOUSKEY_CREDIT_AUD" type="POLYTOMOUSKEY_CREDIT_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_EXTENSION_AUD" type="DEFINEDTERMBASE_EXTENSION_AUD__type" />
+	<xsd:element name="POLYTOMOUSKEY_CREDIT_AUD" type="POLYTOMOUSKEY_CREDIT_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_SUPPORTEDCATEGORICALENUMERATION_AUD" type="DEFINEDTERMBASE_SUPPORTEDCATEGORICALENUMERATION_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_STATISTICALMEASURE" type="DEFINEDTERMBASE_STATISTICALMEASURE__type" />
 	<xsd:element name="DEFINEDTERMBASE_EXTENSION" type="DEFINEDTERMBASE_EXTENSION__type" />
@@ -1001,6 +1003,11 @@
 		<xsd:attribute name="SOURCES_ID" use="optional" />
 		<xsd:attribute name="DESCRIPTIONELEMENTBASE_ID" use="optional" />
 	</xsd:complexType>
+	<xsd:complexType name="TAXONNODE_EXCLUDEDNOTE__type">
+		<xsd:attribute name="EXCLUDEDNOTE_ID" use="optional" />
+		<xsd:attribute name="TAXONNODE_ID" use="optional" />
+		<xsd:attribute name="EXCLUDEDNOTE_MAPKEY_ID" use="optional" />
+	</xsd:complexType>
 	<xsd:complexType name="ANNOTATION_MARKER__type">
 		<xsd:attribute name="MARKERS_ID" use="optional" />
 		<xsd:attribute name="ANNOTATION_ID" use="optional" />
@@ -1239,14 +1246,16 @@
 		<xsd:attribute name="CREATED" use="optional" />
 		<xsd:attribute name="TREEINDEX" use="optional" />
 		<xsd:attribute name="COUNTCHILDREN" use="optional" />
+		<xsd:attribute name="UNPLACED" use="optional" />
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
 		<xsd:attribute name="MICROREFERENCEFORPARENTCHILDRELATION" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
 		<xsd:attribute name="SYNONYMTOBEUSED_ID" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
+		<xsd:attribute name="EXCLUDED" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />
-		<xsd:attribute name="SORTINDEX" use="optional" />
 		<xsd:attribute name="PARENT_ID" use="optional" />
+		<xsd:attribute name="SORTINDEX" use="optional" />
 		<xsd:attribute name="REFERENCEFORPARENTCHILDRELATION_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="FEATURETREE_ORIGINALSOURCEBASE_AUD__type">
@@ -1711,6 +1720,7 @@
 		<xsd:attribute name="DERIVEDFROM_ID" use="optional" />
 		<xsd:attribute name="GATHERINGEVENT_ID" use="optional" />
 		<xsd:attribute name="LSID_LSID" use="optional" />
+		<xsd:attribute name="PROTECTEDIDENTITYCACHE" use="optional" />
 		<xsd:attribute name="BARCODE" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
 		<xsd:attribute name="DTYPE" use="optional" />
@@ -1730,6 +1740,7 @@
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
 		<xsd:attribute name="SEX_ID" use="optional" />
 		<xsd:attribute name="TITLECACHE" use="optional" />
+		<xsd:attribute name="IDENTITYCACHE" use="optional" />
 		<xsd:attribute name="LIFESTAGE_ID" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />
@@ -1783,6 +1794,13 @@
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="DEFINEDTERMBASE_ID" use="optional" />
 		<xsd:attribute name="MARKERS_ID" use="optional" />
+		<xsd:attribute name="REVTYPE" use="optional" />
+	</xsd:complexType>
+	<xsd:complexType name="TAXONNODE_EXCLUDEDNOTE_AUD__type">
+		<xsd:attribute name="EXCLUDEDNOTE_ID" use="optional" />
+		<xsd:attribute name="REV" use="optional" />
+		<xsd:attribute name="TAXONNODE_ID" use="optional" />
+		<xsd:attribute name="EXCLUDEDNOTE_MAPKEY_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="WORKINGSET_DESCRIPTIONBASE_AUD__type">
@@ -2036,11 +2054,13 @@
 		<xsd:attribute name="REVTYPE" use="optional" />
 		<xsd:attribute name="TREEINDEX" use="optional" />
 		<xsd:attribute name="COUNTCHILDREN" use="optional" />
+		<xsd:attribute name="UNPLACED" use="optional" />
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
 		<xsd:attribute name="MICROREFERENCEFORPARENTCHILDRELATION" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
 		<xsd:attribute name="SYNONYMTOBEUSED_ID" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
+		<xsd:attribute name="EXCLUDED" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />
 		<xsd:attribute name="PARENT_ID" use="optional" />
 		<xsd:attribute name="SORTINDEX" use="optional" />
@@ -2069,18 +2089,18 @@
 		<xsd:attribute name="FEATURETREE_ID" use="optional" />
 		<xsd:attribute name="REPRESENTATIONS_ID" use="optional" />
 	</xsd:complexType>
+	<xsd:complexType name="DEFINEDTERMBASE_EXTENSION_AUD__type">
+		<xsd:attribute name="REV" use="optional" />
+		<xsd:attribute name="DEFINEDTERMBASE_ID" use="optional" />
+		<xsd:attribute name="EXTENSIONS_ID" use="optional" />
+		<xsd:attribute name="REVTYPE" use="optional" />
+	</xsd:complexType>
 	<xsd:complexType name="POLYTOMOUSKEY_CREDIT_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="CREDITS_ID" use="optional" />
 		<xsd:attribute name="POLYTOMOUSKEY_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 		<xsd:attribute name="SORTINDEX" use="optional" />
-	</xsd:complexType>
-	<xsd:complexType name="DEFINEDTERMBASE_EXTENSION_AUD__type">
-		<xsd:attribute name="REV" use="optional" />
-		<xsd:attribute name="DEFINEDTERMBASE_ID" use="optional" />
-		<xsd:attribute name="EXTENSIONS_ID" use="optional" />
-		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="DEFINEDTERMBASE_SUPPORTEDCATEGORICALENUMERATION_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
@@ -2461,6 +2481,7 @@
 		<xsd:attribute name="DERIVEDFROM_ID" use="optional" />
 		<xsd:attribute name="GATHERINGEVENT_ID" use="optional" />
 		<xsd:attribute name="LSID_LSID" use="optional" />
+		<xsd:attribute name="PROTECTEDIDENTITYCACHE" use="optional" />
 		<xsd:attribute name="BARCODE" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
 		<xsd:attribute name="DTYPE" use="optional" />
@@ -2479,6 +2500,7 @@
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
 		<xsd:attribute name="SEX_ID" use="optional" />
 		<xsd:attribute name="TITLECACHE" use="optional" />
+		<xsd:attribute name="IDENTITYCACHE" use="optional" />
 		<xsd:attribute name="LIFESTAGE_ID" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />

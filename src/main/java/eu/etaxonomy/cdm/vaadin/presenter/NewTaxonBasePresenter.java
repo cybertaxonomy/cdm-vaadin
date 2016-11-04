@@ -111,21 +111,18 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
         //name.setTitleCache(scientificName, true);
         Taxon newTaxon = Taxon.NewInstance(name, sec);
-        newTaxon.setUnplaced(true);
         List<String> CLASSIFICATION_INIT_STRATEGY = Arrays.asList(new String []{
                 "rootNode.childNodes"
         });
         Classification classification = CdmBase.deproxy(classificationService.load(classificationUuid, CLASSIFICATION_INIT_STRATEGY), Classification.class);
         TaxonNode newTaxonNode = classification.addChildTaxon(newTaxon, null, null);
-        UUID newUuid = taxonNodeService.saveOrUpdate(newTaxonNode);
+        taxonNodeService.saveOrUpdate(newTaxonNode);
+        newTaxonNode.setUnplaced(true);
 
         app.commitTransaction(tx);
         return new IdUuidName(newTaxonNode.getTaxon().getId(), newTaxonNode.getTaxon().getUuid(), newTaxonNode.getTaxon().getTitleCache());
     }
 
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newSynonym(java.lang.String, java.lang.Object, java.util.UUID)
-     */
     @Override
     public IdUuidName newSynonym(String scientificName, Object synSecRefItemId, Object accTaxonSecRefItemId, UUID accTaxonUuid) {
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
