@@ -48,8 +48,6 @@ import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener;
  */
 public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
-
-
     private final CdmSQLContainer accTaxonSecRefContainer;
     private final CdmSQLContainer synSecRefContainer;
 
@@ -98,9 +96,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         }
         return false;
     }
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener#newTaxon(java.lang.String, java.lang.Object, java.util.UUID)
-     */
+
     @Override
     public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();

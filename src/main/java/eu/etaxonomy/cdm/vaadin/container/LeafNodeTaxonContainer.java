@@ -60,7 +60,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private int classificationId = -1;
 
-    private final Map<RowId, RowItem> synItems = new HashMap<RowId, RowItem>();
+    private final Map<RowId, RowItem> synItems = new HashMap<>();
 
     private final Map<Object,List<Object>> taxonSynonymMap;
 
@@ -76,7 +76,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(NAME_ID));
         this.synonymContainer.sort(new String[]{NAME_ID}, new boolean[]{true});
         this.classificationId = classificationId;
-        taxonSynonymMap = new HashMap<Object,List<Object>>();
+        taxonSynonymMap = new HashMap<>();
         initFilters();
         addContainerFilter(classificationFilter);
         enableCacheFlushNotifications();
@@ -153,10 +153,6 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         return size();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#getChildren(java.lang.Object)
-     */
     @Override
     public Collection<?> getChildren(Object itemId) {
         List<Object> synList = taxonSynonymMap.get(itemId);
@@ -167,61 +163,40 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         return addToSynonymCache(itemId);
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#getParent(java.lang.Object)
-     */
     @Override
     public Object getParent(Object itemId) {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#rootItemIds()
-     */
     @Override
     public Collection<?> rootItemIds() {
         return getItemIds();
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#setParent(java.lang.Object, java.lang.Object)
-     */
     @Override
     public boolean setParent(Object itemId, Object newParentId) throws UnsupportedOperationException {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#areChildrenAllowed(java.lang.Object)
-     */
     @Override
     public boolean areChildrenAllowed(Object itemId) {
-        Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
+        Property<?> hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
         if(hasSynProperty == null) {
             return false;
         }
        return (Long)hasSynProperty.getValue() > 0;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#setChildrenAllowed(java.lang.Object, boolean)
-     */
     @Override
     public boolean setChildrenAllowed(Object itemId, boolean areChildrenAllowed) throws UnsupportedOperationException {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#isRoot(java.lang.Object)
-     */
     @Override
     public boolean isRoot(Object itemId) {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#hasChildren(java.lang.Object)
-     */
     @Override
     public boolean hasChildren(Object itemId) {
         return true;
