@@ -14,6 +14,9 @@
     <cdmlib.version>4.4.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring.version>4.2.4.RELEASE</spring.version>
+    <!-- 
+        lucene.version must match the version as defined in cdmlib
+    -->
     <lucene.version>5.4.1</lucene.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -426,46 +429,9 @@
       <version>${cdmlib.version}</version>
       <scope>compile</scope>
     </dependency>    
-    <!-- 
-        further cdmlib-* dependencies
-        which are only needed for running the vaadin application
-        in the IDE.
-        scope test is not transitive, so we have to add any 
-        of the cdmlib artifacts 
-     -->
     <dependency>
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-test</artifactId>
-      <version>${cdmlib.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-commons</artifactId>
-      <version>${cdmlib.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-model</artifactId>
-      <version>${cdmlib.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-persistence</artifactId>
-      <version>${cdmlib.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-remote</artifactId>
-      <version>${cdmlib.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-io</artifactId>
       <version>${cdmlib.version}</version>
       <scope>test</scope>
     </dependency>
@@ -552,12 +518,6 @@
       <version>4.5</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.11</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.2</version>
@@ -574,50 +534,13 @@
       <artifactId>json</artifactId>
       <version>20151123</version>
     </dependency>
-    <!-- lucene -->
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-core</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-suggest</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-analyzers-common</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-queryparser</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-highlighter</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-grouping</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-join</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
+    <!-- 
+        Need to manage the versions of these lucene artifacts
+        as hibernate-search otherwise brings incompatible versions
+    -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-backward-codecs</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-misc</artifactId>
       <version>${lucene.version}</version>
     </dependency>
     <dependency>
