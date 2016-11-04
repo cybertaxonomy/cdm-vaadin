@@ -38,7 +38,7 @@
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.compile.exclude" value="false"/>
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.import.exclude" value="true"/>
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.none.exclude" value="true"/>
-<booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.provided.exclude" value="false"/>
+<booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.provided.exclude" value="true"/>
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.runtime.exclude" value="false"/>
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.system.exclude" value="true"/>
 <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.scope.test.exclude" value="false"/>
