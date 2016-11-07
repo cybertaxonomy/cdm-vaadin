@@ -13,7 +13,6 @@
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <cdmlib.version>4.4.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
-    <spring.version>4.2.4.RELEASE</spring.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
     -->
@@ -71,18 +70,25 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
-  
+
   <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-bom</artifactId>
-                <version>${vaadin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-bom</artifactId>
+        <version>${vaadin.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>eu.etaxonomy</groupId>
+        <artifactId>cdmlib-parent</artifactId>
+        <version>${cdmlib.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   
   <distributionManagement>
     <repository>
@@ -93,6 +99,7 @@
       <layout>default</layout>
     </repository>
   </distributionManagement>
+  
   <profiles>
     <profile>
       <activation>
@@ -125,6 +132,7 @@
       </build>
     </profile>
   </profiles>
+  
   <build>
     <resources>
       <resource>
@@ -373,16 +381,16 @@
       </plugins>
     </pluginManagement>
   </build>
+  
   <dependencies>
+   <!-- ============ Vaadin ============ -->
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-      <version>${vaadin.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client-compiled</artifactId>
-      <version>${vaadin.version}</version>
     </dependency>
     <!-- Needed when using the widgetset optimizer (custom ConnectorBundleLoaderFactory). 
       For widgetset compilation, vaadin-client-compiler is automatically added 
@@ -393,7 +401,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
-      <version>${vaadin.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- disabling push for the moment because it does not work with run-jetty-run 
@@ -409,13 +416,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
-      <version>${vaadin.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
@@ -423,16 +423,21 @@
       <version>RELEASE</version>
       <scope>test</scope>
     </dependency>
+    <!-- vaadin addons / extensions -->
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>contextmenu</artifactId>
+      <version>4.5</version>
+    </dependency>
+    <!-- ============ cdmlib ============ -->
     <dependency>
       <groupId>eu.etaxonomy</groupId>
-      <artifactId>cdmlib-services</artifactId>
-      <version>${cdmlib.version}</version>
+      <artifactId>cdmlib-remote</artifactId>
       <scope>compile</scope>
     </dependency>    
     <dependency>
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-test</artifactId>
-      <version>${cdmlib.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -441,21 +446,14 @@
       <version>${cdmlib.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <!-- adding itextpdf is required to fix dependency problems: itextpdf 
-        is an managed transitive dependency of cdmlib-io without adding it here mvn 
-        fails. Ev. this should be fixed by changing its scope in cdmlib-io to the 
-        default scope -->
-      <groupId>com.itextpdf</groupId>
-      <artifactId>itextpdf</artifactId>
-      <version>5.5.8</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- to override version number coming with vaadin client -->
+    <!-- ============ Other ============ -->
+    <!-- 
+        to override version number coming with vaadin client 
+        version is managed in cdmlib-parent
+    -->
     <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
-      <version>1.1.0.Final</version>
     </dependency>
     <dependency>
       <groupId>org.springmodules</groupId>
@@ -474,79 +472,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <version>1.4.7</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <!-- 
-            provides the spring-tx-4.0.xsd which is otherwise missing and 
-            breaking the dev environment when offline 
-        -->
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring.version}</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-mock</artifactId>
       <version>2.0.8</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>${spring.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${spring.version}</version>
-    </dependency>
-    <!-- vaadin addons / extensions -->
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>contextmenu</artifactId>
-      <version>4.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
+      <!-- Try updating in cdmlib to 20090211 -->
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20151123</version>
     </dependency>
-    <!-- 
-        Need to manage the versions of these lucene artifacts
-        as hibernate-search otherwise brings incompatible versions
-    -->
     <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-backward-codecs</artifactId>
-      <version>${lucene.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-facet</artifactId>
-      <version>${lucene.version}</version>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
