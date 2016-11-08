@@ -115,7 +115,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
         table.setColumnReorderingAllowed(true);
         table.setSortEnabled(false);
-        
+
         table.setColumnCollapsingAllowed(true);
         table.setSelectable(true);
         table.setPageLength(20);
@@ -137,7 +137,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     final Window popup = new Window("Choose distribution status");
                     final ListSelect termSelect = new ListSelect();
                     termSelect.setSizeFull();
-                    termSelect.setNullSelectionAllowed(false);
+                    termSelect.setNullSelectionAllowed(true);
                     termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
                     Button btnOk = new Button("OK", new ClickListener() {
                         private static final long serialVersionUID = -3732219609337335697L;
@@ -189,7 +189,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
 
 		List<String> columnList = new ArrayList<String>(columnHeaders);
-		
+
 		String[] string = new String[columnList.size()];
 
 		table.setVisibleColumns(columnList.toArray());
@@ -246,7 +246,7 @@ public class DistributionTableView extends CustomComponent implements View{
 			}
 		});
 	}
-	
+
 	public void openSettings() {
 		SettingsConfigWindow cw = new SettingsConfigWindow(this);
 		Window window  = cw.createWindow();
@@ -260,5 +260,5 @@ public class DistributionTableView extends CustomComponent implements View{
         Window window  = distributionSettingConfigWindow.createWindow();
         getUI().addWindow(window);
 	}
-	
+
 }
