@@ -97,6 +97,10 @@ public class SettingsPresenter {
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
         vocabularyService = CdmSpringContextHelper.getVocabularyService();
         List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
+        //FIXME: is this necessary??
+        for (TermVocabulary<DefinedTermBase> termVocabulary : termList) {
+			termVocabulary.setTitleCache(null);
+		}
         return termList;
     }
     
