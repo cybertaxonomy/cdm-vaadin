@@ -143,7 +143,10 @@ public class DistributionTableView extends CustomComponent implements View{
                     final ListSelect termSelect = new ListSelect();
                     termSelect.setSizeFull();
                     termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
-                    termSelect.setNullSelectionAllowed(true);
+                    termSelect.setNullSelectionAllowed(presenceAbsenceTerm!=null);
+                    if(presenceAbsenceTerm!=null){
+                    	termSelect.setNullSelectionItemId("[no status]");
+                    }
                     termSelect.setValue(presenceAbsenceTerm);
                     termSelect.addValueChangeListener(new ValueChangeListener() {
 						
