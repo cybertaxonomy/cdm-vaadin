@@ -31,7 +31,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree.ExpandEvent;
@@ -66,7 +65,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
-    
+
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -100,7 +99,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
             classificationBox.setValue(new RowId(parent.getId()));
             showClassificationTaxa(getUuidAndTitleCacheFromRowId(parent));
         }
-        
+
         classificationBox.addValueChangeListener(this);
         taxonFilter.addValueChangeListener(this);
         taxonTree.addExpandListener(this);
@@ -291,6 +290,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         // Enable polling and set frequency to 0.5 seconds
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
+        taxonTree.removeAllItems();
         Notification.show("Loading taxa...");
 
         new TreeUpdater(children).start();
@@ -298,18 +298,18 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
-        int id = (int) classificationBox.getContainerProperty(classificationSelection, "id").getValue();
+        int id = (int) classificationBox.getContainerProperty(classificationSelection, "rootNode_id").getValue();
         String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
         return parent;
     }
-    
+
     private class TreeUpdater extends Thread{
-    	
+
     	private Collection<UuidAndTitleCache<TaxonNode>> children;
 
-    	
+
 		public TreeUpdater(Collection<UuidAndTitleCache<TaxonNode>> children) {
 			this.children = children;
 		}
