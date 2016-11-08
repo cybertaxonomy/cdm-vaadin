@@ -298,7 +298,17 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
-        int id = (int) classificationBox.getContainerProperty(classificationSelection, "rootNode_id").getValue();
+        Property rootNodeContainerProperty = null;
+        
+        Collection<?> ids = classificationBox.getContainerPropertyIds();
+        //use for loop here because the case of the root node id columns differs between some DBs
+        for (Object id : ids) {
+			if(id instanceof String && ((String) id).toLowerCase().equals("rootnode_id")){
+				rootNodeContainerProperty = classificationBox.getContainerProperty(classificationSelection, id);
+				break;
+			}
+		}
+		int id = (int) rootNodeContainerProperty.getValue();
         String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
