@@ -31,6 +31,7 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.TaxonDescription;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -212,8 +213,11 @@ public class DistributionTablePresenter {
 		VaadinSession session = VaadinSession.getCurrent();
 		List<UUID> taxonNodeUUIDs = (List<UUID>) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
 		UUID classificationUuid = (UUID)session.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
-		if(taxonNodeUUIDs==null && classificationUuid!=null){
-			taxonNodeUUIDs = Collections.singletonList(classificationUuid);
+		if((taxonNodeUUIDs==null || taxonNodeUUIDs.isEmpty()) && classificationUuid!=null){
+			Classification classification = classificationService.load(classificationUuid);
+			if(classification!=null){
+				taxonNodeUUIDs = Collections.singletonList(classification.getRootNode().getUuid());
+			}
 		}
 		List<TaxonNode> loadedNodes = taxonNodeService.load(taxonNodeUUIDs, null);
 		if(loadedNodes!=null){
