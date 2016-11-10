@@ -21,7 +21,11 @@ public class CheckUI extends UI
 //			@WebInitParam(name="org.atmosphere.cpr.asyncSupport", value="org.atmosphere.container.Jetty9AsyncSupportWithWebSocket")
 //	})
 
-    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
+    /*
+     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
+     * The is therefore set globally in the web.xml
+     */
+    @WebServlet(value = {"/app/*"}, asyncSupported = true)
     @VaadinServletConfiguration(productionMode = true, ui = CheckUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }

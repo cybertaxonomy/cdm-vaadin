@@ -22,15 +22,12 @@
     <!-- <set-property name="user.agent" value="safari"/> -->
 
     <!--
-     To enable SuperDevMode, uncomment this line.
-
-     See https://vaadin.com/wiki/-/wiki/Main/Using%20SuperDevMode for more
-     information and instructions.
-    -->
-    <!-- <set-configuration-property name="devModeRedirectEnabled" value="true" /> -->
-
-
+     SuperDev mode is enabled default starting with GWT 2.6.0
     
+     For more information and instructions see:
+     https://vaadin.com/wiki/-/wiki/Main/Using%20SuperDevMode 
+    -->
+    <set-configuration-property name="devModeRedirectEnabled" value="false" />
 
     <inherits name="org.vaadin.peter.contextmenu.ContextmenuWidgetset" />
 </module>

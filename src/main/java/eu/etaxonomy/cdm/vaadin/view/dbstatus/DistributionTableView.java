@@ -8,12 +8,13 @@ import java.util.UUID;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.AbsoluteLayout;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -115,7 +116,7 @@ public class DistributionTableView extends CustomComponent implements View{
 
         table.setColumnReorderingAllowed(true);
         table.setSortEnabled(false);
-        
+
         table.setColumnCollapsingAllowed(true);
         table.setSelectable(true);
         table.setPageLength(20);
@@ -132,25 +133,35 @@ public class DistributionTableView extends CustomComponent implements View{
                     UUID uuid = UUID.fromString(itemProperty.getValue().toString());
                     final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
                     final String areaID = (String) event.getPropertyId();
-
+                    PresenceAbsenceTerm presenceAbsenceTerm = null;
+                    Object statusValue = item.getItemProperty(areaID).getValue();
+                    if(statusValue instanceof String){
+                    	presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) statusValue);
+                    }
                     //popup window
                     final Window popup = new Window("Choose distribution status");
                     final ListSelect termSelect = new ListSelect();
                     termSelect.setSizeFull();
-                    termSelect.setNullSelectionAllowed(false);
                     termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
-                    Button btnOk = new Button("OK", new ClickListener() {
-                        private static final long serialVersionUID = -3732219609337335697L;
-                        @Override
-                        public void buttonClick(ClickEvent event) {
-                            Object distributionStatus = termSelect.getValue();
-                            listener.updateDistributionField(areaID, distributionStatus, taxon);
-                            container.refresh();
-                            popup.close();
-                        }
-                    });
-                    VerticalLayout layout = new VerticalLayout(termSelect, btnOk);
-                    layout.setComponentAlignment(btnOk, Alignment.BOTTOM_RIGHT);
+                    termSelect.setNullSelectionAllowed(presenceAbsenceTerm!=null);
+                    if(presenceAbsenceTerm!=null){
+                    	termSelect.setNullSelectionItemId("[no status]");
+                    }
+                    termSelect.setValue(presenceAbsenceTerm);
+                    termSelect.addValueChangeListener(new ValueChangeListener() {
+						
+						private static final long serialVersionUID = 1883728509174752769L;
+
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							System.out.println(event);
+							Object distributionStatus = event.getProperty().getValue();
+							listener.updateDistributionField(areaID, distributionStatus, taxon);
+							container.refresh();
+							popup.close();
+						}
+					});
+                    VerticalLayout layout = new VerticalLayout(termSelect);
                     popup.setContent(layout);
                     popup.setModal(true);
                     popup.center();
@@ -189,7 +200,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
 
 		List<String> columnList = new ArrayList<String>(columnHeaders);
-		
+
 		String[] string = new String[columnList.size()];
 
 		table.setVisibleColumns(columnList.toArray());
@@ -246,7 +257,7 @@ public class DistributionTableView extends CustomComponent implements View{
 			}
 		});
 	}
-	
+
 	public void openSettings() {
 		SettingsConfigWindow cw = new SettingsConfigWindow(this);
 		Window window  = cw.createWindow();
@@ -260,5 +271,5 @@ public class DistributionTableView extends CustomComponent implements View{
         Window window  = distributionSettingConfigWindow.createWindow();
         getUI().addWindow(window);
 	}
-	
+
 }

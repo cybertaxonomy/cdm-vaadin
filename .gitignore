@@ -8,3 +8,4 @@ src/main/webapp/VAADIN/themes/*/addons.scss
 /target
 /spy.log
 src/main/resources/test.txt
+cdmTest.lock.db
