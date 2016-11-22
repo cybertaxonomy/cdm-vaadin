@@ -204,7 +204,6 @@
         <version>${vaadin.plugin.version}</version>
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <!-- <runTarget>mobilemail</runTarget> -->
           <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. 
             This way compatible with Vaadin eclipse plugin. -->
           <webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
