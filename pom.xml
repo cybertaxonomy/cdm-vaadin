@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
@@ -11,7 +10,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.6.3</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.4.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>4.5.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
@@ -20,7 +19,6 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
-  
   <prerequisites>
     <maven>3.0.5</maven>
   </prerequisites>
@@ -58,7 +56,6 @@
       </snapshots>
     </repository>
   </repositories>
-  
   <pluginRepositories>
     <pluginRepository>
       <id>vaadin-snapshots</id>
@@ -71,7 +68,6 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -90,7 +86,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
@@ -100,7 +95,6 @@
       <layout>default</layout>
     </repository>
   </distributionManagement>
-  
   <profiles>
     <profile>
       <activation>
@@ -142,7 +136,6 @@
       </properties>
     </profile>
   </profiles>
-  
   <build>
     <resources>
       <resource>
@@ -204,7 +197,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.9.1</version>
         <configuration>
-            <additionalparam>${javadoc.opts}</additionalparam>
+          <additionalparam>${javadoc.opts}</additionalparam>
         </configuration>
       </plugin>
       <plugin>
@@ -294,17 +287,17 @@
               <value>${project.build.directory}/test-classes/datasources.xml</value>
             </systemProperty>
             <systemProperty>
-                <name>log4j.configuration</name>
-                <value>file:///home/andreas/.cdmLibrary/log4j.properties</value>
-            </systemProperty>            
+              <name>log4j.configuration</name>
+              <value>file:///home/andreas/.cdmLibrary/log4j.properties</value>
+            </systemProperty>
           </systemProperties>
         </configuration>
         <dependencies>
           <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>1.6.4</version>
-            </dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.6.4</version>
+          </dependency>
         </dependencies>
       </plugin>
       <plugin>
@@ -398,9 +391,8 @@
       </plugins>
     </pluginManagement>
   </build>
-  
   <dependencies>
-   <!-- ============ Vaadin ============ -->
+    <!-- ============ Vaadin ============ -->
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
@@ -451,7 +443,7 @@
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-remote</artifactId>
       <scope>compile</scope>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>eu.etaxonomy</groupId>
       <artifactId>cdmlib-test</artifactId>
