@@ -20,6 +20,7 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
+  
   <prerequisites>
     <maven>3.0.5</maven>
   </prerequisites>
@@ -131,6 +132,15 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>java8-doclint-disabled</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <properties>
+        <javadoc.opts>-Xdoclint:none</javadoc.opts>
+      </properties>
+    </profile>
   </profiles>
   
   <build>
@@ -187,6 +197,14 @@
               <directory>src/main/webapp/VAADIN/widgetsets</directory>
             </fileset>
           </filesets>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <configuration>
+            <additionalparam>${javadoc.opts}</additionalparam>
         </configuration>
       </plugin>
       <plugin>
