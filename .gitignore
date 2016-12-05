@@ -3,6 +3,9 @@
 /.settings
 /bin
 src/main/webapp/VAADIN/widgetsets
+src/main/webapp/VAADIN/themes/*/styles.css
+src/main/webapp/VAADIN/themes/*/addons.scss
 /target
 /spy.log
 src/main/resources/test.txt
+cdmTest.lock.db

@@ -55,9 +55,6 @@ public class StatusPresenter implements StatusComponentListener {
         removeNameFilter();
     }
 
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.IStatusComponent.StatusComponentListener#load()
-     */
     @Override
     public LeafNodeTaxonContainer loadTaxa(int classificationId) throws SQLException {
         leafNodeTaxonContainer = new LeafNodeTaxonContainer(classificationId);
@@ -150,9 +147,6 @@ public class StatusPresenter implements StatusComponentListener {
         leafNodeTaxonContainer.refreshSynonymCache();
     }
 
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.IStatusComponent.StatusComponentListener#loadClassifications()
-     */
     @Override
     public CdmSQLContainer loadClassifications() throws SQLException {
         classificationContainer = CdmSQLContainer.newInstance("Classification");
@@ -171,10 +165,6 @@ public class StatusPresenter implements StatusComponentListener {
         }
     }
 
-
-    /* (non-Javadoc)
-     * @see eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener#getCurrentLeafNodeTaxonContainer()
-     */
     @Override
     public LeafNodeTaxonContainer getCurrentLeafNodeTaxonContainer() {
         return leafNodeTaxonContainer;

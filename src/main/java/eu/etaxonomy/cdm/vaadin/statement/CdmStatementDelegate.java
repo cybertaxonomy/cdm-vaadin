@@ -29,7 +29,8 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
  */
 public class CdmStatementDelegate implements FreeformStatementDelegate {
 
-    private List<Filter> filters;
+	private static final long serialVersionUID = 8417860805854924886L;
+	private List<Filter> filters;
     private List<OrderBy> orderBys;
 
     private final String select_query;
@@ -42,68 +43,43 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         this.contains_query = contains_query;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#getQueryString(int, int)
-     */
     @Override
     public String getQueryString(int offset, int limit) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Use getQueryStatement method.");
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#getCountQuery()
-     */
     @Override
     public String getCountQuery() throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Use getCountStatement method.");
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#setFilters(java.util.List)
-     */
     @Override
     public void setFilters(List<Filter> filters) throws UnsupportedOperationException {
         this.filters = filters;
     }
 
-
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#setOrderBy(java.util.List)
-     */
     @Override
     public void setOrderBy(List<OrderBy> orderBys) throws UnsupportedOperationException {
         this.orderBys = orderBys;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#storeRow(java.sql.Connection, com.vaadin.data.util.sqlcontainer.RowItem)
-     */
     @Override
     public int storeRow(Connection conn, RowItem row) throws UnsupportedOperationException, SQLException {
         // TODO Auto-generated method stub
         return 0;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#removeRow(java.sql.Connection, com.vaadin.data.util.sqlcontainer.RowItem)
-     */
     @Override
     public boolean removeRow(Connection conn, RowItem row) throws UnsupportedOperationException, SQLException {
         // TODO Auto-generated method stub
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformQueryDelegate#getContainsRowQueryString(java.lang.Object[])
-     */
     @Override
     public String getContainsRowQueryString(Object... keys) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Use getContainsRowQueryStatement method.");
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformStatementDelegate#getQueryStatement(int, int)
-     */
     @Override
     public StatementHelper getQueryStatement(int offset, int limit) throws UnsupportedOperationException {
         StatementHelper sh = new StatementHelper();
@@ -141,9 +117,6 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         return orderBuffer.toString();
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformStatementDelegate#getCountStatement()
-     */
     @Override
     public StatementHelper getCountStatement() throws UnsupportedOperationException {
         StatementHelper sh = new StatementHelper();
@@ -156,9 +129,6 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         return sh;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.sqlcontainer.query.FreeformStatementDelegate#getContainsRowQueryStatement(java.lang.Object[])
-     */
     @Override
     public StatementHelper getContainsRowQueryStatement(Object... keys) throws UnsupportedOperationException {
         StatementHelper sh = new StatementHelper();
@@ -167,48 +137,5 @@ public class CdmStatementDelegate implements FreeformStatementDelegate {
         sh.setQueryString(query.toString());
         return sh;
     }
-
-//    public static String getWhereStringForFilters(List<Filter> filters,
-//            StatementHelper sh) {
-//        if (filters == null || filters.isEmpty()) {
-//            return "";
-//        }
-//        StringBuilder where = new StringBuilder(" WHERE ");
-//        where.append(getJoinedFilterString(filters, "AND", sh));
-//        return where.toString();
-//    }
-//
-//    public static String getJoinedFilterString(Collection<Filter> filters,
-//            String joinString, StatementHelper sh) {
-//        StringBuilder result = new StringBuilder();
-//        for (Filter f : filters) {
-//            result.append(getWhereStringForFilter(f, sh));
-//            result.append(" ").append(joinString).append(" ");
-//        }
-//        // Remove the last instance of joinString
-//        result.delete(result.length() - joinString.length() - 2,
-//                result.length());
-//        return result.toString();
-//    }
-//
-//    public static String getWhereStringForFilter(Filter filter, StatementHelper sh) {
-//        Compare compare = (Compare) filter;
-//        sh.addParameterValue(compare.getValue());
-//        String prop = compare.getPropertyId().toString();
-//        switch (compare.getOperation()) {
-//        case EQUAL:
-//            return prop + " = ?";
-//        case GREATER:
-//            return prop + " > ?";
-//        case GREATER_OR_EQUAL:
-//            return prop + " >= ?";
-//        case LESS:
-//            return prop + " < ?";
-//        case LESS_OR_EQUAL:
-//            return prop + " <= ?";
-//        default:
-//            return "";
-//        }
-//    }
 
 }

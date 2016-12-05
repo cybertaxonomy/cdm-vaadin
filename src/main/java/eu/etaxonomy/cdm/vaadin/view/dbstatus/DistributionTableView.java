@@ -3,79 +3,55 @@ package eu.etaxonomy.cdm.vaadin.view.dbstatus;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
+import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
-public class DistributionTableView extends CustomComponent implements IDistributionTableComponent, View{
-
-    private final class AreaColumnGenerator implements ColumnGenerator {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Object generateCell(Table source, Object itemId, Object columnId) {
-		    Property<?> containerProperty = source.getContainerProperty(itemId, columnId);
-		    Object value = null;
-		    if(containerProperty != null){
-		        value = containerProperty.getValue();
-		    }
-		    final UUID uuid = UUID.fromString(table.getItem(itemId).getItemProperty("uuid").getValue().toString());
-		    final ComboBox box = new ComboBox("Occurrence Status: ", PresenceAbsenceTermContainer.getInstance());
-		    final String area = columnId.toString();
-		    box.setImmediate(true);
-		    box.setBuffered(true);
-		    box.setValue(PresenceAbsenceTermContainer.titleToTermMap.get(value));
-		    box.addValueChangeListener(new ValueChangeListener() {
-				private static final long serialVersionUID = 6221534597911674067L;
-
-				@Override
-		        public void valueChange(ValueChangeEvent event) {
-		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
-		            listener.updateDistributionField(area, box.getValue(), taxon);
-		        }
-		    });
-		    return box;
-		}
-	}
+public class DistributionTableView extends CustomComponent implements View{
 
 	private static final long serialVersionUID = 1L;
     private HorizontalToolbar toolbar;
 	private Table table;
 
-	private DistributionTableComponentListener listener;
+	private DistributionTablePresenter listener;
 
-	private List<String> columnList;
-	private ArrayList<String> headerList;
+    private CdmSQLContainer container;
+	private DistributionSettingsConfigWindow distributionSettingConfigWindow;
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -96,68 +72,142 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 		mainLayout.setImmediate(false);
 		mainLayout.setWidth("100%");
 		mainLayout.setHeight("100%");
-		
+
 		setWidth("100.0%");
 		setHeight("100.0%");
 
 		//Horizontal Toolbar
 		toolbar = new HorizontalToolbar();
 		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;");
-		
-		// table
-		table = new Table();
+
+		// table + formatting
+		table = new Table(){
+			private static final long serialVersionUID = -5148756917468804385L;
+
+			@Override
+			protected String formatPropertyValue(Object rowId, Object colId, Property<?> property) {
+				String formattedValue = null;
+				PresenceAbsenceTerm presenceAbsenceTerm = null;
+				Object value = property.getValue();
+				if(value instanceof String){
+					presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) value);
+				}
+				if(presenceAbsenceTerm!=null){
+					Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
+					if(representation!=null){
+						if(DistributionEditorUtil.isAbbreviatedLabels()){
+							formattedValue = representation.getAbbreviatedLabel();
+						}
+						else{
+							formattedValue = representation.getLabel();
+						}
+					}
+					if(formattedValue==null){
+						formattedValue = presenceAbsenceTerm.getTitleCache();
+					}
+					return formattedValue;
+				}
+				return super.formatPropertyValue(rowId, colId, property);
+			}
+		};
 		table.setImmediate(false);
 		table.setWidth("100.0%");
 		table.setHeight("100.0%");
+
+        table.setColumnReorderingAllowed(true);
+        table.setSortEnabled(false);
+
+        table.setColumnCollapsingAllowed(true);
+        table.setSelectable(true);
+        table.setPageLength(20);
+        table.setFooterVisible(true);
+        table.setCacheRate(20);
+
+		table.addItemClickListener(new ItemClickListener() {
+            private static final long serialVersionUID = 2743935539139014771L;
+            @Override
+            public void itemClick(ItemClickEvent event) {
+                if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN)) && !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
+                    final Item item = event.getItem();
+                    Property<?> itemProperty = item.getItemProperty("uuid");
+                    UUID uuid = UUID.fromString(itemProperty.getValue().toString());
+                    final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+                    final String areaID = (String) event.getPropertyId();
+                    PresenceAbsenceTerm presenceAbsenceTerm = null;
+                    Object statusValue = item.getItemProperty(areaID).getValue();
+                    if(statusValue instanceof String){
+                    	presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) statusValue);
+                    }
+                    //popup window
+                    final Window popup = new Window("Choose distribution status");
+                    final ListSelect termSelect = new ListSelect();
+                    termSelect.setSizeFull();
+                    termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
+                    termSelect.setNullSelectionAllowed(presenceAbsenceTerm!=null);
+                    if(presenceAbsenceTerm!=null){
+                    	termSelect.setNullSelectionItemId("[no status]");
+                    }
+                    termSelect.setValue(presenceAbsenceTerm);
+                    termSelect.addValueChangeListener(new ValueChangeListener() {
+						
+						private static final long serialVersionUID = 1883728509174752769L;
+
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							System.out.println(event);
+							Object distributionStatus = event.getProperty().getValue();
+							listener.updateDistributionField(areaID, distributionStatus, taxon);
+							container.refresh();
+							popup.close();
+						}
+					});
+                    VerticalLayout layout = new VerticalLayout(termSelect);
+                    popup.setContent(layout);
+                    popup.setModal(true);
+                    popup.center();
+                    UI.getCurrent().addWindow(popup);
+                }
+            }
+        });
+
+
 		mainLayout.addComponent(table, "top:75px;right:0.0px;");
 		return mainLayout;
 	}
 
-	@Override
-	public void addListener(DistributionTableComponentListener listener) {
+	public void addListener(DistributionTablePresenter listener) {
 	   this.listener = listener;
 	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
-		CdmSQLContainer container = null;
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
-			Notification.show("Error while accessing data base", Type.ERROR_MESSAGE);
-			e.printStackTrace();
+			DistributionEditorUtil.showSqlError(e);
+			return;
+		}
+		if(container==null){
 			return;
 		}
 
 		table.setContainerDataSource(container);
-		table.setColumnReorderingAllowed(true);
-		table.setSortEnabled(true);
 
-		columnList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,CdmQueryFactory.RANK_COLUMN}));
-		List<String> termList = listener.getTermList();
-		columnList.addAll(termList);
-		Object[] visibleColumns = columnList.toArray();
-		table.setVisibleColumns(visibleColumns);
+		List<String> columnHeaders = new ArrayList<>(Arrays.asList(table.getColumnHeaders()));
+		columnHeaders.remove(CdmQueryFactory.DTYPE_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.ID_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.UUID_COLUMN);
+		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
 
-		headerList = new ArrayList<String>(Arrays.asList(new String[]{CdmQueryFactory.TAXON_COLUMN,"Rang"}));
-		headerList.addAll(listener.getAbbreviatedTermList());
+		List<String> columnList = new ArrayList<String>(columnHeaders);
 
-		table.setColumnCollapsingAllowed(true);
-		table.setSelectable(true);
-		table.setPageLength(20);
-		table.setFooterVisible(true);
+		String[] string = new String[columnList.size()];
+
+		table.setVisibleColumns(columnList.toArray());
+		table.setColumnHeaders(columnList.toArray(string));
 		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
 
-		table.setCacheRate(20);
 
-		//add generated columns for NamedAreas
-		Collection<?> containerPropertyIds = table.getContainerPropertyIds();
-		for (Object object : containerPropertyIds) {
-			if(termList.contains(object)){
-				table.removeGeneratedColumn(object);
-				table.addGeneratedColumn(object, new AreaColumnGenerator());
-			}
-		}
 	}
 
 	private void createEditClickListener(){
@@ -169,51 +219,57 @@ public class DistributionTableView extends CustomComponent implements IDistribut
 
 			@Override
 			public void buttonClick(ClickEvent event) {
-				try{
-					Object selectedItemId = DistributionTableView.this.table.getValue();
-				    final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
-		            Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+				Object selectedItemId = DistributionTableView.this.table.getValue();
+				if(selectedItemId!=null){
+					final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+					Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
 					List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(taxon, null);
-					DetailWindow dw = new DetailWindow(taxon, listDescriptions);
-					Window window = dw.createWindow();
+					DetailWindow detailWindow = new DetailWindow(taxon, listDescriptions);
+					Window window = detailWindow.createWindow();
+					window.center();
 					getUI().addWindow(window);
-				}catch(Exception e){
-					Notification.show("Unexpected Error, \n\n Please log in again!", Notification.Type.WARNING_MESSAGE);
+				}
+				else{
+					Notification.show("Please select a taxon", Type.HUMANIZED_MESSAGE);
 				}
 			}
 		});
+
+		Button distributionSettingsButton = toolbar.getDistributionSettingsButton();
+		distributionSettingsButton.addClickListener(new ClickListener() {
+
+			private static final long serialVersionUID = -8695281619014251132L;
+
+			@Override
+            public void buttonClick(ClickEvent event) {
+                openDistributionSettings();
+            }
+        });
 
 		Button settingsButton = toolbar.getSettingsButton();
 		settingsButton.addClickListener(new ClickListener() {
 
-			private static final long serialVersionUID = 3834048719431837966L;
+			private static final long serialVersionUID = -147703680580181544L;
 
-			@Override
-            public void buttonClick(ClickEvent event) {
-                SettingsConfigWindow cw = new SettingsConfigWindow();
-                Window window  = cw.createWindow();
-                getUI().addWindow(window);
-            }
-        });
-
-		Button saveButton = toolbar.getSaveButton();
-		saveButton.setClickShortcut(KeyCode.S, ModifierKey.CTRL);
-		saveButton.setDescription("Shortcut: CTRL+S");
-		saveButton.setCaption("Save Data");
-		saveButton.addClickListener(new ClickListener() {
-			private static final long serialVersionUID = 1L;
 			@Override
 			public void buttonClick(ClickEvent event) {
-				ConversationHolder conversationHolder = (ConversationHolder) VaadinSession.getCurrent().getAttribute("conversation");
-				try{
-					conversationHolder.commit();
-				}catch(Exception stateException){
-					//TODO create Table without DTO
-				}
-				Notification.show("Data saved", Notification.Type.HUMANIZED_MESSAGE);
+				openSettings();
 			}
 		});
+	}
 
+	public void openSettings() {
+		SettingsConfigWindow cw = new SettingsConfigWindow(this);
+		Window window  = cw.createWindow();
+		getUI().addWindow(window);
+	}
+
+	public void openDistributionSettings() {
+		if(distributionSettingConfigWindow==null){
+			distributionSettingConfigWindow = new DistributionSettingsConfigWindow(this);
+		}
+        Window window  = distributionSettingConfigWindow.createWindow();
+        getUI().addWindow(window);
 	}
 
 }

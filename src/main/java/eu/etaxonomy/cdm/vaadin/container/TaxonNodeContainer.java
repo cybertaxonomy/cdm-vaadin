@@ -1,85 +1,66 @@
 package eu.etaxonomy.cdm.vaadin.container;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
-import eu.etaxonomy.cdm.api.service.IClassificationService;
-import eu.etaxonomy.cdm.model.name.Rank;
-import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 public class TaxonNodeContainer extends HierarchicalContainer {
 
 	private static final long serialVersionUID = 102401340698963360L;
-	public static final String LABEL = "label";
+	public static final String LABEL = "titleCache";
+	private Map<Object, Object> itemCache = new HashMap<>();
 
 	/**
-	 * Creates a new taxon node container
-	 * @param parentNode the parent node which will <b>not</b> be included
-	 * in the result but only its child nodes
+     * Creates a new taxon node container
+	 * @param roots the root elements of the table
 	 */
-	public TaxonNodeContainer(TaxonNode parentNode) {
-		addContainerProperty(LABEL, String.class, "[no taxon]");
-		getTaxonNodeList(parentNode);
+	public TaxonNodeContainer(Collection<UuidAndTitleCache<TaxonNode>> roots) {
+	    addContainerProperty(LABEL, String.class, "[no taxon]");
+	    for (UuidAndTitleCache<TaxonNode> root: roots) {
+	        addItem(root);
+	        addChildItems(root);
+        }
 	}
 
-	public void getTaxonNodeList(TaxonNode parentNode) {
-		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Item addItem(Object itemId) {
+	    if(itemId instanceof UuidAndTitleCache){
+	        UuidAndTitleCache<TaxonNode> uuidAndTitleCache = (UuidAndTitleCache<TaxonNode>) itemId;
+	        Item item = super.addItem(itemId);
+	        item.getItemProperty(TaxonNodeContainer.LABEL).setValue(uuidAndTitleCache.getTitleCache());
+	        itemCache.put(((UuidAndTitleCache<TaxonNode>) itemId).getId(), false);
+	        return item;
+        }
+	    return null;
+	}
 
-		List<String> nodeInitStrategy = Arrays.asList(new String[]{
-	            "taxon.sec",
-	            "taxon.name",
-	            "classification"
-	    });
-
-		if(parentNode==null){
-			//just load classifications
-			IClassificationService classificationService = CdmSpringContextHelper.getClassificationService();
-			List<Classification> classificationList = classificationService.listClassifications(null, null, null, nodeInitStrategy);
-			for (Classification classification : classificationList) {
-			    TaxonNode rootNode = classification.getRootNode();
-			    Item item = addItem(rootNode);
-				setChildrenAllowed(rootNode, false);
-				nodes.add(rootNode);
-                if(rootNode.getClassification()!=null){
-                    item.getItemProperty(LABEL).setValue(rootNode.getClassification().getName().getText());
+    /**
+     * @param parent
+     */
+    public void addChildItems(UuidAndTitleCache<TaxonNode> parent) {
+        if(itemCache.get(parent.getId()).equals(Boolean.FALSE)){
+            Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+            setChildrenAllowed(parent, !children.isEmpty());
+            for (UuidAndTitleCache<TaxonNode> child : children) {
+                Item childItem = addItem(child);
+                if(childItem!=null){
+                    setParent(child, parent);
                 }
-			}
-		}
-		else{
-			//load child nodes
-	        addChildNodes(parentNode);
-		}
-	}
-
-	private void addChildNodes(TaxonNode parentNode) {
-		List<TaxonNode> childNodes = parentNode.getChildNodes();
-		setChildrenAllowed(parentNode, !childNodes.isEmpty());
-		boolean hasValidChildren = false;
-		for (TaxonNode taxonNode : childNodes) {
-			if(taxonNode!=null && taxonNode.getTaxon()!=null && taxonNode.getTaxon().getName()!=null){
-				Rank rank = taxonNode.getTaxon().getName().getRank();
-				if(rank!=null && rank.isHigher(Rank.SPECIES())){
-				    Item item = addItem(taxonNode);
-					setParent(taxonNode, parentNode);
-					if(taxonNode.getTaxon()!=null){
-					    item.getItemProperty(LABEL).setValue(taxonNode.getTaxon().getName().getTitleCache());
-					}
-					else if(taxonNode.getClassification()!=null){
-                        item.getItemProperty(LABEL).setValue(taxonNode.getClassification().getName().getText());
-                    }
-					hasValidChildren = true;
-
-					addChildNodes(taxonNode);
-				}
-			}
-		}
-		setChildrenAllowed(parentNode, hasValidChildren);
-	}
+                Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
+                setChildrenAllowed(child, !grandChildren.isEmpty());
+            }
+            itemCache.put(parent.getId(), true);
+        }
+    }
 
 }

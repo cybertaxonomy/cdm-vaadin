@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
@@ -31,20 +31,19 @@ import eu.etaxonomy.cdm.model.description.Feature;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.TaxonDescription;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
-import eu.etaxonomy.cdm.vaadin.model.LazyLoadedContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
+import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
-import eu.etaxonomy.cdm.vaadin.view.dbstatus.IDistributionTableComponent;
 
 
-public class DistributionTablePresenter implements IDistributionTableComponent.DistributionTableComponentListener{
+public class DistributionTablePresenter {
 
-
-	private final IClassificationService classificationService;
+    private final IClassificationService classificationService;
 	private final IVocabularyService vocabularyService;
 	private final IDescriptionService descriptionService;
 	private final ITaxonNodeService taxonNodeService;
@@ -52,7 +51,7 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	private final DistributionTableView view;
 	private final ITaxonService taxonService;
 
-	public DistributionTablePresenter(DistributionTableView dtv) throws SQLException{
+	public DistributionTablePresenter(DistributionTableView dtv){
 	    this.view = dtv;
 	    view.addListener(this);
 	    taxonService = CdmSpringContextHelper.getTaxonService();
@@ -63,21 +62,38 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		termService = CdmSpringContextHelper.getTermService();
 	}
 
-
-	@Override
     public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
+	    	Representation representation = term.getRepresentation(Language.DEFAULT());
+	    	if(representation!=null){
+	    		if(DistributionEditorUtil.isAbbreviatedLabels()){
+	    			String label = representation.getLabel();
+	    			String abbreviatedLabel = representation.getAbbreviatedLabel();
+					if(abbreviatedLabel!=null && abbreviatedLabel.equalsIgnoreCase(distributionAreaString)){
+	    				namedArea = (NamedArea) term;
+	    				break;
+	    			}
+					else if(label!=null && label.equalsIgnoreCase(distributionAreaString)){
+						namedArea = (NamedArea) term;
+						break;
+					}
+	    		}
+	    	}
 	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
-	            namedArea = (NamedArea) term;
-	            break;
+	        	namedArea = (NamedArea) term;
+	        	break;
 	        }
+	    }
+	    if(namedArea==null){
+	    	Notification.show("Error during update of distribution term!");
+	    	return -1;
 	    }
 	    List<Distribution> distributions = getDistributions(taxon);
 	    Distribution distribution = null;
 	    for(Distribution dist : distributions){
-	        if(dist.getArea().equals(namedArea)){
+	        if(dist.getArea()!=null && dist.getArea().equals(namedArea)){
 	            distribution = dist;
 	            break;
 	        }
@@ -114,50 +130,41 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 	    return -1;
 	}
 
-	@Override
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID termUUID = (UUID) session.getAttribute("selectedTerm");
+		UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
 		TermVocabulary<DefinedTermBase> term = vocabularyService.load(termUUID);
 		term = CdmBase.deproxy(term, TermVocabulary.class);
 		return term.getTerms();
 	}
 
-
-	@Override
 	public List<String> getAbbreviatedTermList() {
-		SortedSet<DefinedTermBase> terms = getTermSet();
+		Set<NamedArea> terms = getTermSet();
 		List<String> list = new ArrayList<String>();
 		for(DefinedTermBase dtb: terms){
 		    for(Representation r : dtb.getRepresentations()){
 		        list.add(r.getAbbreviatedLabel());
 		    }
 		}
-//		Collections.sort(list);
 		return list;
 	}
 
-    @Override
-    public List<String> getTermList() {
-        SortedSet<DefinedTermBase> terms = getTermSet();
-        List<String> list = new ArrayList<String>();
-        for(DefinedTermBase dtb: terms){
-           list.add(dtb.getTitleCache());
-        }
-//      Collections.sort(list);
-        return list;
-    }
-
-
-	private SortedSet<DefinedTermBase> getTermSet(){
-	    VaadinSession session = VaadinSession.getCurrent();
-	    UUID termUUID = (UUID) session.getAttribute("selectedTerm");
-	    TermVocabulary<DefinedTermBase> term = vocabularyService.load(termUUID);
-	    term = CdmBase.deproxy(term, TermVocabulary.class);
-	    return term.getTermsOrderedByLabels(Language.DEFAULT());
+	public Set<NamedArea> getNamedAreas(){
+	    Set<NamedArea> namedAreas = (Set<NamedArea>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
+	    if(namedAreas!=null && namedAreas.isEmpty()){
+	        return getTermSet();
+	    }
+        return namedAreas;
 	}
 
-	@Override
+	private Set<NamedArea> getTermSet(){
+	    VaadinSession session = VaadinSession.getCurrent();
+	    UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
+	    TermVocabulary<NamedArea> vocabulary = vocabularyService.load(termUUID);
+	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
+	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
+	}
+
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<DescriptionElementBase> listTaxonDescription = descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
@@ -174,14 +181,13 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 		}
 		return map;
 	}
-	@Override
+
 	public List<DescriptionElementBase> listDescriptionElementsForTaxon(Taxon taxon, Set<Feature> setFeature){
 		List<DescriptionElementBase> listDescriptionElementsForTaxon = descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		sort(listDescriptionElementsForTaxon);
 		return listDescriptionElementsForTaxon;
 	}
 
-	@Override
 	public List<Distribution> getDistributions(Taxon taxon) {
 		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<Distribution> listTaxonDescription = descriptionService.listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
@@ -189,42 +195,47 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 
 	}
 
-	@Override
 	public List<TaxonNode> getAllNodes(){
-		TaxonNode taxonNode = getChosenTaxonNode();
-		List<TaxonNode> nodes = new ArrayList<TaxonNode>();
-		if(taxonNode.getTaxon()!=null){
-			nodes.add(taxonNode);
+		List<TaxonNode> allNodes = new ArrayList<TaxonNode>();
+
+		List<TaxonNode> taxonNodes = getChosenTaxonNodes();
+		for (TaxonNode taxonNode : taxonNodes) {
+			if(taxonNode.getTaxon()!=null){
+				allNodes.add(taxonNode);
+			}
+			allNodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		}
-		nodes.addAll(taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null));
-		return nodes;
+		return allNodes;
 	}
 
 
-	@Override
-	public TaxonNode getChosenTaxonNode() {
+	public List<TaxonNode> getChosenTaxonNodes() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID taxonNodeUUID = (UUID) session.getAttribute("taxonNodeUUID");
-		TaxonNode classificationNode = taxonNodeService.load(taxonNodeUUID);
-		return classificationNode;
+		List<UUID> taxonNodeUUIDs = (List<UUID>) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
+		UUID classificationUuid = (UUID)session.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
+		if((taxonNodeUUIDs==null || taxonNodeUUIDs.isEmpty()) && classificationUuid!=null){
+			Classification classification = classificationService.load(classificationUuid);
+			if(classification!=null){
+				taxonNodeUUIDs = Collections.singletonList(classification.getRootNode().getUuid());
+			}
+		}
+		List<TaxonNode> loadedNodes = taxonNodeService.load(taxonNodeUUIDs, null);
+		if(loadedNodes!=null){
+			return loadedNodes;
+		}
+		return Collections.emptyList();
 	}
 
-	@Override
-	public int getSizeOfTaxonNode(){
-		TaxonNode taxonNode = getChosenTaxonNode();
-		return taxonNodeService.loadChildNodesOfTaxonNode(taxonNode, null, true, null).size();
-	}
-
-
-	@Override
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		List<Integer> nodeIds = new ArrayList<Integer>();
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
-		List<String> termList = getTermList();
-		CdmSQLContainer container = new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(termList, nodeIds));
-		return container;
+		Set<NamedArea> namedAreas = getNamedAreas();
+		if(namedAreas!=null){
+			return new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namedAreas));
+		}
+		return null;
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
@@ -251,48 +262,28 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
             "taxon2.name"
     });
 
-
-	@Override
 	public IClassificationService getClassificationService() {
 		return classificationService;
 	}
 
-
-	@Override
 	public IVocabularyService getVocabularyService() {
 		return vocabularyService;
 	}
 
-
-	@Override
 	public IDescriptionService getDescriptionService() {
 		return descriptionService;
 	}
 
-
-	@Override
 	public ITaxonNodeService getTaxonNodeService() {
 		return taxonNodeService;
 	}
 
-
-	@Override
 	public ITermService getTermService() {
 		return termService;
 	}
-
-	@Override
-	public LazyLoadedContainer getTableContainer() {
-		return null;
-	}
-
-
-
-	@Override
 	public ITaxonService getTaxonService() {
 		return taxonService;
 	}
-
 
 	/**Helper Methods*/
 
@@ -311,6 +302,5 @@ public class DistributionTablePresenter implements IDistributionTableComponent.D
 				}
 			}
 		});
-
 	}
 }

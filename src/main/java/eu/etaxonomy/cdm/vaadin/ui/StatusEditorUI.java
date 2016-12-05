@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2015 EDIT
 * European Distributed Institute of Taxonomy
@@ -40,8 +39,16 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
 
     private final static Logger logger =
             Logger.getLogger(StatusEditorUI.class.getName());
-
-    @WebServlet(value = {"/app/editstatus/*"}, asyncSupported = true)
+    /*
+     * NOTE: I it necessary to map the URLs starting with /VAADIN/* since none of the
+     * @WebServlets is mapped to the root path. It is sufficient to configure one of the
+     * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
+     */
+    @WebServlet(value = {"/app/editstatus/*", "/VAADIN/*"}, asyncSupported = true)
+    /*
+     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
+     * The is therefore set globally in the web.xml
+     */
     @VaadinServletConfiguration(productionMode = true, ui = StatusEditorUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
     public static class Servlet extends VaadinServlet {
     }

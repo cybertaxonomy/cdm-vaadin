@@ -1,15 +1,9 @@
 package eu.etaxonomy.cdm.vaadin.model;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
-import eu.etaxonomy.cdm.model.description.Distribution;
-import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
@@ -32,14 +26,14 @@ public class DbTableDTO implements Serializable {
 
 	private DistributionDTO dDTO;
 
-	
+
 
 	public DbTableDTO(Taxon taxon){
 		this.taxon = CdmBase.deproxy(taxon, Taxon.class);
 	}
 
 	//----Getter - Setter - methods ----//
-	
+
 	public DistributionDTO getdDTO() {
 		return dDTO;
 	}
@@ -49,7 +43,7 @@ public class DbTableDTO implements Serializable {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getFullTitleCache() {
@@ -61,7 +55,7 @@ public class DbTableDTO implements Serializable {
 		return name.getFullTitleCache();
 	}
 	/**
-	 * 
+	 *
 	 * @param fullTitleCache
 	 */
 	public void setFullTitleCache(String fullTitleCache) {
@@ -93,7 +87,7 @@ public class DbTableDTO implements Serializable {
 		taxon.getName().setRank(rank);
 	}
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 
@@ -103,7 +97,7 @@ public class DbTableDTO implements Serializable {
 	//----------- Detail View ------------------//
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getTaxonNameCache(){
@@ -114,14 +108,14 @@ public class DbTableDTO implements Serializable {
 		taxon.getName().setTitleCache(titlecache, true);
 	}
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getNomenclaturalCode(){
 		return taxon.getName().getNomenclaturalCode().getTitleCache();
 	}
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public String getSecundum(){

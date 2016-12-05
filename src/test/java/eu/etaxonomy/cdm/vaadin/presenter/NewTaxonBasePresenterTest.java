@@ -41,6 +41,7 @@ import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
 @DataSet
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(NewTaxonBasePresenterTest.class);
 
     private static NewTaxonBasePresenter ntbp;
@@ -52,13 +53,13 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
 
     @Test
-    public void testNewTaxonBase() throws SQLException {
+    public void testNewTaxonBase(){
         RowId refId20 = new RowId(20);
         RowId refId21 = new RowId(21);
         UUID newTaxonUuid = ntbp.newTaxon("Taxon  h", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
                 "sec",
-                "synonymRelations"
+                "synonyms"
         });
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 

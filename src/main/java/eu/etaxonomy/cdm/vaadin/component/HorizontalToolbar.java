@@ -36,6 +36,8 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
 	private final Button detailButton = new Button("Detail");
 
+	private final Button distributionSettingsButton =  new Button("Distribution Settings");
+
 	private final Button settingsButton =  new Button("Settings");
 
 	private final Button logoutButton= new Button("Logout");
@@ -59,7 +61,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 			setHeight("75px");
 
 //			addComponent(editButton);
-			addComponent(saveButton);
+//			addComponent(saveButton);
 			addComponent(detailButton);
 //			addComponent(exporter);
 
@@ -70,6 +72,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 			editButton.setIcon(new ThemeResource("icons/32/document-edit.png"));
 			detailButton.setIcon(new ThemeResource("icons/32/document-txt.png"));
 			settingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
+			distributionSettingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
 			logoutButton.setIcon(new ThemeResource("icons/32/cancel.png"));
 
 			//		SecurityContext context = (SecurityContext)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("context");
@@ -80,6 +83,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 			HorizontalLayout rightLayout = new HorizontalLayout();
 			Image image = new Image(null, new ThemeResource("icons/32/vseparator1.png"));
 			rightLayout.addComponent(settingsButton);
+			rightLayout.addComponent(distributionSettingsButton);
 			rightLayout.addComponent(logoutButton);
 			rightLayout.addComponent(image);
 			rightLayout.addComponent(loginName);
@@ -109,6 +113,10 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
     public Button getSettingsButton(){
         return settingsButton;
     }
+    
+    public Button getDistributionSettingsButton() {
+		return distributionSettingsButton;
+	}
 
 	public Button getEditButton() {
 		return editButton;

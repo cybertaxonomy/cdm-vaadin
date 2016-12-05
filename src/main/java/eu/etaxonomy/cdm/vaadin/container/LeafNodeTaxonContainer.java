@@ -60,7 +60,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private int classificationId = -1;
 
-    private final Map<RowId, RowItem> synItems = new HashMap<RowId, RowItem>();
+    private final Map<RowId, RowItem> synItems = new HashMap<>();
 
     private final Map<Object,List<Object>> taxonSynonymMap;
 
@@ -73,10 +73,10 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
      */
     public LeafNodeTaxonContainer(int classificationId) throws SQLException {
         super(CdmQueryFactory.generateTaxonBaseQuery(NAME_ID, PB_ID, UNP_ID, RANK_ID, HAS_SYN_ID));
-        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymofTaxonQuery(NAME_ID));
+        this.synonymContainer = new CdmSQLContainer(CdmQueryFactory.generateSynonymOfTaxonQuery(NAME_ID));
         this.synonymContainer.sort(new String[]{NAME_ID}, new boolean[]{true});
         this.classificationId = classificationId;
-        taxonSynonymMap = new HashMap<Object,List<Object>>();
+        taxonSynonymMap = new HashMap<>();
         initFilters();
         addContainerFilter(classificationFilter);
         enableCacheFlushNotifications();
@@ -85,18 +85,18 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private void initFilters() {
         //nrFilter = new Compare.Equal(StatusPresenter.UNR_ID, true);
-        unpFilter = new Compare.Equal("tb.unplaced", true);
+        unpFilter = new Compare.Equal("tn.unplaced", true);
         //unfFilter = new Compare.Equal(StatusPresenter.FN_ID, false);
         unpbFilter = new Compare.Equal("tb.publish", false);
-        classificationFilter = new Compare.Equal("tn.classification_id",classificationId);
+        classificationFilter = new Compare.Equal("tn.classification_id", classificationId);
 
         // get species aggregate rank order index
         int saoIndex = Rank.SPECIESAGGREGATE().getOrderIndex();
         rankFilter = new Compare.GreaterOrEqual("dtb.orderindex", saoIndex);
 
-        synonymFilter = new Not(new IsNull("sr.relatedto_id"));
+        synonymFilter = new Not(new IsNull("acc.id"));
 
-        currentFilters = new HashSet<Filter>();
+        currentFilters = new HashSet<>();
     }
 
 
@@ -153,10 +153,6 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         return size();
     }
 
-
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#getChildren(java.lang.Object)
-     */
     @Override
     public Collection<?> getChildren(Object itemId) {
         List<Object> synList = taxonSynonymMap.get(itemId);
@@ -167,68 +163,47 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
         return addToSynonymCache(itemId);
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#getParent(java.lang.Object)
-     */
     @Override
     public Object getParent(Object itemId) {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#rootItemIds()
-     */
     @Override
     public Collection<?> rootItemIds() {
         return getItemIds();
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#setParent(java.lang.Object, java.lang.Object)
-     */
     @Override
     public boolean setParent(Object itemId, Object newParentId) throws UnsupportedOperationException {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#areChildrenAllowed(java.lang.Object)
-     */
     @Override
     public boolean areChildrenAllowed(Object itemId) {
-        Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
+        Property<?> hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
         if(hasSynProperty == null) {
             return false;
         }
        return (Long)hasSynProperty.getValue() > 0;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#setChildrenAllowed(java.lang.Object, boolean)
-     */
     @Override
     public boolean setChildrenAllowed(Object itemId, boolean areChildrenAllowed) throws UnsupportedOperationException {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#isRoot(java.lang.Object)
-     */
     @Override
     public boolean isRoot(Object itemId) {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.Container.Hierarchical#hasChildren(java.lang.Object)
-     */
     @Override
     public boolean hasChildren(Object itemId) {
         return true;
     }
 
     public boolean isSynonym(Object itemId) {
-        Property hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
+        Property<?> hasSynProperty = getItem(itemId).getItemProperty(HAS_SYN_ID);
         return hasSynProperty == null;
     }
 
@@ -245,9 +220,9 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     }
 
     private List<Object> addToSynonymCache(Object taxonItemId) {
-        Filter synonymOfTaxonFilter = new Compare.Equal("sr.relatedto_id", Integer.valueOf(taxonItemId.toString()));
+        Filter synonymOfTaxonFilter = new Compare.Equal("acc.id", Integer.valueOf(taxonItemId.toString()));
         synonymContainer.addContainerFilter(synonymOfTaxonFilter);
-        List<Object> synList = new ArrayList<Object>();
+        List<Object> synList = new ArrayList<>();
         synList.addAll(synonymContainer.getItemIds());
         for(Object synItemId : synList) {
             addSynItem((RowItem) synonymContainer.getItem(synItemId));

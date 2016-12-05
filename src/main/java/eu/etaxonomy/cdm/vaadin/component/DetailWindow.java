@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Window;
 
@@ -15,6 +16,7 @@ import eu.etaxonomy.cdm.model.description.CategoricalData;
 import eu.etaxonomy.cdm.model.description.CommonTaxonName;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.description.StateData;
 import eu.etaxonomy.cdm.model.description.TextData;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
@@ -36,11 +38,16 @@ public class DetailWindow extends CustomComponent{
 	public Window createWindow(){
 		Window window = new Window();
 		window.setHeightUndefined();
-//		window.setHeight("600px");
-//		window.setWidth("400px");
+		window.setHeight("600px");
+		window.setWidth("400px");
 		window.setCaption(taxon.getName().getTitleCache());
 		window.setCloseShortcut(KeyCode.W, ModifierKey.CTRL);
-		window.setContent(constructDescriptionTree(taxon));
+		if(listDescriptions.isEmpty()){
+			window.setContent(new Label("No descriptive data found"));
+		}
+		else{
+			window.setContent(constructDescriptionTree(taxon));
+		}
 		return window;
 	}
 
@@ -86,13 +93,16 @@ public class DetailWindow extends CustomComponent{
 			    tree.setParent(td, deb.getFeature());
 			    tree.setChildrenAllowed(td, false);
 			}else if(deb.isInstanceOf(Distribution.class)){
-				Distribution db = CdmBase.deproxy(deb, Distribution.class);
-				tree.addItem(db.toString());
-				tree.setParent(db.toString(), deb.getFeature());
-				tree.setChildrenAllowed(db.toString(), true);
-				tree.addItem(db.getStatus().toString());
-				tree.setParent(db.getStatus().toString(), db.toString());
-				tree.setChildrenAllowed(db.getStatus().toString(), false);
+			    Distribution db = CdmBase.deproxy(deb, Distribution.class);
+			    PresenceAbsenceTerm status = db.getStatus();
+			    if(status!=null){
+			        tree.addItem(db.toString());
+			        tree.setParent(db.toString(), deb.getFeature());
+			        tree.setChildrenAllowed(db.toString(), true);
+				    tree.addItem(status.toString());
+				    tree.setParent(status.toString(), db.toString());
+				    tree.setChildrenAllowed(status.toString(), false);
+				}
 			}
 			tree.expandItemsRecursively(parent);
 		}
