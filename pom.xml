@@ -4,13 +4,13 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>4.4.0</version>
+  <version>4.4.1</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.6.3</vaadin.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.4.0</cdmlib.version>
+    <cdmlib.version>4.4.1</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
