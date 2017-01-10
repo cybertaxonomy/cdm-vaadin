@@ -36,7 +36,7 @@ public abstract class AbstractSettingsDialogWindow extends CustomComponent {
 	    cancelButton.setImmediate(true);
 	    cancelButton.addStyleName("dialogButton");
 	    buttonToolBar.addComponent(cancelButton);
-	
+
 	    // okButton
 	    okButton = new Button();
 	    okButton.setCaption("OK");
@@ -51,20 +51,20 @@ public abstract class AbstractSettingsDialogWindow extends CustomComponent {
 	    window.setModal(true);
 	    window.setWidth("60%");
 	    window.setHeight("80%");
-	    window.setCaption("Settings");
+	    window.setCaption("Distribution Settings");
 	    window.setContent(mainLayout);
 	    return window;
 	}
-	
+
 	/**
 	 * Update OK/Cancel button depending on {@link #isValid()}
 	 */
 	protected void updateButtons(){
 		okButton.setEnabled(isValid());
 	}
-	
+
 	/**
-	 * Evaluates if this dialog has all necessary values set in 
+	 * Evaluates if this dialog has all necessary values set in
 	 * a correct state
 	 * @return <code>true</code> if the status of this dialog is valid
 	 */
