@@ -47,7 +47,9 @@
     <import resource="datasources/configurable.xml" />
 
     <context:annotation-config/>
-    <bean class="eu.etaxonomy.cdm.remote.config.LoggingConfigurer">
+    
+  <!--   
+    <bean class="eu.etaxonomy.cdm.opt.config.LoggingConfigurer">
     </bean>
 
 
@@ -55,7 +57,7 @@
     <property name="configLocation" value="classpath:/eu/etaxonomy/cdm/remote/ehcache.xml" />
         <property name="shared" value="true"/>
     </bean>
-
+ -->
   <bean id="serializableFactory" class="org.springmodules.cache.serializable.XStreamSerializableFactory"/>
 
   <bean id="cacheProviderFacade" class="org.springmodules.cache.provider.ehcache.EhCacheFacade">
