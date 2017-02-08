@@ -14,11 +14,7 @@
        <property name="omit" value="false" />
     </bean>
    <context:component-scan base-package="eu/etaxonomy/cdm/ext" />
-   <context:component-scan base-package="eu/etaxonomy/cdm/remote/vaadin" />
 
-   <!--
-    <import resource="classpath:/eu/etaxonomy/cdm/remote.xml"/>
-   -->
 <!--    <import resource="classpath:/eu/etaxonomy/cdm/remote-security.xml"/> -->
     <context:component-scan base-package="eu/etaxonomy/cdm/io">
         <context:exclude-filter type="regex" expression="eu\.etaxonomy\.cdm\.io\.pesi.*" />
@@ -51,13 +47,8 @@
   <!--   
     <bean class="eu.etaxonomy.cdm.opt.config.LoggingConfigurer">
     </bean>
-
-
-  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-    <property name="configLocation" value="classpath:/eu/etaxonomy/cdm/remote/ehcache.xml" />
-        <property name="shared" value="true"/>
-    </bean>
  -->
+ 
   <bean id="serializableFactory" class="org.springmodules.cache.serializable.XStreamSerializableFactory"/>
 
   <bean id="cacheProviderFacade" class="org.springmodules.cache.provider.ehcache.EhCacheFacade">
