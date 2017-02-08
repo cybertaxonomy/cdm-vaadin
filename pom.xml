@@ -9,6 +9,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.6.3</vaadin.version>
+    <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <cdmlib.version>4.6.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
@@ -393,6 +394,11 @@
   </build>
   <dependencies>
     <!-- ============ Vaadin ============ -->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-spring</artifactId>
+      <version>${vaadin-spring.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
