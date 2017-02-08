@@ -14,10 +14,10 @@ import javax.servlet.annotation.WebServlet;
 import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
+import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
@@ -28,6 +28,7 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  *
  */
 @Theme("edit")
+@Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
     Navigator navigator;
@@ -36,13 +37,8 @@ public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUIRedirect.class);
 
-    /*
-     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
-     * The is therefore set globally in the web.xml
-     */
     @WebServlet(value = {"/app/editcr/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = true, ui = ConceptRelationshipUIRedirect.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {
+    public static class Servlet extends SpringVaadinServlet {
     }
 
     @Override

@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 
 import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
@@ -14,6 +14,7 @@ import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.NaviTestView;
 
 @Theme("chameleon")
+@Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class NavigatorTestUI extends AbstractAuthenticatedUI {
 
 	Navigator navigator;
@@ -25,7 +26,6 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 			Logger.getLogger(NavigatorTestUI.class.getName());
 
 	@WebServlet(value = {"/app-test/navi/*"}, asyncSupported = true)
-	@VaadinServletConfiguration(productionMode = false, ui = NavigatorTestUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 	public static class Servlet extends CdmVaadinConversationalServlet {
 
 	}

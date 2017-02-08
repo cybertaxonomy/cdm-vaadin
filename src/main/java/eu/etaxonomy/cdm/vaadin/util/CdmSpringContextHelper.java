@@ -26,6 +26,15 @@ import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
 
+/**
+ * This helper relates to the problem that in the Vaadin framework it is
+ * not possible to autowire beans from the underlying application context
+ * as Vaadin prevents this possibility. To overcome this problem, this singleton
+ * helper class has
+ * been written to retrieve the beans given the bean name.
+ *
+ * @author c.mathew
+ */
 public class CdmSpringContextHelper {
 
     private final ApplicationContext context;
