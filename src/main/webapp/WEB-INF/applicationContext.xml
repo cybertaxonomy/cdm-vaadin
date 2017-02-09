@@ -8,6 +8,11 @@
     http://www.springframework.org/schema/tx   http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
     ">
 
+   <context:annotation-config/>
+   
+   <bean class="eu.etaxonomy.cdm.vaadin.conf.CdmVaadinConfiguration" />
+   <context:component-scan base-package="eu/etaxonomy/cdm/vaadin" />
+    
    <!-- include default application context and customization -->
     <import resource="classpath:/eu/etaxonomy/cdm/defaultApplicationContext.xml"/>
     <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
@@ -36,13 +41,9 @@
     <!-- enable the configuration of transactional behavior based on annotations -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <!-- import additional beans into the root context -->
-<!--     <import resource="applicationContext.views.xml"/> -->
 
-    <!-- CONFIGURE WEB APPLICATION HERE -->
+    <!-- import configuration of the datasource bean -->
     <import resource="datasources/configurable.xml" />
-
-    <context:annotation-config/>
     
   <!--   
     <bean class="eu.etaxonomy.cdm.opt.config.LoggingConfigurer">

@@ -8,12 +8,14 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.NaviTestView;
 
-@Theme("chameleon")
+@Theme("edit")
+@SpringUI(path="/app-test/navi")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class NavigatorTestUI extends AbstractAuthenticatedUI {
 
@@ -25,7 +27,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 	private final static Logger logger =
 			Logger.getLogger(NavigatorTestUI.class.getName());
 
-	@WebServlet(value = {"/app-test/navi/*"}, asyncSupported = true)
+	@WebServlet(value = {"/*"}, asyncSupported = true)
 	public static class Servlet extends CdmVaadinConversationalServlet {
 
 	}

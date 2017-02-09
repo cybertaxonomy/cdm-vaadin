@@ -12,7 +12,8 @@
     </welcome-file-list>
 
 	<!--  This config seems to be the same as the servlet 3.0+ web application initializer
-	 	  config found in eu.etaxonomy.cdm.vaadin.CdmAppInitializer but it doesn't work-->
+	 	  config found in eu.etaxonomy.cdm.vaadin.CdmAppInitializer but it doesn't work
+      -->
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener

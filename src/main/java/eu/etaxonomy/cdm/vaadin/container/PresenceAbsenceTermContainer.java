@@ -4,12 +4,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
@@ -17,7 +19,11 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
 	private static final long serialVersionUID = -7891310979870159325L;
 
+	@Autowired
+	private ITermService termService;
+
 	private static PresenceAbsenceTermContainer instance;
+
 	private static Collection<PresenceAbsenceTerm> defaultDistributionStatus;
 
 	private PresenceAbsenceTermContainer()
@@ -28,7 +34,7 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
     private void initDataModel() {
         Collection<PresenceAbsenceTerm> distributionStatus = new HashSet<>();
-        distributionStatus = CdmSpringContextHelper.getTermService().listByTermType(TermType.PresenceAbsenceTerm, null, null, null, null);
+        distributionStatus = termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, null);
         defaultDistributionStatus = distributionStatus;
 		TermCacher termCacher = TermCacher.getInstance();
 		addAll(distributionStatus);

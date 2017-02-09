@@ -5,6 +5,7 @@ import javax.servlet.annotation.WebServlet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -12,13 +13,14 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-@Theme("mytheme")
+@Theme("edit")
+@SpringUI(path="/app-test/*")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class CheckTestUI extends UI {
 
 
-    @WebServlet(value = {"/app-test/*", "/VAADIN/*"}, asyncSupported = true)
+    @WebServlet(value = {"/*", "/VAADIN/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {
     }
 

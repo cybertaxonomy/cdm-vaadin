@@ -1,7 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
@@ -9,20 +7,21 @@ import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.RedirectAfterLoginView;
 
-@Theme("macosx")
+@Theme("edit")
 @Title("CDM Board")
+// @SpringUI(path="/app/distribution") // not needed since this UI is used in the context of DbStatusUI
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class DbStatusUIRedirect extends AbstractAuthenticatedUI{
 
 	private static final String FIRST_VIEW = "firstView";
 
-	@WebServlet(value = {"/app/dbstatus/*"}, asyncSupported = true)
-	public static class Servlet extends CdmVaadinConversationalServlet {
-	}
+// not needed since this UI is used in the context of DbStatusUI
+//	@WebServlet(value = {"/*"}, asyncSupported = true)
+//	public static class Servlet extends CdmVaadinConversationalServlet {
+//	}
 
 
 	@Override

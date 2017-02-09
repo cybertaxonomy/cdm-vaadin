@@ -34,7 +34,9 @@ import eu.etaxonomy.cdm.api.service.IVocabularyService;
  * been written to retrieve the beans given the bean name.
  *
  * @author c.mathew
+ * @deprecated no longer needed since vaadin-spring is being used
  */
+@Deprecated
 public class CdmSpringContextHelper {
 
     private final ApplicationContext context;

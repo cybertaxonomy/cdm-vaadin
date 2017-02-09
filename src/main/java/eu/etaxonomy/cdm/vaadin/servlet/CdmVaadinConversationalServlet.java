@@ -53,7 +53,6 @@ public class CdmVaadinConversationalServlet extends SpringVaadinServlet implemen
 
 	private ConversationHolder conversation;
 
-
 	@Override
 	protected void servletInitialized() throws ServletException {
 		super.servletInitialized();

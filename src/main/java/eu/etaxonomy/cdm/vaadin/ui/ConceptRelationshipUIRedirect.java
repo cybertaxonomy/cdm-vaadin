@@ -9,15 +9,12 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 
-import javax.servlet.annotation.WebServlet;
-
 import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
@@ -28,6 +25,7 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  *
  */
 @Theme("edit")
+// @SpringUI(path="/app/concept") // not needed since this UI is used in the context of ConceptRelationshipUI
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
@@ -37,9 +35,10 @@ public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUIRedirect.class);
 
-    @WebServlet(value = {"/app/editcr/*"}, asyncSupported = true)
-    public static class Servlet extends SpringVaadinServlet {
-    }
+// not needed since this UI is used in the context of ConceptRelationshipUI
+//    @WebServlet(value = {"/*"}, asyncSupported = true)
+//    public static class Servlet extends SpringVaadinServlet {
+//    }
 
     @Override
     protected void doInit(VaadinRequest request) {
