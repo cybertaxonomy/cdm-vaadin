@@ -8,4 +8,11 @@
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
     ">
 
+  <!-- 
+    Initialize SpringMVCConfig and its dependency SpringSwaggerConfig.
+    All further component scans are defined in this mvc configuration class 
+  <context:component-scan base-package="eu/etaxonomy/cdm/remote/config" />
+  <context:component-scan base-package="eu/etaxonomy/cdm/vaadin" />
+  -->
+  
 </beans>

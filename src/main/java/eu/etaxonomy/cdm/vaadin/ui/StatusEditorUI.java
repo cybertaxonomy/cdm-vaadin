@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
  *
  */
 @Theme("edit")
-@SpringUI(path="/app/editstatus")
+@SpringUI(path="editstatus")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class StatusEditorUI extends AbstractAuthenticatedUI {
 
@@ -44,7 +44,7 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
      * @WebServlets is mapped to the root path. It is sufficient to configure one of the
      * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
      */
-    @WebServlet(value = {"/*", "/VAADIN/*"}, asyncSupported = true)
+    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {
     }
 

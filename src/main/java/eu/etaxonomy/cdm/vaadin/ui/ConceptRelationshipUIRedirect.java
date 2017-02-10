@@ -25,7 +25,7 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  *
  */
 @Theme("edit")
-// @SpringUI(path="/app/concept") // not needed since this UI is used in the context of ConceptRelationshipUI
+// @SpringUI(path="concept") // not needed since this UI is used in the context of ConceptRelationshipUI
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
@@ -36,7 +36,7 @@ public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUIRedirect.class);
 
 // not needed since this UI is used in the context of ConceptRelationshipUI
-//    @WebServlet(value = {"/*"}, asyncSupported = true)
+//    @WebServlet(value = {"/app/*"}, asyncSupported = true)
 //    public static class Servlet extends SpringVaadinServlet {
 //    }
 

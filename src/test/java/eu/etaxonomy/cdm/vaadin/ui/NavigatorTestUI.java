@@ -15,7 +15,7 @@ import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.NaviTestView;
 
 @Theme("edit")
-@SpringUI(path="/app-test/navi")
+@SpringUI(path="navi")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class NavigatorTestUI extends AbstractAuthenticatedUI {
 
@@ -27,7 +27,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 	private final static Logger logger =
 			Logger.getLogger(NavigatorTestUI.class.getName());
 
-	@WebServlet(value = {"/*"}, asyncSupported = true)
+	@WebServlet(value = {"/app-test/*"}, asyncSupported = true)
 	public static class Servlet extends CdmVaadinConversationalServlet {
 
 	}

@@ -11,7 +11,7 @@ import eu.etaxonomy.cdm.vaadin.view.dbstatus.RedirectAfterLoginView;
 
 @Theme("edit")
 @Title("CDM Board")
-// @SpringUI(path="/app/distribution") // not needed since this UI is used in the context of DbStatusUI
+// @SpringUI(path="distribution") // not needed since this UI is used in the context of DbStatusUI
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class DbStatusUIRedirect extends AbstractAuthenticatedUI{
@@ -19,7 +19,7 @@ public class DbStatusUIRedirect extends AbstractAuthenticatedUI{
 	private static final String FIRST_VIEW = "firstView";
 
 // not needed since this UI is used in the context of DbStatusUI
-//	@WebServlet(value = {"/*"}, asyncSupported = true)
+//	@WebServlet(value = {"/app/*"}, asyncSupported = true)
 //	public static class Servlet extends CdmVaadinConversationalServlet {
 //	}
 

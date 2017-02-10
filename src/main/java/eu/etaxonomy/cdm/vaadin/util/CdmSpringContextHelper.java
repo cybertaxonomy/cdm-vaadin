@@ -34,9 +34,11 @@ import eu.etaxonomy.cdm.api.service.IVocabularyService;
  * been written to retrieve the beans given the bean name.
  *
  * @author c.mathew
- * @deprecated no longer needed since vaadin-spring is being used
+ *
+ * TODO This class may no longer needed in a couple of cases since vaadin-spring
+ * is being used and spring beans can be injected now.
+ *
  */
-@Deprecated
 public class CdmSpringContextHelper {
 
     private final ApplicationContext context;

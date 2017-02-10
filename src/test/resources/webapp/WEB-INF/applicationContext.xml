@@ -11,12 +11,9 @@
 
     <context:property-override location="classpath:override.properties"/>
     
-    <bean class="eu.etaxonomy.cdm.vaadin.conf.CdmVaadinConfiguration" />
-    <context:component-scan base-package="eu/etaxonomy/cdm/vaadin" />
+    <context:component-scan base-package="eu/etaxonomy/cdm/api/config" />
 
     <context:component-scan base-package="eu/etaxonomy/cdm/api/service">
-    </context:component-scan>
-        <context:component-scan base-package="eu/etaxonomy/cdm/api/config">
     </context:component-scan>
     
     <context:component-scan base-package="eu/etaxonomy/cdm/api/application">

@@ -28,14 +28,14 @@ import eu.etaxonomy.cdm.vaadin.jscomponent.D3CTree;
  *
  */
 @Theme("edit")
-@SpringUI(path="/app-test/d3ctree")
+@SpringUI(path="d3ctree")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class D3CTreeUI extends UI {
 
     private final static Logger logger =
             Logger.getLogger(D3CTreeUI.class.getName());
 
-    @WebServlet(value = {"/*"}, asyncSupported = true)
+    @WebServlet(value = {"/app-test/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {
 
     }

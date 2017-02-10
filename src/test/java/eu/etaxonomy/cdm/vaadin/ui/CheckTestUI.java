@@ -14,13 +14,13 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @Theme("edit")
-@SpringUI(path="/app-test/*")
+@SpringUI(path="")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class CheckTestUI extends UI {
 
 
-    @WebServlet(value = {"/*", "/VAADIN/*"}, asyncSupported = true)
+    @WebServlet(value = {"/app-test/*", "/VAADIN/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {
     }
 
