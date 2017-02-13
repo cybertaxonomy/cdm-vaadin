@@ -11,14 +11,11 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.logging.Logger;
 
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
@@ -39,14 +36,6 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
 
     private final static Logger logger =
             Logger.getLogger(StatusEditorUI.class.getName());
-    /*
-     * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
-     * @WebServlets is mapped to the root path. It is sufficient to configure one of the
-     * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
-     */
-    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
-    public static class Servlet extends SpringVaadinServlet {
-    }
 
     @Override
     protected void doInit(VaadinRequest request) {

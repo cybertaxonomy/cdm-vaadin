@@ -2,8 +2,6 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.logging.Logger;
 
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
@@ -11,7 +9,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.servlet.CdmVaadinConversationalServlet;
 import eu.etaxonomy.cdm.vaadin.view.NaviTestView;
 
 @Theme("edit")
@@ -24,13 +21,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 	private static final String FIRST_VIEW = "firstView";
 	public static final String SECOND_VIEW = "secondView";
 
-	private final static Logger logger =
-			Logger.getLogger(NavigatorTestUI.class.getName());
-
-	@WebServlet(value = {"/app-test/*"}, asyncSupported = true)
-	public static class Servlet extends CdmVaadinConversationalServlet {
-
-	}
+	private final static Logger logger = Logger.getLogger(NavigatorTestUI.class.getName());
 
 	@Override
 	protected void doInit(VaadinRequest request) {

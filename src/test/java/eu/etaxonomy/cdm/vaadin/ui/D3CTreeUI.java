@@ -10,13 +10,10 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.logging.Logger;
 
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -34,11 +31,6 @@ public class D3CTreeUI extends UI {
 
     private final static Logger logger =
             Logger.getLogger(D3CTreeUI.class.getName());
-
-    @WebServlet(value = {"/app-test/*"}, asyncSupported = true)
-    public static class Servlet extends SpringVaadinServlet {
-
-    }
 
     final VerticalLayout layout = new VerticalLayout();
     final D3CTree d3ctree = new D3CTree();

@@ -8,11 +8,14 @@
 */
 package eu.etaxonomy.cdm.addon.config;
 
+import javax.servlet.annotation.WebServlet;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.vaadin.spring.annotation.EnableVaadin;
+import com.vaadin.spring.server.SpringVaadinServlet;
 
 /**
  *
@@ -27,28 +30,15 @@ public class CdmVaadinConfiguration {
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
-//    @Configuration
-//    @EnableVaadin
-//    @Order(value=1)
-//    public static class CdmVaadinEnabler {
-//
-//        public CdmVaadinEnabler() {
-//            logger.debug("CdmVaadinConfiguration enabled");
-//        }
-//
-//    }
-//
-//    @Configuration
-//    @ComponentScan(basePackages={"eu.etaxonomy.cdm.vaadin"})
-//    @Order(value=2)
-//    public static class CdmVaadinScanner {
-//
-//        public CdmVaadinScanner() {
-//            logger.debug("CdmVaadinScanner enabled");
-//        }
-//
-//    }
 
+    /*
+     * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
+     * @WebServlets is mapped to the root path. It is sufficient to configure one of the
+     * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
+     */
+    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
+    public static class Servlet extends SpringVaadinServlet {
+    }
 
 
     public CdmVaadinConfiguration() {

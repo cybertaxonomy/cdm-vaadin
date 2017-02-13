@@ -35,11 +35,6 @@ public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUIRedirect.class);
 
-// not needed since this UI is used in the context of ConceptRelationshipUI
-//    @WebServlet(value = {"/app/*"}, asyncSupported = true)
-//    public static class Servlet extends SpringVaadinServlet {
-//    }
-
     @Override
     protected void doInit(VaadinRequest request) {
         // FIXME: remove this when testing is done

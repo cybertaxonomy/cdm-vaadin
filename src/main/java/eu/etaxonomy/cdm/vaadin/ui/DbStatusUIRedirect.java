@@ -18,12 +18,6 @@ public class DbStatusUIRedirect extends AbstractAuthenticatedUI{
 
 	private static final String FIRST_VIEW = "firstView";
 
-// not needed since this UI is used in the context of DbStatusUI
-//	@WebServlet(value = {"/app/*"}, asyncSupported = true)
-//	public static class Servlet extends CdmVaadinConversationalServlet {
-//	}
-
-
 	@Override
 	protected void doInit(VaadinRequest request) {
 		Navigator navigator = UI.getCurrent().getNavigator();
