@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -14,6 +17,7 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -42,11 +46,14 @@ import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
+@SpringComponent
+@Scope("prototype")
 public class DistributionTableView extends CustomComponent implements View{
 
 	private static final long serialVersionUID = 1L;
     private HorizontalToolbar toolbar;
 	private Table table;
+
 
 	private DistributionTablePresenter listener;
 
@@ -64,7 +71,6 @@ public class DistributionTableView extends CustomComponent implements View{
 		AbsoluteLayout mainLayout = initLayout();
 		setCompositionRoot(mainLayout);
 		createEditClickListener();
-
 	}
 
 	private AbsoluteLayout initLayout() {
@@ -149,7 +155,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     }
                     termSelect.setValue(presenceAbsenceTerm);
                     termSelect.addValueChangeListener(new ValueChangeListener() {
-						
+
 						private static final long serialVersionUID = 1883728509174752769L;
 
 						@Override
@@ -175,6 +181,7 @@ public class DistributionTableView extends CustomComponent implements View{
 		return mainLayout;
 	}
 
+	@Autowired
 	public void addListener(DistributionTablePresenter listener) {
 	   this.listener = listener;
 	}

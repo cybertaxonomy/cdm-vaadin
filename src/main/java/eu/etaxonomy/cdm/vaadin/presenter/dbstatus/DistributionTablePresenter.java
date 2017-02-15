@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
@@ -36,30 +39,30 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.dbstatus.DistributionTableView;
 
 
 public class DistributionTablePresenter {
 
+    @Autowired
+    private CdmRepository cdmRepo = null;
+
     private final IClassificationService classificationService;
 	private final IVocabularyService vocabularyService;
 	private final IDescriptionService descriptionService;
 	private final ITaxonNodeService taxonNodeService;
 	private final ITermService termService;
-	private final DistributionTableView view;
 	private final ITaxonService taxonService;
 
 	public DistributionTablePresenter(DistributionTableView dtv){
-	    this.view = dtv;
-	    view.addListener(this);
-	    taxonService = CdmSpringContextHelper.getTaxonService();
-	    classificationService = CdmSpringContextHelper.getClassificationService();
-	    taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
-		vocabularyService = CdmSpringContextHelper.getVocabularyService();
-		descriptionService = CdmSpringContextHelper.getDescriptionService();
-		termService = CdmSpringContextHelper.getTermService();
+
+	    taxonService = cdmRepo.getTaxonService();
+	    classificationService = cdmRepo.getClassificationService();
+	    taxonNodeService = cdmRepo.getTaxonNodeService();
+		vocabularyService = cdmRepo.getVocabularyService();
+		descriptionService = cdmRepo.getDescriptionService();
+		termService = cdmRepo.getTermService();
 	}
 
     public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {

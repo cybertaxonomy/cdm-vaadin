@@ -7,7 +7,6 @@ import javax.servlet.ServletException;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
@@ -15,6 +14,7 @@ import org.unitils.UnitilsJUnit4;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
+import org.unitils.spring.annotation.SpringApplicationContext;
 
 import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 import com.vaadin.server.DeploymentConfiguration;
@@ -26,9 +26,10 @@ import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 
-@Ignore
 @Transactional(TransactionMode.DISABLED)
-public class CdmVaadinBaseTest extends UnitilsJUnit4 {
+@SpringApplicationContext("file:./src/test/resources/webapp/WEB-INF/applicationContext.xml")
+//@SpringApplicationContext("file:./src/test/resources/eu/etaxonomy/cdm/applicationContext-test.xml")
+public abstract class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
     private static MockServletContext servletContext;
     private static VaadinServlet vaadinServlet;

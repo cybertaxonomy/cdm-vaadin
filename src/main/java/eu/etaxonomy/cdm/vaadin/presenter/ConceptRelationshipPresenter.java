@@ -9,16 +9,18 @@
 package eu.etaxonomy.cdm.vaadin.presenter;
 
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.TransactionStatus;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
-import eu.etaxonomy.cdm.api.service.ITaxonService;
+import com.vaadin.spring.annotation.SpringComponent;
+
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.IConceptRelationshipComponentListener;
 
 /**
@@ -26,28 +28,29 @@ import eu.etaxonomy.cdm.vaadin.view.IConceptRelationshipComponentListener;
  * @date 9 Apr 2015
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class ConceptRelationshipPresenter implements IConceptRelationshipComponentListener {
 
+    @Autowired
+    private CdmRepository cdmRepo = null;
 
-    private final D3ConceptRelationshipTree crTree;
-    private final ITaxonService taxonService;
+    private D3ConceptRelationshipTree crTree = null;
 
-    private final ICdmApplicationConfiguration app;
+    public ConceptRelationshipPresenter(){
+    }
 
-
-    public ConceptRelationshipPresenter(D3ConceptRelationshipTree crTree) {
+    public void setTree(D3ConceptRelationshipTree crTree) {
         this.crTree = crTree;
-
-        taxonService = CdmSpringContextHelper.getTaxonService();
-        app = CdmSpringContextHelper.getApplicationConfiguration();
     }
 
     @Override
+    //@Transactional // FIXME use this annotation instead of the explicit start commit below
     public void refreshRelationshipView(IdUuidName taxonIun, Direction direction) throws JSONException {
-        TransactionStatus tx = app.startTransaction();
-        Taxon taxon = CdmBase.deproxy(taxonService.load(taxonIun.getUuid()), Taxon.class);
+        TransactionStatus tx = cdmRepo.startTransaction();
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(taxonIun.getUuid()), Taxon.class);
         crTree.update(taxon, direction);
-        app.commitTransaction(tx);
+        cdmRepo.commitTransaction(tx);
     }
 
     @Override

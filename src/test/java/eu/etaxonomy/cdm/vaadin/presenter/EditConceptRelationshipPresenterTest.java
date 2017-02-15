@@ -16,17 +16,17 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.spring.annotation.SpringBeanByType;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 /**
  * @author cmathew
@@ -36,17 +36,18 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 @DataSet
 public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
+    @SpringBeanByType
+    private CdmRepository cdmRepo = null;
+
+    @SpringBeanByType
+    private EditConceptRelationshipPresenter ecrp = null;
+
     private static final Logger logger = Logger.getLogger(EditConceptRelationshipPresenterTest.class);
-    public static EditConceptRelationshipPresenter ecrp;
+
 
     private static List<String> FROM_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
             "relationsFromThisTaxon"
     });
-
-    @BeforeClass
-    public static void init() {
-        ecrp = new EditConceptRelationshipPresenter();
-    }
 
     @Test
     public void testLoadTaxonRelationshipTypeContainer() throws SQLException {
@@ -63,7 +64,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
         IdUuidName trId =ecrp.createRelationship(fromTaxonUuid, relTypeUuid, toTaxonUuid);
 
-        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         Assert.assertEquals(1, taxon.getRelationsFromThisTaxon().size());
 
         Assert.assertEquals(trId.getUuid(),taxon.getRelationsFromThisTaxon().iterator().next().getUuid());
@@ -76,7 +77,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         UUID newToTaxonUuid = UUID.fromString("5004a8e7-b907-4744-b67e-44ccb057ab3b");
         UUID newRelTypeUuid = UUID.fromString("a8f03491-2ad6-4fae-a04c-2a4c117a2e9b");
 
-        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         TaxonRelationship tr = getFromRelwithUuid(taxon, taxonRelUuid);
 
         UUID oldToTaxonUuid = tr.getToTaxon().getUuid();
@@ -88,7 +89,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
         // change both to taxon and relationship type
         ecrp.updateRelationship(fromTaxonUuid, taxonRelUuid, newRelTypeUuid, newToTaxonUuid);
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         tr = getFromRelwithUuid(taxon, taxonRelUuid);
 
         Assert.assertNotNull(tr);
@@ -100,7 +101,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
         // change only relationship type
         ecrp.updateRelationship(fromTaxonUuid, taxonRelUuid, newRelTypeUuid, null);
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         tr = getFromRelwithUuid(taxon, taxonRelUuid);
 
         Assert.assertNotNull(tr);
@@ -112,7 +113,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
         // change only to taxon
         ecrp.updateRelationship(fromTaxonUuid, taxonRelUuid, null, newToTaxonUuid);
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         tr = getFromRelwithUuid(taxon, taxonRelUuid);
 
         Assert.assertNotNull(tr);
@@ -127,7 +128,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         UUID taxonRelUuid = UUID.fromString("cac9fa65-9b15-445f-80e4-56f77952f7ec");
 
         ecrp.deleteRelationship(fromTaxonUuid, taxonRelUuid);
-        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         Assert.assertEquals(4, taxon.getRelationsFromThisTaxon().size());
 
         TaxonRelationship tr = getFromRelwithUuid(taxon, taxonRelUuid);
@@ -137,7 +138,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         taxonRelUuid = UUID.fromString("9634d870-bab1-4fdc-8845-c7e71aa8dc6b");
 
         ecrp.deleteRelationship(fromTaxonUuid, taxonRelUuid);
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
         Assert.assertEquals(0, taxon.getRelationsFromThisTaxon().size());
     }
 

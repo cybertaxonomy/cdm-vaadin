@@ -12,16 +12,19 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
 import com.vaadin.data.util.filter.Compare;
 import com.vaadin.data.util.filter.Compare.Equal;
+import com.vaadin.spring.annotation.SpringComponent;
 
-import eu.etaxonomy.cdm.api.service.ITaxonService;
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
 
 /**
@@ -29,8 +32,12 @@ import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
  * @date 10 Mar 2015
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class StatusPresenter implements StatusComponentListener {
 
+    @Autowired
+    private CdmRepository cdmRepo = null;
 
     public final static String C_TCACHE_ID = "titleCache";
 
@@ -38,12 +45,9 @@ public class StatusPresenter implements StatusComponentListener {
 
     private CdmSQLContainer classificationContainer;
 
-    private final ITaxonService taxonService;
-
     private int totalNoOfTaxa = 0;
 
     public StatusPresenter() {
-        taxonService = CdmSpringContextHelper.getTaxonService();
     }
 
 
@@ -156,11 +160,11 @@ public class StatusPresenter implements StatusComponentListener {
     @Override
     public void updatePublished(boolean pb, Object itemId) {
         UUID uuid = UUID.fromString((String)leafNodeTaxonContainer.getItem(itemId).getItemProperty(CdmQueryFactory.UUID_ID).getValue());
-        Taxon taxon = CdmBase.deproxy(taxonService.load(uuid), Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(uuid), Taxon.class);
         boolean currentPb = taxon.isPublish();
         if(currentPb != pb) {
             taxon.setPublish(pb);
-            taxonService.merge(taxon);
+            cdmRepo.getTaxonService().merge(taxon);
         }
     }
 

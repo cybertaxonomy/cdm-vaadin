@@ -13,21 +13,20 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.spring.annotation.SpringBeanByType;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
-import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.BotanicalName;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 /**
  * @author cmathew
@@ -39,20 +38,20 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(ConceptRelationshipPresenterTest.class);
 
-    private static ConceptRelationshipPresenter crp;
-    private static D3ConceptRelationshipTree crTree;
+    @SpringBeanByType
+    private CdmRepository cdmRepo = null;
 
-    private static INameService nameService;
+    @SpringBeanByType
+    private ConceptRelationshipPresenter crp = null;
 
-    private static ICdmApplicationConfiguration app;
+    private D3ConceptRelationshipTree crTree = null;
 
-    @BeforeClass
-    public static void init() {
-        crTree = new D3ConceptRelationshipTree();
-        crp = new ConceptRelationshipPresenter(crTree);
-
-        nameService = CdmSpringContextHelper.getNameService();
-        app = CdmSpringContextHelper.getApplicationConfiguration();
+    @Before
+    public void init() {
+        if(crTree == null){
+            crTree = new D3ConceptRelationshipTree();
+        }
+        crp.setTree(crTree);
     }
 
 
@@ -74,13 +73,13 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     public void testAbbreviatedNameGeneration() {
-        TransactionStatus tx = app.startTransaction();
+        TransactionStatus tx = cdmRepo.startTransaction();
         UUID nameUuid = UUID.fromString("7ebe3f1f-c383-4611-95da-4ee633a12d3a");
-        BotanicalName name = CdmBase.deproxy(nameService.load(nameUuid), BotanicalName.class);
+        BotanicalName name = CdmBase.deproxy(cdmRepo.getNameService().load(nameUuid), BotanicalName.class);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
         Assert.assertEquals("T. × withverylongspecificepithet subsp.", abbreviatedName);
-        app.commitTransaction(tx);
+        cdmRepo.commitTransaction(tx);
 
     }
 

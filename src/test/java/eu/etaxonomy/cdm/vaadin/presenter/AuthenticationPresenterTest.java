@@ -13,9 +13,9 @@ import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.unitils.spring.annotation.SpringBeanByType;
 
 import com.vaadin.server.VaadinSession;
 
@@ -31,12 +31,8 @@ public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(AuthenticationPresenterTest.class);
 
-    private static AuthenticationPresenter ap;
-
-    @BeforeClass
-    public static void init() {
-        ap = new AuthenticationPresenter();
-    }
+    @SpringBeanByType
+    private AuthenticationPresenter ap = null;
 
     @Test
     public void testLogin() throws URISyntaxException {

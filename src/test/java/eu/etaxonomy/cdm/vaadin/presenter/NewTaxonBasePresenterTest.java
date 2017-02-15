@@ -8,7 +8,6 @@
  */
 package eu.etaxonomy.cdm.vaadin.presenter;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -16,17 +15,17 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.spring.annotation.SpringBeanByType;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener;
 import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
 
@@ -39,16 +38,14 @@ import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
 @DataSet
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
+    @SpringBeanByType
+    private CdmRepository cdmRepo = null;
+
     @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(NewTaxonBasePresenterTest.class);
 
-    private static NewTaxonBasePresenter ntbp;
-
-    @BeforeClass
-    public static void init() throws SQLException {
-        ntbp = new NewTaxonBasePresenter();
-    }
-
+    @SpringBeanByType
+    private NewTaxonBasePresenter ntbp = null;
 
     @Test
     public void testNewTaxonBase(){
@@ -59,21 +56,21 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
                 "sec",
                 "synonyms"
         });
-        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
         UUID newSynonymUuid = ntbp.newSynonym("Synonym ofe", refId20, refId21, newTaxonUuid).getUuid();
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
         Set<Synonym> synonyms = taxon.getSynonyms();
         Assert.assertEquals(1,synonyms.size());
         Synonym synonymOfTaxon = synonyms.iterator().next();
 
-        Synonym synonym = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newSynonymUuid),Synonym.class);
+        Synonym synonym = CdmBase.deproxy(cdmRepo.getTaxonService().load(newSynonymUuid),Synonym.class);
         Assert.assertEquals(synonym, synonymOfTaxon);
 
         Assert.assertEquals(synonym.getSec().getId(), 20);
 
-        taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+        taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
 
         Assert.assertEquals(taxon.getSec().getId(), 21);
     }
@@ -109,7 +106,7 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
                 "sec",
                 "synonymRelations"
         });
-        Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
+        Taxon taxon = CdmBase.deproxy(cdmRepo.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
         try {
             ntbp.newSynonym("Htsynonym bofa", refId20, refId21, newTaxonUuid);
             Assert.fail("Exception should be thrown as name already exists");;

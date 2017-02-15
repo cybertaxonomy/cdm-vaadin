@@ -14,6 +14,8 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.vaadin.server.ServiceException;
 import com.vaadin.server.SessionDestroyEvent;
@@ -24,7 +26,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.server.SpringVaadinServlet;
 
 import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 
@@ -63,7 +64,8 @@ public class CdmVaadinConversationalServlet extends SpringVaadinServlet implemen
 	@Override
 	public void sessionInit(SessionInitEvent event)
 			throws ServiceException {
-		conversation = (ConversationHolder) CdmSpringContextHelper.getCurrent().getBean("conversationHolder");
+	    WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+		conversation = webApplicationContext.getBean(ConversationHolder.class);
 		conversation.bind();
 		VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_CONVERSATION, conversation);
 	}

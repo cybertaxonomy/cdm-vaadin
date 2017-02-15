@@ -13,10 +13,10 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.spring.annotation.SpringBeanByType;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.sqlcontainer.RowId;
@@ -36,14 +36,8 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);
 
-    private static StatusPresenter sp;
-
-    @BeforeClass
-    public static void init() {
-        sp = new StatusPresenter();
-    }
-
-
+    @SpringBeanByType
+    private StatusPresenter sp = null;
 
     @Test
     public void testLoadTaxa() throws SQLException {
