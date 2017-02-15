@@ -17,7 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
@@ -55,7 +55,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final ITaxonService taxonService;
     private final IClassificationService classificationService;
     private final INameService nameService;
-    private final ICdmApplicationConfiguration app;
+    private final ICdmRepository app;
 
 
 

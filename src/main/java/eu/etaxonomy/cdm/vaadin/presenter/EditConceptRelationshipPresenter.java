@@ -18,7 +18,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.util.filter.Compare;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -41,7 +41,7 @@ public class EditConceptRelationshipPresenter {
 
     private final ITaxonService taxonService;
     private final ITermService termService;
-    private final ICdmApplicationConfiguration app;
+    private final ICdmRepository app;
 
     public final static String REL_TYPE_KEY = "relTypeIun";
     public final static String TO_TAXON_KEY = "toTaxonIun";

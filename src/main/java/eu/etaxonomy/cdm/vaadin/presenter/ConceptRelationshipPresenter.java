@@ -11,7 +11,7 @@ package eu.etaxonomy.cdm.vaadin.presenter;
 import org.json.JSONException;
 import org.springframework.transaction.TransactionStatus;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
@@ -32,7 +32,7 @@ public class ConceptRelationshipPresenter implements IConceptRelationshipCompone
     private final D3ConceptRelationshipTree crTree;
     private final ITaxonService taxonService;
 
-    private final ICdmApplicationConfiguration app;
+    private final ICdmRepository app;
 
 
     public ConceptRelationshipPresenter(D3ConceptRelationshipTree crTree) {

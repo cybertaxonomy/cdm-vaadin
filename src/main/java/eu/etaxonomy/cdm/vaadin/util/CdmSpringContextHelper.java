@@ -14,7 +14,7 @@ import com.vaadin.data.util.sqlcontainer.connection.J2EEConnectionPool;
 import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.server.VaadinServlet;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.ICommonService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
@@ -119,8 +119,8 @@ public class CdmSpringContextHelper {
         return databaseMetaData;
     }
 
-    public static ICdmApplicationConfiguration getApplicationConfiguration() {
-        return (ICdmApplicationConfiguration) getCurrent().getBean("cdmApplicationDefaultConfiguration");
+    public static ICdmRepository getApplicationConfiguration() {
+        return (ICdmRepository) getCurrent().getBean("cdmRepository");
     }
     public static ITaxonService getTaxonService() {
         return (ITaxonService)getCurrent().getBean(ITaxonService.class);

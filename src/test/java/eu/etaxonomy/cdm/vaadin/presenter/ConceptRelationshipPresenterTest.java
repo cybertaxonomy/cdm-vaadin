@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.BotanicalName;
@@ -44,7 +44,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static INameService nameService;
 
-    private static ICdmApplicationConfiguration app;
+    private static ICdmRepository app;
 
     @BeforeClass
     public static void init() {
