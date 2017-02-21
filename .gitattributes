@@ -30,9 +30,9 @@ src/main/java/eu/etaxonomy/cdm/vaadin/presenter/ConceptRelationshipPresenter.jav
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/EditConceptRelationshipPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/NewTaxonBasePresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenter.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionSelectionPresenter.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/DistributionTablePresenter.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/presenter/dbstatus/settings/SettingsPresenter.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/presenter/distributionStatus/DistributionSelectionPresenter.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/presenter/distributionStatus/DistributionTablePresenter.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/presenter/distributionStatus/settings/SettingsPresenter.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/servlet/CdmVaadinConversationalServlet.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmChangeEvent.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/session/CdmDataChangeService.java -text
@@ -45,7 +45,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/ui/AbstractAuthenticatedUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/CdmBaseUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/CheckUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/ConceptRelationshipUI.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/ui/DbStatusUI.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/ui/DistributionStatusUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/ui/StatusEditorUI.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/util/CdmQueryFactory.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/util/CdmSQLStringDecorator.java -text
@@ -60,10 +60,10 @@ src/main/java/eu/etaxonomy/cdm/vaadin/view/IConceptRelationshipComponentListener
 src/main/java/eu/etaxonomy/cdm/vaadin/view/INewTaxonBaseComponentListener.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/INewTaxonBaseComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/view/IStatusComposite.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionSelectionView.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/DistributionTableView.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionSelectionComponent.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/view/dbstatus/IDistributionTableComponent.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/view/distributionStatus/DistributionSelectionView.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/view/distributionStatus/DistributionTableView.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/view/distributionStatus/IDistributionSelectionComponent.java -text
+src/main/java/eu/etaxonomy/cdm/vaadin/view/distributionStatus/IDistributionTableComponent.java -text
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/css/d3.conceptrelationshiptree.css -text
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/extlib/d3.min.js -text
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/lib/d3.conceptrelationshiptree_connector.js -text

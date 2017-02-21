@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.view.dbstatus;
+package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
 
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -7,7 +7,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.presenter.dbstatus.settings.SettingsPresenter;
+import eu.etaxonomy.cdm.vaadin.presenter.distributionStatus.settings.SettingsPresenter;
 
 @SuppressWarnings("serial")
 public abstract class AbstractSettingsDialogWindow extends CustomComponent {
