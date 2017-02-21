@@ -85,6 +85,12 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <dependency>
+        <!-- Try updating in cdmlib to 20090211 -->
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20151123</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <distributionManagement>
@@ -498,10 +504,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <!-- Try updating in cdmlib to 20090211 -->
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20151123</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
