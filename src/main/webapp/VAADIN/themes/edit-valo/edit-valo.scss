@@ -3,7 +3,7 @@
 // Defines the plaintext font size, weight and family. Font size affects general component sizing.
 //$v-font-size: 16px;
 //$v-font-weight: 300;
-//$v-font-family: "Open Sans", sans-serif;
+$v-font-family: "Open Sans", sans-serif;
 
 // Defines the border used by all components.
 //$v-border: 1px solid (v-shade 0.7);
@@ -14,7 +14,7 @@
 // Affects the color of content areas, e.g  Panel and Window content, TextField input etc
 //$v-app-background-color: $v-background-color;
 
-// Affects the visual appearance of all components
+// Affects the visual appearance of all component
 //$v-gradient: v-linear 8%;
 //$v-bevel-depth: 30%;
 //$v-shadow-opacity: 5%;
@@ -53,4 +53,20 @@ $v-component-group-spacing: 6px;
   @include valo;
 
   // Insert your own theme rules here
+  
+  // ----- Banner and Logo  ------
+  $banner-height:  60px;
+  
+  .logo {
+    font-weight: bold;
+    font-size: 1.5em;
+    color: #0E9B06;
+    height: $banner-height;
+  }
+  
+  .banner {
+    height: $banner-height;
+  }
+  
+
 }
