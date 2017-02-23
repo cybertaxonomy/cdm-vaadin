@@ -10,3 +10,4 @@ src/main/webapp/VAADIN/themes/*/addons.scss
 src/main/resources/test.txt
 cdmTest.lock.db
 .designer
+.vaadin-designer
