@@ -51,7 +51,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testLoadTaxonRelationshipTypeContainer() throws SQLException {
         CdmSQLContainer container = ecrp.loadTaxonRelationshipTypeContainer();
-        Assert.assertEquals(29, container.size());
+        Assert.assertEquals(30, container.size());
     }
 
 
