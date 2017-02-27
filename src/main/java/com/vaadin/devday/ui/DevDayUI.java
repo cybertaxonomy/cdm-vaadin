@@ -1,7 +1,7 @@
 package com.vaadin.devday.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.events.EventBus;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Viewport;
@@ -26,7 +26,7 @@ public class DevDayUI extends UI {
 	private ViewDisplay viewDisplay;
 
 	@Autowired
-	private EventBus.UIEventBus eventBus;
+	private ApplicationEventPublisher eventBus;
 
 	/*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -41,7 +41,7 @@ public class DevDayUI extends UI {
 
 		setContent((Component) viewDisplay);
 
-		eventBus.publish(this, new UIInitializedEvent());
+		eventBus.publishEvent(new UIInitializedEvent());
 	}
 
 	// @WebServlet(value = "/*", asyncSupported = true)

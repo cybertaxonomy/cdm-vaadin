@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 
 import com.vaadin.devday.ui.MainMenu;
 import com.vaadin.devday.ui.MenuItem;
@@ -33,7 +31,7 @@ public class MenuBeanDiscoveryBean {
 	private ApplicationContext beanManager;
 
     @Autowired
-    private EventBus.UIEventBus eventBus;
+    private ApplicationEventPublisher eventBus;
 
 	private MainMenu mainMenuLookup = null;
 
@@ -49,12 +47,7 @@ public class MenuBeanDiscoveryBean {
 	    this.mainMenuLookup = mainMenu;
 	}
 
-	@PostConstruct
-    protected void init() {
-        eventBus.subscribe(this);
-	}
-
-	@EventBusListenerMethod
+	@EventListener
 	protected void doMenuItemLookup(UIInitializedEvent event) {
 
 		if (mainMenuLookup == null) {

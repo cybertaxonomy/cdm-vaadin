@@ -9,11 +9,13 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.devday.ui.UIInitializedEvent;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
@@ -41,7 +43,7 @@ public class RegistrationUI extends UI {
     private ViewDisplay viewDisplay;
 
     @Autowired
-    // private javax.enterprise.event.Event<UIInitializedEvent> event;
+    ApplicationEventPublisher eventBus;
 
     @Override
     protected void init(VaadinRequest request) {
@@ -50,6 +52,6 @@ public class RegistrationUI extends UI {
 
         setContent((Component) viewDisplay);
 
-        // event.fire(new UIInitializedEvent());
+        eventBus.publishEvent(new UIInitializedEvent());
     }
 }

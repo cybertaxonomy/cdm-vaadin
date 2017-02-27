@@ -3,7 +3,8 @@ package com.vaadin.devday.ui.navigation;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.events.EventBus;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 
 import com.vaadin.devday.ui.NavigationManager;
 import com.vaadin.navigator.View;
@@ -16,19 +17,20 @@ import com.vaadin.spring.annotation.UIScope;
 class ViewChangeListenerBean implements ViewChangeListener {
 	private static final long serialVersionUID = 1913421359807383L;
 
-	@Autowired
-	private Collection<ViewChangeAllowedVerifier> verifiers;
+	@Autowired(required=false)
+	private Collection<ViewChangeAllowedVerifier> verifiers = null;
 
 	@Autowired
+	@Lazy
 	private NavigationManager navigationManager;
 
 	@Autowired
-    EventBus.UIEventBus eventBus;
+    ApplicationEventPublisher eventBus;
 
 	@Override
 	public boolean beforeViewChange(ViewChangeEvent event) {
 		View currentView = navigationManager.getCurrentView();
-		if (currentView != null) {
+		if (currentView != null && verifiers != null) {
 			for (ViewChangeAllowedVerifier verifier : verifiers) {
 				if (currentView.equals(verifier)) {
 					if (!verifier.isViewChangeAllowed()) {
@@ -37,13 +39,12 @@ class ViewChangeListenerBean implements ViewChangeListener {
 				}
 			}
 		}
-
 		return true;
 	}
 
 	@Override
 	public void afterViewChange(ViewChangeEvent event) {
-	    eventBus.publish(this, new AfterViewChangeEvent());
+	    eventBus.publishEvent(new AfterViewChangeEvent());
 	}
 
 }

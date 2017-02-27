@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 
 import com.vaadin.devday.ui.NavigationManager;
 import com.vaadin.devday.ui.UIInitializedEvent;
@@ -32,7 +32,7 @@ class NavigationManagerBean extends SpringNavigator implements NavigationManager
 	@Autowired
 	private SpringViewProvider viewProvider;
 
-	// @Autowired
+	@Autowired
 	private ViewChangeListener viewChangeListener;
 
 	private Map<PopupView, Window> popupMap;
@@ -41,16 +41,16 @@ class NavigationManagerBean extends SpringNavigator implements NavigationManager
 		popupMap = new HashMap<>();
 	}
 
-    @Autowired
-    private Map<String, PopupView> popupViews;
+	//@Autowired
+    private Map<String, PopupView> popupViews = null;
 
 	@Autowired
 	private UriFragmentManager uriFragmentManager;
 
 	@Autowired
-	EventBus.UIEventBus eventBus;
+	ApplicationEventPublisher eventBus;
 
-	@EventBusListenerMethod()
+	@EventListener
 	protected void onUIInitialized(UIInitializedEvent e) {
 		init(UI.getCurrent(), uriFragmentManager, viewDisplay);
 		addProvider(viewProvider);
@@ -68,10 +68,10 @@ class NavigationManagerBean extends SpringNavigator implements NavigationManager
 	@Override
 	public void navigateTo(String navigationState) {
 		super.navigateTo(navigationState);
-		eventBus.publish(this, new NavigationEvent(navigationState));
+		eventBus.publishEvent(new NavigationEvent(navigationState));
 	}
 
-	@EventBusListenerMethod()
+	@EventListener
 	protected void onNavigationEvent(NavigationEvent e) {
 		navigateTo(e.getViewName(), false);
 	}
@@ -95,7 +95,7 @@ class NavigationManagerBean extends SpringNavigator implements NavigationManager
 		return (T) popupContent;
 	}
 
-    @EventBusListenerMethod()
+    @EventListener
 	protected void onDoneWithTheEditor(DoneWithPopupEvent e) {
 		Window window = popupMap.get(e.getPopup());
 		if (window != null) {
