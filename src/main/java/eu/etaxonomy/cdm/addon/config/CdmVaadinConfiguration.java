@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.vaadin.spring.events.annotation.EnableEventBus;
 
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.server.SpringVaadinServlet;
@@ -24,8 +25,13 @@ import com.vaadin.spring.server.SpringVaadinServlet;
  *
  */
 @Configuration
-@ComponentScan(basePackages={"eu.etaxonomy.cdm.vaadin"})
+@ComponentScan(basePackages={
+        "eu.etaxonomy.cdm.vaadin",
+        "com.vaadin.devday.ui"
+        })
 @EnableVaadin   // this imports VaadinConfiguration
+@EnableEventBus
+//@Import(EventBusConfiguration.class)
 public class CdmVaadinConfiguration {
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
@@ -40,9 +46,9 @@ public class CdmVaadinConfiguration {
     public static class Servlet extends SpringVaadinServlet {
     }
 
-
     public CdmVaadinConfiguration() {
         logger.debug("CdmVaadinConfiguration enabled");
     }
+
 
 }

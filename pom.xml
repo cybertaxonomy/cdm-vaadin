@@ -17,8 +17,8 @@
         lucene.version must match the version as defined in cdmlib
     -->
     <lucene.version>5.4.1</lucene.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <prerequisites>
     <maven>3.0.5</maven>
