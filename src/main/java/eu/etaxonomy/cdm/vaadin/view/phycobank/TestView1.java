@@ -21,29 +21,27 @@ import com.vaadin.ui.VerticalLayout;
  * @since Feb 24, 2017
  *
  */
-@SpringView(name=TestView.NAME)
+@SpringView(name=TestView1.NAME)
 /*
  * MenuBeanDiscovery is not yet working with spring!!!!!
 @SpringComponent
 @Scope(scopeName = ViewScopeImpl.VAADIN_VIEW_SCOPE_NAME, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @MenuItem(name="test", icon=FontAwesome.INFO_CIRCLE, order = 0)
 */
-public class TestView extends VerticalLayout  implements View {
+public class TestView1 extends VerticalLayout  implements View {
 
     public static final String NAME = "test1";
 
     private static final long serialVersionUID = 6152530138547633828L;
 
-    public TestView(){
-        Label label = new Label();
-        label.setDescription("This is only a test!");
-        this.addComponent(label);
+    public TestView1(){
+        setWidth(100, Unit.PERCENTAGE);
+        setMargin(true);
+        this.addComponent(new Label("This is only a test!"));
     }
 
     @PostConstruct
     protected void initialize() {
-
-
     }
 
     /**

@@ -26,7 +26,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView;
+import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView1;
+import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView2;
 
 /**
  * @author a.kohlbecker
@@ -70,7 +71,8 @@ public class RegistrationUI extends UI {
 
         setContent((Component) viewDisplay);
 
-        mainMenu.addMenuItem(TestView.NAME, FontAwesome.AMBULANCE, TestView.NAME);
+        mainMenu.addMenuItem(TestView1.NAME, FontAwesome.AMBULANCE, TestView1.NAME);
+        mainMenu.addMenuItem(TestView2.NAME, FontAwesome.APPLE, TestView2.NAME);
 
         eventBus.publishEvent(new UIInitializedEvent());
     }
