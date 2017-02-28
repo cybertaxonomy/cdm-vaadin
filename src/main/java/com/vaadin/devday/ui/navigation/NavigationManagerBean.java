@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 
 import com.vaadin.devday.ui.NavigationManager;
@@ -13,16 +14,14 @@ import com.vaadin.devday.ui.view.DoneWithPopupEvent;
 import com.vaadin.devday.ui.view.PopupView;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
-import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-@SpringComponent
 @UIScope
-class NavigationManagerBean extends SpringNavigator implements NavigationManager {
+public class NavigationManagerBean extends SpringNavigator implements NavigationManager {
 
 	private static final long serialVersionUID = 6599898650948333853L;
 
@@ -44,8 +43,22 @@ class NavigationManagerBean extends SpringNavigator implements NavigationManager
 	//@Autowired
     private Map<String, PopupView> popupViews = null;
 
-	@Autowired
+    /*
+     * Why UriFragmentManager must be initialized lazily:
+     *
+     * when the SpringVaadinServlet usually is being instantiated the ServletUIInitHandler(UIInitHandler).getBrowserDetailsUI(VaadinRequest, VaadinSession) method is called which will
+     * first cause the WebapplicationContext being created. Once this is done the initialization of the UI classes is completed. This means that the UI classes are not readily available
+     * via Page.getCurrent() which is used in the UriFragmentManager constructor. The NavigationManagerBean is initialized with the WebapplicationContext, that is when the current ui is
+     * not yet available, therefore the UriFragmentManager must be initialized lazily.
+     */
+    @Autowired
+    @Lazy
 	private UriFragmentManager uriFragmentManager;
+
+
+//	public void setUriFragmentManager(UriFragmentManager uriFragmentManager) {
+//	    this.uriFragmentManager = uriFragmentManager;
+//	}
 
 	@Autowired
 	ApplicationEventPublisher eventBus;

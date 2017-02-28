@@ -14,17 +14,17 @@ import com.vaadin.devday.ui.MainMenu;
 import com.vaadin.devday.ui.MenuItem;
 import com.vaadin.devday.ui.UIInitializedEvent;
 import com.vaadin.navigator.View;
-import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.spring.annotation.UIScope;
 
+// MenuBeanDiscovery is not yet working with spring!!!!!
+//
 // @NormalUIScoped // FIXME this provided a MenuBeanDiscoveryBean as a proxy, which is the equivalent in spring?
 // otherwise the following error will be thrown:
 //    Error creating bean with name 'testView': Scope 'vaadin-view' is not active for the current thread;
 //    consider defining a scoped proxy for this bean if you intend to refer to it from a singleton
-@SpringComponent
-@UIScope
-// @Scope(value=UIScopeImpl.VAADIN_UI_SCOPE_NAME, proxyMode = ScopedProxyMode.TARGET_CLASS)
+//###DISABLED:
+//@SpringComponent
+//@UIScope
 public class MenuBeanDiscoveryBean {
 
 	@Autowired

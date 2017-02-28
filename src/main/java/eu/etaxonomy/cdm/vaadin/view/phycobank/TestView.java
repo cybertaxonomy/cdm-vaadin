@@ -10,15 +10,9 @@ package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-
-import com.vaadin.devday.ui.MenuItem;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.internal.ViewScopeImpl;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
@@ -27,15 +21,17 @@ import com.vaadin.ui.VerticalLayout;
  * @since Feb 24, 2017
  *
  */
-//@SpringView
+@SpringView(name=TestView.NAME)
+/*
+ * MenuBeanDiscovery is not yet working with spring!!!!!
 @SpringComponent
 @Scope(scopeName = ViewScopeImpl.VAADIN_VIEW_SCOPE_NAME, proxyMode = ScopedProxyMode.TARGET_CLASS)
-@MenuItem(name="Test", icon=FontAwesome.INFO_CIRCLE, order = 0)
+@MenuItem(name="test", icon=FontAwesome.INFO_CIRCLE, order = 0)
+*/
 public class TestView extends VerticalLayout  implements View {
 
-    /**
-     *
-     */
+    public static final String NAME = "test1";
+
     private static final long serialVersionUID = 6152530138547633828L;
 
     public TestView(){

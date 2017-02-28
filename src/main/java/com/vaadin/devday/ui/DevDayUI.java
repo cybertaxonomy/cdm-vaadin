@@ -5,7 +5,6 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Viewport;
-import com.vaadin.devday.ui.mainmenu.MenuBeanDiscoveryBean;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
@@ -31,8 +30,8 @@ public class DevDayUI extends UI {
 	/*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
      */
-    @Autowired
-    MenuBeanDiscoveryBean bean;
+//    @Autowired
+//    MenuBeanDiscoveryBean bean;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -41,7 +40,7 @@ public class DevDayUI extends UI {
 
 		setContent((Component) viewDisplay);
 
-		eventBus.publishEvent(new UIInitializedEvent());
+		//FIXME disabled! eventBus.publishEvent(new UIInitializedEvent());
 	}
 
 	// @WebServlet(value = "/*", asyncSupported = true)

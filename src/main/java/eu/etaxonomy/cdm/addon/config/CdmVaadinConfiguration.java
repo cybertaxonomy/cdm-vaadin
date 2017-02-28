@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import com.vaadin.devday.ui.annotation.EnableVaadinSpringNavigation;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.server.SpringVaadinServlet;
 
@@ -29,10 +30,10 @@ import com.vaadin.spring.server.SpringVaadinServlet;
         "com.vaadin.devday.ui"
         })
 @EnableVaadin   // this imports VaadinConfiguration
+@EnableVaadinSpringNavigation // activate the NavigationManagerBean
 public class CdmVaadinConfiguration {
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
-
 
     /*
      * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
