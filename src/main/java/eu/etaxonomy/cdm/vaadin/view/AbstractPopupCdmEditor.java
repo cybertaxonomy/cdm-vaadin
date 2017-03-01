@@ -6,10 +6,11 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package com.vaadin.devday.ui.view;
+package eu.etaxonomy.cdm.vaadin.view;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vaadin.devday.ui.view.AbstractPopupEditor;
 import com.vaadin.ui.AbstractOrderedLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
