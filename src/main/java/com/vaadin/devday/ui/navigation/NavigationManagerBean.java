@@ -40,7 +40,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		popupMap = new HashMap<>();
 	}
 
-	//@Autowired
+	@Autowired(required=false)
     private Map<String, PopupView> popupViews = null;
 
     /*

@@ -17,6 +17,7 @@ import com.vaadin.annotations.Viewport;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.devday.ui.MainMenu;
 import com.vaadin.devday.ui.UIInitializedEvent;
+import com.vaadin.devday.ui.navigation.NavigationEvent;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
@@ -75,5 +76,8 @@ public class RegistrationUI extends UI {
         mainMenu.addMenuItem(TestView2.NAME, FontAwesome.APPLE, TestView2.NAME);
 
         eventBus.publishEvent(new UIInitializedEvent());
+
+        //navigate to initial view
+        eventBus.publishEvent(new NavigationEvent(TestView1.NAME));
     }
 }

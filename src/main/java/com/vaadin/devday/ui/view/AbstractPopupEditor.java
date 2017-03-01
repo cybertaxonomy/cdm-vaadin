@@ -1,14 +1,12 @@
 package com.vaadin.devday.ui.view;
 
-import javax.ejb.EJB;
-import javax.inject.Inject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
-import com.vaadin.devday.service.AbstractDTOWithIdentity;
-import com.vaadin.devday.service.DTOService;
 import com.vaadin.devday.ui.view.DoneWithPopupEvent.Reason;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -27,7 +25,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-public abstract class AbstractPopupEditor<DTO extends AbstractDTOWithIdentity> extends CustomComponent
+public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComponent
 		implements PopupView {
 	private static final long serialVersionUID = 1441816620197127918L;
 
@@ -37,11 +35,8 @@ public abstract class AbstractPopupEditor<DTO extends AbstractDTOWithIdentity> e
 
 	private AbstractOrderedLayout fieldLayout;
 
-	@EJB
-	private DTOService dtoService;
-
-	@Inject
-	private javax.enterprise.event.Event<DoneWithPopupEvent> doneWithEditorEventSource;
+    @Autowired
+    ApplicationEventPublisher eventBus;
 
 	private HorizontalLayout buttonLayout;
 
@@ -59,13 +54,15 @@ public abstract class AbstractPopupEditor<DTO extends AbstractDTOWithIdentity> e
 		@Override
 		public void postCommit(CommitEvent commitEvent) throws CommitException {
 			try {
-				dtoService.storeDto(getBean());
-				doneWithEditorEventSource.fire(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
+			    AbstractPopupEditor.this.storeDto(getBean());
+				eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
 			} catch (Exception e) {
 				throw new CommitException("Failed to store data to backend", e);
 			}
 		}
-	};
+	}
+
+	public abstract void storeDto(DTO bean) throws CommitException;
 
 	public AbstractPopupEditor(Class<DTO> dtoType) {
 		this(new FormLayout(), dtoType);
@@ -132,7 +129,7 @@ public abstract class AbstractPopupEditor<DTO extends AbstractDTOWithIdentity> e
 
 	private void onCancelClicked() {
 		fieldGroup.discard();
-		doneWithEditorEventSource.fire(new DoneWithPopupEvent(this, Reason.CANCEL));
+		eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
 	}
 
 	private void onSaveClicked() {
