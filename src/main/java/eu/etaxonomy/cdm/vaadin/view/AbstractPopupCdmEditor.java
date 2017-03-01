@@ -10,11 +10,11 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.vaadin.devday.ui.view.AbstractPopupEditor;
 import com.vaadin.ui.AbstractOrderedLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.vaadin.ui.view.AbstractPopupEditor;
 
 /**
  * @author a.kohlbecker

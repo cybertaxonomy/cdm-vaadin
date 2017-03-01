@@ -15,9 +15,6 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.annotations.Widgetset;
-import com.vaadin.devday.ui.MainMenu;
-import com.vaadin.devday.ui.UIInitializedEvent;
-import com.vaadin.devday.ui.navigation.NavigationEvent;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Responsive;
@@ -29,6 +26,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView1;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView2;
+import eu.etaxonomy.vaadin.ui.MainMenu;
+import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
  * @author a.kohlbecker

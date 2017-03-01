@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui;
+package eu.etaxonomy.vaadin.ui;
 
 import com.vaadin.server.Resource;
 

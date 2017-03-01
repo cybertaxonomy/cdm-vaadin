@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.view;
+package eu.etaxonomy.vaadin.ui.view;
 
 public class DoneWithPopupEvent {
 

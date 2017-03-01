@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.view;
+package eu.etaxonomy.vaadin.ui.view;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -7,7 +7,6 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
-import com.vaadin.devday.ui.view.DoneWithPopupEvent.Reason;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
@@ -24,6 +23,8 @@ import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComponent
 		implements PopupView {

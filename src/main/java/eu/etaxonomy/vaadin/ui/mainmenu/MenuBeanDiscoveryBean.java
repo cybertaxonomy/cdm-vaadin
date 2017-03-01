@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.mainmenu;
+package eu.etaxonomy.vaadin.ui.mainmenu;
 
 import java.util.Comparator;
 import java.util.List;
@@ -10,11 +10,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
-import com.vaadin.devday.ui.MainMenu;
-import com.vaadin.devday.ui.MenuItem;
-import com.vaadin.devday.ui.UIInitializedEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
+
+import eu.etaxonomy.vaadin.ui.MainMenu;
+import eu.etaxonomy.vaadin.ui.MenuItem;
+import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 
 // MenuBeanDiscovery is not yet working with spring!!!!!
 //

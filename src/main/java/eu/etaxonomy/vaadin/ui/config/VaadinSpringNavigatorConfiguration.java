@@ -6,14 +6,15 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package com.vaadin.devday.ui.config;
+package eu.etaxonomy.vaadin.ui.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.vaadin.devday.ui.navigation.NavigationManagerBean;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.internal.SpringViewDisplayPostProcessor;
+
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * @author a.kohlbecker

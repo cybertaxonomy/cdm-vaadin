@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package com.vaadin.devday.ui.annotation;
+package eu.etaxonomy.vaadin.ui.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -17,9 +17,10 @@ import java.lang.annotation.Target;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
-import com.vaadin.devday.ui.config.VaadinSpringNavigatorConfiguration;
-import com.vaadin.devday.ui.navigation.NavigationManagerBean;
 import com.vaadin.spring.annotation.SpringViewDisplay;
+
+import eu.etaxonomy.vaadin.ui.config.VaadinSpringNavigatorConfiguration;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * Activates automatic navigation through the {@link NavigationManagerBean} based on

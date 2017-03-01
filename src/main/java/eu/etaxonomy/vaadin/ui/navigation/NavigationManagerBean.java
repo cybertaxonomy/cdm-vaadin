@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.navigation;
+package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +8,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 
-import com.vaadin.devday.ui.NavigationManager;
-import com.vaadin.devday.ui.UIInitializedEvent;
-import com.vaadin.devday.ui.view.DoneWithPopupEvent;
-import com.vaadin.devday.ui.view.PopupView;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.spring.annotation.UIScope;
@@ -19,6 +15,11 @@ import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
+
+import eu.etaxonomy.vaadin.ui.NavigationManager;
+import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 @UIScope
 public class NavigationManagerBean extends SpringNavigator implements NavigationManager {

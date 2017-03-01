@@ -31,5 +31,7 @@
 
     <inherits name="org.vaadin.peter.contextmenu.ContextmenuWidgetset" />
 
-    <inherits name="com.vaadin.devday.ui.DevDayWidgetset" />
+    
+
+    <inherits name="eu.etaxonomy.vaadin.ui.DevDayWidgetset" />
 </module>

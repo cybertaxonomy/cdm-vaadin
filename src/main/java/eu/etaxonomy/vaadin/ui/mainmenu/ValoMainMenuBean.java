@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.mainmenu;
+package eu.etaxonomy.vaadin.ui.mainmenu;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,9 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
-import com.vaadin.devday.ui.MainMenu;
-import com.vaadin.devday.ui.navigation.AfterViewChangeEvent;
-import com.vaadin.devday.ui.navigation.NavigationEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -19,6 +16,10 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.vaadin.ui.MainMenu;
+import eu.etaxonomy.vaadin.ui.navigation.AfterViewChangeEvent;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
  * ValoMainMenuBean is the implementation of responsive Vaadin Valo theme's menu

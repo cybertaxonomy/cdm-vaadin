@@ -14,9 +14,10 @@ import org.apache.log4j.Logger;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.vaadin.devday.ui.annotation.EnableVaadinSpringNavigation;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.server.SpringVaadinServlet;
+
+import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
  *
@@ -27,7 +28,7 @@ import com.vaadin.spring.server.SpringVaadinServlet;
 @Configuration
 @ComponentScan(basePackages={
         "eu.etaxonomy.cdm.vaadin",
-        "com.vaadin.devday.ui"
+        "eu.etaxonomy.vaadin.ui"
         })
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean

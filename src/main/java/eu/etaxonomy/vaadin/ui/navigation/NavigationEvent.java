@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.navigation;
+package eu.etaxonomy.vaadin.ui.navigation;
 
 public class NavigationEvent {
 

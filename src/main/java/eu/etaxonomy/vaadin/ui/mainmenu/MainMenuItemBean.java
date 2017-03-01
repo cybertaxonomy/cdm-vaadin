@@ -1,9 +1,10 @@
-package com.vaadin.devday.ui.mainmenu;
+package eu.etaxonomy.vaadin.ui.mainmenu;
 
-import com.vaadin.devday.ui.MainMenu.MainMenuItem;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.vaadin.ui.MainMenu.MainMenuItem;
 
 class MainMenuItemBean extends Button implements MainMenuItem {
 

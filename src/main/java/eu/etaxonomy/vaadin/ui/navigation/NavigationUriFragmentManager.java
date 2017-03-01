@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.navigation;
+package eu.etaxonomy.vaadin.ui.navigation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

@@ -1,7 +1,8 @@
-package com.vaadin.devday.ui;
+package eu.etaxonomy.vaadin.ui;
 
-import com.vaadin.devday.ui.view.PopupView;
 import com.vaadin.navigator.View;
+
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 public interface NavigationManager {
 

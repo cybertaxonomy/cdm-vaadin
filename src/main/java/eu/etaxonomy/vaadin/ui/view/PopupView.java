@@ -1,6 +1,6 @@
-package com.vaadin.devday.ui.view;
+package eu.etaxonomy.vaadin.ui.view;
 
-import com.vaadin.devday.ui.CanCastComponent;
+import eu.etaxonomy.vaadin.ui.CanCastComponent;
 
 public interface PopupView extends CanCastComponent {
 

@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui.navigation;
+package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.Collection;
 
@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 
-import com.vaadin.devday.ui.NavigationManager;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
+
+import eu.etaxonomy.vaadin.ui.NavigationManager;
 
 @SpringComponent
 @UIScope

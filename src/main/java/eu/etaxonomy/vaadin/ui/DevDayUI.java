@@ -1,4 +1,4 @@
-package com.vaadin.devday.ui;
+package eu.etaxonomy.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +17,7 @@ import com.vaadin.ui.themes.ValoTheme;
 @Theme("edit-valo")
 @Viewport("width=device-width, initial-scale=1")
 // @Push
-// @Widgetset("com.vaadin.devday.ui.DevDayWidgetset")
+// @Widgetset("eu.etaxonomy.vaadin.ui.DevDayWidgetset")
 public class DevDayUI extends UI {
 	private static final long serialVersionUID = -6541105928485822011L;
 
