@@ -25,7 +25,7 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  * @date 9 Apr 2015
  *
  */
-@Theme("edit")
+@Theme("valo")
 @SpringUI(path="concept")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUI extends AbstractAuthenticatedUI {

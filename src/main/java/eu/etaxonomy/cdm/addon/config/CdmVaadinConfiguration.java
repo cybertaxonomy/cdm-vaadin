@@ -17,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.server.SpringVaadinServlet;
 
+import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
+
 /**
  *
  * @author a.kohlbecker
@@ -24,12 +26,15 @@ import com.vaadin.spring.server.SpringVaadinServlet;
  *
  */
 @Configuration
-@ComponentScan(basePackages={"eu.etaxonomy.cdm.vaadin"})
+@ComponentScan(basePackages={
+        "eu.etaxonomy.cdm.vaadin",
+        "eu.etaxonomy.vaadin.ui"
+        })
 @EnableVaadin   // this imports VaadinConfiguration
+@EnableVaadinSpringNavigation // activate the NavigationManagerBean
 public class CdmVaadinConfiguration {
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
-
 
     /*
      * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
@@ -40,9 +45,9 @@ public class CdmVaadinConfiguration {
     public static class Servlet extends SpringVaadinServlet {
     }
 
-
     public CdmVaadinConfiguration() {
         logger.debug("CdmVaadinConfiguration enabled");
     }
+
 
 }

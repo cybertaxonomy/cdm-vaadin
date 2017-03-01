@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;edit-valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-horizontal-layout style-name="app-shell v-menu-responsive" responsive size-full>
+   <vaadin-css-layout style-name="navigation-bar-container" width="200px" height-full>
+    <vaadin-css-layout style-name="navigation-bar" size-full>
+     <vaadin-label primary-style-name="v-label logo" style-name="logo" plain-text>
+       PhycoBank 
+     </vaadin-label>
+     <vaadin-css-layout style-name="navigation" width-full _id="menu">
+      <vaadin-button icon="fonticon://FontAwesome/f044" style-name="borderless huge" width-full plain-text _id="dashboard">
+        New 
+      </vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f061" style-name="borderless huge" width-full plain-text _id="reports">
+        Continue 
+      </vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f03a" style-name="borderless huge" width-full plain-text _id="customize">
+        List 
+      </vaadin-button>
+     </vaadin-css-layout>
+    </vaadin-css-layout>
+   </vaadin-css-layout>
+   <vaadin-vertical-layout style-name="content-container" size-full :expand>
+    <vaadin-horizontal-layout style-name="banner" width-full :bottom :right>
+     <vaadin-css-layout :bottom :right>
+      <vaadin-button style-name="borderless small" plain-text _id="help">
+        Help 
+      </vaadin-button>
+      <vaadin-button style-name="borderless small" plain-text _id="login">
+        Login 
+      </vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f007" style-name="borderless small" plain-text _id="userAccount">
+        User Name 
+      </vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f0e0" style-name="borderless small" _id="messagesButton">
+       <span class="valo-menu-badge">123</span>
+      </vaadin-button>
+     </vaadin-css-layout>
+    </vaadin-horizontal-layout>
+    <vaadin-css-layout size-full _id="content" :expand>
+     <vaadin-css-layout size-full>
+      <vaadin-css-layout style-name="content-section padding" size-full></vaadin-css-layout>
+     </vaadin-css-layout>
+    </vaadin-css-layout>
+   </vaadin-vertical-layout>
+  </vaadin-horizontal-layout>
+ </body>
+</html>
