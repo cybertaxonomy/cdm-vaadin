@@ -16,17 +16,21 @@ import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
+import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.view.phycobank.DashBoardView;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView1;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView2;
+import eu.etaxonomy.cdm.vaadin.view.phycobank.ListView;
+import eu.etaxonomy.cdm.vaadin.view.phycobank.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -72,13 +76,26 @@ public class RegistrationUI extends UI {
         Responsive.makeResponsive(this);
 
         setContent((Component) viewDisplay);
+        Label phycoBankLogo = new Label("PhycoBank");
+        phycoBankLogo.addStyleName("phycobank-green");
+        phycoBankLogo.addStyleName(ValoTheme.LABEL_HUGE);
+        mainMenu.addMenuComponent(phycoBankLogo);
 
-        mainMenu.addMenuItem(TestView1.NAME, FontAwesome.AMBULANCE, TestView1.NAME);
-        mainMenu.addMenuItem(TestView2.NAME, FontAwesome.APPLE, TestView2.NAME);
+        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME);
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListView.NAME);
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListView.NAME);
 
         eventBus.publishEvent(new UIInitializedEvent());
 
         //navigate to initial view
         eventBus.publishEvent(new NavigationEvent(DashBoardView.NAME));
+
+        //TODO the branding should be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
+        //  See CdmUtils for appropriate methods to access this folder
+        String brand = "phycobank";
+
+        // the 'vaadin://' protocol refers to the VAADIN folder
+        Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
+        Page.getCurrent().getStyles().add(registryCssFile);
     }
 }

@@ -14,6 +14,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -102,4 +103,12 @@ class ValoMainMenuBean extends CssLayout implements MainMenu {
 	protected void afterViewChange(AfterViewChangeEvent event) {
 		removeStyleName(MENU_VISIBLE);
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addMenuComponent(Component component) {
+        menuArea.addComponent(component);
+    }
 }

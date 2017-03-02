@@ -71,6 +71,12 @@ $v-component-group-spacing: 6px;
    .dashboard-actions {
       margin: 0 10%;
     
+      .dashboard-action-2 {
+        width: 50%;
+        .v-label {
+            white-space: normal;
+        }
+      }
       .dashboard-action-3 {
         width: 33%;
         .v-label {
@@ -78,7 +84,7 @@ $v-component-group-spacing: 6px;
         }
       }
       &[width-range~="-650px"] {
-          .dashboard-action-3 {
+          .dashboard-action-2, .dashboard-action-3 {
               width: 100%;
           }
       }
