@@ -56,19 +56,32 @@ $v-component-group-spacing: 6px;
 
   // Insert your own theme rules here
   
-  // ----- Banner and Logo  ------
-  $banner-height:  60px;
-  
-  .logo {
-    font-weight: bold;
-    font-size: 1.5em;
-    color: #0E9B06;
-    height: $banner-height;
-  }
-  
-  .banner {
-    height: $banner-height;
-  }
-  
+  .logo_giant {
+    font-size: 400%;
+   }
+   
+   .v-button-giant { /* using v-slot-* to select the wrapper for the label */
+     font-size: 32px;
+     .v-icon {
+       font-size: 64px;
+       line-height: 50px;
+     }
+   }
+   
+   .dashboard-actions {
+      margin: 0 10%;
+    
+      .dashboard-action-3 {
+        width: 33%;
+        .v-label {
+            white-space: normal;
+        }
+      }
+      &[width-range~="-650px"] {
+          .dashboard-action-3 {
+              width: 100%;
+          }
+      }
+    }
 
 }

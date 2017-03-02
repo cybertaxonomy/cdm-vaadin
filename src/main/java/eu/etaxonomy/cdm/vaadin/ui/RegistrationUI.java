@@ -24,6 +24,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.view.phycobank.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView1;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.TestView2;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -78,6 +79,6 @@ public class RegistrationUI extends UI {
         eventBus.publishEvent(new UIInitializedEvent());
 
         //navigate to initial view
-        eventBus.publishEvent(new NavigationEvent(TestView1.NAME));
+        eventBus.publishEvent(new NavigationEvent(DashBoardView.NAME));
     }
 }
