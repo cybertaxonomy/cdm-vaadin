@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
@@ -101,5 +103,14 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
     @Override
     public Label getCaptionLabel() {
         return design.getCaptionLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void openNameEditor(UUID nameUuid) {
+        // TODO Auto-generated method stub
+
     }
 }

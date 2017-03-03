@@ -2,7 +2,11 @@ package eu.etaxonomy.vaadin.mvp;
 
 import java.util.logging.Logger;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.vaadin.spring.annotation.SpringComponent;
+
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -18,6 +22,9 @@ import com.vaadin.spring.annotation.SpringComponent;
 public abstract class AbstractPresenter<V extends ApplicationView> {
 
 	private V view;
+
+	@Autowired
+	private CdmRepository repo;
 
 	protected V getView() {
 		return view;

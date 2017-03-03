@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
+import java.util.UUID;
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -28,5 +30,14 @@ public interface RegistrationWorkflowView extends ApplicationView{
     CssLayout getWorkflow();
 
     Label getTitle();
+
+
+    /**
+     * Open a popup editor for an existing TaxonName if the nameUuid is
+     * given otherwise a blank editor will open if the  nameUuid is null.
+     *
+     * @param nameUuid can be null
+     */
+    void openNameEditor(UUID nameUuid);
 
 }
