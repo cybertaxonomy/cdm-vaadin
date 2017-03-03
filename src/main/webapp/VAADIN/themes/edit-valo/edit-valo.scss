@@ -89,5 +89,62 @@ $v-component-group-spacing: 6px;
           }
       }
     }
+    
+    .workflow {
+    
+        $workflow-icon-size: 110px;
+        // can not be set per css as this need to set as property to the component in vaadin
+        $workflow-timeline-bar-height: 10px; 
+        // the fator by which the caption should be smaller than the circe
+        $workflow-caption-shrink: 0.64; 
+
+        $workflow-icon-margin-h: $workflow-icon-size / 5;
+        $workflow-icon-left: $workflow-icon-margin-h / 2;
+        $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;
+        
+        .steps {
+            z-index: 10;
+            
+            .v-button {
+                margin: 0 $workflow-icon-margin-h;
+                font-size: $workflow-icon-size;
+                height: $workflow-icon-size;
+                width: $workflow-icon-size;
+                line-height: $workflow-icon-size;
+            
+                .v-icon, .v-button-caption {
+                    position: absolute;
+                    left: $workflow-icon-left;
+                    top: 0px;
+                }
+                .v-button-caption {
+                    font-family: monospace;
+                    left: (($workflow-icon-size - $workflow-caption-font-size) / 2) + $workflow-icon-left; // 30px;
+                    top: -2px;
+                    color: $v-background-color;
+                    font-size: $workflow-caption-font-size; // 70px;
+                }
+            }
+            
+            .v-csslayout {
+                width: $workflow-icon-size + 2 * $workflow-icon-margin-h;
+                .v-label {
+                    display: block;
+                    text-align: center;
+                }
+            }
+         }
+         
+         .timeline {
+            display: block;
+            position: relative;
+            top: ($workflow-icon-size / 2) + $workflow-timeline-bar-height / 2;
+            padding: 0 $workflow-icon-size / 2;
+            .timeline-bar {
+                z-index: 0;
+                background-color: $v-font-color;
+            }
+        }
+    }
 
 }
