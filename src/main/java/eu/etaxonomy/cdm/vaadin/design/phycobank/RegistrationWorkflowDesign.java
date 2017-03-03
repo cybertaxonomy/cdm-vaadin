@@ -28,4 +28,6 @@ public class RegistrationWorkflowDesign extends VerticalLayout {
     public RegistrationWorkflowDesign() {
         Design.read(this);
     }
+
+
 }

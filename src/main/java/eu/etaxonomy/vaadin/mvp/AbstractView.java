@@ -5,19 +5,21 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.ui.CustomComponent;
 
 /**
  * AbstractView is the base class of all MVP views. It takes care of finding
  * appropriate presenter component for the view.
- * 
+ *
  * @param
  * 			<P>
  *            type of the presenter this view uses.
- * 
+ *
  * @author Peter / Vaadin
  */
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
@@ -26,6 +28,9 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	private P presenter;
 
 	private ApplicationContext applicationContext;
+
+    @Autowired
+    ApplicationEventPublisher eventBus;
 
 	@PostConstruct
 	protected final void init() {
