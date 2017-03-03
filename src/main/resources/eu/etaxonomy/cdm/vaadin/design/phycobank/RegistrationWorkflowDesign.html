@@ -7,8 +7,8 @@
  </head>
  <body>
   <vaadin-vertical-layout spacing>
-   <vaadin-label style-name="huge" size-auto plain-text :center>
-     Registration of ... 
+   <vaadin-label style-name="huge" size-auto plain-text _id="title" :center>
+     Registration of the 
    </vaadin-label>
    <vaadin-label size-auto plain-text :middle :center>
      Advance step by step through the registration workflow for scientific names. 
@@ -19,10 +19,10 @@
     </vaadin-css-layout>
     <vaadin-css-layout style-name="steps">
      <vaadin-css-layout>
-      <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text>
+      <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text _id="stepIndex">
         1 
       </vaadin-button>
-      <vaadin-label plain-text>
+      <vaadin-label plain-text _id="caption">
         Edit the scientific name and related names. 
       </vaadin-label>
      </vaadin-css-layout>
@@ -31,7 +31,7 @@
         2 
       </vaadin-button>
       <vaadin-label plain-text>
-        Label 
+        Edit the scientific name and related names. 
       </vaadin-label>
      </vaadin-css-layout>
      <vaadin-css-layout>

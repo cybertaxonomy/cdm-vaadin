@@ -16,6 +16,7 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 
 import eu.etaxonomy.cdm.vaadin.design.phycobank.StartRegistrationDesign;
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
@@ -34,7 +35,7 @@ public class StartRegistrationView extends StartRegistrationDesign implements Vi
     ApplicationEventPublisher eventBus;
 
     public StartRegistrationView() {
-        buttonName.addClickListener(e -> new NavigationEvent(RegistrationWorkflowView.NAME));
+        buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowView.NAME+ "/" + RegistrationType.name)));
     }
 
     /**
