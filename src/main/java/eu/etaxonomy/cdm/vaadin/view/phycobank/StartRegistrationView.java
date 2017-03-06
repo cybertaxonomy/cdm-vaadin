@@ -35,7 +35,11 @@ public class StartRegistrationView extends StartRegistrationDesign implements Vi
     ApplicationEventPublisher eventBus;
 
     public StartRegistrationView() {
-        buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowViewBean.NAME+ "/" + RegistrationType.name)));
+        buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(
+                RegistrationWorkflowViewBean.NAME,
+                RegistrationWorkflowViewBean.ACTION_NEW,
+                RegistrationType.name.name()
+                )));
     }
 
     /**

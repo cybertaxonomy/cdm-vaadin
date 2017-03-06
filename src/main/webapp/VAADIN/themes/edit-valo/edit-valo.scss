@@ -25,7 +25,7 @@ $v-font-family: "Open Sans", sans-serif;
 //$v-error-indicator-color: #ed473b;
 
 // ================== DARK ================ //
-/*
+
 $v-app-loading-text: "Dark Valo";
 $v-background-color: #444d50;
 $v-focus-color: #07a9ca;
@@ -43,7 +43,7 @@ $v-textfield-shadow: $v-shadow;
 $v-unit-size: 40px;
 $v-overlay-shadow: 0 0 0 3px (v-shade 8), 0 5px 10px (v-shade 4);
 $v-component-group-spacing: 6px;
-*/
+
 // ========================================== //
 
 // For more information, see: https://vaadin.com/book/-/page/themes.valo.html
@@ -144,6 +144,12 @@ $v-component-group-spacing: 6px;
                 z-index: 0;
                 background-color: $v-font-color;
             }
+        }
+    }
+    
+    #registration-list {
+        .status-preparation td.status {
+            color: green;
         }
     }
 

@@ -37,6 +37,10 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
 
     public static final String NAME = "workflow";
 
+    public static final String ACTION_NEW = "new";
+
+    public static final String ACTION_EDIT = "edit";
+
     public RegistrationType regType = null;
 
     RegistrationWorkflowComponent design;
@@ -53,9 +57,12 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
            String[] params = event.getParameters().split("/");
-           if(params.length > 0){
-               regType = RegistrationType.valueOf(params[0]);
+
+           if(params[0].equals(ACTION_NEW)) {
+               regType = RegistrationType.valueOf(params[1]);
                design.getTitle().setValue(design.getTitle().getValue() + "  " + regType.name() + " ...");
+           } else if( params[0].equals(ACTION_EDIT)) {
+               design.getTitle().setValue(design.getTitle().getValue() + "  " + params[1]);
            }
         }
 

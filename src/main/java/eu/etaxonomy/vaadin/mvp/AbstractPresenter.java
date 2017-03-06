@@ -3,8 +3,10 @@ package eu.etaxonomy.vaadin.mvp;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 
@@ -19,15 +21,25 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
  *            type of the view this presenter governs
  */
 @SpringComponent
+@ViewScope
 public abstract class AbstractPresenter<V extends ApplicationView> {
 
 	private V view;
 
-	@Autowired
-	private CdmRepository repo;
 
 	protected V getView() {
 		return view;
+	}
+
+	@Autowired
+	@Qualifier("cdmRepository")
+	private CdmRepository repo;
+
+	/**
+	 * @return the repo
+	 */
+	public CdmRepository getRepo() {
+	    return repo;
 	}
 
 	/**
@@ -61,4 +73,5 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	public void onViewExit() {
 
 	}
+
 }

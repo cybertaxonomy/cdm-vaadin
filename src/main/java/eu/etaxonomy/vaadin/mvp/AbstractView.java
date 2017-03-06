@@ -30,7 +30,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	private ApplicationContext applicationContext;
 
     @Autowired
-    ApplicationEventPublisher eventBus;
+    protected ApplicationEventPublisher eventBus;
 
 	@PostConstruct
 	protected final void init() {

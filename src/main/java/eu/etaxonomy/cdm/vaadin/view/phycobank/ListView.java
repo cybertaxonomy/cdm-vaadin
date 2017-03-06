@@ -8,34 +8,22 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
+import java.util.Collection;
+
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter.RegistrationDTO;
+import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * @author a.kohlbecker
- * @since Mar 2, 2017
+ * @since Mar 3, 2017
  *
  */
-@SpringView(name=ListView.NAME)
-public class ListView extends VerticalLayout implements View {
-
-    private static final long serialVersionUID = 3543300933072824713L;
-
-    public static final String NAME = "list";
-
-    public ListView() {
-        addComponent(new Label("List View"));
-    }
+public interface ListView extends ApplicationView<ListPresenter>{
 
     /**
-     * {@inheritDoc}
+     * @param page
      */
-    @Override
-    public void enter(ViewChangeEvent event) {
-
-    }
+    void populateTable(Collection<RegistrationDTO> registrations);
 
 }

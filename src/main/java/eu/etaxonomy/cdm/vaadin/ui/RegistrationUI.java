@@ -29,7 +29,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.view.phycobank.DashBoardView;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.ListView;
+import eu.etaxonomy.cdm.vaadin.view.phycobank.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
@@ -82,8 +82,8 @@ public class RegistrationUI extends UI {
         mainMenu.addMenuComponent(phycoBankLogo);
 
         mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME);
-        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListView.NAME);
-        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListView.NAME);
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME);
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME);
 
         eventBus.publishEvent(new UIInitializedEvent());
 
