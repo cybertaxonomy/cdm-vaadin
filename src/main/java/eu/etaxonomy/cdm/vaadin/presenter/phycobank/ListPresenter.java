@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -17,7 +18,6 @@ import org.joda.time.DateTime;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.ListView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -31,8 +31,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
 
-    private static final int PAGESIZE =20;
-
     @Override
     public void onViewEnter() {
         super.onViewEnter();
@@ -43,9 +41,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      * @return
      */
     private Collection<RegistrationDTO> listRegistrations() {
-        Pager<TaxonNameBase> pager = getRepo().getNameService().page(TaxonNameBase.class, PAGESIZE, 0, null, null);
-        Collection<RegistrationDTO> dtos = new ArrayList<>(pager.getRecords().size());
-        pager.getRecords().forEach(i -> { dtos.add(new RegistrationDTO(i)); });
+        List<TaxonNameBase> names = getRepo().getNameService().list(TaxonNameBase.class, 500, 0, null, null);
+        Collection<RegistrationDTO> dtos = new ArrayList<>(names.size());
+        names.forEach(name -> { dtos.add(new RegistrationDTO(name)); });
         return dtos;
     }
 
@@ -73,7 +71,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             registeredEntityUuid = name.getUuid();
 
             registrationType = RegistrationType.name;
-            status = RegistrationStatus.preparation;
+            status = RegistrationStatus.values()[(int) (Math.random() * RegistrationStatus.values().length)];
             internalRegId = Integer.toString(ListPresenter.idAutoincrement++);
             registrationId = "http://pyhcobank.org/" + internalRegId;
             created = DateTime.now();

@@ -51,6 +51,21 @@ $v-component-group-spacing: 6px;
 
 @import "../valo/valo.scss";
 
+// ========================================== //
+// Status colors for the redistration
+// 
+// change-color cant be used since this is not fully supported by the vaadin sass-compiler
+// see https://github.com/vaadin/sass-compiler/issues/147
+$hue-offset: hue($v-focus-color);
+$plain-red: adjust-color($v-focus-color, $hue: -1 * $hue-offset);  // red as 0 degree hue
+$status-rejected-color: adjust-color($plain-red, $hue: 0deg);
+$status-curation-color: adjust-color($plain-red, $hue: 30deg); 
+$status-preparation-color: adjust-color($plain-red, $hue: 60deg); 
+$status-published-color: adjust-color($plain-red, $hue: 105deg); 
+$status-ready-color: adjust-color($plain-red, $hue: 180deg);
+// ========================================== //
+
+
 @mixin edit-valo {
   @include valo;
 
@@ -60,7 +75,7 @@ $v-component-group-spacing: 6px;
     font-size: 400%;
    }
    
-   .v-button-giant { /* using v-slot-* to select the wrapper for the label */
+   .v-button-giant {
      font-size: 32px;
      .v-icon {
        font-size: 64px;
@@ -147,9 +162,33 @@ $v-component-group-spacing: 6px;
         }
     }
     
+    
+    
     #registration-list {
-        .status-preparation td.status {
-            color: green;
+        .status-rejected {
+            td.registrationType, td.status {
+                color: $status-rejected-color;
+            }
+        }
+        .status-curation {
+            td.registrationType, td.status {
+                color: $status-curation-color;
+            }
+        }
+        .status-preparation {
+            td.registrationType, td.status {
+                color: $status-preparation-color;
+            }
+        }
+        .status-published {
+            td.registrationType, td.status {
+                color: $status-published-color;
+            }
+        }
+        .status-ready {
+            td.registrationType, td.status {
+                color: $status-ready-color;
+            }
         }
     }
 

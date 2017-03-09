@@ -21,6 +21,7 @@ import com.vaadin.data.util.converter.Converter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Grid;
@@ -95,20 +96,25 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
     public ListViewBean() {
         layout = new VerticalLayout();
         layout.setSpacing(true);
+        layout.setSizeFull();
 
         Label title = new Label("Registrations");
         title.setStyleName(ValoTheme.LABEL_HUGE);
+        title.setWidthUndefined();
         layout.addComponent(title);
         layout.setComponentAlignment(title, Alignment.TOP_CENTER);
 
         Label hint = new Label("This is the list of all your registrations in progress.");
+        hint.setWidthUndefined();
         layout.addComponent(hint);
         layout.setComponentAlignment(hint, Alignment.MIDDLE_CENTER);
 
         grid = buildGrid();
         layout.addComponent(grid);
+        layout.setExpandRatio(grid, 1);
 
         setCompositionRoot(layout);
+        this.setSizeFull();
     }
 
     private Grid buildGrid() {
@@ -118,6 +124,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         grid.setId("registration-list");
         grid.setCellStyleGenerator(cellRef -> cellRef.getPropertyId().toString());
         grid.setSelectionMode(SelectionMode.NONE);
+        grid.setHeightMode(HeightMode.CSS);
         // add status as class  attribute to the rows to allow styling with css
         grid.setRowStyleGenerator(rowRef -> {return "status-" + rowRef.getItem().getItemProperty("status").getValue().toString();});
         return grid;
