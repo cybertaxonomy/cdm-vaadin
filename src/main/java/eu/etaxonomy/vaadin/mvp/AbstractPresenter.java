@@ -1,7 +1,6 @@
 package eu.etaxonomy.vaadin.mvp;
 
-import java.util.logging.Logger;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -23,6 +22,8 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 @SpringComponent
 @ViewScope
 public abstract class AbstractPresenter<V extends ApplicationView> {
+
+    public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 
 	private V view;
 
@@ -49,7 +50,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	 * @param view
 	 */
 	protected final void init(V view) {
-		Logger.getLogger(getClass().getName()).info("Presenter init");
+	    logger.trace("Presenter init");
 		this.view = view;
 		onPresenterReady();
 	}
@@ -59,7 +60,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	 * after presenter has finished initializing.
 	 */
 	protected void onPresenterReady() {
-		Logger.getLogger(getClass().getName()).info("Presenter ready");
+	    logger.trace("Presenter ready");
 	}
 
 	/**
@@ -67,7 +68,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	 * user has navigated into the view that this presenter governs.
 	 */
 	public void onViewEnter() {
-		Logger.getLogger(getClass().getName()).info("View entered");
+	    logger.trace("View entered");
 	}
 
 	public void onViewExit() {

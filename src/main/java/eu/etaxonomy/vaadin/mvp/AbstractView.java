@@ -1,9 +1,8 @@
 package eu.etaxonomy.vaadin.mvp;
 
-import java.util.logging.Logger;
-
 import javax.annotation.PostConstruct;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +23,9 @@ import com.vaadin.ui.CustomComponent;
  */
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
 		implements ApplicationContextAware {
+
+
+    public static final Logger logger = Logger.getLogger(AbstractView.class);
 
 	private P presenter;
 
@@ -53,7 +55,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	}
 
 	protected void onViewReady() {
-		Logger.getLogger(getClass().getSimpleName()).info("View ready");
+	    logger.trace("View ready");
 	}
 
 	protected P getPresenter() {
