@@ -1,16 +1,10 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
-import com.vaadin.client.renderers.ClickableRenderer.RendererClickEvent;
-
 public class NavigationEvent {
 
 	public static final char SEPARATOR = '/';
 
     private final String viewName;
-
-	public NavigationEvent(String viewName, RendererClickEvent event) {
-		this.viewName = viewName;
-	}
 
 	public NavigationEvent(String viewName, String ... parameters) {
 	    StringBuilder sb = new StringBuilder(viewName);
