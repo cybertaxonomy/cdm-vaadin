@@ -53,7 +53,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             registration = serviceMock.loadByRegistrationID(e.getRegistrationID());
         }
         if(registration != null){
-            getView().getTitle().setValue(getView().getTitle().getValue() + " " + registrationType().name());
+            getView().getTitle().setValue("Workflow for a " + registrationType().name());
             getView().makeWorflow(registrationType());
         }
     }

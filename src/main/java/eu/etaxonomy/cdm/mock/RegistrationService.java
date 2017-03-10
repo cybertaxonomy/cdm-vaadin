@@ -83,7 +83,7 @@ public class RegistrationService {
      * @return
      */
     public Registration loadByRegistrationID(Integer registrationID) {
-        return registrationsByRegID.get(registrationID);
+        return registrationsByRegID.get(registrationID.toString());
     }
 
 
