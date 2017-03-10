@@ -69,7 +69,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
             if(value.equals(RegistrationType.name)) {
                 return FontAwesome.TAG.getHtml();
             }
-            if(value.equals(RegistrationType.name)) {
+            if(value.equals(RegistrationType.typification)) {
                 return FontAwesome.TAGS.getHtml();
             }
             return FontAwesome.WARNING.getHtml();

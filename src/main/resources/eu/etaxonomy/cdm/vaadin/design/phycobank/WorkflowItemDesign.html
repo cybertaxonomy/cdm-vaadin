@@ -6,14 +6,13 @@
   <meta name="vaadin-version" content="7.7.0">
  </head>
  <body>
-  <vaadin-vertical-layout spacing>
-   <vaadin-label style-name="huge" size-auto plain-text _id="title" :center>
-     Registration of the 
+  <vaadin-css-layout style-name="workflow-item">
+   <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text _id="stepIndex">
+     1 
+   </vaadin-button>
+   <vaadin-label plain-text _id="caption">
+     Item for step 1 of the workflow 
    </vaadin-label>
-   <vaadin-label size-auto plain-text :middle :center>
-     Advance step by step through the registration workflow for scientific names. 
-   </vaadin-label>
-   <vaadin-css-layout style-name="workflow" responsive _id="workflow" :center></vaadin-css-layout>
-  </vaadin-vertical-layout>
+  </vaadin-css-layout>
  </body>
 </html>

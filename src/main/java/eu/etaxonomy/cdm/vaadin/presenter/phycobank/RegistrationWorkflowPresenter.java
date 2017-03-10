@@ -28,6 +28,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     private RegistrationType registrationType = null;
 
+
     /**
      *
      */
@@ -38,7 +39,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     protected void onRegistrationStartEvent(RegistrationStartEvent e){
         this.registrationType = e.getType();
         getView().getTitle().setValue(getView().getTitle().getValue() + " " + registrationType.name());
-        getView().openNameEditor(null);
     }
+
+
 
 }

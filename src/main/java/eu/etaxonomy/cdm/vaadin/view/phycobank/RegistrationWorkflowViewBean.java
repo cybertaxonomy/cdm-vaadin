@@ -15,11 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
 import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationWorkflowComponent;
+import eu.etaxonomy.cdm.vaadin.component.phycobank.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationWorkflowPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -61,12 +61,52 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
            if(params[0].equals(ACTION_NEW)) {
                regType = RegistrationType.valueOf(params[1]);
                design.getTitle().setValue(design.getTitle().getValue() + "  " + regType.name() + " ...");
+               makeWorflow(regType);
            } else if( params[0].equals(ACTION_EDIT)) {
                design.getTitle().setValue(design.getTitle().getValue() + "  " + params[1]);
            }
-        }
 
+        }
     }
+
+    private void makeWorflow(RegistrationType type){
+        switch (type) {
+        case name:
+            addNameWorkflow();
+            break;
+        case typification:
+            addTypificationWorkflow();
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+    *
+    */
+   private void addNameWorkflow() {
+       WorkflowSteps steps = new WorkflowSteps();
+       steps.appendNewWorkflowItem(1, "Nomenclatural reference", null);
+       steps.appendNewWorkflowItem(2, "Name", null);
+       steps.appendNewWorkflowItem(3, "Publisher Details", null);
+       steps.appendNewWorkflowItem(4, "Data curation", null);
+       steps.appendNewWorkflowItem(5, "Awaiting publication", null);
+       getWorkflow().addComponent(steps);
+   }
+
+   /**
+   *
+   */
+  private void addTypificationWorkflow() {
+      WorkflowSteps steps = new WorkflowSteps();
+      steps.appendNewWorkflowItem(1, "Name", null);
+      steps.appendNewWorkflowItem(2, "Type information", null);
+      steps.appendNewWorkflowItem(3, "Publisher Details", null);
+      steps.appendNewWorkflowItem(4, "Data curation", null);
+      steps.appendNewWorkflowItem(5, "Awaiting publication", null);
+      getWorkflow().addComponent(steps);
+  }
 
     /**
      * {@inheritDoc}
@@ -96,23 +136,6 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
     }
 
     /**
-     * @return the stepIndex
-     */
-    @Override
-    public Button getStepIndex() {
-        return design.getStepIndex();
-    }
-
-    /**
-     * @return the caption
-     */
-
-    @Override
-    public Label getCaptionLabel() {
-        return design.getCaptionLabel();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -120,4 +143,5 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
         // TODO Auto-generated method stub
 
     }
+
 }

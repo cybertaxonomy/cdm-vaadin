@@ -10,7 +10,6 @@ package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
 import java.util.UUID;
 
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
@@ -23,9 +22,6 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface RegistrationWorkflowView extends ApplicationView{
 
-    Label getCaptionLabel();
-
-    Button getStepIndex();
 
     CssLayout getWorkflow();
 
@@ -37,7 +33,9 @@ public interface RegistrationWorkflowView extends ApplicationView{
      * given otherwise a blank editor will open if the  nameUuid is null.
      *
      * @param nameUuid can be null
+     * @deprecated will be handled by the WorkflowItem
      */
+    @Deprecated
     void openNameEditor(UUID nameUuid);
 
 }

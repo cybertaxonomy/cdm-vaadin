@@ -70,7 +70,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             summary = name.getTitleCache();
             registeredEntityUuid = name.getUuid();
 
-            registrationType = RegistrationType.name;
+            registrationType = RegistrationType.values()[(int) (Math.random() * RegistrationType.values().length)];
             status = RegistrationStatus.values()[(int) (Math.random() * RegistrationStatus.values().length)];
             internalRegId = Integer.toString(ListPresenter.idAutoincrement++);
             registrationId = "http://pyhcobank.org/" + internalRegId;

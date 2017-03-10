@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.phycobank;
 
-import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
@@ -35,21 +34,6 @@ public class RegistrationWorkflowComponent extends RegistrationWorkflowDesign {
      */
     public CssLayout getWorkflow() {
         return workflow;
-    }
-
-    /**
-     * @return the stepIndex
-     */
-    public Button getStepIndex() {
-        return stepIndex;
-    }
-
-    /**
-     * @return the caption
-     */
-
-    public Label getCaptionLabel() {
-        return caption;
     }
 
 }
