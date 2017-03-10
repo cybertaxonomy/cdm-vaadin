@@ -213,7 +213,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
 
             @Override
             public String getValue(Item item, Object itemId, Object propertyId) {
-                return "Edit";
+                return "Open";
             }
 
             @Override
