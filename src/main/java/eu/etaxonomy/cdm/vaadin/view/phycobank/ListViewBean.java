@@ -35,7 +35,7 @@ import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.util.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.UrlStringConverter;

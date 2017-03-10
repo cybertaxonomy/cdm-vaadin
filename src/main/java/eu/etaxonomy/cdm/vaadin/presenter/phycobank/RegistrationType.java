@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
 
+import eu.etaxonomy.cdm.mock.Registration;
+
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
@@ -15,6 +17,34 @@ package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
  */
 public enum RegistrationType {
 
-    name, typification;
+    name, typification, invalid;
+
+    /**
+     * @param reg
+     * @return
+     */
+    public static RegistrationType from(Registration reg) {
+        if(reg.getName() != null){
+            return name;
+        }
+        if(reg.getTypeDesignations().size() > 0){
+            return typification;
+        }
+        return invalid;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isName() {
+        return name.equals(this);
+
+  }
+    /**
+     * @return
+     */
+    public boolean isTypification() {
+        return typification.equals(this);
+    }
 
 }

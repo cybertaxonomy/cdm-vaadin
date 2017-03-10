@@ -20,6 +20,7 @@ import com.vaadin.ui.Label;
 
 import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationWorkflowComponent;
 import eu.etaxonomy.cdm.vaadin.component.phycobank.WorkflowSteps;
+import eu.etaxonomy.cdm.vaadin.event.phycobank.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationWorkflowPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -61,15 +62,18 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
            if(params[0].equals(ACTION_NEW)) {
                regType = RegistrationType.valueOf(params[1]);
                design.getTitle().setValue(design.getTitle().getValue() + "  " + regType.name() + " ...");
-               makeWorflow(regType);
+               eventBus.publishEvent(new RegistrationWorkflowEvent(regType));
+
            } else if( params[0].equals(ACTION_EDIT)) {
                design.getTitle().setValue(design.getTitle().getValue() + "  " + params[1]);
+               eventBus.publishEvent(new RegistrationWorkflowEvent(Integer.parseInt(params[1])));
            }
 
         }
     }
 
-    private void makeWorflow(RegistrationType type){
+    @Override
+    public void makeWorflow(RegistrationType type){
         switch (type) {
         case name:
             addNameWorkflow();

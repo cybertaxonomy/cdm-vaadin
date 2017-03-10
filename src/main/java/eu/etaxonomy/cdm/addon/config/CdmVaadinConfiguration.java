@@ -28,7 +28,8 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @Configuration
 @ComponentScan(basePackages={
         "eu.etaxonomy.cdm.vaadin",
-        "eu.etaxonomy.vaadin.ui"
+        "eu.etaxonomy.vaadin.ui",
+        "eu.etaxonomy.cdm.mock" // FIXME remove once mocks are no longer needed
         })
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean

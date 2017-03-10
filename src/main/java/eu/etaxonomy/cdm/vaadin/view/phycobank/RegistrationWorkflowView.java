@@ -13,6 +13,7 @@ import java.util.UUID;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -37,5 +38,7 @@ public interface RegistrationWorkflowView extends ApplicationView{
      */
     @Deprecated
     void openNameEditor(UUID nameUuid);
+
+    public void makeWorflow(RegistrationType type);
 
 }

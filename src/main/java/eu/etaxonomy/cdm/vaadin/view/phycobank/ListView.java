@@ -11,7 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.phycobank;
 import java.util.Collection;
 
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -25,5 +25,6 @@ public interface ListView extends ApplicationView<ListPresenter>{
      * @param page
      */
     void populateTable(Collection<RegistrationDTO> registrations);
+
 
 }
