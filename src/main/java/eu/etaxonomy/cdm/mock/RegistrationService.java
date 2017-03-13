@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.mock;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,18 +19,23 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
 
 /**
  * @author a.kohlbecker
  * @since Mar 10, 2017
  *
  */
-@Component("registrationServiceMock")
+@Service("registrationServiceMock")
+@Transactional
 public class RegistrationService {
 
     @Autowired
@@ -38,33 +44,55 @@ public class RegistrationService {
 
     private Map<UUID, Registration> registrationsByUUID = new HashMap<>();
     private Map<String, Registration> registrationsByRegID = new HashMap<>();
+    private Map<String, RegistrationDTO> registrationDTOsByRegID = new HashMap<>();
+
+    private Collection<CdmBase> cdmEntities = new HashSet<>();
 
     public RegistrationService() {
     }
 
+
+    int minTypeDesignationCount = 1;
+
     @PostConstruct
     protected void init(){
-        List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 20, 0, null, null);
-        names.forEach(
-                name -> {
-                    Registration reg = new Registration();
-                    reg.setName(name);
-                    registrationsByUUID.put(reg.getUuid(), reg);
-                    registrationsByRegID.put(reg.getSpecificIdentifier(), reg);
-                }
-               );
-        List<TypeDesignationBase> tds = repo.getNameService().getAllTypeDesignations(20, 0);
-        tds.forEach(
-                type -> {
-                    Registration reg = new Registration();
-                    reg.addTypeDesignationBase(type);
-                    registrationsByUUID.put(reg.getUuid(), reg);
-                    registrationsByRegID.put(reg.getSpecificIdentifier(), reg);
-                }
-               );
+        TransactionStatus tx = repo.startTransaction(true);
+        while(registrationsByUUID.size() < 20){
+            List<TaxonNameBase> names = repo.getNameService(). list(TaxonNameBase.class, 100, 0, null, null);
+            for(TaxonNameBase name : names){
+                if(name.getRank().isLower(Rank.SUBFAMILY())){
+                    if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
 
+                        // name
+                        Registration nameReg = new Registration();
+                        nameReg.setName(name);
+                        cdmEntities.add(name);
+                        put(nameReg, new RegistrationDTO(nameReg, null));
+
+                        // typedesignation
+                        Registration typedesignationReg = new Registration();
+                        typedesignationReg.addTypeDesignations(name.getTypeDesignations());
+                        cdmEntities.addAll(name.getTypeDesignations());
+                        put(typedesignationReg,  new RegistrationDTO(typedesignationReg, name));
+                    }
+                }
+            }
+        }
+        repo.commitTransaction(tx);
     }
 
+    /**
+     * @param reg
+     */
+    private void put(Registration reg, RegistrationDTO dto) {
+        registrationsByUUID.put(reg.getUuid(), reg);
+        registrationsByRegID.put(reg.getSpecificIdentifier(), reg);
+        registrationDTOsByRegID.put(reg.getSpecificIdentifier(), dto);
+    }
+
+    private void mergeBack(){
+        cdmEntities.forEach(e -> repo.getNameService().getSession().merge(e));
+    }
 
     /**
      * {@inheritDoc}
@@ -77,6 +105,9 @@ public class RegistrationService {
         return registrationsByUUID.values();
     }
 
+    public Collection<RegistrationDTO> listDTOs() {
+        return registrationDTOsByRegID.values();
+    }
 
     /**
      * @param registrationID

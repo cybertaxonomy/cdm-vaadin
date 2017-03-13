@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationService;
 import eu.etaxonomy.cdm.vaadin.view.phycobank.ListView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -43,9 +41,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      * @return
      */
     private Collection<RegistrationDTO> listRegistrations() {
-        Collection<Registration> registrations = serviceMock.list();
-        Collection<RegistrationDTO> dtos = new ArrayList<>(registrations.size());
-        registrations.forEach(reg -> { dtos.add(new RegistrationDTO(reg)); });
+        Collection<RegistrationDTO> dtos = serviceMock.listDTOs();
         return dtos;
     }
 

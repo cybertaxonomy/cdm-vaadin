@@ -12,6 +12,8 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.vaadin.util.TypeDesignationConverter;
 
 public class RegistrationDTO{
 
@@ -25,8 +27,9 @@ public class RegistrationDTO{
 
     /**
      * @param reg
+     * @param typifiedName should be provided in for Registrations for TypeDesignations
      */
-    public RegistrationDTO(Registration reg) {
+    public RegistrationDTO(Registration reg, TaxonNameBase typifiedName) {
 
          this.reg = reg;
 
@@ -34,9 +37,8 @@ public class RegistrationDTO{
         if(registrationType.isName()){
             summary = reg.getName().getTitleCache();
         } else if(registrationType.isTypification()){
-            StringBuffer sb = new StringBuffer();
-            reg.getTypeDesignations().forEach(td -> sb.append(td.toString()).append(' '));
-            summary = sb.toString();
+            summary = new TypeDesignationConverter(reg.getTypeDesignations(), typifiedName)
+                    .buildString().print();
         } else {
             summary = "- INVALID REGISTRATION -";
         }

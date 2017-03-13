@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.mock;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -158,8 +159,12 @@ public class Registration extends CdmBase {
         this.submitter = submitter;
     }
 
-    public boolean addTypeDesignationBase(TypeDesignationBase typeDesignationBase){
-        return typeDesignations.add(typeDesignationBase);
+    public boolean addTypeDesignation(TypeDesignationBase typeDesignation){
+        return this.typeDesignations.add(typeDesignation);
+    }
+
+    public boolean addTypeDesignations(Collection<TypeDesignationBase> typeDesignations){
+        return this.typeDesignations.addAll(typeDesignations);
     }
 
     public boolean addBlockedBy(Registration registration){
