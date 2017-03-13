@@ -14,7 +14,7 @@ import com.vaadin.data.util.sqlcontainer.connection.J2EEConnectionPool;
 import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 import com.vaadin.server.VaadinServlet;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.ICommonService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
@@ -26,6 +26,19 @@ import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.api.service.IVocabularyService;
 
+/**
+ * This helper relates to the problem that in the Vaadin framework it is
+ * not possible to autowire beans from the underlying application context
+ * as Vaadin prevents this possibility. To overcome this problem, this singleton
+ * helper class has
+ * been written to retrieve the beans given the bean name.
+ *
+ * @author c.mathew
+ *
+ * TODO This class may no longer needed in a couple of cases since vaadin-spring
+ * is being used and spring beans can be injected now.
+ *
+ */
 public class CdmSpringContextHelper {
 
     private final ApplicationContext context;
@@ -106,8 +119,8 @@ public class CdmSpringContextHelper {
         return databaseMetaData;
     }
 
-    public static ICdmApplicationConfiguration getApplicationConfiguration() {
-        return (ICdmApplicationConfiguration) getCurrent().getBean("cdmApplicationDefaultConfiguration");
+    public static ICdmRepository getApplicationConfiguration() {
+        return (ICdmRepository) getCurrent().getBean("cdmRepository");
     }
     public static ITaxonService getTaxonService() {
         return (ITaxonService)getCurrent().getBean(ITaxonService.class);

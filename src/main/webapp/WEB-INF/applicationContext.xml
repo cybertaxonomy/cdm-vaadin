@@ -8,18 +8,29 @@
     http://www.springframework.org/schema/tx   http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
     ">
 
+  <!-- 
+    NOTE: 
+    For a detailed overview on the spring MVC and application context configuration and 
+    bootstrapping of this web application see: 
+    http://dev.e-taxonomy.eu/trac/wiki/cdmlib-remote-webappConfigurationAndBootstrapping
+  -->
+   
+   <context:annotation-config />
+   
+    <!--  
+        find the eu.etaxonomy.cdm.remote.config.CdmVaadinConfiguration
+    -->
+   <context:component-scan base-package="eu/etaxonomy/cdm/addon/config" />
+    
    <!-- include default application context and customization -->
-    <import resource="classpath:/eu/etaxonomy/cdm/defaultApplicationContext.xml"/>
-    <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
+   <import resource="classpath:/eu/etaxonomy/cdm/defaultApplicationContext.xml"/>
+   
+   <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
        <property name="omit" value="false" />
-    </bean>
+   </bean>
    <context:component-scan base-package="eu/etaxonomy/cdm/ext" />
-   <context:component-scan base-package="eu/etaxonomy/cdm/remote/vaadin" />
 
-   <!--
     <import resource="classpath:/eu/etaxonomy/cdm/remote.xml"/>
-   -->
-<!--    <import resource="classpath:/eu/etaxonomy/cdm/remote-security.xml"/> -->
     <context:component-scan base-package="eu/etaxonomy/cdm/io">
         <context:exclude-filter type="regex" expression="eu\.etaxonomy\.cdm\.io\.pesi.*" />
         <context:exclude-filter type="regex" expression="eu\.etaxonomy\.cdm\.io\.faunaEuropaea.*" />
@@ -38,29 +49,30 @@
     </bean>
 
     <!-- enable the configuration of transactional behavior based on annotations -->
-    <tx:annotation-driven transaction-manager="transactionManager"/>
-
-    <!-- import additional beans into the root context -->
-<!--     <import resource="applicationContext.views.xml"/> -->
-
-    <!-- CONFIGURE WEB APPLICATION HERE -->
+    <tx:annotation-driven transaction-manager="transactionManager" />
+  	
+  	<!-- import additional beans into the root context (this is in cdmlib-remote-webapp) -->
+  	<!-- <import resource="applicationContext.views.xml" />  -->
+  
+    <!-- import configuration of the datasource bean -->
     <import resource="datasources/configurable.xml" />
+    
+    <!-- bootstrap the Web Configuration -->
+  	<bean class="eu.etaxonomy.cdm.remote.config.MultiWebSecurityConfiguration" />
+ 
+    <bean class="eu.etaxonomy.cdm.opt.config.LoggingConfigurer" />
 
-    <context:annotation-config/>
-    <bean class="eu.etaxonomy.cdm.remote.config.LoggingConfigurer">
+    <bean class="eu.etaxonomy.cdm.opt.config.EhCacheDiskStoreConfiguration" />
+ 
+    <bean id="serializableFactory" class="org.springmodules.cache.serializable.XStreamSerializableFactory" />
+
+    <bean id="cacheProviderFacade" class="org.springmodules.cache.provider.ehcache.EhCacheFacade">
+        <!-- 
+            the cacheManager is provided by the eu.etaxonomy.cdm.api.config.EhCacheConfiguration
+            in cdmlib-services
+        -->
+        <property name="cacheManager" ref="cacheManager" />
+        <property name="serializableFactory" ref="serializableFactory"/>
     </bean>
-
-
-  <bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-    <property name="configLocation" value="classpath:/eu/etaxonomy/cdm/remote/ehcache.xml" />
-        <property name="shared" value="true"/>
-    </bean>
-
-  <bean id="serializableFactory" class="org.springmodules.cache.serializable.XStreamSerializableFactory"/>
-
-  <bean id="cacheProviderFacade" class="org.springmodules.cache.provider.ehcache.EhCacheFacade">
-      <property name="cacheManager" ref="cacheManager" />
-      <property name="serializableFactory" ref="serializableFactory"/>
-  </bean>
 
 </beans>

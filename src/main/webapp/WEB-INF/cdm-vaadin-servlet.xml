@@ -7,5 +7,8 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
     ">
-
+    <!-- 
+        No MVC Servlet, the cdm-vaadin project is dedicated to be merged with cdmlib-remote-webapp
+        which will provide the full mvc context.
+     -->
 </beans>

@@ -10,12 +10,10 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.logging.Logger;
 
-import javax.servlet.annotation.WebServlet;
-
 import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -27,16 +25,12 @@ import eu.etaxonomy.cdm.vaadin.jscomponent.D3CTree;
  *
  */
 @Theme("edit")
+@SpringUI(path="d3ctree")
+@Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class D3CTreeUI extends UI {
 
     private final static Logger logger =
             Logger.getLogger(D3CTreeUI.class.getName());
-
-    @WebServlet(value = {"/app-test/d3ctree/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = D3CTreeUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {
-
-    }
 
     final VerticalLayout layout = new VerticalLayout();
     final D3CTree d3ctree = new D3CTree();

@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;edit-valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-vertical-layout spacing>
+   <vaadin-label style-name="huge" size-auto plain-text _id="title" :center>
+     Registration of the 
+   </vaadin-label>
+   <vaadin-label size-auto plain-text :middle :center>
+     Advance step by step through the registration workflow for scientific names. 
+   </vaadin-label>
+   <vaadin-css-layout style-name="workflow" responsive _id="workflow" :center>
+    <vaadin-css-layout style-name="timeline" width-full height="10px">
+     <vaadin-css-layout style-name="timeline-bar" width-full height="10px"></vaadin-css-layout>
+    </vaadin-css-layout>
+    <vaadin-css-layout style-name="steps">
+     <vaadin-css-layout>
+      <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text _id="stepIndex">
+        1 
+      </vaadin-button>
+      <vaadin-label plain-text _id="caption">
+        Edit the scientific name and related names. 
+      </vaadin-label>
+     </vaadin-css-layout>
+     <vaadin-css-layout>
+      <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text>
+        2 
+      </vaadin-button>
+      <vaadin-label plain-text>
+        Edit the scientific name and related names. 
+      </vaadin-label>
+     </vaadin-css-layout>
+     <vaadin-css-layout>
+      <vaadin-button icon="fonticon://FontAwesome/f111" style-name="borderless" plain-text>
+        3 
+      </vaadin-button>
+      <vaadin-label plain-text>
+        Label 
+      </vaadin-label>
+     </vaadin-css-layout>
+    </vaadin-css-layout>
+   </vaadin-css-layout>
+  </vaadin-vertical-layout>
+ </body>
+</html>

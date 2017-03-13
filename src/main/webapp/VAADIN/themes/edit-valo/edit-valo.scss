@@ -1,0 +1,195 @@
+// Global variable overrides. Must be declared before importing Valo.
+
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+//$v-font-size: 16px;
+//$v-font-weight: 300;
+$v-font-family: "Open Sans", sans-serif;
+
+// Defines the border used by all components.
+//$v-border: 1px solid (v-shade 0.7);
+//$v-border-radius: 4px;
+
+// Affects the color of some component elements, e.g Button, Panel title, etc
+//$v-background-color: hsl(210, 0%, 98%);
+// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
+//$v-app-background-color: $v-background-color;
+
+// Affects the visual appearance of all component
+//$v-gradient: v-linear 8%;
+//$v-bevel-depth: 30%;
+//$v-shadow-opacity: 5%;
+
+// Defines colors for indicating status (focus, success, failure)
+//$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
+//$v-friendly-color: #2c9720;
+//$v-error-indicator-color: #ed473b;
+
+// ================== DARK ================ //
+
+$v-app-loading-text: "Dark Valo";
+$v-background-color: #444d50;
+$v-focus-color: #07a9ca;
+$v-focus-style: 0 0 3px 2px $v-focus-color;
+$v-bevel-depth: 40%;
+$v-gradient: v-linear 12%;
+$v-border-radius: 10px;
+$v-font-family: Roboto, sans-serif;
+$v-font-weight: 400;
+$v-font-weight--header: 400;
+$v-bevel: inset 0 1px 2px v-tint, inset 0 0 1px (v-tint 0.1);
+$v-shadow: 0 0 0 3px rgba(0,0,0,0.32), 0 1px 0 3px rgba(255,255,255,0.14);
+$v-textfield-bevel: inset 0 2px 2px v-shade;
+$v-textfield-shadow: $v-shadow;
+$v-unit-size: 40px;
+$v-overlay-shadow: 0 0 0 3px (v-shade 8), 0 5px 10px (v-shade 4);
+$v-component-group-spacing: 6px;
+
+// ========================================== //
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+@import "../valo/valo.scss";
+
+// ========================================== //
+// Status colors for the redistration
+// 
+// change-color cant be used since this is not fully supported by the vaadin sass-compiler
+// see https://github.com/vaadin/sass-compiler/issues/147
+$hue-offset: hue($v-focus-color);
+$plain-red: adjust-color($v-focus-color, $hue: -1 * $hue-offset);  // red as 0 degree hue
+$status-rejected-color: adjust-color($plain-red, $hue: 0deg);
+$status-curation-color: adjust-color($plain-red, $hue: 30deg); 
+$status-preparation-color: adjust-color($plain-red, $hue: 60deg); 
+$status-published-color: adjust-color($plain-red, $hue: 105deg); 
+$status-ready-color: adjust-color($plain-red, $hue: 180deg);
+// ========================================== //
+
+
+@mixin edit-valo {
+  @include valo;
+
+  // Insert your own theme rules here
+  
+  .logo_giant {
+    font-size: 400%;
+   }
+   
+   .v-button-giant {
+     font-size: 32px;
+     .v-icon {
+       font-size: 64px;
+       line-height: 50px;
+     }
+   }
+   
+   .dashboard-actions {
+      margin: 0 10%;
+    
+      .dashboard-action-2 {
+        width: 50%;
+        .v-label {
+            white-space: normal;
+        }
+      }
+      .dashboard-action-3 {
+        width: 33%;
+        .v-label {
+            white-space: normal;
+        }
+      }
+      &[width-range~="-650px"] {
+          .dashboard-action-2, .dashboard-action-3 {
+              width: 100%;
+          }
+      }
+    }
+    
+    .workflow {
+    
+        $workflow-icon-size: 110px;
+        // can not be set per css as this need to set as property to the component in vaadin
+        $workflow-timeline-bar-height: 10px; 
+        // the fator by which the caption should be smaller than the circe
+        $workflow-caption-shrink: 0.64; 
+
+        $workflow-icon-margin-h: $workflow-icon-size / 5;
+        $workflow-icon-left: $workflow-icon-margin-h / 2;
+        $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;
+        
+        .steps {
+            z-index: 10;
+            
+            .v-button {
+                margin: 0 $workflow-icon-margin-h;
+                font-size: $workflow-icon-size;
+                height: $workflow-icon-size;
+                width: $workflow-icon-size;
+                line-height: $workflow-icon-size;
+            
+                .v-icon, .v-button-caption {
+                    position: absolute;
+                    left: $workflow-icon-left;
+                    top: 0px;
+                }
+                .v-button-caption {
+                    font-family: monospace;
+                    left: (($workflow-icon-size - $workflow-caption-font-size) / 2) + $workflow-icon-left; // 30px;
+                    top: -2px;
+                    color: $v-background-color;
+                    font-size: $workflow-caption-font-size; // 70px;
+                }
+            }
+            
+            .v-csslayout {
+                width: $workflow-icon-size + 2 * $workflow-icon-margin-h;
+                .v-label {
+                    display: block;
+                    text-align: center;
+                }
+            }
+         }
+         
+         .timeline {
+            display: block;
+            position: relative;
+            top: ($workflow-icon-size / 2) + $workflow-timeline-bar-height / 2;
+            padding: 0 $workflow-icon-size / 2;
+            .timeline-bar {
+                z-index: 0;
+                background-color: $v-font-color;
+            }
+        }
+    }
+    
+    
+    
+    #registration-list {
+        .status-rejected {
+            td.registrationType, td.status {
+                color: $status-rejected-color;
+            }
+        }
+        .status-curation {
+            td.registrationType, td.status {
+                color: $status-curation-color;
+            }
+        }
+        .status-preparation {
+            td.registrationType, td.status {
+                color: $status-preparation-color;
+            }
+        }
+        .status-published {
+            td.registrationType, td.status {
+                color: $status-published-color;
+            }
+        }
+        .status-ready {
+            td.registrationType, td.status {
+                color: $status-ready-color;
+            }
+        }
+    }
+
+}

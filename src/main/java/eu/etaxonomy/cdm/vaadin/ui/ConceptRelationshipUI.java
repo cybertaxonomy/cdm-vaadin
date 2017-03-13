@@ -9,15 +9,13 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 
-import javax.servlet.annotation.WebServlet;
-
 import org.apache.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
@@ -27,7 +25,9 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  * @date 9 Apr 2015
  *
  */
-@Theme("edit")
+@Theme("valo")
+@SpringUI(path="concept")
+@Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     Navigator navigator;
@@ -35,15 +35,6 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
     private static final String FIRST_VIEW = "editcr";
 
     private final static Logger logger = Logger.getLogger(ConceptRelationshipUI.class);
-
-    /*
-     * NOTE: productionMode=true seems not to have any effect here, maybe because we are using multiple Servlets?
-     * The is therefore set globally in the web.xml
-     */
-    @WebServlet(value = {"/app/concept/*"}, asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = true, ui = ConceptRelationshipUI.class, widgetset = "eu.etaxonomy.cdm.vaadin.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {
-    }
 
     @Override
     protected void doInit(VaadinRequest request) {

@@ -17,7 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 
-import eu.etaxonomy.cdm.api.application.ICdmApplicationConfiguration;
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
@@ -25,7 +25,7 @@ import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.name.NonViralName;
+import eu.etaxonomy.cdm.model.name.INonViralName;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.taxon.Classification;
@@ -55,7 +55,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final ITaxonService taxonService;
     private final IClassificationService classificationService;
     private final INameService nameService;
-    private final ICdmApplicationConfiguration app;
+    private final ICdmRepository app;
 
 
 
@@ -81,7 +81,8 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         app = CdmSpringContextHelper.getApplicationConfiguration();
     }
 
-    private boolean checkIfNameExists(NonViralName name) {
+    private boolean checkIfNameExists(INonViralName nvn) {
+        TaxonNameBase<?,?> name = TaxonNameBase.castAndDeproxy(nvn);
         Pager<TaxonNameBase> names = nameService.findByName(name.getClass(),
                 name.getNameCache(),
                 MatchMode.EXACT,
@@ -99,7 +100,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     @Override
     public IdUuidName newTaxon(String scientificName, Object secRefItemId, UUID classificationUuid) {
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
-        NonViralName name = parser.parseFullName(scientificName);
+        INonViralName name = parser.parseFullName(scientificName);
 
         if(checkIfNameExists(name)) {
             throw new IllegalArgumentException("Given name already exists");
@@ -125,7 +126,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     @Override
     public IdUuidName newSynonym(String scientificName, Object synSecRefItemId, Object accTaxonSecRefItemId, UUID accTaxonUuid) {
         NonViralNameParserImpl parser = NonViralNameParserImpl.NewInstance();
-        NonViralName name = parser.parseFullName(scientificName);
+        INonViralName name = parser.parseFullName(scientificName);
 
         if(checkIfNameExists(name)) {
             throw new IllegalArgumentException("Given name already exists");
