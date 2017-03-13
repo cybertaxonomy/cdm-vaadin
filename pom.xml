@@ -11,7 +11,7 @@
     <vaadin.version>7.7.7</vaadin.version>
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.6.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>4.6.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
