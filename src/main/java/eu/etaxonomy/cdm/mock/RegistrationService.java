@@ -58,9 +58,9 @@ public class RegistrationService {
     protected void init(){
         TransactionStatus tx = repo.startTransaction(true);
         while(registrationsByUUID.size() < 20){
-            List<TaxonNameBase> names = repo.getNameService(). list(TaxonNameBase.class, 100, 0, null, null);
+            List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, 0, null, null);
             for(TaxonNameBase name : names){
-                if(name.getRank().isLower(Rank.SUBFAMILY())){
+                if(name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY())){
                     if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
 
                         // name
