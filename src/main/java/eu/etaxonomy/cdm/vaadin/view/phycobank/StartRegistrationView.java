@@ -38,7 +38,7 @@ public class StartRegistrationView extends StartRegistrationDesign implements Vi
         buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(
                 RegistrationWorkflowViewBean.NAME,
                 RegistrationWorkflowViewBean.ACTION_NEW,
-                RegistrationType.name.name()
+                RegistrationType.NAME.name()
                 )));
     }
 

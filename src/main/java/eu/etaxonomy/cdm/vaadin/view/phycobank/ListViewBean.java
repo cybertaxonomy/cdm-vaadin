@@ -66,10 +66,10 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         @Override
         public String convertToPresentation(RegistrationType value, Class<? extends String> targetType,
                 Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
-            if(value.equals(RegistrationType.name)) {
+            if(value.equals(RegistrationType.NAME)) {
                 return FontAwesome.TAG.getHtml();
             }
-            if(value.equals(RegistrationType.typification)) {
+            if(value.equals(RegistrationType.TYPIFICATION)) {
                 return FontAwesome.TAGS.getHtml();
             }
             return FontAwesome.WARNING.getHtml();
@@ -157,7 +157,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
     public void populateTable(Collection<RegistrationDTO> registrations) {
 
         BeanContainer<String, RegistrationDTO> registrationItems = new BeanContainer<String, RegistrationDTO>(RegistrationDTO.class);
-        registrationItems.setBeanIdProperty("internalRegId");
+        registrationItems.setBeanIdProperty("specificIdentifier");
         registrationItems.addAll(registrations);
 
         grid.setContainerDataSource(buildGeneratedProperties(registrationItems));
@@ -167,17 +167,16 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         Column typeColumn = grid.addColumn("registrationType");
         typeColumn.setRenderer(new HtmlRenderer(), new RegistrationTypeConverter());
         typeColumn.setHeaderCaption("");
-        typeColumn.setExpandRatio(0);
 
         Column statusColumn = grid.addColumn("status");
-        statusColumn.setExpandRatio(0);
+
+        Column citationColumn = grid.addColumn("citation");
 
         Column summaryColumn = grid.addColumn("summary");
-        summaryColumn.setExpandRatio(1);
 
         Column regidColumn = grid.addColumn("registrationId");
         regidColumn.setHeaderCaption("Id");
-        regidColumn.setRenderer(new HtmlRenderer(), new UrlStringConverter());
+        regidColumn.setRenderer(new HtmlRenderer(), new UrlStringConverter("http://pyhcobank.org/"));
 
         Column createdColumn = grid.addColumn("created");
         createdColumn.setRenderer(new DateRenderer(), new JodaDateTimeConverter());
@@ -198,6 +197,8 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
                 e.getItemId().toString()
                 ))));
         buttonColumn.setSortable(false);
+
+        grid.setFrozenColumnCount(1);
 
     }
 

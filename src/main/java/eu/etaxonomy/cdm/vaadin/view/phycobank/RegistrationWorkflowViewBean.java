@@ -75,10 +75,10 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
     @Override
     public void makeWorflow(RegistrationType type){
         switch (type) {
-        case name:
+        case NAME:
             addNameWorkflow();
             break;
-        case typification:
+        case TYPIFICATION:
             addTypificationWorkflow();
             break;
         default:

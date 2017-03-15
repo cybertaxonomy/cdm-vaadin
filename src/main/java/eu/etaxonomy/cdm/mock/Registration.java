@@ -51,7 +51,7 @@ public class Registration extends CdmBase {
 
 
     /**
-     * @param name
+     * @param NAME
      */
     public Registration() {
         super();

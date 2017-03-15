@@ -19,6 +19,8 @@ public class RegistrationDTO{
 
     private String summary = "";
 
+    private String citation = "";
+
     private RegistrationType registrationType;
 
     private Registration reg;
@@ -36,9 +38,17 @@ public class RegistrationDTO{
         registrationType = RegistrationType.from(reg);
         if(registrationType.isName()){
             summary = reg.getName().getTitleCache();
+            if(reg.getName().getNomenclaturalReference() != null){
+                citation = reg.getName().getNomenclaturalReference().generateTitle();
+            }
         } else if(registrationType.isTypification()){
             summary = new TypeDesignationConverter(reg.getTypeDesignations(), typifiedName)
                     .buildString().print();
+            if(!reg.getTypeDesignations().isEmpty()){
+                if(reg.getTypeDesignations().iterator().next().getCitation() != null) {
+                    citation = reg.getTypeDesignations().iterator().next().getCitation().generateTitle();
+                }
+            }
         } else {
             summary = "- INVALID REGISTRATION -";
         }
@@ -77,9 +87,9 @@ public class RegistrationDTO{
 
 
     /**
-     * @return the internalRegId
+     * @return the specificIdentifier
      */
-    public String getInternalRegId() {
+    public String getSpecificIdentifier() {
         return reg.getSpecificIdentifier();
     }
 
@@ -95,6 +105,10 @@ public class RegistrationDTO{
      */
     public DateTime getCreated() {
         return reg.getCreated();
+    }
+
+    public String getCitation() {
+        return citation;
     }
 
 }

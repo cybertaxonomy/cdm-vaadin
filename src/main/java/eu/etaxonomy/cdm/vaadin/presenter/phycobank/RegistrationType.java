@@ -17,7 +17,7 @@ import eu.etaxonomy.cdm.mock.Registration;
  */
 public enum RegistrationType {
 
-    name, typification, invalid;
+    NAME, TYPIFICATION, INVALID;
 
     /**
      * @param reg
@@ -25,26 +25,26 @@ public enum RegistrationType {
      */
     public static RegistrationType from(Registration reg) {
         if(reg.getName() != null){
-            return name;
+            return NAME;
         }
         if(reg.getTypeDesignations().size() > 0){
-            return typification;
+            return TYPIFICATION;
         }
-        return invalid;
+        return INVALID;
     }
 
     /**
      * @return
      */
     public boolean isName() {
-        return name.equals(this);
+        return NAME.equals(this);
 
   }
     /**
      * @return
      */
     public boolean isTypification() {
-        return typification.equals(this);
+        return TYPIFICATION.equals(this);
     }
 
 }

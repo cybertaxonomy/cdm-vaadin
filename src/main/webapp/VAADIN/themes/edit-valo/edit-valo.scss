@@ -60,7 +60,7 @@ $status-reference-color:$v-focus-color;
 $hue-offset: hue($status-reference-color);
 $plain-red: adjust-color($status-reference-color, $hue: -1 * $hue-offset);  // red as 0 degree hue
 $status-rejected-color: adjust-color($plain-red, $hue: 0deg);
-$status-curation-color: adjust-color($plain-red, $hue: 30deg); 
+$status-curation-color: adjust-color($plain-red, $hue: 35deg); 
 $status-preparation-color: adjust-color($plain-red, $hue: 60deg); 
 $status-published-color: adjust-color($plain-red, $hue: 105deg); 
 $status-ready-color: adjust-color($plain-red, $hue: 180deg);
@@ -172,33 +172,32 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     
     
     #registration-list {
-        .status-rejected {
+        .status-REJECTED {
             td.registrationType, td.status {
                 color: $status-rejected-color;
             }
         }
-        .status-curation {
+        .status-CURATION {
             td.registrationType, td.status {
                 color: $status-curation-color;
             }
         }
-        .status-preparation {
+        .status-PREPARATION {
             td.registrationType, td.status {
                 color: $status-preparation-color;
             }
         }
-        .status-published {
+        .status-PUBLISHED {
             td.registrationType, td.status {
                 color: $status-published-color;
             }
         }
-        .status-ready {
+        .status-READY {
             td.registrationType, td.status {
                 color: $status-ready-color;
             }
         }
     }
-
 
 
 }
