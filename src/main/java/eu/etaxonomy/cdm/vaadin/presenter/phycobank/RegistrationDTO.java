@@ -8,24 +8,33 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.util.TypeDesignationConverter;
 
 public class RegistrationDTO{
 
     private String summary = "";
 
-    private String citation = "";
+    private String citationString = "";
+
+    private int citationID;
 
     private RegistrationType registrationType;
 
     private Registration reg;
 
     static int idAutoincrement = 100000;
+
+    private Set<Registration> blockedBy = new HashSet<>();
 
     /**
      * @param reg
@@ -38,15 +47,19 @@ public class RegistrationDTO{
         registrationType = RegistrationType.from(reg);
         if(registrationType.isName()){
             summary = reg.getName().getTitleCache();
-            if(reg.getName().getNomenclaturalReference() != null){
-                citation = reg.getName().getNomenclaturalReference().generateTitle();
+            INomenclaturalReference citation = reg.getName().getNomenclaturalReference();
+            if(citation != null){
+                citationString = citation.generateTitle();
+                citationID = citation.getId();
             }
         } else if(registrationType.isTypification()){
             summary = new TypeDesignationConverter(reg.getTypeDesignations(), typifiedName)
                     .buildString().print();
             if(!reg.getTypeDesignations().isEmpty()){
-                if(reg.getTypeDesignations().iterator().next().getCitation() != null) {
-                    citation = reg.getTypeDesignations().iterator().next().getCitation().generateTitle();
+                Reference citation = reg.getTypeDesignations().iterator().next().getCitation();
+                if(citation != null) {
+                    citationString = citation.generateTitle();
+                    citationID = citation.getId();
                 }
             }
         } else {
@@ -108,7 +121,28 @@ public class RegistrationDTO{
     }
 
     public String getCitation() {
-        return citation;
+        return citationString;
+    }
+
+    /**
+     * @return the blockedBy
+     */
+    public Set<Registration> getBlockedBy() {
+        return blockedBy;
+    }
+
+    /**
+     * @return the citationString
+     */
+    public String getCitationString() {
+        return citationString;
+    }
+
+    /**
+     * @return the citationID
+     */
+    public int getCitationID() {
+        return citationID;
     }
 
 }

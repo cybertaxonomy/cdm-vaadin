@@ -171,6 +171,8 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         Column statusColumn = grid.addColumn("status");
 
         Column citationColumn = grid.addColumn("citation");
+        citationColumn.setHeaderCaption("Publication");
+
 
         Column summaryColumn = grid.addColumn("summary");
 
