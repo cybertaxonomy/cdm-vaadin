@@ -84,6 +84,19 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
      }
    }
    
+   // label with caption and icon horizonatally aligned
+   // to apply this to a Vaadin Label set 'label-nowrap'
+   // as style
+   .v-slot-label-nowrap {
+        .v-caption, .v-label {
+            display: inline;
+        }
+        .v-label {
+            margin-left: 8px; // TODO use sass variable here
+            vertical-align: baseline;
+        }
+   }
+   
    .dashboard-actions {
       margin: 0 10%;
     
