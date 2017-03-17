@@ -66,4 +66,8 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
+
+	public ApplicationEventPublisher getEventBus(){
+	    return eventBus;
+	}
 }

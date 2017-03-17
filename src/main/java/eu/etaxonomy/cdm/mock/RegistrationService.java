@@ -37,6 +37,11 @@ import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
 @Transactional
 public class RegistrationService {
 
+    /**
+     *
+     */
+    private static final int SIZE = 5; // FIXME test performance with 50 !!!!!
+
     @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
@@ -57,8 +62,9 @@ public class RegistrationService {
     protected void init(){
         if(registrationsByUUID.size() == 0){
             TransactionStatus tx = repo.startTransaction(true);
-            while(registrationsByUUID.size() < 20){
-                List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, 0, null, null);
+            int pageIndex = 0;
+            while(registrationsByUUID.size() < SIZE){
+                List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, pageIndex++, null, null);
                 for(TaxonNameBase name : names){
                     if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY())){
                         if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {

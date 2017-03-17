@@ -132,7 +132,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;
         
     .workflow {
-        
         .steps {
             z-index: 10;
             
@@ -144,7 +143,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
                 }
             }
          }
-         
          .timeline {
             display: block;
             position: relative;
@@ -182,9 +180,13 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
     // --------------------------------------------------- //
     
-    
+    .registration-item {
+        border-top: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+        padding-top: 4px; // avoid button group to overlap with border
+    }
     
     #registration-list {
+        // for grid rows
         .status-REJECTED {
             td.registrationType, td.status {
                 color: $status-rejected-color;
@@ -209,6 +211,22 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             td.registrationType, td.status {
                 color: $status-ready-color;
             }
+        }
+        // for RegistrationItems
+        .v-slot-status-REJECTED {
+            color: $status-rejected-color;
+        }
+        .v-slot-status-CURATION {
+            color: $status-curation-color;
+        }
+        .v-slot-status-PREPARATION {
+            color: $status-preparation-color;
+        }
+        .v-slot-status-PUBLISHED {
+            color: $status-published-color;
+        }
+        .v-slot-status-READY {
+            color: $status-ready-color;
         }
     }
 

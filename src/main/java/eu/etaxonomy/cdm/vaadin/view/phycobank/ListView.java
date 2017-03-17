@@ -26,5 +26,10 @@ public interface ListView extends ApplicationView<ListPresenter>{
      */
     void populateTable(Collection<RegistrationDTO> registrations);
 
+    /**
+     * @param page
+     */
+    void populateList(Collection<RegistrationDTO> registrations);
+
 
 }

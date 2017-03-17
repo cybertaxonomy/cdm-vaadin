@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
 import java.util.Collection;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,10 +16,9 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
-import com.vaadin.data.util.converter.Converter;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
@@ -28,15 +26,16 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.ButtonRenderer;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.util.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.UrlStringConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -50,41 +49,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 @SpringView(name=ListViewBean.NAME)
 public class ListViewBean extends AbstractView<ListPresenter> implements ListView, View {
 
-    /**
-     * @author a.kohlbecker
-     * @since Mar 7, 2017
-     *
-     */
-    protected final class RegistrationTypeConverter implements Converter<String, RegistrationType> {
-        @Override
-        public RegistrationType convertToModel(String value, Class<? extends RegistrationType> targetType,
-                Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
-            // not implemented
-            return null;
-        }
-
-        @Override
-        public String convertToPresentation(RegistrationType value, Class<? extends String> targetType,
-                Locale locale) throws com.vaadin.data.util.converter.Converter.ConversionException {
-            if(value.equals(RegistrationType.NAME)) {
-                return FontAwesome.TAG.getHtml();
-            }
-            if(value.equals(RegistrationType.TYPIFICATION)) {
-                return FontAwesome.TAGS.getHtml();
-            }
-            return FontAwesome.WARNING.getHtml();
-        }
-
-        @Override
-        public Class<RegistrationType> getModelType() {
-            return RegistrationType.class;
-        }
-
-        @Override
-        public Class<String> getPresentationType() {
-            return String.class;
-        }
-    }
     private static final long serialVersionUID = 3543300933072824713L;
 
     public static final String NAME = "list";
@@ -92,6 +56,8 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
     private VerticalLayout layout;
 
     private Grid grid;
+
+    private Panel panel;
 
     public ListViewBean() {
         layout = new VerticalLayout();
@@ -109,12 +75,25 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         layout.addComponent(hint);
         layout.setComponentAlignment(hint, Alignment.MIDDLE_CENTER);
 
-        grid = buildGrid();
-        layout.addComponent(grid);
-        layout.setExpandRatio(grid, 1);
+//        grid = buildGrid();
+//        layout.addComponent(grid);
+//        layout.setExpandRatio(grid, 1);
+
+        buildPanel();
 
         setCompositionRoot(layout);
         this.setSizeFull();
+    }
+
+    /**
+     *
+     */
+    private void buildPanel() {
+        panel = new Panel();
+        panel.setSizeFull();
+        panel.setId("registration-list");
+        layout.addComponent(panel);
+        layout.setExpandRatio(panel, 1);
     }
 
     private Grid buildGrid() {
@@ -205,6 +184,25 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void populateList(Collection<RegistrationDTO> registrations) {
+        VerticalLayout list = new VerticalLayout();
+        list.setMargin(new MarginInfo(false, true));
+        list.setSpacing(true);
+        for(RegistrationDTO regDto : registrations) {
+
+            list.addComponent(new RegistrationItem(regDto, this));
+            if(list.getComponentCount() > 10){
+                break;
+            }
+        }
+        panel.setContent(list);
+
+    }
+
+    /**
      * @param registrationItems
      * @return
      */
@@ -227,5 +225,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
 
         return gpContainer;
     }
+
+
 
 }

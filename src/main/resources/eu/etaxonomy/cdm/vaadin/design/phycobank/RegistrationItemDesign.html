@@ -6,7 +6,7 @@
   <meta name="vaadin-version" content="7.7.0">
  </head>
  <body>
-  <vaadin-horizontal-layout width-full>
+  <vaadin-horizontal-layout style-name="registration-item" width-full>
    <vaadin-vertical-layout :expand>
     <vaadin-horizontal-layout spacing width-full height="34px" :middle>
      <vaadin-label icon="fonticon://FontAwesome/f02b" style-name="label-nowrap" size-auto plain-text _id="typeStateLabel">
@@ -17,7 +17,7 @@
     <vaadin-label plain-text _id="citationLabel">
       Publication citation string 
     </vaadin-label>
-    <vaadin-label description="Registration summary" plain-text _id="summaryLabel">
+    <vaadin-label plain-text _id="summaryLabel">
       Publication citation string possibly spanning multiple lines 
     </vaadin-label>
    </vaadin-vertical-layout>
@@ -28,11 +28,11 @@
      <vaadin-button icon="fonticon://FontAwesome/f085" style-name="tiny primary" plain-text _id="openButton"></vaadin-button>
     </vaadin-css-layout>
     <vaadin-vertical-layout size-full :bottom :right>
-     <vaadin-label size-auto plain-text _id="createdLabel" :bottom :right :expand>
-       Created: 12.12.2012 
+     <vaadin-label caption="Created" style-name="label-nowrap" size-auto plain-text _id="createdLabel" :bottom :right>
+       12.12.2012 
      </vaadin-label>
-     <vaadin-label size-auto plain-text _id="publishedLabel1" :bottom :right>
-       Published: 12.12.2012 
+     <vaadin-label caption="Published" style-name="label-nowrap" size-auto plain-text _id="publishedLabel" :bottom :right>
+       12.12.2012 
      </vaadin-label>
     </vaadin-vertical-layout>
    </vaadin-vertical-layout>
