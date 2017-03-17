@@ -16,12 +16,14 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.lazyloadwrapper.LazyLoadWrapper;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
@@ -193,10 +195,11 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         list.setSpacing(true);
         for(RegistrationDTO regDto : registrations) {
 
-            list.addComponent(new RegistrationItem(regDto, this));
-            if(list.getComponentCount() > 10){
-                break;
-            }
+            Component lazyItem = new LazyLoadWrapper(new RegistrationItem(regDto, this));
+            list.addComponent(lazyItem);
+//            if(list.getComponentCount() > 10){
+//                break;
+//            }
         }
         panel.setContent(list);
 

@@ -34,4 +34,6 @@
     
 
     <inherits name="eu.etaxonomy.vaadin.ui.DevDayWidgetset" />
+
+    <inherits name="com.vaadin.lazyloadwrapper.widgetset.LazyLoadWrapperWidgetset" />
 </module>

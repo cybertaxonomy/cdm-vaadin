@@ -27,7 +27,7 @@
     <!-- the cdm internal repository -->
     <repository>
       <id>EditRepository</id>
-      <url>http://wp5.e-taxonomy.eu/mavenrepo/</url>
+      <url>http://cybertaxonomy.eu/mavenrepo/</url>
     </repository>
     <!-- current spring source repositories -->
     <repository>
@@ -449,6 +449,12 @@
       <groupId>org.vaadin.addons</groupId>
       <artifactId>contextmenu</artifactId>
       <version>4.5</version>
+    </dependency>
+    <dependency>
+       <!--  only in the edit repo -->
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>lazyloadwrapper</artifactId>
+      <version>0.1-alpha</version>
     </dependency>
     <!-- ============ cdmlib ============ -->
     <dependency>

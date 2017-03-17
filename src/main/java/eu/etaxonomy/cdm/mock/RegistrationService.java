@@ -40,7 +40,7 @@ public class RegistrationService {
     /**
      *
      */
-    private static final int SIZE = 5; // FIXME test performance with 50 !!!!!
+    private static final int SIZE = 50; // FIXME test performance with 50 !!!!!
 
     @Autowired
     @Qualifier("cdmRepository")
