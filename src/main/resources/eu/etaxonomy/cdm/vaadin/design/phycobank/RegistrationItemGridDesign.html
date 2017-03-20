@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;edit-valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-grid-layout width-full>
+   <row>
+    <column>
+     <vaadin-label icon="fonticon://FontAwesome/f02b" style-name="label-nowrap" size-auto plain-text _id="typeStateLabel">
+       State 
+     </vaadin-label>
+    </column>
+    <column>
+     <vaadin-link caption="http://phycobank/100000" _id="identifierLink" :center></vaadin-link>
+    </column>
+    <column>
+     <vaadin-css-layout style-name="v-component-group" :right>
+      <vaadin-button icon="fonticon://FontAwesome/f071" enabled="false" style-name="tiny" plain-text _id="blockedByButton"></vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f075" enabled="false" style-name="tiny" plain-text _id="messageButton"></vaadin-button>
+      <vaadin-button icon="fonticon://FontAwesome/f085" style-name="tiny primary" plain-text _id="openButton"></vaadin-button>
+     </vaadin-css-layout>
+    </column>
+   </row>
+   <row>
+    <column>
+     <vaadin-label size-auto plain-text _id="citationLabel">
+       Publication citation string 
+     </vaadin-label>
+    </column>
+   </row>
+   <row></row>
+  </vaadin-grid-layout>
+ </body>
+</html>

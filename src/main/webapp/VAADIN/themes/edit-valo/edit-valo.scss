@@ -83,19 +83,26 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
        line-height: 50px;
      }
    }
+
+   .v-label .caption {
+       font-size: $v-font-size--small;
+   }
    
    // label with caption and icon horizonatally aligned
    // to apply this to a Vaadin Label set 'label-nowrap'
    // as style
-   .v-slot-label-nowrap {
-        .v-caption, .v-label {
-            display: inline;
+
+    .v-caption-label-nowrap, .v-label-label-nowrap {
+        display: inline;
+    }
+    .v-label-label-nowrap {
+//         margin-left: 8px; // TODO use sass variable here
+//         vertical-align: baseline;
+        .v-icon {
+           display : inline;
         }
-        .v-label {
-            margin-left: 8px; // TODO use sass variable here
-            vertical-align: baseline;
-        }
-   }
+    }
+   
    
    .dashboard-actions {
       margin: 0 10%;
@@ -188,44 +195,49 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     #registration-list {
         // for grid rows
         .status-REJECTED {
+            color: $status-rejected-color;
             td.registrationType, td.status {
                 color: $status-rejected-color;
             }
         }
         .status-CURATION {
+            color: $status-curation-color;
             td.registrationType, td.status {
                 color: $status-curation-color;
             }
         }
         .status-PREPARATION {
+            color: $status-preparation-color;
             td.registrationType, td.status {
                 color: $status-preparation-color;
             }
         }
         .status-PUBLISHED {
+            color: $status-published-color;
             td.registrationType, td.status {
                 color: $status-published-color;
             }
         }
         .status-READY {
+            color: $status-ready-color;
             td.registrationType, td.status {
                 color: $status-ready-color;
             }
         }
         // for RegistrationItems
-        .v-slot-status-REJECTED {
+        .v-caption-status-REJECTED {
             color: $status-rejected-color;
         }
-        .v-slot-status-CURATION {
+        .v-caption-status-CURATION {
             color: $status-curation-color;
         }
-        .v-slot-status-PREPARATION {
+        .v-caption-status-PREPARATION {
             color: $status-preparation-color;
         }
-        .v-slot-status-PUBLISHED {
+        .v-caption-status-PUBLISHED {
             color: $status-published-color;
         }
-        .v-slot-status-READY {
+        .v-caption-status-READY {
             color: $status-ready-color;
         }
     }

@@ -16,7 +16,6 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
-import com.vaadin.lazyloadwrapper.LazyLoadWrapper;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.MarginInfo;
@@ -195,7 +194,7 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
         list.setSpacing(true);
         for(RegistrationDTO regDto : registrations) {
 
-            Component lazyItem = new LazyLoadWrapper(new RegistrationItem(regDto, this));
+            Component lazyItem = new RegistrationItem(regDto, this); //new LazyLoadWrapper(new RegistrationItem(regDto, this));
             list.addComponent(lazyItem);
 //            if(list.getComponentCount() > 10){
 //                break;
