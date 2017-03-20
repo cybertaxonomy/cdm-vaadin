@@ -77,13 +77,12 @@ public class RegistrationItem extends GridLayout {
 
     public void init() {
 
-        setId("registration-list");
         setWidth(100, Unit.PERCENTAGE);
         addStyleName("registration-item");
 
         typeStateLabel.setStyleName(STYLE_LABEL_NOWRAP);
         addComponent(typeStateLabel, 0, 0);
-        setComponentAlignment(typeStateLabel, Alignment.MIDDLE_LEFT);
+        setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
 
         addComponent(identifierLink, 1, 0);
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);

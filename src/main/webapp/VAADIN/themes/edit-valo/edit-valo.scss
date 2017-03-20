@@ -72,6 +72,20 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
   // Insert your own theme rules here
   
+  // --- AbstractPageView --- // 
+  #header {
+    text-align: center;
+    margin: round($v-layout-spacing-vertical/2); // corresponds to layout spacing
+    font-size: $v-font-size--huge; // corresponds to valo style huge (26px)
+  }
+
+  #subheader {
+    text-align: center;
+    margin: round($v-layout-spacing-vertical/2);
+    font-size: $v-font-size; // valo default font size (16px)
+  }
+  // ------------------- // 
+  
   .logo_giant {
     font-size: 400%;
    }
@@ -193,6 +207,16 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     }
     
     #registration-list {
+        /* --- for the css layout --- */
+        overflow: auto;
+        height: 100%;
+        padding-left: round($v-unit-size/3);
+        padding-right: round($v-unit-size/3);
+        
+        border: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
+        border-radius: $v-border-radius - first-number($v-border) $v-border-radius - first-number($v-border) 0 0;
+        /* ----------------------------------------------- */
+        
         // for grid rows
         .status-REJECTED {
             color: $status-rejected-color;

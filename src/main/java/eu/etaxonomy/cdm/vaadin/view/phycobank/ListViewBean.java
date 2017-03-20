@@ -18,28 +18,23 @@ import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.renderers.ButtonRenderer;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
-import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.util.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.UrlStringConverter;
-import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
@@ -48,53 +43,44 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  *
  */
 @SpringView(name=ListViewBean.NAME)
-public class ListViewBean extends AbstractView<ListPresenter> implements ListView, View {
+public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View {
 
     private static final long serialVersionUID = 3543300933072824713L;
 
     public static final String NAME = "list";
 
-    private VerticalLayout layout;
+    CssLayout listContainer;
 
     private Grid grid;
 
-    private Panel panel;
-
     public ListViewBean() {
-        layout = new VerticalLayout();
-        layout.setSpacing(true);
-        layout.setSizeFull();
 
-        Label title = new Label("Registrations");
-        title.setStyleName(ValoTheme.LABEL_HUGE);
-        title.setWidthUndefined();
-        layout.addComponent(title);
-        layout.setComponentAlignment(title, Alignment.TOP_CENTER);
+        super();
 
-        Label hint = new Label("This is the list of all your registrations in progress.");
-        hint.setWidthUndefined();
-        layout.addComponent(hint);
-        layout.setComponentAlignment(hint, Alignment.MIDDLE_CENTER);
+        CssLayout toolBar = new CssLayout();
+        // toolBar.addComponent(new Button);
 
 //        grid = buildGrid();
 //        layout.addComponent(grid);
 //        layout.setExpandRatio(grid, 1);
 
-        buildPanel();
+        listContainer = new CssLayout();
+        listContainer.setId("registration-list");
+        listContainer.setWidth(100, Unit.PERCENTAGE);
+        listContainer.setHeight(100, Unit.PERCENTAGE);
 
-        setCompositionRoot(layout);
-        this.setSizeFull();
+        getLayout().addComponent(listContainer);
+
     }
 
-    /**
-     *
-     */
-    private void buildPanel() {
-        panel = new Panel();
-        panel.setSizeFull();
-        panel.setId("registration-list");
-        layout.addComponent(panel);
-        layout.setExpandRatio(panel, 1);
+    @Override
+    protected String getHeaderText() {
+        return "Registrations";
+    }
+
+    @Override
+    protected String getSubHeaderText() {
+        return "This is the list of all your registrations in progress.";
     }
 
     private Grid buildGrid() {
@@ -189,18 +175,17 @@ public class ListViewBean extends AbstractView<ListPresenter> implements ListVie
      */
     @Override
     public void populateList(Collection<RegistrationDTO> registrations) {
-        VerticalLayout list = new VerticalLayout();
-        list.setMargin(new MarginInfo(false, true));
-        list.setSpacing(true);
+
         for(RegistrationDTO regDto : registrations) {
 
             Component lazyItem = new RegistrationItem(regDto, this); //new LazyLoadWrapper(new RegistrationItem(regDto, this));
-            list.addComponent(lazyItem);
+            lazyItem.setWidth(100, Unit.PERCENTAGE);
+            listContainer.addComponent(lazyItem);
 //            if(list.getComponentCount() > 10){
 //                break;
 //            }
         }
-        panel.setContent(list);
+        // panel.setContent(listContainer);
 
     }
 
