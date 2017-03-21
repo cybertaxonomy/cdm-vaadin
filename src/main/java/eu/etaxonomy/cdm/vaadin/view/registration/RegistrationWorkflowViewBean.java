@@ -16,14 +16,12 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationWorkflowComponent;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationWorkflowPresenter;
-import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
  * @author a.kohlbecker
@@ -31,8 +29,17 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  *
  */
 @SpringView(name=RegistrationWorkflowViewBean.NAME)
-public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkflowPresenter>
+public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationWorkflowPresenter>
     implements RegistrationWorkflowView, View {
+
+    /**
+     *
+     */
+    private static final String CSS_CLASS_WORKFLOW = "workflow-container";
+
+    private static final String SUBHEADER_PREFIX = "Advance step by step through the registration workflow for scientific names.";
+
+    private static final String HEADER_PREFIX = "Registration of the ...";
 
     private static final long serialVersionUID = -213040114015958970L;
 
@@ -44,11 +51,17 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
 
     public RegistrationType regType = null;
 
-    RegistrationWorkflowComponent design;
+    CssLayout workflow;
+
+    String headerSuffix = "";
 
     public RegistrationWorkflowViewBean() {
-        design = new RegistrationWorkflowComponent();
-        setCompositionRoot(design);
+        super();
+
+        workflow = new CssLayout();
+        workflow.setSizeFull();
+        workflow.setId(CSS_CLASS_WORKFLOW);
+        getLayout().addComponent(workflow);
     }
 
     /**
@@ -61,14 +74,14 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
 
            if(params[0].equals(ACTION_NEW)) {
                regType = RegistrationType.valueOf(params[1]);
-               design.getTitle().setValue(design.getTitle().getValue() + "  " + regType.name() + " ...");
+               headerSuffix = regType.name() + " ...";
                eventBus.publishEvent(new RegistrationWorkflowEvent(regType));
 
            } else if( params[0].equals(ACTION_EDIT)) {
-               design.getTitle().setValue(design.getTitle().getValue() + "  " + params[1]);
+               headerSuffix = params[1];
                eventBus.publishEvent(new RegistrationWorkflowEvent(Integer.parseInt(params[1])));
            }
-
+           updateHeader();
         }
     }
 
@@ -121,24 +134,6 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
         setPresenter(presenter);
     }
 
-    /* ------- RegistrationWorkflowView implementation ------- */
-
-    /**
-     * @return the title
-     */
-    @Override
-    public Label getTitle() {
-        return design.getTitle();
-    }
-
-    /**
-     * @return the workflow
-     */
-    @Override
-    public CssLayout getWorkflow() {
-        return design.getWorkflow();
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -147,5 +142,30 @@ public class RegistrationWorkflowViewBean extends AbstractView<RegistrationWorkf
         // TODO Auto-generated method stub
 
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getHeaderText() {
+        return HEADER_PREFIX + " " + headerSuffix;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getSubHeaderText() {
+        return SUBHEADER_PREFIX;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CssLayout getWorkflow() {
+        return workflow;
+    }
+
 
 }

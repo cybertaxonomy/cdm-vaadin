@@ -43,11 +43,18 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
         header.setStyleName(ValoTheme.LABEL_HUGE);
         header.setWidth(100, Unit.PERCENTAGE);
         header.setContentMode(ContentMode.HTML);
-        header.setValue("<div id=\"header\">" + getHeaderText() + "</div><div id=\"subheader\">" + getSubHeaderText() + "</div>");
+        updateHeader();
         layout.addComponent(header);
 
         setCompositionRoot(layout);
         this.setSizeFull();
+    }
+
+    /**
+     * 
+     */
+    public void updateHeader() {
+        header.setValue("<div id=\"header\">" + getHeaderText() + "</div><div id=\"subheader\">" + getSubHeaderText() + "</div>");
     }
 
     protected CssLayout getLayout() {

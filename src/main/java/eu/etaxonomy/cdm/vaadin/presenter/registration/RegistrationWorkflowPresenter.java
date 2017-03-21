@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.registration;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 
@@ -46,6 +47,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     @EventListener
     protected void onRegistrationStartEvent(RegistrationWorkflowEvent e){
 
+        if(registration != null){
+            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Foiling attempt to start another registration in existing workflow");
+            return;
+        }
+
         if(e.isStart()) {
             registration = new Registration();
             registration.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
@@ -53,7 +59,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             registration = serviceMock.loadByRegistrationID(e.getRegistrationID());
         }
         if(registration != null){
-            getView().getTitle().setValue("Workflow for a " + registrationType().name());
+            // getView().getTitle().setValue("Workflow for a " + registrationType().name());
             getView().makeWorflow(registrationType());
         }
     }

@@ -141,6 +141,10 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     }
 
     // ===== workflow ==== // 
+
+    #workflow-container {
+        text-align: center;
+    }
     
     $workflow-icon-size: 110px;
     // can not be set per css as this need to set as property to the component in vaadin
@@ -150,8 +154,8 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
     $workflow-icon-margin-h: $workflow-icon-size / 5;
     $workflow-icon-left: $workflow-icon-margin-h / 2;
-    $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;
-        
+    $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;        
+    
     .workflow {
         .steps {
             z-index: 10;

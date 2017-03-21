@@ -19,9 +19,8 @@ import eu.etaxonomy.cdm.vaadin.design.registration.WorkflowStepsDesign;
  */
 public class WorkflowSteps extends WorkflowStepsDesign {
 
-    /**
-     *
-     */
+    private static final long serialVersionUID = 7224620045791102584L;
+
     public WorkflowSteps() {
         // TODO Auto-generated constructor stub
     }

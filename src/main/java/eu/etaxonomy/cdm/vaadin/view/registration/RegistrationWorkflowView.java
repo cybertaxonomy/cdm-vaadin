@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.UUID;
 
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
 
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -25,8 +24,6 @@ public interface RegistrationWorkflowView extends ApplicationView{
 
 
     CssLayout getWorkflow();
-
-    Label getTitle();
 
 
     /**

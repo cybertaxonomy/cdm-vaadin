@@ -95,11 +95,7 @@ public class RegistrationItem extends GridLayout {
         messageButton.setEnabled(false);
         openButton.setStyleName(ValoTheme.BUTTON_TINY);
         openButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
-        openButton.addClickListener(e -> parentView.getEventBus().publishEvent(new NavigationEvent(
-                RegistrationWorkflowViewBean.NAME,
-                RegistrationWorkflowViewBean.ACTION_EDIT,
-                regDto.getSpecificIdentifier().toString()
-                )));
+
         buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         addComponent(buttonGroup, 2, 0);
         setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
