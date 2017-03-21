@@ -28,9 +28,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.vaadin.view.phycobank.DashBoardView;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.ListViewBean;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.StartRegistrationView;
+import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
+import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
+import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;

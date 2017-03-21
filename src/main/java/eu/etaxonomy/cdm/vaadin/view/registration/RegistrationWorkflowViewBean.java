@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.phycobank;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.UUID;
 
@@ -18,11 +18,11 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 
-import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationWorkflowComponent;
-import eu.etaxonomy.cdm.vaadin.component.phycobank.WorkflowSteps;
-import eu.etaxonomy.cdm.vaadin.event.phycobank.RegistrationWorkflowEvent;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationWorkflowPresenter;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationWorkflowComponent;
+import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationWorkflowPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**

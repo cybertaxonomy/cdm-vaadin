@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.phycobank;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,9 +32,9 @@ import com.vaadin.ui.renderers.ButtonRenderer;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
-import eu.etaxonomy.cdm.vaadin.component.phycobank.RegistrationItem;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.ListPresenter;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.util.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;

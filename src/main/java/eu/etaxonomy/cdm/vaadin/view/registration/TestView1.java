@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.phycobank;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import javax.annotation.PostConstruct;
 
@@ -21,28 +21,27 @@ import com.vaadin.ui.VerticalLayout;
  * @since Feb 24, 2017
  *
  */
-@SpringView(name=TestView2.NAME)
+@SpringView(name=TestView1.NAME)
 /*
  * MenuBeanDiscovery is not yet working with spring!!!!!
 @SpringComponent
 @Scope(scopeName = ViewScopeImpl.VAADIN_VIEW_SCOPE_NAME, proxyMode = ScopedProxyMode.TARGET_CLASS)
 @MenuItem(name="test", icon=FontAwesome.INFO_CIRCLE, order = 0)
 */
-public class TestView2 extends VerticalLayout  implements View {
+public class TestView1 extends VerticalLayout  implements View {
 
-    public static final String NAME = "test2";
+    public static final String NAME = "test1";
 
     private static final long serialVersionUID = 6152530138547633828L;
 
-    public TestView2(){
+    public TestView1(){
         setWidth(100, Unit.PERCENTAGE);
         setMargin(true);
-        this.addComponent(new Label("This is another test"));
+        this.addComponent(new Label("This is only a test!"));
     }
 
     @PostConstruct
     protected void initialize() {
-
     }
 
     /**

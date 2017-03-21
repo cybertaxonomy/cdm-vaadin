@@ -6,9 +6,9 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.event.phycobank;
+package eu.etaxonomy.cdm.vaadin.event.registration;
 
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationType;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 
 /**
  * @author a.kohlbecker

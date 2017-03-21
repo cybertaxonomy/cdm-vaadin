@@ -26,7 +26,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 
 /**
  * @author a.kohlbecker

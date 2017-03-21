@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.presenter.phycobank;
+package eu.etaxonomy.cdm.vaadin.presenter.registration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -18,8 +18,8 @@ import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationService;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
-import eu.etaxonomy.cdm.vaadin.event.phycobank.RegistrationWorkflowEvent;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.RegistrationWorkflowView;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**

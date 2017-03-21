@@ -6,12 +6,12 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.phycobank;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Collection;
 
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.phycobank.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.ListPresenter;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**

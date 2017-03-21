@@ -6,17 +6,17 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.phycobank;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.server.Responsive;
 import com.vaadin.spring.annotation.SpringView;
 
-import eu.etaxonomy.cdm.vaadin.design.phycobank.DashBoardDesign;
+import eu.etaxonomy.cdm.vaadin.design.registration.StartRegistrationDesign;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
@@ -24,21 +24,22 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  * @since Mar 2, 2017
  *
  */
-@SpringView(name=DashBoardView.NAME)
-public class DashBoardView extends DashBoardDesign implements View {
+@SpringView(name=StartRegistrationView.NAME)
+public class StartRegistrationView extends StartRegistrationDesign implements View {
 
-    public static final String NAME = "dashboard";
+    private static final long serialVersionUID = -213040114015958970L;
 
-    private static final long serialVersionUID = -6172448806905158782L;
+    public static final String NAME = "regStart";
 
     @Autowired
     ApplicationEventPublisher eventBus;
 
-    public DashBoardView() {
-        Responsive.makeResponsive(dashboard);
-        buttonNew.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(StartRegistrationView.NAME)));
-        buttonContinue.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME)));
-        buttonList.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME)));
+    public StartRegistrationView() {
+        buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(
+                RegistrationWorkflowViewBean.NAME,
+                RegistrationWorkflowViewBean.ACTION_NEW,
+                RegistrationType.NAME.name()
+                )));
     }
 
     /**
@@ -46,7 +47,6 @@ public class DashBoardView extends DashBoardDesign implements View {
      */
     @Override
     public void enter(ViewChangeEvent event) {
-        // TODO Auto-generated method stub
 
     }
 
