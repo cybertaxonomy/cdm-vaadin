@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.phycobank;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer = new CssLayout();
         listContainer.setId("registration-list");
         listContainer.setWidth(100, Unit.PERCENTAGE);
-        listContainer.setHeight(100, Unit.PERCENTAGE);
     }
 
     private void buildGrid() {
@@ -151,6 +151,9 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     @Override
     public void populate(Collection<RegistrationDTO> registrations) {
+
+        registrations = new ArrayList<RegistrationDTO>(registrations).subList(0, 10);
+
         populateGrid(registrations);
         populateList(registrations);
     }
