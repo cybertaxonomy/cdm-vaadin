@@ -34,8 +34,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     @Override
     public void onViewEnter() {
         super.onViewEnter();
-        //getView().populateTable(listRegistrations());
-        getView().populateList(listRegistrations());
+        getView().populate(listRegistrations());
     }
 
     /**

@@ -20,6 +20,8 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
@@ -49,28 +51,25 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     public static final String NAME = "list";
 
-    CssLayout listContainer;
+    private CssLayout listContainer;
 
     private Grid grid;
+
+    private CssLayout toolBar;
 
     public ListViewBean() {
 
         super();
 
-        CssLayout toolBar = new CssLayout();
-        // toolBar.addComponent(new Button);
+        toolBar = new CssLayout();
+        toolBar.setWidth(100, Unit.PERCENTAGE);
+        toolBar.addComponent(new Button("As grid", e -> toggleListType(e)));
+        getLayout().addComponent(toolBar);
 
-//        grid = buildGrid();
-//        layout.addComponent(grid);
-//        layout.setExpandRatio(grid, 1);
+        buildList();
+        buildGrid();
 
-        listContainer = new CssLayout();
-        listContainer.setId("registration-list");
-        listContainer.setWidth(100, Unit.PERCENTAGE);
-        listContainer.setHeight(100, Unit.PERCENTAGE);
-
-        getLayout().addComponent(listContainer);
-
+        showList();
     }
 
     @Override
@@ -83,8 +82,15 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         return "This is the list of all your registrations in progress.";
     }
 
-    private Grid buildGrid() {
-        Grid grid = new Grid();
+    private void buildList() {
+        listContainer = new CssLayout();
+        listContainer.setId("registration-list");
+        listContainer.setWidth(100, Unit.PERCENTAGE);
+        listContainer.setHeight(100, Unit.PERCENTAGE);
+    }
+
+    private void buildGrid() {
+        grid = new Grid();
         grid.setSizeFull();
         grid.setEditorEnabled(false);
         grid.setId("registration-list");
@@ -93,8 +99,38 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         grid.setHeightMode(HeightMode.CSS);
         // add status as class  attribute to the rows to allow styling with css
         grid.setRowStyleGenerator(rowRef -> {return "status-" + rowRef.getItem().getItemProperty("status").getValue().toString();});
-        return grid;
     }
+
+    /**
+     * @param e
+     * @return
+     */
+    private Object toggleListType(ClickEvent e) {
+        Button button = e.getButton();
+        if(button.getCaption().equals("As grid")){
+            button.setCaption("As list");
+            showGrid();
+        } else {
+            button.setCaption("As grid");
+            showList();
+        }
+        return null;
+    }
+
+    private void showList() {
+        if(grid != null){
+            getLayout().removeComponent(grid);
+        }
+        getLayout().addComponent(listContainer);
+    }
+
+    private void showGrid() {
+        if(listContainer != null){
+            getLayout().removeComponent(listContainer);
+        }
+        getLayout().addComponent(grid);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -102,7 +138,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Override
     public void enter(ViewChangeEvent event) {
         getPresenter().onViewEnter();
-
     }
 
     /**
@@ -112,15 +147,16 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Autowired
     protected void injectPresenter(ListPresenter presenter) {
         setPresenter(presenter);
-
     }
 
-    static final String[] visiblCols = new String[]{"status, summary", "registrationId"};
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void populateTable(Collection<RegistrationDTO> registrations) {
+    public void populate(Collection<RegistrationDTO> registrations) {
+        populateGrid(registrations);
+        populateList(registrations);
+    }
+
+
+    public void populateGrid(Collection<RegistrationDTO> registrations) {
 
         BeanContainer<String, RegistrationDTO> registrationItems = new BeanContainer<String, RegistrationDTO>(RegistrationDTO.class);
         registrationItems.setBeanIdProperty("specificIdentifier");
@@ -170,23 +206,14 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         for(RegistrationDTO regDto : registrations) {
-
             Component lazyItem = new RegistrationItem(regDto, this); //new LazyLoadWrapper(new RegistrationItem(regDto, this));
             lazyItem.setWidth(100, Unit.PERCENTAGE);
             listContainer.addComponent(lazyItem);
-//            if(list.getComponentCount() > 10){
-//                break;
-//            }
         }
-        // panel.setContent(listContainer);
-
     }
 
     /**
