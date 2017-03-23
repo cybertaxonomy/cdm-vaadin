@@ -32,4 +32,9 @@ public class WorkflowItem extends WorkflowItemDesign {
         }
     }
 
+    @Override
+    public void setCaption(String text){
+        this.caption.setValue(text);
+    }
+
 }

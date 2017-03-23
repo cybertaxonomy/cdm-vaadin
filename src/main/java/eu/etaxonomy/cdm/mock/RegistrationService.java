@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationException;
 
 /**
  * @author a.kohlbecker
@@ -73,13 +75,23 @@ public class RegistrationService {
                             Registration nameReg = new Registration();
                             nameReg.setName(name);
                             cdmEntities.add(name);
-                            put(nameReg, new RegistrationDTO(nameReg, null));
+                            try {
+                                put(nameReg, new RegistrationDTO(nameReg));
+                            } catch (RegistrationValidationException e) {
+                                //FIXME throw  and handle Exception
+                                Logger.getLogger(this.getClass()).error(e);
+                            }
 
                             // typedesignation
                             Registration typedesignationReg = new Registration();
                             typedesignationReg.addTypeDesignations(name.getTypeDesignations());
                             cdmEntities.addAll(name.getTypeDesignations());
-                            put(typedesignationReg,  new RegistrationDTO(typedesignationReg, name));
+                            try {
+                                put(typedesignationReg,  new RegistrationDTO(typedesignationReg));
+                            } catch (RegistrationValidationException e) {
+                                //FIXME throw  and handle Exception
+                                Logger.getLogger(this.getClass()).error(e);
+                            }
                         }
                     }
                 }

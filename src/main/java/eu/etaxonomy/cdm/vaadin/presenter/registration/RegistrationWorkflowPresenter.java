@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationService;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -55,14 +56,27 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         if(e.isStart()) {
             registration = new Registration();
             registration.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
+            getView().setHeaderText("New " + e.getType().name().toString()+ " Registration");
         } else {
             registration = serviceMock.loadByRegistrationID(e.getRegistrationID());
+            getView().setHeaderText("Registration " + registration.getIdentifier());
         }
         if(registration != null){
             // getView().getTitle().setValue("Workflow for a " + registrationType().name());
             getView().makeWorflow(registrationType());
         }
     }
+
+//    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EventType).ADD")
+//    public void onReferenceAddEvent(ReferenceEvent event) {
+//        getView().openReferenceEditor(null);
+//    }
+
+    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EventType).EDIT")
+    public void onReferenceEditEvent(ReferenceEvent event) {
+        getView().openReferenceEditor(null);
+    }
+
 
     /**
      * @return

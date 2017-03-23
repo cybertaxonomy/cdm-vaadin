@@ -31,11 +31,30 @@ public interface RegistrationWorkflowView extends ApplicationView{
      * given otherwise a blank editor will open if the  nameUuid is null.
      *
      * @param nameUuid can be null
-     * @deprecated will be handled by the WorkflowItem
      */
-    @Deprecated
     void openNameEditor(UUID nameUuid);
 
+    /**
+     * Open a popup editor for an existing Reference if the referenceUuid is
+     * given otherwise a blank editor will open if the  referenceUuid is null.
+     *
+     * @param referenceUuid can be null
+     */
+    void openReferenceEditor(UUID referenceUuid);
+
     public void makeWorflow(RegistrationType type);
+
+
+    /**
+     * @param subheaderText
+     */
+    void setSubheaderText(String subheaderText);
+
+    /**
+     * @param subheaderText
+     */
+    void setHeaderText(String subheaderText);
+
+
 
 }

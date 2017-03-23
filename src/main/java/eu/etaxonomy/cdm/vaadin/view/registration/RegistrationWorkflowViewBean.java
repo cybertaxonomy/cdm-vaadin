@@ -18,6 +18,9 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.CssLayout;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
+import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationWorkflowPresenter;
@@ -32,14 +35,10 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationWorkflowPresenter>
     implements RegistrationWorkflowView, View {
 
-    /**
-     *
-     */
-    private static final String CSS_CLASS_WORKFLOW = "workflow-container";
 
-    private static final String SUBHEADER_PREFIX = "Advance step by step through the registration workflow for scientific names.";
+    public static final String CSS_CLASS_WORKFLOW = "workflow-container";
 
-    private static final String HEADER_PREFIX = "Registration of the ...";
+    public static final String SUBHEADER_DEEFAULT = "Advance step by step through the registration workflow.";
 
     private static final long serialVersionUID = -213040114015958970L;
 
@@ -53,7 +52,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     CssLayout workflow;
 
-    String headerSuffix = "";
+    private String headerText = "-- empty --";
+    private String subheaderText = SUBHEADER_DEEFAULT;
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -74,11 +74,11 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
            if(params[0].equals(ACTION_NEW)) {
                regType = RegistrationType.valueOf(params[1]);
-               headerSuffix = regType.name() + " ...";
+               headerText = regType.name() + " ...";
                eventBus.publishEvent(new RegistrationWorkflowEvent(regType));
 
            } else if( params[0].equals(ACTION_EDIT)) {
-               headerSuffix = params[1];
+               headerText = params[1];
                eventBus.publishEvent(new RegistrationWorkflowEvent(Integer.parseInt(params[1])));
            }
            updateHeader();
@@ -104,11 +104,12 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     */
    private void addNameWorkflow() {
        WorkflowSteps steps = new WorkflowSteps();
-       steps.appendNewWorkflowItem(1, "Nomenclatural reference", null);
-       steps.appendNewWorkflowItem(2, "Name", null);
-       steps.appendNewWorkflowItem(3, "Publisher Details", null);
-       steps.appendNewWorkflowItem(4, "Data curation", null);
-       steps.appendNewWorkflowItem(5, "Awaiting publication", null);
+       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
+               e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+       steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
+               e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
+       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
        getWorkflow().addComponent(steps);
    }
 
@@ -117,11 +118,12 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
    */
   private void addTypificationWorkflow() {
       WorkflowSteps steps = new WorkflowSteps();
-      steps.appendNewWorkflowItem(1, "Name", null);
-      steps.appendNewWorkflowItem(2, "Type information", null);
-      steps.appendNewWorkflowItem(3, "Publisher Details", null);
-      steps.appendNewWorkflowItem(4, "Data curation", null);
-      steps.appendNewWorkflowItem(5, "Awaiting publication", null);
+      steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
+              e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+      steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
+              e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+      steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
+      steps.appendNewWorkflowItem(4, "Awaiting publication", null);
       getWorkflow().addComponent(steps);
   }
 
@@ -138,6 +140,15 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * {@inheritDoc}
      */
     @Override
+    public void openReferenceEditor(UUID referenceUuid) {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void openNameEditor(UUID nameUuid) {
         // TODO Auto-generated method stub
 
@@ -148,7 +159,31 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     @Override
     protected String getHeaderText() {
-        return HEADER_PREFIX + " " + headerSuffix;
+        return headerText;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setHeaderText(String text) {
+        this.headerText = text;
+
+    }
+
+    /**
+     * @return the subheaderText
+     */
+    public String getSubheaderText() {
+        return subheaderText;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSubheaderText(String text) {
+        subheaderText = text;
     }
 
     /**
@@ -156,7 +191,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     @Override
     protected String getSubHeaderText() {
-        return SUBHEADER_PREFIX;
+        return subheaderText;
     }
 
     /**
