@@ -11,3 +11,5 @@ src/main/resources/test.txt
 cdmTest.lock.db
 .designer
 .vaadin-designer
+.idea
+*.iml
