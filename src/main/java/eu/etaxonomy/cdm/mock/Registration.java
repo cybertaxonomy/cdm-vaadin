@@ -56,7 +56,8 @@ public class Registration extends CdmBase {
     public Registration() {
         super();
         status = RegistrationStatus.values()[(int) (Math.random() * RegistrationStatus.values().length)];
-        specificIdentifier = Integer.toString(idAutoincrement++);
+        setId(idAutoincrement++);
+        specificIdentifier = Integer.toString(getId());
         identifier = "http://pyhcobank.org/" + specificIdentifier;
         registrationDate = DateTime.now();
     }

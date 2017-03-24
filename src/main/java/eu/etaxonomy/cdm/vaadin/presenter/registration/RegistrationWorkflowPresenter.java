@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 
+import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
@@ -21,6 +22,7 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
@@ -37,7 +39,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     @Autowired
     private RegistrationService serviceMock;
 
-    private Registration registration;
+    private RegistrationWorkingSet workingset;
 
     /**
      *
@@ -46,24 +48,37 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener
-    protected void onRegistrationStartEvent(RegistrationWorkflowEvent e){
+    protected void onRegistrationStartEvent(RegistrationWorkflowEvent event){
 
-        if(registration != null){
-            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Foiling attempt to start another registration in existing workflow");
+        if(workingset != null){
+            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Cant start a new workflow over an existing one.");
             return;
         }
 
-        if(e.isStart()) {
-            registration = new Registration();
-            registration.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
-            getView().setHeaderText("New " + e.getType().name().toString()+ " Registration");
+
+        if(event.isStart()) {
+            workingset = new RegistrationWorkingSet();
+            Registration reg = new Registration();
+            reg.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
+            getView().setHeaderText("New " + event.getType().name().toString()+ " Registration");
+            try {
+                workingset.add(reg);
+            } catch (RegistrationValidationException error) {
+                getView().getWorkflow().setComponentError(new SystemError(error));
+            }
         } else {
-            registration = serviceMock.loadByRegistrationID(e.getRegistrationID());
-            getView().setHeaderText("Registration " + registration.getIdentifier());
+            try {
+                workingset = serviceMock.loadWorkingSetByRegistrationID(event.getRegistrationID());
+            } catch (RegistrationValidationException error) {
+                getView().getWorkflow().setComponentError(new SystemError(error));
+            }
+            getView().setHeaderText("Registration for " + workingset.getCitation());
         }
-        if(registration != null){
+        if(workingset != null){
             // getView().getTitle().setValue("Workflow for a " + registrationType().name());
-            getView().makeWorflow(registrationType());
+            for(Registration reg : workingset.getRegistrations()){
+                getView().makeWorflow(RegistrationType.from(reg));
+            }
         }
     }
 
@@ -76,15 +91,5 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public void onReferenceEditEvent(ReferenceEvent event) {
         getView().openReferenceEditor(null);
     }
-
-
-    /**
-     * @return
-     */
-    private RegistrationType registrationType() {
-        return RegistrationType.from(registration);
-    }
-
-
 
 }

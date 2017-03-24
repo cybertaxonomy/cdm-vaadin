@@ -8,15 +8,14 @@
 */
 package eu.etaxonomy.cdm.mock;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,6 +26,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationException;
 
@@ -49,9 +49,10 @@ public class RegistrationService {
     private CdmRepository repo;
 
     private Map<UUID, Registration> registrationsByUUID = new HashMap<>();
-    private Map<String, Registration> registrationsByRegID = new HashMap<>();
-    private Map<String, RegistrationDTO> registrationDTOsByRegID = new HashMap<>();
-    private Map<Integer, Set<RegistrationDTO>> registrationDTOsByCitationID = new HashMap<>();
+    private Map<Integer, Registration> registrationsByRegID = new HashMap<>();
+    private Map<Integer, RegistrationDTO> registrationDTOsById = new HashMap<>();
+    private Map<String, RegistrationDTO> registrationDTOsByIdentifier = new HashMap<>();
+    private Map<Integer, List<RegistrationDTO>> registrationDTOsByCitationId = new HashMap<>();
 
     private Collection<CdmBase> cdmEntities = new HashSet<>();
 
@@ -75,23 +76,13 @@ public class RegistrationService {
                             Registration nameReg = new Registration();
                             nameReg.setName(name);
                             cdmEntities.add(name);
-                            try {
-                                put(nameReg, new RegistrationDTO(nameReg));
-                            } catch (RegistrationValidationException e) {
-                                //FIXME throw  and handle Exception
-                                Logger.getLogger(this.getClass()).error(e);
-                            }
+                            put(new RegistrationDTO(nameReg));
 
                             // typedesignation
                             Registration typedesignationReg = new Registration();
                             typedesignationReg.addTypeDesignations(name.getTypeDesignations());
                             cdmEntities.addAll(name.getTypeDesignations());
-                            try {
-                                put(typedesignationReg,  new RegistrationDTO(typedesignationReg));
-                            } catch (RegistrationValidationException e) {
-                                //FIXME throw  and handle Exception
-                                Logger.getLogger(this.getClass()).error(e);
-                            }
+                            put(new RegistrationDTO(typedesignationReg));
                         }
                     }
                 }
@@ -103,14 +94,18 @@ public class RegistrationService {
     /**
      * @param reg
      */
-    private void put(Registration reg, RegistrationDTO dto) {
-        registrationsByUUID.put(reg.getUuid(), reg);
-        registrationsByRegID.put(reg.getSpecificIdentifier(), reg);
-        registrationDTOsByRegID.put(reg.getSpecificIdentifier(), dto);
-        if(! registrationDTOsByCitationID.containsKey(dto.getCitationID())){
-            registrationDTOsByCitationID.put(dto.getCitationID(), new HashSet<RegistrationDTO>());
+    private void put(RegistrationDTO dto) {
+        Registration reg = dto.registration();
+        registrationsByUUID.put(dto.getUuid(), reg);
+        registrationsByRegID.put(reg.getId(), reg);
+
+        registrationDTOsById.put(reg.getId(), dto);
+        registrationDTOsByIdentifier.put(reg.getIdentifier(), dto);
+
+        if(! registrationDTOsByCitationId.containsKey(dto.getCitationID())){
+            registrationDTOsByCitationId.put(dto.getCitationID(), new ArrayList<RegistrationDTO>());
         }
-        registrationDTOsByCitationID.get(dto.getCitationID()).add(dto);
+        registrationDTOsByCitationId.get(dto.getCitationID()).add(dto);
     }
 
     private void mergeBack(){
@@ -125,6 +120,7 @@ public class RegistrationService {
         return registrationsByUUID.get(uuid);
     }
 
+
     public Collection<Registration> list(){
         init();
         return registrationsByUUID.values();
@@ -132,21 +128,51 @@ public class RegistrationService {
 
     public Collection<RegistrationDTO> listDTOs() {
         init();
-        return registrationDTOsByRegID.values();
+        return registrationDTOsById.values();
     }
 
-    public Map<Integer, Set<RegistrationDTO>> listDTOsByWorkingSet() {
+    public Map<Integer, List<RegistrationDTO>> listDTOsByWorkingSet() {
         init();
-        return registrationDTOsByCitationID;
+        return registrationDTOsByCitationId;
     }
 
     /**
-     * @param registrationID
+     * @param  id the CDM Entity id
      * @return
      */
-    public Registration loadByRegistrationID(Integer registrationID) {
+    public Registration loadByRegistrationID(Integer id) {
         init();
-        return registrationsByRegID.get(registrationID.toString());
+        return registrationsByRegID.get(id);
+    }
+
+    /**
+     * @param identifier the Registration Identifier String
+     * @return
+     */
+    public RegistrationDTO loadDtoByIdentifier(String identifier) {
+        init();
+        return registrationDTOsById.get(identifier);
+    }
+
+    /**
+     * @param id the CDM Entity id
+     * @return
+     */
+    public RegistrationDTO loadDtoById(Integer id) {
+        init();
+        return registrationDTOsById.get(id);
+    }
+
+    /**
+     * @param  id the CDM Entity id
+     * @return
+     * @throws RegistrationValidationException
+     */
+    public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
+        init();
+        RegistrationDTO dto = registrationDTOsById.get(id);
+
+        return new RegistrationWorkingSet(registrationDTOsByCitationId.get(dto.getCitationID()));
     }
 
 

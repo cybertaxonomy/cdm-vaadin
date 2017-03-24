@@ -8,18 +8,36 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.registration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author a.kohlbecker
  * @since Mar 23, 2017
  *
  */
+@SuppressWarnings("serial")
 public class RegistrationValidationException extends Exception {
+
+    List<String> problems = new ArrayList<>();
 
     /**
      * @param message
      */
-    public RegistrationValidationException(String message) {
+    public RegistrationValidationException(String message, List<String> problems) {
         super(message);
+        this.problems = problems;
+    }
+
+    @Override
+    public String getMessage() {
+        StringBuffer sb = new StringBuffer(super.getMessage()).append(" - Problems:");
+        problems.forEach(p -> sb.append("- ").append(p).append("\n"));
+        return sb.toString();
+    }
+
+    public List<String> getProblems() {
+        return problems;
     }
 
 

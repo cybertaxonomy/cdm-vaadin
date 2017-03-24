@@ -8,8 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.registration;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 
@@ -33,7 +36,7 @@ public class RegistrationDTO{
 
     private Registration reg;
 
-    static int idAutoincrement = 100000;
+    private List<String> messages = new ArrayList<>();
 
     private Set<Registration> blockedBy = new HashSet<>();
 
@@ -42,9 +45,8 @@ public class RegistrationDTO{
     /**
      * @param reg
      * @param typifiedName should be provided in for Registrations for TypeDesignations
-     * @throws RegistrationValidationException in case of inconsistencies in the Registration
      */
-    public RegistrationDTO(Registration reg) throws RegistrationValidationException {
+    public RegistrationDTO(Registration reg) {
 
          this.reg = reg;
 
@@ -57,7 +59,11 @@ public class RegistrationDTO{
                 citationID = citation.getId();
             }
         } else if(registrationType.isTypification()){
-            typifiedName = findTypifiedName();
+            try {
+                typifiedName = findTypifiedName();
+            } catch (RegistrationValidationException e) {
+                messages.add("Validation errors: " + e.getMessage());
+            }
             summary = new TypeDesignationConverter(reg.getTypeDesignations(), typifiedName)
                     .buildString().print();
             if(!reg.getTypeDesignations().isEmpty()){
@@ -70,17 +76,21 @@ public class RegistrationDTO{
         } else {
             summary = "- INVALID REGISTRATION -";
         }
+
+        messages.add("dummy");
     }
 
 
 
     /**
+     * FIXME use the validation framework validators and to store the validation problems!!!
+     *
      * @return
      * @throws RegistrationValidationException
      */
     private TaxonNameBase<?,?> findTypifiedName() throws RegistrationValidationException {
 
-        StringBuffer problems = new StringBuffer();
+        List<String> problems = new ArrayList<>();
 
         TaxonNameBase<?,?> typifiedName = null;
 
@@ -89,12 +99,12 @@ public class RegistrationDTO{
             if(typeDesignation.getTypifiedNames().isEmpty()){
 
                 //TODO instead throw RegistrationValidationException()
-                problems.append(" - Missing typifiedName in " + typeDesignation.toString()).append("\n");
+                problems.add("Missing typifiedName in " + typeDesignation.toString());
                 continue;
             }
             if(typeDesignation.getTypifiedNames().size() > 1){
               //TODO instead throw RegistrationValidationException()
-                problems.append(" - Multiple typifiedName in " + typeDesignation.toString()).append("\n");
+                problems.add("Multiple typifiedName in " + typeDesignation.toString());
                 continue;
             }
             if(typifiedName == null){
@@ -105,16 +115,28 @@ public class RegistrationDTO{
                 TaxonNameBase<?,?> otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
                 if(typifiedName.getId() != otherTypifiedName.getId()){
                   //TODO instead throw RegistrationValidationException()
-                    problems.append(" - Multiple typifiedName in " + typeDesignation.toString()).append("\n");
+                    problems.add("Multiple typifiedName in " + typeDesignation.toString());
                 }
             }
 
         }
-        if(problems.length() > 0){
-            throw new RegistrationValidationException("Inconsistent Registration entity. " + reg.toString() + " Problems:\n" + problems.toString());
+        if(!problems.isEmpty()){
+            // FIXME use the validation framework
+            throw new RegistrationValidationException("Inconsistent Registration entity. " + reg.toString(), problems);
         }
 
         return typifiedName;
+    }
+
+    /**
+     * Provides access to the Registration entity this DTO has been build from.
+     * This method is purposely not a getter to hide the original Registration
+     * from generic processes which are exposing, binding bean properties.
+     *
+     * @return
+     */
+    public Registration registration() {
+        return reg;
     }
 
 
@@ -143,12 +165,21 @@ public class RegistrationDTO{
 
 
     /**
-     * @return the registrationId
+     * @return the identifier
      */
-    public String getRegistrationId() {
+    public String getIdentifier() {
         return reg.getIdentifier();
     }
 
+
+    public int getId() {
+        return reg.getId();
+    }
+
+
+    public UUID getUuid() {
+        return reg.getUuid();
+    }
 
     /**
      * @return the specificIdentifier
@@ -194,6 +225,15 @@ public class RegistrationDTO{
      */
     public int getCitationID() {
         return citationID;
+    }
+
+
+
+    /**
+     * @return
+     */
+    public List<String> getMessages() {
+        return messages;
     }
 
 }

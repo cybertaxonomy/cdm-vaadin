@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Collection;
+import java.util.List;
 
 import eu.etaxonomy.cdm.vaadin.presenter.registration.ListPresenter;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
@@ -25,6 +26,11 @@ public interface ListView extends ApplicationView<ListPresenter>{
      * @param page
      */
     void populate(Collection<RegistrationDTO> registrations);
+
+    /**
+     * @param messages
+     */
+    void openDetailsPopup(String caption, List<String> messages);
 
 
 }

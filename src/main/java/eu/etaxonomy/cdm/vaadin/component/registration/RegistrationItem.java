@@ -22,6 +22,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
@@ -131,11 +132,25 @@ public class RegistrationItem extends GridLayout {
         updateTypeStateLabel();
         getCitationSummaryLabel().setValue(regDto.getCitationString() + "</br>" + regDto.getSummary());
         updateIdentifierLink();
-        getOpenButton().addClickListener(e -> parentView.getEventBus().publishEvent(new NavigationEvent(
+
+        // Buttons
+        getOpenButton().addClickListener(e -> publishEvent(new NavigationEvent(
                 RegistrationWorkflowViewBean.NAME,
                 RegistrationWorkflowViewBean.ACTION_EDIT,
-                regDto.getSpecificIdentifier().toString()
+                Integer.toString(regDto.getId())
                 )));
+        if(regDto.getMessages().size() > 0){
+            getMessageButton().setEnabled(true);
+            getMessageButton().addStyleName(ValoTheme.BUTTON_FRIENDLY);
+            getMessageButton().addClickListener(e -> publishEvent(
+                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                            e,
+                            RegistrationDTO.class,
+                            regDto.getId(),
+                            "messages"))
+                    );
+        }
+
         updateDateLabels();
     }
 
@@ -162,9 +177,9 @@ public class RegistrationItem extends GridLayout {
      *
      */
     private void updateIdentifierLink() {
-        getIdentifierLink().setResource(new ExternalResource(regDto.getRegistrationId()));
+        getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
         //TODO make responsive and use specificIdetifier in case the space gets too narrow
-        getIdentifierLink().setCaption(regDto.getRegistrationId());
+        getIdentifierLink().setCaption(regDto.getIdentifier());
     }
 
     /**
@@ -177,6 +192,10 @@ public class RegistrationItem extends GridLayout {
         } else {
             getPublishedLabel().setVisible(false);
         }
+    }
+
+    private void publishEvent(Object event) {
+        parentView.getEventBus().publishEvent(event);
     }
 
     /* ====== RegistrationItemDesign Getters ====== */

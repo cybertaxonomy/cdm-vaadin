@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +20,7 @@ import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
@@ -28,6 +30,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.renderers.ButtonRenderer;
 import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
@@ -181,7 +184,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         Column summaryColumn = grid.addColumn("summary");
 
-        Column regidColumn = grid.addColumn("registrationId");
+        Column regidColumn = grid.addColumn("identifier");
         regidColumn.setHeaderCaption("Id");
         regidColumn.setRenderer(new HtmlRenderer(), new UrlStringConverter("http://pyhcobank.org/"));
 
@@ -213,10 +216,19 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         for(RegistrationDTO regDto : registrations) {
-            Component lazyItem = new RegistrationItem(regDto, this); //new LazyLoadWrapper(new RegistrationItem(regDto, this));
-            lazyItem.setWidth(100, Unit.PERCENTAGE);
-            listContainer.addComponent(lazyItem);
+            Component item = new RegistrationItem(regDto, this);
+            item.setWidth(100, Unit.PERCENTAGE);
+            listContainer.addComponent(item);
         }
+    }
+
+    @Override
+    public void openDetailsPopup(String caption, List<String> messages){
+        StringBuffer sb = new StringBuffer();
+        sb.append("<div class=\"details-popup-content\">");
+        messages.forEach(s -> sb.append(s).append("</br>"));
+        sb.append("</div>");
+        new Notification(caption, sb.toString(), Notification.Type.HUMANIZED_MESSAGE, true).show(Page.getCurrent());
     }
 
     /**

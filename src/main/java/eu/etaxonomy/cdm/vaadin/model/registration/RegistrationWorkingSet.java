@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.etaxonomy.cdm.mock.Registration;
+import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationException;
 
@@ -24,15 +25,21 @@ import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationExce
  */
 public class RegistrationWorkingSet {
 
-    private Set<Registration> registrations = new HashSet<>();
+    private List<RegistrationDTO> registrationDTOs = new ArrayList<>();
 
     private int citationId = -1;
 
     private String citation = null;
 
-    public RegistrationWorkingSet(Set<Registration> registrations) throws RegistrationValidationException {
+    /**
+     * Creates an empty working set
+     */
+    public RegistrationWorkingSet() {
 
-        validateAndAdd(registrations);
+    }
+
+    public RegistrationWorkingSet(List<RegistrationDTO> registrationDTOs) throws RegistrationValidationException {
+        validateAndAddDTOs(registrationDTOs, null);
     }
 
     /**
@@ -40,42 +47,70 @@ public class RegistrationWorkingSet {
      * @throws RegistrationValidationException
      *
      */
-    private void validateAndAdd(Set<Registration> candidated) throws RegistrationValidationException {
-        List<String> problems = new ArrayList<>();
-        for(Registration reg : candidated){
-            try {
-                RegistrationDTO regDto = new RegistrationDTO(reg);
+    private void validateAndAdd(Set<Registration> candidates) throws RegistrationValidationException {
+        List<RegistrationDTO> dtos = new ArrayList<>(registrationDTOs.size());
+        candidates.forEach(reg -> dtos.add(new RegistrationDTO(reg)));
+        validateAndAddDTOs(dtos, null);
+    }
+
+    /**
+     * Validate and add all Registrations to the working set which are referring to the same publication
+     * which is either the citation of the nomenclatural reference of the {@link TaxonNameBase} or the
+     * citation of the {@link TypeDesignations}. Registration with a differing publication are not added to
+     * the working set, instead a {@link RegistrationValidationException} is thrown which is a container for
+     * all validation problems.
+     *
+     * @param candidates
+     * @param problems Problems detected in prior validation and processing passed to this method to be completed.
+     * @throws RegistrationValidationException
+     */
+    private void validateAndAddDTOs(List<RegistrationDTO> candidates, List<String> problems) throws RegistrationValidationException {
+        if(problems == null){
+            problems = new ArrayList<>();
+        }
+        for(RegistrationDTO regDto : candidates){
                 if(citationId == -1){
                     citationId = regDto.getCitationID();
                     citation = regDto.getCitation();
                 } else {
                     if(regDto.getCitationID() != citationId){
-                        problems.add("Removing Registration " + reg.toString() + " from set since this refers to a different citation.\n");
+                        problems.add("Removing Registration " + regDto.registration().toString() + " from set since this refers to a different citation.");
                         continue;
                     }
                 }
-                this.registrations.add(reg);
-
-            } catch (RegistrationValidationException e) {
-                problems.add(e.getMessage());
-            }
+                this.registrationDTOs.add(regDto);
         }
 
         if(!problems.isEmpty()){
-            throw new RegistrationValidationException(problems.toString());
+            throw new RegistrationValidationException("", problems);
         }
 
     }
 
-    public boolean add(Registration registration){
-        return registrations.add(registration);
+    /**
+     * @param reg
+     * @throws RegistrationValidationException
+     */
+    public void add(Registration reg) throws RegistrationValidationException {
+        Set<Registration> candidates = new HashSet<>();
+        candidates.add(reg);
+        validateAndAdd(candidates);
     }
 
     /**
      * @return the registrations
      */
-    public Set<Registration> getRegistrations() {
-        return registrations;
+    public List<Registration> getRegistrations() {
+        List<Registration> regs = new ArrayList<>(registrationDTOs.size());
+        registrationDTOs.forEach(dto -> regs.add(dto.registration()));
+        return regs;
+    }
+
+    /**
+     * @return the registrations
+     */
+    public List<RegistrationDTO> getRegistrationDTOs() {
+        return registrationDTOs;
     }
 
     /**
@@ -91,6 +126,7 @@ public class RegistrationWorkingSet {
     public String getCitation() {
         return citation;
     }
+
 
 
 
