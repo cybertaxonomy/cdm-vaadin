@@ -17,14 +17,14 @@ import eu.etaxonomy.cdm.vaadin.design.registration.WorkflowItemDesign;
  * @since Mar 10, 2017
  *
  */
-public class WorkflowItem extends WorkflowItemDesign {
+public class WorkflowBulletItem extends WorkflowItemDesign {
 
     private static final long serialVersionUID = -6825656185698773467L;
 
     /**
      *
      */
-    public WorkflowItem(int stepIndex, String caption, ClickListener listener) {
+    public WorkflowBulletItem(int stepIndex, String caption, ClickListener listener) {
         this.stepIndex.setCaption(Integer.toString(stepIndex));
         this.caption.setValue(caption);
         if(listener != null){

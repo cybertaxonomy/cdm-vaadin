@@ -15,4 +15,5 @@ public enum RegistrationStatus {
     READY, //The record has passed the validation by the curator and is ready for publication.
     PUBLISHED, //The name or typification has finally been published.
     REJECTED //The registration has been rejected, the process is aborted and the record is preserved.
+
 }

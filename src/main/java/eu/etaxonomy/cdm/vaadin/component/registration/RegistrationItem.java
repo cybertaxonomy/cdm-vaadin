@@ -79,7 +79,7 @@ public class RegistrationItem extends GridLayout {
     public void init() {
 
         setWidth(100, Unit.PERCENTAGE);
-        addStyleName("registration-item");
+        addStyleName("registration-list-item");
 
         typeStateLabel.setStyleName(STYLE_LABEL_NOWRAP);
         addComponent(typeStateLabel, 0, 0);

@@ -75,10 +75,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             getView().setHeaderText("Registration for " + workingset.getCitation());
         }
         if(workingset != null){
-            // getView().getTitle().setValue("Workflow for a " + registrationType().name());
-            for(Registration reg : workingset.getRegistrations()){
-                getView().makeWorflow(RegistrationType.from(reg));
-            }
+            getView().setWorkingset(workingset);
+            //TODO add Blocking registrations to view
         }
     }
 

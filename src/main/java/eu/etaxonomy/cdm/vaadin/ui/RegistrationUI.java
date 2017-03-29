@@ -90,10 +90,12 @@ public class RegistrationUI extends UI {
         //navigate to initial view
         eventBus.publishEvent(new NavigationEvent(DashBoardView.NAME));
 
-        //TODO the branding should be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
-        //  See CdmUtils for appropriate methods to access this folder
         String brand = "phycobank";
-
+        //TODO create annotation:
+        // @Styles(files={""}, branding="brand")
+        //
+        // the branding can either be specified or can be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
+        //  See CdmUtils for appropriate methods to access this folder
         // the 'vaadin://' protocol refers to the VAADIN folder
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);

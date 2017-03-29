@@ -12,7 +12,8 @@ import java.util.UUID;
 
 import com.vaadin.ui.CssLayout;
 
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -42,9 +43,6 @@ public interface RegistrationWorkflowView extends ApplicationView{
      */
     void openReferenceEditor(UUID referenceUuid);
 
-    public void makeWorflow(RegistrationType type);
-
-
     /**
      * @param subheaderText
      */
@@ -54,6 +52,13 @@ public interface RegistrationWorkflowView extends ApplicationView{
      * @param subheaderText
      */
     void setHeaderText(String subheaderText);
+
+    /**
+     * @param workingset
+     */
+    void setWorkingset(RegistrationWorkingSet workingset);
+
+    void addBlockingRegistration(RegistrationDTO blocking);
 
 
 

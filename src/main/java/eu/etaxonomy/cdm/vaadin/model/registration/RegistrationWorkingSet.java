@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.etaxonomy.cdm.mock.Registration;
+import eu.etaxonomy.cdm.mock.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationException;
@@ -107,6 +108,37 @@ public class RegistrationWorkingSet {
     }
 
     /**
+     * Calculates the total count of messages in the registrations contained
+     * in the working set.
+     *
+     * @return
+     */
+    public int messagesCount() {
+        int messagesCount = 0;
+        for(RegistrationDTO dto : getRegistrationDTOs()) {
+            messagesCount = messagesCount + dto.getMessages().size();
+        }
+        return messagesCount;
+    }
+
+    /**
+     * Finds the lowest status in the registrations contained
+     * in the working set.
+     *
+     * @return
+     */
+    public RegistrationStatus lowestStatus() {
+        RegistrationStatus status = RegistrationStatus.REJECTED;
+        for(RegistrationDTO dto : getRegistrationDTOs()) {
+            if(dto.getStatus().compareTo(status) < 0){
+                status = dto.getStatus();
+            }
+        }
+        return status;
+    }
+
+
+    /**
      * @return the registrations
      */
     public List<RegistrationDTO> getRegistrationDTOs() {
@@ -126,8 +158,5 @@ public class RegistrationWorkingSet {
     public String getCitation() {
         return citation;
     }
-
-
-
 
 }

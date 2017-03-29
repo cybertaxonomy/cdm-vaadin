@@ -25,12 +25,12 @@ public class WorkflowSteps extends WorkflowStepsDesign {
         // TODO Auto-generated constructor stub
     }
 
-    public void appendWorkflowItem(WorkflowItem item){
+    public void appendWorkflowItem(WorkflowBulletItem item){
         this.steps.addComponent(item);
     }
 
     public void appendNewWorkflowItem(int stepIndex, String caption, ClickListener listener){
-        this.steps.addComponent(new WorkflowItem(stepIndex, caption, listener));
+        this.steps.addComponent(new WorkflowBulletItem(stepIndex, caption, listener));
     }
 
 }

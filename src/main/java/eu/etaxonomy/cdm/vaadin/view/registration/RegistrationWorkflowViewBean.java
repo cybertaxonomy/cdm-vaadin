@@ -8,20 +8,34 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.GenericFontIcon;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.mock.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
+import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationWorkflowPresenter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -50,10 +64,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public RegistrationType regType = null;
 
-    CssLayout workflow;
+    private CssLayout workflow;
+
+    private List<CssLayout> registrations = new ArrayList<>();
 
     private String headerText = "-- empty --";
     private String subheaderText = SUBHEADER_DEEFAULT;
+
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -85,24 +102,96 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void makeWorflow(RegistrationType type){
-        switch (type) {
-        case NAME:
-            addNameWorkflow();
-            break;
-        case TYPIFICATION:
-            addTypificationWorkflow();
-            break;
-        default:
-            break;
+    public void setWorkingset(RegistrationWorkingSet workingset) {
+
+        CssLayout registration = new CssLayout();
+        registration.setWidth(100, Unit.PERCENTAGE);
+        registration.addComponent(createRegistrationCaption(workingset));
+        registrations.add(registration);
+        workflow.addComponent(registration);
+
+    }
+
+    /**
+     * @param workingset
+     * @return
+     */
+    private Component createRegistrationCaption(RegistrationWorkingSet workingset) {
+        String citation = workingset.getCitation();
+        int messagesCount = workingset.messagesCount();
+        RegistrationStatus status = workingset.lowestStatus();
+
+        return createRegistrationCaption(citation, status, messagesCount);
+    }
+
+    /**
+     * @param workingset
+     * @return
+     */
+    private Component createRegistrationCaption(RegistrationDTO regitrationDto) {
+        String citation = regitrationDto.getCitation();
+        int messagesCount = regitrationDto.getMessages().size();
+        RegistrationStatus status = regitrationDto.getStatus();
+
+        return createRegistrationCaption(citation, status, messagesCount);
+    }
+
+    /**
+     * @param workingset
+     * @return
+     */
+    private Component createRegistrationCaption(String citation, RegistrationStatus status, int messagesCount){
+
+        GridLayout grid = new GridLayout(2, 1);
+        grid.addStyleName("registration-workflow-item");
+        grid.setWidth(100, Unit.PERCENTAGE);
+        Label citationLabel = new Label(citation);
+        grid.addComponent(citationLabel, 0, 0);
+        grid.setColumnExpandRatio(0, 1.0f);
+
+        CssLayout iconContainer = new CssLayout();
+        iconContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        if(messagesCount > 0){
+            Button messagesButton = new Button(FontAwesome.COMMENT);
+            messagesButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+            iconContainer.addComponent(messagesButton);
         }
+
+        WorkflowStep step = WorkflowStep.from(status, citation != null && !citation.isEmpty());
+        Label statusIndicator = new Label(WorkflowStep.from(status, citation != null && !citation.isEmpty()).getHtml());
+        statusIndicator.setCaptionAsHtml(true);
+        statusIndicator.setStyleName("workflow-step label-nowrap");
+        statusIndicator.setIcon(new GenericFontIcon("IcoMoon", 0xe900)); // triangle-right
+        CssLayout statusWrap = new CssLayout(statusIndicator);
+        statusWrap.setStyleName("workflow-step-wrap bg-status-" + status.name());
+        iconContainer.addComponent(statusWrap);
+
+        grid.addComponent(iconContainer, 1, 0);
+        grid.setComponentAlignment(iconContainer, Alignment.TOP_RIGHT);
+
+        return grid;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addBlockingRegistration(RegistrationDTO blocking) {
+        if(registrations == null) {
+            throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
+        }
+        // add the blocking registration
+
     }
 
     /**
     *
     */
-   private void addNameWorkflow() {
+   private void addBulletWorkflowName() {
        WorkflowSteps steps = new WorkflowSteps();
        steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
                e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
@@ -116,7 +205,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
    /**
    *
    */
-  private void addTypificationWorkflow() {
+  private void addBulletWorkflowTypification() {
       WorkflowSteps steps = new WorkflowSteps();
       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
               e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));

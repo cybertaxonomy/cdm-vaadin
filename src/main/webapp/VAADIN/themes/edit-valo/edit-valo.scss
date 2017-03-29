@@ -51,6 +51,22 @@ $v-component-group-spacing: 6px;
 
 @import "../valo/valo.scss";
 
+
+// ========================================== //
+
+// import custom font icons TODO rename font
+@include v-font(IcoMoon, "../../../../../fonts/icomoon");
+
+.IcoMoon {
+   font-family: IcoMoon;
+   font-style: normal;
+   font-weight: normal;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   display: inline-block;
+   text-align: center;
+}
+
 // ========================================== //
 // Status colors for the redistration
 // 
@@ -205,10 +221,70 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
     // --------------------------------------------------- //
     
-    .registration-item {
+    .registration-list-item {
         border-top: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
         padding-top: 4px; // avoid button group to overlap with border
     }
+
+   .registration-workflow-item {
+       border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+    }
+
+    // tab element being part of a process ----------- //
+    .workflow-step-wrap {
+        padding-right: 10px;
+        height: $v-font-size * 3;
+        background-color: scale-color(lighten($v-app-background-color, 20%), $saturation: -20%);
+        @include box-shadow(inset 0 0 5px $v-app-background-color);
+    }
+    .workflow-step {
+        line-height: $v-font-size * 3;
+    }
+    .v-caption-workflow-step {
+        vertical-align: top;
+        padding: 0;
+         .v-icon {
+            line-height: $v-font-size * 3;
+            font-size: $v-font-size * 3.5;
+            padding-right: 10px;
+            color: $v-background-color;
+        }
+  
+    }
+
+    // ----------------------------------------------- //
+    .status-REJECTED {
+        color: $status-rejected-color;
+    }
+    .status-CURATION {
+        color: $status-curation-color;
+    }
+    .status-PREPARATION {
+        color: $status-preparation-color;
+    }
+    .status-PUBLISHED {
+        color: $status-published-color;
+    }
+    .status-READY {
+        color: $status-ready-color;
+    }
+
+    .bg-status-REJECTED {
+        background-color: $status-rejected-color;
+    }
+    .bg-status-CURATION {
+        background-color: $status-curation-color;
+    }
+    .bg-status-PREPARATION {
+        background-color: $status-preparation-color;
+    }
+    .bg-status-PUBLISHED {
+        background-color: $status-published-color;
+    }
+    .bg-status-READY {
+        background-color: $status-ready-color;
+    }
+    // ----------------------------------------------- //
     
     #registration-list {
         /* --- for the css layout --- */
@@ -251,22 +327,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             td.registrationType, td.status {
                 color: $status-ready-color;
             }
-        }
-        // for RegistrationItems
-        .v-caption-status-REJECTED {
-            color: $status-rejected-color;
-        }
-        .v-caption-status-CURATION {
-            color: $status-curation-color;
-        }
-        .v-caption-status-PREPARATION {
-            color: $status-preparation-color;
-        }
-        .v-caption-status-PUBLISHED {
-            color: $status-published-color;
-        }
-        .v-caption-status-READY {
-            color: $status-ready-color;
         }
     }
 
