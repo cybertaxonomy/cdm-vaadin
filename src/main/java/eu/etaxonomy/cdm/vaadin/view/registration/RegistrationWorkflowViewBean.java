@@ -25,9 +25,13 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
@@ -110,9 +114,28 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
         CssLayout registration = new CssLayout();
         registration.setWidth(100, Unit.PERCENTAGE);
+
+        Panel namesTypesPanel = createNamesAndTypesList(workingset);
+        namesTypesPanel.setCaption("Names & Types");
+
+        registration.addComponent(createWorkflowTabSheet(workingset, null));
         registration.addComponent(createRegistrationCaption(workingset));
+        registration.addComponent(namesTypesPanel);
+
         registrations.add(registration);
         workflow.addComponent(registration);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addBlockingRegistration(RegistrationDTO blocking) {
+        if(registrations == null) {
+            throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
+        }
+        // add the blocking registration
 
     }
 
@@ -132,10 +155,10 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param workingset
      * @return
      */
-    private Component createRegistrationCaption(RegistrationDTO regitrationDto) {
-        String citation = regitrationDto.getCitation();
-        int messagesCount = regitrationDto.getMessages().size();
-        RegistrationStatus status = regitrationDto.getStatus();
+    private Component createRegistrationCaption(RegistrationDTO registrationDto) {
+        String citation = registrationDto.getCitation();
+        int messagesCount = registrationDto.getMessages().size();
+        RegistrationStatus status = registrationDto.getStatus();
 
         return createRegistrationCaption(citation, status, messagesCount);
     }
@@ -149,8 +172,11 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         GridLayout grid = new GridLayout(2, 1);
         grid.addStyleName("registration-workflow-item");
         grid.setWidth(100, Unit.PERCENTAGE);
-        Label citationLabel = new Label(citation);
-        grid.addComponent(citationLabel, 0, 0);
+        Button citationButton = new Button(citation + "&nbsp;&nbsp;" + FontAwesome.EDIT.getHtml());
+        citationButton.setHtmlContentAllowed(true);
+        citationButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+        grid.addComponent(citationButton, 0, 0);
+        grid.setComponentAlignment(citationButton, Alignment.MIDDLE_LEFT);
         grid.setColumnExpandRatio(0, 1.0f);
 
         CssLayout iconContainer = new CssLayout();
@@ -162,13 +188,14 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         }
 
         WorkflowStep step = WorkflowStep.from(status, citation != null && !citation.isEmpty());
+
         Label statusIndicator = new Label(WorkflowStep.from(status, citation != null && !citation.isEmpty()).getHtml());
         statusIndicator.setCaptionAsHtml(true);
         statusIndicator.setStyleName("workflow-step label-nowrap");
         statusIndicator.setIcon(new GenericFontIcon("IcoMoon", 0xe900)); // triangle-right
         CssLayout statusWrap = new CssLayout(statusIndicator);
-        statusWrap.setStyleName("workflow-step-wrap bg-status-" + status.name());
-        iconContainer.addComponent(statusWrap);
+        statusWrap.setStyleName("workflow-step-wrap"); // bg-status-" + status.name());
+        // iconContainer.addComponent(statusWrap);
 
         grid.addComponent(iconContainer, 1, 0);
         grid.setComponentAlignment(iconContainer, Alignment.TOP_RIGHT);
@@ -176,17 +203,60 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         return grid;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void addBlockingRegistration(RegistrationDTO blocking) {
-        if(registrations == null) {
-            throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
-        }
-        // add the blocking registration
+    private Component createWorkflowTabSheet(RegistrationWorkingSet workingset, Component namesTypesPanel){
 
+        if(namesTypesPanel == null){
+            namesTypesPanel = new CssLayout();
+        }
+        Component citationComponent = new CssLayout(); // new Label(workingset.getCitation());
+        Component curationComponent = new CssLayout(); // new Label("Curation in progress ...")
+        Component releaseComponent = new CssLayout(); // new Label("Not yet published")
+
+        GenericFontIcon tabIcon = new GenericFontIcon("IcoMoon", 0xe900);
+        TabSheet tabsheet = new TabSheet();
+        // tabsheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
+        //tabsheet.addStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
+        tabsheet.addStyleName("workflow-tabsheet");
+
+        Tab pubDetailsTab = tabsheet.addTab(citationComponent, WorkflowStep.PUBLICATION_DETAILS.getRepresentation(), tabIcon);
+        Tab namesTypesTab = tabsheet.addTab(namesTypesPanel, WorkflowStep.NAMES_N_TYPES.getRepresentation(), tabIcon);
+        Tab curationTab = tabsheet.addTab(curationComponent, WorkflowStep.CURATION.getRepresentation(), tabIcon);
+        Tab awaitingPubTab = tabsheet.addTab(releaseComponent, WorkflowStep.AWAITING_PUBLICATION.getRepresentation(), tabIcon);
+
+        pubDetailsTab.setStyleName("bg-status-" + WorkflowStep.PUBLICATION_DETAILS.name());
+        namesTypesTab.setStyleName("bg-status-" + WorkflowStep.NAMES_N_TYPES.name());
+        curationTab.setStyleName("bg-status-" + WorkflowStep.CURATION.name());
+        awaitingPubTab.setStyleName("bg-status-" + WorkflowStep.AWAITING_PUBLICATION.name());
+
+        return tabsheet;
     }
+
+    /**
+     * @param workingset
+     * @return
+     */
+    public Panel createNamesAndTypesList(RegistrationWorkingSet workingset) {
+        // prepare name and type list
+        GridLayout namesTypesList = new GridLayout(4, workingset.getRegistrationDTOs().size());
+        int row = 0;
+        for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
+            Button commentButton = new Button(FontAwesome.COMMENT);
+            commentButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+            Button editButton = new Button(FontAwesome.EDIT);
+            editButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+
+            namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
+            namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
+            namesTypesList.addComponent(commentButton, 2, row);
+            namesTypesList.addComponent(editButton, 3, row);
+            row++;
+        }
+        namesTypesList.setSizeUndefined();
+        Panel namesTypesPanel = new Panel(namesTypesList);
+        namesTypesPanel.setHeight("300px");
+        return namesTypesPanel;
+    }
+
 
     /**
     *

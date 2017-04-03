@@ -8,7 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
-import org.apache.commons.lang.StringUtils;
+import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.STYLE_LABEL_NOWRAP;
+
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.vaadin.server.ExternalResource;
@@ -24,7 +25,6 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -46,8 +46,6 @@ public class RegistrationItem extends GridLayout {
 
     private static final int GRID_COLS = 3;
 
-    private static final String STYLE_LABEL_NOWRAP = "label-nowrap";
-
     private static final long serialVersionUID = -211003770452173644L;
 
     private RegistrationDTO regDto;
@@ -57,7 +55,7 @@ public class RegistrationItem extends GridLayout {
     private AbstractView<?> parentView;
 
     // --------------------------------------------------
-    private Label typeStateLabel = new Label();
+    private TypeStateLabel typeStateLabel = new TypeStateLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
@@ -129,7 +127,7 @@ public class RegistrationItem extends GridLayout {
      *
      */
     private void updateUI() {
-        updateTypeStateLabel();
+        typeStateLabel.update(regDto.getRegistrationType(), regDto.getStatus());
         getCitationSummaryLabel().setValue(regDto.getCitationString() + "</br>" + regDto.getSummary());
         updateIdentifierLink();
 
@@ -152,25 +150,6 @@ public class RegistrationItem extends GridLayout {
         }
 
         updateDateLabels();
-    }
-
-
-    /**
-     *
-     */
-    private void updateTypeStateLabel() {
-
-        FontAwesome icon;
-        if(regDto.getRegistrationType().equals(RegistrationType.NAME)) {
-            icon = FontAwesome.TAG;
-        } else if(regDto.getRegistrationType().equals(RegistrationType.TYPIFICATION)) {
-            icon = FontAwesome.TAGS;
-        } else {
-            icon = FontAwesome.WARNING;
-        }
-        typeStateLabel.setContentMode(ContentMode.HTML);
-        typeStateLabel.setValue(icon.getHtml() + "&nbsp;" + StringUtils.capitalize((regDto.getStatus().name().toLowerCase())));
-        typeStateLabel.addStyleName("status-" + regDto.getStatus().name());
     }
 
     /**
