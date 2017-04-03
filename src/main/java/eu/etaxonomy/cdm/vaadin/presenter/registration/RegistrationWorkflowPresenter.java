@@ -8,6 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter.registration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -21,6 +24,7 @@ import eu.etaxonomy.cdm.mock.RegistrationService;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowView;
@@ -88,6 +92,17 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EventType).EDIT")
     public void onReferenceEditEvent(ReferenceEvent event) {
         getView().openReferenceEditor(null);
+    }
+
+    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
+    public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
+        List<String> messages = new ArrayList<>();
+        for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
+            dto.getMessages().forEach(m -> messages.add(dto.getSummary() + ": " + m));
+        }
+        if(event.getProperty().equals("messages")){
+            getView().openDetailsPopup("Messages", messages);
+        }
     }
 
 }

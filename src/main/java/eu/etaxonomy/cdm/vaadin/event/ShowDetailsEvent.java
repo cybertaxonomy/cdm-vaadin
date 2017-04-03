@@ -52,7 +52,7 @@ public class ShowDetailsEvent<T extends Object, I extends Object> {
     /**
      * @return the type
      */
-    public Class<T> getType() {
+    public Class<T> getEntityType() {
         return entityType;
     }
 

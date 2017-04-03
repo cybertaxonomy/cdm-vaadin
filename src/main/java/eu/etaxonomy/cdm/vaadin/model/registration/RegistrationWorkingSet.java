@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.joda.time.DateTime;
+
 import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
@@ -29,6 +31,8 @@ public class RegistrationWorkingSet {
     private List<RegistrationDTO> registrationDTOs = new ArrayList<>();
 
     private int citationId = -1;
+
+    private DateTime created = null;
 
     private String citation = null;
 
@@ -80,6 +84,9 @@ public class RegistrationWorkingSet {
                     }
                 }
                 this.registrationDTOs.add(regDto);
+                if(created == null || created.isAfter(regDto.getCreated())){
+                    created = regDto.getCreated();
+                }
         }
 
         if(!problems.isEmpty()){
@@ -157,6 +164,25 @@ public class RegistrationWorkingSet {
      */
     public String getCitation() {
         return citation;
+    }
+
+    public DateTime getRegistrationDate() {
+        return registrationDTOs.get(0).getRegistrationDate();
+    }
+
+    public DateTime getCreationDate() {
+        return registrationDTOs.get(0).getCreated();
+    }
+
+    /**
+     * The creation time stamp of a registration set always is
+     * the creation DateTime of the oldest Registration contained
+     * in the set.
+     *
+     * @return
+     */
+    public DateTime getCreated(){
+        return created;
     }
 
 }

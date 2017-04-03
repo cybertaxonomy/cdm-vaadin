@@ -18,6 +18,7 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
@@ -42,6 +43,8 @@ public class RegistrationDTO{
 
     private TaxonNameBase<?, ?> typifiedName;
 
+    private TimePeriod datePublished;
+
     /**
      * @param reg
      * @param typifiedName should be provided in for Registrations for TypeDesignations
@@ -57,6 +60,7 @@ public class RegistrationDTO{
             if(citation != null){
                 citationString = citation.generateTitle();
                 citationID = citation.getId();
+                datePublished = citation.getDatePublished();
             }
         } else if(registrationType.isTypification()){
             try {
@@ -193,6 +197,13 @@ public class RegistrationDTO{
      */
     public DateTime getRegistrationDate() {
         return reg.getRegistrationDate();
+    }
+
+    /**
+     * @return the registrationDate
+     */
+    public TimePeriod getDatePublished() {
+        return datePublished;
     }
 
     /**

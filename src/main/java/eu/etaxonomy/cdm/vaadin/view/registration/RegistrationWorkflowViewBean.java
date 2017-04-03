@@ -18,19 +18,20 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.GenericFontIcon;
+import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
@@ -119,7 +120,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         namesTypesPanel.setCaption("Names & Types");
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
-        registration.addComponent(createRegistrationCaption(workingset));
+        registration.addComponent(new RegistrationItem(workingset, this));
         registration.addComponent(namesTypesPanel);
 
         registrations.add(registration);
@@ -137,70 +138,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         }
         // add the blocking registration
 
-    }
-
-    /**
-     * @param workingset
-     * @return
-     */
-    private Component createRegistrationCaption(RegistrationWorkingSet workingset) {
-        String citation = workingset.getCitation();
-        int messagesCount = workingset.messagesCount();
-        RegistrationStatus status = workingset.lowestStatus();
-
-        return createRegistrationCaption(citation, status, messagesCount);
-    }
-
-    /**
-     * @param workingset
-     * @return
-     */
-    private Component createRegistrationCaption(RegistrationDTO registrationDto) {
-        String citation = registrationDto.getCitation();
-        int messagesCount = registrationDto.getMessages().size();
-        RegistrationStatus status = registrationDto.getStatus();
-
-        return createRegistrationCaption(citation, status, messagesCount);
-    }
-
-    /**
-     * @param workingset
-     * @return
-     */
-    private Component createRegistrationCaption(String citation, RegistrationStatus status, int messagesCount){
-
-        GridLayout grid = new GridLayout(2, 1);
-        grid.addStyleName("registration-workflow-item");
-        grid.setWidth(100, Unit.PERCENTAGE);
-        Button citationButton = new Button(citation + "&nbsp;&nbsp;" + FontAwesome.EDIT.getHtml());
-        citationButton.setHtmlContentAllowed(true);
-        citationButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-        grid.addComponent(citationButton, 0, 0);
-        grid.setComponentAlignment(citationButton, Alignment.MIDDLE_LEFT);
-        grid.setColumnExpandRatio(0, 1.0f);
-
-        CssLayout iconContainer = new CssLayout();
-        iconContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-        if(messagesCount > 0){
-            Button messagesButton = new Button(FontAwesome.COMMENT);
-            messagesButton.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-            iconContainer.addComponent(messagesButton);
-        }
-
-        WorkflowStep step = WorkflowStep.from(status, citation != null && !citation.isEmpty());
-
-        Label statusIndicator = new Label(WorkflowStep.from(status, citation != null && !citation.isEmpty()).getHtml());
-        statusIndicator.setCaptionAsHtml(true);
-        statusIndicator.setStyleName("workflow-step label-nowrap");
-        statusIndicator.setIcon(new GenericFontIcon("IcoMoon", 0xe900)); // triangle-right
-        CssLayout statusWrap = new CssLayout(statusIndicator);
-        statusWrap.setStyleName("workflow-step-wrap"); // bg-status-" + status.name());
-        // iconContainer.addComponent(statusWrap);
-
-        grid.addComponent(iconContainer, 1, 0);
-        grid.setComponentAlignment(iconContainer, Alignment.TOP_RIGHT);
-
-        return grid;
     }
 
     private Component createWorkflowTabSheet(RegistrationWorkingSet workingset, Component namesTypesPanel){
@@ -361,5 +298,16 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         return workflow;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void openDetailsPopup(String caption, List<String> messages) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("<div class=\"details-popup-content\">");
+        messages.forEach(s -> sb.append(s).append("</br>"));
+        sb.append("</div>");
+        new Notification(caption, sb.toString(), Notification.Type.HUMANIZED_MESSAGE, true).show(Page.getCurrent());
+    }
 
 }

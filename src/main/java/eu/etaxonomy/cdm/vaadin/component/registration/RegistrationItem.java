@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.STYLE_LABEL_NOWRAP;
 
+import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.vaadin.server.ExternalResource;
@@ -23,7 +24,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean;
@@ -42,13 +45,13 @@ public class RegistrationItem extends GridLayout {
 
     private static final String LABEL_CAPTION_PUBLISHED = "Published";
 
-    private static final int GRID_ROWS = 3;
+    private static final String LABEL_CAPTION_RELEASED = "Released";
+
+    private static final int GRID_ROWS = 4;
 
     private static final int GRID_COLS = 3;
 
     private static final long serialVersionUID = -211003770452173644L;
-
-    private RegistrationDTO regDto;
 
     private RegistrationTypeConverter regTypeConverter = new RegistrationTypeConverter();
 
@@ -63,6 +66,9 @@ public class RegistrationItem extends GridLayout {
     private Button openButton = new Button(FontAwesome.COGS);
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
+    private Label releasedLabel = new Label();
+
+    private String citationString;
     // --------------------------------------------------
 
     /**
@@ -74,15 +80,26 @@ public class RegistrationItem extends GridLayout {
         setItem(item, parentView);
     }
 
+    /**
+    *
+    */
+   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView) {
+       super(GRID_COLS, GRID_ROWS);
+       init();
+       setWorkingSet(workingSet, parentView);
+   }
+
     public void init() {
 
         setWidth(100, Unit.PERCENTAGE);
         addStyleName("registration-list-item");
 
         typeStateLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        typeStateLabel.setVisible(false);
         addComponent(typeStateLabel, 0, 0);
         setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
 
+        identifierLink.setVisible(false);
         addComponent(identifierLink, 1, 0);
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);
         setColumnExpandRatio(1, 1.0f);
@@ -94,13 +111,14 @@ public class RegistrationItem extends GridLayout {
         messageButton.setEnabled(false);
         openButton.setStyleName(ValoTheme.BUTTON_TINY);
         openButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+        openButton.setVisible(false);
 
         buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         addComponent(buttonGroup, 2, 0);
         setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
 
         citationSummaryLabel.setContentMode(ContentMode.HTML);
-        addComponent(citationSummaryLabel, 0, 1, 1, 2);
+        addComponent(citationSummaryLabel, 0, 1, 1, 3);
 
         createdLabel.setStyleName(STYLE_LABEL_NOWRAP);
         createdLabel.setContentMode(ContentMode.HTML);
@@ -111,66 +129,112 @@ public class RegistrationItem extends GridLayout {
         publishedLabel.setStyleName(STYLE_LABEL_NOWRAP);
         publishedLabel.setContentMode(ContentMode.HTML);
         publishedLabel.setWidthUndefined();
+        publishedLabel.setVisible(false);
         addComponent(publishedLabel, 2, 2);
         setComponentAlignment(publishedLabel, Alignment.BOTTOM_RIGHT);
 
+        releasedLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        releasedLabel.setContentMode(ContentMode.HTML);
+        releasedLabel.setWidthUndefined();
+        releasedLabel.setVisible(false);
+        addComponent(releasedLabel, 2, 3);
+        setComponentAlignment(releasedLabel, Alignment.BOTTOM_RIGHT);
+
     }
 
-    public void setItem(RegistrationDTO item, AbstractView<?> parentView){
-        regDto = item;
+    public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
         this.parentView = parentView;
-        updateUI();
+        updateUI(regDto.getCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(), regDto);
+    }
+
+    public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
+        this.parentView = parentView;
+        updateUI(workingSet.getCitation(), workingSet.getCreated(), null, workingSet.messagesCount(), null);
     }
 
 
     /**
      *
      */
-    private void updateUI() {
-        typeStateLabel.update(regDto.getRegistrationType(), regDto.getStatus());
-        getCitationSummaryLabel().setValue(regDto.getCitationString() + "</br>" + regDto.getSummary());
-        updateIdentifierLink();
+    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount, RegistrationDTO regDto) {
 
-        // Buttons
-        getOpenButton().addClickListener(e -> publishEvent(new NavigationEvent(
-                RegistrationWorkflowViewBean.NAME,
-                RegistrationWorkflowViewBean.ACTION_EDIT,
-                Integer.toString(regDto.getId())
-                )));
-        if(regDto.getMessages().size() > 0){
+        StringBuffer labelMarkup = new StringBuffer();
+        DateTime registrationDate = null;
+
+        if(messagesCount > 0){
             getMessageButton().setEnabled(true);
             getMessageButton().addStyleName(ValoTheme.BUTTON_FRIENDLY);
-            getMessageButton().addClickListener(e -> publishEvent(
-                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+            getMessageButton().addClickListener(e -> {
+                ShowDetailsEvent detailsEvent;
+                if(regDto != null){
+                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, Integer>(
                             e,
                             RegistrationDTO.class,
                             regDto.getId(),
-                            "messages"))
-                    );
+                            "messages");
+                } else {
+                    detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, Integer>(
+                            e,
+                            RegistrationWorkingSet.class,
+                            null,
+                            "messages");
+                }
+                publishEvent(detailsEvent);
+                }
+            );
         }
 
-        updateDateLabels();
+        labelMarkup.append(citationString);
+        if(regDto != null){
+            labelMarkup.append("</br>").append(regDto.getSummary());
+
+            typeStateLabel.setVisible(true);
+            typeStateLabel.update(regDto.getRegistrationType(), regDto.getStatus());
+            getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            //TODO make responsive and use specificIdentifier in case the space gets too narrow
+            getIdentifierLink().setVisible(true);
+            getIdentifierLink().setCaption(regDto.getIdentifier());
+
+            // Buttons
+            getOpenButton().setVisible(true);
+            getOpenButton().addClickListener(e -> publishEvent(new NavigationEvent(
+                    RegistrationWorkflowViewBean.NAME,
+                    RegistrationWorkflowViewBean.ACTION_EDIT,
+                    Integer.toString(regDto.getId())
+                    )));
+
+            registrationDate = regDto.getRegistrationDate();
+        }
+
+        getCitationSummaryLabel().setValue(labelMarkup.toString());
+        updateDateLabels(created, datePublished, registrationDate);
     }
+
 
     /**
      *
      */
-    private void updateIdentifierLink() {
-        getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
-        //TODO make responsive and use specificIdetifier in case the space gets too narrow
-        getIdentifierLink().setCaption(regDto.getIdentifier());
-    }
-
-    /**
-     *
-     */
-    private void updateDateLabels() {
-        getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + regDto.getCreated().toString(ISODateTimeFormat.yearMonthDay()));
-        if(regDto.getRegistrationDate() != null){
-            getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + regDto.getRegistrationDate().toString(ISODateTimeFormat.yearMonthDay()));
-        } else {
-            getPublishedLabel().setVisible(false);
+    private void updateDateLabels(DateTime created, TimePeriod published, DateTime released) {
+        getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
+        if(published != null){
+            getPublishedLabel().setVisible(true);
+            StringBuffer sb = new StringBuffer();
+            if(published.getStart() != null){
+                sb.append(published.getStart().toString(ISODateTimeFormat.yearMonthDay()));
+            }
+            if(published.getEnd() != null){
+                if(sb.length() > 0){
+                    sb.append('-');
+                    sb.append(published.getEnd().toString(ISODateTimeFormat.yearMonthDay()));
+                }
+            }
+            getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + sb.toString());
         }
+        if(released != null){
+            getReleasedLabel().setVisible(true);
+            getReleasedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_RELEASED + "</span>&nbsp;" + released.toString(ISODateTimeFormat.yearMonthDay()));
+        }
+        // LABEL_CAPTION_RELEASED
     }
 
     private void publishEvent(Object event) {
@@ -232,6 +296,14 @@ public class RegistrationItem extends GridLayout {
      */
     public Label getPublishedLabel() {
         return publishedLabel;
+    }
+
+
+    /**
+     * @return
+     */
+    public Label getReleasedLabel() {
+        return releasedLabel;
     }
 
    /* --------------------------------------- */

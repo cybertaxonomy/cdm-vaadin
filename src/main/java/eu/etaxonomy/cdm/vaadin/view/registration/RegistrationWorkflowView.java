@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.vaadin.ui.CssLayout;
@@ -59,6 +60,11 @@ public interface RegistrationWorkflowView extends ApplicationView{
     void setWorkingset(RegistrationWorkingSet workingset);
 
     void addBlockingRegistration(RegistrationDTO blocking);
+
+    /**
+     * @param messages
+     */
+    void openDetailsPopup(String caption, List<String> messages);
 
 
 
