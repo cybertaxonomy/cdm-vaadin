@@ -89,10 +89,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 //        getView().openReferenceEditor(null);
 //    }
 
-    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EventType).EDIT")
+    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EntityEventType).EDIT")
     public void onReferenceEditEvent(ReferenceEvent event) {
         getView().openReferenceEditor(null);
     }
+
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
     public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
