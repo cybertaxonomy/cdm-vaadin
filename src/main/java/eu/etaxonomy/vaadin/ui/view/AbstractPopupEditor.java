@@ -28,6 +28,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComponent
 		implements PopupView {
+
 	private static final long serialVersionUID = 1441816620197127918L;
 
 	private BeanFieldGroup<DTO> fieldGroup;
