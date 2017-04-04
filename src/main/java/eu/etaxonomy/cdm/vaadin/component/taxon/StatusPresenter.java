@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.presenter;
+package eu.etaxonomy.cdm.vaadin.component.taxon;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -18,11 +18,11 @@ import com.vaadin.data.util.filter.Compare.Equal;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.vaadin.component.taxon.IStatusComposite.StatusComponentListener;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
-import eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener;
 
 /**
  * @author cmathew

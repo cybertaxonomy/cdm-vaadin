@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.presenter.distributionStatus;
+package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,7 +38,6 @@ import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableView;
 
 
 public class DistributionTablePresenter {

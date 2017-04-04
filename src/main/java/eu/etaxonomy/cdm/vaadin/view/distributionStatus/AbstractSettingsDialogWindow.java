@@ -7,7 +7,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.presenter.distributionStatus.settings.SettingsPresenter;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.SettingsPresenter;
 
 @SuppressWarnings("serial")
 public abstract class AbstractSettingsDialogWindow extends CustomComponent {

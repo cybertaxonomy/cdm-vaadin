@@ -32,7 +32,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationshipType;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedText;
-import eu.etaxonomy.cdm.vaadin.component.ConceptRelationshipComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipComposite;
 
 /**
  * @author cmathew

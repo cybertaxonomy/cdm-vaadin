@@ -21,7 +21,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
-import eu.etaxonomy.cdm.vaadin.presenter.AuthenticationPresenter;
 import eu.etaxonomy.cdm.vaadin.ui.AbstractAuthenticatedUI;
 
 

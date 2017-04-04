@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.presenter;
+package eu.etaxonomy.cdm.vaadin.view;
 
 import java.net.URI;
 
@@ -12,7 +12,6 @@ import com.vaadin.server.VaadinSession;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
-import eu.etaxonomy.cdm.vaadin.view.IAuthenticationComponent;
 
 public class AuthenticationPresenter implements IAuthenticationComponent.AuthenticationComponentListener{
 

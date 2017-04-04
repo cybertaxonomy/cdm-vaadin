@@ -36,8 +36,6 @@ import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.util.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;

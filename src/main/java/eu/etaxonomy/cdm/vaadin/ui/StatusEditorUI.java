@@ -18,7 +18,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.StatusComposite;
 
 /**
  * @author cmathew

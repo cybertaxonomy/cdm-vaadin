@@ -6,7 +6,7 @@
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * See LICENSE.TXT at the top of this package for the full license terms.
  */
-package eu.etaxonomy.cdm.vaadin.component;
+package eu.etaxonomy.cdm.vaadin.component.taxon;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -43,10 +43,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.component.CdmProgressComponent;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
-import eu.etaxonomy.cdm.vaadin.presenter.EditConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.session.BasicEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent.Action;

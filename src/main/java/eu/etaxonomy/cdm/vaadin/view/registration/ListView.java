@@ -11,8 +11,6 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.Collection;
 import java.util.List;
 
-import eu.etaxonomy.cdm.vaadin.presenter.registration.ListPresenter;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**

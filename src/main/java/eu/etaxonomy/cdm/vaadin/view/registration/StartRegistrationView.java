@@ -16,7 +16,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
 
 import eu.etaxonomy.cdm.vaadin.design.registration.StartRegistrationDesign;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**

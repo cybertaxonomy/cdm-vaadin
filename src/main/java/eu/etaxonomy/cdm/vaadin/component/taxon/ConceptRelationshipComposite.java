@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.component;
+package eu.etaxonomy.cdm.vaadin.component.taxon;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -27,7 +27,6 @@ import com.vaadin.ui.VerticalLayout;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
-import eu.etaxonomy.cdm.vaadin.presenter.ConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.session.BasicEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent.Action;
@@ -38,7 +37,6 @@ import eu.etaxonomy.cdm.vaadin.session.SelectionEvent;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
-import eu.etaxonomy.cdm.vaadin.view.IConceptRelationshipComponentListener;
 
 /**
  * @author cmathew

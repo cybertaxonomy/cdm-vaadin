@@ -26,9 +26,10 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
+import eu.etaxonomy.cdm.vaadin.component.taxon.INewTaxonBaseComponentListener;
+import eu.etaxonomy.cdm.vaadin.component.taxon.INewTaxonBaseComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.NewTaxonBasePresenter;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
-import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener;
-import eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite;
 
 /**
  * @author cmathew

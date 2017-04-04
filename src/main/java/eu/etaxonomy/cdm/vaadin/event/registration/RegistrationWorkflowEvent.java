@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.registration;
 
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationType;
 
 /**
  * @author a.kohlbecker

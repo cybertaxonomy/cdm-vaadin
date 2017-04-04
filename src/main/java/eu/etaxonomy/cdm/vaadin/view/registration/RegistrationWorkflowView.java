@@ -14,7 +14,6 @@ import java.util.UUID;
 import com.vaadin.ui.CssLayout;
 
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**

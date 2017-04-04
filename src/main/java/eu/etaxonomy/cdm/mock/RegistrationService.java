@@ -27,8 +27,8 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationValidationException;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
  * @author a.kohlbecker

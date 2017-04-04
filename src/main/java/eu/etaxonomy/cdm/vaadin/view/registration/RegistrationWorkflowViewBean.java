@@ -43,9 +43,6 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationType;
-import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationWorkflowPresenter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**

@@ -27,9 +27,9 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TreeTable;
 
-import eu.etaxonomy.cdm.vaadin.component.ConceptRelationshipComposite;
-import eu.etaxonomy.cdm.vaadin.component.EditConceptRelationshipComposite;
-import eu.etaxonomy.cdm.vaadin.component.StatusComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.EditConceptRelationshipComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.StatusComposite;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;

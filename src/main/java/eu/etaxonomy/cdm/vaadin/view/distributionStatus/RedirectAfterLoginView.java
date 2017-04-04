@@ -5,7 +5,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.presenter.distributionStatus.DistributionTablePresenter;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 public class RedirectAfterLoginView extends CustomComponent implements View{
