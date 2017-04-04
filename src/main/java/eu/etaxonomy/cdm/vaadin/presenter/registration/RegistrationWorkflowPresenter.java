@@ -95,13 +95,21 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
-    public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
+    public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
         List<String> messages = new ArrayList<>();
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
             dto.getMessages().forEach(m -> messages.add(dto.getSummary() + ": " + m));
         }
         if(event.getProperty().equals("messages")){
             getView().openDetailsPopup("Messages", messages);
+        }
+    }
+
+    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO)")
+    public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
+        RegistrationDTO regDto = serviceMock.loadDtoById((Integer)event.getIdentifier());
+        if(event.getProperty().equals("messages")){
+            getView().openDetailsPopup("Messages", regDto.getMessages());
         }
     }
 

@@ -10,16 +10,9 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 
 /**
  * @author a.kohlbecker
- * @since Mar 30, 2017
+ * @since Apr 3, 2017
  *
  */
-public class RegistrationStyles {
-
-    public static final String LABEL_NOWRAP = "label-nowrap";
-
-    public static final String FRIENDLY_FOREGROUND = "friendly-foreground";
-
-    public static final String BUTTON_BADGE = "button-badge";
-
+public class ButtonFactory {
 
 }

@@ -8,13 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
-import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.STYLE_LABEL_NOWRAP;
+import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -25,6 +26,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
+import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO;
@@ -62,7 +65,7 @@ public class RegistrationItem extends GridLayout {
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
-    private Button messageButton = new Button(FontAwesome.COMMENT);
+    private Button messageButton;
     private Button openButton = new Button(FontAwesome.COGS);
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
@@ -94,7 +97,7 @@ public class RegistrationItem extends GridLayout {
         setWidth(100, Unit.PERCENTAGE);
         addStyleName("registration-list-item");
 
-        typeStateLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        typeStateLabel.setStyleName(LABEL_NOWRAP);
         typeStateLabel.setVisible(false);
         addComponent(typeStateLabel, 0, 0);
         setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
@@ -104,11 +107,13 @@ public class RegistrationItem extends GridLayout {
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);
         setColumnExpandRatio(1, 1.0f);
 
+        messageButton = new Button(FontAwesome.COMMENT);
         CssLayout buttonGroup = new CssLayout(blockedByButton, messageButton, openButton);
         blockedByButton.setStyleName(ValoTheme.BUTTON_TINY);
         blockedByButton.setEnabled(false);
         messageButton.setStyleName(ValoTheme.BUTTON_TINY);
         messageButton.setEnabled(false);
+
         openButton.setStyleName(ValoTheme.BUTTON_TINY);
         openButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         openButton.setVisible(false);
@@ -120,20 +125,20 @@ public class RegistrationItem extends GridLayout {
         citationSummaryLabel.setContentMode(ContentMode.HTML);
         addComponent(citationSummaryLabel, 0, 1, 1, 3);
 
-        createdLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        createdLabel.setStyleName(LABEL_NOWRAP);
         createdLabel.setContentMode(ContentMode.HTML);
         createdLabel.setWidthUndefined();
         addComponent(createdLabel, 2, 1);
         setComponentAlignment(createdLabel, Alignment.BOTTOM_RIGHT);
 
-        publishedLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        publishedLabel.setStyleName(LABEL_NOWRAP);
         publishedLabel.setContentMode(ContentMode.HTML);
         publishedLabel.setWidthUndefined();
         publishedLabel.setVisible(false);
         addComponent(publishedLabel, 2, 2);
         setComponentAlignment(publishedLabel, Alignment.BOTTOM_RIGHT);
 
-        releasedLabel.setStyleName(STYLE_LABEL_NOWRAP);
+        releasedLabel.setStyleName(LABEL_NOWRAP);
         releasedLabel.setContentMode(ContentMode.HTML);
         releasedLabel.setWidthUndefined();
         releasedLabel.setVisible(false);
@@ -144,26 +149,42 @@ public class RegistrationItem extends GridLayout {
 
     public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
         this.parentView = parentView;
-        updateUI(regDto.getCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(), regDto);
+
+        NavigationEvent openButtonEvent = new NavigationEvent(
+                RegistrationWorkflowViewBean.NAME,
+                RegistrationWorkflowViewBean.ACTION_EDIT,
+                Integer.toString(regDto.getId())
+                );
+
+        updateUI(regDto.getCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+                openButtonEvent, null, regDto);
     }
 
     public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
         this.parentView = parentView;
-        updateUI(workingSet.getCitation(), workingSet.getCreated(), null, workingSet.messagesCount(), null);
+        ReferenceEvent openButtonEvent;
+        if(workingSet.getCitationId() != null){
+            openButtonEvent = new ReferenceEvent(EntityEventType.EDIT, workingSet.getCitationId());
+        } else {
+            openButtonEvent = new ReferenceEvent(EntityEventType.ADD);
+        }
+        updateUI(workingSet.getCitation(), workingSet.getCreated(), null, workingSet.messagesCount(),
+                openButtonEvent, FontAwesome.EDIT, null);
     }
 
 
     /**
      *
      */
-    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount, RegistrationDTO regDto) {
+    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount,
+            Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto) {
 
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
 
         if(messagesCount > 0){
             getMessageButton().setEnabled(true);
-            getMessageButton().addStyleName(ValoTheme.BUTTON_FRIENDLY);
+            // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
             getMessageButton().addClickListener(e -> {
                 ShowDetailsEvent detailsEvent;
                 if(regDto != null){
@@ -182,9 +203,22 @@ public class RegistrationItem extends GridLayout {
                 publishEvent(detailsEvent);
                 }
             );
+            getMessageButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + messagesCount + "</span>");
+            getMessageButton().setCaptionAsHtml(true);
         }
 
         labelMarkup.append(citationString);
+
+        if(openButtonEvent != null){
+            // Buttons
+            getOpenButton().setVisible(true);
+            getOpenButton().addClickListener(e -> publishEvent(openButtonEvent));
+        }
+
+        if(openButtonIcon != null){
+            getOpenButton().setIcon(openButtonIcon);
+        }
+
         if(regDto != null){
             labelMarkup.append("</br>").append(regDto.getSummary());
 
@@ -195,16 +229,9 @@ public class RegistrationItem extends GridLayout {
             getIdentifierLink().setVisible(true);
             getIdentifierLink().setCaption(regDto.getIdentifier());
 
-            // Buttons
-            getOpenButton().setVisible(true);
-            getOpenButton().addClickListener(e -> publishEvent(new NavigationEvent(
-                    RegistrationWorkflowViewBean.NAME,
-                    RegistrationWorkflowViewBean.ACTION_EDIT,
-                    Integer.toString(regDto.getId())
-                    )));
-
             registrationDate = regDto.getRegistrationDate();
         }
+
 
         getCitationSummaryLabel().setValue(labelMarkup.toString());
         updateDateLabels(created, datePublished, registrationDate);

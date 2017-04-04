@@ -132,7 +132,14 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
            display : inline;
         }
     }
+
+   .friendly-foreground {
+        color: $v-friendly-color;
+    }
    
+   .v-button .button-badge {
+         @include valo-badge-style($states: inactive, $background-color: lighten($v-background-color, 10%), $active-color: $v-focus-color);
+    } 
    
    .dashboard-actions {
       margin: 0 10%;
@@ -218,6 +225,13 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
                 font-size: $workflow-caption-font-size; // 70px;
             }
         }
+    }
+
+    #workingset {
+            padding: round($v-unit-size / 2);
+            .names-types-list, .registration-list-item {
+                margin-top: round($v-unit-size / 2);
+            }
     }
 
     // --------------------------------------------------- //

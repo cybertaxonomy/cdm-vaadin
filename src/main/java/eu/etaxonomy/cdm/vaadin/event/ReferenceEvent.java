@@ -15,9 +15,22 @@ package eu.etaxonomy.cdm.vaadin.event;
  */
 public class ReferenceEvent extends AbstractEntityEvent {
 
-
+    /**
+     * @param eventType
+     */
     public ReferenceEvent(EntityEventType eventType) {
         super(eventType);
     }
+
+    /**
+     * @param eventType
+     * @param entityId
+     */
+    public ReferenceEvent(EntityEventType eventType, Integer entityId) {
+        super(eventType, entityId);
+    }
+
+
+
 
 }

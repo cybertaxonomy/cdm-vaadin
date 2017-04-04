@@ -9,7 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 
-import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.STYLE_LABEL_NOWRAP;
+import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -37,7 +37,7 @@ public class TypeStateLabel extends Label {
      *
      */
     public TypeStateLabel() {
-        setStyleName(STYLE_LABEL_NOWRAP);
+        setStyleName(LABEL_NOWRAP);
     }
 
     /**

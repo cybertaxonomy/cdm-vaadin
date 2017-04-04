@@ -20,6 +20,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -32,10 +33,12 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
@@ -55,7 +58,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     implements RegistrationWorkflowView, View {
 
 
-    public static final String CSS_CLASS_WORKFLOW = "workflow-container";
+    public static final String DOM_ID_WORKFLOW = "workflow-container";
+
+    public static final String DOM_ID_WORKINGSET = "workingset";
 
     public static final String SUBHEADER_DEEFAULT = "Advance step by step through the registration workflow.";
 
@@ -82,7 +87,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
         workflow = new CssLayout();
         workflow.setSizeFull();
-        workflow.setId(CSS_CLASS_WORKFLOW);
+        workflow.setId(DOM_ID_WORKFLOW);
         getLayout().addComponent(workflow);
     }
 
@@ -114,10 +119,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     public void setWorkingset(RegistrationWorkingSet workingset) {
 
         CssLayout registration = new CssLayout();
+        registration.setId(DOM_ID_WORKINGSET);
         registration.setWidth(100, Unit.PERCENTAGE);
 
         Panel namesTypesPanel = createNamesAndTypesList(workingset);
+        namesTypesPanel.setStyleName("names-types-list");
         namesTypesPanel.setCaption("Names & Types");
+
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
         registration.addComponent(new RegistrationItem(workingset, this));
@@ -174,21 +182,45 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     public Panel createNamesAndTypesList(RegistrationWorkingSet workingset) {
         // prepare name and type list
-        GridLayout namesTypesList = new GridLayout(4, workingset.getRegistrationDTOs().size());
+        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
-            Button commentButton = new Button(FontAwesome.COMMENT);
-            commentButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+
+            Button messageButton = new Button(FontAwesome.COMMENT);
+            messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
+            if(dto.getMessages().isEmpty()){
+                messageButton.setEnabled(false);
+            } else {
+                messageButton.addClickListener(e -> eventBus.publishEvent(
+                        new ShowDetailsEvent<RegistrationDTO, Integer>(
+                            e,
+                            RegistrationDTO.class,
+                            dto.getId(),
+                            "messages"
+                            )
+                        )
+                    );
+            }
+            messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
+            messageButton.setCaptionAsHtml(true);
+
             Button editButton = new Button(FontAwesome.EDIT);
-            editButton.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+            editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
 
             namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
             namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
-            namesTypesList.addComponent(commentButton, 2, row);
-            namesTypesList.addComponent(editButton, 3, row);
+            CssLayout buttonGroup = new CssLayout();
+            buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+            buttonGroup.addComponent(messageButton);
+            buttonGroup.addComponent(editButton);
+            namesTypesList.addComponent(buttonGroup, 2, row);
+            namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
             row++;
         }
         namesTypesList.setSizeUndefined();
+        namesTypesList.setWidth(100, Unit.PERCENTAGE);
+        namesTypesList.setColumnExpandRatio(0, 0.1f);
+        namesTypesList.setColumnExpandRatio(1, 0.9f);
         Panel namesTypesPanel = new Panel(namesTypesList);
         namesTypesPanel.setHeight("300px");
         return namesTypesPanel;

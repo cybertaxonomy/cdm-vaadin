@@ -18,11 +18,18 @@ public abstract class AbstractEntityEvent {
 
     private EntityEventType eventType;
 
-    public AbstractEntityEvent(EntityEventType eventType) {
+    private Integer entityId = null;
+
+    public AbstractEntityEvent(EntityEventType eventType, Integer entityId) {
         this.eventType = eventType;
         if(eventType == null){
             throw new NullPointerException();
         }
+        this.setEntityId(entityId);
+    }
+
+    public AbstractEntityEvent(EntityEventType eventType) {
+        this(eventType, null);
     }
 
     public EntityEventType getEventType() {
@@ -37,6 +44,20 @@ public abstract class AbstractEntityEvent {
     }
     public boolean isRemoveEvent() {
         return eventType.equals(EntityEventType.REMOVE);
+    }
+
+    /**
+     * @return the entityId
+     */
+    public Integer getEntityId() {
+        return entityId;
+    }
+
+    /**
+     * @param entityId the entityId to set
+     */
+    private void setEntityId(Integer entityId) {
+        this.entityId = entityId;
     }
 
 }

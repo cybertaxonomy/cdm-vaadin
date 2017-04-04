@@ -30,7 +30,7 @@ public class RegistrationWorkingSet {
 
     private List<RegistrationDTO> registrationDTOs = new ArrayList<>();
 
-    private int citationId = -1;
+    private Integer citationId = null;
 
     private DateTime created = null;
 
@@ -74,7 +74,7 @@ public class RegistrationWorkingSet {
             problems = new ArrayList<>();
         }
         for(RegistrationDTO regDto : candidates){
-                if(citationId == -1){
+                if(citationId == null){
                     citationId = regDto.getCitationID();
                     citation = regDto.getCitation();
                 } else {
@@ -155,7 +155,7 @@ public class RegistrationWorkingSet {
     /**
      * @return the citationId
      */
-    public int getCitationId() {
+    public Integer getCitationId() {
         return citationId;
     }
 
