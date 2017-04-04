@@ -8,6 +8,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.vaadin.ui.NavigationManager;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -35,6 +36,9 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	@Autowired
 	@Qualifier("cdmRepository")
 	private CdmRepository repo;
+
+	@Autowired
+	private NavigationManager navigationManager;
 
 	/**
 	 * @return the repo
@@ -74,5 +78,12 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	public void onViewExit() {
 
 	}
+
+    /**
+     * @return the navigationManager
+     */
+    public NavigationManager getNavigationManager() {
+        return navigationManager;
+    }
 
 }

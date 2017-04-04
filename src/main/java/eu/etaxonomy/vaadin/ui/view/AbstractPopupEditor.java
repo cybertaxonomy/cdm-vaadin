@@ -24,10 +24,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
-public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComponent
-		implements PopupView {
+//FIXME this pop editor is not following the MVP pattern, the com.vaadin.devday.mvp.ui.AbstractPopupView is designed better in this sense!!
+public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComponent implements PopupView {
 
 	private static final long serialVersionUID = 1441816620197127918L;
 
@@ -39,6 +40,9 @@ public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComp
 
     @Autowired
     ApplicationEventPublisher eventBus;
+
+    @Autowired
+    CdmRepository cdmRepository;
 
 	private HorizontalLayout buttonLayout;
 
@@ -62,6 +66,10 @@ public abstract class AbstractPopupEditor<DTO extends Object> extends CustomComp
 				throw new CommitException("Failed to store data to backend", e);
 			}
 		}
+	}
+
+	protected CdmRepository getRepsitory() {
+	    return cdmRepository;
 	}
 
 	public abstract void storeDto(DTO bean) throws CommitException;

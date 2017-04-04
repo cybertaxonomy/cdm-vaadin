@@ -49,7 +49,7 @@ class ViewAreaBean extends HorizontalLayout implements ViewDisplay {
 	    addComponentAsFirst(this.mainMenu.asComponent());
 	}
 
-// TODO was this needed to avoid bean loading probelms? Otherwise remove it
+// TODO was this needed to avoid bean loading problems? Otherwise remove it
 //	private MainMenu mainMenuInstantiator;
 //	@PostConstruct
 //	protected void initialize() {

@@ -1,5 +1,6 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +42,12 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		popupMap = new HashMap<>();
 	}
 
-	@Autowired(required=false)
-    private Map<String, PopupView> popupViews = null;
+    private Map<String, PopupView> popupViews = new HashMap<>();
+
+    @Autowired(required=false)
+	private void popUpViews(Collection<PopupView> popupViews){
+        popupViews.forEach(view -> this.popupViews.put(view.getClass().getSimpleName(), view));
+	}
 
     /*
      * Why UriFragmentManager must be initialized lazily:
