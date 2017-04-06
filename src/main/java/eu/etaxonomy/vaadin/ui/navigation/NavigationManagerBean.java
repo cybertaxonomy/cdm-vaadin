@@ -2,7 +2,9 @@ package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -11,13 +13,13 @@ import org.springframework.context.event.EventListener;
 
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.vaadin.ui.NavigationManager;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
@@ -42,12 +44,18 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		popupMap = new HashMap<>();
 	}
 
-    private Map<String, PopupView> popupViews = new HashMap<>();
+    private Collection<PopupView> popupViews = new HashSet<>();
 
+    @Lazy
     @Autowired(required=false)
 	private void popUpViews(Collection<PopupView> popupViews){
-        popupViews.forEach(view -> this.popupViews.put(view.getClass().getSimpleName(), view));
+        this.popupViews = popupViews;
+        // popupViews.forEach(view -> this.popupViews.put(view.getClass(), view));
 	}
+
+    private <P extends PopupView> Optional<PopupView> findPopupView(Class<P> type){
+        return popupViews.stream().filter(p -> p.getClass().equals(type)).findFirst();
+    }
 
     /*
      * Why UriFragmentManager must be initialized lazily:
@@ -97,14 +105,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
-		// Instance<T> instanceSelection = popupViewInstantiator.select(popupType);
-		PopupView popupContent =  popupViews.get(popupType.getSimpleName()); // FIXME better scan the collection for the correct bean class
+
+		PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
 
 		Window window = new Window();
 		window.setCaption(popupContent.getWindowCaption());
 		window.center();
-		window.setResizable(false);
-
+		window.setResizable(popupContent.isResizable());
+		window.setModal(popupContent.isModal());
+		window.setCaptionAsHtml(popupContent.isWindowCaptionAsHtml());
+		window.setWidth(popupContent.getWindowPixelWidth(), Unit.PIXELS);
 		window.setContent(popupContent.asComponent());
 		UI.getCurrent().addWindow(window);
 		popupContent.focusFirst();

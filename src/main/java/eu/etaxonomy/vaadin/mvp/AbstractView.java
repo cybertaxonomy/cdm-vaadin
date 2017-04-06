@@ -20,6 +20,7 @@ import com.vaadin.ui.CustomComponent;
  *            type of the presenter this view uses.
  *
  * @author Peter / Vaadin
+ * @param <V>
  */
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
 		implements ApplicationContextAware {
@@ -34,10 +35,14 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
     @Autowired
     protected ApplicationEventPublisher eventBus;
 
-	@PostConstruct
+	@SuppressWarnings("unchecked")
+    @PostConstruct
 	protected final void init() {
 		Logger.getLogger(getClass().getSimpleName()).info("View init");
-		presenter.init((ApplicationView) this);
+		if(!ApplicationView.class.isAssignableFrom(this.getClass())){
+		    throw new RuntimeException("Any view bean must implement the ApplicationView interface: ViewBean ---> ViewInterface ---> ApplicationView");
+		}
+		presenter.init((ApplicationView<P>) this);
 
 		onViewReady();
 	}

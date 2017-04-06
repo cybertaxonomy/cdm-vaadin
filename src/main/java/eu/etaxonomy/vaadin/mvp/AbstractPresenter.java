@@ -8,7 +8,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.vaadin.ui.NavigationManager;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's

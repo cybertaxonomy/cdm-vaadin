@@ -1,4 +1,4 @@
-package eu.etaxonomy.vaadin.ui;
+package eu.etaxonomy.vaadin.ui.navigation;
 
 import com.vaadin.navigator.View;
 

@@ -11,8 +11,6 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
-import eu.etaxonomy.vaadin.ui.NavigationManager;
-
 @SpringComponent
 @UIScope
 class ViewChangeListenerBean implements ViewChangeListener {

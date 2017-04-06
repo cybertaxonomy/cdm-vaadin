@@ -8,14 +8,15 @@
 */
 package eu.etaxonomy.cdm.vaadin.editor.reference;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
-import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.vaadin.ui.view.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 /**
  * @author a.kohlbecker
@@ -25,7 +26,7 @@ import eu.etaxonomy.vaadin.ui.view.AbstractPopupEditor;
 
 @SpringComponent
 @Scope("prototype")
-public class ReferencePopupEditor extends AbstractPopupEditor<Reference> {
+public class ReferencePopupEditor extends AbstractPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 
@@ -36,7 +37,7 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference> {
      * @param dtoType
      */
     public ReferencePopupEditor() {
-        super(Reference.class);
+        super(new GridLayout(), Reference.class);
         /*
         "type",
         "uri",
@@ -102,9 +103,17 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference> {
      * {@inheritDoc}
      */
     @Override
-    public void storeDto(Reference bean) throws CommitException {
-        //TODO this should happen in the AbstractPopupEditor!
-        getRepsitory().getReferenceService().saveOrUpdate(bean);
+    public boolean isResizable() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Autowired
+    @Override
+    protected void injectPresenter(ReferenceEditorPresenter presenter) {
+        setPresenter(presenter);
     }
 
 
