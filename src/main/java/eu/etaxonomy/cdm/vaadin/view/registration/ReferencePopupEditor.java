@@ -32,12 +32,20 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
 
     private TextField titleField;
 
+    private final static int GRID_COLS = 4;
+
+    private final static int GRID_ROWS = 8;
+
     /**
      * @param layout
      * @param dtoType
      */
     public ReferencePopupEditor() {
-        super(new GridLayout(), Reference.class);
+        super(new GridLayout(GRID_COLS, GRID_ROWS), Reference.class);
+        GridLayout grid = (GridLayout)getFieldLayout();
+        grid.setSpacing(true);
+        grid.setMargin(true);
+
         /*
         "type",
         "uri",
@@ -64,23 +72,32 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
         "organization",
         "inReference"
          */
-        addTextField("Reference cache", "titleCache");
-        addTextField("Abbrev. cache", "abbrevTitleCache");
-        titleField = addTextField("Title", "title");
+        //addField(new Select("Reference type", new String[]{}), "type");
+        addTextField("Reference cache", "titleCache", 0, 0, GRID_COLS-1, 0).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Abbrev. cache", "abbrevTitleCache", 0, 1, GRID_COLS-1, 1).setWidth(100, Unit.PERCENTAGE);
+        titleField = addTextField("Title", "title", 0, 2, GRID_COLS-1, 2);
         titleField.setRequired(true);
-        addTextField("NomenclaturalTitle", "abbrevTitle");
-        // addTextField("Author(s)", "authorship").setRequired(true);
-        addTextField("Editor", "editor");
-        addTextField("Series", "seriesPart");
-        addTextField("Volume", "volume");
-        addTextField("Pages", "pages");
-        addTextField("Place published", "placePublished");
-        addTextField("Publisher", "publisher").setRequired(true);
-        // TODO implement a TimePeriod component addDateField("DatePublished", "datePublished") // .setConverter(new JodaDateTimeConverter());
-        addTextField("ISSN", "issn");
-        addTextField("ISBN", "isbn");
-        addTextField("DOI", "doi");
+        titleField.setWidth(100, Unit.PERCENTAGE);
+        addTextField("NomenclaturalTitle", "abbrevTitle", 0, 3, GRID_COLS-1, 3).setWidth(100, Unit.PERCENTAGE);
 
+        // addTextField("Author(s)", "authorship", 0, 4, 1, 4)).setRequired(true);
+        addTextField("Editor", "editor", 2, 4, 3, 4).setWidth(100, Unit.PERCENTAGE);
+
+        addTextField("Series", "seriesPart", 0, 5, 0, 5);
+        addTextField("Volume", "volume", 1, 5, 1, 5);
+        addTextField("Pages", "pages", 2, 5, 2, 5);
+
+        addTextField("Place published", "placePublished", 0, 6, 1, 6).setWidth(100, Unit.PERCENTAGE);
+        TextField publisherField = addTextField("Publisher", "publisher", 2, 6, 3, 6);
+        publisherField.setRequired(true);
+        publisherField.setWidth(100, Unit.PERCENTAGE);
+
+
+        // TODO implement a TimePeriod component addDateField("DatePublished", "datePublished") // .setConverter(new JodaDateTimeConverter());
+        addTextField("ISSN", "issn", 0, 7, 0, 7);
+        addTextField("ISBN", "isbn", 1, 7, 1, 7);
+        addTextField("DOI", "doi", 2, 7, 2, 7);
+        addTextField("Uri", "uri", 3, 7, 3, 7);
     }
 
     /**
@@ -89,6 +106,14 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
     @Override
     public String getWindowCaption() {
         return "Reference editor";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getDefaultComponentStyles() {
+        return "tiny";
     }
 
     /**

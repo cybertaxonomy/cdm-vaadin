@@ -28,7 +28,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -53,6 +52,8 @@ public class RegistrationUI extends UI {
 
     @Autowired
     private ViewDisplay viewDisplay;
+
+    private final String INITIAL_VIEW = "workflow/edit/100002"; // DashBoardView.NAME
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -88,7 +89,7 @@ public class RegistrationUI extends UI {
         eventBus.publishEvent(new UIInitializedEvent());
 
         //navigate to initial view
-        eventBus.publishEvent(new NavigationEvent(DashBoardView.NAME));
+        eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 
         String brand = "phycobank";
         //TODO create annotation:

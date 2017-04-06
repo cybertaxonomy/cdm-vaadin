@@ -19,6 +19,9 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.GridLayout.OutOfBoundsException;
+import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
@@ -50,6 +53,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private Button save;
 
     private Button cancel;
+
+    private GridLayout _gridLayoutCache;
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
@@ -91,6 +96,24 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected VerticalLayout getMainLayout() {
         return mainLayout;
+    }
+
+    protected Layout getFieldLayout() {
+        return fieldLayout;
+    }
+
+    /**
+     * @return
+     */
+    private GridLayout gridLayout() {
+        if(_gridLayoutCache == null){
+            if(fieldLayout instanceof GridLayout){
+                _gridLayoutCache = (GridLayout)fieldLayout;
+            } else {
+                throw new RuntimeException("The fieldlayout of this editor is not a GridLayout");
+            }
+        }
+        return _gridLayoutCache;
     }
 
     @Override
@@ -147,6 +170,17 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return addField(new TextField(caption), propertyId);
     }
 
+    protected TextField addTextField(String caption, String propertyId, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+        return addField(new TextField(caption), propertyId, column1, row1, column2, row2);
+    }
+
+    protected TextField addTextField(String caption, String propertyId, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+        return addField(new TextField(caption), propertyId, column, row);
+    }
+
     protected PopupDateField addDateField(String caption, String propertyId) {
         return addField(new PopupDateField(caption), propertyId);
     }
@@ -157,13 +191,136 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected <T extends Field> T addField(T field, String propertyId) {
         fieldGroup.bind(field, propertyId);
-        fieldLayout.addComponent(field);
+        addComponent(field);
+        return field;
+    }
+
+    /**
+     * Can only be used if the <code>fieldlayout</code> is a GridLayout.
+     *
+     * @param field
+     *            the field to be added, not <code>null</code>.
+     * @param propertyId
+     * @param column
+     *            the column index, starting from 0.
+     * @param row
+     *            the row index, starting from 0.
+     * @throws OverlapsException
+     *             if the new component overlaps with any of the components
+     *             already in the grid.
+     * @throws OutOfBoundsException
+     *             if the cell is outside the grid area.
+     */
+    protected <T extends Field> T addField(T field, String propertyId, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+        fieldGroup.bind(field, propertyId);
+        addComponent(field, column, row);
+        return field;
+    }
+
+    /**
+     * Can only be used if the <code>fieldlayout</code> is a GridLayout.
+     *
+     * @param field
+     * @param propertyId
+     * @param column1
+     * @param row1
+     * @param column2
+     * @param row2
+     * @return
+     * @throws OverlapsException
+     * @throws OutOfBoundsException
+     */
+    protected <T extends Field> T addField(T field, String propertyId, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+        fieldGroup.bind(field, propertyId);
+        addComponent(field, column1, row1, column2, row2);
         return field;
     }
 
     protected void addComponent(Component component) {
+        applyDefaultComponentStyles(component);
         fieldLayout.addComponent(component);
     }
+
+    /**
+     * @param component
+     */
+    public void applyDefaultComponentStyles(Component component) {
+        component.setStyleName(getDefaultComponentStyles());
+    }
+
+    protected abstract String getDefaultComponentStyles();
+
+    /**
+     * Can only be used if the <code>fieldlayout</code> is a GridLayout.
+     * <p>
+     * Adds the component to the grid in cells column1,row1 (NortWest corner of
+     * the area.) End coordinates (SouthEast corner of the area) are the same as
+     * column1,row1. The coordinates are zero-based. Component width and height
+     * is 1.
+     *
+     * @param component
+     *            the component to be added, not <code>null</code>.
+     * @param column
+     *            the column index, starting from 0.
+     * @param row
+     *            the row index, starting from 0.
+     * @throws OverlapsException
+     *             if the new component overlaps with any of the components
+     *             already in the grid.
+     * @throws OutOfBoundsException
+     *             if the cell is outside the grid area.
+     */
+    public void addComponent(Component component, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+        applyDefaultComponentStyles(component);
+        gridLayout().addComponent(component, column, row, column, row);
+    }
+
+    /**
+     * Can only be used if the <code>fieldlayout</code> is a GridLayout.
+     * <p>
+     * Adds a component to the grid in the specified area. The area is defined
+     * by specifying the upper left corner (column1, row1) and the lower right
+     * corner (column2, row2) of the area. The coordinates are zero-based.
+     * </p>
+     *
+     * <p>
+     * If the area overlaps with any of the existing components already present
+     * in the grid, the operation will fail and an {@link OverlapsException} is
+     * thrown.
+     * </p>
+     *
+     * @param component
+     *            the component to be added, not <code>null</code>.
+     * @param column1
+     *            the column of the upper left corner of the area <code>c</code>
+     *            is supposed to occupy. The leftmost column has index 0.
+     * @param row1
+     *            the row of the upper left corner of the area <code>c</code> is
+     *            supposed to occupy. The topmost row has index 0.
+     * @param column2
+     *            the column of the lower right corner of the area
+     *            <code>c</code> is supposed to occupy.
+     * @param row2
+     *            the row of the lower right corner of the area <code>c</code>
+     *            is supposed to occupy.
+     * @throws OverlapsException
+     *             if the new component overlaps with any of the components
+     *             already in the grid.
+     * @throws OutOfBoundsException
+     *             if the cells are outside the grid area.
+     */
+    public void addComponent(Component component, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+        applyDefaultComponentStyles(component);
+        gridLayout().addComponent(component, column1, row1, column2, row2);
+    }
+
+
 
     // ------------------------ data binding ------------------------ //
 
