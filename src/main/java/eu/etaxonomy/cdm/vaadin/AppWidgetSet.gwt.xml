@@ -35,5 +35,9 @@
 
     <inherits name="eu.etaxonomy.vaadin.ui.DevDayWidgetset" />
 
-    <inherits name="com.vaadin.lazyloadwrapper.widgetset.LazyLoadWrapperWidgetset" />
+    
+
+    
+
+    <inherits name="org.vaadin.addons.tuningdatefield.widgetset.TuningDateFieldWidgetset" />
 </module>

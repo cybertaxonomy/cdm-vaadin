@@ -60,6 +60,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         super.setPrimaryStyleName(PRIMARY_STYLE);
 
         // better use https://vaadin.com/directory#!addon/tuning-datefield ???
+        TuningDateField startDateField = new TuningDateField();
         PopupDateField startDate = new PopupDateField("Start");
         startDate.setConverter(new JodaDateTimeConverter());
         PopupDateField endDate = new PopupDateField("End");

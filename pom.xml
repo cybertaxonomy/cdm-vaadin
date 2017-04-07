@@ -451,11 +451,16 @@
       <version>4.5</version>
     </dependency>
     <dependency>
-       <!--  only in the edit repo -->
+       <groupId>org.vaadin.addons</groupId>
+       <artifactId>tuning-datefield</artifactId>
+       <version>0.18.0</version>
+    </dependency>
+<!--     <dependency>
+        only in the edit repo
       <groupId>org.vaadin.addons</groupId>
       <artifactId>lazyloadwrapper</artifactId>
       <version>0.1-alpha</version>
-    </dependency>
+    </dependency> -->
     <!-- ============ cdmlib ============ -->
     <dependency>
       <groupId>eu.etaxonomy</groupId>

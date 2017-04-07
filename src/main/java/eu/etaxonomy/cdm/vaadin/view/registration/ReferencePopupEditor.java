@@ -20,7 +20,6 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
@@ -41,9 +40,6 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
     private final static int GRID_COLS = 4;
 
     private final static int GRID_ROWS = 9;
-
-    @Autowired
-    private SelectFieldFactory selectFactory;
 
     /**
      * @param layout
