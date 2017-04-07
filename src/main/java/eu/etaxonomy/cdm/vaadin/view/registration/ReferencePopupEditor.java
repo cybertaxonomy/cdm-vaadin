@@ -8,14 +8,20 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
+import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 /**
@@ -34,7 +40,10 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 8;
+    private final static int GRID_ROWS = 9;
+
+    @Autowired
+    private SelectFieldFactory selectFactory;
 
     /**
      * @param layout
@@ -72,32 +81,41 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
         "organization",
         "inReference"
          */
-        //addField(new Select("Reference type", new String[]{}), "type");
-        addTextField("Reference cache", "titleCache", 0, 0, GRID_COLS-1, 0).setWidth(100, Unit.PERCENTAGE);
-        addTextField("Abbrev. cache", "abbrevTitleCache", 0, 1, GRID_COLS-1, 1).setWidth(100, Unit.PERCENTAGE);
-        titleField = addTextField("Title", "title", 0, 2, GRID_COLS-1, 2);
+        int row = 0;
+        ListSelect typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
+        typeSelect.setNullSelectionAllowed(false);
+        typeSelect.setRows(1);
+        addField(typeSelect, "type", 3, row);
+        row++;
+        addTextField("Reference cache", "titleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
+        addTextField("Abbrev. cache", "abbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
+        titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setRequired(true);
         titleField.setWidth(100, Unit.PERCENTAGE);
-        addTextField("NomenclaturalTitle", "abbrevTitle", 0, 3, GRID_COLS-1, 3).setWidth(100, Unit.PERCENTAGE);
-
+        row++;
+        addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
         // addTextField("Author(s)", "authorship", 0, 4, 1, 4)).setRequired(true);
-        addTextField("Editor", "editor", 2, 4, 3, 4).setWidth(100, Unit.PERCENTAGE);
-
-        addTextField("Series", "seriesPart", 0, 5, 0, 5);
-        addTextField("Volume", "volume", 1, 5, 1, 5);
-        addTextField("Pages", "pages", 2, 5, 2, 5);
-
-        addTextField("Place published", "placePublished", 0, 6, 1, 6).setWidth(100, Unit.PERCENTAGE);
-        TextField publisherField = addTextField("Publisher", "publisher", 2, 6, 3, 6);
+        addTextField("Editor", "editor", 2, row, 3, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
+        addTextField("Series", "seriesPart", 0, row);
+        addTextField("Volume", "volume", 1, row);
+        addTextField("Pages", "pages", 2, row);
+        row++;
+        addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
+        TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
         publisherField.setRequired(true);
         publisherField.setWidth(100, Unit.PERCENTAGE);
-
-
-        // TODO implement a TimePeriod component addDateField("DatePublished", "datePublished") // .setConverter(new JodaDateTimeConverter());
-        addTextField("ISSN", "issn", 0, 7, 0, 7);
-        addTextField("ISBN", "isbn", 1, 7, 1, 7);
-        addTextField("DOI", "doi", 2, 7, 2, 7);
-        addTextField("Uri", "uri", 3, 7, 3, 7);
+        TimePeriodField timePeriodField = new TimePeriodField("Date published");
+        addField(timePeriodField, "datePublished");
+        row++;
+        // TODO implement a TimePeriod component
+        addTextField("ISSN", "issn", 0, row);
+        addTextField("ISBN", "isbn", 1, row);
+        addTextField("DOI", "doi", 2, row);
+        addTextField("Uri", "uri", 3, row);
     }
 
     /**
@@ -129,7 +147,7 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
      */
     @Override
     public boolean isResizable() {
-        return true;
+        return false;
     }
 
     /**

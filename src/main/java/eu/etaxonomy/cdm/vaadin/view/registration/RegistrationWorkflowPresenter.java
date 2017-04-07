@@ -55,11 +55,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     @EventListener
     protected void onRegistrationStartEvent(RegistrationWorkflowEvent event){
 
-        if(workingset != null){
-            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Cant start a new workflow over an existing one.");
+        boolean HACK = true;
+        if(workingset != null && !HACK){
+            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Can't start a new workflow over an existing one.");
             return;
         }
-
 
         if(event.isStart()) {
             workingset = new RegistrationWorkingSet();

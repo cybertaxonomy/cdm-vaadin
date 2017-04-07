@@ -130,7 +130,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
         registrations.add(registration);
         workflow.addComponent(registration);
-
     }
 
     /**

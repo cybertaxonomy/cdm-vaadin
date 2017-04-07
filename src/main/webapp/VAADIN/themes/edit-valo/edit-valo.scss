@@ -53,6 +53,8 @@ $v-component-group-spacing: 6px;
 
 @import "valo-fix.scss";
 
+@import "custom-fields.scss";
+
 
 // ========================================== //
 
@@ -60,7 +62,7 @@ $v-component-group-spacing: 6px;
 @include v-font(IcoMoon, "../../../../../fonts/icomoon");
 
 .IcoMoon {
-   font-family: IcoMoon;*
+   font-family: IcoMoon;
    font-style: normal;
    font-weight: normal;
    -webkit-font-smoothing: antialiased;
