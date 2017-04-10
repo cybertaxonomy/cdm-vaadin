@@ -25,12 +25,14 @@ import eu.etaxonomy.cdm.vaadin.util.converter.JodaTimePartialConverter;
  */
 public class PartialDateField extends TextField {
 
+    JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.DAY_MONTH_YEAR_DOT;
+
     /**
      *
      */
     public PartialDateField() {
         super();
-        setConverter(new JodaTimePartialConverter());
+        setConverter(new JodaTimePartialConverter(format));
     }
 
     /**
@@ -38,7 +40,7 @@ public class PartialDateField extends TextField {
      */
     public PartialDateField(Property dataSource) {
         super(dataSource);
-        setConverter(new JodaTimePartialConverter());
+        setConverter(new JodaTimePartialConverter(format));
     }
 
     /**
@@ -47,7 +49,7 @@ public class PartialDateField extends TextField {
      */
     public PartialDateField(String caption, Property dataSource) {
         super(caption, dataSource);
-        setConverter(new JodaTimePartialConverter());
+        setConverter(new JodaTimePartialConverter(format));
     }
 
     /**
@@ -56,7 +58,7 @@ public class PartialDateField extends TextField {
      */
     public PartialDateField(String caption, String value) {
         super(caption, value);
-        setConverter(new JodaTimePartialConverter());
+        setConverter(new JodaTimePartialConverter(format));
     }
 
     /**
@@ -64,7 +66,7 @@ public class PartialDateField extends TextField {
      */
     public PartialDateField(String caption) {
         super(caption);
-        setConverter(new JodaTimePartialConverter());
+        setConverter(new JodaTimePartialConverter(format));
     }
 
 

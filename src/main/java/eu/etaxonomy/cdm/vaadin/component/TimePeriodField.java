@@ -73,7 +73,9 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         parseField.addTextChangeListener(e -> parseInput(e));
 
         PartialDateField startDate = new PartialDateField("Start");
+        startDate.setInputPrompt("dd.mm.yyy");
         PartialDateField endDate = new PartialDateField("End");
+        endDate.setInputPrompt("dd.mm.yyy");
         freeText = new TextField("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 
