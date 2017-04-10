@@ -10,6 +10,9 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
           background-color: $v-app-background-color;
           padding: round($v-unit-size / 4);
       }
+      .to-label {
+        padding: 0 round($v-unit-size / 2);
+      }
   }
   
   .v-textfield-helper-field { 

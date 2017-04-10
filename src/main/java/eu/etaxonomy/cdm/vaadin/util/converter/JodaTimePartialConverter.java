@@ -87,9 +87,11 @@ public class JodaTimePartialConverter implements Converter<String, Partial> {
             try {
                 sb.append(value.get(DateTimeFieldType.year()));
                 try {
-                    sb.append(GLUE).append(StringUtils.leftPad(Integer.toString((value.get(DateTimeFieldType.monthOfYear()))), 2, "0"));
+                    String month = StringUtils.leftPad(Integer.toString((value.get(DateTimeFieldType.monthOfYear()))), 2, "0");
+                    sb.append(GLUE).append(month);
                     try {
-                        sb.append(GLUE).append(StringUtils.leftPad(Integer.toString((value.get(DateTimeFieldType.dayOfMonth()))), 2, "0"));
+                        String day = StringUtils.leftPad(Integer.toString((value.get(DateTimeFieldType.dayOfMonth()))), 2, "0");
+                        sb.append(GLUE).append(day);
                     } catch (IllegalArgumentException e){
                         /* IGNORE */
                     }

@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,8 +39,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkflowPresenter extends AbstractPresenter<RegistrationWorkflowView> {
+public class RegistrationWorkflowPresenter extends AbstractPresenter<RegistrationWorkflowView> implements Serializable{
 
+    private static final long serialVersionUID = 1L;
 
     @Autowired
     private RegistrationService serviceMock;
