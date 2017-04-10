@@ -15,11 +15,10 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
-import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 
 /**
  * @author a.kohlbecker
@@ -34,7 +33,9 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
     private BeanFieldGroup<TimePeriod> fieldGroup = new BeanFieldGroup<>(TimePeriod.class);
 
-    GridLayout grid = new GridLayout(4, 2);
+    TextField parseField = null;
+
+    GridLayout grid = new GridLayout(3, 3);
 
     /**
      *
@@ -59,12 +60,12 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
         super.setPrimaryStyleName(PRIMARY_STYLE);
 
-        // better use https://vaadin.com/directory#!addon/tuning-datefield ???
-        TuningDateField startDateField = new TuningDateField();
-        PopupDateField startDate = new PopupDateField("Start");
-        startDate.setConverter(new JodaDateTimeConverter());
-        PopupDateField endDate = new PopupDateField("End");
-        endDate.setConverter(new JodaDateTimeConverter());
+        parseField = new TextField();
+        parseField.setWidth(100, Unit.PERCENTAGE);
+        parseField.setInputPrompt("This field will parse the entered time period");
+
+        PartialDateField startDate = new PartialDateField("Start");
+        PartialDateField endDate = new PartialDateField("End");
         TextField freeText = new TextField("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 
@@ -74,11 +75,15 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
         Label dashLabel = new Label("-");
 
-        grid.addComponent(startDate, 0, 0);
-        grid.addComponent(dashLabel);
+        int row = 0;
+        grid.addComponent(parseField, 0, row, 2, row);
+        row++;
+        grid.addComponent(startDate, 0, row);
+        grid.addComponent(dashLabel, 1, row);
         grid.setComponentAlignment(dashLabel, Alignment.BOTTOM_CENTER);
-        grid.addComponent(endDate, 2, 0);
-        grid.addComponent(freeText, 0, 1, 2, 1);
+        grid.addComponent(endDate, 2, row);
+        row++;
+        grid.addComponent(freeText, 0, row, 2, row);
 
         grid.iterator().forEachRemaining(c -> c.setStyleName(getStyleName()));
 
@@ -86,10 +91,22 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         marginwrapper.setStyleName("margin-wrapper");
         marginwrapper.addComponent(grid);
 
+        applyDefaultStyles();
+
         return marginwrapper;
     }
 
 
+
+    /**
+     *
+     */
+    private void applyDefaultStyles() {
+        if(parseField != null) {
+            parseField.addStyleName(RegistrationStyles.HELPER_FIELD);
+        }
+
+    }
 
     @Override
     protected void setInternalValue(TimePeriod newValue) {
@@ -101,6 +118,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     public void setStyleName(String style) {
         super.setStyleName(style);
         grid.iterator().forEachRemaining(c -> c.setStyleName(style));
+        applyDefaultStyles();
     }
 
     @Override

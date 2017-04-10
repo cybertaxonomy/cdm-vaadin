@@ -1,11 +1,25 @@
 // styles for custom fields
 
-// TimePeriodField
-.v-time-period-field {
-    .margin-wrapper {
-        border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
-        border-radius: $v-border-radius;
-        background-color: $v-app-background-color;
-        padding: round($v-unit-size / 4);
-    }
-}
+body .edit-valo { // increasing specifity to allow overriding the valo default field themes
+  
+  // TimePeriodField
+  .v-time-period-field {
+      .margin-wrapper {
+          border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+          border-radius: $v-border-radius;
+          background-color: $v-app-background-color;
+          padding: round($v-unit-size / 4);
+      }
+  }
+  
+  .v-textfield-helper-field { 
+          @if is-dark-color($v-background-color) {
+              $helper-color: lighten($v-background-color, 20%);
+          } @else {
+              $helper-color: lighten($v-background-color, -20%);
+          }
+          color: $helper-color;
+          background-color: valo-font-color($helper-color);
+          border-radius: $v-border-radius;
+      }
+} 

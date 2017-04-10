@@ -21,5 +21,7 @@ public class RegistrationStyles {
 
     public static final String BUTTON_BADGE = "button-badge";
 
+    public static final String HELPER_FIELD = "helper-field";
+
 
 }

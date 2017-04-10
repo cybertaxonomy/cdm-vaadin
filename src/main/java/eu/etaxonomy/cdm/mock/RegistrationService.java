@@ -36,12 +36,9 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  *
  */
 @Service("registrationServiceMock")
-@Transactional
+@Transactional(readOnly=true)
 public class RegistrationService {
 
-    /**
-     *
-     */
     private static final int SIZE = 50; // FIXME test performance with 50 !!!!!
 
     @Autowired
@@ -68,6 +65,9 @@ public class RegistrationService {
             int pageIndex = 0;
             while(registrationsByUUID.size() < SIZE){
                 List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, pageIndex++, null, null);
+                if(names.isEmpty()){
+                    break;
+                }
                 for(TaxonNameBase name : names){
                     if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY())){
                         if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
