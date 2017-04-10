@@ -450,11 +450,6 @@
       <artifactId>contextmenu</artifactId>
       <version>4.5</version>
     </dependency>
-    <dependency>
-       <groupId>org.vaadin.addons</groupId>
-       <artifactId>tuning-datefield</artifactId>
-       <version>0.18.0</version>
-    </dependency>
 <!--     <dependency>
         only in the edit repo
       <groupId>org.vaadin.addons</groupId>
