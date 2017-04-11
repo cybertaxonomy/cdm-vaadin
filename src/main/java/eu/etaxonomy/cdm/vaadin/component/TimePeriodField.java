@@ -136,9 +136,9 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         buttonTextField.setColumnExpandRatio(1, 1.0f);
 
         PartialDateField startDate = new PartialDateField("Start");
-        startDate.setInputPrompt("dd.mm.yyy");
+        startDate.setInputPrompt("dd.mm.yyyy");
         PartialDateField endDate = new PartialDateField("End");
-        endDate.setInputPrompt("dd.mm.yyy");
+        endDate.setInputPrompt("dd.mm.yyyy");
         freeText = new TextField("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 
