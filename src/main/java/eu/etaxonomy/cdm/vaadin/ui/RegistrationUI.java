@@ -28,6 +28,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -53,7 +54,8 @@ public class RegistrationUI extends UI {
     @Autowired
     private ViewDisplay viewDisplay;
 
-    private final String INITIAL_VIEW = "workflow/edit/100002"; // DashBoardView.NAME
+    //private final String INITIAL_VIEW = "workflow/edit/100002";
+    private final String INITIAL_VIEW =  DashBoardView.NAME;
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly

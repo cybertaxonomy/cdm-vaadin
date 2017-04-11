@@ -240,15 +240,15 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     protected void addComponent(Component component) {
-        applyDefaultComponentStyles(component);
         fieldLayout.addComponent(component);
+        applyDefaultComponentStyles(component);
     }
 
     /**
      * @param component
      */
     public void applyDefaultComponentStyles(Component component) {
-        component.setStyleName(getDefaultComponentStyles());
+        component.addStyleName(getDefaultComponentStyles());
     }
 
     protected abstract String getDefaultComponentStyles();

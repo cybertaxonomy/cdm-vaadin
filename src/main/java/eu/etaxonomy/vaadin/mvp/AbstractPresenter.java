@@ -1,5 +1,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +24,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @ViewScope
-public abstract class AbstractPresenter<V extends ApplicationView> {
+public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
 
     public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 

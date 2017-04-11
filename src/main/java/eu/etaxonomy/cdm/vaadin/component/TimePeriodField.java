@@ -8,6 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.component;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -45,20 +48,24 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
     Label toLabel = null;
 
-    GridLayout grid = new GridLayout(3, 3);
+    GridLayout grid = new GridLayout(3, 4);
 
     CssLayout detailsView = new CssLayout();
-    CssLayout buttonTextField = new CssLayout();
 
-    CssLayout simpleView = new CssLayout();
+    //TODO implement custom button textfield which does not require a gridLayout
+    GridLayout buttonTextField = new GridLayout(2, 1);
+    GridLayout simpleView = new GridLayout(2, 1);
 
     TextField cacheField = new TextField();
+
+    Set<Component> styledComponents = new HashSet<>();
 
     /**
      *
      */
     public TimePeriodField() {
         super();
+
     }
 
     /**
@@ -80,9 +87,9 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         CssLayout root = new CssLayout();
 
         initSimpleView();
-        root.addComponent(simpleView);
-
         initDetailsView();
+
+        root.addComponent(simpleView);
         root.addComponent(detailsView);
 
         applyDefaultStyles();
@@ -97,12 +104,15 @@ public class TimePeriodField extends CustomField<TimePeriod> {
      */
     private void initSimpleView() {
 
-        cacheField.setWidth(100, Unit.PERCENTAGE);
         Button showDetailsButton = new Button(FontAwesome.CALENDAR);
         showDetailsButton.addClickListener(e -> showDetails());
-        simpleView.addComponent(showDetailsButton);
-        simpleView.addComponent(cacheField);
+        cacheField.setWidth(353, Unit.PIXELS); // FIXME 100% does not work
+
         simpleView.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        simpleView.setWidth(100, Unit.PERCENTAGE);
+        simpleView.addComponent(showDetailsButton, 0, 0);
+        simpleView.addComponent(cacheField, 1, 0);
+        simpleView.setColumnExpandRatio(1, 0.9f);
     }
 
     /**
@@ -111,15 +121,19 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     private void initDetailsView() {
 
         parseField = new TextField();
-        parseField.setWidth(100, Unit.PERCENTAGE);
+        // parseField.setWidth(100, Unit.PERCENTAGE);
         parseField.setInputPrompt("This field will parse the entered time period");
         parseField.addTextChangeListener(e -> parseInput(e));
+        parseField.setWidth(100, Unit.PERCENTAGE);
 
         Button closeDetailsButton = new Button(FontAwesome.CLOSE);
         closeDetailsButton.addClickListener(e -> showSimple());
 
-        buttonTextField.addComponent(closeDetailsButton);
-        buttonTextField.addComponent(parseField);
+        buttonTextField.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        buttonTextField.setWidth(100, Unit.PERCENTAGE);
+        buttonTextField.addComponent(closeDetailsButton, 0, 0);
+        buttonTextField.addComponent(parseField, 1, 0);
+        buttonTextField.setColumnExpandRatio(1, 1.0f);
 
         PartialDateField startDate = new PartialDateField("Start");
         startDate.setInputPrompt("dd.mm.yyy");
@@ -144,10 +158,12 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         row++;
         grid.addComponent(freeText, 0, row, 2, row);
 
-        grid.iterator().forEachRemaining(c -> c.setStyleName(getStyleName()));
+        // apply the style of the container to all child components. E.g. make all tiny
+        addStyleName((getStyleName()));
 
         detailsView.setStyleName("margin-wrapper");
         detailsView.addComponent(grid);
+
     }
 
 
@@ -213,7 +229,10 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     public void addStyleName(String style) {
         super.addStyleName(style);
         grid.iterator().forEachRemaining(c -> c.addStyleName(style));
-        simpleView.iterator().forEachRemaining(c -> c.addStyleName(style));
+        simpleView.iterator().forEachRemaining(c -> {
+            c.addStyleName(style);
+        });
+
         buttonTextField.iterator().forEachRemaining(c -> c.addStyleName(style));
     }
 

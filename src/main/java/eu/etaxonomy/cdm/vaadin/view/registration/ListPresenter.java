@@ -29,6 +29,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
 
+    private static final long serialVersionUID = 5419947244621450665L;
+
     @Autowired
     private RegistrationService serviceMock;
 

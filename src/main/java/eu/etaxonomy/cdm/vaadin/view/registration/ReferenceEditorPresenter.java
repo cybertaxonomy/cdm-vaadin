@@ -23,6 +23,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 @ViewScope
 public class ReferenceEditorPresenter extends AbstractEditorPresenter<Reference> {
 
+
+    private static final long serialVersionUID = -7926116447719010837L;
+
     /**
      * {@inheritDoc}
      */
