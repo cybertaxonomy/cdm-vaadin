@@ -48,11 +48,13 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         return dtos;
     }
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.presenter.registration.RegistrationDTO)")
+    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
     public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
         RegistrationDTO regDto = serviceMock.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
-            getView().openDetailsPopup("Messages", regDto.getMessages());
+            if(getView() != null){
+                getView().openDetailsPopup("Messages", regDto.getMessages());
+            }
         }
     }
 
