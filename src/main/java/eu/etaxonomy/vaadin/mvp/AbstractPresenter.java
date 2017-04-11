@@ -26,12 +26,18 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 @ViewScope
 public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
 
+
+    private static final long serialVersionUID = 5260910510283481832L;
+
     public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 
 	private V view;
 
 
 	protected V getView() {
+	    if(view == null){
+            Logger.getLogger(this.getClass()).warn("CDM-VAADIN#6562: presenter " + toString() + " without view.");
+        }
 		return view;
 	}
 
