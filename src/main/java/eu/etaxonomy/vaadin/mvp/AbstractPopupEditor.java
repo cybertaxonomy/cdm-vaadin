@@ -8,11 +8,21 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
+import com.vaadin.data.fieldgroup.FieldGroup.FieldGroupInvalidValueException;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.UserError;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -126,6 +136,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     // ------------------------ event handler ------------------------ //
 
     private class SaveHandler implements CommitHandler {
+
         private static final long serialVersionUID = 2047223089707080659L;
 
         @Override
@@ -160,11 +171,33 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         try {
             fieldGroup.commit();
         } catch (CommitException e) {
-            Notification.show("Error saving", Type.ERROR_MESSAGE);
+            fieldGroup.getFields().forEach(f -> ((AbstractField)f).setValidationVisible(true));
+            if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
+                FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
+                updateFieldNotifications(invalidValueException.getInvalidFields());
+                Notification.show("The entered data in " + invalidValueException.getInvalidFields().size() + " fields is incomplete or invalid.");
+            } else {
+                Logger.getLogger(this.getClass()).error("Error saving", e);
+                Notification.show("Error saving", Type.ERROR_MESSAGE);
+            }
         }
     }
 
+    /**
+     * @param invalidFields
+     */
+    private void updateFieldNotifications(Map<Field<?>, InvalidValueException> invalidFields) {
+        for(Field<?> f : invalidFields.keySet()){
+            if(f instanceof AbstractField){
+                String message = invalidFields.get(f).getHtmlMessage();
+                ((AbstractField)f).setComponentError(new UserError(message, ContentMode.HTML, ErrorLevel.ERROR));
+            }
+        }
+
+    }
+
     // ------------------------ field adding methods ------------------------ //
+
 
     protected TextField addTextField(String caption, String propertyId) {
         return addField(new TextField(caption), propertyId);
