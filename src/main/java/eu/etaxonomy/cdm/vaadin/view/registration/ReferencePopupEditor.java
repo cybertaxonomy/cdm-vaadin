@@ -112,6 +112,7 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
         addTextField("ISBN", "isbn", 1, row);
         addTextField("DOI", "doi", 2, row);
         addTextField("Uri", "uri", 3, row);
+
     }
 
     /**

@@ -19,7 +19,6 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
  */
 public abstract class AbstractEditorPresenter<DTO extends Object> extends AbstractPresenter {
 
-
     @SuppressWarnings("unchecked")
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
