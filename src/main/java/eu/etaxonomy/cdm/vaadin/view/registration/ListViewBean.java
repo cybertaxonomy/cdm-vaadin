@@ -36,6 +36,7 @@ import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.security.annotation.RequireAuthentication;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -47,6 +48,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  *
  */
 @SpringView(name=ListViewBean.NAME)
+@RequireAuthentication
 public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View {
 
     private static final long serialVersionUID = 3543300933072824713L;

@@ -17,9 +17,11 @@ public class AuthenticationPresenter implements IAuthenticationComponent.Authent
 
     @Override
     public boolean login(URI uri, String context, String userName, String password) {
+
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
         AuthenticationManager authenticationManager = (AuthenticationManager) CdmSpringContextHelper.getCurrent().getBean("authenticationManager");
         Authentication authentication = authenticationManager.authenticate(token);
+
         if(authentication != null && authentication.isAuthenticated()) {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CdmVaadinAuthentication cvAuthentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
@@ -30,6 +32,7 @@ public class AuthenticationPresenter implements IAuthenticationComponent.Authent
             CdmVaadinSessionUtilities.setCurrentAttribute(CdmVaadinAuthentication.KEY, cvAuthentication);
             return true;
         }
+
         return false;
     }
 
