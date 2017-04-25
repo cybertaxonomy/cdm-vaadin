@@ -9,9 +9,11 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
@@ -21,6 +23,7 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 /**
@@ -31,7 +34,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 @SpringComponent
 @Scope("prototype")
-public class ReferencePopupEditor extends AbstractPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView {
+public class ReferencePopupEditor extends AbstractPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 
@@ -154,6 +157,22 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
     @Override
     protected void injectPresenter(ReferenceEditorPresenter presenter) {
         setPresenter(presenter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
     }
 
 

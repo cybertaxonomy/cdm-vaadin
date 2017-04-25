@@ -9,4 +9,6 @@ public interface NavigationManager {
 	View getCurrentView();
 
 	<T extends PopupView> T showInPopup(Class<T> popupType);
+
+	void reloadCurrentView();
 }

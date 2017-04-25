@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanContainer;
@@ -36,7 +37,7 @@ import com.vaadin.ui.renderers.DateRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
-import eu.etaxonomy.cdm.vaadin.security.annotation.RequireAuthentication;
+import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -48,8 +49,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  *
  */
 @SpringView(name=ListViewBean.NAME)
-@RequireAuthentication
-public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View {
+public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View, AccessRestrictedView {
 
     private static final long serialVersionUID = 3543300933072824713L;
 
@@ -253,6 +253,22 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
           });
 
         return gpContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
     }
 
 

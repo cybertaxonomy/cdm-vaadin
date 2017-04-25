@@ -9,10 +9,12 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -43,6 +45,7 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
+import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -52,7 +55,7 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  */
 @SpringView(name=RegistrationWorkflowViewBean.NAME)
 public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationWorkflowPresenter>
-    implements RegistrationWorkflowView, View {
+    implements RegistrationWorkflowView, View, AccessRestrictedView {
 
 
     public static final String DOM_ID_WORKFLOW = "workflow-container";
@@ -336,6 +339,22 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         messages.forEach(s -> sb.append(s).append("</br>"));
         sb.append("</div>");
         new Notification(caption, sb.toString(), Notification.Type.HUMANIZED_MESSAGE, true).show(Page.getCurrent());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
     }
 
 }

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
@@ -28,6 +29,8 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 public class NavigationManagerBean extends SpringNavigator implements NavigationManager {
 
 	private static final long serialVersionUID = 6599898650948333853L;
+
+	private final static Logger logger = Logger.getLogger(NavigationManagerBean.class);
 
 	@Autowired
 	private ViewDisplay viewDisplay;
@@ -132,4 +135,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 			popupMap.remove(e.getPopup());
 		}
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void reloadCurrentView() {
+        if(logger.isTraceEnabled()){
+            logger.trace("reloading " + getState());
+        }
+        navigateTo(getState(), false);
+
+    }
 }
