@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.util;
 
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.Partial;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -39,10 +40,14 @@ public class TimePeriodFormatter {
 
     public String print(TimePeriod timePeriod) {
 
-        switch (format) {
-        case ISO8601:
-        default:
-            return printISO8601(timePeriod);
+        if ( StringUtils.isNotBlank(timePeriod.getFreeText())){
+           return timePeriod.getFreeText();
+        }else{
+            switch (format) {
+            case ISO8601:
+            default:
+                return printISO8601(timePeriod);
+            }
         }
     }
 
