@@ -30,6 +30,7 @@ import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean;
@@ -59,6 +60,8 @@ public class RegistrationItem extends GridLayout {
     private RegistrationTypeConverter regTypeConverter = new RegistrationTypeConverter();
 
     private AbstractView<?> parentView;
+
+    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(TimePeriodFormatter.Format.ISO8601);
 
     // --------------------------------------------------
     private TypeStateLabel typeStateLabel = new TypeStateLabel();
@@ -168,7 +171,8 @@ public class RegistrationItem extends GridLayout {
         } else {
             openButtonEvent = new ReferenceEvent(EntityEventType.ADD);
         }
-        updateUI(workingSet.getCitation(), workingSet.getCreated(), null, workingSet.messagesCount(),
+        TimePeriod datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
+        updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 openButtonEvent, FontAwesome.EDIT, null);
     }
 
@@ -241,21 +245,13 @@ public class RegistrationItem extends GridLayout {
     /**
      *
      */
-    private void updateDateLabels(DateTime created, TimePeriod published, DateTime released) {
+    private void updateDateLabels(DateTime created, TimePeriod datePublished, DateTime released) {
         getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
-        if(published != null){
+        if(datePublished != null){
             getPublishedLabel().setVisible(true);
-            StringBuffer sb = new StringBuffer();
-            if(published.getStart() != null){
-                sb.append(published.getStart().toString(ISODateTimeFormat.yearMonthDay()));
-            }
-            if(published.getEnd() != null){
-                if(sb.length() > 0){
-                    sb.append('-');
-                    sb.append(published.getEnd().toString(ISODateTimeFormat.yearMonthDay()));
-                }
-            }
-            getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + sb.toString());
+
+
+            getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + timePeriodFormatter.print(datePublished));
         }
         if(released != null){
             getReleasedLabel().setVisible(true);
@@ -263,6 +259,8 @@ public class RegistrationItem extends GridLayout {
         }
         // LABEL_CAPTION_RELEASED
     }
+
+
 
     private void publishEvent(Object event) {
         parentView.getEventBus().publishEvent(event);

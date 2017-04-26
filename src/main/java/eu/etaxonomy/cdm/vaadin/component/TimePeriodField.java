@@ -28,6 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.strategy.parser.TimePeriodParser;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
+import eu.etaxonomy.cdm.vaadin.util.TimePeriodFormatter;
 
 /**
  * @author a.kohlbecker
@@ -59,6 +60,8 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     TextField cacheField = new TextField();
 
     Set<Component> styledComponents = new HashSet<>();
+
+    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(TimePeriodFormatter.Format.ISO8601);
 
     /**
      *
@@ -212,7 +215,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
 
         cacheField.setReadOnly(false);
-        cacheField.setValue(newValue.toString());
+        cacheField.setValue(timePeriodFormatter.print(newValue));
         cacheField.setReadOnly(true);
     }
 
