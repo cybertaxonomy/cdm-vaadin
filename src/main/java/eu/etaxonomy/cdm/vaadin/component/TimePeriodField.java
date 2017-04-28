@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.server.FontAwesome;
@@ -131,7 +132,16 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         parseField.setWidth(100, Unit.PERCENTAGE);
 
         Button closeDetailsButton = new Button(FontAwesome.CLOSE);
-        closeDetailsButton.addClickListener(e -> showSimple());
+        closeDetailsButton.addClickListener(e -> {
+            try {
+                fieldGroup.commit();
+            } catch (CommitException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+            updateCacheField();
+            showSimple();
+        });
 
         buttonTextField.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         buttonTextField.setWidth(100, Unit.PERCENTAGE);
@@ -215,6 +225,14 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
 
+        updateCacheField();
+    }
+
+    /**
+     * @param newValue
+     */
+    private void updateCacheField() {
+        TimePeriod newValue = fieldGroup.getItemDataSource().getBean();
         cacheField.setReadOnly(false);
         cacheField.setValue(timePeriodFormatter.print(newValue));
         cacheField.setReadOnly(true);
