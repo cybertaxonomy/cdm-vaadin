@@ -30,7 +30,8 @@ import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.util.TimePeriodFormatter;
+import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
+import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean;
@@ -61,7 +62,7 @@ public class RegistrationItem extends GridLayout {
 
     private AbstractView<?> parentView;
 
-    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(TimePeriodFormatter.Format.ISO8601);
+    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
     // --------------------------------------------------
     private TypeStateLabel typeStateLabel = new TypeStateLabel();

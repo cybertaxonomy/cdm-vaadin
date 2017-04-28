@@ -28,7 +28,6 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
-import eu.etaxonomy.cdm.vaadin.util.TypeDesignationConverter;
 
 /**
  * @author a.kohlbecker

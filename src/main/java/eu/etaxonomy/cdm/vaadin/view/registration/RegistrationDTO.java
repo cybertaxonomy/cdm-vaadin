@@ -23,7 +23,7 @@ import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.util.TypeDesignationConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
 
 public class RegistrationDTO{
 

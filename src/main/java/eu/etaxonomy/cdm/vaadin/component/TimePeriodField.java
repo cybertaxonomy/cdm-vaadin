@@ -28,7 +28,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.strategy.parser.TimePeriodParser;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.util.TimePeriodFormatter;
+import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
+import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 
 /**
  * @author a.kohlbecker
@@ -61,7 +62,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
     Set<Component> styledComponents = new HashSet<>();
 
-    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(TimePeriodFormatter.Format.ISO8601);
+    private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
     /**
      *
