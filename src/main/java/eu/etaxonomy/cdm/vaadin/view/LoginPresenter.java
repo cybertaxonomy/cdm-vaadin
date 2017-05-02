@@ -33,7 +33,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  * Therefore the LoginPresenter must be in <b>UIScope</b> so that the LoginPresenter
  * is available to all Views.
  * <p>
- * The LoginPresenter offers a <b>auto login feature for developers</b>. Tio activate the auto login
+ * The LoginPresenter offers a <b>auto login feature for developers</b>. To activate the auto login
  * you need to provide the <code>user name</code> and <code>password</code> using the environment variables
  * <code>cdm-vaadin.login.usr</code> and <code>cdm-vaadin.login.pwd</code>, e.g.:
  * <pre>
