@@ -29,7 +29,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
 /**
- * The {@link LoginView is used as replacement view in the scope of other views.
+ * The {@link LoginView} is used as replacement view in the scope of other views.
  * Therefore the LoginPresenter must be in <b>UIScope</b> so that the LoginPresenter
  * is available to all Views.
  * <p>
