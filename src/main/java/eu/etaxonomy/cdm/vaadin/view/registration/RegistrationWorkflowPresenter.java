@@ -20,9 +20,9 @@ import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationService;
 import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -66,7 +66,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
         if(event.isStart()) {
             workingset = new RegistrationWorkingSet();
-            Registration reg = new Registration();
+            Registration reg = Registration.NewInstance();
             reg.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
             getView().setHeaderText("New " + event.getType().name().toString()+ " Registration");
             try {
