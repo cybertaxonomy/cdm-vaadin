@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
@@ -89,7 +90,7 @@ public class RegistrationDTO{
         }
 
         // trigger initialization of the reference
-        getCitationString();
+        getNomenclaturalCitationString();
 
     }
 
@@ -247,7 +248,7 @@ public class RegistrationDTO{
     /**
      * @return the citationString
      */
-    public String getCitationString() {
+    public String getNomenclaturalCitationString() {
         if(citation == null){
             return null;
         }
@@ -256,6 +257,23 @@ public class RegistrationDTO{
         } else {
             logger.error("The citation is not a NomenclaturalReference");
             return citation.generateTitle();
+        }
+    }
+
+    /**
+     * @return the citationString
+     */
+    public String getBibliographicCitationString() {
+        if(citation == null){
+            return null;
+        } else {
+            if(StringUtils.isNotEmpty(citationDetail)){
+                return citation.generateTitle().replaceAll("\\.$", "") + (StringUtils.isNotEmpty(citationDetail) ? ": " + citationDetail : "");
+            } else {
+                return citation.generateTitle();
+
+            }
+
         }
     }
 

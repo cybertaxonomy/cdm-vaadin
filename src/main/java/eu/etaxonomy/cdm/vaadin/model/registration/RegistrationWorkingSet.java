@@ -76,7 +76,7 @@ public class RegistrationWorkingSet {
         for(RegistrationDTO regDto : candidates){
                 if(citationId == null){
                     citationId = regDto.getCitationID();
-                    citation = regDto.getCitationString();
+                    citation = regDto.getCitation().getTitleCache();
                 } else {
                     if(regDto.getCitationID() != citationId){
                         problems.add("Removing Registration " + regDto.registration().toString() + " from set since this refers to a different citation.");

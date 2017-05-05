@@ -123,8 +123,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.setWidth(100, Unit.PERCENTAGE);
 
         Panel namesTypesPanel = createNamesAndTypesList(workingset);
-        namesTypesPanel.setStyleName("names-types-list");
-        namesTypesPanel.setCaption("Names & Types");
+        namesTypesPanel.setStyleName("registration-list");
+        namesTypesPanel.setCaption("Registrations");
 
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
