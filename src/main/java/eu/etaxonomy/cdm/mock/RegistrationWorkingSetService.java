@@ -80,6 +80,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
     private ExtensionType extensionTypeIAPTRegData;
 
+    public static boolean commandsExecuted = false;
+
     public RegistrationWorkingSetService() {
 
     }
@@ -90,6 +92,13 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
 
     private void executeSuppliedCommands() {
+
+        if(commandsExecuted){
+            // do not run twice
+            // a second run could take place during initialization of the web context
+            return;
+        }
+        commandsExecuted  = true;
 
         String wipeoutCmd = System.getProperty(PARAM_NAME_WIPEOUT);
         String createCmd = System.getProperty(PARAM_NAME_CREATE);
