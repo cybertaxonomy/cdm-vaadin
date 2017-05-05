@@ -11,10 +11,8 @@ package eu.etaxonomy.cdm.mock;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,10 +35,8 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
-import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Extension;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
-import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
@@ -76,23 +72,11 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
     protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
 
-    private static final int SIZE = 50; // FIXME test performance with 50 !!!!!
-
     private static final Logger logger = Logger.getLogger(RegistrationWorkingSetService.class);
 
     @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
-
-    private Map<UUID, Registration> registrationsByUUID = new HashMap<>();
-    private Map<Integer, Registration> registrationsByRegID = new HashMap<>();
-    private Map<Integer, RegistrationDTO> registrationDTOsById = new HashMap<>();
-    private Map<String, RegistrationDTO> registrationDTOsByIdentifier = new HashMap<>();
-    private Map<Integer, List<RegistrationDTO>> registrationDTOsByCitationId = new HashMap<>();
-
-    private Collection<CdmBase> cdmEntities = new HashSet<>();
-
-    int autoincrementId = 100000;
 
     private ExtensionType extensionTypeIAPTRegData;
 
@@ -235,132 +219,25 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
     int minTypeDesignationCount = 1;
 
-    protected void init(){
-        if(isCleanSweep()){
-            autoincrementId = 100000;
-            registrationsByUUID = new HashMap<>();
-            registrationsByRegID = new HashMap<>();
-            registrationDTOsById = new HashMap<>();
-            registrationDTOsByIdentifier = new HashMap<>();
-            registrationDTOsByCitationId = new HashMap<>();
-        }
-        if(registrationsByUUID.size() == 0){
-            TransactionStatus tx = repo.startTransaction(true);
-            int pageIndex = 0;
-            while(registrationsByUUID.size() < SIZE){
-                List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, pageIndex++, null, null);
-                if(names.isEmpty()){
-                    break;
-                }
-                for(TaxonNameBase name : names){
-                    if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY()) && name.getNomenclaturalReference() != null){
-                        if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
-
-                            // name
-                            logger.debug("creating Registration for " + name.getTitleCache());
-                            Registration reg = newMockRegistration();
-                            reg.setName(name);
-                            cdmEntities.add(name);
-
-                            // typedesignation
-                            reg.setTypeDesignations(name.getTypeDesignations());
-                            cdmEntities.addAll(name.getTypeDesignations());
-
-                            put(new RegistrationDTO(reg));
-                            logger.debug("\t\t\tdone");
-                        }
-                    }
-                }
-            }
-            repo.commitTransaction(tx);
-        }
-    }
-
-    /**
-     * @return
-     */
-    private Registration newMockRegistration() {
-        Registration reg = Registration.NewInstance();
-        reg.setId(autoincrementId);
-        reg.setSpecificIdentifier(String.valueOf(autoincrementId));
-        reg.setIdentifier("http://phycobank/" + reg.getSpecificIdentifier());
-        autoincrementId++;
-        reg.setStatus(RegistrationStatus.values()[(int) (Math.random() * RegistrationStatus.values().length)]);
-        reg.setRegistrationDate(DateTime.now());
-        return reg;
-    }
-
-    /**
-     * @return
-     */
-    private boolean isCleanSweep() {
-
-        return false;
-    }
-
-    /**
-     * @param reg
-     */
-    private void put(RegistrationDTO dto) {
-        logger.debug("putting DTO " + dto.getSummary());
-        Registration reg = dto.registration();
-        registrationsByUUID.put(dto.getUuid(), reg);
-        registrationsByRegID.put(reg.getId(), reg);
-
-        registrationDTOsById.put(reg.getId(), dto);
-        registrationDTOsByIdentifier.put(reg.getIdentifier(), dto);
-
-        if(! registrationDTOsByCitationId.containsKey(dto.getCitationID())){
-            registrationDTOsByCitationId.put(dto.getCitationID(), new ArrayList<RegistrationDTO>());
-        }
-        registrationDTOsByCitationId.get(dto.getCitationID()).add(dto);
-    }
-
-    private void mergeBack(){
-        cdmEntities.forEach(e -> repo.getNameService().getSession().merge(e));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Registration load(UUID uuid) {
-        init();
-        return registrationsByUUID.get(uuid);
-    }
-
-
-    public Collection<Registration> list(){
-        init();
-        return registrationsByUUID.values();
-    }
 
     @Override
     public Collection<RegistrationDTO> listDTOs() {
-        init();
-        return registrationDTOsById.values();
+
+        List<Registration> regs = repo.getRegistrationService().list(null, 50, 0, null, null);
+
+        List<RegistrationDTO> dtos = makeDTOs(regs);
+        return dtos;
     }
 
-    public Map<Integer, List<RegistrationDTO>> listDTOsByWorkingSet() {
-        init();
-        return registrationDTOsByCitationId;
-    }
-
-    /**
-     * @param  id the CDM Entity id
-     * @return
-     */
-    public Registration loadByRegistrationID(Integer id) {
-        init();
-        return registrationsByRegID.get(id);
-    }
 
     /**
-     * @param identifier the Registration Identifier String
+     * @param regs
      * @return
      */
-    public RegistrationDTO loadDtoByIdentifier(String identifier) {
-        init();
-        return registrationDTOsById.get(identifier);
+    private List<RegistrationDTO> makeDTOs(List<Registration> regs) {
+        List<RegistrationDTO> dtos = new ArrayList<>(regs.size());
+        regs.forEach(reg -> {dtos.add(new RegistrationDTO(reg));});
+        return dtos;
     }
 
     /**
@@ -369,8 +246,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
     @Override
     public RegistrationDTO loadDtoById(Integer id) {
-        init();
-        return registrationDTOsById.get(id);
+        Registration reg = repo.getRegistrationService().find(id);
+        return new RegistrationDTO(reg);
     }
 
     /**
@@ -380,10 +257,23 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
     @Override
     public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
-        init();
-        RegistrationDTO dto = registrationDTOsById.get(id);
 
-        return new RegistrationWorkingSet(registrationDTOsByCitationId.get(dto.getCitationID()));
+        RegistrationDTO dto = loadDtoById(id);
+
+        Pager<Registration> pager = null;
+
+        List<Registration> workingSetRegs;
+
+        if (pager == null){
+            //FIXME remove below mock function once the service if fully working
+            workingSetRegs = new ArrayList<>();
+            workingSetRegs.add(dto.registration());
+        } else {
+            pager = repo.getRegistrationService().page(null, null, dto.getCitation(), null, null, null);
+            workingSetRegs = pager.getRecords();
+        }
+
+        return new RegistrationWorkingSet(makeDTOs(workingSetRegs));
     }
 
     /**
