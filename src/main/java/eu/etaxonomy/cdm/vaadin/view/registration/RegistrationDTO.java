@@ -268,6 +268,7 @@ public class RegistrationDTO{
             return null;
         } else {
             if(StringUtils.isNotEmpty(citationDetail)){
+                // TODO see https://dev.e-taxonomy.eu/redmine/issues/6623
                 return citation.generateTitle().replaceAll("\\.$", "") + (StringUtils.isNotEmpty(citationDetail) ? ": " + citationDetail : "");
             } else {
                 return citation.generateTitle();
