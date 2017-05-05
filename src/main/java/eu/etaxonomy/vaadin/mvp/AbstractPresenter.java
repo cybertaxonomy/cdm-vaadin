@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -75,17 +76,31 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	    logger.trace("Presenter ready");
 	}
 
+	public final void onViewEnter() {
+	    logger.trace("View entered");
+	    TransactionStatus tx = getRepo().startTransaction();
+	    handleViewEntered();
+	    getRepo().commitTransaction(tx);
+	}
+
+	public final void onViewExit() {
+	    handleViewExit();
+	}
+
 	/**
 	 * Extending classes should overwrite this method to react to the event when
 	 * user has navigated into the view that this presenter governs.
 	 */
-	public void onViewEnter() {
-	    logger.trace("View entered");
+	public void handleViewEntered() {
 	}
 
-	public void onViewExit() {
-
-	}
+    /**
+     * Extending classes may overwrite this method to react to
+     * the event when user leaves the view that this presenter
+     * governs.
+     */
+    public void handleViewExit() {
+    }
 
     /**
      * @return the navigationManager

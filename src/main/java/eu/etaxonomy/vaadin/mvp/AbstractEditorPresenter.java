@@ -19,10 +19,20 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
  */
 public abstract class AbstractEditorPresenter<DTO extends Object> extends AbstractPresenter {
 
-    @SuppressWarnings("unchecked")
+
+    private static final long serialVersionUID = -6677074110764145236L;
+
+    @EventListener
+    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+
+    }
+
+    /**
+     *
+     * @param saveEvent
+     */
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-        // casting to BeanFieldGroup<DTO> must be possible here!
         DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
         saveBean(bean);
     }

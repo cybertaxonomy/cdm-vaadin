@@ -8,15 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
  * @author a.kohlbecker
@@ -25,23 +21,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
  */
 @SpringComponent
 @ViewScope
-public class ReferenceEditorPresenter extends AbstractEditorPresenter<Reference> {
+public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Reference> {
 
 
     private static final long serialVersionUID = -7926116447719010837L;
-
-    @Autowired
-    private SessionFactory factory;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveBean(Reference bean) {
-        TransactionStatus tx = getRepo().startTransaction();
-        Reference persistedBean = getRepo().getReferenceService().merge(bean);
-        getRepo().getReferenceService().saveOrUpdate(persistedBean);
-        getRepo().commitTransaction(tx);
-    }
 
 }

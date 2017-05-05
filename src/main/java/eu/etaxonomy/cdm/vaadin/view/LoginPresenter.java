@@ -92,8 +92,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
      * {@inheritDoc}
      */
     @Override
-    public void onViewEnter() {
-        super.onViewEnter();
+    public void handleViewEntered() {
         // attempt to auto login
         if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
             log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));

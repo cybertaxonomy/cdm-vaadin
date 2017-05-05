@@ -12,20 +12,20 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 
 /**
  * Usually a notification to a presenter to
- * perform a save operation and to commit the transaction
+ * prepare for a save operation by starting a transaction
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
  */
-public class EditorSaveEvent {
+public class EditorPreSaveEvent {
 
     private CommitEvent commitEvent;
 
     /**
      * @param commitEvent
      */
-    public EditorSaveEvent(CommitEvent commitEvent) {
+    public EditorPreSaveEvent(CommitEvent commitEvent) {
         this.commitEvent = commitEvent;
     }
 

@@ -141,12 +141,15 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
+            logger.debug("preCommit");
+            // notify the presenter to start a transaction
+            eventBus.publishEvent(new EditorPreSaveEvent(commitEvent));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
-                // notify the presenter to persist the bean
+                // notify the presenter to persist the bean and to commit the transaction
                 eventBus.publishEvent(new EditorSaveEvent(commitEvent));
 
                 // notify the NavigationManagerBean to close the window and to dispose the view
@@ -171,7 +174,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         try {
             fieldGroup.commit();
         } catch (CommitException e) {
-            fieldGroup.getFields().forEach(f -> ((AbstractField)f).setValidationVisible(true));
+            fieldGroup.getFields().forEach(f -> ((AbstractField<?>)f).setValidationVisible(true));
             if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
                 FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
                 updateFieldNotifications(invalidValueException.getInvalidFields());

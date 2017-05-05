@@ -13,6 +13,7 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -37,9 +38,10 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     private IRegistrationWorkingSetService workingSetService;
 
     @Override
-    public void onViewEnter() {
-        super.onViewEnter();
+    public void handleViewEntered() {
+        TransactionStatus tx = getRepo().startTransaction();
         getView().populate(listRegistrations());
+        getRepo().commitTransaction(tx);
     }
 
     /**

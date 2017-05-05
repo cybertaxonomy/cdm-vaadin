@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
  * @author a.kohlbecker
@@ -34,7 +34,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 @SpringComponent
 @Scope("prototype")
-public class ReferencePopupEditor extends AbstractPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
+public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 
