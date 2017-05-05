@@ -35,13 +35,16 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
+ * Mock service which creates Registration on the fly.
+ * Registrations are never persisted they are only kept in memory.
+ *
  * @author a.kohlbecker
  * @since Mar 10, 2017
  *
  */
 @Service("registrationServiceMock")
 @Transactional(readOnly=true)
-public class RegistrationService {
+public class RegistrationService implements IRegistrationWorkingSetService {
 
     private static final int SIZE = 50; // FIXME test performance with 50 !!!!!
 
@@ -166,6 +169,7 @@ public class RegistrationService {
         return registrationsByUUID.values();
     }
 
+    @Override
     public Collection<RegistrationDTO> listDTOs() {
         init();
         return registrationDTOsById.values();
@@ -198,6 +202,7 @@ public class RegistrationService {
      * @param id the CDM Entity id
      * @return
      */
+    @Override
     public RegistrationDTO loadDtoById(Integer id) {
         init();
         return registrationDTOsById.get(id);
@@ -208,6 +213,7 @@ public class RegistrationService {
      * @return
      * @throws RegistrationValidationException
      */
+    @Override
     public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
         init();
         RegistrationDTO dto = registrationDTOsById.get(id);

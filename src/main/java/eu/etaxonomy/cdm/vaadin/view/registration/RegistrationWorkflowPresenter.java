@@ -14,13 +14,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 
 import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.mock.RegistrationService;
+import eu.etaxonomy.cdm.mock.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
@@ -45,7 +46,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     private static final long serialVersionUID = 1L;
 
     @Autowired
-    private RegistrationService serviceMock;
+    @Qualifier(IRegistrationWorkingSetService.ACTIVE_IMPL)
+    private IRegistrationWorkingSetService workingSetService;
 
     private RegistrationWorkingSet workingset;
 
@@ -76,7 +78,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             }
         } else {
             try {
-                workingset = serviceMock.loadWorkingSetByRegistrationID(event.getRegistrationID());
+                workingset = workingSetService.loadWorkingSetByRegistrationID(event.getRegistrationID());
             } catch (RegistrationValidationException error) {
                 getView().getWorkflow().setComponentError(new SystemError(error));
             }
@@ -116,7 +118,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
     public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
-        RegistrationDTO regDto = serviceMock.loadDtoById((Integer)event.getIdentifier());
+        RegistrationDTO regDto = workingSetService.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
             if(getView() != null){
                 getView().openDetailsPopup("Messages", regDto.getMessages());
