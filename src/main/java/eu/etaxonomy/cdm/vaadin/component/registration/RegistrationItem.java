@@ -160,7 +160,7 @@ public class RegistrationItem extends GridLayout {
                 Integer.toString(regDto.getId())
                 );
 
-        updateUI(regDto.getNomenclaturalCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
                 openButtonEvent, null, regDto);
     }
 
