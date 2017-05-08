@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.mock;
 
 import java.util.Collection;
 
+import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
@@ -29,6 +31,8 @@ public interface IRegistrationWorkingSetService {
 
 
     public Collection<RegistrationDTO> listDTOs();
+
+    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus);
 
     /**
      * @param  id the CDM Entity id

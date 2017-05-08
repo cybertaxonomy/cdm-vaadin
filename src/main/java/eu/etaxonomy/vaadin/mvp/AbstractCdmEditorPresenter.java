@@ -34,7 +34,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
         tx = getRepo().startTransaction(true);
         // merge the bean and update the fieldGroup with the merged bean, so that updating
-        // of field values in turn of the commit are can not cause LazyInitializytionExeptions
+        // of field values in turn of the commit are can not cause LazyInitializationExeptions
         // the bean still has the original values at this point
         mergedBean(preSaveEvent.getCommitEvent());
 

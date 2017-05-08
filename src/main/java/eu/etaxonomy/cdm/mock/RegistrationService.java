@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -219,6 +220,15 @@ public class RegistrationService implements IRegistrationWorkingSetService {
         RegistrationDTO dto = registrationDTOsById.get(id);
 
         return new RegistrationWorkingSet(registrationDTOsByCitationId.get(dto.getCitationID()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,10 +38,12 @@ import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.Extension;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -86,6 +89,72 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
     }
 
+
+    /**
+     * @param id the CDM Entity id
+     * @return
+     */
+    @Override
+    public RegistrationDTO loadDtoById(Integer id) {
+        Registration reg = repo.getRegistrationService().find(id);
+        return new RegistrationDTO(reg);
+    }
+
+
+    @Override
+    public Collection<RegistrationDTO> listDTOs() {
+
+        List<Registration> regs = repo.getRegistrationService().list(null, 50, 0, null, null);
+
+        List<RegistrationDTO> dtos = makeDTOs(regs);
+        return dtos;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus) {
+
+        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, null, null, null, null);
+        return makeDTOs(pager.getRecords());
+    }
+
+    /**
+     * @param  id the CDM Entity id
+     * @return
+     * @throws RegistrationValidationException
+     */
+    @Override
+    public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
+
+        RegistrationDTO dto = loadDtoById(id);
+
+        Pager<Registration> pager = repo.getRegistrationService().page(Optional.of((Reference)dto.getCitation()), null, null, null, null);
+
+        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
+    }
+
+
+    /**
+     * @param regs
+     * @return
+     */
+    private List<RegistrationDTO> makeDTOs(List<Registration> regs) {
+        List<RegistrationDTO> dtos = new ArrayList<>(regs.size());
+        regs.forEach(reg -> {dtos.add(new RegistrationDTO(reg));});
+        return dtos;
+    }
+
+    // ==================== Registration creation ======================= //
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        executeSuppliedCommands();
+    }
 
     /**
      *
@@ -203,6 +272,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         }
     }
 
+
     /**
      * @param office
      * @return
@@ -226,72 +296,6 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     }
 
 
-    int minTypeDesignationCount = 1;
-
-
-    @Override
-    public Collection<RegistrationDTO> listDTOs() {
-
-        List<Registration> regs = repo.getRegistrationService().list(null, 50, 0, null, null);
-
-        List<RegistrationDTO> dtos = makeDTOs(regs);
-        return dtos;
-    }
-
-
-    /**
-     * @param regs
-     * @return
-     */
-    private List<RegistrationDTO> makeDTOs(List<Registration> regs) {
-        List<RegistrationDTO> dtos = new ArrayList<>(regs.size());
-        regs.forEach(reg -> {dtos.add(new RegistrationDTO(reg));});
-        return dtos;
-    }
-
-    /**
-     * @param id the CDM Entity id
-     * @return
-     */
-    @Override
-    public RegistrationDTO loadDtoById(Integer id) {
-        Registration reg = repo.getRegistrationService().find(id);
-        return new RegistrationDTO(reg);
-    }
-
-    /**
-     * @param  id the CDM Entity id
-     * @return
-     * @throws RegistrationValidationException
-     */
-    @Override
-    public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
-
-        RegistrationDTO dto = loadDtoById(id);
-
-        Pager<Registration> pager = null;
-
-        List<Registration> workingSetRegs;
-
-        if (pager == null){
-            //FIXME remove below mock function once the service if fully working
-            workingSetRegs = new ArrayList<>();
-            workingSetRegs.add(dto.registration());
-        } else {
-            pager = repo.getRegistrationService().page(null, null, dto.getCitation(), null, null, null);
-            workingSetRegs = pager.getRecords();
-        }
-
-        return new RegistrationWorkingSet(makeDTOs(workingSetRegs));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        executeSuppliedCommands();
-    }
 
 
 }
