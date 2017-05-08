@@ -98,9 +98,9 @@ public class RegistrationUI extends UI {
         phycoBankLogo.addStyleName(ValoTheme.LABEL_HUGE);
         mainMenu.addMenuComponent(phycoBankLogo);
 
-        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME);
-        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME);
-        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME);
+        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME );
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
 
         eventBus.publishEvent(new UIInitializedEvent());
 

@@ -226,7 +226,7 @@ public class RegistrationService implements IRegistrationWorkingSetService {
      * {@inheritDoc}
      */
     @Override
-    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus) {
+    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus) {
         // TODO Auto-generated method stub
         return null;
     }

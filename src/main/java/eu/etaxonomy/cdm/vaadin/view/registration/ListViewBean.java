@@ -55,6 +55,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     public static final String NAME = "list";
 
+    public static final String OPTION_ALL = "all";
+
+    public static final String OPTION_IN_PROGRESS = "inprogress";
+
     private CssLayout listContainer;
 
     private Grid grid;
@@ -155,7 +159,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Override
     public void populate(Collection<RegistrationDTO> registrations) {
 
-        registrations = new ArrayList<RegistrationDTO>(registrations).subList(0, 10);
+        registrations = new ArrayList<RegistrationDTO>(registrations);
 
         populateGrid(registrations);
         populateList(registrations);

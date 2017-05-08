@@ -32,7 +32,7 @@ public interface IRegistrationWorkingSetService {
 
     public Collection<RegistrationDTO> listDTOs();
 
-    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus);
+    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus);
 
     /**
      * @param  id the CDM Entity id

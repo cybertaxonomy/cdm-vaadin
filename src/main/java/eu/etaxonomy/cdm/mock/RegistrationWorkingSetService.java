@@ -71,6 +71,11 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
 @Transactional(readOnly=true)
 public class RegistrationWorkingSetService implements IRegistrationWorkingSetService, ApplicationListener<ContextRefreshedEvent> {
 
+    /**
+     *
+     */
+    private static final int PAGE_SIZE = 50;
+
     protected static final String PARAM_NAME_CREATE = "registrationCreate";
 
     protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
@@ -104,7 +109,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     @Override
     public Collection<RegistrationDTO> listDTOs() {
 
-        List<Registration> regs = repo.getRegistrationService().list(null, 50, 0, null, null);
+        List<Registration> regs = repo.getRegistrationService().list(null, PAGE_SIZE, 0, null, null);
 
         List<RegistrationDTO> dtos = makeDTOs(regs);
         return dtos;
@@ -114,9 +119,9 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      * {@inheritDoc}
      */
     @Override
-    public Collection<RegistrationDTO> listDTOsFor(User submitter, Collection<RegistrationStatus> includedStatus) {
+    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus) {
 
-        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, null, null, null, null);
+        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, PAGE_SIZE, 0, null, null);
         return makeDTOs(pager.getRecords());
     }
 

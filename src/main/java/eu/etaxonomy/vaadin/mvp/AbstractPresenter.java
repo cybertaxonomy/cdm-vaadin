@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
@@ -55,6 +57,15 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	public CdmRepository getRepo() {
 	    return repo;
 	}
+
+	/**
+     * @return
+     *
+     * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
+     */
+    protected SecurityContext currentSecurityContext() {
+        return SecurityContextHolder.getContext();
+    }
 
 	/**
 	 * Notifies the presenter that its view is initialized so that presenter can
