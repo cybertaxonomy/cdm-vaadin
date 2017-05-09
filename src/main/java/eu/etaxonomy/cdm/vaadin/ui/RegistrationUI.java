@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -29,6 +30,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.vaadin.view.LoginViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
@@ -55,6 +57,16 @@ public class RegistrationUI extends UI {
 
     @Autowired
     private ViewDisplay viewDisplay;
+
+    /**
+     * The RegistrationDefaultDataInserter is not used in the ui directly
+     * but will as a ApplicationListener for ContextRefreshedEvents insert
+     * data required for the registration application into the database.
+     */
+    @SuppressWarnings("unused")
+    @Autowired
+    @Lazy
+    private RegistrationRequiredDataInserter dataInserter;
 
     //---- pull into abstract super class ? ---------
     @Autowired
@@ -111,8 +123,8 @@ public class RegistrationUI extends UI {
         //TODO create annotation:
         // @Styles(files={""}, branding="brand")
         //
-        // the branding can either be specified or can be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
-        //  See CdmUtils for appropriate methods to access this folder
+        // the branding can either be specified or can be read from the properties file in .cdmLibrary/remote-webapp/{instance-name}-app.properties
+        // See CdmUtils for appropriate methods to access this folder
         // the 'vaadin://' protocol refers to the VAADIN folder
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);

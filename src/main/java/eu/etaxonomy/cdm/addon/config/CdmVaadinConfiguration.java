@@ -47,8 +47,10 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
  */
 @Configuration
 @ComponentScan(basePackages={
-        "eu.etaxonomy.cdm.vaadin",
         "eu.etaxonomy.vaadin.ui",
+        "eu.etaxonomy.cdm.vaadin",
+        "eu.etaxonomy.cdm.dataInserter",
+        "eu.etaxonomy.cdm.service",
         "eu.etaxonomy.cdm.mock" // FIXME remove once mocks are no longer needed
         },
         // exclude UI classes, these are provided via the @Bean annotated methods below

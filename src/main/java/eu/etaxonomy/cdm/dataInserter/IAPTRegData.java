@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.mock;
+package eu.etaxonomy.cdm.dataInserter;
 
 /**
  * Created by andreas on 9/16/16.
