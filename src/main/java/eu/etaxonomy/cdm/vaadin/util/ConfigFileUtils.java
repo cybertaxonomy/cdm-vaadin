@@ -23,15 +23,13 @@ import eu.etaxonomy.cdm.common.CdmUtils;
  */
 public class ConfigFileUtils extends CdmUtils {
 
-    private static final String CDM_VAADIN_CONFIG_FOLDER = "cdm-vaadin";
-
     //TODO better store in VaadinSession?
     static Properties uiprops = null;
 
     public static File getPropertiesFile(String instanceName, String propertiesSet) {
 
-        File vaadinConfigFolder = getCdmSubDir(CDM_VAADIN_CONFIG_FOLDER);
-        return new File(vaadinConfigFolder, instanceName + (propertiesSet == null? "" : "-" + propertiesSet) + ".properties");
+        File configFolder = getCdmHomeSubDir(CdmUtils.SUBFOLDER_WEBAPP);
+        return new File(configFolder, instanceName + (propertiesSet == null? "" : "-" + propertiesSet) + ".properties");
 
     }
 
