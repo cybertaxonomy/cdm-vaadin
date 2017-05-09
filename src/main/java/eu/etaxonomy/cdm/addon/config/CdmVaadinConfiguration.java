@@ -29,6 +29,7 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
 import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
@@ -36,7 +37,6 @@ import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.InactiveUIException;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
-import eu.etaxonomy.cdm.vaadin.util.ConfigFileUtils;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
@@ -158,6 +158,28 @@ public class CdmVaadinConfiguration {
     }
 
 
+
+    static final String PROPERTIES_NAME = "vaadin-apps";
+
+    private Properties appProps = null;
+
+    //@formatter:off
+    private static final String APP_FILE_CONTENT=
+            "########################################################\n"+
+            "#                                                       \n"+
+            "# Vaadin application specific configurations            \n"+
+            "#                                                       \n"+
+            "########################################################\n"+
+            "                                                        \n"+
+            "# Enablement of vaadin uis.                             \n"+
+            "#                                                       \n"+
+            "# Multiple uis can be defined as comma separated list.  \n"+
+            "# Whitespace before and after the comma will be ignored.\n"+
+            "# Valid values are the path properties of the @SpringUI \n"+
+            "# annotation which is used for UI classes.              \n"+
+            "cdm-vaadin.ui.activated=concept,distribution,editstatus \n";
+    //@formatter:on
+
     /**
      * Checks if the ui class supplied is activated by listing it in the properties by its {@link SpringUI#path()} value.
      *
@@ -166,13 +188,20 @@ public class CdmVaadinConfiguration {
      * @throws InactiveUIException
      */
     private boolean isUIEnabled(Class<? extends UI>uiClass) throws InactiveUIException {
-        String path = uiClass.getAnnotation(SpringUI.class).path();
+        String path = uiClass.getAnnotation(SpringUI.class).path().trim();
 
         try {
-            Properties appProps = ConfigFileUtils.getApplicationProperties(dataSourceConfigurer.dataSourceProperties().getCurrentDataSourceId());
+            if(appProps == null){
+                String currentDataSourceId = dataSourceConfigurer.dataSourceProperties().getCurrentDataSourceId();
+                appProps = new ConfigFileUtil()
+                        .setDefaultContent(APP_FILE_CONTENT)
+                        .getProperties(currentDataSourceId, PROPERTIES_NAME);
+            }
             if(appProps.get(CDM_VAADIN_UI_ACTIVATED) != null){
                 String[] uiPaths = appProps.get(CDM_VAADIN_UI_ACTIVATED).toString().split("\\s*,\\s*");
-                return Arrays.asList(uiPaths).stream().anyMatch(p -> p.equals(path));
+                if(Arrays.asList(uiPaths).stream().anyMatch(p -> p.trim().equals(path))){
+                    return true;
+                }
             }
             throw new InactiveUIException(path);
         } catch (IOException e) {
