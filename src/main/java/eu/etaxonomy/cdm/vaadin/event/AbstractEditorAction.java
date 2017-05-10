@@ -33,10 +33,6 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractE
         super(type, entityId);
     }
 
-    public Type getActionType() {
-        return type;
-    }
-
     public boolean isAddAction() {
         return type.equals(Type.ADD);
     }

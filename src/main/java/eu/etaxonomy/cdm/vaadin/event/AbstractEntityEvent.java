@@ -34,4 +34,8 @@ public abstract class AbstractEntityEvent<T extends Enum> {
         return entityId;
     }
 
+    public T getType() {
+        return type;
+    }
+
 }

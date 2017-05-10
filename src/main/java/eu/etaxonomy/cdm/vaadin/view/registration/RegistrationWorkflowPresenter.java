@@ -113,14 +113,14 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         getView().setWorkingset(workingset);
     }
 
-    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EntityEventType).ADD")
+    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).ADD")
     public void onReferenceAddEvent(ReferenceEditorAction event) {
         Reference reference = ReferenceFactory.newGeneric();
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
     }
 
-    @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EntityEventType).EDIT")
+    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
     public void onReferenceEditEvent(ReferenceEditorAction event) {
         Reference reference = getRepo().getReferenceService().find(event.getEntityId());
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
@@ -128,7 +128,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
+    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
     public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
         List<String> messages = new ArrayList<>();
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
@@ -139,7 +139,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         }
     }
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.entityType == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
+    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
     public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
         RegistrationDTO regDto = workingSetService.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
