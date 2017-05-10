@@ -26,7 +26,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
-import eu.etaxonomy.cdm.vaadin.event.EditorActionType;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
@@ -168,9 +168,9 @@ public class RegistrationItem extends GridLayout {
         this.parentView = parentView;
         ReferenceEditorAction openButtonEvent;
         if(workingSet.getCitationId() != null){
-            openButtonEvent = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId());
+            openButtonEvent = new ReferenceEditorAction(Type.EDIT, workingSet.getCitationId());
         } else {
-            openButtonEvent = new ReferenceEditorAction(EditorActionType.ADD);
+            openButtonEvent = new ReferenceEditorAction(Type.ADD);
         }
         TimePeriod datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),

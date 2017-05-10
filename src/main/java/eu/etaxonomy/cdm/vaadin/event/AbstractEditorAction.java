@@ -13,51 +13,39 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @since Mar 22, 2017
  *
  */
-public abstract class AbstractEditorAction {
+public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractEditorAction.Type> {
 
-
-    private EditorActionType actionType;
-
-    private Integer entityId = null;
-
-    public AbstractEditorAction(EditorActionType eventType, Integer entityId) {
-        this.actionType = eventType;
-        if(eventType == null){
-            throw new NullPointerException();
-        }
-        this.setEntityId(entityId);
+    public enum Type {
+        ADD,
+        EDIT,
+        REMOVE;
     }
 
-    public AbstractEditorAction(EditorActionType actionType) {
-        this(actionType, null);
+    public AbstractEditorAction(Type type) {
+        super(type, null);
     }
 
-    public EditorActionType getActionType() {
-        return actionType;
+    /**
+     * @param type
+     * @param citationId
+     */
+    public AbstractEditorAction(Type type, Integer entityId) {
+        super(type, entityId);
+    }
+
+    public Type getActionType() {
+        return type;
     }
 
     public boolean isAddAction() {
-        return actionType.equals(EditorActionType.ADD);
+        return type.equals(Type.ADD);
     }
     public boolean isEditAction() {
-        return actionType.equals(EditorActionType.EDIT);
+        return type.equals(Type.EDIT);
     }
     public boolean isRemoveAction() {
-        return actionType.equals(EditorActionType.REMOVE);
+        return type.equals(Type.REMOVE);
     }
 
-    /**
-     * @return the entityId
-     */
-    public Integer getEntityId() {
-        return entityId;
-    }
-
-    /**
-     * @param entityId the entityId to set
-     */
-    private void setEntityId(Integer entityId) {
-        this.entityId = entityId;
-    }
 
 }

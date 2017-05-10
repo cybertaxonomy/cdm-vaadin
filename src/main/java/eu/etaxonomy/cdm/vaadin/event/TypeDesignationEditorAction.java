@@ -16,8 +16,18 @@ package eu.etaxonomy.cdm.vaadin.event;
 public class TypeDesignationEditorAction extends AbstractEditorAction {
 
 
-    public TypeDesignationEditorAction(EditorActionType eventType) {
+    public TypeDesignationEditorAction(Type eventType) {
         super(eventType);
     }
+
+    /**
+     * @param type
+     * @param entityId
+     */
+    public TypeDesignationEditorAction(Type type, Integer entityId) {
+        super(type, entityId);
+    }
+
+
 
 }

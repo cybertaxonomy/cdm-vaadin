@@ -18,19 +18,16 @@ public class ReferenceEditorAction extends AbstractEditorAction {
     /**
      * @param eventType
      */
-    public ReferenceEditorAction(EditorActionType eventType) {
-        super(eventType);
+    public ReferenceEditorAction(Type type) {
+        super(type);
     }
 
     /**
-     * @param eventType
-     * @param entityId
+     * @param edit
+     * @param citationId
      */
-    public ReferenceEditorAction(EditorActionType eventType, Integer entityId) {
-        super(eventType, entityId);
+    public ReferenceEditorAction(Type type, Integer citationId) {
+        super(type, citationId);
     }
-
-
-
 
 }

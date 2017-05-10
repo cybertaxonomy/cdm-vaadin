@@ -10,21 +10,22 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 /**
  * @author a.kohlbecker
- * @since Mar 22, 2017
+ * @since May 10, 2017
  *
  */
-public class TaxonNameEditorAction extends AbstractEditorAction {
+public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Type> {
 
-
-    public TaxonNameEditorAction(Type eventType) {
-        super(eventType);
+    public enum Type {
+        CREATED,
+        MODIFIED,
+        REMOVED;
     }
 
     /**
      * @param type
      * @param entityId
      */
-    public TaxonNameEditorAction(Type type, Integer entityId) {
+    public EntityChangeEvent(Type type, Integer entityId) {
         super(type, entityId);
     }
 

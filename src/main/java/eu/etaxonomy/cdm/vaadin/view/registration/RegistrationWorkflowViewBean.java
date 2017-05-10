@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
-import eu.etaxonomy.cdm.vaadin.event.EditorActionType;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -232,9 +232,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
    private void addBulletWorkflowName() {
        WorkflowSteps steps = new WorkflowSteps();
        steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-               e -> eventBus.publishEvent(new ReferenceEditorAction(EditorActionType.EDIT)));
+               e -> eventBus.publishEvent(new ReferenceEditorAction(Type.EDIT)));
        steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
-               e -> eventBus.publishEvent(new TaxonNameEditorAction(EditorActionType.EDIT)));
+               e -> eventBus.publishEvent(new TaxonNameEditorAction(Type.EDIT)));
        steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
        steps.appendNewWorkflowItem(4, "Awaiting publication", null);
        getWorkflow().addComponent(steps);
@@ -246,9 +246,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
   private void addBulletWorkflowTypification() {
       WorkflowSteps steps = new WorkflowSteps();
       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-              e -> eventBus.publishEvent(new ReferenceEditorAction(EditorActionType.EDIT)));
+              e -> eventBus.publishEvent(new ReferenceEditorAction(Type.EDIT)));
       steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
-              e -> eventBus.publishEvent(new TaxonNameEditorAction(EditorActionType.EDIT)));
+              e -> eventBus.publishEvent(new TaxonNameEditorAction(Type.EDIT)));
       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
       getWorkflow().addComponent(steps);
