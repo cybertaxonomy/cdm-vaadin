@@ -13,37 +13,37 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @since Mar 22, 2017
  *
  */
-public abstract class AbstractEntityEvent {
+public abstract class AbstractEditorAction {
 
 
-    private EntityEventType eventType;
+    private EditorActionType actionType;
 
     private Integer entityId = null;
 
-    public AbstractEntityEvent(EntityEventType eventType, Integer entityId) {
-        this.eventType = eventType;
+    public AbstractEditorAction(EditorActionType eventType, Integer entityId) {
+        this.actionType = eventType;
         if(eventType == null){
             throw new NullPointerException();
         }
         this.setEntityId(entityId);
     }
 
-    public AbstractEntityEvent(EntityEventType eventType) {
-        this(eventType, null);
+    public AbstractEditorAction(EditorActionType actionType) {
+        this(actionType, null);
     }
 
-    public EntityEventType getEventType() {
-        return eventType;
+    public EditorActionType getActionType() {
+        return actionType;
     }
 
-    public boolean isAddEvent() {
-        return eventType.equals(EntityEventType.ADD);
+    public boolean isAddAction() {
+        return actionType.equals(EditorActionType.ADD);
     }
-    public boolean isEditEvent() {
-        return eventType.equals(EntityEventType.EDIT);
+    public boolean isEditAction() {
+        return actionType.equals(EditorActionType.EDIT);
     }
-    public boolean isRemoveEvent() {
-        return eventType.equals(EntityEventType.REMOVE);
+    public boolean isRemoveAction() {
+        return actionType.equals(EditorActionType.REMOVE);
     }
 
     /**

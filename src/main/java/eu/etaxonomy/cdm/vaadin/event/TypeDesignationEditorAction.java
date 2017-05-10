@@ -13,10 +13,10 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @since Mar 22, 2017
  *
  */
-public class TypeDesignationEvent extends AbstractEntityEvent {
+public class TypeDesignationEditorAction extends AbstractEditorAction {
 
 
-    public TypeDesignationEvent(EntityEventType eventType) {
+    public TypeDesignationEditorAction(EditorActionType eventType) {
         super(eventType);
     }
 

@@ -13,7 +13,7 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @since Mar 22, 2017
  *
  */
-public enum EntityEventType {
+public enum EditorActionType {
 
     ADD,
     EDIT,
