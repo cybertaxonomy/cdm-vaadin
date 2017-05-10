@@ -17,6 +17,8 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.util.BeanItem;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 
 /**
  * @author a.kohlbecker
@@ -46,10 +48,17 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
         // the bean is now updated with the changes made by the user
         // merge the bean into the session, ...
         DTO bean = mergedBean(saveEvent.getCommitEvent());
+        Type changeEventType;
+        if(bean.getId() > 1){
+            changeEventType = Type.MODIFIED;
+        } else {
+            changeEventType = Type.CREATED;
+        }
         getRepo().getCommonService().saveOrUpdate(bean);
         getSession().flush();
         getRepo().commitTransaction(tx);
         tx = null;
+        eventBus.publishEvent(new EntityChangeEvent(bean.getClass(), bean.getId(), changeEventType));
     }
 
     /**

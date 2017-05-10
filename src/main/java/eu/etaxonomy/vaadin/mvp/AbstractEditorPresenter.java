@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -21,6 +23,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object> extends Abstra
 
 
     private static final long serialVersionUID = -6677074110764145236L;
+
+    @Autowired
+    protected ApplicationEventPublisher eventBus;
 
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){

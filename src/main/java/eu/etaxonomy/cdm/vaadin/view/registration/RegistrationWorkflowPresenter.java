@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
@@ -76,18 +77,40 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             } catch (RegistrationValidationException error) {
                 getView().getWorkflow().setComponentError(new SystemError(error));
             }
-        } else {
-            try {
-                workingset = workingSetService.loadWorkingSetByRegistrationID(event.getRegistrationID());
-            } catch (RegistrationValidationException error) {
-                getView().getWorkflow().setComponentError(new SystemError(error));
-            }
-            getView().setHeaderText("Registration for " + workingset.getCitation());
-        }
-        if(workingset != null){
             getView().setWorkingset(workingset);
-            //TODO add Blocking registrations to view
+        } else {
+            Integer registrationID = event.getRegistrationID();
+            presentWorkingSetByRegID(registrationID);
         }
+
+    }
+
+    /**
+     * @param registrationID
+     * @deprecated use other method working sets should only be addressed by the referenceID
+     */
+    @Deprecated
+    private void presentWorkingSetByRegID(Integer registrationID) {
+        try {
+            workingset = workingSetService.loadWorkingSetByRegistrationID(registrationID);
+        } catch (RegistrationValidationException error) {
+            getView().getWorkflow().setComponentError(new SystemError(error));
+        }
+        getView().setHeaderText("Registration for " + workingset.getCitation());
+        getView().setWorkingset(workingset);
+    }
+
+    /**
+     * @param registrationID
+     */
+    private void presentWorkingSet(Integer referenceID) {
+        try {
+            workingset = workingSetService.loadWorkingSetByReferenceID(referenceID);
+        } catch (RegistrationValidationException error) {
+            getView().getWorkflow().setComponentError(new SystemError(error));
+        }
+        getView().setHeaderText("Registration for " + workingset.getCitation());
+        getView().setWorkingset(workingset);
     }
 
     @EventListener(condition = "#event.eventType ==T(eu.etaxonomy.cdm.vaadin.event.EntityEventType).ADD")
@@ -124,6 +147,16 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
                 getView().openDetailsPopup("Messages", regDto.getMessages());
             }
         }
+    }
+
+    @EventListener
+    public void onEntityChangeEvent(EntityChangeEvent event){
+        if(event.getEntityType().isAssignableFrom(Reference.class)){
+            if(workingset.getCitationId().equals(event.getEntityId())){
+                presentWorkingSet(event.getEntityId());
+            }
+        }
+
     }
 
 }

@@ -21,13 +21,22 @@ public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Typ
         REMOVED;
     }
 
+    private Class<?> entityType;
+
     /**
      * @param type
      * @param entityId
      */
-    public EntityChangeEvent(Type type, Integer entityId) {
+    public EntityChangeEvent(Class<?> entityType, Integer entityId, Type type) {
         super(type, entityId);
+        this.entityType = entityType;
     }
 
+    /**
+     * @return the entityType
+     */
+    public Class<?> getEntityType() {
+        return entityType;
+    }
 
 }

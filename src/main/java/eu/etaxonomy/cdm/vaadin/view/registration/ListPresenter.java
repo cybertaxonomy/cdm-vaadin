@@ -21,8 +21,10 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -90,6 +92,14 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 getView().openDetailsPopup("Messages", regDto.getMessages());
             }
         }
+    }
+
+    @EventListener
+    public void onEntityChangeEvent(EntityChangeEvent event){
+        if(event.getEntityType().isAssignableFrom(Reference.class)){
+            // TODO update component showing the according reference, is there a Vaadin event supporting this?
+        }
+
     }
 
 }

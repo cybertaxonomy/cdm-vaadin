@@ -98,17 +98,28 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     }
 
     /**
+     * {@inheritDoc}
+     * @throws RegistrationValidationException
+     */
+    @Override
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
+        Reference reference = repo.getReferenceService().find(referenceID);
+        Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, null);
+        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
+    }
+
+    /**
      * @param  id the CDM Entity id
      * @return
      * @throws RegistrationValidationException
+     * @deprecated use other method working sets should only be addressed by the referenceID
      */
+    @Deprecated
     @Override
     public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
 
         RegistrationDTO dto = loadDtoById(id);
-
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of((Reference)dto.getCitation()), null, null, null, null);
-
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
@@ -122,6 +133,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         regs.forEach(reg -> {dtos.add(new RegistrationDTO(reg));});
         return dtos;
     }
+
+
 
 
 

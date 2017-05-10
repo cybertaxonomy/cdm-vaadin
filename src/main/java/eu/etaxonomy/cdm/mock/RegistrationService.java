@@ -232,5 +232,14 @@ public class RegistrationService implements IRegistrationWorkingSetService {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 
 }
