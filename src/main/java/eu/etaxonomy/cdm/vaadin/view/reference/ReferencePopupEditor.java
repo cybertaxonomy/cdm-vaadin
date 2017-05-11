@@ -22,7 +22,7 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
@@ -86,9 +86,9 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         typeSelect.setRows(1);
         addField(typeSelect, "type", 3, row);
         row++;
-        addTextField("Reference cache", "titleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        addTextField("Abbrev. cache", "abbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setRequired(true);

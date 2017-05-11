@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -215,6 +216,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected TextField addTextField(String caption, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
         return addField(new TextField(caption), propertyId, column, row);
+    }
+
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column1, row1, column2, row2);
+        return field;
+    }
+
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column, row);
+        return field;
     }
 
     protected PopupDateField addDateField(String caption, String propertyId) {

@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.component;
+package eu.etaxonomy.cdm.vaadin.component.common;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.strategy.parser.TimePeriodParser;
+import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;

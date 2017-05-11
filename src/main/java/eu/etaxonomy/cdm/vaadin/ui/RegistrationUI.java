@@ -77,8 +77,9 @@ public class RegistrationUI extends UI {
     }
     //---------------------------------------------
 
-    //private final String INITIAL_VIEW = "workflow/edit/100002";
+    // public static final String INITIAL_VIEW = "workflow/edit/10";
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
+    static boolean debugMode = false;
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -116,9 +117,6 @@ public class RegistrationUI extends UI {
 
         eventBus.publishEvent(new UIInitializedEvent());
 
-        //navigate to initial view
-        eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
-
         String brand = "phycobank";
         //TODO create annotation:
         // @Styles(files={""}, branding="brand")
@@ -128,5 +126,27 @@ public class RegistrationUI extends UI {
         // the 'vaadin://' protocol refers to the VAADIN folder
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);
+
+        //navigate to initial view
+        String state = pageFragmentAsState();
+
+        if(debugMode && state != null){
+            eventBus.publishEvent(new NavigationEvent(state));
+        } else {
+            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
+        }
+    }
+
+    /**
+     * @return
+     */
+    private String pageFragmentAsState() {
+        Page page = Page.getCurrent();
+        String fragment = page.getUriFragment();
+        String state = null;
+        if(fragment.startsWith("!")){
+            state = fragment.substring(1, fragment.length());
+        }
+        return state;
     }
 }

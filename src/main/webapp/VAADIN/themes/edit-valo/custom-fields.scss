@@ -24,5 +24,23 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
           color: $helper-color;
           background-color: valo-font-color($helper-color);
           border-radius: $v-border-radius;
-      }
+   }
+  
+  // v-switchable-textfield
+  .v-switchable-textfield {
+    height: $v-line-height * 2;
+    .v-caption {
+        display: block;
+    }   
+    .v-textfield {
+        padding-right: $v-unit-size;
+    }
+    .v-switch {
+        z-index: 10;
+        width: $v-unit-size;
+        position: absolute;
+        right: 1px;
+        bottom: 1px;
+    }
+  }
 } 
