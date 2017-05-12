@@ -225,7 +225,6 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     protected void setInternalValue(TimePeriod newValue) {
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
-
         updateCacheField();
     }
 

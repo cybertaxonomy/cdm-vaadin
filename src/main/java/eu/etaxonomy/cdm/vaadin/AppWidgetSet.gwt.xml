@@ -43,5 +43,5 @@
 
     <inherits name="org.vaadin.teemu.switchui.SwitchComponentWidgetset" />
 
-    <inherits name="com.vaadin.addon.onoffswitch.WidgetSet" />
+    
 </module>

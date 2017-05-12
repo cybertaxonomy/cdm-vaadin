@@ -144,7 +144,7 @@ public class RegistrationUI extends UI {
         Page page = Page.getCurrent();
         String fragment = page.getUriFragment();
         String state = null;
-        if(fragment.startsWith("!")){
+        if(fragment != null && fragment.startsWith("!")){
             state = fragment.substring(1, fragment.length());
         }
         return state;

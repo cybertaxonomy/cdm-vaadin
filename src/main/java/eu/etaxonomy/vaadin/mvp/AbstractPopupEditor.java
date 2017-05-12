@@ -75,6 +75,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         mainLayout.setWidthUndefined();
 
         fieldGroup = new BeanFieldGroup<>(dtoType);
+        fieldGroup.setBuffered(false);
         fieldGroup.addCommitHandler(new SaveHandler());
 
         setCompositionRoot(mainLayout);
@@ -290,7 +291,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column1, int row1,
             int column2, int row2)
             throws OverlapsException, OutOfBoundsException {
-        fieldGroup.bind(field, propertyId);
+        if(propertyId != null){
+            fieldGroup.bind(field, propertyId);
+        }
         addComponent(field, column1, row1, column2, row2);
         return field;
     }

@@ -22,6 +22,7 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -42,7 +43,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 9;
+    private final static int GRID_ROWS = 10;
 
     /**
      * @param layout
@@ -91,30 +92,32 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
-        titleField.setRequired(true);
         titleField.setWidth(100, Unit.PERCENTAGE);
         row++;
         addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        // addTextField("Author(s)", "authorship", 0, 4, 1, 4)).setRequired(true);
-        addTextField("Editor", "editor", 2, row, 3, row).setWidth(100, Unit.PERCENTAGE);
+        TeamOrPersonField authorshipField = new TeamOrPersonField("Author(s)");
+        authorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(authorshipField, "authorship", 0, row, 3, row);
         row++;
         addTextField("Series", "seriesPart", 0, row);
         addTextField("Volume", "volume", 1, row);
         addTextField("Pages", "pages", 2, row);
+        addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
-        publisherField.setRequired(true);
         publisherField.setWidth(100, Unit.PERCENTAGE);
         TimePeriodField timePeriodField = new TimePeriodField("Date published");
         addField(timePeriodField, "datePublished");
         row++;
-        // TODO implement a TimePeriod component
         addTextField("ISSN", "issn", 0, row);
         addTextField("ISBN", "isbn", 1, row);
         addTextField("DOI", "doi", 2, row);
         addTextField("Uri", "uri", 3, row);
+
+//        titleField.setRequired(true);
+//        publisherField.setRequired(true);
 
     }
 

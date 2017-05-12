@@ -1,14 +1,22 @@
 // styles for custom fields
 
+// ===================== Mixins ==============================//
+
+@mixin composite-field-wrapper() {
+  border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+  border-radius: $v-border-radius;
+  background-color: $v-app-background-color;
+  padding: round($v-unit-size / 4);
+}
+
+// ===================== Styles ==============================//
+
 body .edit-valo { // increasing specifity to allow overriding the valo default field themes
   
   // TimePeriodField
   .v-time-period-field {
       .margin-wrapper {
-          border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
-          border-radius: $v-border-radius;
-          background-color: $v-app-background-color;
-          padding: round($v-unit-size / 4);
+          @include composite-field-wrapper;
       }
       .to-label {
         padding: 0 round($v-unit-size / 2);
@@ -28,6 +36,7 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   
   // v-switchable-textfield
   .v-switchable-textfield {
+    position: relative; // needs to be a positioned element
     height: $v-line-height * 2;
     .v-caption {
         display: block;
@@ -43,4 +52,44 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         bottom: 1px;
     }
   }
+  
+  // v-person-field
+  .v-person-field {
+    .v-caption {
+        display: block;
+    }
+    .cache-field, .details-fields  {
+        padding-right: $v-unit-size;
+    }
+    .v-switch {
+        z-index: 10;
+        width: $v-unit-size;
+        position: absolute;
+        right: 1px;
+        bottom: 1px;
+    } 
+  }
+  .v-person-field-cache-mode {
+        .cache-field {
+            display: block;
+        }
+        .details-fields {
+            display: none;
+        }
+    }
+   .v-person-field-details-mode {
+        .cache-field {
+            display: none;
+        }
+        .details-fields {
+            display: block;
+        }
+    }
+    
+   // team-or-person-field
+   .v-team-or-person-field {
+        .margin-wrapper {
+            @include composite-field-wrapper;
+        }
+    }
 } 

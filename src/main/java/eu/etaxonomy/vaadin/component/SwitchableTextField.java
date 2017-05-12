@@ -13,7 +13,6 @@ import org.vaadin.teemu.switchui.Switch;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.CustomField;
 import com.vaadin.ui.TextField;
 
 
@@ -22,7 +21,7 @@ import com.vaadin.ui.TextField;
  * @since May 11, 2017
  *
  */
-public class SwitchableTextField extends CustomField<String> {
+public class SwitchableTextField extends CompositeCustomField<String> {
 
     private static final long serialVersionUID = -4760153886584883137L;
 
@@ -40,10 +39,17 @@ public class SwitchableTextField extends CustomField<String> {
         textField.setCaption(caption);
         unlockSwitch.addValueChangeListener(e -> {
             textField.setEnabled(unlockSwitch.getValue());
+            textField.focus();
         });
         unlockSwitch.setValueSetLister(e -> {
             textField.setEnabled(unlockSwitch.getValue());
         });
+
+        addSizedComponent(root);
+        addSizedComponent(textField);
+
+        addStyledComponent(textField);
+        addStyledComponent(unlockSwitch);
     }
 
     /**
@@ -57,6 +63,7 @@ public class SwitchableTextField extends CustomField<String> {
         textField.setWidth(getWidth(), getWidthUnits());
         root.addComponent(unlockSwitch);
         setPrimaryStyleName(PRIMARY_STYLE);
+
         return root;
     }
 
@@ -66,13 +73,6 @@ public class SwitchableTextField extends CustomField<String> {
     @Override
     public Class<? extends String> getType() {
         return String.class;
-    }
-
-    /**
-     * @return the serialversionuid
-     */
-    public static long getSerialversionuid() {
-        return serialVersionUID;
     }
 
     /**
@@ -99,67 +99,9 @@ public class SwitchableTextField extends CustomField<String> {
      * {@inheritDoc}
      */
     @Override
-    public void setWidthUndefined() {
-        super.setWidthUndefined();
-        root.setWidthUndefined();
-        textField.setWidthUndefined();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setWidth(String width) {
-        super.setWidth(width);
-        root.setWidth(width);
-        textField.setWidth(width);
-    }
-
-    @Override
-    public void setWidth(float width, Unit unit){
-        super.setWidth(width, unit);
-        if(root != null){
-            root.setWidth(width, unit);
-            textField.setWidth(width, unit);
-        }
-    }
-
-    @Override
-    public void setStyleName(String style) {
-        super.setStyleName(style);
-        textField.setStyleName(style);
-        unlockSwitch.setStyleName(style);
-    }
-
-    @Override
-    public void addStyleName(String style) {
-        super.addStyleName(style);
-        textField.addStyleName(style);
-        unlockSwitch.addStyleName(style);
-    }
-
-    private class SwitchButton extends Switch {
-
-        private static final long serialVersionUID = 2557108593729214773L;
-
-        private ValueChangeListener valueSetListener = null;
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void setInternalValue(Boolean newValue) {
-            super.setInternalValue(newValue);
-            if(valueSetListener != null){
-                valueSetListener.valueChange(new ValueChangeEvent(this));
-            }
-        }
-
-        public void setValueSetLister(ValueChangeListener valueSetListener){
-            this.valueSetListener = valueSetListener;
-        }
-
-
+    protected void addDefaultStyles() {
+        // no default styles
 
     }
+
 }

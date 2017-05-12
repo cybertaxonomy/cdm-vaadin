@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -122,9 +123,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
     public void onReferenceEditEvent(ReferenceEditorAction event) {
+        TransactionStatus tx = getRepo().startTransaction(false);
         Reference reference = getRepo().getReferenceService().find(event.getEntityId());
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
+        getRepo().commitTransaction(tx);
     }
 
 

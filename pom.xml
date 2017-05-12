@@ -455,11 +455,6 @@
        <artifactId>switch</artifactId>
        <version>3.0.0</version>
     </dependency>
-    <dependency>
-       <groupId>com.vaadin.addon</groupId>
-       <artifactId>vaadin-onoffswitch</artifactId>
-       <version>0.0.1</version>
-    </dependency>
 <!--     <dependency>
         only in the edit repo
       <groupId>org.vaadin.addons</groupId>
