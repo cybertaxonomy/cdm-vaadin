@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
@@ -75,7 +76,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         mainLayout.setWidthUndefined();
 
         fieldGroup = new BeanFieldGroup<>(dtoType);
-        fieldGroup.setBuffered(false);
         fieldGroup.addCommitHandler(new SaveHandler());
 
         setCompositionRoot(mainLayout);
@@ -248,6 +248,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected <T extends Field> T addField(T field, String propertyId) {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field);
         return field;
     }
@@ -271,6 +274,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field, column, row);
         return field;
     }
@@ -293,6 +299,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             throws OverlapsException, OutOfBoundsException {
         if(propertyId != null){
             fieldGroup.bind(field, propertyId);
+            if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+                ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+            }
         }
         addComponent(field, column1, row1, column2, row2);
         return field;

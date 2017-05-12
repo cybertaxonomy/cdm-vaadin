@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.common;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.Component;
@@ -97,6 +98,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             compositeWrapper.addComponent(personField);
 
             personField.setValue((Person) newValue);
+            personField.registerParentFieldGroup(fieldGroup);
+
         }
         else if(Team.class.isAssignableFrom(newValue.getClass())){
             // otherwise it a Team
@@ -108,6 +111,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             fieldGroup.bind(personsListEditor, "teamMembers");
 
             fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+            personsListEditor.registerParentFieldGroup(fieldGroup);
+
+
         } else {
             setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
         }
@@ -120,6 +126,14 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     protected void addDefaultStyles() {
         // no default styles here
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldGroup getFieldGroup() {
+        return fieldGroup;
     }
 
 

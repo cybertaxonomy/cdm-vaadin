@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
+import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 
@@ -23,7 +27,7 @@ import com.vaadin.ui.CustomField;
  *
  */
 @SuppressWarnings("serial")
-public abstract class CompositeCustomField<T> extends CustomField<T> {
+public abstract class CompositeCustomField<T> extends CustomField<T> implements NestedFieldGroup {
 
     private List<Component> styledComponents = new ArrayList<>();
 
@@ -133,5 +137,32 @@ public abstract class CompositeCustomField<T> extends CustomField<T> {
      * to prevent these styles from being overwritten when setStyleName() id called on the composite field.
      */
     protected abstract void addDefaultStyles();
+
+    /**
+     * Implementations return the local fieldGroup
+     *
+     * @return
+     */
+    @Override
+    public abstract FieldGroup getFieldGroup();
+
+    @Override
+    public void registerParentFieldGroup(FieldGroup parent) {
+        parent.addCommitHandler(new CommitHandler() {
+
+            @Override
+            public void preCommit(CommitEvent commitEvent) throws CommitException {
+                // commit the nested bean(s) first
+                if(getFieldGroup() != null){
+                    getFieldGroup().commit();
+                }
+            }
+
+            @Override
+            public void postCommit(CommitEvent commitEvent) throws CommitException {
+                // noting to do
+            }}
+       );
+    }
 
 }

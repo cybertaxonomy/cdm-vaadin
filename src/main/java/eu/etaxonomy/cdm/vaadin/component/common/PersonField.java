@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.common;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextField;
@@ -194,5 +195,13 @@ public class PersonField extends CompositeCustomField<Person> {
     protected void addDefaultStyles(){
         cacheField.addStyleName("cache-field");
         detailsContainer.addStyleName("details-fields");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldGroup getFieldGroup() {
+        return fieldGroup;
     }
 }

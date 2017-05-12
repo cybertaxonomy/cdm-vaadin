@@ -104,4 +104,12 @@ public class SwitchableTextField extends CompositeCustomField<String> {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FieldGroup getFieldGroup() {
+        return null;
+    }
+
 }

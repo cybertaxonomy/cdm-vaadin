@@ -10,6 +10,7 @@ package eu.etaxonomy.vaadin.component;
 
 import java.util.List;
 
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractField;
@@ -31,6 +32,8 @@ public class FieldListEditor<V extends Object, F extends AbstractField<V>>  exte
     private Class<F> fieldType;
 
     private Class<V> itemType;
+
+    private FieldGroup parentFieldGroup = null;
 
     //NOTE: Managing the item
     //      IDs makes BeanContainer more complex to use, but it is necessary in some cases where the
@@ -93,21 +96,41 @@ public class FieldListEditor<V extends Object, F extends AbstractField<V>>  exte
         grid.setRows(newValue.size());
         int row = 0;
         for(V val : newValue){
-            try {
-                F field = fieldType.newInstance();
-                addStyledComponent(field);
-                field.setWidth(100, Unit.PERCENTAGE);
-                field.setValue(val);
-                grid.addComponent(field, 0, row);
-                grid.addComponent(buttonGroup(), 1, row);
-                row++;
-            } catch (InstantiationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            row = addNewRow(row, val);
+        }
+    }
+
+    /**
+     * @param row
+     * @param val
+     * @return
+     */
+    protected int addNewRow(int row, V val) {
+        try {
+            F field = fieldType.newInstance();
+            addStyledComponent(field);
+            field.setWidth(100, Unit.PERCENTAGE);
+            field.setValue(val);
+            grid.addComponent(field, 0, row);
+            grid.addComponent(buttonGroup(), 1, row);
+            nestFieldGroup(field);
+            row++;
+        } catch (InstantiationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return row;
+    }
+
+    /**
+     * @param field
+     */
+    protected void nestFieldGroup(F field) {
+        if(NestedFieldGroup.class.isAssignableFrom(fieldType) && parentFieldGroup != null){
+            ((NestedFieldGroup)field).registerParentFieldGroup(parentFieldGroup);
         }
     }
 
@@ -134,6 +157,23 @@ public class FieldListEditor<V extends Object, F extends AbstractField<V>>  exte
     @Override
     protected void addDefaultStyles() {
         // no default styles
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * However, this class has no local fieldGroup but must delegate to the nested NestedFieldGroup
+     * if there are any. This happens in {@link #nestFieldGroup(AbstractField)}.
+     * <p>
+     */
+    @Override
+    public FieldGroup getFieldGroup() {
+        return null;
+    }
+
+    @Override
+    public void registerParentFieldGroup(FieldGroup parent) {
+        parentFieldGroup = parent;
     }
 
 
