@@ -74,8 +74,10 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
         @SuppressWarnings("unchecked")
         BeanItem<DTO> itemDataSource = ((BeanFieldGroup<DTO>)commitEvent.getFieldBinder()).getItemDataSource();
         DTO bean = itemDataSource.getBean();
-        // evict bean before merge to avoid duplicate beans in same session
-        session.evict(bean);
+        if(session.isOpen()){
+            // evict bean before merge to avoid duplicate beans in same session
+            session.evict(bean);
+        }
         @SuppressWarnings("unchecked")
         DTO mergedBean = (DTO) session.merge(bean);
         itemDataSource.setBean(mergedBean);

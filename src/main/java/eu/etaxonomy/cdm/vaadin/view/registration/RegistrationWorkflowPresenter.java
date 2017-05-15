@@ -30,6 +30,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
@@ -115,18 +116,27 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).ADD")
-    public void onReferenceAddEvent(ReferenceEditorAction event) {
+    public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
         Reference reference = ReferenceFactory.newGeneric();
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
     }
 
     @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
-    public void onReferenceEditEvent(ReferenceEditorAction event) {
+    public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         Reference reference = getRepo().getReferenceService().find(event.getEntityId());
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
+        getRepo().commitTransaction(tx);
+    }
+
+    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
+    public void onRegistrationEditorAction(RegistrationEditorAction event) {
+        TransactionStatus tx = getRepo().startTransaction(false);
+        Registration registration = getRepo().getRegistrationService().find(event.getEntityId());
+        RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class);
+        popup.showInEditor(registration);
         getRepo().commitTransaction(tx);
     }
 

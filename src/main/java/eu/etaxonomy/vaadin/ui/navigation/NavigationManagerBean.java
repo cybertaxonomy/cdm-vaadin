@@ -112,7 +112,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
 
-		PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
+	    PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
 
 		Window window = new Window();
 		window.setCaption(popupContent.getWindowCaption());

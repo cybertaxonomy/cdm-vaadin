@@ -38,8 +38,10 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
@@ -122,7 +124,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.setId(DOM_ID_WORKINGSET);
         registration.setWidth(100, Unit.PERCENTAGE);
 
-        Panel namesTypesPanel = createNamesAndTypesList(workingset);
+        Panel namesTypesPanel = createRegistrationsList(workingset);
         namesTypesPanel.setStyleName("registration-list");
         namesTypesPanel.setCaption("Registrations");
 
@@ -180,7 +182,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param workingset
      * @return
      */
-    public Panel createNamesAndTypesList(RegistrationWorkingSet workingset) {
+    public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
         // prepare name and type list
         GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
         int row = 0;
@@ -206,6 +208,10 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
             Button editButton = new Button(FontAwesome.EDIT);
             editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
+            editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+                AbstractEditorAction.Type.EDIT,
+                dto.getId()
+                )));
 
             namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
             namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);

@@ -197,6 +197,10 @@ public class RegistrationDTO{
     }
 
 
+    /**
+     * The entity ID of the Registration Item
+     * @return
+     */
     public int getId() {
         return reg.getId();
     }
