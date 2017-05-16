@@ -21,6 +21,7 @@ import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
+import eu.etaxonomy.cdm.vaadin.view.AuthenticationPresenter;
 
 /**
  * @author cmathew

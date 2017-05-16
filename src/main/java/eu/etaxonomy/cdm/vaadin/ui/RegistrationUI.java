@@ -23,14 +23,16 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.vaadin.view.phycobank.DashBoardView;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.ListViewBean;
-import eu.etaxonomy.cdm.vaadin.view.phycobank.StartRegistrationView;
+import eu.etaxonomy.cdm.vaadin.view.LoginViewBean;
+import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
+import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
+import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationView;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -54,6 +56,18 @@ public class RegistrationUI extends UI {
     @Autowired
     private ViewDisplay viewDisplay;
 
+    //---- pull into abstract super class ? ---------
+    @Autowired
+    SpringViewProvider viewProvider;
+
+    protected void configureAccessDeniedView() {
+        viewProvider.setAccessDeniedViewClass(LoginViewBean.class);
+    }
+    //---------------------------------------------
+
+    //private final String INITIAL_VIEW = "workflow/edit/100002";
+    public static final String INITIAL_VIEW =  DashBoardView.NAME;
+
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
      */
@@ -72,6 +86,9 @@ public class RegistrationUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
+
+        configureAccessDeniedView();
+
         addStyleName(ValoTheme.UI_WITH_MENU);
         Responsive.makeResponsive(this);
 
@@ -88,12 +105,14 @@ public class RegistrationUI extends UI {
         eventBus.publishEvent(new UIInitializedEvent());
 
         //navigate to initial view
-        eventBus.publishEvent(new NavigationEvent(DashBoardView.NAME));
+        eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 
-        //TODO the branding should be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
-        //  See CdmUtils for appropriate methods to access this folder
         String brand = "phycobank";
-
+        //TODO create annotation:
+        // @Styles(files={""}, branding="brand")
+        //
+        // the branding can either be specified or can be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
+        //  See CdmUtils for appropriate methods to access this folder
         // the 'vaadin://' protocol refers to the VAADIN folder
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);

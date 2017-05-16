@@ -8,11 +8,19 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 
+/**
+ * @author c.mathew
+ * @since 2015
+ *
+ * @deprecated Use per View based authentication instead. This is provided by the {@link SpringViewProvider}.
+ */
+@Deprecated
 public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
 	/**

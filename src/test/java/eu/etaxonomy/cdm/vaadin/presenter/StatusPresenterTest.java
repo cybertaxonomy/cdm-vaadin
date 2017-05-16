@@ -22,9 +22,10 @@ import com.vaadin.data.Item;
 import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
+import eu.etaxonomy.cdm.vaadin.component.taxon.IStatusComposite;
+import eu.etaxonomy.cdm.vaadin.component.taxon.StatusPresenter;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
-import eu.etaxonomy.cdm.vaadin.view.IStatusComposite;
 
 
 /**

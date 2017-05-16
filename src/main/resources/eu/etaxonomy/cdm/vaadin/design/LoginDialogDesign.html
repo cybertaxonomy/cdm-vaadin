@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <meta name="design-properties" content="{&quot;RULERS_VISIBLE&quot;:true,&quot;GUIDELINES_VISIBLE&quot;:false,&quot;SNAP_TO_OBJECTS&quot;:true,&quot;SNAP_TO_GRID&quot;:true,&quot;SNAPPING_DISTANCE&quot;:10,&quot;JAVA_SOURCES_ROOT&quot;:&quot;src/main/java&quot;,&quot;THEME&quot;:&quot;edit-valo&quot;}">
+  <meta name="vaadin-version" content="7.7.0">
+ </head>
+ <body>
+  <vaadin-tab-sheet style-name="framed" size-auto>
+   <tab caption="Login" selected>
+    <vaadin-form-layout size-auto margin>
+     <vaadin-label style-name="tiny" width="190px" plain-text>
+       Please enter your username and password. 
+     </vaadin-label>
+     <vaadin-text-field caption="Username" _id="userName"></vaadin-text-field>
+     <vaadin-password-field caption="Password" _id="password"></vaadin-password-field>
+     <vaadin-label style-name="tiny" width="190px">
+       Lost your password? Please use the 
+      <b>Password Recovery</b> tab. 
+     </vaadin-label>
+     <vaadin-horizontal-layout spacing width-full>
+      <vaadin-button style-name="primary" plain-text _id="loginButton">
+        Login 
+      </vaadin-button>
+      <vaadin-button style-name="danger" plain-text _id="cancelLoginButton">
+        Cancel 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+     <vaadin-label style-name="tiny" width="190px">
+       Please use the 
+      <b>Register</b> tab if you are not having a login yet. 
+     </vaadin-label>
+    </vaadin-form-layout>
+   </tab>
+   <tab caption="Register">
+    <vaadin-form-layout size-auto margin>
+     <vaadin-text-field caption="Username" _id="userNameSuggestion"></vaadin-text-field>
+     <vaadin-text-field caption="Email" _id="email"></vaadin-text-field>
+     <vaadin-horizontal-layout spacing width-full>
+      <vaadin-button enabled="false" style-name="primary" plain-text _id="registerButton">
+        Register 
+      </vaadin-button>
+      <vaadin-button style-name="danger" plain-text _id="cancelRegistrationButton">
+        Cancel 
+      </vaadin-button>
+     </vaadin-horizontal-layout>
+     <vaadin-label style-name="tiny" width="190px">
+       After clicking 
+      <b class="primary">Register</b> you will receive an E-mail with further instructions. 
+     </vaadin-label>
+    </vaadin-form-layout>
+   </tab>
+   <tab caption="Password Recovery">
+    <vaadin-form-layout size-auto margin>
+     <vaadin-label style-name="tiny" size-auto plain-text>
+       Please enter your username or email adress. 
+     </vaadin-label>
+     <vaadin-text-field caption="Username / email address" _id="userNameOrEmail"></vaadin-text-field>
+     <vaadin-button enabled="false" style-name="primary" plain-text _id="sendOnetimeLogin">
+       E-mail new password 
+     </vaadin-button>
+     <vaadin-label style-name="tiny" width="190px">
+       After clicking the above button you will receive an E-mail with further instructions. 
+     </vaadin-label>
+    </vaadin-form-layout>
+   </tab>
+  </vaadin-tab-sheet>
+ </body>
+</html>

@@ -1,0 +1,13 @@
+// Fixes problems in the valo theme
+// must be imported after the valo theme
+
+// -------------------------------------------
+// add missing tiny, and small style for select lists
+
+.v-select-tiny {
+  font-size: $v-font-size--tiny;
+}
+
+.v-select-small {
+  font-size: $v-font-size--small;
+}

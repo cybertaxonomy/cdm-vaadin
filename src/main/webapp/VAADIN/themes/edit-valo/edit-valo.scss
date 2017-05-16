@@ -26,7 +26,7 @@ $v-font-family: "Open Sans", sans-serif;
 
 // ================== DARK ================ //
 
-$v-app-loading-text: "Dark Valo";
+// $v-app-loading-text: "Dark Valo";
 $v-background-color: #444d50;
 $v-focus-color: #07a9ca;
 $v-focus-style: 0 0 3px 2px $v-focus-color;
@@ -51,15 +51,36 @@ $v-component-group-spacing: 6px;
 
 @import "../valo/valo.scss";
 
+@import "valo-fix.scss";
+
+@import "custom-fields.scss";
+
+
+// ========================================== //
+
+// import custom font icons TODO rename font
+@include v-font(IcoMoon, "../../../../../fonts/icomoon");
+
+.IcoMoon {
+   font-family: IcoMoon;
+   font-style: normal;
+   font-weight: normal;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   display: inline-block;
+   text-align: center;
+}
+
 // ========================================== //
 // Status colors for the redistration
 // 
 // change-color cant be used since this is not fully supported by the vaadin sass-compiler
 // see https://github.com/vaadin/sass-compiler/issues/147
-$hue-offset: hue($v-focus-color);
-$plain-red: adjust-color($v-focus-color, $hue: -1 * $hue-offset);  // red as 0 degree hue
+$status-reference-color:$v-focus-color;
+$hue-offset: hue($status-reference-color);
+$plain-red: adjust-color($status-reference-color, $hue: -1 * $hue-offset);  // red as 0 degree hue
 $status-rejected-color: adjust-color($plain-red, $hue: 0deg);
-$status-curation-color: adjust-color($plain-red, $hue: 30deg); 
+$status-curation-color: adjust-color($plain-red, $hue: 35deg); 
 $status-preparation-color: adjust-color($plain-red, $hue: 60deg); 
 $status-published-color: adjust-color($plain-red, $hue: 105deg); 
 $status-ready-color: adjust-color($plain-red, $hue: 180deg);
@@ -70,6 +91,20 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
   @include valo;
 
   // Insert your own theme rules here
+  
+  // --- AbstractPageView --- // 
+  #header {
+    text-align: center;
+    margin: round($v-layout-spacing-vertical/2); // corresponds to layout spacing
+    font-size: $v-font-size--huge; // corresponds to valo style huge (26px)
+  }
+
+  #subheader {
+    text-align: center;
+    margin: round($v-layout-spacing-vertical/2);
+    font-size: $v-font-size; // valo default font size (16px)
+  }
+  // ------------------- // 
   
   .logo_giant {
     font-size: 400%;
@@ -82,6 +117,33 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
        line-height: 50px;
      }
    }
+
+   .v-label .caption {
+       font-size: $v-font-size--small;
+   }
+   
+   // label with caption and icon horizonatally aligned
+   // to apply this to a Vaadin Label set 'label-nowrap'
+   // as style
+
+    .v-caption-label-nowrap, .v-label-label-nowrap {
+        display: inline;
+    }
+    .v-label-label-nowrap {
+//         margin-left: 8px; // TODO use sass variable here
+//         vertical-align: baseline;
+        .v-icon {
+           display : inline;
+        }
+    } 
+
+   .friendly-foreground {
+        color: $v-friendly-color;
+    }
+   
+   .v-button .button-badge {
+         @include valo-badge-style($states: inactive, $background-color: lighten($v-background-color, 10%), $active-color: $v-focus-color);
+    } 
    
    .dashboard-actions {
       margin: 0 10%;
@@ -104,42 +166,28 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
           }
       }
     }
+
+
+    // ===== workflow ==== // 
+
+    #workflow-container {
+        text-align: center;
+        margin-top: $v-unit-size;
+    }
+    
+    $workflow-icon-size: 110px;
+    // can not be set per css as this need to set as property to the component in vaadin
+    $workflow-timeline-bar-height: 10px; 
+    // the fator by which the caption should be smaller than the circe
+    $workflow-caption-shrink: 0.64; 
+
+    $workflow-icon-margin-h: $workflow-icon-size / 5;
+    $workflow-icon-left: $workflow-icon-margin-h / 2;
+    $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;        
     
     .workflow {
-    
-        $workflow-icon-size: 110px;
-        // can not be set per css as this need to set as property to the component in vaadin
-        $workflow-timeline-bar-height: 10px; 
-        // the fator by which the caption should be smaller than the circe
-        $workflow-caption-shrink: 0.64; 
-
-        $workflow-icon-margin-h: $workflow-icon-size / 5;
-        $workflow-icon-left: $workflow-icon-margin-h / 2;
-        $workflow-caption-font-size: $workflow-icon-size * $workflow-caption-shrink;
-        
         .steps {
             z-index: 10;
-            
-            .v-button {
-                margin: 0 $workflow-icon-margin-h;
-                font-size: $workflow-icon-size;
-                height: $workflow-icon-size;
-                width: $workflow-icon-size;
-                line-height: $workflow-icon-size;
-            
-                .v-icon, .v-button-caption {
-                    position: absolute;
-                    left: $workflow-icon-left;
-                    top: 0px;
-                }
-                .v-button-caption {
-                    font-family: monospace;
-                    left: (($workflow-icon-size - $workflow-caption-font-size) / 2) + $workflow-icon-left; // 30px;
-                    top: -2px;
-                    color: $v-background-color;
-                    font-size: $workflow-caption-font-size; // 70px;
-                }
-            }
             
             .v-csslayout {
                 width: $workflow-icon-size + 2 * $workflow-icon-margin-h;
@@ -149,7 +197,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
                 }
             }
          }
-         
          .timeline {
             display: block;
             position: relative;
@@ -161,35 +208,192 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             }
         }
     }
+
+    .workflow-item {
+        .v-button {
+            margin: 0 $workflow-icon-margin-h;
+            font-size: $workflow-icon-size;
+            height: $workflow-icon-size;
+            width: $workflow-icon-size;
+            line-height: $workflow-icon-size;
+        
+            .v-icon, .v-button-caption {
+                position: absolute;
+                left: $workflow-icon-left;
+                top: 0px;
+            }
+            .v-button-caption {
+                font-family: monospace;
+                left: (($workflow-icon-size - $workflow-caption-font-size) / 2) + $workflow-icon-left; // 30px;
+                top: -2px;
+                color: $v-background-color;
+                font-size: $workflow-caption-font-size; // 70px;
+            }
+        }
+    }
+
+    #workingset {
+            padding: round($v-unit-size / 2);
+            .names-types-list, .registration-list-item {
+                margin-top: round($v-unit-size / 2);
+            }
+    }
+
+    // --------------------------------------------------- //
     
+    .registration-list-item {
+        border-top: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+        padding-top: 4px; // avoid button group to overlap with border
+    }
+
+   .registration-workflow-item {
+       border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+    }
+
+    // tab element being part of a process ----------- //
+    // use $v-unit-size instead of $v-font-size * 3?
+    .workflow-step-wrap {
+        padding-right: 10px;
+        height: $v-font-size * 3;
+        background-color: scale-color(lighten($v-app-background-color, 20%), $saturation: -20%);
+        @include box-shadow(inset 0 0 5px $v-app-background-color);
+    }
+    .workflow-step {
+        line-height: $v-font-size * 3;
+    }
+    .v-caption-workflow-step {
+        vertical-align: top;
+        padding: 0;
+         .v-icon {
+            line-height: $v-font-size * 3;
+            font-size: $v-font-size * 3.5;
+            padding-right: 10px;
+            color: $v-background-color;
+        }
+    }
+
+    .workflow-tabsheet {
+        
+        table.v-tabsheet-tabs, .v-tabsheet-tabs tr, .v-tabsheet-tabs tbody {
+          width: 100%; 
+        }
+        
+        .v-tabsheet-tabitemcell {
+              width: 25%;
+        }
+
+        .v-tabsheet-tabitem {
+            
+            // background-color: scale-color(lighten($v-app-background-color, 20%), $saturation: -20%);
+            // @include valo-gradient($color: $v-background-color, $gradient: $v-gradient, $fallback: null, $direction: to right);
+            // @include box-shadow(inset 0 0 5px $v-app-background-color);
+            // background-color: $v-font-color
+            
+            // border: valo-border($border: 2px solid, $color: $v-font-color, $strength: 1);
+            
+            background-color: scale-color(lighten($v-app-background-color, 20%), $saturation: -20%);
+            @include box-shadow(inset 0 0 5px $v-app-background-color);
+            border: valo-border($border: 2px solid, $color: $v-app-background-color, $strength: 1);
+            border-color: $v-app-background-color;
+            .v-caption {
+                // line-height: $v-unit-size;
+                margin: 0;
+                padding: 0;
+                padding-right: $v-unit-size / 2;
+                border: 0px none;
+            }
+            .v-icon {
+                line-height: $v-unit-size;
+                font-size: $v-unit-size * 1.8;
+                vertical-align: middle;
+                // padding-right: $v-unit-size / 2;
+                
+                //color: $v-font-color;
+                
+                color: $v-app-background-color;
+            }
+        }
+    }
+
+    // ----------------------------------------------- //
     
+   // status colors --------------------------------- //
+    .status-REJECTED {
+        color: $status-rejected-color;
+    }
+    .status-CURATION {
+        color: $status-curation-color;
+    }
+    .status-PREPARATION {
+        color: $status-preparation-color;
+    }
+    .status-PUBLISHED {
+        color: $status-published-color;
+    }
+    .status-READY {
+        color: $status-ready-color;
+    }
+
+    .bg-status-REJECTED {
+        background-color: $status-rejected-color;
+    }
+    .bg-status-CURATION {
+        background-color: $status-curation-color;
+    }
+    .bg-status-PREPARATION {
+        background-color: $status-preparation-color;
+    }
+    .bg-status-PUBLISHED {
+        background-color: $status-published-color;
+    }
+    .bg-status-READY {
+        background-color: $status-ready-color;
+    }
+    // ----------------------------------------------- //
     
     #registration-list {
-        .status-rejected {
+        /* --- for the css layout --- */
+        overflow: auto;
+        height: 100%;
+        padding-left: round($v-unit-size/3);
+        padding-right: round($v-unit-size/3);
+        
+        border: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
+        border-radius: $v-border-radius - first-number($v-border) $v-border-radius - first-number($v-border) 0 0;
+        /* ----------------------------------------------- */
+        
+        // for grid rows
+        .status-REJECTED {
+            color: $status-rejected-color;
             td.registrationType, td.status {
                 color: $status-rejected-color;
             }
         }
-        .status-curation {
+        .status-CURATION {
+            color: $status-curation-color;
             td.registrationType, td.status {
                 color: $status-curation-color;
             }
         }
-        .status-preparation {
+        .status-PREPARATION {
+            color: $status-preparation-color;
             td.registrationType, td.status {
                 color: $status-preparation-color;
             }
         }
-        .status-published {
+        .status-PUBLISHED {
+            color: $status-published-color;
             td.registrationType, td.status {
                 color: $status-published-color;
             }
         }
-        .status-ready {
+        .status-READY {
+            color: $status-ready-color;
             td.registrationType, td.status {
                 color: $status-ready-color;
             }
         }
     }
+
 
 }

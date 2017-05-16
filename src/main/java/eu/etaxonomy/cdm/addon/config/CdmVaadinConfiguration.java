@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.server.SpringVaadinServlet;
 
+import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
@@ -28,10 +29,12 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @Configuration
 @ComponentScan(basePackages={
         "eu.etaxonomy.cdm.vaadin",
-        "eu.etaxonomy.vaadin.ui"
+        "eu.etaxonomy.vaadin.ui",
+        "eu.etaxonomy.cdm.mock" // FIXME remove once mocks are no longer needed
         })
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
+@EnableAnnotationBasedAccessControl // enable annotation based per view access control
 public class CdmVaadinConfiguration {
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);

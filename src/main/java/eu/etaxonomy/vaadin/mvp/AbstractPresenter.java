@@ -1,5 +1,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,6 +10,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -21,7 +24,10 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
  */
 @SpringComponent
 @ViewScope
-public abstract class AbstractPresenter<V extends ApplicationView> {
+public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
+
+
+    private static final long serialVersionUID = 5260910510283481832L;
 
     public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 
@@ -29,12 +35,18 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 
 
 	protected V getView() {
+	    if(view == null){
+            Logger.getLogger(this.getClass()).warn("CDM-VAADIN#6562: presenter " + toString() + " without view.");
+        }
 		return view;
 	}
 
 	@Autowired
 	@Qualifier("cdmRepository")
 	private CdmRepository repo;
+
+	@Autowired
+	private NavigationManager navigationManager;
 
 	/**
 	 * @return the repo
@@ -74,5 +86,12 @@ public abstract class AbstractPresenter<V extends ApplicationView> {
 	public void onViewExit() {
 
 	}
+
+    /**
+     * @return the navigationManager
+     */
+    public NavigationManager getNavigationManager() {
+        return navigationManager;
+    }
 
 }

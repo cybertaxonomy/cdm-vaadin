@@ -34,4 +34,10 @@
     
 
     <inherits name="eu.etaxonomy.vaadin.ui.DevDayWidgetset" />
+
+    
+
+    
+
+    
 </module>
