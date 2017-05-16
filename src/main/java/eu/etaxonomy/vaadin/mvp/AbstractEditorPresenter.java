@@ -29,7 +29,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object> extends Abstra
 
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-
+        if(!preSaveEvent.getView().equals(getView())){
+            return;
+        }
     }
 
     /**
@@ -38,6 +40,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object> extends Abstra
      */
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
+        if(!saveEvent.getView().equals(getView())){
+            return;
+        }
         DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
         saveBean(bean);
     }

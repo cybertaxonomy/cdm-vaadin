@@ -145,14 +145,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         public void preCommit(CommitEvent commitEvent) throws CommitException {
             logger.debug("preCommit");
             // notify the presenter to start a transaction
-            eventBus.publishEvent(new EditorPreSaveEvent(commitEvent));
+            eventBus.publishEvent(new EditorPreSaveEvent(commitEvent, AbstractPopupEditor.this));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
                 // notify the presenter to persist the bean and to commit the transaction
-                eventBus.publishEvent(new EditorSaveEvent(commitEvent));
+                eventBus.publishEvent(new EditorSaveEvent(commitEvent, AbstractPopupEditor.this));
 
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));

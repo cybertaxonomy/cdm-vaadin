@@ -22,15 +22,26 @@ public class EditorPreSaveEvent {
 
     private CommitEvent commitEvent;
 
+    // FIXME this is only a iterim solution for the problem described in https://dev.e-taxonomy.eu/redmine/issues/6562
+    private AbstractView view;
+
     /**
      * @param commitEvent
      */
-    public EditorPreSaveEvent(CommitEvent commitEvent) {
+    public EditorPreSaveEvent(CommitEvent commitEvent, AbstractView view) {
         this.commitEvent = commitEvent;
+        this.view = view;
     }
 
     public CommitEvent getCommitEvent(){
         return commitEvent;
+    }
+
+    /**
+     * @return the view
+     */
+    public AbstractView getView() {
+        return view;
     }
 
 }

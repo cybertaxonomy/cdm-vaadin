@@ -34,6 +34,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
     @Override
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+        super.onEditorPreSaveEvent(preSaveEvent);
         tx = getRepo().startTransaction(true);
         // merge the bean and update the fieldGroup with the merged bean, so that updating
         // of field values in turn of the commit are can not cause LazyInitializationExeptions
@@ -45,6 +46,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
     @Override
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
+        if(!saveEvent.getView().equals(getView())){
+            return;
+        }
         // the bean is now updated with the changes made by the user
         // merge the bean into the session, ...
         DTO bean = mergedBean(saveEvent.getCommitEvent());
@@ -78,6 +82,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase> extends Ab
             // evict bean before merge to avoid duplicate beans in same session
             session.evict(bean);
         }
+
         @SuppressWarnings("unchecked")
         DTO mergedBean = (DTO) session.merge(bean);
         itemDataSource.setBean(mergedBean);
