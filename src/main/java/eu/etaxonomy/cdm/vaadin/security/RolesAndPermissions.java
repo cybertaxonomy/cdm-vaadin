@@ -10,8 +10,6 @@ package eu.etaxonomy.cdm.vaadin.security;
 
 import java.util.UUID;
 
-import org.springframework.security.core.GrantedAuthority;
-
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 
 /**
@@ -24,7 +22,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
  */
 public class RolesAndPermissions {
 
-    public static final GrantedAuthority ROLE_CURATION = new Role(UUID.fromString("642d9ea7-f18c-4ac3-b437-ed05ce5461c3"), "ROLE_CURATION");
+    public static final Role ROLE_CURATION = new Role(UUID.fromString("642d9ea7-f18c-4ac3-b437-ed05ce5461c3"), "ROLE_CURATION");
 
 
 }

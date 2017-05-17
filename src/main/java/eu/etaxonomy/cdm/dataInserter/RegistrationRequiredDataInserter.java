@@ -40,7 +40,9 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 
 /**
  * @author a.kohlbecker
@@ -72,8 +74,21 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        insertRequiredData();
         executeSuppliedCommands();
     }
+
+    /**
+ *
+ */
+private void insertRequiredData() {
+    Role roleCuration = RolesAndPermissions.ROLE_CURATION;
+    if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
+        repo.getGrantedAuthorityService().saveOrUpdate(roleCuration.asNewGrantedAuthority());
+        repo.getGrantedAuthorityService().getSession().flush();
+    }
+
+}
 
     /**
      *
