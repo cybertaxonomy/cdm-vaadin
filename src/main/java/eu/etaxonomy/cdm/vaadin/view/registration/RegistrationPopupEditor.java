@@ -45,6 +45,9 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     @Autowired
     private SelectFieldFactory selectFieldFactory;
 
+    TextField identifierField;
+    TextField specificIdentifierField;
+
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
     }
@@ -59,13 +62,11 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         form.setSpacing(true);
         form.setMargin(true);
 
-        TextField identifierField = new TextField("Identifier");
+        identifierField = new TextField("Identifier");
         addField(identifierField, "identifier");
-        identifierField.setEnabled(false);
 
-        TextField specificIdentifierField = new TextField("Specific Identifier");
+        specificIdentifierField = new TextField("Specific Identifier");
         addField(specificIdentifierField, "specificIdentifier");
-        specificIdentifierField.setEnabled(false);
 
         ListSelect statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
         statusSelect.setNullSelectionAllowed(false);
@@ -74,16 +75,24 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
         ListSelect submitterField = selectFieldFactory.createListSelect("Submitter", User.class);
         submitterField.setEnabled(false);
+        submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
         ListSelect institutionField = selectFieldFactory.createListSelect("Institution", Institution.class);
         institutionField.setEnabled(false);
+        institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
 
         DateField registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
 
+    }
+
+    @Override
+    protected void afterItemDataSourceSet() {
+        identifierField.setEnabled(false);
+        specificIdentifierField.setEnabled(false);
     }
 
     /**

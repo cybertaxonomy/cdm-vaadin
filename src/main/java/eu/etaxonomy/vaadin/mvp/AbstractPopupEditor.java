@@ -400,5 +400,17 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public void showInEditor(DTO beanToEdit) {
         fieldGroup.setItemDataSource(beanToEdit);
+        afterItemDataSourceSet();
+    }
+
+    /**
+     * This method is called after setting the item data source whereby the {@link FieldGroup#configureField(Field<?> field)} method will be called.
+     * In this method all fields are set to default states defined for the fieldGroup.
+     * <p>
+     * You can now implement this method if you need to configure the enable state of fields
+     * individually.
+     */
+    protected void afterItemDataSourceSet() {
+
     }
 }
