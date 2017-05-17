@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Item;
@@ -148,15 +147,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Override
     public void enter(ViewChangeEvent event) {
         getPresenter().onViewEnter();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Autowired
-    protected void injectPresenter(ListPresenter presenter) {
-        setPresenter(presenter);
     }
 
     @Override

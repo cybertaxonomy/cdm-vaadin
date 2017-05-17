@@ -54,7 +54,10 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 		this.presenter = presenter;
 	}
 
-	protected abstract void injectPresenter(P presenter);
+    @Autowired
+	protected final void injectPresenter(P presenter){
+	    setPresenter(presenter);
+	}
 
 	@Override
 	public void detach() {

@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.navigator.View;
@@ -263,15 +262,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
       getWorkflow().addComponent(steps);
   }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Autowired
-    @Override
-    protected void injectPresenter(RegistrationWorkflowPresenter presenter) {
-        setPresenter(presenter);
-    }
 
     /**
      * {@inheritDoc}

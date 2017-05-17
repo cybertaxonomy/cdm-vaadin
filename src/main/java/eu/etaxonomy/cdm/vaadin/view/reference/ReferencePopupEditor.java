@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -155,15 +154,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public boolean isResizable() {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Autowired
-    @Override
-    protected void injectPresenter(ReferenceEditorPresenter presenter) {
-        setPresenter(presenter);
     }
 
     /**

@@ -114,15 +114,6 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
      * {@inheritDoc}
      */
     @Override
-    @Autowired
-    protected void injectPresenter(RegistrationEditorPresenter presenter) {
-        setPresenter(presenter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
