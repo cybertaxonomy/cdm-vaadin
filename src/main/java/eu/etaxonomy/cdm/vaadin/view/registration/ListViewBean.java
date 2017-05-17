@@ -66,9 +66,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private CssLayout toolBar;
 
     public ListViewBean() {
-
         super();
+    }
 
+    @Override
+    protected void initContent() {
         toolBar = new CssLayout();
         toolBar.setWidth(100, Unit.PERCENTAGE);
         toolBar.addComponent(new Button("As grid", e -> toggleListType(e)));
@@ -78,6 +80,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         buildGrid();
 
         showList();
+
     }
 
     @Override

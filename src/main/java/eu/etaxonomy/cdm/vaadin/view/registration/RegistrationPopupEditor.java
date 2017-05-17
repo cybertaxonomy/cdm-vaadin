@@ -21,8 +21,11 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.agent.Institution;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -40,6 +43,14 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initContent() {
+
         FormLayout form = (FormLayout)getFieldLayout();
         form.setSpacing(true);
         form.setMargin(true);

@@ -86,7 +86,10 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public RegistrationWorkflowViewBean() {
         super();
+    }
 
+    @Override
+    protected void initContent() {
         workflow = new CssLayout();
         workflow.setSizeFull();
         workflow.setId(DOM_ID_WORKFLOW);

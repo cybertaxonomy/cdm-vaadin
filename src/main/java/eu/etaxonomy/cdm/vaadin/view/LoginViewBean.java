@@ -41,6 +41,10 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
 
     public LoginViewBean() {
         super();
+    }
+
+    @Override
+    protected void initContent() {
         VerticalLayout root = new VerticalLayout();
         root.setSizeFull();
         root.addComponent(loginDialog);
