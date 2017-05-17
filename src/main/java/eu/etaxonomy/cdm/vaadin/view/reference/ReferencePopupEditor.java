@@ -51,6 +51,10 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
      */
     public ReferencePopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), Reference.class);
+    }
+
+    @Override
+    protected void initContent() {
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
         grid.setMargin(true);

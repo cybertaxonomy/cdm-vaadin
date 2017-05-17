@@ -40,6 +40,10 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter>
     implements RegistrationPopEditorView, AccessRestrictedView {
 
+    private static final long serialVersionUID = 5418275817834009509L;
+
+    @Autowired
+    private SelectFieldFactory selectFieldFactory;
 
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
@@ -68,17 +72,18 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         statusSelect.setRows(1);
         addField(statusSelect, "status");
 
-        TextField submitterField = new TextField("Submitter");
+        ListSelect submitterField = selectFieldFactory.createListSelect("Submitter", User.class);
         submitterField.setEnabled(false);
         addField(submitterField, "submitter");
 
-//        TextField institutionField = new TextField("Institution");
-//        institutionField.setEnabled(false);
-//        addField(institutionField, "institution");
+        ListSelect institutionField = selectFieldFactory.createListSelect("Institution", Institution.class);
+        institutionField.setEnabled(false);
+        addField(institutionField, "institution");
 
         DateField registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
+
     }
 
     /**
