@@ -21,11 +21,10 @@ import com.vaadin.spring.annotation.ViewScope;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -64,7 +63,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         // list all if the authenticated user is having the role CURATION of if it is an admin
         Authentication authentication = currentSecurityContext().getAuthentication();
         User submitter = null;
-        if(!authentication.getAuthorities().stream().anyMatch(ga -> ga.equals(RolesAndPermissions.ROLE_CURATION) || ga.equals(Role.ROLE_ADMIN))){
+        if(!(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin())) {
             submitter = (User) authentication.getPrincipal();
         }
 

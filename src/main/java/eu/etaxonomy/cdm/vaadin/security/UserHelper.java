@@ -61,8 +61,9 @@ public class UserHelper {
         Authentication authentication = getAuthentication();
         if(authentication != null) {
             return authentication.getAuthorities().stream().anyMatch(a -> {
-                // doing faster regex check here instreas of using CdmAuthoritiy.fromString()
-                return a.getAuthority().matches("^Registration\\.\\[.*UPDATE");
+                return a.equals(RolesAndPermissions.ROLE_CURATION)
+                        // doing faster regex check here instreas of using CdmAuthoritiy.fromString()
+                        || a.getAuthority().matches("^Registration\\.\\[.*UPDATE");
             });
         }
         return false;
