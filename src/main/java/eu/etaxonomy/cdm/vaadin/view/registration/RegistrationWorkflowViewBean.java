@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.navigator.View;
@@ -38,10 +37,12 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
-import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
-import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
@@ -84,7 +85,10 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public RegistrationWorkflowViewBean() {
         super();
+    }
 
+    @Override
+    protected void initContent() {
         workflow = new CssLayout();
         workflow.setSizeFull();
         workflow.setId(DOM_ID_WORKFLOW);
@@ -122,9 +126,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.setId(DOM_ID_WORKINGSET);
         registration.setWidth(100, Unit.PERCENTAGE);
 
-        Panel namesTypesPanel = createNamesAndTypesList(workingset);
-        namesTypesPanel.setStyleName("names-types-list");
-        namesTypesPanel.setCaption("Names & Types");
+        Panel namesTypesPanel = createRegistrationsList(workingset);
+        namesTypesPanel.setStyleName("registration-list");
+        namesTypesPanel.setCaption("Registrations");
 
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
@@ -132,6 +136,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.addComponent(namesTypesPanel);
 
         registrations.add(registration);
+        workflow.removeAllComponents();
         workflow.addComponent(registration);
     }
 
@@ -179,7 +184,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param workingset
      * @return
      */
-    public Panel createNamesAndTypesList(RegistrationWorkingSet workingset) {
+    public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
         // prepare name and type list
         GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
         int row = 0;
@@ -205,6 +210,10 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
             Button editButton = new Button(FontAwesome.EDIT);
             editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
+            editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+                AbstractEditorAction.Type.EDIT,
+                dto.getId()
+                )));
 
             namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
             namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
@@ -232,9 +241,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
    private void addBulletWorkflowName() {
        WorkflowSteps steps = new WorkflowSteps();
        steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-               e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+               e -> eventBus.publishEvent(new ReferenceEditorAction(Type.EDIT)));
        steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
-               e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+               e -> eventBus.publishEvent(new TaxonNameEditorAction(Type.EDIT)));
        steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
        steps.appendNewWorkflowItem(4, "Awaiting publication", null);
        getWorkflow().addComponent(steps);
@@ -246,22 +255,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
   private void addBulletWorkflowTypification() {
       WorkflowSteps steps = new WorkflowSteps();
       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-              e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+              e -> eventBus.publishEvent(new ReferenceEditorAction(Type.EDIT)));
       steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
-              e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+              e -> eventBus.publishEvent(new TaxonNameEditorAction(Type.EDIT)));
       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
       getWorkflow().addComponent(steps);
   }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Autowired
-    @Override
-    protected void injectPresenter(RegistrationWorkflowPresenter presenter) {
-        setPresenter(presenter);
-    }
 
     /**
      * {@inheritDoc}

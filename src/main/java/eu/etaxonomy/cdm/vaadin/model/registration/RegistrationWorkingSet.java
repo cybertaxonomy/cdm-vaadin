@@ -15,8 +15,8 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import eu.etaxonomy.cdm.mock.Registration;
-import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
@@ -76,7 +76,7 @@ public class RegistrationWorkingSet {
         for(RegistrationDTO regDto : candidates){
                 if(citationId == null){
                     citationId = regDto.getCitationID();
-                    citation = regDto.getCitation();
+                    citation = regDto.getCitation().getTitleCache();
                 } else {
                     if(regDto.getCitationID() != citationId){
                         problems.add("Removing Registration " + regDto.registration().toString() + " from set since this refers to a different citation.");

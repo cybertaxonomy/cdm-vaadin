@@ -41,6 +41,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.vaadin.component.NestedFieldGroup;
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -141,13 +143,16 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
+            logger.debug("preCommit");
+            // notify the presenter to start a transaction
+            eventBus.publishEvent(new EditorPreSaveEvent(commitEvent, AbstractPopupEditor.this));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
-                // notify the presenter to persist the bean
-                eventBus.publishEvent(new EditorSaveEvent(commitEvent));
+                // notify the presenter to persist the bean and to commit the transaction
+                eventBus.publishEvent(new EditorSaveEvent(commitEvent, AbstractPopupEditor.this));
 
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
@@ -171,7 +176,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         try {
             fieldGroup.commit();
         } catch (CommitException e) {
-            fieldGroup.getFields().forEach(f -> ((AbstractField)f).setValidationVisible(true));
+            fieldGroup.getFields().forEach(f -> ((AbstractField<?>)f).setValidationVisible(true));
             if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
                 FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
                 updateFieldNotifications(invalidValueException.getInvalidFields());
@@ -214,6 +219,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return addField(new TextField(caption), propertyId, column, row);
     }
 
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column1, row1, column2, row2);
+        return field;
+    }
+
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column, row);
+        return field;
+    }
+
     protected PopupDateField addDateField(String caption, String propertyId) {
         return addField(new PopupDateField(caption), propertyId);
     }
@@ -224,6 +248,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected <T extends Field> T addField(T field, String propertyId) {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field);
         return field;
     }
@@ -247,6 +274,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field, column, row);
         return field;
     }
@@ -267,7 +297,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column1, int row1,
             int column2, int row2)
             throws OverlapsException, OutOfBoundsException {
-        fieldGroup.bind(field, propertyId);
+        if(propertyId != null){
+            fieldGroup.bind(field, propertyId);
+            if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+                ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+            }
+        }
         addComponent(field, column1, row1, column2, row2);
         return field;
     }
@@ -365,5 +400,17 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public void showInEditor(DTO beanToEdit) {
         fieldGroup.setItemDataSource(beanToEdit);
+        afterItemDataSourceSet();
+    }
+
+    /**
+     * This method is called after setting the item data source whereby the {@link FieldGroup#configureField(Field<?> field)} method will be called.
+     * In this method all fields are set to default states defined for the fieldGroup.
+     * <p>
+     * You can now implement this method if you need to configure the enable state of fields
+     * individually.
+     */
+    protected void afterItemDataSourceSet() {
+
     }
 }

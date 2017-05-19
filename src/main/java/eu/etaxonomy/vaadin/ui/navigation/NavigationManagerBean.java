@@ -1,8 +1,10 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import org.springframework.context.event.EventListener;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
@@ -109,7 +112,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
 
-		PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
+	    PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
 
 		Window window = new Window();
 		window.setCaption(popupContent.getWindowCaption());
@@ -145,6 +148,29 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
             logger.trace("reloading " + getState());
         }
         navigateTo(getState(), false);
+    }
 
+    /**
+     * This method requires that the {@SpringView} annotation is used to ser the name of the <code>View</code>.
+     *
+     * @return the current view name or <code>null</code>
+     */
+    public String getCurrentViewName() {
+        SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
+        if(springViewAnnotation != null){
+            return springViewAnnotation.name();
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getCurrentViewParameters(){
+        String substate = getState();
+        String currentViewName = getCurrentViewName();
+        if(currentViewName != null){
+            substate = substate.replaceAll("^" + currentViewName + "/?", "");
+
+        }
+        return Arrays.asList(substate.split("/"));
     }
 }

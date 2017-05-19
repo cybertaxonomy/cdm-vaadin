@@ -16,15 +16,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
-import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
@@ -59,23 +56,14 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
     @Autowired
     protected ApplicationEventPublisher eventBus;
 
-    /**
-     * @return
-     *
-     * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
-     */
-    private SecurityContext currentSecurityContext() {
-        return SecurityContextHolder.getContext();
-    }
-
     public boolean authenticate(String userName, String password){
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
-        AuthenticationManager authenticationManager = (AuthenticationManager) CdmSpringContextHelper.getCurrent().getBean("authenticationManager");
+        AuthenticationManager authenticationManager = getRepo().getAuthenticationManager();
         Authentication authentication = authenticationManager.authenticate(token);
 
         if(authentication != null && authentication.isAuthenticated()) {
-            log.debug("user '" + userName + "' autheticated");
+            log.debug("user '" + userName + "' authenticated");
             currentSecurityContext().setAuthentication(authentication);
             if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
                 log.debug("reloading current view");
@@ -92,8 +80,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
      * {@inheritDoc}
      */
     @Override
-    public void onViewEnter() {
-        super.onViewEnter();
+    public void handleViewEntered() {
         // attempt to auto login
         if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
             log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));

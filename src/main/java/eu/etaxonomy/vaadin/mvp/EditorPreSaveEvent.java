@@ -12,24 +12,23 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 
 /**
  * Usually a notification to a presenter to
- * perform a save operation and to commit the transaction
+ * prepare for a save operation by starting a transaction
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
  */
-public class EditorSaveEvent {
+public class EditorPreSaveEvent {
 
     private CommitEvent commitEvent;
 
     // FIXME this is only a iterim solution for the problem described in https://dev.e-taxonomy.eu/redmine/issues/6562
     private AbstractView view;
 
-
     /**
      * @param commitEvent
      */
-    public EditorSaveEvent(CommitEvent commitEvent, AbstractView view) {
+    public EditorPreSaveEvent(CommitEvent commitEvent, AbstractView view) {
         this.commitEvent = commitEvent;
         this.view = view;
     }

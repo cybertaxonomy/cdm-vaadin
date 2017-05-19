@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,22 +26,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
+ * Mock service which creates Registration on the fly.
+ * Registrations are never persisted they are only kept in memory.
+ *
  * @author a.kohlbecker
  * @since Mar 10, 2017
  *
  */
 @Service("registrationServiceMock")
 @Transactional(readOnly=true)
-public class RegistrationService {
+public class RegistrationService implements IRegistrationWorkingSetService {
 
     private static final int SIZE = 50; // FIXME test performance with 50 !!!!!
+
+    private static final Logger logger = Logger.getLogger(RegistrationService.class);
 
     @Autowired
     @Qualifier("cdmRepository")
@@ -53,6 +64,8 @@ public class RegistrationService {
 
     private Collection<CdmBase> cdmEntities = new HashSet<>();
 
+    int autoincrementId = 100000;
+
     public RegistrationService() {
     }
 
@@ -60,6 +73,14 @@ public class RegistrationService {
     int minTypeDesignationCount = 1;
 
     protected void init(){
+        if(isCleanSweep()){
+            autoincrementId = 100000;
+            registrationsByUUID = new HashMap<>();
+            registrationsByRegID = new HashMap<>();
+            registrationDTOsById = new HashMap<>();
+            registrationDTOsByIdentifier = new HashMap<>();
+            registrationDTOsByCitationId = new HashMap<>();
+        }
         if(registrationsByUUID.size() == 0){
             TransactionStatus tx = repo.startTransaction(true);
             int pageIndex = 0;
@@ -69,20 +90,21 @@ public class RegistrationService {
                     break;
                 }
                 for(TaxonNameBase name : names){
-                    if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY())){
+                    if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY()) && name.getNomenclaturalReference() != null){
                         if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
 
                             // name
-                            Registration nameReg = new Registration();
-                            nameReg.setName(name);
+                            logger.debug("creating Registration for " + name.getTitleCache());
+                            Registration reg = newMockRegistration();
+                            reg.setName(name);
                             cdmEntities.add(name);
-                            put(new RegistrationDTO(nameReg));
 
                             // typedesignation
-                            Registration typedesignationReg = new Registration();
-                            typedesignationReg.addTypeDesignations(name.getTypeDesignations());
+                            reg.setTypeDesignations(name.getTypeDesignations());
                             cdmEntities.addAll(name.getTypeDesignations());
-                            put(new RegistrationDTO(typedesignationReg));
+
+                            put(new RegistrationDTO(reg));
+                            logger.debug("\t\t\tdone");
                         }
                     }
                 }
@@ -92,9 +114,32 @@ public class RegistrationService {
     }
 
     /**
+     * @return
+     */
+    private Registration newMockRegistration() {
+        Registration reg = Registration.NewInstance();
+        reg.setId(autoincrementId);
+        reg.setSpecificIdentifier(String.valueOf(autoincrementId));
+        reg.setIdentifier("http://phycobank/" + reg.getSpecificIdentifier());
+        autoincrementId++;
+        reg.setStatus(RegistrationStatus.values()[(int) (Math.random() * RegistrationStatus.values().length)]);
+        reg.setRegistrationDate(DateTime.now());
+        return reg;
+    }
+
+    /**
+     * @return
+     */
+    private boolean isCleanSweep() {
+
+        return false;
+    }
+
+    /**
      * @param reg
      */
     private void put(RegistrationDTO dto) {
+        logger.debug("putting DTO " + dto.getSummary());
         Registration reg = dto.registration();
         registrationsByUUID.put(dto.getUuid(), reg);
         registrationsByRegID.put(reg.getId(), reg);
@@ -126,6 +171,7 @@ public class RegistrationService {
         return registrationsByUUID.values();
     }
 
+    @Override
     public Collection<RegistrationDTO> listDTOs() {
         init();
         return registrationDTOsById.values();
@@ -158,6 +204,7 @@ public class RegistrationService {
      * @param id the CDM Entity id
      * @return
      */
+    @Override
     public RegistrationDTO loadDtoById(Integer id) {
         init();
         return registrationDTOsById.get(id);
@@ -168,11 +215,30 @@ public class RegistrationService {
      * @return
      * @throws RegistrationValidationException
      */
+    @Override
     public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException {
         init();
         RegistrationDTO dto = registrationDTOsById.get(id);
 
         return new RegistrationWorkingSet(registrationDTOsByCitationId.get(dto.getCitationID()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 

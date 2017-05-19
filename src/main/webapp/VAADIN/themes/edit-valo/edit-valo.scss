@@ -234,7 +234,7 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
     #workingset {
             padding: round($v-unit-size / 2);
-            .names-types-list, .registration-list-item {
+            .registration-list, .registration-list-item {
                 margin-top: round($v-unit-size / 2);
             }
     }

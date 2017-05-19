@@ -13,24 +13,21 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @since Mar 22, 2017
  *
  */
-public class ReferenceEvent extends AbstractEntityEvent {
+public class RegistrationEditorAction extends AbstractEditorAction {
 
     /**
      * @param eventType
      */
-    public ReferenceEvent(EntityEventType eventType) {
-        super(eventType);
+    public RegistrationEditorAction(Type type) {
+        super(type);
     }
 
     /**
-     * @param eventType
-     * @param entityId
+     * @param edit
+     * @param citationId
      */
-    public ReferenceEvent(EntityEventType eventType, Integer entityId) {
-        super(eventType, entityId);
+    public RegistrationEditorAction(Type type, Integer enitityId) {
+        super(type, enitityId);
     }
-
-
-
 
 }

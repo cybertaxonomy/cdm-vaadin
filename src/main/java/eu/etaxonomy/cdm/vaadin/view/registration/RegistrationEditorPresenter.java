@@ -6,24 +6,24 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.reference;
+package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
  * @author a.kohlbecker
- * @since Apr 5, 2017
+ * @since May 15, 2017
  *
  */
 @SpringComponent
 @ViewScope
-public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Reference> {
+public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration> {
 
+    private static final long serialVersionUID = 6930557602995331944L;
 
-    private static final long serialVersionUID = -7926116447719010837L;
 
 }

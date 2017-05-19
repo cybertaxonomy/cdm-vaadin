@@ -42,6 +42,9 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 		if(!ApplicationView.class.isAssignableFrom(this.getClass())){
 		    throw new RuntimeException("Any view bean must implement the ApplicationView interface: ViewBean ---> ViewInterface ---> ApplicationView");
 		}
+
+		initContent();
+
 		presenter.init((ApplicationView<P>) this);
 
 		onViewReady();
@@ -51,7 +54,10 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 		this.presenter = presenter;
 	}
 
-	protected abstract void injectPresenter(P presenter);
+    @Autowired
+	protected final void injectPresenter(P presenter){
+	    setPresenter(presenter);
+	}
 
 	@Override
 	public void detach() {
@@ -59,6 +65,15 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 		super.detach();
 	}
 
+	/**
+	 * Initialize the Components of the View
+	 */
+	protected abstract void initContent();
+
+	/**
+	 * This method is called after the content of the view and the presenter
+	 * are initialized and ready.
+	 */
 	protected void onViewReady() {
 	    logger.trace("View ready");
 	}

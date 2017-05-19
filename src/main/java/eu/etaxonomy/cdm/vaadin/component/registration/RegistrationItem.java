@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
+import java.util.Collection;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -19,6 +21,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
@@ -26,8 +29,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
-import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
-import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
@@ -74,9 +77,6 @@ public class RegistrationItem extends GridLayout {
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
     private Label releasedLabel = new Label();
-
-    private String citationString;
-    // --------------------------------------------------
 
     /**
      *
@@ -154,29 +154,29 @@ public class RegistrationItem extends GridLayout {
     public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
         this.parentView = parentView;
 
-        NavigationEvent openButtonEvent = new NavigationEvent(
+        NavigationEvent navigationEvent = new NavigationEvent(
                 RegistrationWorkflowViewBean.NAME,
                 RegistrationWorkflowViewBean.ACTION_EDIT,
                 Integer.toString(regDto.getId())
                 );
 
-        updateUI(regDto.getCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
-                openButtonEvent, null, regDto);
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+                navigationEvent, null, regDto);
     }
 
     public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
         this.parentView = parentView;
-        ReferenceEvent openButtonEvent;
+
+        ReferenceEditorAction referenceEditorAction;
         if(workingSet.getCitationId() != null){
-            openButtonEvent = new ReferenceEvent(EntityEventType.EDIT, workingSet.getCitationId());
+            referenceEditorAction = new ReferenceEditorAction(Type.EDIT, workingSet.getCitationId());
         } else {
-            openButtonEvent = new ReferenceEvent(EntityEventType.ADD);
+            referenceEditorAction = new ReferenceEditorAction(Type.ADD);
         }
         TimePeriod datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
-                openButtonEvent, FontAwesome.EDIT, null);
+                referenceEditorAction, FontAwesome.EDIT, null);
     }
-
 
     /**
      *
@@ -217,6 +217,8 @@ public class RegistrationItem extends GridLayout {
         if(openButtonEvent != null){
             // Buttons
             getOpenButton().setVisible(true);
+            Collection<?> removeCandidates = getOpenButton().getListeners(ClickListener.class);
+            removeCandidates.forEach(l -> getOpenButton().removeClickListener((ClickListener)l));
             getOpenButton().addClickListener(e -> publishEvent(openButtonEvent));
         }
 

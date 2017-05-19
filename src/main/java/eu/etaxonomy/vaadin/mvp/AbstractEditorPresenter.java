@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -19,10 +21,28 @@ import com.vaadin.data.fieldgroup.BeanFieldGroup;
  */
 public abstract class AbstractEditorPresenter<DTO extends Object> extends AbstractPresenter {
 
-    @SuppressWarnings("unchecked")
+
+    private static final long serialVersionUID = -6677074110764145236L;
+
+    @Autowired
+    protected ApplicationEventPublisher eventBus;
+
+    @EventListener
+    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+        if(!preSaveEvent.getView().equals(getView())){
+            return;
+        }
+    }
+
+    /**
+     *
+     * @param saveEvent
+     */
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-        // casting to BeanFieldGroup<DTO> must be possible here!
+        if(!saveEvent.getView().equals(getView())){
+            return;
+        }
         DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
         saveBean(bean);
     }

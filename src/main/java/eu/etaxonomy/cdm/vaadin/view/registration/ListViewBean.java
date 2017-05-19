@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Item;
@@ -55,6 +54,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     public static final String NAME = "list";
 
+    public static final String OPTION_ALL = "all";
+
+    public static final String OPTION_IN_PROGRESS = "inprogress";
+
     private CssLayout listContainer;
 
     private Grid grid;
@@ -62,9 +65,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private CssLayout toolBar;
 
     public ListViewBean() {
-
         super();
+    }
 
+    @Override
+    protected void initContent() {
         toolBar = new CssLayout();
         toolBar.setWidth(100, Unit.PERCENTAGE);
         toolBar.addComponent(new Button("As grid", e -> toggleListType(e)));
@@ -74,6 +79,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         buildGrid();
 
         showList();
+
     }
 
     @Override
@@ -143,19 +149,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         getPresenter().onViewEnter();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Autowired
-    protected void injectPresenter(ListPresenter presenter) {
-        setPresenter(presenter);
-    }
-
     @Override
     public void populate(Collection<RegistrationDTO> registrations) {
 
-        registrations = new ArrayList<RegistrationDTO>(registrations).subList(0, 10);
+        registrations = new ArrayList<RegistrationDTO>(registrations);
 
         populateGrid(registrations);
         populateList(registrations);
