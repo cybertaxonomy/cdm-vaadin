@@ -195,6 +195,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
 
+            CssLayout buttonGroup = new CssLayout();
+            buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+
             Button messageButton = new Button(FontAwesome.COMMENT);
             messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
             if(dto.getMessages().isEmpty()){
@@ -212,20 +215,20 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
             }
             messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
             messageButton.setCaptionAsHtml(true);
+            buttonGroup.addComponent(messageButton);
 
+            if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()) {
             Button editButton = new Button(FontAwesome.EDIT);
             editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
             editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
                 AbstractEditorAction.Type.EDIT,
                 dto.getId()
                 )));
+            buttonGroup.addComponent(editButton);
+            }
 
             namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
             namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
-            CssLayout buttonGroup = new CssLayout();
-            buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-            buttonGroup.addComponent(messageButton);
-            buttonGroup.addComponent(editButton);
             namesTypesList.addComponent(buttonGroup, 2, row);
             namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
             row++;
