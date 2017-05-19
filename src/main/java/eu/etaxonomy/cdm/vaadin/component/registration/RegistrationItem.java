@@ -18,6 +18,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -163,13 +164,19 @@ public class RegistrationItem extends GridLayout {
     public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
         this.parentView = parentView;
 
-        NavigationEvent navigationEvent = new NavigationEvent(
-                RegistrationWorkflowViewBean.NAME,
-                RegistrationWorkflowViewBean.ACTION_EDIT,
-                Integer.toString(regDto.getId())
-                );
+        NavigationEvent navigationEvent = null;
+        if(regDto.getCitationID() != null) {
+            navigationEvent = new NavigationEvent(
+                    RegistrationWorkflowViewBean.NAME,
+                    RegistrationWorkflowViewBean.ACTION_EDIT,
+                    Integer.toString(regDto.getCitationID())
+                    );
+        } else {
+            setComponentError(new UserError("Citation is missing"));
+        }
 
-        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(),
+                regDto.getMessages().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 

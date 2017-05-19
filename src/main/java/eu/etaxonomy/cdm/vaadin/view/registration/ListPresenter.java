@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 
@@ -48,7 +47,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     private static final long serialVersionUID = 5419947244621450665L;
 
     @Autowired
-    @Qualifier(IRegistrationWorkingSetService.ACTIVE_IMPL)
     private IRegistrationWorkingSetService workingSetService;
 
     @Override

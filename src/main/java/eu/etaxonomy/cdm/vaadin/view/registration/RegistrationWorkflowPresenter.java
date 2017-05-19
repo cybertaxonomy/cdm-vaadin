@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.TransactionStatus;
 
@@ -49,7 +48,6 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     private static final long serialVersionUID = 1L;
 
     @Autowired
-    @Qualifier(IRegistrationWorkingSetService.ACTIVE_IMPL)
     private IRegistrationWorkingSetService workingSetService;
 
     private RegistrationWorkingSet workingset;
@@ -81,8 +79,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             }
             getView().setWorkingset(workingset);
         } else {
-            Integer registrationID = event.getRegistrationID();
-            presentWorkingSetByRegID(registrationID);
+            Integer citationID = event.getCitationID();
+            presentWorkingSetByRegID(citationID);
         }
 
     }
@@ -92,9 +90,9 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
      * @deprecated use other method working sets should only be addressed by the referenceID
      */
     @Deprecated
-    private void presentWorkingSetByRegID(Integer registrationID) {
+    private void presentWorkingSetByRegID(Integer citationID) {
         try {
-            workingset = workingSetService.loadWorkingSetByRegistrationID(registrationID);
+            workingset = workingSetService.loadWorkingSetByCitationID(citationID);
         } catch (RegistrationValidationException error) {
             getView().getWorkflow().setComponentError(new SystemError(error));
         }
@@ -178,7 +176,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     /**
-     * 
+     *
      */
     protected void refreshView() {
         presentWorkingSet(workingset.getCitationId());

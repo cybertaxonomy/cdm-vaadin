@@ -38,12 +38,8 @@ public interface IRegistrationWorkingSetService {
      * @param  id the CDM Entity id
      * @return
      * @throws RegistrationValidationException
-     * @deprecated use other method working sets should only be addressed by the referenceID
      */
-    @Deprecated
-    public RegistrationWorkingSet loadWorkingSetByRegistrationID(Integer id) throws RegistrationValidationException;
-
-    public static final String ACTIVE_IMPL = "registrationWorkingSetService";
+    public RegistrationWorkingSet loadWorkingSetByCitationID(Integer id) throws RegistrationValidationException;
 
     /**
      * @param referenceID
