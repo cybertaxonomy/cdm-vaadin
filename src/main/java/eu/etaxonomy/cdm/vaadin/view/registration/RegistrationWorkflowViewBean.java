@@ -47,6 +47,7 @@ import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -126,14 +127,18 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.setId(DOM_ID_WORKINGSET);
         registration.setWidth(100, Unit.PERCENTAGE);
 
-        Panel namesTypesPanel = createRegistrationsList(workingset);
-        namesTypesPanel.setStyleName("registration-list");
-        namesTypesPanel.setCaption("Registrations");
+        Panel registrationListPanel = createRegistrationsList(workingset);
+        registrationListPanel.setStyleName("registration-list");
+        registrationListPanel.setCaption("Registrations");
 
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
-        registration.addComponent(new RegistrationItem(workingset, this));
-        registration.addComponent(namesTypesPanel);
+        RegistrationItem registrationItem = new RegistrationItem(workingset, this);
+        if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()){
+            registrationItem.getSubmitterLabel().setVisible(true);
+        };
+        registration.addComponent(registrationItem);
+        registration.addComponent(registrationListPanel);
 
         registrations.add(registration);
         workflow.removeAllComponents();

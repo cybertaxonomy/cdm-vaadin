@@ -244,6 +244,12 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     .registration-list-item {
         border-top: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
         padding-top: 4px; // avoid button group to overlap with border
+        .v-label-registration-state {
+            margin-right: round($v-unit-size / 4);
+        }            
+        .v-caption-submitter {
+            margin-right: round($v-unit-size / 8);
+        }
     }
 
    .registration-workflow-item {

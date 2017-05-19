@@ -166,10 +166,22 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public void onEntityChangeEvent(EntityChangeEvent event){
         if(event.getEntityType().isAssignableFrom(Reference.class)){
             if(workingset.getCitationId().equals(event.getEntityId())){
-                presentWorkingSet(event.getEntityId());
+                refreshView();
+            }
+        }
+        if(event.getEntityType().isAssignableFrom(Registration.class)){
+            if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getId() == event.getEntityId())){
+                refreshView();
             }
         }
 
+    }
+
+    /**
+     * 
+     */
+    protected void refreshView() {
+        presentWorkingSet(workingset.getCitationId());
     }
 
 }

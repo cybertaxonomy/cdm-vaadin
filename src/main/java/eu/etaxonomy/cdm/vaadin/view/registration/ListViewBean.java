@@ -25,7 +25,6 @@ import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -37,6 +36,7 @@ import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -206,14 +206,14 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         buttonColumn.setSortable(false);
 
         grid.setFrozenColumnCount(1);
-
     }
-
 
     public void populateList(Collection<RegistrationDTO> registrations) {
 
+        boolean isCurator = UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
-            Component item = new RegistrationItem(regDto, this);
+            RegistrationItem item = new RegistrationItem(regDto, this);
+            item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
             listContainer.addComponent(item);
         }

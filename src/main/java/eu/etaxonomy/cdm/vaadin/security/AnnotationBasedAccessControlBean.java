@@ -22,6 +22,8 @@ import com.vaadin.ui.UI;
  * @author a.kohlbecker
  * @since Apr 24, 2017
  *
+ *
+ * FIMXE consider renaming this class and its interface, since it is no longer annotation based!!!!
  */
 public class AnnotationBasedAccessControlBean implements ViewInstanceAccessControl {
 
@@ -60,6 +62,7 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
                 }
                 return false;
                 // FIMXE implement further checks
+                // TODO use the UserHelperBean?
             }
         }
 

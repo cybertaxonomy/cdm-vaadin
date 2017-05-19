@@ -55,7 +55,7 @@ public class RegistrationItem extends GridLayout {
 
     private static final String LABEL_CAPTION_RELEASED = "Released";
 
-    private static final int GRID_ROWS = 4;
+    private static final int GRID_ROWS = 5;
 
     private static final int GRID_COLS = 3;
 
@@ -74,6 +74,7 @@ public class RegistrationItem extends GridLayout {
     private Button blockedByButton = new Button(FontAwesome.WARNING);
     private Button messageButton;
     private Button openButton = new Button(FontAwesome.COGS);
+    private Label submitterLabel = new Label();
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
     private Label releasedLabel = new Label();
@@ -101,10 +102,18 @@ public class RegistrationItem extends GridLayout {
         setWidth(100, Unit.PERCENTAGE);
         addStyleName("registration-list-item");
 
-        typeStateLabel.setStyleName(LABEL_NOWRAP);
+        CssLayout stateUserContainer = new CssLayout();
+        typeStateLabel.setStyleName(LABEL_NOWRAP + " registration-state");
         typeStateLabel.setVisible(false);
-        addComponent(typeStateLabel, 0, 0);
-        setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
+
+        submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
+        submitterLabel.setIcon(FontAwesome.USER);
+        submitterLabel.setContentMode(ContentMode.HTML);
+        submitterLabel.setVisible(false);
+
+        stateUserContainer.addComponents(typeStateLabel, submitterLabel);
+        addComponent(stateUserContainer, 0, 0);
+        setComponentAlignment(stateUserContainer, Alignment.TOP_LEFT);
 
         identifierLink.setVisible(false);
         addComponent(identifierLink, 1, 0);
@@ -161,7 +170,7 @@ public class RegistrationItem extends GridLayout {
                 );
 
         updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
-                navigationEvent, null, regDto);
+                navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 
     public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
@@ -175,14 +184,15 @@ public class RegistrationItem extends GridLayout {
         }
         TimePeriod datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
-                referenceEditorAction, FontAwesome.EDIT, null);
+                referenceEditorAction, FontAwesome.EDIT, null, workingSet.getRegistrationDTOs().get(0).getSubmitterUserName());
     }
 
     /**
+     * @param submitterUserName TODO
      *
      */
     private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount,
-            Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto) {
+            Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto, String submitterUserName) {
 
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
@@ -239,30 +249,23 @@ public class RegistrationItem extends GridLayout {
             registrationDate = regDto.getRegistrationDate();
         }
 
-
         getCitationSummaryLabel().setValue(labelMarkup.toString());
+        getSubmitterLabel().setValue(submitterUserName);
         updateDateLabels(created, datePublished, registrationDate);
     }
 
 
-    /**
-     *
-     */
     private void updateDateLabels(DateTime created, TimePeriod datePublished, DateTime released) {
         getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
         if(datePublished != null){
             getPublishedLabel().setVisible(true);
-
-
             getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + timePeriodFormatter.print(datePublished));
         }
         if(released != null){
             getReleasedLabel().setVisible(true);
             getReleasedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_RELEASED + "</span>&nbsp;" + released.toString(ISODateTimeFormat.yearMonthDay()));
         }
-        // LABEL_CAPTION_RELEASED
     }
-
 
 
     private void publishEvent(Object event) {
@@ -333,6 +336,14 @@ public class RegistrationItem extends GridLayout {
     public Label getReleasedLabel() {
         return releasedLabel;
     }
+
+    /**
+     * @return the submitterLabel
+     */
+    public Label getSubmitterLabel() {
+        return submitterLabel;
+    }
+
 
    /* --------------------------------------- */
 

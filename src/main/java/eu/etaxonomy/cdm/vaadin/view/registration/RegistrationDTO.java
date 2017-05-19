@@ -39,6 +39,8 @@ public class RegistrationDTO{
 
     private String citationDetail = null;
 
+    private String submitterUserName = null;
+
     private Registration reg;
 
     private List<String> messages = new ArrayList<>();
@@ -56,6 +58,10 @@ public class RegistrationDTO{
          this.reg = reg;
 
          registrationType = RegistrationType.from(reg);
+
+         if(reg.getSubmitter() != null ){
+             submitterUserName = reg.getSubmitter().getUsername();
+         }
 
         if(hasName(reg)){
             citation = reg.getName().getNomenclaturalReference();
@@ -173,6 +179,10 @@ public class RegistrationDTO{
      */
     public String getSummary() {
         return summary;
+    }
+
+    public String getSubmitterUserName(){
+        return submitterUserName;
     }
 
     /**
