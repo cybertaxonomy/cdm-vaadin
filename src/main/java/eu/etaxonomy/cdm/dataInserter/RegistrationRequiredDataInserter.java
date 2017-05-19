@@ -10,8 +10,10 @@ package eu.etaxonomy.cdm.dataInserter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -60,6 +62,8 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
     private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
     private ExtensionType extensionTypeIAPTRegData;
+
+    Map<String, Institution> instituteMap = new HashMap<>();
 
     public static boolean commandsExecuted = false;
 
@@ -212,13 +216,21 @@ private void insertRequiredData() {
      * @return
      */
     private Institution getInstitution(String office) {
-        Pager<AgentBase> pager = repo.getAgentService().findByTitle(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
-        if(!pager.getRecords().isEmpty()){
-            return (Institution) pager.getRecords().get(0);
+        Institution institution;
+        if(instituteMap.containsKey(office)){
+            institution = instituteMap.get(office);
         } else {
-            Institution institute = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
-            return institute;
+
+            Pager<AgentBase> pager = repo.getAgentService().findByTitle(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
+            if(!pager.getRecords().isEmpty()){
+                institution =  (Institution) pager.getRecords().get(0);
+            } else {
+                Institution institute = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
+                institution = institute;
+            }
+            instituteMap.put(office, institution);
         }
+        return institution;
     }
 
 
