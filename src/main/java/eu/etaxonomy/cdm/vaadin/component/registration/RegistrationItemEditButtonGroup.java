@@ -31,18 +31,11 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     public static final String STYLE_NAMES = "edit-button-group " + ValoTheme.LAYOUT_COMPONENT_GROUP;
 
-    /**
-     * Either the id of the name in the Registration or the id of the typifying name
-     * of the first type designation.
-     */
-    private Integer nameId = null;
+    private IdButton nameButton = null;
 
-    private Button nameButton = null;
-
-    private List<Button> typeDesignationButtons = new ArrayList<>();
+    private List<IdButton> typeDesignationButtons = new ArrayList<>();
 
     private List<Label> labels = new ArrayList<>();
-
 
 
     public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
@@ -50,8 +43,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         setWidth(100, Unit.PERCENTAGE);
 
         if(regDto.getName() != null){
-            nameButton = new Button(regDto.getName().getLabel());
-            addComponent(nameButton);
+            nameButton = new IdButton(regDto.getName().getId(), new Button(regDto.getName().getLabel()));
+            addComponent(nameButton.getButton());
         } else {
             // no name in the registration! we only show the typified name as label
             addComponent(new Label(regDto.getTypifiedName().getLabel()));
@@ -65,7 +58,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             regDto.getTypeDesignations().get(key).forEach(value -> {
             Button tdButton = new Button(value.getLabel());
             addComponent(tdButton);
-            typeDesignationButtons.add(tdButton);
+            typeDesignationButtons.add(new IdButton(value.getId(), tdButton));
             }) ;
         });
         Button addTypeDesignationButton = new Button(FontAwesome.PLUS);
@@ -76,7 +69,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     }
 
-    public Button getNameButton() {
+    public IdButton getNameButton() {
         return nameButton;
     }
 
@@ -86,6 +79,32 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
     @Override
     protected void addDefaultStyles() {
         addStyleName(STYLE_NAMES);
+    }
+
+    public class IdButton {
+        private Integer id;
+        private Button button;
+
+        public IdButton(Integer id, Button button){
+            this.id = id;
+            this.button = button;
+        }
+
+        /**
+         * @return the id
+         */
+        public Integer getId() {
+            return id;
+        }
+
+        /**
+         * @return the button
+         */
+        public Button getButton() {
+            return button;
+        }
+
+
     }
 
 }

@@ -93,6 +93,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         newValue = HibernateProxyHelper.deproxy(newValue);
 
+        if(newValue == null) {
+            return;
+        }
+
         if(Person.class.isAssignableFrom(newValue.getClass())){
             // value is a Person:
             compositeWrapper.addComponent(personField);

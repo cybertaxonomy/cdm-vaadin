@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
@@ -89,6 +90,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
         addField(typeSelect, "type", 3, row);
+        grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
         addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;

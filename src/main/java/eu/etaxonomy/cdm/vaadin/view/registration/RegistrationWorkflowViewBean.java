@@ -249,7 +249,17 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         namesTypesList.setComponentAlignment(typeStateLabel, Alignment.MIDDLE_LEFT);
 
         RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
-        // editButtonGroup.setStyleName(ValoTheme.BUTTON_TINY);
+        if(editButtonGroup.getNameButton() != null){
+
+            editButtonGroup.getNameButton().getButton().addClickListener(e -> {
+                Integer nameId = editButtonGroup.getNameButton().getId();
+                getEventBus().publishEvent(new TaxonNameEditorAction(
+                    AbstractEditorAction.Type.EDIT,
+                    nameId
+                    )
+                );
+            });
+        }
         namesTypesList.addComponent(editButtonGroup, 1, row);
         namesTypesList.addComponent(buttonGroup, 2, row);
         namesTypesList.setComponentAlignment(buttonGroup, Alignment.MIDDLE_LEFT);

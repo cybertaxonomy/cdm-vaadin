@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -181,7 +182,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
                 updateFieldNotifications(invalidValueException.getInvalidFields());
                 Notification.show("The entered data in " + invalidValueException.getInvalidFields().size() + " fields is incomplete or invalid.");
-            } else {
+            } else if(e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof PermissionDeniedException){
+                PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
+                Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
+            }
+            else {
                 Logger.getLogger(this.getClass()).error("Error saving", e);
                 Notification.show("Error saving", Type.ERROR_MESSAGE);
             }

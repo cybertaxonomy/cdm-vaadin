@@ -74,6 +74,18 @@ public class SelectFieldFactory {
     }
 
     public <T extends CdmBase> ListSelect createListSelect(String caption, Class<T> type, List<OrderHint> orderHints){
+        return createListSelect(caption, type, orderHints, null);
+    }
+
+    /**
+     *
+     * @param caption
+     * @param type
+     * @param orderHints
+     * @param propertyId the property id from which to read the label
+     * @return
+     */
+    public <T extends CdmBase> ListSelect createListSelect(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
 
         if(orderHints == null){
             orderHints = OrderHint.defaultOrderHintsFor(type);
@@ -83,9 +95,12 @@ public class SelectFieldFactory {
         ListSelect select = new ListSelect(caption, termItemContainer);
 
         // guess property id to use for display
-        String propertyId = null;
-        if(orderHints != null && !orderHints.isEmpty()){
-            propertyId = orderHints.get(0).getPropertyName();
+        if(propertyId == null) {
+            if(orderHints != null && !orderHints.isEmpty()){
+                propertyId = orderHints.get(0).getPropertyName();
+            }
+        }
+        if(propertyId != null){
             select.setItemCaptionPropertyId(propertyId);
         }
         return select;

@@ -23,6 +23,7 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -31,9 +32,11 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.taxon.TaxonNamePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -135,6 +138,15 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         Registration registration = getRepo().getRegistrationService().find(event.getEntityId());
         RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class);
         popup.showInEditor(registration);
+        getRepo().commitTransaction(tx);
+    }
+
+    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
+    public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
+        TransactionStatus tx = getRepo().startTransaction(false);
+        TaxonNameBase taxonName = getRepo().getNameService().find(event.getEntityId());
+        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        popup.showInEditor(taxonName);
         getRepo().commitTransaction(tx);
     }
 
