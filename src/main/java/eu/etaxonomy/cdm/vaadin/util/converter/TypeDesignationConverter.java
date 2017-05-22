@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,8 @@ import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
+import eu.etaxonomy.cdm.vaadin.view.registration.IdAndString;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
  * Converts a collection of TypeDesignations, which should belong to the
@@ -41,46 +44,30 @@ public class TypeDesignationConverter {
     private final String separator = ", ";
 
     private Collection<TypeDesignationBase> typeDesignations;
-    private Map<TypeDesignationStatusBase<?>, Collection<String>> orderedStrings;
+    private Map<TypeDesignationStatusBase<?>, Collection<IdAndString>> orderedStringsByType;
+    private LinkedHashMap<String, Collection<IdAndString>> orderedRepresentations = new LinkedHashMap<>();
+    private IdAndString typifiedName;
 
     private String finalString = null;
 
-    private String typifiedNameCache = null;
+
 
     /**
      * @param taxonNameBase
+     * @throws RegistrationValidationException
      *
      */
-    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations, TaxonNameBase taxonNameBase) {
+    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
-        orderedStrings = new HashMap<>(typeDesignations.size());
-        if(taxonNameBase != null){
-            this.typifiedNameCache = taxonNameBase.getTitleCache();
-        }
+        orderedStringsByType = new HashMap<>();
+        typeDesignations.forEach(td -> putString(td.getTypeStatus(), new IdAndString(td.getId(), stringify(td))));
+        orderedRepresentations = buildOrderedRepresentations();
+        this.typifiedName = findTypifiedName();
     }
 
-    private void putString(TypeDesignationStatusBase<?> status, String string){
-        // the cdm orderd term bases are ordered invers, fixing this for here
-        if(status == null){
-            status = SpecimenTypeDesignationStatus.TYPE();
-        }
-        if(!orderedStrings.containsKey(status)){
-            orderedStrings.put(status, new ArrayList<String>());
-        }
-        orderedStrings.get(status).add(string);
-    }
+    private LinkedHashMap buildOrderedRepresentations(){
 
-
-    public TypeDesignationConverter buildString(){
-
-        typeDesignations.forEach(td -> putString(td.getTypeStatus(), stringify(td)));
-
-        StringBuilder sb = new StringBuilder();
-
-        if(typifiedNameCache != null){
-            sb.append(typifiedNameCache).append(": ");
-        }
-        List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(orderedStrings.keySet());
+        List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(orderedStringsByType.keySet());
 
         Collections.sort(keyList, new Comparator<TypeDesignationStatusBase>() {
             @Override
@@ -90,15 +77,25 @@ public class TypeDesignationConverter {
             }
         });
 
+        keyList.forEach(key -> orderedRepresentations.put(getTypeDesignationStytusLabel(key), orderedStringsByType.get(key)));
+        return orderedRepresentations;
+    }
+
+    public TypeDesignationConverter buildString(){
+
+        StringBuilder sb = new StringBuilder();
+
+        if(getTypifiedNameCache() != null){
+            sb.append(getTypifiedNameCache()).append(": ");
+        }
+
+        List<String> keyList = new LinkedList<>(orderedRepresentations.keySet());
+
+
         keyList.forEach(key -> {
-            if(key.equals( SpecimenTypeDesignationStatus.TYPE())){
-                sb.append("Type");
-            } else {
-                sb.append(key.getPreferredRepresentation(Language.DEFAULT()));
-            }
-            sb.append(": ");
-            orderedStrings.get(key).forEach(str -> {
-                sb.append(str);
+            sb.append(key).append(": ");
+            orderedRepresentations.get(key).forEach(isAndString -> {
+                sb.append(isAndString.getLabel());
                 if(sb.length() > 0){
                     sb.append(separator);
                 }
@@ -107,6 +104,93 @@ public class TypeDesignationConverter {
 
         finalString  = sb.toString();
         return this;
+    }
+
+    public Map<String, Collection<IdAndString>> getOrderedTypeDesignationRepresentations() {
+        return orderedRepresentations;
+    }
+
+    /**
+     * FIXME use the validation framework validators and to store the validation problems!!!
+     *
+     * @return
+     * @throws RegistrationValidationException
+     */
+    private IdAndString findTypifiedName() throws RegistrationValidationException {
+
+        List<String> problems = new ArrayList<>();
+
+        TaxonNameBase<?,?> typifiedName = null;
+
+        for(TypeDesignationBase<?> typeDesignation : typeDesignations){
+            typeDesignation.getTypifiedNames();
+            if(typeDesignation.getTypifiedNames().isEmpty()){
+
+                //TODO instead throw RegistrationValidationException()
+                problems.add("Missing typifiedName in " + typeDesignation.toString());
+                continue;
+            }
+            if(typeDesignation.getTypifiedNames().size() > 1){
+              //TODO instead throw RegistrationValidationException()
+                problems.add("Multiple typifiedName in " + typeDesignation.toString());
+                continue;
+            }
+            if(typifiedName == null){
+                // remember
+                typifiedName = typeDesignation.getTypifiedNames().iterator().next();
+            } else {
+                // compare
+                TaxonNameBase<?,?> otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
+                if(typifiedName.getId() != otherTypifiedName.getId()){
+                  //TODO instead throw RegistrationValidationException()
+                    problems.add("Multiple typifiedName in " + typeDesignation.toString());
+                }
+            }
+
+        }
+        if(!problems.isEmpty()){
+            // FIXME use the validation framework
+            throw new RegistrationValidationException("Inconsistent type designations", problems);
+        }
+
+        if(typifiedName != null){
+            return new IdAndString(typifiedName.getId(), typifiedName.getTitleCache());
+        }
+        return null;
+    }
+
+
+    /**
+     * @return the title cache of the typifying name or <code>null</code>
+     */
+    public String getTypifiedNameCache() {
+        if(typifiedName != null){
+            return typifiedName.getLabel();
+        }
+        return null;
+    }
+
+    /**
+     * @return the title cache of the typifying name or <code>null</code>
+     */
+    public IdAndString getTypifiedName() {
+
+       return typifiedName;
+
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    protected String getTypeDesignationStytusLabel(TypeDesignationStatusBase<?> key) {
+        String typeLable;
+        if(key.equals( SpecimenTypeDesignationStatus.TYPE())){
+            typeLable = "Type";
+        } else {
+            typeLable = key.getPreferredRepresentation(Language.DEFAULT()).getLabel();
+        }
+        return typeLable;
     }
 
     /**
@@ -161,8 +245,8 @@ public class TypeDesignationConverter {
 
         if(td.getTypeSpecimen() != null){
             String nameTitleCache = td.getTypeSpecimen().getTitleCache();
-            if(typifiedNameCache != null){
-                nameTitleCache = nameTitleCache.replace(typifiedNameCache, "");
+            if(getTypifiedNameCache() != null){
+                nameTitleCache = nameTitleCache.replace(getTypifiedNameCache(), "");
             }
             sb.append(nameTitleCache);
         }
@@ -178,6 +262,17 @@ public class TypeDesignationConverter {
         }
 
         return sb.toString();
+    }
+
+    private void putString(TypeDesignationStatusBase<?> status, IdAndString idAndString){
+        // the cdm orderd term bases are ordered invers, fixing this for here
+        if(status == null){
+            status = SpecimenTypeDesignationStatus.TYPE();
+        }
+        if(!orderedStringsByType.containsKey(status)){
+            orderedStringsByType.put(status, new ArrayList<IdAndString>());
+        }
+        orderedStringsByType.get(status).add(idAndString);
     }
 
     public String print(){

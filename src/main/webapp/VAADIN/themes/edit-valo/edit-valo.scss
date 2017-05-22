@@ -237,6 +237,12 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             .registration-list, .registration-list-item {
                 margin-top: round($v-unit-size / 2);
             }
+        
+            .registration-list {
+                .v-gridlayout-slot {
+                    border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
+                }
+            }
     }
 
     // --------------------------------------------------- //
@@ -399,7 +405,19 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
                 color: $status-ready-color;
             }
         }
+
     }
+    
+    // ---------------- custom components ----------------------- //
+    
+    .edit-button-group {
+        margin-top: round($v-unit-size/10);
+        .v-button {
+            padding: 0 round($v-unit-size/4);
+            // margin: 0 round($v-unit-size/4);
+        }
+    }
+    
 
 
 }

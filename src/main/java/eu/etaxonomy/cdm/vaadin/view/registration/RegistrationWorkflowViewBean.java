@@ -26,7 +26,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -34,6 +33,7 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
@@ -194,45 +194,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
-
-            CssLayout buttonGroup = new CssLayout();
-            buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-
-            Button messageButton = new Button(FontAwesome.COMMENT);
-            messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-            if(dto.getMessages().isEmpty()){
-                messageButton.setEnabled(false);
-            } else {
-                messageButton.addClickListener(e -> eventBus.publishEvent(
-                        new ShowDetailsEvent<RegistrationDTO, Integer>(
-                            e,
-                            RegistrationDTO.class,
-                            dto.getId(),
-                            "messages"
-                            )
-                        )
-                    );
-            }
-            messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
-            messageButton.setCaptionAsHtml(true);
-            buttonGroup.addComponent(messageButton);
-
-            if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()) {
-            Button editButton = new Button(FontAwesome.EDIT);
-            editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
-            editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
-                AbstractEditorAction.Type.EDIT,
-                dto.getId()
-                )));
-            buttonGroup.addComponent(editButton);
-            }
-
-            namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
-            namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
-            namesTypesList.addComponent(buttonGroup, 2, row);
-            namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
-            row++;
+            registrationListComponent(namesTypesList, row++, dto);
         }
+
         namesTypesList.setSizeUndefined();
         namesTypesList.setWidth(100, Unit.PERCENTAGE);
         namesTypesList.setColumnExpandRatio(0, 0.1f);
@@ -240,6 +204,55 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         Panel namesTypesPanel = new Panel(namesTypesList);
         namesTypesPanel.setHeight("300px");
         return namesTypesPanel;
+    }
+
+    /**
+     * @param namesTypesList
+     * @param row
+     * @param dto
+     */
+    protected void registrationListComponent(GridLayout namesTypesList, int row, RegistrationDTO dto) {
+        CssLayout buttonGroup = new CssLayout();
+        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+
+        Button messageButton = new Button(FontAwesome.COMMENT);
+        messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
+        if(dto.getMessages().isEmpty()){
+            messageButton.setEnabled(false);
+        } else {
+            messageButton.addClickListener(e -> eventBus.publishEvent(
+                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                        e,
+                        RegistrationDTO.class,
+                        dto.getId(),
+                        "messages"
+                        )
+                    )
+                );
+        }
+        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
+        messageButton.setCaptionAsHtml(true);
+        buttonGroup.addComponent(messageButton);
+
+        if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()) {
+        Button editButton = new Button(FontAwesome.EDIT);
+        editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
+        editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+            AbstractEditorAction.Type.EDIT,
+            dto.getId()
+            )));
+        buttonGroup.addComponent(editButton);
+        }
+
+        TypeStateLabel typeStateLabel = new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus());
+        namesTypesList.addComponent(typeStateLabel, 0, row);
+        namesTypesList.setComponentAlignment(typeStateLabel, Alignment.MIDDLE_LEFT);
+
+        RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
+        // editButtonGroup.setStyleName(ValoTheme.BUTTON_TINY);
+        namesTypesList.addComponent(editButtonGroup, 1, row);
+        namesTypesList.addComponent(buttonGroup, 2, row);
+        namesTypesList.setComponentAlignment(buttonGroup, Alignment.MIDDLE_LEFT);
     }
 
 

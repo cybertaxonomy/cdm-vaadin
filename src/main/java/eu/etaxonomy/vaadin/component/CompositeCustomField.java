@@ -25,6 +25,8 @@ import com.vaadin.ui.CustomField;
  * @author a.kohlbecker
  * @since May 12, 2017
  *
+ * IMPORTANT see also {@link CompositeStyledComponent} which has almost the same functionality.
+ *
  */
 @SuppressWarnings("serial")
 public abstract class CompositeCustomField<T> extends CustomField<T> implements NestedFieldGroup {

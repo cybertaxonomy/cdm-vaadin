@@ -9,8 +9,10 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,7 +23,6 @@ import org.joda.time.DateTime;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
@@ -41,17 +42,21 @@ public class RegistrationDTO{
 
     private String submitterUserName = null;
 
+    private IdAndString name = null;
+
+    private TypeDesignationConverter typeDesignationConverter;
+
     private Registration reg;
 
     private List<String> messages = new ArrayList<>();
 
     private Set<eu.etaxonomy.cdm.model.name.Registration> blockedBy = new HashSet<>();
 
-    private TaxonNameBase<?, ?> typifiedName;
 
     /**
      * @param reg
      * @param typifiedName should be provided in for Registrations for TypeDesignations
+     * @throws RegistrationValidationException
      */
     public RegistrationDTO(Registration reg) {
 
@@ -66,18 +71,15 @@ public class RegistrationDTO{
         if(hasName(reg)){
             citation = reg.getName().getNomenclaturalReference();
             citationDetail = reg.getName().getNomenclaturalMicroReference();
+            name = new IdAndString(reg.getName().getId(), reg.getName().getTitleCache());
         }
         if(hasTypifications(reg)){
-            try {
-                typifiedName = findTypifiedName();
-            } catch (RegistrationValidationException e) {
-                messages.add("Validation errors: " + e.getMessage());
-            }
             if(!reg.getTypeDesignations().isEmpty()){
-                if(citation == null) {
-                    TypeDesignationBase first = reg.getTypeDesignations().iterator().next();
-                    citation = first.getCitation();
-                    citationDetail = first.getCitationMicroReference();
+                for(TypeDesignationBase td : reg.getTypeDesignations()){
+                    if(citation == null) {
+                        citation = td.getCitation();
+                        citationDetail = td.getCitationMicroReference();
+                    }
                 }
             }
         }
@@ -91,7 +93,12 @@ public class RegistrationDTO{
         case NAME_AND_TYPIFICATION:
         case TYPIFICATION:
         default:
-            summary = new TypeDesignationConverter(reg.getTypeDesignations(), typifiedName).buildString().print();
+            try {
+                typeDesignationConverter = new TypeDesignationConverter(reg.getTypeDesignations());
+                summary = typeDesignationConverter.buildString().print();
+            } catch (RegistrationValidationException e) {
+                messages.add("Validation errors: " + e.getMessage());
+            }
             break;
         }
 
@@ -116,51 +123,6 @@ public class RegistrationDTO{
         return reg.getName() != null;
     }
 
-    /**
-     * FIXME use the validation framework validators and to store the validation problems!!!
-     *
-     * @return
-     * @throws RegistrationValidationException
-     */
-    private TaxonNameBase<?,?> findTypifiedName() throws RegistrationValidationException {
-
-        List<String> problems = new ArrayList<>();
-
-        TaxonNameBase<?,?> typifiedName = null;
-
-        for(TypeDesignationBase<?> typeDesignation : reg.getTypeDesignations()){
-            typeDesignation.getTypifiedNames();
-            if(typeDesignation.getTypifiedNames().isEmpty()){
-
-                //TODO instead throw RegistrationValidationException()
-                problems.add("Missing typifiedName in " + typeDesignation.toString());
-                continue;
-            }
-            if(typeDesignation.getTypifiedNames().size() > 1){
-              //TODO instead throw RegistrationValidationException()
-                problems.add("Multiple typifiedName in " + typeDesignation.toString());
-                continue;
-            }
-            if(typifiedName == null){
-                // remember
-                typifiedName = typeDesignation.getTypifiedNames().iterator().next();
-            } else {
-                // compare
-                TaxonNameBase<?,?> otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
-                if(typifiedName.getId() != otherTypifiedName.getId()){
-                  //TODO instead throw RegistrationValidationException()
-                    problems.add("Multiple typifiedName in " + typeDesignation.toString());
-                }
-            }
-
-        }
-        if(!problems.isEmpty()){
-            // FIXME use the validation framework
-            throw new RegistrationValidationException("Inconsistent Registration entity. " + reg.toString(), problems);
-        }
-
-        return typifiedName;
-    }
 
     /**
      * Provides access to the Registration entity this DTO has been build from.
@@ -257,6 +219,18 @@ public class RegistrationDTO{
      */
     public Integer getCitationID() {
         return citation == null ? null : citation.getId();
+    }
+
+    public IdAndString getTypifiedName() {
+        return typeDesignationConverter != null ? typeDesignationConverter.getTypifiedName() : null;
+    }
+
+    public IdAndString getName() {
+        return name;
+    }
+
+    public Map<String, Collection<IdAndString>> getTypeDesignations() {
+        return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignationRepresentations() : null;
     }
 
     /**
