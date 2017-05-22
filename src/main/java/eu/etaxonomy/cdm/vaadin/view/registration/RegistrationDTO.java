@@ -26,6 +26,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
+import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
 
 public class RegistrationDTO{
@@ -42,7 +43,7 @@ public class RegistrationDTO{
 
     private String submitterUserName = null;
 
-    private IdAndString name = null;
+    private EntityReference name = null;
 
     private TypeDesignationConverter typeDesignationConverter;
 
@@ -71,7 +72,7 @@ public class RegistrationDTO{
         if(hasName(reg)){
             citation = reg.getName().getNomenclaturalReference();
             citationDetail = reg.getName().getNomenclaturalMicroReference();
-            name = new IdAndString(reg.getName().getId(), reg.getName().getTitleCache());
+            name = new EntityReference(reg.getName().getId(), reg.getName().getTitleCache());
         }
         if(hasTypifications(reg)){
             if(!reg.getTypeDesignations().isEmpty()){
@@ -221,15 +222,15 @@ public class RegistrationDTO{
         return citation == null ? null : citation.getId();
     }
 
-    public IdAndString getTypifiedName() {
+    public EntityReference getTypifiedName() {
         return typeDesignationConverter != null ? typeDesignationConverter.getTypifiedName() : null;
     }
 
-    public IdAndString getName() {
+    public EntityReference getName() {
         return name;
     }
 
-    public Map<String, Collection<IdAndString>> getTypeDesignations() {
+    public Map<String, Collection<EntityReference>> getTypeDesignations() {
         return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignationRepresentations() : null;
     }
 

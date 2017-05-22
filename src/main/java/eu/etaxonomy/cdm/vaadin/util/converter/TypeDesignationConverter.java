@@ -25,7 +25,7 @@ import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
-import eu.etaxonomy.cdm.vaadin.view.registration.IdAndString;
+import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
@@ -44,9 +44,9 @@ public class TypeDesignationConverter {
     private final String separator = ", ";
 
     private Collection<TypeDesignationBase> typeDesignations;
-    private Map<TypeDesignationStatusBase<?>, Collection<IdAndString>> orderedStringsByType;
-    private LinkedHashMap<String, Collection<IdAndString>> orderedRepresentations = new LinkedHashMap<>();
-    private IdAndString typifiedName;
+    private Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByType;
+    private LinkedHashMap<String, Collection<EntityReference>> orderedRepresentations = new LinkedHashMap<>();
+    private EntityReference typifiedName;
 
     private String finalString = null;
 
@@ -60,7 +60,7 @@ public class TypeDesignationConverter {
     public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
         orderedStringsByType = new HashMap<>();
-        typeDesignations.forEach(td -> putString(td.getTypeStatus(), new IdAndString(td.getId(), stringify(td))));
+        typeDesignations.forEach(td -> putString(td.getTypeStatus(), new EntityReference(td.getId(), stringify(td))));
         orderedRepresentations = buildOrderedRepresentations();
         this.typifiedName = findTypifiedName();
     }
@@ -106,7 +106,7 @@ public class TypeDesignationConverter {
         return this;
     }
 
-    public Map<String, Collection<IdAndString>> getOrderedTypeDesignationRepresentations() {
+    public Map<String, Collection<EntityReference>> getOrderedTypeDesignationRepresentations() {
         return orderedRepresentations;
     }
 
@@ -116,7 +116,7 @@ public class TypeDesignationConverter {
      * @return
      * @throws RegistrationValidationException
      */
-    private IdAndString findTypifiedName() throws RegistrationValidationException {
+    private EntityReference findTypifiedName() throws RegistrationValidationException {
 
         List<String> problems = new ArrayList<>();
 
@@ -154,7 +154,7 @@ public class TypeDesignationConverter {
         }
 
         if(typifiedName != null){
-            return new IdAndString(typifiedName.getId(), typifiedName.getTitleCache());
+            return new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
         }
         return null;
     }
@@ -173,7 +173,7 @@ public class TypeDesignationConverter {
     /**
      * @return the title cache of the typifying name or <code>null</code>
      */
-    public IdAndString getTypifiedName() {
+    public EntityReference getTypifiedName() {
 
        return typifiedName;
 
@@ -264,13 +264,13 @@ public class TypeDesignationConverter {
         return sb.toString();
     }
 
-    private void putString(TypeDesignationStatusBase<?> status, IdAndString idAndString){
+    private void putString(TypeDesignationStatusBase<?> status, EntityReference idAndString){
         // the cdm orderd term bases are ordered invers, fixing this for here
         if(status == null){
             status = SpecimenTypeDesignationStatus.TYPE();
         }
         if(!orderedStringsByType.containsKey(status)){
-            orderedStringsByType.put(status, new ArrayList<IdAndString>());
+            orderedStringsByType.put(status, new ArrayList<EntityReference>());
         }
         orderedStringsByType.get(status).add(idAndString);
     }
