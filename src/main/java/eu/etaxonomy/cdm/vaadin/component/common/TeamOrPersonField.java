@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.FieldListEditor;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
@@ -121,6 +122,14 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         } else {
             setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
         }
+
+        checkUserPermissions(newValue);
+    }
+
+    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
+        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+        titleField.setEnabled(userCanEdit);
+        nomenclaturalTitleField.setEnabled(userCanEdit);
     }
 
     /**
