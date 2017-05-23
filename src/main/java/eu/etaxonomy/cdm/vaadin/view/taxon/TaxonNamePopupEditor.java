@@ -26,6 +26,7 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -55,6 +56,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     private TextField specificEpithetField;
 
     private TextField infraSpecificEpithetField;
+
+    private SwitchableTextField fullTitleCacheFiled;
+
+    private SwitchableTextField protectedNameCacheField;
 
 
 
@@ -99,7 +104,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
 
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
-        grid.setMargin(true);
 
         /*
          - nameType: preset, needs to be set in the presenter for new names
@@ -161,9 +165,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
         row++;
         // fullTitleCache
-        addSwitchableTextField("Full title cache", "fullTitleCache", "protectedFullTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        fullTitleCacheFiled = addSwitchableTextField("Full title cache", "fullTitleCache", "protectedFullTitleCache", 0, row, GRID_COLS-1, row);
+        fullTitleCacheFiled.setWidth(100, Unit.PERCENTAGE);
         row++;
-        addSwitchableTextField("Name cache", "nameCache", "protectedNameCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        protectedNameCacheField = addSwitchableTextField("Name cache", "nameCache", "protectedNameCache", 0, row, GRID_COLS-1, row);
+        protectedNameCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
         genusOrUninomialField = addTextField("Genus or uninomial", "genusOrUninomial", 0, row, 1, row);
         genusOrUninomialField.setWidth(200, Unit.PIXELS);
@@ -184,7 +190,9 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
         row++;
 
-
+        setAdvancedModeEnabled(true);
+        registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
+        setAdvancedMode(false);
 
     }
 

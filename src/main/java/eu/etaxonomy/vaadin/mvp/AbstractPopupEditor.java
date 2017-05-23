@@ -23,11 +23,13 @@ import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
@@ -67,6 +69,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Button cancel;
 
+    private CssLayout toolBar = new CssLayout();
+
+    private CssLayout toolBarButtonGroup = new CssLayout();
+
     private GridLayout _gridLayoutCache;
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
@@ -80,6 +86,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         fieldGroup.addCommitHandler(new SaveHandler());
 
         setCompositionRoot(mainLayout);
+
+        toolBar.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
+        toolBar.setWidth(100, Unit.PERCENTAGE);
+        toolBarButtonGroup.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        toolBarButtonGroup.setWidthUndefined();
+        toolBar.addComponent(toolBarButtonGroup);
+        toolBar.setVisible(false);
 
         fieldLayout = layout;
         fieldLayout.setWidthUndefined();
@@ -104,7 +117,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
-        mainLayout.addComponents(fieldLayout, buttonLayout);
+        mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
+        mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
     }
 
     protected VerticalLayout getMainLayout() {
@@ -135,6 +149,60 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.setVisible(!readOnly);
         cancel.setCaption(readOnly ? "Close" : "Cancel");
     }
+
+    /**
+     * @return
+     * @return
+     */
+    protected AbstractLayout getToolBar() {
+        return toolBar;
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarAdd(Component c) {
+        toolBar.addComponent(c, toolBar.getComponentIndex(toolBarButtonGroup) - 1);
+        updateToolBarVisibility();
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarButtonGroupAdd(Component c) {
+        toolBarButtonGroup.addComponent(c);
+        updateToolBarVisibility();
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarButtonGroupRemove(Component c) {
+        toolBarButtonGroup.removeComponent(c);
+        updateToolBarVisibility();
+    }
+
+    /**
+     *
+     */
+    private void updateToolBarVisibility() {
+        toolBar.setVisible(toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1);
+
+    }
+
+    /**
+     * The top tool-bar is initially invisible.
+     *
+     * @param visible
+     */
+    protected void setToolBarVisible(boolean visible){
+        toolBar.setVisible(true);
+    }
+
+
 
     // ------------------------ event handler ------------------------ //
 

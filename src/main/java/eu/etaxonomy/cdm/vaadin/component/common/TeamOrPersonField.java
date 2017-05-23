@@ -140,6 +140,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return fieldGroup;
     }
 
+    public Component[] getCachFields(){
+        return new Component[]{titleField, nomenclaturalTitleField};
+    }
+
 
 
 }

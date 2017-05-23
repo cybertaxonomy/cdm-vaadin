@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -92,9 +93,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addField(typeSelect, "type", 3, row);
         grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
-        addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        SwitchableTextField titleCacheField = addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row);
+        titleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        SwitchableTextField abbrevTitleCacheField = addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row);
+        abbrevTitleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setWidth(100, Unit.PERCENTAGE);
@@ -123,6 +126,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
+
+        setAdvancedModeEnabled(true);
+        registerAdvancedModeComponents(titleCacheField, abbrevTitleCacheField);
+        registerAdvancedModeComponents(authorshipField.getCachFields());
+        setAdvancedMode(false);
 
     }
 
