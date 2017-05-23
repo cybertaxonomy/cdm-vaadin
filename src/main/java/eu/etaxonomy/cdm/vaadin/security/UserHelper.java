@@ -8,81 +8,44 @@
 */
 package eu.etaxonomy.cdm.vaadin.security;
 
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.vaadin.server.VaadinSession;
 
-import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 
 /**
+ * UserHelper interface. Imeplemtations should use the {@link #VADDIN_SESSION_KEY} to auto registers
+ * in the VaadinSession.
+ *
  * @author a.kohlbecker
- * @since May 19, 2017
+ * @since May 23, 2017
  *
  */
-public class UserHelper {
+public interface UserHelper {
 
-
-    public static boolean userIsAutheticated() {
-        Authentication authentication = getAuthentication();
-        if(authentication != null){
-            return authentication.isAuthenticated();
-        }
-        return false;
-    }
-
-
-    public static boolean userIsAnnonymous() {
-        Authentication authentication = getAuthentication();
-        return authentication != null
-                && authentication.isAuthenticated()
-                && authentication instanceof AnonymousAuthenticationToken;
-    }
-
-    public static String userName() {
-        Authentication authentication = getAuthentication();
-        if(authentication != null) {
-            return authentication.getName();
-        }
-        return null;
-    }
-
-    public static boolean userIsAdmin() {
-        Authentication authentication = getAuthentication();
-        if(authentication != null) {
-            return authentication.getAuthorities().stream().anyMatch(a -> {
-                return a.getAuthority().equals(Role.ROLE_ADMIN.getAuthority());
-            });
-        }
-        return false;
-    }
-
-    public static boolean userIsRegistrationCurator() {
-        Authentication authentication = getAuthentication();
-        if(authentication != null) {
-            return authentication.getAuthorities().stream().anyMatch(a -> {
-                return a.equals(RolesAndPermissions.ROLE_CURATION)
-                        // doing faster regex check here instreas of using CdmAuthoritiy.fromString()
-                        || a.getAuthority().matches("^Registration\\.\\[.*UPDATE");
-            });
-        }
-        return false;
-    }
+    public static final String VADDIN_SESSION_KEY = "USER_HELPER";
 
     /**
-     * @return
+     * Static accessor method to obtain the auto-registered UserHelper-Bean from the
+     * VaadinSession.
      *
-     * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
-     */
-    private static SecurityContext currentSecurityContext() {
-        return SecurityContextHolder.getContext();
-    }
-
-    /**
      * @return
      */
-    private static Authentication getAuthentication() {
-        return currentSecurityContext().getAuthentication();
+    public static UserHelper fromSession() {
+       return (UserHelper)VaadinSession.getCurrent().getAttribute(VADDIN_SESSION_KEY);
     }
+
+    boolean userHasPermission(Class<? extends CdmBase> cdmType, Integer entitiyId, Object ... args);
+
+    boolean userHasPermission(CdmBase entity, Object ... args);
+
+    boolean userIsRegistrationCurator();
+
+    boolean userIsAdmin();
+
+    String userName();
+
+    boolean userIsAnnonymous();
+
+    boolean userIsAutheticated();
 
 }

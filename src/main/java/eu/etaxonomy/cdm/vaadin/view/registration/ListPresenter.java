@@ -63,7 +63,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         // list all if the authenticated user is having the role CURATION of if it is an admin
         Authentication authentication = currentSecurityContext().getAuthentication();
         User submitter = null;
-        if(!(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin())) {
+        if(!(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin())) {
             submitter = (User) authentication.getPrincipal();
         }
 

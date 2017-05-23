@@ -24,6 +24,7 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
@@ -43,6 +44,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Autowired
 	private ViewChangeListener viewChangeListener;
+
+	@Autowired
+    private UserHelper userHelper;
 
 	private Map<PopupView, Window> popupMap;
 

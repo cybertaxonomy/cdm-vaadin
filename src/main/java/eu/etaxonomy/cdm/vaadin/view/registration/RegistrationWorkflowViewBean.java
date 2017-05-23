@@ -134,7 +134,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
         registration.addComponent(createWorkflowTabSheet(workingset, null));
         RegistrationItem registrationItem = new RegistrationItem(workingset, this);
-        if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()){
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
             registrationItem.getSubmitterLabel().setVisible(true);
         };
         registration.addComponent(registrationItem);
@@ -234,7 +234,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         messageButton.setCaptionAsHtml(true);
         buttonGroup.addComponent(messageButton);
 
-        if(UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin()) {
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
         Button editButton = new Button(FontAwesome.EDIT);
         editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
         editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(

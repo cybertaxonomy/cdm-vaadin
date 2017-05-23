@@ -16,6 +16,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
 
@@ -53,8 +54,6 @@ public class PersonField extends CompositeCustomField<Person> {
     private TextField suffixField = new TextField();
     private SwitchButton unlockSwitch = new SwitchButton();
 
-
-
     /**
      * @param caption
      */
@@ -79,6 +78,19 @@ public class PersonField extends CompositeCustomField<Person> {
         addStyledComponent(unlockSwitch);
 
         addSizedComponent(root);
+
+    }
+
+    /**
+     *
+     */
+    private void checkUserPermissions(Person newValue) {
+        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+        cacheField.setEnabled(userCanEdit);
+        firstNameField.setEnabled(userCanEdit);
+        lastNameField.setEnabled(userCanEdit);
+        prefixField.setEnabled(userCanEdit);
+        suffixField.setEnabled(userCanEdit);
     }
 
     private void setMode(Mode mode){
@@ -188,7 +200,7 @@ public class PersonField extends CompositeCustomField<Person> {
     protected void setInternalValue(Person newValue) {
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(newValue);
-        // refreshMode();
+        checkUserPermissions(newValue);
     }
 
     @Override

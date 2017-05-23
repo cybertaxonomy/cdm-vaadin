@@ -210,7 +210,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     public void populateList(Collection<RegistrationDTO> registrations) {
 
-        boolean isCurator = UserHelper.userIsRegistrationCurator() || UserHelper.userIsAdmin();
+        boolean isCurator = UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this);
             item.getSubmitterLabel().setVisible(isCurator);

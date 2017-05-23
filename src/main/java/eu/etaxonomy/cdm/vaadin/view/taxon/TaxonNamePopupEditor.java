@@ -47,8 +47,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
 
     private final static int GRID_ROWS = 7;
 
-    private TextField titleField;
-
     private TextField genusOrUninomialField;
 
     private TextField infraGenericEpithetField;
@@ -60,7 +58,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     private SwitchableTextField fullTitleCacheFiled;
 
     private SwitchableTextField protectedNameCacheField;
-
 
 
     /**
@@ -160,7 +157,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
         ListSelect rankSelect = selectFieldFactory.createListSelect("Rank", Rank.class, OrderHint.BY_ORDER_INDEX.asList(), "label");
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setRows(1);
-        rankSelect.addValidator(e -> updateFieldVisibility());
+        rankSelect.addValueChangeListener(e -> updateFieldVisibility((Rank)e.getProperty().getValue()));
         addField(rankSelect, "rank", 3, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
         row++;
@@ -197,13 +194,15 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     }
 
     /**
+     * @param rank
      * @return
      */
-    private Object updateFieldVisibility() {
-        // TODO Auto-generated method stub
-        // TODO change label of
-        // - genusOrUninomialField
-        return null;
+    private void updateFieldVisibility(Rank rank) {
+        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
+        infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
+        specificEpithetField.setVisible(isSpeciesOrBelow);
+        infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
+        genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
     }
 
     /**
