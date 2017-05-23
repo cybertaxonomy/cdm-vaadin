@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
+import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
@@ -74,7 +75,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             workingset = new RegistrationWorkingSet();
             Registration reg = Registration.NewInstance();
             reg.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
-            getView().setHeaderText("New " + event.getType().name().toString()+ " Registration");
+            getView().setHeaderText("New Registration");
             try {
                 workingset.add(reg);
             } catch (RegistrationValidationException error) {
@@ -99,7 +100,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         } catch (RegistrationValidationException error) {
             getView().getWorkflow().setComponentError(new SystemError(error));
         }
-        getView().setHeaderText("Registration for " + workingset.getCitation());
+        getView().setHeaderText("Registrations in " + workingset.getCitation());
         getView().setWorkingset(workingset);
     }
 
@@ -174,13 +175,29 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     @EventListener
     public void onEntityChangeEvent(EntityChangeEvent event){
-        if(event.getEntityType().isAssignableFrom(Reference.class)){
+        if(Reference.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getCitationId().equals(event.getEntityId())){
                 refreshView();
             }
-        }
-        if(event.getEntityType().isAssignableFrom(Registration.class)){
+        } else
+        if(Registration.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getId() == event.getEntityId())){
+                refreshView();
+            }
+        } else
+        if(TaxonNameBase.class.isAssignableFrom(event.getEntityType())){
+            if(workingset.getRegistrationDTOs().stream().anyMatch(reg -> reg.getTypifiedName().getId() == event.getEntityId())){
+                refreshView();
+            }
+        } else
+        if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
+            if(workingset.getRegistrationDTOs().stream().anyMatch(
+                    reg -> reg.getTypeDesignations().values().stream().anyMatch(
+                            tds -> tds.stream().anyMatch(
+                                    td -> td.getId() == event.getEntityId()
+                                    ))
+                            )
+                    ){
                 refreshView();
             }
         }

@@ -182,6 +182,4 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         return null;
     }
 
-
-
 }
