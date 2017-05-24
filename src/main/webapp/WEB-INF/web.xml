@@ -33,10 +33,30 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+    	<servlet-name>Cdm_vaadin Application</servlet-name>
+    	<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    	<init-param>
+    		<description>
+    		Vaadin UI class to use</description>
+    		<param-name>UI</param-name>
+    		<param-value>com.example.cdm_vaadin.Cdm_vaadinUI</param-value>
+    	</init-param>
+    	<init-param>
+    		<description>
+    		Legacy mode to return the value of the property as a string from AbstractProperty.toString()</description>
+    		<param-name>legacyPropertyToString</param-name>
+    		<param-value>false</param-value>
+    	</init-param>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>cdm-vaadin</servlet-name>
         <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+    	<servlet-name>Cdm_vaadin Application</servlet-name>
+    	<url-pattern>/*</url-pattern>
     </servlet-mapping>
 
 
@@ -78,5 +98,11 @@
       <description>Vaadin production mode</description>
       <param-name>productionMode</param-name>
       <param-value>false</param-value>
+    </context-param>
+    <context-param>
+    	<description>
+    	Vaadin production mode</description>
+    	<param-name>productionMode</param-name>
+    	<param-value>false</param-value>
     </context-param>
 </web-app>

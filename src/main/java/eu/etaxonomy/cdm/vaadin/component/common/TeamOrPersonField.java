@@ -138,7 +138,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     @Override
     protected void addDefaultStyles() {
         // no default styles here
-
     }
 
     /**

@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -22,6 +23,8 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -39,6 +42,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
+
+    @Autowired
+    private SelectFieldFactory selectFieldFactory;
 
     private TextField titleField;
 
@@ -90,6 +96,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         ListSelect typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
+        typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
         addField(typeSelect, "type", 3, row);
         grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
@@ -113,6 +120,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addTextField("Pages", "pages", 2, row);
         addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
+        ListSelect inReferenceSelect = selectFieldFactory.createListSelect("In-reference", Reference.class, OrderHint.ORDER_BY_TITLE_CACHE.asList(), "titleCache");
+        inReferenceSelect.setWidth(100, Unit.PERCENTAGE);
+        inReferenceSelect.setRows(1);
+        addField(inReferenceSelect, "inReference", 0, row, 3, row);
+        row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
         publisherField.setWidth(100, Unit.PERCENTAGE);
@@ -132,6 +144,25 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         registerAdvancedModeComponents(authorshipField.getCachFields());
         setAdvancedMode(false);
 
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private Object updateFieldVisibility(ReferenceType value) {
+        getField("volume").setVisible(value.isVolumeReference());
+
+        getField("placePublished").setVisible(value.isPublication());
+        getField("publisher").setVisible(value.isPublication());
+
+        getField("editor").setVisible(value.isPrintedUnit());
+        getField("seriesPart").setVisible(value.isPrintedUnit());
+
+        getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
+        getField("pages").setVisible(value.isSection());
+
+        return null;
     }
 
     /**

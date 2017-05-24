@@ -380,6 +380,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return field;
     }
 
+    protected Field<?> getField(Object propertyId){
+        return fieldGroup.getField(propertyId);
+    }
+
     protected void addComponent(Component component) {
         fieldLayout.addComponent(component);
         applyDefaultComponentStyles(component);

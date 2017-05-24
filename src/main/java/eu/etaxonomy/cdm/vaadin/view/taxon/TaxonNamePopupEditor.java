@@ -199,6 +199,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
      */
     private void updateFieldVisibility(Rank rank) {
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
+        // TODO use getField() instead and remove field references
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
