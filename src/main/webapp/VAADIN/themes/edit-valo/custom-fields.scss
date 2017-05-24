@@ -9,6 +9,53 @@
   padding: round($v-unit-size / 4);
 }
 
+@mixin icon-button-field-button($button-style-name, $button-count: 1, $button-alignment: 'right', $button-width: $v-unit-size, $button-index: 0){
+
+   $sibling-selector:'';
+   @if $button-index > 0 {
+    $sibling-selector:'+';
+   }
+    
+  #{$sibling-selector} .#{$button-style-name} {
+        z-index: 10;
+        width: $button-width;
+        position: absolute;
+        @if $button-alignment == 'left' {
+            left: $button-width * $button-index + 1px;
+        }
+        @if $button-alignment == 'right' {
+            right: $button-width * ($button-count - 1 - $button-index) + 1px;
+        }
+        @if $button-index < $button-count - 1 {
+            $button-index: $button-index + 1;
+            @include icon-button-field-button($button-style-name, $button-count, $button-alignment, $button-width, $button-index);
+        }
+    }
+}
+
+
+@mixin icon-button-field($field-stylename, $button-style-name, $button-count: 1, $button-alignment: 'right', $button-width: $v-unit-size) {
+    position: relative; // needs to be a positioned element
+    height: $v-line-height * 2;
+    .v-caption {
+        display: block;
+    }   
+    .#{$field-stylename} {
+        @if $button-alignment == 'left' {
+            padding-left: $button-count * $button-width; 
+        }
+        @if $button-alignment == 'right' {
+            $more-padding: 0px;
+            @if $field-stylename == 'v-select' {
+                $more-padding: 8px;
+            }
+            padding-right: $button-count * $button-width + $more-padding; 
+        }        
+    }
+    // recursive include
+    @include icon-button-field-button($button-style-name, $button-count, $button-alignment, $button-width);
+}
+
 // ===================== Styles ==============================//
 
 body .edit-valo { // increasing specifity to allow overriding the valo default field themes
@@ -36,21 +83,7 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   
   // v-switchable-textfield
   .v-switchable-textfield {
-    position: relative; // needs to be a positioned element
-    height: $v-line-height * 2;
-    .v-caption {
-        display: block;
-    }   
-    .v-textfield {
-        padding-right: $v-unit-size;
-    }
-    .v-switch {
-        z-index: 10;
-        width: $v-unit-size;
-        position: absolute;
-        right: 1px;
-        bottom: 1px;
-    }
+    @include icon-button-field('v-textfield', 'v-switch', 1, 'right');
   }
   
   // v-person-field
@@ -92,4 +125,10 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
             @include composite-field-wrapper;
         }
     }
+    
+    // v-related-entity-list-select
+    .v-related-entity-list-select {
+        @include icon-button-field('v-select', 'v-button', 2, 'right');
+    }
+    
 } 

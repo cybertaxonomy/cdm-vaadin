@@ -24,6 +24,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.vaadin.component.RelatedEntityListSelect;
 
 /**
  * @author a.kohlbecker
@@ -50,17 +51,6 @@ public class SelectFieldFactory {
         BeanItemContainer<DefinedTermBase> termItemContainer = buildBeanItemContainer(termType);
         ListSelect select = new ListSelect(caption, termItemContainer);
         return select;
-    }
-
-    /**
-     * @param termType
-     */
-    private BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
-        // TODO use TermCacher?
-        List<DefinedTermBase> terms = repo.getTermService().listByTermType(termType, null, null, orderHints, INIT_STRATEGY);
-        BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
-        termItemContainer.addAll(terms);
-        return termItemContainer;
     }
 
     /**
@@ -104,6 +94,46 @@ public class SelectFieldFactory {
             select.setItemCaptionPropertyId(propertyId);
         }
         return select;
+    }
+
+    /**
+    *
+    * @param caption
+    * @param type
+    * @param orderHints
+    * @param propertyId the property id from which to read the label
+    * @return
+    */
+   public <T extends CdmBase> RelatedEntityListSelect<T> createListSelectEditor(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
+
+       if(orderHints == null){
+           orderHints = OrderHint.defaultOrderHintsFor(type);
+       }
+
+       BeanItemContainer<T> termItemContainer = buildBeanItemContainer(type, orderHints);
+       RelatedEntityListSelect<T> selectEditor = new RelatedEntityListSelect<T>(caption, type, termItemContainer);
+
+    // guess property id to use for display
+       if(propertyId == null) {
+           if(orderHints != null && !orderHints.isEmpty()){
+               propertyId = orderHints.get(0).getPropertyName();
+           }
+       }
+       if(propertyId != null){
+           selectEditor.getSelect().setItemCaptionPropertyId(propertyId);
+       }
+       return selectEditor;
+   }
+
+    /**
+     * @param termType
+     */
+    private BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
+        // TODO use TermCacher?
+        List<DefinedTermBase> terms = repo.getTermService().listByTermType(termType, null, null, orderHints, INIT_STRATEGY);
+        BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
+        termItemContainer.addAll(terms);
+        return termItemContainer;
     }
 
     /**

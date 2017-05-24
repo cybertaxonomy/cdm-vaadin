@@ -28,6 +28,7 @@ import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.vaadin.component.RelatedEntityListSelect;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
@@ -120,9 +121,9 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addTextField("Pages", "pages", 2, row);
         addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        ListSelect inReferenceSelect = selectFieldFactory.createListSelect("In-reference", Reference.class, OrderHint.ORDER_BY_TITLE_CACHE.asList(), "titleCache");
+        RelatedEntityListSelect<Reference> inReferenceSelect = selectFieldFactory.createListSelectEditor("In-reference", Reference.class, OrderHint.ORDER_BY_TITLE_CACHE.asList(), "titleCache");
         inReferenceSelect.setWidth(100, Unit.PERCENTAGE);
-        inReferenceSelect.setRows(1);
+        inReferenceSelect.getSelect().setRows(1);
         addField(inReferenceSelect, "inReference", 0, row, 3, row);
         row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
