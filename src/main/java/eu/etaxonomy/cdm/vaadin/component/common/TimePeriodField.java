@@ -223,8 +223,11 @@ public class TimePeriodField extends CustomField<TimePeriod> {
 
     @Override
     protected void setInternalValue(TimePeriod newValue) {
+        if(newValue == null){
+            newValue = TimePeriod.NewInstance();
+        }
         super.setInternalValue(newValue);
-        fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
+            fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
         updateCacheField();
     }
 

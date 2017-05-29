@@ -8,15 +8,19 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import com.vaadin.ui.Component;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
  *
+ * @deprecated replace by {@link EntityEditorAction}
  */
+@Deprecated
 public class TaxonNameEditorAction extends AbstractEditorAction {
 
 
-    public TaxonNameEditorAction(Type eventType) {
+    public TaxonNameEditorAction(Action eventType) {
         super(eventType);
     }
 
@@ -24,9 +28,20 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param type
      * @param entityId
      */
-    public TaxonNameEditorAction(Type type, Integer entityId) {
+    public TaxonNameEditorAction(Action type, Integer entityId) {
         super(type, entityId);
     }
+
+    /**
+     * @param type
+     * @param entityId
+     * @param source
+     */
+    public TaxonNameEditorAction(Action type, Integer entityId, Component source) {
+        super(type, entityId, source);
+    }
+
+
 
 
 }

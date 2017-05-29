@@ -117,14 +117,14 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         getView().setWorkingset(workingset);
     }
 
-    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.source == null")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
         Reference reference = ReferenceFactory.newGeneric();
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
     }
 
-    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.source == null")
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         Reference reference = getRepo().getReferenceService().find(event.getEntityId());
@@ -133,7 +133,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         getRepo().commitTransaction(tx);
     }
 
-    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.source == null")
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         Registration registration = getRepo().getRegistrationService().find(event.getEntityId());
@@ -142,7 +142,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         getRepo().commitTransaction(tx);
     }
 
-    @EventListener(condition = "#event.type ==T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Type).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.source == null")
     public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         TaxonNameBase taxonName = getRepo().getNameService().find(event.getEntityId());

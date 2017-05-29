@@ -6,9 +6,11 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.vaadin.mvp;
+package eu.etaxonomy.vaadin.mvp.event;
 
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
+
+import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
  * Usually a notification to a presenter to
@@ -18,7 +20,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
  * @since Apr 5, 2017
  *
  */
-public class EditorPreSaveEvent {
+public class EditorPreSaveEvent implements EditorViewEvent{
 
     private CommitEvent commitEvent;
 
@@ -40,6 +42,7 @@ public class EditorPreSaveEvent {
     /**
      * @return the view
      */
+    @Override
     public AbstractView getView() {
         return view;
     }

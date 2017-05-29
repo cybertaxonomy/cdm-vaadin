@@ -18,7 +18,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
     /**
      * @param eventType
      */
-    public RegistrationEditorAction(Type type) {
+    public RegistrationEditorAction(Action type) {
         super(type);
     }
 
@@ -26,7 +26,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param edit
      * @param citationId
      */
-    public RegistrationEditorAction(Type type, Integer enitityId) {
+    public RegistrationEditorAction(Action type, Integer enitityId) {
         super(type, enitityId);
     }
 

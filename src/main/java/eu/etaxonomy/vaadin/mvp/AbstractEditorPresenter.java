@@ -14,12 +14,15 @@ import org.springframework.context.event.EventListener;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 
+import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
+
 /**
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractEditorPresenter<DTO extends Object> extends AbstractPresenter {
+public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>> extends AbstractPresenter<V> {
 
 
     private static final long serialVersionUID = -6677074110764145236L;
@@ -47,6 +50,12 @@ public abstract class AbstractEditorPresenter<DTO extends Object> extends Abstra
         saveBean(bean);
     }
 
+    protected Class<V> getViewType() {
+        return (Class<V>) super.getView().getClass();
+    }
+
     protected abstract void saveBean(DTO bean);
+
+
 
 }

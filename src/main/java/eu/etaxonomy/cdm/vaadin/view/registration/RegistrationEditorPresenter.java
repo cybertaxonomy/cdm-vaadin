@@ -21,7 +21,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration> {
+public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration, RegistrationPopEditorView> {
 
     private static final long serialVersionUID = 6930557602995331944L;
 

@@ -46,6 +46,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -54,7 +56,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO>>
+public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
 
     private BeanFieldGroup<DTO> fieldGroup;
@@ -476,8 +478,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     public void showInEditor(DTO beanToEdit) {
+
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
+    }
+
+    /**
+     * Returns the bean to be edited.
+     *
+     * @return
+     */
+    public DTO getBean() {
+        return fieldGroup.getItemDataSource().getBean();
     }
 
     /**

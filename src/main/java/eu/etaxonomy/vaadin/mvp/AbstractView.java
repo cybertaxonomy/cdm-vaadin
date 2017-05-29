@@ -56,6 +56,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 
     @Autowired
 	protected final void injectPresenter(P presenter){
+        logger.trace(this.toString() + " injecting presenter " + presenter.toString());
 	    setPresenter(presenter);
 	}
 

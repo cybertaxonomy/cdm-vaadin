@@ -116,22 +116,25 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
 
-	    PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
+	    PopupView popupView =  findPopupView(popupType).get(); // TODO make better use of Optional
 
 		Window window = new Window();
-		window.setCaption(popupContent.getWindowCaption());
+		window.setCaption(popupView.getWindowCaption());
 		window.center();
-		window.setResizable(popupContent.isResizable());
-		window.setModal(popupContent.isModal());
-		window.setCaptionAsHtml(popupContent.isWindowCaptionAsHtml());
-		window.setWidth(popupContent.getWindowPixelWidth(), Unit.PIXELS);
-		window.setContent(popupContent.asComponent());
+		window.setResizable(popupView.isResizable());
+		// due to issue #6673 (https://dev.e-taxonomy.eu/redmine/issues/6673) popup editors must be modal!
+		//window.setModal(popupView.isModal());
+		window.setModal(true);
+		window.setCaptionAsHtml(popupView.isWindowCaptionAsHtml());
+		window.setWidth(popupView.getWindowPixelWidth(), Unit.PIXELS);
+		window.setContent(popupView.asComponent());
 		UI.getCurrent().addWindow(window);
-		popupContent.focusFirst();
+		popupView.viewEntered();
+		popupView.focusFirst();
 
-		popupMap.put(popupContent, window);
+		popupMap.put(popupView, window);
 
-		return (T) popupContent;
+		return (T) popupView;
 	}
 
     @EventListener

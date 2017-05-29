@@ -51,6 +51,11 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
         return false;
     }
 
+    @Override
+    public void viewEntered(){
+        getPresenter().onViewEnter();
+    }
+
 	/* Methods which existed in the original version of the AbstractPopupView
 	 * There are not needed here since the creation of the window and disposal
 	 * is done by the NavigationManagerBean

@@ -14,6 +14,7 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -101,6 +102,9 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	/**
 	 * Extending classes should overwrite this method to react to the event when
 	 * user has navigated into the view that this presenter governs.
+	 * For implementations of {@link AbstractPopupEditor AbstractPopupEditors} this is usually
+	 * called before the data item has been bound. This order is guaranteed since popup editors
+	 * are managed through the {@link NavigationManagerBean}
 	 */
 	public void handleViewEntered() {
 	}

@@ -11,10 +11,10 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
@@ -23,13 +23,13 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.vaadin.component.RelatedEntityListSelect;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityListSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -44,14 +44,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private static final long serialVersionUID = -4347633563800758815L;
 
-    @Autowired
-    private SelectFieldFactory selectFieldFactory;
-
     private TextField titleField;
 
     private final static int GRID_COLS = 4;
 
     private final static int GRID_ROWS = 10;
+
+    private ListSelect typeSelect;
+
+    private ToOneRelatedEntityListSelect<Reference> inReferenceSelect;
 
     /**
      * @param layout
@@ -94,7 +95,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         "inReference"
          */
         int row = 0;
-        ListSelect typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
+        typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
         typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
@@ -121,9 +122,19 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addTextField("Pages", "pages", 2, row);
         addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        RelatedEntityListSelect<Reference> inReferenceSelect = selectFieldFactory.createListSelectEditor("In-reference", Reference.class, OrderHint.ORDER_BY_TITLE_CACHE.asList(), "titleCache");
+        inReferenceSelect = new ToOneRelatedEntityListSelect<Reference>("In-reference", Reference.class, new BeanItemContainer<>(Reference.class));
         inReferenceSelect.setWidth(100, Unit.PERCENTAGE);
         inReferenceSelect.getSelect().setRows(1);
+        inReferenceSelect.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceSelect)
+                ));
+        inReferenceSelect.addClickListenerEditEntity(e -> {
+            if(inReferenceSelect.getSelect().getValue() != null){
+                getEventBus().publishEvent(
+                    new ReferenceEditorAction(AbstractEditorAction.Action.EDIT, ((Reference)inReferenceSelect.getSelect().getValue()).getId(), inReferenceSelect)
+                );
+            }
+            });
         addField(inReferenceSelect, "inReference", 0, row, 3, row);
         row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
@@ -212,6 +223,16 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public ListSelect getTypeSelect() {
+        return typeSelect;
+    }
+
+    @Override
+    public ToOneRelatedEntityListSelect<Reference> getInReferenceSelect() {
+        return inReferenceSelect;
     }
 
 }

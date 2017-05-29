@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.vaadin.component.RelatedEntityListSelect;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityListSelect;
 
 /**
  * @author a.kohlbecker
@@ -104,14 +104,14 @@ public class SelectFieldFactory {
     * @param propertyId the property id from which to read the label
     * @return
     */
-   public <T extends CdmBase> RelatedEntityListSelect<T> createListSelectEditor(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
+   public <T extends CdmBase> ToOneRelatedEntityListSelect<T> createListSelectEditor(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
 
        if(orderHints == null){
            orderHints = OrderHint.defaultOrderHintsFor(type);
        }
 
        BeanItemContainer<T> termItemContainer = buildBeanItemContainer(type, orderHints);
-       RelatedEntityListSelect<T> selectEditor = new RelatedEntityListSelect<T>(caption, type, termItemContainer);
+       ToOneRelatedEntityListSelect<T> selectEditor = new ToOneRelatedEntityListSelect<T>(caption, type, termItemContainer);
 
     // guess property id to use for display
        if(propertyId == null) {

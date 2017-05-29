@@ -9,9 +9,11 @@
 package eu.etaxonomy.vaadin.component;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.ListSelect;
@@ -22,7 +24,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * @since May 24, 2017
  *
  */
-public class RelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> {
+public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
@@ -34,13 +36,13 @@ public class RelatedEntityListSelect<V extends Object> extends CompositeCustomFi
 
     private ListSelect select;
 
-    private Button newButton = new Button(FontAwesome.PLUS);
+    private Button addButton = new Button(FontAwesome.PLUS);
     private Button editButton  = new Button(FontAwesome.EDIT);
 
-    public RelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
+    public ToOneRelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
         this.type = type;
         select = new ListSelect(caption, dataSource);
-        addStyledComponents(select, newButton, editButton);
+        addStyledComponents(select, addButton, editButton);
         addSizedComponent(select);
     }
 
@@ -49,7 +51,7 @@ public class RelatedEntityListSelect<V extends Object> extends CompositeCustomFi
      */
     @Override
     protected Component initContent() {
-        container.addComponents(select, newButton, editButton);
+        container.addComponents(select, addButton, editButton);
         setPrimaryStyleName(PRIMARY_STYLE);
         addDefaultStyles();
         return container;
@@ -86,22 +88,36 @@ public class RelatedEntityListSelect<V extends Object> extends CompositeCustomFi
         return select;
     }
 
+
+
     /**
-     * @return the newButton
+     * {@inheritDoc}
      */
-    public Button getNewButton() {
-        return newButton;
+    @Override
+    public void setPropertyDataSource(Property newDataSource) {
+        select.setPropertyDataSource(newDataSource);
+    }
+
+    @Override
+    public Property getPropertyDataSource() {
+        return select.getPropertyDataSource();
     }
 
     /**
-     * @return the editButton
+     * {@inheritDoc}
      */
-    public Button getEditButton() {
-        return editButton;
+    @Override
+    public void addClickListenerAddEntity(ClickListener listener) {
+        addButton.addClickListener(listener);
     }
 
-
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addClickListenerEditEntity(ClickListener listener) {
+        editButton.addClickListener(listener);
+    }
 
 
 }

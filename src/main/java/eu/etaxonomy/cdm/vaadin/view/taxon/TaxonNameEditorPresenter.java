@@ -21,7 +21,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  */
 @SpringComponent
 @ViewScope
-public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNameBase> {
+public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNameBase, TaxonNamePopupEditorView> {
 
 
 }

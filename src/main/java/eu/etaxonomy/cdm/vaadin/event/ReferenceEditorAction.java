@@ -8,17 +8,20 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import com.vaadin.ui.Component;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
+ * @deprecated replace by {@link EntityEditorAction}
  */
+@Deprecated
 public class ReferenceEditorAction extends AbstractEditorAction {
 
     /**
      * @param eventType
      */
-    public ReferenceEditorAction(Type type) {
+    public ReferenceEditorAction(Action type) {
         super(type);
     }
 
@@ -26,8 +29,19 @@ public class ReferenceEditorAction extends AbstractEditorAction {
      * @param edit
      * @param citationId
      */
-    public ReferenceEditorAction(Type type, Integer citationId) {
+    public ReferenceEditorAction(Action type, Integer citationId) {
         super(type, citationId);
     }
+
+    /**
+     * @param type
+     * @param entityId
+     * @param source
+     */
+    public ReferenceEditorAction(Action type, Integer entityId, Component source) {
+        super(type, entityId, source);
+    }
+
+
 
 }

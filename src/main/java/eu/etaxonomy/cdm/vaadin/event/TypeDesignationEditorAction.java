@@ -12,11 +12,14 @@ package eu.etaxonomy.cdm.vaadin.event;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  *
+ *
+ * @deprecated replace by {@link EntityEditorAction}
  */
+@Deprecated
 public class TypeDesignationEditorAction extends AbstractEditorAction {
 
 
-    public TypeDesignationEditorAction(Type eventType) {
+    public TypeDesignationEditorAction(Action eventType) {
         super(eventType);
     }
 
@@ -24,10 +27,8 @@ public class TypeDesignationEditorAction extends AbstractEditorAction {
      * @param type
      * @param entityId
      */
-    public TypeDesignationEditorAction(Type type, Integer entityId) {
+    public TypeDesignationEditorAction(Action type, Integer entityId) {
         super(type, entityId);
     }
-
-
 
 }
