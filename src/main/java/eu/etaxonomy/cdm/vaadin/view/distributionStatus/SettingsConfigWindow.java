@@ -48,6 +48,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
     	this.distributionTableView = distributionTableView;
     }
 
+    @Override
     protected void init() {
         boxToggleAbbreviatedLabels.addValueChangeListener(this);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
@@ -57,6 +58,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
         updateButtons();
     }
 
+    @Override
     protected AbstractLayout buildMainLayout() {
 
     	mainLayout = new VerticalLayout();
@@ -88,7 +90,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 
         return mainLayout;
     }
-    
+
     @Override
     protected boolean isValid() {
     	return true;

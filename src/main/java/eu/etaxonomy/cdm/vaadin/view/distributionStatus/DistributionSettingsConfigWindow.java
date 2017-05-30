@@ -64,6 +64,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
+    DistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -75,6 +76,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
      */
     public DistributionSettingsConfigWindow(DistributionTableView distributionTableView) {
         super();
+        this.distributionTableView = distributionTableView;
     }
 
     @Override
@@ -270,7 +272,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
             }
             term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
             Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-            DistributionEditorUtil.openDistributionView(taxonNodes, term, selectedAreas, classificationUuid);
+            DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, term, selectedAreas, classificationUuid);
             window.close();
         }
         else if(source==cancelButton){
@@ -298,7 +300,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
         Property rootNodeContainerProperty = null;
-        
+
         Collection<?> ids = classificationBox.getContainerPropertyIds();
         //use for loop here because the case of the root node id columns differs between some DBs
         for (Object id : ids) {
