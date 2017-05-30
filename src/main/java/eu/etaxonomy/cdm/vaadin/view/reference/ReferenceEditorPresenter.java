@@ -67,9 +67,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     */
    @EventListener(condition = "#editorAction.source != null")
    public void onReferenceEditorAction(ReferenceEditorAction editorAction){
-       if(isViewLess()){
-           return;
-       }
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSource().getClass())){
            if(editorAction.isAddAction()){
                Reference reference = ReferenceFactory.newGeneric();
@@ -89,9 +86,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
    @EventListener
    public void doDoneWithPopupEvent(DoneWithPopupEvent event){
-       if(isViewLess()){
-           return;
-       }
+
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();

@@ -56,15 +56,4 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     protected abstract void saveBean(DTO bean);
 
-    /**
-     *
-     * @return
-     * @deprecated see #6673
-     */
-    @Deprecated
-    protected boolean isViewLess() {
-        return getView() == null;
-    }
-
-
 }

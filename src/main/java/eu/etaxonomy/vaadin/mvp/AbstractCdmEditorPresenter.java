@@ -23,7 +23,6 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
-import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
 
 /**
  * Provides generic save operations of modified cdm entities.
@@ -48,9 +47,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-        if(!isResponsible(preSaveEvent)){
-            return;
-        }
+
         if(tx != null){
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we should change the save operation
@@ -77,9 +74,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-        if(!isResponsible(saveEvent)){
-            return;
-        }
+
         // the bean is now updated with the changes made by the user
         // merge the bean into the session, ...
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
@@ -139,16 +134,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         Session session = getRepo().getUserService().getSession();
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
         return session;
-    }
-
-    /**
-     * see  #6673 (https://dev.e-taxonomy.eu/redmine/issues/6673)
-     * @param event
-     * @return
-     */
-    private boolean isResponsible(EditorViewEvent event){
-
-        return !isViewLess() && event.getView().getClass().equals(getViewType());
     }
 
     @Override
