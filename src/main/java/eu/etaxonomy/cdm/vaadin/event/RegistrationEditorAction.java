@@ -8,6 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import com.vaadin.ui.Component;
+
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -28,5 +32,34 @@ public class RegistrationEditorAction extends AbstractEditorAction {
     public RegistrationEditorAction(Action type, Integer enitityId) {
         super(type, enitityId);
     }
+
+    /**
+     * @param action
+     * @param source
+     */
+    public RegistrationEditorAction(Action action, Component source) {
+        super(action, source);
+    }
+
+    /**
+     * @param action
+     * @param entityId
+     * @param source
+     * @param sourceView
+     */
+    public RegistrationEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+        super(action, entityId, source, sourceView);
+    }
+
+    /**
+     * @param action
+     * @param entityId
+     * @param source
+     */
+    public RegistrationEditorAction(Action action, Integer entityId, Component source) {
+        super(action, entityId, source);
+    }
+
+
 
 }

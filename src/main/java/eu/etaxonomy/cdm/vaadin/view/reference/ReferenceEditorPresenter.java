@@ -15,7 +15,6 @@ import org.apache.log4j.Logger;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.TransactionStatus;
 
-import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ListSelect;
 
@@ -65,9 +64,12 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     *
     * @param editorAction
     */
-   @EventListener(condition = "#editorAction.source != null")
+   @EventListener(condition = "#editorAction.sourceComponent != null")
    public void onReferenceEditorAction(ReferenceEditorAction editorAction){
-       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSource().getClass())){
+       if(!isFromOwnView(editorAction)){
+           return;
+       }
+       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
            if(editorAction.isAddAction()){
                Reference reference = ReferenceFactory.newGeneric();
                getView().getTypeSelect().getValue();
@@ -91,9 +93,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();
                // TODO update items from db instead of just adding the new item
-               Item selectItem = getView().getInReferenceSelect().getSelect().addItem(bean);
-               getView().getInReferenceSelect().getSelect().select(selectItem);
-               getView().getInReferenceSelect().getSelect().markAsDirty();
+               ListSelect localInReferenceSelectSelect = getView().getInReferenceSelect().getSelect();
+               localInReferenceSelectSelect.addItem(bean);
+               localInReferenceSelectSelect.select(bean);
            }
            inReferencePopup = null;
        }

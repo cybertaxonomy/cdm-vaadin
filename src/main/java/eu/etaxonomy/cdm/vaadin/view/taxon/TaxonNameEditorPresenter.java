@@ -8,9 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.taxon;
 
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.ViewScope;
-
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -19,9 +16,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  * @since May 22, 2017
  *
  */
-@SpringComponent
-@ViewScope
 public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNameBase, TaxonNamePopupEditorView> {
+
+    private static final long serialVersionUID = -3538980627079389221L;
 
 
 }

@@ -132,7 +132,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		window.setCaptionAsHtml(popupView.isWindowCaptionAsHtml());
 		window.setWidth(popupView.getWindowPixelWidth(), Unit.PIXELS);
 		window.setContent(popupView.asComponent());
-		window.addCloseListener(e -> popupView.cancel());
+		// window.addCloseListener(e -> popupView.cancel());
 		UI.getCurrent().addWindow(window);
 		popupView.viewEntered();
 		popupView.focusFirst();

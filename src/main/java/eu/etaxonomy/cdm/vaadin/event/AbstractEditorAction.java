@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -23,7 +25,9 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractE
         REMOVE;
     }
 
-    private Component source = null;
+    private Component sourceComponent = null;
+
+    private AbstractView sourceView = null;
 
     public AbstractEditorAction(Action action) {
         super(action, null);
@@ -43,7 +47,13 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractE
 
     public AbstractEditorAction(Action action, Integer entityId, Component source) {
         super(action, entityId);
-        this.source = source;
+        this.sourceComponent = source;
+    }
+
+    public AbstractEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+        super(action, entityId);
+        this.sourceComponent = source;
+        this.sourceView = sourceView;
     }
 
     public boolean isAddAction() {
@@ -58,12 +68,19 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractE
         return type.equals(Action.REMOVE);
     }
 
-    public Component getSource(){
-        return source;
+    public Component getSourceComponent(){
+        return sourceComponent;
     }
 
     public boolean hasSource() {
-        return source != null;
+        return sourceComponent != null;
+    }
+
+    /**
+     * @return the sourceView
+     */
+    public AbstractView getSourceView() {
+        return sourceView;
     }
 
 

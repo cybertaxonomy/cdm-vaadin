@@ -14,8 +14,10 @@ import org.springframework.context.event.EventListener;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
 
 /**
  * @author a.kohlbecker
@@ -32,7 +34,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-        if(!preSaveEvent.getView().equals(getView())){
+        if(!isFromOwnView(preSaveEvent)){
             return;
         }
     }
@@ -43,15 +45,27 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      */
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-        if(!saveEvent.getView().equals(getView())){
+        if(!isFromOwnView(saveEvent)){
             return;
         }
         DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
         saveBean(bean);
     }
 
+    /**
+     * @param saveEvent
+     * @return
+     */
+    protected boolean isFromOwnView(EditorViewEvent saveEvent) {
+        return saveEvent.getView().equals(getView());
+    }
+
     protected Class<V> getViewType() {
         return (Class<V>) super.getView().getClass();
+    }
+
+    protected boolean isFromOwnView(AbstractEditorAction action){
+        return action.getSourceView() != null && getView().equals(action.getSourceView());
     }
 
     protected abstract void saveBean(DTO bean);

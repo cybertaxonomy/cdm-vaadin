@@ -121,12 +121,12 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         inReferenceSelect.setWidth(100, Unit.PERCENTAGE);
         inReferenceSelect.getSelect().setRows(1);
         inReferenceSelect.addClickListenerAddEntity(e -> getEventBus().publishEvent(
-                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceSelect)
+                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceSelect, this)
                 ));
         inReferenceSelect.addClickListenerEditEntity(e -> {
             if(inReferenceSelect.getSelect().getValue() != null){
                 getEventBus().publishEvent(
-                    new ReferenceEditorAction(AbstractEditorAction.Action.EDIT, ((Reference)inReferenceSelect.getSelect().getValue()).getId(), inReferenceSelect)
+                    new ReferenceEditorAction(AbstractEditorAction.Action.EDIT, ((Reference)inReferenceSelect.getSelect().getValue()).getId(), inReferenceSelect, this)
                 );
             }
             });

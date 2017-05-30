@@ -239,7 +239,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
         editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
             AbstractEditorAction.Action.EDIT,
-            dto.getId()
+            dto.getId(),
+            null,
+            this
             )));
         buttonGroup.addComponent(editButton);
         }

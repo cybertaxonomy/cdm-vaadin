@@ -47,7 +47,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-
+        if(!isFromOwnView(preSaveEvent)){
+            return;
+        }
         if(tx != null){
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we should change the save operation
@@ -59,7 +61,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             // @formatter:on
             throw new RuntimeException("Can't process a second save operation while another one is in progress.");
         }
-        super.onEditorPreSaveEvent(preSaveEvent);
 
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
         tx = getRepo().startTransaction(true);
@@ -74,7 +75,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-
+        if(!isFromOwnView(saveEvent)){
+            return;
+        }
         // the bean is now updated with the changes made by the user
         // merge the bean into the session, ...
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");

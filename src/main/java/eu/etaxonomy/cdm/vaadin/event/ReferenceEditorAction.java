@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -40,6 +42,22 @@ public class ReferenceEditorAction extends AbstractEditorAction {
         super(type, entityId, source);
     }
 
+    /**
+     * @param action
+     * @param source
+     */
+    public ReferenceEditorAction(Action action, Component source) {
+        super(action, source);
+    }
 
+    /**
+     * @param action
+     * @param entityId
+     * @param source
+     * @param sourceView
+     */
+    public ReferenceEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+        super(action, entityId, source, sourceView);
+    }
 
 }
