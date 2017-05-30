@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.event;
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
  */
 public class RegistrationEditorAction extends AbstractEditorAction {
 

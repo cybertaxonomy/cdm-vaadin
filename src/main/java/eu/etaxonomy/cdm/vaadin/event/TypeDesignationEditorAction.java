@@ -11,11 +11,7 @@ package eu.etaxonomy.cdm.vaadin.event;
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
- *
- * @deprecated replace by {@link EntityEditorAction}
  */
-@Deprecated
 public class TypeDesignationEditorAction extends AbstractEditorAction {
 
 

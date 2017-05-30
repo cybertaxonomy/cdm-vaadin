@@ -14,9 +14,7 @@ import com.vaadin.ui.Component;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  *
- * @deprecated replace by {@link EntityEditorAction}
  */
-@Deprecated
 public class TaxonNameEditorAction extends AbstractEditorAction {
 
 
