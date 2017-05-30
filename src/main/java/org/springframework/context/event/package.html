@@ -1,0 +1,9 @@
+This package contains the PojoEventListenerManager which manages the event lsiterner methodfs in mvp popup presenter instances. 
+Presenter instances are created in turn of the calls to NavigationManagerBean.findPopupView()
+The PojoEventListenerManager creates ApplicationListener instances for each method annotated with @EventListner 
+and adds them to the EventMulticaster.
+
+These classes are locate in this spring package to allow the PojoEventListenerManager using the 
+org.springframework.context.event.EventExpressionEvaluator class wich is otherwise not visible. 
+
+see also https://dev.e-taxonomy.eu/redmine/issues/6673

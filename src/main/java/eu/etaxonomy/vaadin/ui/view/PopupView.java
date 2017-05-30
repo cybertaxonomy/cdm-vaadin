@@ -42,5 +42,10 @@ public interface PopupView extends CanCastComponent {
      */
     void focusFirst();
 
+    /**
+     * Cancel any operation in progress and close the view.
+     */
+    public void cancel();
+
 
 }

@@ -147,7 +147,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      * @return
      */
     private boolean isResponsible(EditorViewEvent event){
-        return event.getView().getClass().equals(getViewType());
+
+        return !isViewLess() && event.getView().getClass().equals(getViewType());
     }
 
     @Override

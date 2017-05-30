@@ -109,10 +109,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         save = new Button("Save", FontAwesome.SAVE);
         save.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.addClickListener(e -> onSaveClicked());
+        save.addClickListener(e -> save());
 
         cancel = new Button("Cancel", FontAwesome.TRASH);
-        cancel.addClickListener(e -> onCancelClicked());
+        cancel.addClickListener(e -> cancel());
 
         buttonLayout.addComponents(save, cancel);
         buttonLayout.setExpandRatio(save, 1);
@@ -238,12 +238,19 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
 
-    private void onCancelClicked() {
+    /**
+     * Cancel editing and discard all modifications.
+     */
+    @Override
+    public void cancel() {
         fieldGroup.discard();
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
-    private void onSaveClicked() {
+    /**
+     * Save the changes made in the editor.
+     */
+    private void save() {
         try {
             fieldGroup.commit();
         } catch (CommitException e) {
@@ -501,5 +508,16 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      */
     protected void afterItemDataSourceSet() {
 
+    }
+
+    // ------------------------ issue related temporary solutions --------------------- //
+    /**
+     *
+     * @return
+     * @deprecated see #6673
+     */
+    @Deprecated
+    public P presenter() {
+        return getPresenter();
     }
 }

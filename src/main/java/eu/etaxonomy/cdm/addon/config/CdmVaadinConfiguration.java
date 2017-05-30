@@ -52,7 +52,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
         "eu.etaxonomy.cdm.dataInserter",
         "eu.etaxonomy.cdm.service",
         "eu.etaxonomy.cdm.vaadin.component", // for the FieldFactories
-        "eu.etaxonomy.cdm.mock" // FIXME remove once mocks are no longer needed
+        "org.springframework.context.event"
         },
         // exclude UI classes, these are provided via the @Bean annotated methods below
         excludeFilters={@Filter(

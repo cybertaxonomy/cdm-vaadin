@@ -11,13 +11,14 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -35,12 +36,18 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  *
  */
 @SpringComponent
-@ViewScope
+@Scope("prototype")
 public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Reference, ReferencePopupEditorView> {
 
     private static final long serialVersionUID = -7926116447719010837L;
 
+    private static final Logger logger = Logger.getLogger(ReferenceEditorPresenter.class);
+
     ReferencePopupEditor inReferencePopup = null;
+
+    public ReferenceEditorPresenter() {
+        logger.trace("CONTRUCTOR");
+    }
 
     /**
      * {@inheritDoc}
@@ -64,6 +71,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     */
    @EventListener(condition = "#editorAction.source != null")
    public void onReferenceEditorAction(ReferenceEditorAction editorAction){
+       if(isViewLess()){
+           return;
+       }
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSource().getClass())){
            if(editorAction.isAddAction()){
                Reference reference = ReferenceFactory.newGeneric();
@@ -83,6 +93,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
    @EventListener
    public void doDoneWithPopupEvent(DoneWithPopupEvent event){
+       if(isViewLess()){
+           return;
+       }
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();
