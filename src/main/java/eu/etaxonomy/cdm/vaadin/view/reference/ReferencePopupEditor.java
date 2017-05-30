@@ -11,11 +11,9 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
@@ -37,9 +35,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since Apr 4, 2017
  *
  */
-
-@SpringComponent
-@Scope("prototype")
 public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;

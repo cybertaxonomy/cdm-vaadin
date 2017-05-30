@@ -9,9 +9,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.TransactionStatus;
 
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.ViewScope;
-
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
@@ -26,8 +23,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
  * @param <V>
  *            type of the view this presenter governs
  */
-@SpringComponent
-@ViewScope
 public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
 
 
@@ -123,5 +118,21 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     public NavigationManager getNavigationManager() {
         return navigationManager;
     }
+
+    /**
+     * @param repo the repo to set
+     */
+    protected void setRepo(CdmRepository repo) {
+        this.repo = repo;
+    }
+
+    /**
+     * @param navigationManager the navigationManager to set
+     */
+    protected void setNavigationManager(NavigationManager navigationManager) {
+        this.navigationManager = navigationManager;
+    }
+
+
 
 }

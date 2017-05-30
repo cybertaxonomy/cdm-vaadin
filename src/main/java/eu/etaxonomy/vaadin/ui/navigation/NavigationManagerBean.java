@@ -1,12 +1,9 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +27,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 @UIScope
@@ -52,6 +50,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	private PojoEventListenerManager eventListenerManager;
 
 	@Autowired
+	private PopupEditorFactory popupEditorFactory;
+
+	@Autowired
     private UserHelper userHelper;
 
 	private Map<PopupView, Window> popupMap;
@@ -60,17 +61,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		popupMap = new HashMap<>();
 	}
 
-    private Collection<PopupView> popupViews = new HashSet<>();
 
-    @Lazy
-    @Autowired(required=false)
-	private void popUpViews(Collection<PopupView> popupViews){
-        this.popupViews = popupViews;
-        // popupViews.forEach(view -> this.popupViews.put(view.getClass(), view));
-	}
-
-    private <P extends PopupView> Optional<PopupView> findPopupView(Class<P> type){
-        return popupViews.stream().filter(p -> p.getClass().equals(type)).findFirst();
+    private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
+        return popupEditorFactory.newPopupView(popupViewClass);
     }
 
     /*
@@ -122,7 +115,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
 
-	    PopupView popupView =  findPopupView(popupType).get(); // TODO make better use of Optional
+	    PopupView popupView =  findPopupView(popupType); // TODO make better use of Optional
 
 	    if(AbstractPopupEditor.class.isAssignableFrom(popupView.getClass())){
 	        AbstractEditorPresenter presenter = ((AbstractPopupEditor)popupView).presenter();
