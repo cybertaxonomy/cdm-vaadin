@@ -104,6 +104,7 @@
   </distributionManagement>
   <profiles>
     <profile>
+      <id>align-cdmlib-version</id>
       <activation>
         <property>
           <name>align-cdmlib-version</name>
@@ -236,7 +237,6 @@
           <!-- Remove draftCompile when project is ready -->
           <draftCompile>false</draftCompile>
           <style>OBF</style>
-          <strict>true</strict>
           <runTarget>http://localhost:8080/</runTarget>
         </configuration>
         <executions>
@@ -454,6 +454,11 @@
        <groupId>org.vaadin.teemu</groupId>
        <artifactId>switch</artifactId>
        <version>3.0.0</version>
+    </dependency>
+    <dependency>
+       <groupId>org.vaadin</groupId>
+       <artifactId>viritin</artifactId>
+       <version>1.61</version>
     </dependency>
     <!--     <dependency>
         only in the edit repo
