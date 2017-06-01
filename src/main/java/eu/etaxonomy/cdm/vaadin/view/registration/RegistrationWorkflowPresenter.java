@@ -130,6 +130,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         Reference reference = getRepo().getReferenceService().find(event.getEntityId());
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.showInEditor(reference);
+        popup.withDeleteButton(true);
         getRepo().commitTransaction(tx);
     }
 
@@ -148,6 +149,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         TaxonNameBase taxonName = getRepo().getNameService().find(event.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.showInEditor(taxonName);
+        popup.withDeleteButton(true);
         getRepo().commitTransaction(tx);
     }
 

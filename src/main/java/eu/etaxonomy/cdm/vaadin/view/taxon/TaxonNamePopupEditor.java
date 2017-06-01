@@ -10,11 +10,8 @@ package eu.etaxonomy.cdm.vaadin.view.taxon;
 
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
@@ -23,7 +20,6 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
@@ -34,14 +30,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since May 22, 2017
  *
  */
-@SpringComponent
-@Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
-
-    @Autowired
-    private SelectFieldFactory selectFieldFactory;
 
     private final static int GRID_COLS = 4;
 

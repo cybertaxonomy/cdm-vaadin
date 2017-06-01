@@ -125,6 +125,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                TransactionStatus tx = getRepo().startTransaction(false);
                Reference reference = getRepo().getReferenceService().find(editorAction.getEntityId());
                ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+               popup.withDeleteButton(true);
                popup.showInEditor(reference);
                getRepo().commitTransaction(tx);
            }

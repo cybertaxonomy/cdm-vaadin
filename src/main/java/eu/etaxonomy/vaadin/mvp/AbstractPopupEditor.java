@@ -53,6 +53,9 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
+ *
+ * Optional with a delete button which can be enabled with {@link #withDeleteButton(boolean)}
+ *
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
@@ -120,9 +123,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         delete = new Button("Delete", FontAwesome.REMOVE);
         delete.setStyleName(ValoTheme.BUTTON_DANGER);
         delete.addClickListener(e -> delete());
+        delete.setVisible(false);
 
         buttonLayout.addComponents(delete, save, cancel);
-        buttonLayout.setExpandRatio(delete, 1);
+        // delete is initially invisible, let save take all space
+        buttonLayout.setExpandRatio(save, 1);
         buttonLayout.setComponentAlignment(delete, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
@@ -490,6 +495,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         gridLayout().addComponent(component, column1, row1, column2, row2);
     }
 
+
+    public void withDeleteButton(boolean withDelete){
+
+        if(withDelete){
+            buttonLayout.setExpandRatio(save, 0);
+            buttonLayout.setExpandRatio(delete, 1);
+        } else {
+            buttonLayout.setExpandRatio(save, 1);
+            buttonLayout.setExpandRatio(delete, 0);
+        }
+        delete.setVisible(withDelete);
+    }
 
 
     // ------------------------ data binding ------------------------ //

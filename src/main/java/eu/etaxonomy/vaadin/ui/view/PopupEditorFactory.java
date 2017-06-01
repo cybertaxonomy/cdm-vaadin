@@ -23,6 +23,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -47,6 +49,9 @@ public class PopupEditorFactory {
     private CdmRepository repo;
 
     @Autowired
+    private SelectFieldFactory selectFieldFactory;
+
+    @Autowired
     @Lazy
     private NavigationManager navigationManager;
 
@@ -58,6 +63,8 @@ public class PopupEditorFactory {
     private Method viewInjectPresenterMethod;
 
     private Method viewInitMethod;
+
+    private Field selectFieldFactoryField;
 
     public PopupEditorFactory(){
         initFieldsAccess();
@@ -87,6 +94,9 @@ public class PopupEditorFactory {
 
             viewInitMethod = AbstractView.class.getDeclaredMethod("init");
             viewInitMethod.setAccessible(true);
+
+            selectFieldFactoryField = AbstractCdmPopupEditor.class.getDeclaredField("selectFieldFactory");
+            selectFieldFactoryField.setAccessible(true);
 
         } catch (NoSuchFieldException | SecurityException | NoSuchMethodException  e) {
             throw new RuntimeException("Severe error during initialization. Please check the classes AbstractPresenter, AbstractEditorPresenter, AbstractView for modificactions.", e);
@@ -119,6 +129,11 @@ public class PopupEditorFactory {
                 viewEventBusField.set(abstractView, eventBus);
                 viewInjectPresenterMethod.invoke(abstractView, presenter);
                 // invoke the @PostConstruct method
+
+                if(AbstractCdmPopupEditor.class.isAssignableFrom(popupViewClass)){
+                    selectFieldFactoryField.set(view, selectFieldFactory);
+                }
+
                 viewInitMethod.invoke(abstractView);
             }
             return view;

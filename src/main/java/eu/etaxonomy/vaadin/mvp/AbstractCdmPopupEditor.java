@@ -21,6 +21,8 @@ import com.vaadin.ui.Layout.MarginHandler;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
+import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 
 /**
  * @author a.kohlbecker
@@ -37,6 +39,11 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
     private List<Component> advancedModeComponents = new ArrayList<>();
 
     private Button advancedModeButton;
+
+    /**
+     * set by the {@link PopupEditorFactory}
+     */
+    protected SelectFieldFactory selectFieldFactory;
 
     /**
      * @param layout

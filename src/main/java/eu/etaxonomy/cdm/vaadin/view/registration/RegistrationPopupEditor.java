@@ -11,11 +11,8 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.ListSelect;
@@ -25,7 +22,6 @@ import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -35,15 +31,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since May 15, 2017
  *
  */
-@SpringComponent
-@Scope("prototype")
 public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter>
     implements RegistrationPopEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-    @Autowired
-    private SelectFieldFactory selectFieldFactory;
 
     TextField identifierField;
     TextField specificIdentifierField;
