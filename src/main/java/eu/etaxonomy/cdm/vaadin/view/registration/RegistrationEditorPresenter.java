@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -19,6 +20,14 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration, RegistrationPopEditorView> {
 
     private static final long serialVersionUID = 6930557602995331944L;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DeleteResult executeServiceDeleteOperation(Registration bean) {
+        return getRepo().getRegistrationService().delete(bean);
+    }
 
 
 }

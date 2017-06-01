@@ -12,9 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
-
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
@@ -33,7 +32,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected ApplicationEventPublisher eventBus;
 
     @EventListener
-    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+    public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
@@ -44,13 +43,26 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      * @param saveEvent
      */
     @EventListener
-    public void onEditorSaveEvent(EditorSaveEvent saveEvent){
+    public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
         if(!isFromOwnView(saveEvent)){
             return;
         }
-        DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
+        DTO bean = saveEvent.getBean();
         saveBean(bean);
     }
+
+    // EditorDeleteEvent
+    /**
+    *
+    * @param saveEvent
+    */
+   @EventListener
+   public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
+       if(!isFromOwnView(deleteEvent)){
+           return;
+       }
+       deleteBean(deleteEvent.getBean());
+   }
 
     /**
      * @param saveEvent
@@ -69,5 +81,10 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     }
 
     protected abstract void saveBean(DTO bean);
+
+    /**
+     * @param bean
+     */
+    protected abstract void deleteBean(DTO bean);
 
 }

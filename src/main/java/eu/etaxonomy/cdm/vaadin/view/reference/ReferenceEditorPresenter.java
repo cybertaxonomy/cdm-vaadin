@@ -18,8 +18,7 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
-import com.vaadin.ui.ListSelect;
-
+import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -139,14 +138,22 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();
-               // TODO update items from db instead of just adding the new item
-               ListSelect localInReferenceSelectSelect = getView().getInReferenceSelect().getSelect();
-               localInReferenceSelectSelect.addItem(bean);
-               localInReferenceSelectSelect.select(bean);
+               getView().getInReferenceCombobox().selectNewItem(bean);
+           }
+           if(event.getReason().equals(Reason.DELETE)){
+               getView().getInReferenceCombobox().selectNewItem(null);
            }
            inReferencePopup = null;
        }
 
    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DeleteResult executeServiceDeleteOperation(Reference bean) {
+        return getRepo().getReferenceService().delete(bean);
+    }
 
 }

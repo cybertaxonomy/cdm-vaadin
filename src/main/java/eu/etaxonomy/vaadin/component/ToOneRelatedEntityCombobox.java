@@ -25,7 +25,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * @since May 24, 2017
  *
  */
-public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField {
+public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField<V> {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
@@ -42,9 +42,14 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     public ToOneRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;
+        setCaption(caption);
         lazySelect = new LazyComboBox<V>(type);
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
+        lazySelect.addValueChangeListener(e -> {
+            // update the itemContainer immediately so that the edit button acts on the chosen item
+            lazySelect.commit();
+        });
     }
 
 
@@ -112,6 +117,13 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     @Override
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
+    }
+
+    @Override
+    public void selectNewItem(V bean){
+        lazySelect.refresh();
+        lazySelect.setValue(bean);
+        lazySelect.markAsDirty();
     }
 
 }

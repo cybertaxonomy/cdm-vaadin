@@ -3,7 +3,7 @@ package eu.etaxonomy.vaadin.ui.view;
 public class DoneWithPopupEvent {
 
 	public enum Reason {
-		CANCEL, SAVE;
+		CANCEL, SAVE, DELETE;
 	}
 
 	private final Reason reason;

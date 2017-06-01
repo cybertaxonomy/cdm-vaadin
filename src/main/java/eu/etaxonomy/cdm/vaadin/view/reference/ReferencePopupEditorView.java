@@ -12,7 +12,6 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
-import eu.etaxonomy.vaadin.component.ToOneRelatedEntityListSelect;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -23,8 +22,6 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 public interface ReferencePopupEditorView extends ApplicationView<ReferenceEditorPresenter> {
 
     public ListSelect getTypeSelect();
-
-    public ToOneRelatedEntityListSelect<Reference> getInReferenceSelect();
 
     public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox();
 

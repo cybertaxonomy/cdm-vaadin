@@ -46,6 +46,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -70,6 +71,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private Button save;
 
     private Button cancel;
+
+    private Button delete;
 
     private CssLayout toolBar = new CssLayout();
 
@@ -114,8 +117,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         cancel = new Button("Cancel", FontAwesome.TRASH);
         cancel.addClickListener(e -> cancel());
 
-        buttonLayout.addComponents(save, cancel);
-        buttonLayout.setExpandRatio(save, 1);
+        delete = new Button("Delete", FontAwesome.REMOVE);
+        delete.setStyleName(ValoTheme.BUTTON_DANGER);
+        delete.addClickListener(e -> delete());
+
+        buttonLayout.addComponents(delete, save, cancel);
+        buttonLayout.setExpandRatio(delete, 1);
+        buttonLayout.setComponentAlignment(delete, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
@@ -216,14 +224,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         public void preCommit(CommitEvent commitEvent) throws CommitException {
             logger.debug("preCommit");
             // notify the presenter to start a transaction
-            eventBus.publishEvent(new EditorPreSaveEvent(commitEvent, AbstractPopupEditor.this));
+            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, fieldGroup.getItemDataSource().getBean()));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
                 // notify the presenter to persist the bean and to commit the transaction
-                eventBus.publishEvent(new EditorSaveEvent(commitEvent, AbstractPopupEditor.this));
+                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, fieldGroup.getItemDataSource().getBean()));
 
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
@@ -245,6 +253,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public void cancel() {
         fieldGroup.discard();
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
+    }
+
+    /**
+     * @return
+     */
+    private void delete() {
+        eventBus.publishEvent(new EditorDeleteEvent(this, fieldGroup.getItemDataSource().getBean()));
+        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
     }
 
     /**

@@ -11,30 +11,24 @@ package eu.etaxonomy.vaadin.mvp.event;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
- * Usually a notification to a presenter to
- * perform a save operation and to commit the transaction
- *
  * @author a.kohlbecker
- * @since Apr 5, 2017
+ * @since Jun 1, 2017
  *
  */
-public class EditorSaveEvent<DTO extends Object> implements EditorViewEvent, EditorBeanEvent<DTO> {
+public class EditorDeleteEvent<DTO extends Object> implements EditorViewEvent, EditorBeanEvent<DTO> {
 
     // FIXME this is only a iterim solution for the problem described in https://dev.e-taxonomy.eu/redmine/issues/6562
     private AbstractView<?> view;
 
-
     private DTO bean;
 
-    /**
-     */
-    public EditorSaveEvent(AbstractView<?> view, DTO bean) {
-        this.bean = bean;
+    public EditorDeleteEvent(AbstractView<?> view, DTO bean){
         this.view = view;
+        this.bean = bean;
     }
 
     /**
-     * @return the view
+     * {@inheritDoc}
      */
     @Override
     public AbstractView<?> getView() {
@@ -48,4 +42,5 @@ public class EditorSaveEvent<DTO extends Object> implements EditorViewEvent, Edi
     public DTO getBean() {
         return bean;
     }
+
 }

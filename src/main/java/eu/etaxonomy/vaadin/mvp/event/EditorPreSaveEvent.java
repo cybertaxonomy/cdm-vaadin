@@ -8,8 +8,6 @@
 */
 package eu.etaxonomy.vaadin.mvp.event;
 
-import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
-
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -20,31 +18,37 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Apr 5, 2017
  *
  */
-public class EditorPreSaveEvent implements EditorViewEvent{
-
-    private CommitEvent commitEvent;
+public class EditorPreSaveEvent<DTO extends Object> implements EditorViewEvent, EditorBeanEvent<DTO>{
 
     // FIXME this is only a iterim solution for the problem described in https://dev.e-taxonomy.eu/redmine/issues/6562
-    private AbstractView view;
+    private AbstractView<?> view;
+
+    private DTO bean;
 
     /**
      * @param commitEvent
      */
-    public EditorPreSaveEvent(CommitEvent commitEvent, AbstractView view) {
-        this.commitEvent = commitEvent;
+    public EditorPreSaveEvent(AbstractView<?> view, DTO bean) {
+        this.bean = bean;
         this.view = view;
     }
 
-    public CommitEvent getCommitEvent(){
-        return commitEvent;
-    }
 
     /**
      * @return the view
      */
     @Override
-    public AbstractView getView() {
+    public AbstractView<?> getView() {
         return view;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DTO getBean() {
+        return bean;
     }
 
 }

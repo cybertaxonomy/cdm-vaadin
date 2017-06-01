@@ -15,7 +15,7 @@ import com.vaadin.ui.Button.ClickListener;
  * @since May 25, 2017
  *
  */
-public interface ToOneRelatedEntityField {
+public interface ToOneRelatedEntityField<V extends Object> {
 
     /**
      * Adds the click listener to the add-entity-button.
@@ -32,5 +32,7 @@ public interface ToOneRelatedEntityField {
      *            the Listener to be added.
      */
     public void addClickListenerEditEntity(ClickListener listener);
+
+    public void selectNewItem(V bean);
 
 }

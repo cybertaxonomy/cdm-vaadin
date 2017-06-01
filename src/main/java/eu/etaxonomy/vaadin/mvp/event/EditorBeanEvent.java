@@ -8,15 +8,13 @@
 */
 package eu.etaxonomy.vaadin.mvp.event;
 
-import eu.etaxonomy.vaadin.mvp.AbstractView;
-
 /**
  * @author a.kohlbecker
- * @since May 29, 2017
+ * @since Jun 1, 2017
  *
  */
-public interface EditorViewEvent {
+public interface EditorBeanEvent<DTO extends Object> {
 
-    public AbstractView<?> getView();
+    public DTO getBean();
 
 }

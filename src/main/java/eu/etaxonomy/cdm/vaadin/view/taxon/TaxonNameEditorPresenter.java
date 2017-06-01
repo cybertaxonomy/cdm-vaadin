@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.taxon;
 
+import eu.etaxonomy.cdm.api.service.DeleteResult;
+import eu.etaxonomy.cdm.api.service.config.NameDeletionConfigurator;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -19,6 +21,15 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNameBase, TaxonNamePopupEditorView> {
 
     private static final long serialVersionUID = -3538980627079389221L;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DeleteResult executeServiceDeleteOperation(TaxonNameBase bean) {
+        NameDeletionConfigurator config = new NameDeletionConfigurator();
+        return getRepo().getNameService().delete(bean.getUuid(), config);
+    }
 
 
 }

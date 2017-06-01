@@ -24,7 +24,7 @@ import com.vaadin.ui.themes.ValoTheme;
  * @since May 24, 2017
  *
  */
-public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField {
+public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField<V> {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
@@ -42,6 +42,7 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
 
     public ToOneRelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
         this.type = type;
+        setCaption(caption);
         select = new ListSelect(caption, dataSource);
         addStyledComponents(select, addButton, editButton);
         addSizedComponent(select);
@@ -91,8 +92,6 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
         return select;
     }
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -120,6 +119,16 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
     @Override
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void selectNewItem(V bean) {
+
+      select.addItem(bean);
+      select.select(bean);
     }
 
 

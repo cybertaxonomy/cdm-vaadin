@@ -14,11 +14,12 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.TransactionStatus;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
-import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
-import com.vaadin.data.util.BeanItem;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
@@ -46,10 +47,23 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     @Override
     @EventListener
-    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+    public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
+        startTransaction();
+        // merge the bean and update the fieldGroup with the merged bean, so that updating
+        // of field values in turn of the commit are can not cause LazyInitializationExeptions
+        // the bean still has the original values at this point
+        logger.trace(this._toString() + ".onEditorPreSaveEvent - merging bean into session");
+        mergedBean(preSaveEvent.getBean());
+
+    }
+
+    /**
+     *
+     */
+    protected void startTransaction() {
         if(tx != null){
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we should change the save operation
@@ -64,12 +78,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
         tx = getRepo().startTransaction(true);
-        // merge the bean and update the fieldGroup with the merged bean, so that updating
-        // of field values in turn of the commit are can not cause LazyInitializationExeptions
-        // the bean still has the original values at this point
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - merging bean into session");
-        mergedBean(preSaveEvent.getCommitEvent());
-
     }
 
     @Override
@@ -81,7 +89,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         // the bean is now updated with the changes made by the user
         // merge the bean into the session, ...
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
-        DTO bean = mergedBean(saveEvent.getCommitEvent());
+        DTO bean = mergedBean((DTO) saveEvent.getBean());
 
         Type changeEventType;
         if(bean.getId() > 1){
@@ -106,12 +114,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      * @param CommitEvent
      * @return The bean merged to the session or original bean in case a merge was not necessary.
      */
-    private DTO mergedBean(CommitEvent commitEvent) {
+    private DTO mergedBean(DTO bean) {
         // using just some service to get hold of the session
         Session session = getSession();
-        @SuppressWarnings("unchecked")
-        BeanItem<DTO> itemDataSource = ((BeanFieldGroup<DTO>)commitEvent.getFieldBinder()).getItemDataSource();
-        DTO bean = itemDataSource.getBean();
         if(session.contains(bean)){
 
             if(session.isOpen()){
@@ -123,7 +128,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             @SuppressWarnings("unchecked")
             DTO mergedBean = (DTO) session.merge(bean);
             logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
-            itemDataSource.setBean(mergedBean);
+            ((AbstractPopupEditor<DTO, AbstractCdmEditorPresenter<DTO, V>>)getView()).showInEditor(mergedBean);
             return mergedBean;
         }
         return bean;
@@ -143,6 +148,63 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     protected final void saveBean(DTO bean){
         // blank implementation, since this is not needed in this or any sub class
     }
+
+    @Override
+    protected final void deleteBean(DTO bean){
+        startTransaction();
+        logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
+        DeleteResult result = executeServiceDeleteOperation(bean);
+        if(result.isOk()){
+            getSession().flush();
+            logger.trace(this._toString() + ".deleteBean - session flushed");
+            getRepo().commitTransaction(tx);
+            tx = null;
+            logger.trace(this._toString() + ".deleteBean - transaction comitted");
+            eventBus.publishEvent(new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED));
+        } else {
+            String notificationTitle;
+            StringBuffer messageBody = new StringBuffer();
+            if(result.isAbort()){
+                notificationTitle = "The delete operation as abborded by the system.";
+            } else {
+                notificationTitle = "An error occured during the delete operation.";
+            }
+            if(!result.getExceptions().isEmpty()){
+                messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
+                result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
+                messageBody.append("</ul>");
+            }
+            if(!result.getRelatedObjects().isEmpty()){
+                messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
+                result.getRelatedObjects().forEach(e -> {
+                    messageBody.append("<li>");
+                    if(IdentifiableEntity.class.isAssignableFrom(e.getClass())){
+                        messageBody.append(((IdentifiableEntity)e).getTitleCache());
+                    } else {
+                        messageBody.append(e.toString());
+                    }
+                    messageBody.append("</li>");
+                }
+                );
+
+                messageBody.append("</ul>");
+            }
+
+            Notification notification = new Notification(
+                   notificationTitle,
+                   messageBody.toString(),
+                   com.vaadin.ui.Notification.Type.ERROR_MESSAGE,
+                   true);
+            notification.show(UI.getCurrent().getPage());
+        }
+    }
+
+    /**
+     * Implementations will execute the {@link
+     *
+     * @return
+     */
+    protected abstract DeleteResult executeServiceDeleteOperation(DTO bean);
 
     private String _toString(){
         return this.getClass().getSimpleName() + "@" + this.hashCode();
