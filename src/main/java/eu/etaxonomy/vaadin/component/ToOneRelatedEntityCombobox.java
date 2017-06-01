@@ -8,15 +8,16 @@
 */
 package eu.etaxonomy.vaadin.component;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
+import org.vaadin.viritin.fields.LazyComboBox;
+import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
+import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
+
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
 /**
@@ -24,35 +25,35 @@ import com.vaadin.ui.themes.ValoTheme;
  * @since May 24, 2017
  *
  */
-public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField {
+public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
-    public static final String PRIMARY_STYLE = "v-related-entity-list-select";
+    public static final String PRIMARY_STYLE = "v-related-entity-combobox";
 
     private Class<V> type;
 
     private CssLayout container = new CssLayout();
 
-    private ListSelect select;
-
+    private LazyComboBox<V> lazySelect;
 
     private Button addButton = new Button(FontAwesome.PLUS);
     private Button editButton  = new Button(FontAwesome.EDIT);
 
-    public ToOneRelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
+    public ToOneRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;
-        select = new ListSelect(caption, dataSource);
-        addStyledComponents(select, addButton, editButton);
-        addSizedComponent(select);
+        lazySelect = new LazyComboBox<V>(type);
+        addStyledComponents(lazySelect, addButton, editButton);
+        addSizedComponents(lazySelect, container);
     }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected Component initContent() {
-        container.addComponents(select, addButton, editButton);
+        container.addComponents(lazySelect, addButton, editButton);
         setPrimaryStyleName(PRIMARY_STYLE);
         addDefaultStyles();
         return container;
@@ -84,26 +85,17 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
 
     /**
      * @return the select
-     * @deprecated list specific method should not be in the interface
      */
-    @Deprecated
-    public ListSelect getSelect() {
-        return select;
+    public LazyComboBox<V> getSelect() {
+        return lazySelect;
     }
-
-
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void setPropertyDataSource(Property newDataSource) {
-        select.setPropertyDataSource(newDataSource);
-    }
+    public void loadFrom(FilterablePagingProvider<V> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength) {
+        lazySelect.loadFrom(filterablePagingProvider, filterableCountProvider, pageLength);
 
-    @Override
-    public Property getPropertyDataSource() {
-        return select.getPropertyDataSource();
     }
 
     /**
@@ -121,6 +113,5 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
     }
-
 
 }

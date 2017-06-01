@@ -128,7 +128,15 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     
     // v-related-entity-list-select
     .v-related-entity-list-select {
-        @include icon-button-field('v-select', 'v-button', 2, 'right');
+        @include icon-button-field('v-select', 'v-button', 2, 'right', $v-unit-size);
+    }
+    
+    // v-related-entity-combobox
+    .v-related-entity-combobox {
+        @include icon-button-field('v-filterselect', 'v-button', 2, 'right', $v-unit-size);
+        .v-filterselect-button {
+            right: $v-unit-size * 2 + 1px;
+        }
     }
     
 } 

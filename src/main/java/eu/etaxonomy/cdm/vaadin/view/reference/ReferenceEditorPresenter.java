@@ -14,12 +14,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.TransactionStatus;
+import org.vaadin.viritin.fields.CaptionGenerator;
+import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
+import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ListSelect;
 
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
@@ -50,6 +54,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
+        /*
         ListSelect select = getView().getInReferenceSelect().getSelect();
         BeanItemContainer<Reference> inReferenceSelectContainer = (BeanItemContainer<Reference>) select.getContainerDataSource();
         List<Reference> references = getRepo().getCommonService().list(Reference.class, (Integer)null, (Integer)null,
@@ -58,6 +63,48 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         inReferenceSelectContainer.addAll(references);
         select.setItemCaptionPropertyId("titleCache");
         select.markAsDirty();
+        */
+
+        getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new CaptionGenerator<Reference>(){
+
+            @Override
+            public String getCaption(Reference option) {
+                return option.getTitleCache();
+            }
+
+        });
+        getView().getInReferenceCombobox().loadFrom(new FilterablePagingProvider<Reference>(){
+
+            @Override
+            public List<Reference> findEntities(int firstRow, String filter) {
+                Pager<Reference> page = getRepo().getReferenceService().findByTitle(
+                        null,
+                        filter,
+                        MatchMode.ANYWHERE,
+                        null,
+                        20,
+                        firstRow,
+                        OrderHint.ORDER_BY_TITLE_CACHE.asList(),
+                        Arrays.asList("$")
+                      );
+                return page.getRecords();
+            }},
+            new FilterableCountProvider(){
+                @Override
+                public int size(String filter) {
+                    Pager<Reference> page = getRepo().getReferenceService().findByTitle(
+                            null,
+                            filter,
+                            MatchMode.ANYWHERE,
+                            null,
+                            1,
+                            0,
+                            null,
+                            null
+                          );
+                    return page.getCount().intValue();
+                }}
+            , 20);
     }
 
     /**

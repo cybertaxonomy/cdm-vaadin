@@ -155,6 +155,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		    AbstractEditorPresenter presenter = ((AbstractPopupEditor)popup).presenter();
 		    eventListenerManager.removeEventListeners(presenter);
 		}
+
 	}
 
     /**

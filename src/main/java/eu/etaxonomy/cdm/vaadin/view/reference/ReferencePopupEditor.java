@@ -13,7 +13,6 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
@@ -27,6 +26,7 @@ import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityListSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
@@ -48,6 +48,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private ListSelect typeSelect;
 
     private ToOneRelatedEntityListSelect<Reference> inReferenceSelect;
+
+    private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     /**
      * @param layout
@@ -117,6 +119,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addTextField("Pages", "pages", 2, row);
         addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
+        /*
         inReferenceSelect = new ToOneRelatedEntityListSelect<Reference>("In-reference", Reference.class, new BeanItemContainer<>(Reference.class));
         inReferenceSelect.setWidth(100, Unit.PERCENTAGE);
         inReferenceSelect.getSelect().setRows(1);
@@ -131,6 +134,20 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             }
             });
         addField(inReferenceSelect, "inReference", 0, row, 3, row);
+        */
+        inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
+        inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
+        inReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceSelect, this)
+                ));
+        inReferenceCombobox.addClickListenerEditEntity(e -> {
+            if(inReferenceCombobox.getSelect().getValue() != null){
+                getEventBus().publishEvent(
+                    new ReferenceEditorAction(AbstractEditorAction.Action.EDIT, ((Reference)inReferenceSelect.getSelect().getValue()).getId(), inReferenceSelect, this)
+                );
+            }
+            });
+        addField(inReferenceCombobox, "inReference", 0, row, 3, row);
         row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
@@ -228,6 +245,14 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public ToOneRelatedEntityListSelect<Reference> getInReferenceSelect() {
         return inReferenceSelect;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
+        return inReferenceCombobox;
     }
 
 }
