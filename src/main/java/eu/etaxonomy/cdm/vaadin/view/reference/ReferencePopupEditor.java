@@ -123,7 +123,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                 new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceCombobox, this)
                 ));
         inReferenceCombobox.addClickListenerEditEntity(e -> {
-            if(inReferenceCombobox.getSelect().getValue() != null){
+            if(inReferenceCombobox.getValue() != null){
                 getEventBus().publishEvent(
                     new ReferenceEditorAction(
                             AbstractEditorAction.Action.EDIT,

@@ -126,4 +126,18 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         lazySelect.markAsDirty();
     }
 
+
+    /**
+     * Returns always currently selected item by
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public V getValue() {
+        lazySelect.commit();
+        return lazySelect.getValue();
+    }
+
+
+
 }

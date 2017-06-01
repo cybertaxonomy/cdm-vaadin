@@ -118,7 +118,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
            if(editorAction.isAddAction()){
                Reference reference = ReferenceFactory.newGeneric();
-               getView().getTypeSelect().getValue();
                inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
                inReferencePopup.showInEditor(reference);
            }
