@@ -128,6 +128,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         }
 
         logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
+        // to avoid merge problems as described in https://dev.e-taxonomy.eu/redmine/issues/6687
+        // we are set the hibernate property hibernate.event.merge.entity_copy_observer=allow
         @SuppressWarnings("unchecked")
         DTO mergedBean = (DTO) session.merge(bean);
         logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
