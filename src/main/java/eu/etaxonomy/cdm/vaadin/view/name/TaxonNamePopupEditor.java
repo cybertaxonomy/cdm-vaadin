@@ -40,7 +40,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 9;
+    private final static int GRID_ROWS = 10;
 
     private TextField genusOrUninomialField;
 
@@ -177,6 +177,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
         infraSpecificEpithetField = addTextField("Infraspecific epithet", "infraSpecificEpithet", 2, row, 3, row);
         infraSpecificEpithetField.setWidth(200, Unit.PIXELS);
         row++;
+        TeamOrPersonField combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
+        combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
+        row++;
         TeamOrPersonField exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
@@ -249,5 +253,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox() {
         return nomReferenceCombobox;
     }
+
 
 }
