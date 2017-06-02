@@ -12,7 +12,9 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -136,6 +138,28 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     public V getValue() {
         lazySelect.commit();
         return lazySelect.getValue();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValue(V newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
+        lazySelect.setValue(newFieldValue);
+    }
+
+    @Override
+    public void setPropertyDataSource(Property newDataSource) {
+        lazySelect.setPropertyDataSource(newDataSource);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Property getPropertyDataSource() {
+        return lazySelect.getPropertyDataSource();
     }
 
 
