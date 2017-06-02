@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.taxon;
+package eu.etaxonomy.cdm.vaadin.view.name;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;

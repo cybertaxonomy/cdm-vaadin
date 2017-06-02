@@ -36,8 +36,8 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
-import eu.etaxonomy.cdm.vaadin.view.taxon.TaxonNamePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
