@@ -460,6 +460,14 @@
        <artifactId>viritin</artifactId>
        <version>1.61</version>
     </dependency>
+    <!-- 
+    <dependency>
+        <groupId>org.vaadin.spring.extensions</groupId>
+        <artifactId>vaadin-spring-ext-test</artifactId>
+        <version>0.0.8-SNAPSHOT</version>
+        <scope>test</scope>
+    </dependency>
+     -->
     <!--     <dependency>
         only in the edit repo
       <groupId>org.vaadin.addons</groupId>
