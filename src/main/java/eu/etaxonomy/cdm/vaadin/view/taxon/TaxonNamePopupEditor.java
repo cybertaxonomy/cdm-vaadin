@@ -19,10 +19,14 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -36,7 +40,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 7;
+    private final static int GRID_ROWS = 9;
 
     private TextField genusOrUninomialField;
 
@@ -49,6 +53,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     private SwitchableTextField fullTitleCacheFiled;
 
     private SwitchableTextField protectedNameCacheField;
+
+    private ToOneRelatedEntityCombobox<Reference> nomReferenceCombobox;
+
+    private TextField nomenclaturalReferenceDetail;
 
 
     /**
@@ -178,6 +186,27 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
         row++;
 
+        // nomenclaturalReference
+        nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
+        nomReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
+        nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, nomReferenceCombobox, this)
+                ));
+        nomReferenceCombobox.addClickListenerEditEntity(e -> {
+            if(nomReferenceCombobox.getValue() != null){
+                getEventBus().publishEvent(
+                    new ReferenceEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            nomReferenceCombobox.getValue().getId(),
+                            nomReferenceCombobox,
+                            this)
+                );
+            }
+            });
+        addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 3, row);
+        row++;
+        nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 1, row);
+
         setAdvancedModeEnabled(true);
         registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
         setAdvancedMode(false);
@@ -211,6 +240,14 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox() {
+        return nomReferenceCombobox;
     }
 
 }

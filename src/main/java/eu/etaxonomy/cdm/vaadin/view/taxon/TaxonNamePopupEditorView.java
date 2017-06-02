@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.taxon;
 
+import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -16,5 +18,10 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  *
  */
 public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEditorPresenter> {
+
+    /**
+     * @return
+     */
+    public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox();
 
 }
