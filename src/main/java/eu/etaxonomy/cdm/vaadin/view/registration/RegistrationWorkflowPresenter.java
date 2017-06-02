@@ -150,6 +150,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.showInEditor(taxonName);
         popup.withDeleteButton(true);
+        // in the registration application inReferences should only edited centrally
+        popup.getNomReferenceCombobox().setEnabled(false);
         getRepo().commitTransaction(tx);
     }
 
