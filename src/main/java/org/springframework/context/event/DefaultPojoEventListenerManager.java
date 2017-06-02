@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +26,8 @@ import org.springframework.util.ReflectionUtils;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
+import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+
 /**
  * @author a.kohlbecker
  * @since May 29, 2017
@@ -33,6 +36,8 @@ import com.vaadin.spring.annotation.UIScope;
 @SpringComponent
 @UIScope
 public class DefaultPojoEventListenerManager implements PojoEventListenerManager, ApplicationContextAware {
+
+    public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 
     @Autowired
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -55,6 +60,9 @@ public class DefaultPojoEventListenerManager implements PojoEventListenerManager
             ApplicationListenerPojoMethodAdapter applicationListener = new ApplicationListenerPojoMethodAdapter(o.toString(), o.getClass(), method, o);
             applicationListener.init(this.applicationContext, this.evaluator);
 
+            if(logger.isTraceEnabled()){
+                logger.trace(String.format("Adding ApplicationListener for  %s@%s#%s", o.getClass().getSimpleName(), o.hashCode(), method.toGenericString()));
+            }
             applicationEventMulticaster.addApplicationListener(applicationListener);
             addToMap(o, applicationListener);
 

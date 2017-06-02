@@ -111,17 +111,12 @@ public class PopupEditorFactory {
      */
     public <V extends PopupView, P extends AbstractPresenter> PopupView newPopupView(Class<V> popupViewClass) {
 
-        Class<? extends AbstractPresenter<?>> prestenterClass = findGenericPresenterType(popupViewClass);
+        Class<? extends AbstractPresenter<?>> presenterClass = findGenericPresenterType(popupViewClass);
         try {
 
-            P presenter = (P) prestenterClass.newInstance();
+            P presenter = (P) presenterClass.newInstance();
 
-            presenterRepoField.set(presenter, repo);
-            presenterNavigationManagerField.set(presenter, navigationManager);
-
-            if(AbstractEditorPresenter.class.isAssignableFrom(prestenterClass)){
-                presenterEventBusField.set(presenter, eventBus);
-            }
+            injectPresenterBeans(presenterClass, presenter);
 
             PopupView view = popupViewClass.newInstance();
             if(AbstractView.class.isAssignableFrom(popupViewClass)){
@@ -138,7 +133,23 @@ public class PopupEditorFactory {
             }
             return view;
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw new RuntimeException(String.format("Error creating the view class '%s' with presenter class '%s'", popupViewClass, prestenterClass), e);
+            throw new RuntimeException(String.format("Error creating the view class '%s' with presenter class '%s'", popupViewClass, presenterClass), e);
+        }
+    }
+
+
+    /**
+     * @param presenterClass
+     * @param presenter
+     * @throws IllegalAccessException
+     */
+    public <P extends AbstractPresenter> void injectPresenterBeans(
+            Class<? extends AbstractPresenter<?>> presenterClass, P presenter) throws IllegalAccessException {
+        presenterRepoField.set(presenter, repo);
+        presenterNavigationManagerField.set(presenter, navigationManager);
+
+        if(AbstractEditorPresenter.class.isAssignableFrom(presenterClass)){
+            presenterEventBusField.set(presenter, eventBus);
         }
     }
 

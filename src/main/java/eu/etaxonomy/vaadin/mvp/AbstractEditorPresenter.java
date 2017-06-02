@@ -51,7 +51,6 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         saveBean(bean);
     }
 
-    // EditorDeleteEvent
     /**
     *
     * @param saveEvent

@@ -3,6 +3,8 @@ package eu.etaxonomy.vaadin.mvp;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
@@ -63,6 +65,19 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         return SecurityContextHolder.getContext();
     }
 
+    /**
+     * @return
+     */
+    protected Session getSession() {
+        Session session = getRepo().getSession(false);
+        logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
+        return session;
+    }
+
+    protected String _toString(){
+        return this.getClass().getSimpleName() + "@" + this.hashCode();
+    }
+
 	/**
 	 * Notifies the presenter that its view is initialized so that presenter can
 	 * start its own initialization if required.
@@ -70,7 +85,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	 * @param view
 	 */
 	protected final void init(V view) {
-	    logger.trace("Presenter init");
+	    logger.trace(String.format("Presenter %s init", this.toString()));
 		this.view = view;
 		onPresenterReady();
 	}
@@ -80,7 +95,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	 * after presenter has finished initializing.
 	 */
 	protected void onPresenterReady() {
-	    logger.trace("Presenter ready");
+	    logger.trace(String.format("Presenter %s ready", this.toString()));
 	}
 
 	public final void onViewEnter() {

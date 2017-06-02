@@ -63,6 +63,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
 
+    public static final Logger logger = Logger.getLogger(AbstractPopupEditor.class);
+
     private BeanFieldGroup<DTO> fieldGroup;
 
     private VerticalLayout mainLayout;
@@ -227,17 +229,22 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
-            logger.debug("preCommit");
+            logger.debug("preCommit, publishing EditorPreSaveEvent");
             // notify the presenter to start a transaction
-            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, fieldGroup.getItemDataSource().getBean()));
+            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
+                if(logger.isTraceEnabled()){
+                    logger.trace("postCommit() publishing EditorSaveEvent for " + getBean().toString());
+                }
                 // notify the presenter to persist the bean and to commit the transaction
-                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, fieldGroup.getItemDataSource().getBean()));
-
+                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+                if(logger.isTraceEnabled()){
+                    logger.trace("postCommit() publishing DoneWithPopupEvent");
+                }
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
             } catch (Exception e) {
@@ -524,12 +531,21 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     /**
-     * Returns the bean to be edited.
+     * Returns the bean contained in the itemDatasource of the fieldGroup.
      *
      * @return
      */
     public DTO getBean() {
         return fieldGroup.getItemDataSource().getBean();
+    }
+
+    /**
+     * This method should only be used by the presenter of this view
+     *
+     * @param bean
+     */
+    protected void updateItemDataSource(DTO bean) {
+        fieldGroup.getItemDataSource().setBean(bean);
     }
 
     /**
