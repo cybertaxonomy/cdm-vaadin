@@ -526,6 +526,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public void showInEditor(DTO beanToEdit) {
 
+
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
     }
@@ -549,7 +550,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     /**
-     * This method is called after setting the item data source whereby the {@link FieldGroup#configureField(Field<?> field)} method will be called.
+     * This method is called after setting the item data source whereby the
+     * {@link FieldGroup#configureField(Field<?> field)} method will be called.
      * In this method all fields are set to default states defined for the fieldGroup.
      * <p>
      * You can now implement this method if you need to configure the enable state of fields
@@ -561,9 +563,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     // ------------------------ issue related temporary solutions --------------------- //
     /**
+     * Publicly accessible equivalent to getPreseneter(), needed for
+     * managing the presenter listeners.
+     * <p>
+     * TODO: refactor the presenter listeners management to get rid of this method
      *
      * @return
-     * @deprecated see #6673
+     * @deprecated marked deprecated to emphasize on the special character of this method
+     *    which should only be used interlally see #6673
      */
     @Deprecated
     public P presenter() {
