@@ -48,14 +48,14 @@ public class TypeDesignationConverter {
     private String typifiedNameCache = null;
 
     /**
-     * @param taxonNameBase
+     * @param taxonName
      *
      */
-    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations, TaxonName taxonNameBase) {
+    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations, TaxonName taxonName) {
         this.typeDesignations = typeDesignations;
         orderedStrings = new HashMap<>(typeDesignations.size());
-        if(taxonNameBase != null){
-            this.typifiedNameCache = taxonNameBase.getTitleCache();
+        if(taxonName != null){
+            this.typifiedNameCache = taxonName.getTitleCache();
         }
     }
 

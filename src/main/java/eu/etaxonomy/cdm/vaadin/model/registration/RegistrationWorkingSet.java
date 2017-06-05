@@ -59,7 +59,7 @@ public class RegistrationWorkingSet {
 
     /**
      * Validate and add all Registrations to the working set which are referring to the same publication
-     * which is either the citation of the nomenclatural reference of the {@link TaxonNameBase} or the
+     * which is either the citation of the nomenclatural reference of the {@link TaxonName} or the
      * citation of the {@link TypeDesignations}. Registration with a differing publication are not added to
      * the working set, instead a {@link RegistrationValidationException} is thrown which is a container for
      * all validation problems.

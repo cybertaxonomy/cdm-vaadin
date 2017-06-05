@@ -14,7 +14,8 @@ import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 @DataSet
 public class CdmSQLContainerTest extends CdmVaadinBaseTest {
 
-	private static final Logger logger = Logger.getLogger(CdmSQLContainerTest.class);
+	@SuppressWarnings("unused")
+    private static final Logger logger = Logger.getLogger(CdmSQLContainerTest.class);
 
 
 	@Test

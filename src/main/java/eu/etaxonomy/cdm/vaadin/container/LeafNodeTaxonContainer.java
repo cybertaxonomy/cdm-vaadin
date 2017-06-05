@@ -122,7 +122,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     public void setNameFilter(String filterString) {
         removeNameFilter();
-        nameFilter = new SimpleStringFilter("tnb.titleCache", filterString, true, true);
+        nameFilter = new SimpleStringFilter("n.titleCache", filterString, true, true);
         addContainerFilter(nameFilter);
     }
 
