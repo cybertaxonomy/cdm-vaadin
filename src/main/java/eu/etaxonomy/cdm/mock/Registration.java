@@ -17,7 +17,7 @@ import org.joda.time.DateTime;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 
 /**
@@ -39,7 +39,7 @@ public class Registration extends CdmBase {
 
     private Institution institution;
 
-    private TaxonNameBase name;
+    private TaxonName name;
 
     private Set<TypeDesignationBase> typeDesignations = new HashSet<>();
 
@@ -135,14 +135,14 @@ public class Registration extends CdmBase {
     /**
      * @return the name
      */
-    public TaxonNameBase getName() {
+    public TaxonName getName() {
         return name;
     }
 
     /**
      * @param name the name to set
      */
-    public void setName(TaxonNameBase name) {
+    public void setName(TaxonName name) {
         this.name = name;
     }
 

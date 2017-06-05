@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 
@@ -51,7 +51,7 @@ public class TypeDesignationConverter {
      * @param taxonNameBase
      *
      */
-    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations, TaxonNameBase taxonNameBase) {
+    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations, TaxonName taxonNameBase) {
         this.typeDesignations = typeDesignations;
         orderedStrings = new HashMap<>(typeDesignations.size());
         if(taxonNameBase != null){

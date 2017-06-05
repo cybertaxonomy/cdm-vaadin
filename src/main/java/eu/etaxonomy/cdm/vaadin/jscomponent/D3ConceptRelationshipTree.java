@@ -26,7 +26,7 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 
 import elemental.json.JsonArray;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationshipType;
@@ -92,7 +92,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
                     UUID relUuid = UUID.fromString(arguments.getString(0));
                     conceptRelComposite.setSelectedTaxonRelUuid(relUuid);
                 }
-				
+
 			}
         });
         setConceptRelationshipTree("");
@@ -222,7 +222,7 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
     }
 
 
-    public String getAbbreviatedName(TaxonNameBase tnb) {
+    public String getAbbreviatedName(TaxonName tnb) {
         List<TaggedText> taggedTextList = tnb.getTaggedName();
         StringBuffer nameSb = new StringBuffer();
         boolean foundGenusOrUninomial = false;

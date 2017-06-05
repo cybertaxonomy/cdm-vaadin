@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
@@ -64,11 +64,11 @@ public class RegistrationService {
             TransactionStatus tx = repo.startTransaction(true);
             int pageIndex = 0;
             while(registrationsByUUID.size() < SIZE){
-                List<TaxonNameBase> names = repo.getNameService().list(TaxonNameBase.class, 100, pageIndex++, null, null);
+                List<TaxonName> names = repo.getNameService().list(TaxonName.class, 100, pageIndex++, null, null);
                 if(names.isEmpty()){
                     break;
                 }
-                for(TaxonNameBase name : names){
+                for(TaxonName name : names){
                     if(name != null && name.getRank() != null && name.getRank().isLower(Rank.SUBFAMILY())){
                         if(name.getTypeDesignations().size() > minTypeDesignationCount - 1) {
 

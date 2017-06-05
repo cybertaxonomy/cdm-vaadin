@@ -19,7 +19,7 @@ import org.joda.time.DateTime;
 import eu.etaxonomy.cdm.mock.Registration;
 import eu.etaxonomy.cdm.mock.RegistrationStatus;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -41,7 +41,7 @@ public class RegistrationDTO{
 
     private Set<Registration> blockedBy = new HashSet<>();
 
-    private TaxonNameBase<?, ?> typifiedName;
+    private TaxonName typifiedName;
 
     private TimePeriod datePublished;
 
@@ -92,11 +92,11 @@ public class RegistrationDTO{
      * @return
      * @throws RegistrationValidationException
      */
-    private TaxonNameBase<?,?> findTypifiedName() throws RegistrationValidationException {
+    private TaxonName findTypifiedName() throws RegistrationValidationException {
 
         List<String> problems = new ArrayList<>();
 
-        TaxonNameBase<?,?> typifiedName = null;
+        TaxonName typifiedName = null;
 
         for(TypeDesignationBase<?> typeDesignation : reg.getTypeDesignations()){
             typeDesignation.getTypifiedNames();
@@ -116,7 +116,7 @@ public class RegistrationDTO{
                 typifiedName = typeDesignation.getTypifiedNames().iterator().next();
             } else {
                 // compare
-                TaxonNameBase<?,?> otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
+                TaxonName otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
                 if(typifiedName.getId() != otherTypifiedName.getId()){
                   //TODO instead throw RegistrationValidationException()
                     problems.add("Multiple typifiedName in " + typeDesignation.toString());
