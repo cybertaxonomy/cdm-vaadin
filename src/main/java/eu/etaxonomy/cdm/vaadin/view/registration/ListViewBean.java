@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Item;
@@ -26,7 +25,6 @@ import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -38,6 +36,7 @@ import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -55,6 +54,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     public static final String NAME = "list";
 
+    public static final String OPTION_ALL = "all";
+
+    public static final String OPTION_IN_PROGRESS = "inprogress";
+
     private CssLayout listContainer;
 
     private Grid grid;
@@ -62,9 +65,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private CssLayout toolBar;
 
     public ListViewBean() {
-
         super();
+    }
 
+    @Override
+    protected void initContent() {
         toolBar = new CssLayout();
         toolBar.setWidth(100, Unit.PERCENTAGE);
         toolBar.addComponent(new Button("As grid", e -> toggleListType(e)));
@@ -74,6 +79,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         buildGrid();
 
         showList();
+
     }
 
     @Override
@@ -143,19 +149,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         getPresenter().onViewEnter();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Autowired
-    protected void injectPresenter(ListPresenter presenter) {
-        setPresenter(presenter);
-    }
-
     @Override
     public void populate(Collection<RegistrationDTO> registrations) {
 
-        registrations = new ArrayList<RegistrationDTO>(registrations).subList(0, 10);
+        registrations = new ArrayList<RegistrationDTO>(registrations);
 
         populateGrid(registrations);
         populateList(registrations);
@@ -209,14 +206,14 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         buttonColumn.setSortable(false);
 
         grid.setFrozenColumnCount(1);
-
     }
-
 
     public void populateList(Collection<RegistrationDTO> registrations) {
 
+        boolean isCurator = UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
-            Component item = new RegistrationItem(regDto, this);
+            RegistrationItem item = new RegistrationItem(regDto, this);
+            item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
             listContainer.addComponent(item);
         }

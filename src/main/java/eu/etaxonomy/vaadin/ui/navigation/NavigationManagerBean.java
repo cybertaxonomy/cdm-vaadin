@@ -1,28 +1,33 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
+import org.springframework.context.event.PojoEventListenerManager;
 
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 @UIScope
@@ -41,23 +46,24 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Autowired
 	private ViewChangeListener viewChangeListener;
 
+	@Autowired
+	private PojoEventListenerManager eventListenerManager;
+
+	@Autowired
+	private PopupEditorFactory popupEditorFactory;
+
+	@Autowired
+    private UserHelper userHelper;
+
 	private Map<PopupView, Window> popupMap;
 
 	public NavigationManagerBean() {
 		popupMap = new HashMap<>();
 	}
 
-    private Collection<PopupView> popupViews = new HashSet<>();
 
-    @Lazy
-    @Autowired(required=false)
-	private void popUpViews(Collection<PopupView> popupViews){
-        this.popupViews = popupViews;
-        // popupViews.forEach(view -> this.popupViews.put(view.getClass(), view));
-	}
-
-    private <P extends PopupView> Optional<PopupView> findPopupView(Class<P> type){
-        return popupViews.stream().filter(p -> p.getClass().equals(type)).findFirst();
+    private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
+        return popupEditorFactory.newPopupView(popupViewClass);
     }
 
     /*
@@ -109,31 +115,47 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public <T extends PopupView> T showInPopup(Class<T> popupType) {
 
-		PopupView popupContent =  findPopupView(popupType).get(); // TODO make better use of Optional
+	    PopupView popupView =  findPopupView(popupType); // TODO make better use of Optional
+
+	    if(AbstractPopupEditor.class.isAssignableFrom(popupView.getClass())){
+	        AbstractEditorPresenter presenter = ((AbstractPopupEditor)popupView).presenter();
+	        eventListenerManager.addEventListeners(presenter);
+	    }
 
 		Window window = new Window();
-		window.setCaption(popupContent.getWindowCaption());
+		window.setCaption(popupView.getWindowCaption());
 		window.center();
-		window.setResizable(popupContent.isResizable());
-		window.setModal(popupContent.isModal());
-		window.setCaptionAsHtml(popupContent.isWindowCaptionAsHtml());
-		window.setWidth(popupContent.getWindowPixelWidth(), Unit.PIXELS);
-		window.setContent(popupContent.asComponent());
+		window.setResizable(popupView.isResizable());
+		// due to issue #6673 (https://dev.e-taxonomy.eu/redmine/issues/6673) popup editors must be modal!
+		//window.setModal(popupView.isModal());
+		window.setModal(true);
+		window.setCaptionAsHtml(popupView.isWindowCaptionAsHtml());
+		window.setWidth(popupView.getWindowPixelWidth(), Unit.PIXELS);
+		window.setContent(popupView.asComponent());
+		// window.addCloseListener(e -> popupView.cancel());
 		UI.getCurrent().addWindow(window);
-		popupContent.focusFirst();
+		popupView.viewEntered();
+		popupView.focusFirst();
 
-		popupMap.put(popupContent, window);
+		popupMap.put(popupView, window);
 
-		return (T) popupContent;
+		return (T) popupView;
 	}
 
     @EventListener
 	protected void onDoneWithTheEditor(DoneWithPopupEvent e) {
-		Window window = popupMap.get(e.getPopup());
+
+		PopupView popup = e.getPopup();
+        Window window = popupMap.get(popup);
 		if (window != null) {
 			window.close();
-			popupMap.remove(e.getPopup());
+			popupMap.remove(popup);
 		}
+		if(AbstractPopupEditor.class.isAssignableFrom(popup.getClass())){
+		    AbstractEditorPresenter presenter = ((AbstractPopupEditor)popup).presenter();
+		    eventListenerManager.removeEventListeners(presenter);
+		}
+
 	}
 
     /**
@@ -145,6 +167,38 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
             logger.trace("reloading " + getState());
         }
         navigateTo(getState(), false);
+    }
 
+    /**
+     * This method requires that the {@SpringView} annotation is used to ser the name of the <code>View</code>.
+     *
+     * @return the current view name or <code>null</code>
+     */
+    public String getCurrentViewName() {
+        SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
+        if(springViewAnnotation != null){
+            return springViewAnnotation.name();
+        }
+        return null;
+    }
+
+    @Override
+    public List<String> getCurrentViewParameters(){
+        String substate = getState();
+        String currentViewName = getCurrentViewName();
+        if(currentViewName != null){
+            substate = substate.replaceAll("^" + currentViewName + "/?", "");
+
+        }
+        return Arrays.asList(substate.split("/"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<AbstractEditorPresenter<?, ?>> getPopupEditorPresenters() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

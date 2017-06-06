@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import eu.etaxonomy.cdm.mock.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+
 
 /**
  * @author a.kohlbecker

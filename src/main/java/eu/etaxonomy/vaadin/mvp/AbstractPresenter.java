@@ -3,14 +3,17 @@ package eu.etaxonomy.vaadin.mvp;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.ViewScope;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.TransactionStatus;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -22,8 +25,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  * @param <V>
  *            type of the view this presenter governs
  */
-@SpringComponent
-@ViewScope
 public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
 
 
@@ -56,13 +57,35 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	}
 
 	/**
+     * @return
+     *
+     * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
+     */
+    protected SecurityContext currentSecurityContext() {
+        return SecurityContextHolder.getContext();
+    }
+
+    /**
+     * @return
+     */
+    protected Session getSession() {
+        Session session = getRepo().getSession();
+        logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
+        return session;
+    }
+
+    protected String _toString(){
+        return this.getClass().getSimpleName() + "@" + this.hashCode();
+    }
+
+	/**
 	 * Notifies the presenter that its view is initialized so that presenter can
 	 * start its own initialization if required.
 	 *
 	 * @param view
 	 */
 	protected final void init(V view) {
-	    logger.trace("Presenter init");
+	    logger.trace(String.format("Presenter %s init", this.toString()));
 		this.view = view;
 		onPresenterReady();
 	}
@@ -72,20 +95,37 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	 * after presenter has finished initializing.
 	 */
 	protected void onPresenterReady() {
-	    logger.trace("Presenter ready");
+	    logger.trace(String.format("Presenter %s ready", this.toString()));
+	}
+
+	public final void onViewEnter() {
+	    logger.trace("View entered");
+	    TransactionStatus tx = getRepo().startTransaction();
+	    handleViewEntered();
+	    getRepo().commitTransaction(tx);
+	}
+
+	public final void onViewExit() {
+	    handleViewExit();
 	}
 
 	/**
 	 * Extending classes should overwrite this method to react to the event when
 	 * user has navigated into the view that this presenter governs.
+	 * For implementations of {@link AbstractPopupEditor AbstractPopupEditors} this is usually
+	 * called before the data item has been bound. This order is guaranteed since popup editors
+	 * are managed through the {@link NavigationManagerBean}
 	 */
-	public void onViewEnter() {
-	    logger.trace("View entered");
+	public void handleViewEntered() {
 	}
 
-	public void onViewExit() {
-
-	}
+    /**
+     * Extending classes may overwrite this method to react to
+     * the event when user leaves the view that this presenter
+     * governs.
+     */
+    public void handleViewExit() {
+    }
 
     /**
      * @return the navigationManager
@@ -93,5 +133,21 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     public NavigationManager getNavigationManager() {
         return navigationManager;
     }
+
+    /**
+     * @param repo the repo to set
+     */
+    protected void setRepo(CdmRepository repo) {
+        this.repo = repo;
+    }
+
+    /**
+     * @param navigationManager the navigationManager to set
+     */
+    protected void setNavigationManager(NavigationManager navigationManager) {
+        this.navigationManager = navigationManager;
+    }
+
+
 
 }

@@ -8,8 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
@@ -41,6 +39,10 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
 
     public LoginViewBean() {
         super();
+    }
+
+    @Override
+    protected void initContent() {
         VerticalLayout root = new VerticalLayout();
         root.setSizeFull();
         root.addComponent(loginDialog);
@@ -65,17 +67,6 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
     @Override
     public LoginDialog getLoginDialog(){
         return loginDialog;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Autowired
-    // TODO pull up to AbstractView?
-    protected void injectPresenter(LoginPresenter presenter) {
-        setPresenter(presenter);
-
     }
 
     /**

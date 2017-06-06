@@ -32,9 +32,20 @@ public interface PopupView extends CanCastComponent {
     boolean isWindowCaptionAsHtml();
 
     /**
+     * Is called once the popView is displayed in the UI
+     */
+    void viewEntered();
+
+    /**
      * Can be implemented by editor views to set the focus on a specific form
      * item.
      */
     void focusFirst();
+
+    /**
+     * Cancel any operation in progress and close the view.
+     */
+    public void cancel();
+
 
 }

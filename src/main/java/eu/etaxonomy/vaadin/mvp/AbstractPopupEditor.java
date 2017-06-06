@@ -23,11 +23,13 @@ import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
@@ -41,16 +43,27 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.vaadin.component.NestedFieldGroup;
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
+ *
+ * Optional with a delete button which can be enabled with {@link #withDeleteButton(boolean)}
+ *
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO>>
+public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
+
+    public static final Logger logger = Logger.getLogger(AbstractPopupEditor.class);
 
     private BeanFieldGroup<DTO> fieldGroup;
 
@@ -63,6 +76,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private Button save;
 
     private Button cancel;
+
+    private Button delete;
+
+    private CssLayout toolBar = new CssLayout();
+
+    private CssLayout toolBarButtonGroup = new CssLayout();
 
     private GridLayout _gridLayoutCache;
 
@@ -78,6 +97,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         setCompositionRoot(mainLayout);
 
+        toolBar.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
+        toolBar.setWidth(100, Unit.PERCENTAGE);
+        toolBarButtonGroup.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        toolBarButtonGroup.setWidthUndefined();
+        toolBar.addComponent(toolBarButtonGroup);
+        toolBar.setVisible(false);
+
         fieldLayout = layout;
         fieldLayout.setWidthUndefined();
         if(fieldLayout instanceof AbstractOrderedLayout){
@@ -91,17 +117,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         save = new Button("Save", FontAwesome.SAVE);
         save.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.addClickListener(e -> onSaveClicked());
+        save.addClickListener(e -> save());
 
         cancel = new Button("Cancel", FontAwesome.TRASH);
-        cancel.addClickListener(e -> onCancelClicked());
+        cancel.addClickListener(e -> cancel());
 
-        buttonLayout.addComponents(save, cancel);
+        delete = new Button("Delete", FontAwesome.REMOVE);
+        delete.setStyleName(ValoTheme.BUTTON_DANGER);
+        delete.addClickListener(e -> delete());
+        delete.setVisible(false);
+
+        buttonLayout.addComponents(delete, save, cancel);
+        // delete is initially invisible, let save take all space
         buttonLayout.setExpandRatio(save, 1);
+        buttonLayout.setComponentAlignment(delete, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
-        mainLayout.addComponents(fieldLayout, buttonLayout);
+        mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
+        mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
     }
 
     protected VerticalLayout getMainLayout() {
@@ -133,6 +167,60 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         cancel.setCaption(readOnly ? "Close" : "Cancel");
     }
 
+    /**
+     * @return
+     * @return
+     */
+    protected AbstractLayout getToolBar() {
+        return toolBar;
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarAdd(Component c) {
+        toolBar.addComponent(c, toolBar.getComponentIndex(toolBarButtonGroup) - 1);
+        updateToolBarVisibility();
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarButtonGroupAdd(Component c) {
+        toolBarButtonGroup.addComponent(c);
+        updateToolBarVisibility();
+    }
+
+    /**
+     * @return
+     * @return
+     */
+    protected void toolBarButtonGroupRemove(Component c) {
+        toolBarButtonGroup.removeComponent(c);
+        updateToolBarVisibility();
+    }
+
+    /**
+     *
+     */
+    private void updateToolBarVisibility() {
+        toolBar.setVisible(toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1);
+
+    }
+
+    /**
+     * The top tool-bar is initially invisible.
+     *
+     * @param visible
+     */
+    protected void setToolBarVisible(boolean visible){
+        toolBar.setVisible(true);
+    }
+
+
+
     // ------------------------ event handler ------------------------ //
 
     private class SaveHandler implements CommitHandler {
@@ -141,14 +229,22 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
+            logger.debug("preCommit, publishing EditorPreSaveEvent");
+            // notify the presenter to start a transaction
+            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
         }
 
         @Override
         public void postCommit(CommitEvent commitEvent) throws CommitException {
             try {
-                // notify the presenter to persist the bean
-                eventBus.publishEvent(new EditorSaveEvent(commitEvent));
-
+                if(logger.isTraceEnabled()){
+                    logger.trace("postCommit() publishing EditorSaveEvent for " + getBean().toString());
+                }
+                // notify the presenter to persist the bean and to commit the transaction
+                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+                if(logger.isTraceEnabled()){
+                    logger.trace("postCommit() publishing DoneWithPopupEvent");
+                }
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
             } catch (Exception e) {
@@ -162,21 +258,40 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
 
-    private void onCancelClicked() {
+    /**
+     * Cancel editing and discard all modifications.
+     */
+    @Override
+    public void cancel() {
         fieldGroup.discard();
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
-    private void onSaveClicked() {
+    /**
+     * @return
+     */
+    private void delete() {
+        eventBus.publishEvent(new EditorDeleteEvent(this, fieldGroup.getItemDataSource().getBean()));
+        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
+    }
+
+    /**
+     * Save the changes made in the editor.
+     */
+    private void save() {
         try {
             fieldGroup.commit();
         } catch (CommitException e) {
-            fieldGroup.getFields().forEach(f -> ((AbstractField)f).setValidationVisible(true));
+            fieldGroup.getFields().forEach(f -> ((AbstractField<?>)f).setValidationVisible(true));
             if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
                 FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
                 updateFieldNotifications(invalidValueException.getInvalidFields());
                 Notification.show("The entered data in " + invalidValueException.getInvalidFields().size() + " fields is incomplete or invalid.");
-            } else {
+            } else if(e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof PermissionDeniedException){
+                PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
+                Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
+            }
+            else {
                 Logger.getLogger(this.getClass()).error("Error saving", e);
                 Notification.show("Error saving", Type.ERROR_MESSAGE);
             }
@@ -214,6 +329,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return addField(new TextField(caption), propertyId, column, row);
     }
 
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column1, int row1,
+            int column2, int row2)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column1, row1, column2, row2);
+        return field;
+    }
+
+    protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column, int row)
+            throws OverlapsException, OutOfBoundsException {
+
+        SwitchableTextField field = new SwitchableTextField(caption);
+        field.bindTo(fieldGroup, textPropertyId, switchPropertyId);
+        addComponent(field, column, row);
+        return field;
+    }
+
     protected PopupDateField addDateField(String caption, String propertyId) {
         return addField(new PopupDateField(caption), propertyId);
     }
@@ -224,6 +358,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected <T extends Field> T addField(T field, String propertyId) {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field);
         return field;
     }
@@ -247,6 +384,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
         fieldGroup.bind(field, propertyId);
+        if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+            ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+        }
         addComponent(field, column, row);
         return field;
     }
@@ -267,9 +407,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected <T extends Field> T addField(T field, String propertyId, int column1, int row1,
             int column2, int row2)
             throws OverlapsException, OutOfBoundsException {
-        fieldGroup.bind(field, propertyId);
+        if(propertyId != null){
+            fieldGroup.bind(field, propertyId);
+            if(NestedFieldGroup.class.isAssignableFrom(field.getClass())){
+                ((NestedFieldGroup)field).registerParentFieldGroup(fieldGroup);
+            }
+        }
         addComponent(field, column1, row1, column2, row2);
         return field;
+    }
+
+    protected Field<?> getField(Object propertyId){
+        return fieldGroup.getField(propertyId);
     }
 
     protected void addComponent(Component component) {
@@ -354,6 +503,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
 
+    public void withDeleteButton(boolean withDelete){
+
+        if(withDelete){
+            buttonLayout.setExpandRatio(save, 0);
+            buttonLayout.setExpandRatio(delete, 1);
+        } else {
+            buttonLayout.setExpandRatio(save, 1);
+            buttonLayout.setExpandRatio(delete, 0);
+        }
+        delete.setVisible(withDelete);
+    }
+
 
     // ------------------------ data binding ------------------------ //
 
@@ -364,6 +525,55 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     public void showInEditor(DTO beanToEdit) {
+
+
         fieldGroup.setItemDataSource(beanToEdit);
+        afterItemDataSourceSet();
+    }
+
+    /**
+     * Returns the bean contained in the itemDatasource of the fieldGroup.
+     *
+     * @return
+     */
+    public DTO getBean() {
+        return fieldGroup.getItemDataSource().getBean();
+    }
+
+    /**
+     * This method should only be used by the presenter of this view
+     *
+     * @param bean
+     */
+    protected void updateItemDataSource(DTO bean) {
+        fieldGroup.getItemDataSource().setBean(bean);
+    }
+
+    /**
+     * This method is called after setting the item data source whereby the
+     * {@link FieldGroup#configureField(Field<?> field)} method will be called.
+     * In this method all fields are set to default states defined for the fieldGroup.
+     * <p>
+     * You can now implement this method if you need to configure the enable state of fields
+     * individually.
+     */
+    protected void afterItemDataSourceSet() {
+
+    }
+
+    // ------------------------ issue related temporary solutions --------------------- //
+    /**
+     * Publicly accessible equivalent to getPreseneter(), needed for
+     * managing the presenter listeners.
+     * <p>
+     * TODO: refactor the presenter listeners management to get rid of this method
+     *
+     * @return
+     * @deprecated marked deprecated to emphasize on the special character of this method
+     *    which should only be used interlally see #6673
+     */
+    @Deprecated
+    public P presenter() {
+        return getPresenter();
     }
 }

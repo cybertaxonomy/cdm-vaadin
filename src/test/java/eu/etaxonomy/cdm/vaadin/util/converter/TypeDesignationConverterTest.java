@@ -28,6 +28,7 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
  * @author a.kohlbecker
@@ -38,7 +39,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
 
 
     @Test
-    public void test1(){
+    public void test1() throws RegistrationValidationException{
 
         NameTypeDesignation ntd = NameTypeDesignation.NewInstance();
         TaxonName typeName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
@@ -58,7 +59,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
         tds.add(ntd);
         tds.add(std);
 
-        String result = new TypeDesignationConverter(tds, null).buildString().print();
+        String result = new TypeDesignationConverter(tds).buildString().print();
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
     }

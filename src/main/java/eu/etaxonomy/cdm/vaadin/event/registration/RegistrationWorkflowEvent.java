@@ -19,11 +19,16 @@ public class RegistrationWorkflowEvent {
 
     private RegistrationType type = null;
     private Action action;
-    private Integer registrationID = null;
+    private Integer citationID = null;
 
-    public RegistrationWorkflowEvent(int registrationID){
+    /**
+     *
+     * @param citationID the id of a {@link Reference} denoting a
+     * complete registration working set.
+     */
+    public RegistrationWorkflowEvent(int citationID){
         this.action = Action.open;
-        this.registrationID = registrationID;
+        this.citationID = citationID;
     }
 
     public RegistrationWorkflowEvent(RegistrationType type){
@@ -48,8 +53,8 @@ public class RegistrationWorkflowEvent {
     /**
      * @return the registrationID
      */
-    public Integer getRegistrationID() {
-        return registrationID;
+    public Integer getCitationID() {
+        return citationID;
     }
 
     public boolean isStart() {

@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -29,6 +30,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.vaadin.view.LoginViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
@@ -56,6 +58,16 @@ public class RegistrationUI extends UI {
     @Autowired
     private ViewDisplay viewDisplay;
 
+    /**
+     * The RegistrationDefaultDataInserter is not used in the ui directly
+     * but will as a ApplicationListener for ContextRefreshedEvents insert
+     * data required for the registration application into the database.
+     */
+    @SuppressWarnings("unused")
+    @Autowired
+    @Lazy
+    private RegistrationRequiredDataInserter dataInserter;
+
     //---- pull into abstract super class ? ---------
     @Autowired
     SpringViewProvider viewProvider;
@@ -65,8 +77,9 @@ public class RegistrationUI extends UI {
     }
     //---------------------------------------------
 
-    //private final String INITIAL_VIEW = "workflow/edit/100002";
+    // public static final String INITIAL_VIEW = "workflow/edit/10";
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
+    static boolean debugMode = false;
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -98,23 +111,42 @@ public class RegistrationUI extends UI {
         phycoBankLogo.addStyleName(ValoTheme.LABEL_HUGE);
         mainMenu.addMenuComponent(phycoBankLogo);
 
-        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME);
-        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME);
-        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME);
+        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME );
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
 
         eventBus.publishEvent(new UIInitializedEvent());
-
-        //navigate to initial view
-        eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 
         String brand = "phycobank";
         //TODO create annotation:
         // @Styles(files={""}, branding="brand")
         //
-        // the branding can either be specified or can be read from a properties file in .cdmLibrary/{instance-name}/cdm-vaadin.properties
-        //  See CdmUtils for appropriate methods to access this folder
+        // the branding can either be specified or can be read from the properties file in .cdmLibrary/remote-webapp/{instance-name}-app.properties
+        // See CdmUtils for appropriate methods to access this folder
         // the 'vaadin://' protocol refers to the VAADIN folder
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);
+
+        //navigate to initial view
+        String state = pageFragmentAsState();
+
+        if(debugMode && state != null){
+            eventBus.publishEvent(new NavigationEvent(state));
+        } else {
+            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
+        }
+    }
+
+    /**
+     * @return
+     */
+    private String pageFragmentAsState() {
+        Page page = Page.getCurrent();
+        String fragment = page.getUriFragment();
+        String state = null;
+        if(fragment != null && fragment.startsWith("!")){
+            state = fragment.substring(1, fragment.length());
+        }
+        return state;
     }
 }

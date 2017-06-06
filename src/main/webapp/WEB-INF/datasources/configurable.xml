@@ -26,6 +26,12 @@
               <prop key="hibernate.format_sql">false</prop>
               <prop key="hibernate.search.default.directory_provider">org.hibernate.search.store.impl.FSDirectoryProvider</prop>
               <prop key="hibernate.search.default.indexBase">${eu.etaxonomy.cdm.search.index.path}</prop><!-- set in applicationContext.xml -->
+              <!-- 
+                  Using the hibernate.event.merge.entity_copy_observer is a bit risky, 
+                  see https://hibernate.atlassian.net/browse/HHH-9106 and 
+                  https://dev.e-taxonomy.eu/redmine/issues/6687 
+              -->
+              <prop key="hibernate.event.merge.entity_copy_observer">allow</prop>
 
               <!-- disabling hibernate search for testing (speed up and lesser heap usage)
               <prop key="hibernate.search.autoregister_listeners">false</prop>

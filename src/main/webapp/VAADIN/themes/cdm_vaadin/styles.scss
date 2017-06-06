@@ -1,0 +1,9 @@
+@import "addons.scss";
+@import "cdm_vaadin.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+/* The actual styles should be defined in cdm_vaadin.scss */
+.cdm_vaadin {
+  @include addons;
+  @include cdm_vaadin;
+}

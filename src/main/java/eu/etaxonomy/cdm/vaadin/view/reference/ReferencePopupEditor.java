@@ -11,30 +11,30 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
-import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.vaadin.component.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
  * @author a.kohlbecker
  * @since Apr 4, 2017
  *
  */
-
-@SpringComponent
-@Scope("prototype")
-public class ReferencePopupEditor extends AbstractPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
+public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 
@@ -42,7 +42,11 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 9;
+    private final static int GRID_ROWS = 10;
+
+    private ListSelect typeSelect;
+
+    private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     /**
      * @param layout
@@ -50,6 +54,10 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
      */
     public ReferencePopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), Reference.class);
+    }
+
+    @Override
+    protected void initContent() {
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
         grid.setMargin(true);
@@ -81,41 +89,90 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
         "inReference"
          */
         int row = 0;
-        ListSelect typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
+        typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
+        typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
         addField(typeSelect, "type", 3, row);
+        grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
-        addTextField("Reference cache", "titleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        SwitchableTextField titleCacheField = addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row);
+        titleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        addTextField("Abbrev. cache", "abbrevTitleCache", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        SwitchableTextField abbrevTitleCacheField = addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row);
+        abbrevTitleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
-        titleField.setRequired(true);
         titleField.setWidth(100, Unit.PERCENTAGE);
         row++;
         addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        // addTextField("Author(s)", "authorship", 0, 4, 1, 4)).setRequired(true);
-        addTextField("Editor", "editor", 2, row, 3, row).setWidth(100, Unit.PERCENTAGE);
+        TeamOrPersonField authorshipField = new TeamOrPersonField("Author(s)");
+        authorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(authorshipField, "authorship", 0, row, 3, row);
         row++;
         addTextField("Series", "seriesPart", 0, row);
         addTextField("Volume", "volume", 1, row);
         addTextField("Pages", "pages", 2, row);
+        addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
+
+        inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
+        inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
+        inReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceCombobox, this)
+                ));
+        inReferenceCombobox.addClickListenerEditEntity(e -> {
+            if(inReferenceCombobox.getValue() != null){
+                getEventBus().publishEvent(
+                    new ReferenceEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            inReferenceCombobox.getValue().getId(),
+                            inReferenceCombobox,
+                            this)
+                );
+            }
+            });
+        addField(inReferenceCombobox, "inReference", 0, row, 3, row);
         row++;
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
-        publisherField.setRequired(true);
         publisherField.setWidth(100, Unit.PERCENTAGE);
         TimePeriodField timePeriodField = new TimePeriodField("Date published");
         addField(timePeriodField, "datePublished");
         row++;
-        // TODO implement a TimePeriod component
         addTextField("ISSN", "issn", 0, row);
         addTextField("ISBN", "isbn", 1, row);
         addTextField("DOI", "doi", 2, row);
         addTextField("Uri", "uri", 3, row);
 
+//        titleField.setRequired(true);
+//        publisherField.setRequired(true);
+
+        setAdvancedModeEnabled(true);
+        registerAdvancedModeComponents(titleCacheField, abbrevTitleCacheField);
+        registerAdvancedModeComponents(authorshipField.getCachFields());
+        setAdvancedMode(false);
+
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private Object updateFieldVisibility(ReferenceType value) {
+        getField("volume").setVisible(value.isVolumeReference());
+
+        getField("placePublished").setVisible(value.isPublication());
+        getField("publisher").setVisible(value.isPublication());
+
+        getField("editor").setVisible(value.isPrintedUnit());
+        getField("seriesPart").setVisible(value.isPrintedUnit());
+
+        getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
+        getField("pages").setVisible(value.isSection());
+
+        return null;
     }
 
     /**
@@ -153,15 +210,6 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
     /**
      * {@inheritDoc}
      */
-    @Autowired
-    @Override
-    protected void injectPresenter(ReferenceEditorPresenter presenter) {
-        setPresenter(presenter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
@@ -175,6 +223,17 @@ public class ReferencePopupEditor extends AbstractPopupEditor<Reference, Referen
         return null;
     }
 
+    @Override
+    public ListSelect getTypeSelect() {
+        return typeSelect;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
+        return inReferenceCombobox;
+    }
 
 }

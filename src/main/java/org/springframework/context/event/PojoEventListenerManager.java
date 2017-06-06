@@ -6,18 +6,17 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.event;
+package org.springframework.context.event;
 
 /**
  * @author a.kohlbecker
- * @since Mar 22, 2017
+ * @since May 29, 2017
  *
  */
-public class TaxonNameEvent extends AbstractEntityEvent {
+public interface PojoEventListenerManager {
 
+    void removeEventListeners(Object o);
 
-    public TaxonNameEvent(EntityEventType eventType) {
-        super(eventType);
-    }
+    void addEventListeners(Object o);
 
 }
