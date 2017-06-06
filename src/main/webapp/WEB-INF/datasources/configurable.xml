@@ -31,7 +31,7 @@
                   see https://hibernate.atlassian.net/browse/HHH-9106 and 
                   https://dev.e-taxonomy.eu/redmine/issues/6687 
               -->
-              <prop key="hibernate.event.merge.entity_copy_observer">allow</prop>
+              <!-- <prop key="hibernate.event.merge.entity_copy_observer">allow</prop> -->
 
               <!-- disabling hibernate search for testing (speed up and lesser heap usage)
               <prop key="hibernate.search.autoregister_listeners">false</prop>

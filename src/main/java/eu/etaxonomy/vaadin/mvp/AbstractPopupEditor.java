@@ -526,8 +526,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public void showInEditor(DTO beanToEdit) {
 
-
-        fieldGroup.setItemDataSource(beanToEdit);
+        DTO preparedBean = getPresenter().prepareAsFieldGroupDataSource(beanToEdit);
+        fieldGroup.setItemDataSource(preparedBean);
         afterItemDataSourceSet();
     }
 
@@ -570,7 +570,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      * @return
      * @deprecated marked deprecated to emphasize on the special character of this method
-     *    which should only be used interlally see #6673
+     *    which should only be used internally see #6673
      */
     @Deprecated
     public P presenter() {
