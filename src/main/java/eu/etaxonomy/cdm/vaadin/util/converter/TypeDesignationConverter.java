@@ -22,7 +22,7 @@ import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
@@ -120,7 +120,7 @@ public class TypeDesignationConverter {
 
         List<String> problems = new ArrayList<>();
 
-        TaxonNameBase<?,?> typifiedName = null;
+        TaxonName typifiedName = null;
 
         for(TypeDesignationBase<?> typeDesignation : typeDesignations){
             typeDesignation.getTypifiedNames();
@@ -140,7 +140,7 @@ public class TypeDesignationConverter {
                 typifiedName = typeDesignation.getTypifiedNames().iterator().next();
             } else {
                 // compare
-                TaxonNameBase<?,?> otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
+                TaxonName otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
                 if(typifiedName.getId() != otherTypifiedName.getId()){
                   //TODO instead throw RegistrationValidationException()
                     problems.add("Multiple typifiedName in " + typeDesignation.toString());

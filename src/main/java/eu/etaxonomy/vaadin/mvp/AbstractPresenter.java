@@ -69,7 +69,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
      * @return
      */
     protected Session getSession() {
-        Session session = getRepo().getSession(false);
+        Session session = getRepo().getSession();
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
         return session;
     }

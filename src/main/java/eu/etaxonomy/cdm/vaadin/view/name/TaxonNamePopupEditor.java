@@ -18,7 +18,7 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.name.Rank;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -34,7 +34,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since May 22, 2017
  *
  */
-public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
+public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
 
@@ -64,7 +64,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonNameBase, 
      * @param dtoType
      */
     public TaxonNamePopupEditor() {
-        super(new GridLayout(GRID_COLS, GRID_ROWS), TaxonNameBase.class);
+        super(new GridLayout(GRID_COLS, GRID_ROWS), TaxonName.class);
     }
 
     /**

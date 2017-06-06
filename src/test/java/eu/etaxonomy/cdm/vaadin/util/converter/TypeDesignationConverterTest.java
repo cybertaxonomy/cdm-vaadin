@@ -20,7 +20,7 @@ import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
@@ -42,7 +42,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
     public void test1() throws RegistrationValidationException{
 
         NameTypeDesignation ntd = NameTypeDesignation.NewInstance();
-        TaxonNameBase typeName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
+        TaxonName typeName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
         typeName.setTitleCache("Prionus coriatius L.", true);
         ntd.setTypeName(typeName);
         Reference citation = ReferenceFactory.newGeneric();

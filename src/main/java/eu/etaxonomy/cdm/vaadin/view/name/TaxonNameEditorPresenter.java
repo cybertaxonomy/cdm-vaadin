@@ -18,7 +18,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.NameDeletionConfigurator;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
@@ -29,7 +29,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  * @since May 22, 2017
  *
  */
-public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNameBase, TaxonNamePopupEditorView> {
+public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonName, TaxonNamePopupEditorView> {
 
     private static final long serialVersionUID = -3538980627079389221L;
 
@@ -87,7 +87,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      * {@inheritDoc}
      */
     @Override
-    protected DeleteResult executeServiceDeleteOperation(TaxonNameBase bean) {
+    protected DeleteResult executeServiceDeleteOperation(TaxonName bean) {
         NameDeletionConfigurator config = new NameDeletionConfigurator();
         return getRepo().getNameService().delete(bean.getUuid(), config);
     }

@@ -22,7 +22,7 @@ import org.unitils.dbunit.annotation.DataSet;
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.name.BotanicalName;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
@@ -77,7 +77,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     public void testAbbreviatedNameGeneration() {
         TransactionStatus tx = app.startTransaction();
         UUID nameUuid = UUID.fromString("7ebe3f1f-c383-4611-95da-4ee633a12d3a");
-        BotanicalName name = CdmBase.deproxy(nameService.load(nameUuid), BotanicalName.class);
+        TaxonName name = CdmBase.deproxy(nameService.load(nameUuid), TaxonName.class);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
         Assert.assertEquals("T. × withverylongspecificepithet subsp.", abbreviatedName);

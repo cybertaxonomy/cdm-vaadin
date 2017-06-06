@@ -80,29 +80,29 @@ public class SettingsPresenter {
     public Container getDistributionContainer() {
         return distributionContainer;
     }
-    
+
     public void setDistributionContainer(Container distributionContainer) {
         this.distributionContainer = distributionContainer;
     }
-    
+
     public Container getDistributionStatusContainer() {
         return distributionStatusContainer;
     }
-    
+
     public void setDistributionStatusContainer(Container distributionStatusContainer) {
         this.distributionStatusContainer = distributionStatusContainer;
     }
 
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
         vocabularyService = CdmSpringContextHelper.getVocabularyService();
-        List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
+        List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea, null);
         //FIXME: is this necessary??
         for (TermVocabulary<DefinedTermBase> termVocabulary : termList) {
 			termVocabulary.setTitleCache(null);
 		}
         return termList;
     }
-    
+
     private List<DefinedTermBase<?>> getPresenceAbsenceVocabulary(){
         termService = CdmSpringContextHelper.getTermService();
         return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);

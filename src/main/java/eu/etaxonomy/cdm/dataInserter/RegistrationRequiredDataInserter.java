@@ -36,11 +36,10 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
-import eu.etaxonomy.cdm.model.common.Extension;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
@@ -122,7 +121,7 @@ private void insertRequiredData() {
                 if(onlyIapt){
                     try {
                         @SuppressWarnings("unchecked")
-                        Set<Extension> extensions = reg.getName().getExtensions(getExtensionTypeIAPTRegData());
+                        Set<String> extensions = reg.getName().getExtensions(getExtensionTypeIAPTRegData());
                         deleteCandidates.add(reg.getUuid());
                     } catch(NullPointerException e){
                         // IGNORE
@@ -143,12 +142,12 @@ private void insertRequiredData() {
 
             TransactionStatus tx = repo.startTransaction(false);
             while(true) {
-                Pager<TaxonNameBase> pager = repo.getNameService().page(null, 1000, pageIndex, null, null);
+                Pager<TaxonName> pager = repo.getNameService().page(null, 1000, pageIndex, null, null);
                 if(pager.getRecords().isEmpty()){
                     break;
                 }
                 List<Registration> newRegs = new ArrayList<>(pager.getRecords().size());
-                for(TaxonNameBase name : pager.getRecords()){
+                for(TaxonName name : pager.getRecords()){
 
                     Set<String> extensionValues = name.getExtensions(getExtensionTypeIAPTRegData());
 
