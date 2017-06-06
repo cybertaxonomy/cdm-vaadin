@@ -41,19 +41,26 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
     @Test
     public void test1() throws RegistrationValidationException{
 
+        TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
+        typifiedName.setTitleCache("Prionus coriatius L.", true);
+
         NameTypeDesignation ntd = NameTypeDesignation.NewInstance();
         TaxonName typeName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
-        typeName.setTitleCache("Prionus coriatius L.", true);
+        typeName.setTitleCache("Prionus L.", true);
         ntd.setTypeName(typeName);
         Reference citation = ReferenceFactory.newGeneric();
         citation.setTitleCache("Species Platarum", true);
         ntd.setCitation(citation);
+
+        typifiedName.addTypeDesignation(ntd, false);
 
         SpecimenTypeDesignation std = SpecimenTypeDesignation.NewInstance();
         DerivedUnit specimen = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen.setTitleCache("OHA", true);
         std.setTypeSpecimen(specimen);
         std.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
+
+        typifiedName.addTypeDesignation(std, false);
 
         List<TypeDesignationBase> tds = new ArrayList<>();
         tds.add(ntd);
