@@ -49,18 +49,20 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             // no name in the registration! we only show the typified name as label
             addComponent(new Label(regDto.getTypifiedName().getLabel()));
         }
-        regDto.getTypeDesignations().keySet().iterator().forEachRemaining(key -> {
-            Label label = new Label(key   + ":");
-            label.setWidthUndefined();
-            addComponent(label);
-            labels.add(label);
+        if(regDto.getTypeDesignations() != null){
+            regDto.getTypeDesignations().keySet().iterator().forEachRemaining(key -> {
+                Label label = new Label(key   + ":");
+                label.setWidthUndefined();
+                addComponent(label);
+                labels.add(label);
 
-            regDto.getTypeDesignations().get(key).forEach(value -> {
-            Button tdButton = new Button(value.getLabel());
-            addComponent(tdButton);
-            typeDesignationButtons.add(new IdButton(value.getId(), tdButton));
-            }) ;
-        });
+                regDto.getTypeDesignations().get(key).forEach(value -> {
+                    Button tdButton = new Button(value.getLabel());
+                    addComponent(tdButton);
+                    typeDesignationButtons.add(new IdButton(value.getId(), tdButton));
+                }) ;
+            });
+        }
         Button addTypeDesignationButton = new Button(FontAwesome.PLUS);
         addComponent(addTypeDesignationButton);
 
