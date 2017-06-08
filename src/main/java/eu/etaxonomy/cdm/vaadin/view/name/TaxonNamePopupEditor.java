@@ -73,6 +73,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     private ListSelect rankSelect;
 
+    private TeamOrPersonField combinationAuthorshipField;
+
+    private TeamOrPersonField exCombinationAuthorshipField;
+
 
     /**
      * @param layout
@@ -178,8 +182,18 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         rankSelect.setRows(1);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
         rankSelect.addValueChangeListener(e -> updateFieldVisibility((Rank)e.getProperty().getValue()));
-        addField(rankSelect, "rank", 2, row, 3, row);
+        addField(rankSelect, "rank", 0, row, 1, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
+
+        basionymToggle = new CheckBox("With basionym");
+        basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
+        basionymToggle.addValueChangeListener(e -> {
+                boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+                enableBasionymFields(enable);
+            });
+        basionymToggle.setStyleName(getDefaultComponentStyles());
+        grid.addComponent(basionymToggle, 2, row, 3, row);
+        grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
         row++;
         // fullTitleCache
         fullTitleCacheFiled = addSwitchableTextField("Full title cache", "fullTitleCache", "protectedFullTitleCache", 0, row, GRID_COLS-1, row);
@@ -198,11 +212,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         infraSpecificEpithetField = addTextField("Infraspecific epithet", "infraSpecificEpithet", 2, row, 3, row);
         infraSpecificEpithetField.setWidth(200, Unit.PIXELS);
         row++;
-        TeamOrPersonField combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
+        combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
         row++;
-        TeamOrPersonField exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
+        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -229,17 +243,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
 
         // Basionym
-        row++;
-        basionymToggle = new CheckBox("With basionym");
-        basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
-        basionymToggle.addValueChangeListener(e -> {
-                boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
-                enableBasionymFields(enable);
-            });
-        basionymToggle.setStyleName(getDefaultComponentStyles());
-        grid.addComponent(basionymToggle, 0, row);
-        grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
-
         row++;
         basionymCombobox = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Basionym");
         /**
@@ -305,6 +308,16 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
+    }
+
+    @Override
+    protected void afterItemDataSourceSet() {
+        TaxonName taxonName = getBean();
+        boolean showBasionymSection = taxonName.getBasionyms().size() > 0
+                || taxonName.getBasionymAuthorship() != null
+                || taxonName.getExBasionymAuthorship() != null;
+        basionymToggle.setValue(showBasionymSection);
+
     }
 
     /**
