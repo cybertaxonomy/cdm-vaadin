@@ -8,20 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.vaadin.viritin.fields.CaptionGenerator;
-import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
-import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
-
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.NameDeletionConfigurator;
-import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
-import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -40,46 +32,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     public void handleViewEntered() {
         super.handleViewEntered();
 
-        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CaptionGenerator<Reference>(){
+        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
+        getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
 
-            @Override
-            public String getCaption(Reference option) {
-                return option.getTitleCache();
-            }
 
-        });
-        getView().getNomReferenceCombobox().loadFrom(new FilterablePagingProvider<Reference>(){
-
-            @Override
-            public List<Reference> findEntities(int firstRow, String filter) {
-                Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                        null,
-                        filter,
-                        MatchMode.ANYWHERE,
-                        null,
-                        20,
-                        firstRow,
-                        OrderHint.ORDER_BY_TITLE_CACHE.asList(),
-                        Arrays.asList("$")
-                      );
-                return page.getRecords();
-            }},
-            new FilterableCountProvider(){
-                @Override
-                public int size(String filter) {
-                    Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                            null,
-                            filter,
-                            MatchMode.ANYWHERE,
-                            null,
-                            1,
-                            0,
-                            null,
-                            null
-                          );
-                    return page.getCount().intValue();
-                }}
-            , 20);
+        getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService());
+        getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
     }
 
 

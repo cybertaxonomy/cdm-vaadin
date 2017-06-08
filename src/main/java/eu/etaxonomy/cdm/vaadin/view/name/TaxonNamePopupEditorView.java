@@ -8,7 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -23,5 +25,10 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox();
+
+    /**
+     * @return
+     */
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox();
 
 }

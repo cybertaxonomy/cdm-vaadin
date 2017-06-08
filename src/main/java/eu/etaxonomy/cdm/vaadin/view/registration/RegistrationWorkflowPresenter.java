@@ -190,8 +190,10 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             }
         } else
         if(TaxonName.class.isAssignableFrom(event.getEntityType())){
-            if(workingset.getRegistrationDTOs().stream().anyMatch(reg -> reg.getTypifiedName().getId() == event.getEntityId())){
-                refreshView();
+            if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
+                reg.getTypifiedName() != null
+                && reg.getTypifiedName().getId() == event.getEntityId())){
+                    refreshView();
             }
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){

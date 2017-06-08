@@ -13,6 +13,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
@@ -25,7 +26,9 @@ import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
@@ -40,7 +43,9 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 10;
+    private final static int GRID_ROWS = 12;
+
+    private static final boolean HAS_BASIONYM_DEFAULT = false;
 
     private TextField genusOrUninomialField;
 
@@ -57,6 +62,16 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     private ToOneRelatedEntityCombobox<Reference> nomReferenceCombobox;
 
     private TextField nomenclaturalReferenceDetail;
+
+    private TeamOrPersonField exBasionymAuthorshipField;
+
+    private TeamOrPersonField basionymAuthorshipField;
+
+    private ToManyRelatedEntitiesComboboxSelect<TaxonName> basionymCombobox;
+
+    private CheckBox basionymToggle;
+
+    private ListSelect rankSelect;
 
 
     /**
@@ -100,6 +115,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
+        grid.setColumnExpandRatio(0, 0.3f);
+        grid.setColumnExpandRatio(1, 0.3f);
+        grid.setColumnExpandRatio(2, 0.3f);
+        grid.setColumnExpandRatio(3, 0.0f);
 
         /*
          - nameType: preset, needs to be set in the presenter for new names
@@ -153,12 +172,13 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         */
 
         int row = 0;
-        // FIXME add hasBasionymCheckox and toggle the according fields
-        ListSelect rankSelect = selectFieldFactory.createListSelect("Rank", Rank.class, OrderHint.BY_ORDER_INDEX.asList(), "label");
+
+        rankSelect = selectFieldFactory.createListSelect("Rank", Rank.class, OrderHint.BY_ORDER_INDEX.asList(), "label");
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setRows(1);
+        rankSelect.setWidth(100, Unit.PERCENTAGE);
         rankSelect.addValueChangeListener(e -> updateFieldVisibility((Rank)e.getProperty().getValue()));
-        addField(rankSelect, "rank", 3, row);
+        addField(rankSelect, "rank", 2, row, 3, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
         row++;
         // fullTitleCache
@@ -182,20 +202,13 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
         row++;
-        // FIXME add basionym name field
-        // FIXME add basionymAuthorship
         TeamOrPersonField exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
-        row++;
-        TeamOrPersonField exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)");
-        exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
-        addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
-        row++;
 
         // nomenclaturalReference
+        row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
-        nomReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
         nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
                 new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, nomReferenceCombobox, this)
                 ));
@@ -210,14 +223,75 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 );
             }
             });
-        addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 3, row);
+        nomReferenceCombobox.setWidth(300, Unit.PIXELS);
+        addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 2, row);
+        nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 3, row, 3, row);
+        nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
+
+        // Basionym
         row++;
-        nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 1, row);
+        basionymToggle = new CheckBox("With basionym");
+        basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
+        basionymToggle.addValueChangeListener(e -> {
+                boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+                enableBasionymFields(enable);
+            });
+        basionymToggle.setStyleName(getDefaultComponentStyles());
+        grid.addComponent(basionymToggle, 0, row);
+        grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
+
+        row++;
+        basionymCombobox = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Basionym");
+        /**
+        basionymCombobox.newAdd(e -> getEventBus().publishEvent(
+                new TaxonNameEditorAction(AbstractEditorAction.Action.ADD, null, basionymCombobox, this)
+                ));
+        basionymCombobox.addClickListenerEditEntity(e -> {
+            if(basionymCombobox.getValue() != null){
+                getEventBus().publishEvent(
+                    new TaxonNameEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            basionymCombobox.getValue().getId(),
+                            basionymCombobox,
+                            this)
+                );
+            }
+            });
+         **/
+        basionymCombobox.setConverter(new SetToListConverter<TaxonName>());
+        addField(basionymCombobox, "basionyms", 0, row, 3, row);
+        basionymCombobox.setWidth(100, Unit.PERCENTAGE);
+        grid.setComponentAlignment(basionymCombobox, Alignment.TOP_RIGHT);
+        row++;
+        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
+        basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(basionymAuthorshipField, "basionymAuthorship", 0, row, GRID_COLS-1, row);
+        row++;
+        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)");
+        exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
+
+
 
         setAdvancedModeEnabled(true);
+        enableBasionymFields(HAS_BASIONYM_DEFAULT);
         registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
+        registerAdvancedModeComponents(basionymAuthorshipField.getCachFields());
+        registerAdvancedModeComponents(exBasionymAuthorshipField.getCachFields());
+        registerAdvancedModeComponents(combinationAuthorshipField.getCachFields());
+        registerAdvancedModeComponents(exCombinationAuthorshipField.getCachFields());
         setAdvancedMode(false);
 
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private void enableBasionymFields(boolean enable) {
+        basionymAuthorshipField.setVisible(enable);
+        exBasionymAuthorshipField.setVisible(enable);
+        basionymCombobox.setVisible(enable);
     }
 
     /**
@@ -255,6 +329,14 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox() {
         return nomReferenceCombobox;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox() {
+        return basionymCombobox;
     }
 
 

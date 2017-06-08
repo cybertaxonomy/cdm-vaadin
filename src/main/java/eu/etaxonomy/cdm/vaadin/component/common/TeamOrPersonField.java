@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
-import eu.etaxonomy.vaadin.component.FieldListEditor;
+import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 
 /**
@@ -44,7 +44,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     // Fields for case when value is a Team
     private SwitchableTextField titleField = new SwitchableTextField("Team (bibliographic)");
     private SwitchableTextField nomenclaturalTitleField = new SwitchableTextField("Team (nomenclatural)");
-    private FieldListEditor<Person, PersonField> personsListEditor = new FieldListEditor<Person, PersonField>(Person.class, PersonField.class, "Teammembers");
+    private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<Person, PersonField>(Person.class, PersonField.class, "Teammembers");
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 

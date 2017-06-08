@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -37,6 +39,26 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      */
     public TaxonNameEditorAction(Action type, Integer entityId, Component source) {
         super(type, entityId, source);
+    }
+
+    /**
+     * @param action
+     * @param source
+     */
+    public TaxonNameEditorAction(Action action, Component source) {
+        super(action, source);
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param action
+     * @param entityId
+     * @param source
+     * @param sourceView
+     */
+    public TaxonNameEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+        super(action, entityId, source, sourceView);
+        // TODO Auto-generated constructor stub
     }
 
 

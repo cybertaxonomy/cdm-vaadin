@@ -554,11 +554,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * {@link FieldGroup#configureField(Field<?> field)} method will be called.
      * In this method all fields are set to default states defined for the fieldGroup.
      * <p>
-     * You can now implement this method if you need to configure the enable state of fields
-     * individually.
+     * You can now implement this method if you need to modify the state or value of individual fields.
      */
     protected void afterItemDataSourceSet() {
-
     }
 
     // ------------------------ issue related temporary solutions --------------------- //
@@ -570,7 +568,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      * @return
      * @deprecated marked deprecated to emphasize on the special character of this method
-     *    which should only be used interlally see #6673
+     *    which should only be used internally see #6673
      */
     @Deprecated
     public P presenter() {

@@ -112,4 +112,17 @@ public class SwitchableTextField extends CompositeCustomField<String> {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        // the unlockSwitch needs to be handled explicitly, for the textField this is not needed.
+        unlockSwitch.setVisible(visible);
+    }
+
+
+
+
 }
