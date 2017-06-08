@@ -21,13 +21,9 @@ import com.vaadin.data.util.converter.Converter;
  * @since Jun 7, 2017
  *
  */
-public final class SetToListConverter<V extends Object> implements Converter<List<V>, Set<V>> {
+public final class SetToListConverter<V> implements Converter<List<V>, Set<V>> {
 
     private static final long serialVersionUID = -4453200532452354378L;
-
-    Class<Set<V>> modelType = (Class<Set<V>>) new HashSet<V>(0).getClass();
-
-    Class<List<V>> presentationType = (Class<List<V>>) new ArrayList<V>(0).getClass();
 
     @Override
     public Set<V> convertToModel(List<V> value, Class<? extends Set<V>> targetType, Locale locale)
@@ -53,11 +49,11 @@ public final class SetToListConverter<V extends Object> implements Converter<Lis
 
     @Override
     public Class<Set<V>> getModelType() {
-        return modelType;
+        return ((Class)Set.class);
     }
 
     @Override
     public Class<List<V>> getPresentationType() {
-        return presentationType;
+        return ((Class)List.class);
     }
 }
