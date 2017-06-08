@@ -58,6 +58,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         if(captionGenerator != null){
             field.setCaptionGenerator(captionGenerator);
         }
+        field.setValue(val);
         return field;
     }
 
