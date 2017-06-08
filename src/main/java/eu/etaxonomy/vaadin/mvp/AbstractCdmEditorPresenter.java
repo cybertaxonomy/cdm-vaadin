@@ -44,22 +44,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         logger.trace(this._toString() + " constructor");
     }
 
-    @Override
-    @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
-    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-        if(!isFromOwnView(preSaveEvent)){
-            return;
-        }
-
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-        tx = startTransaction();
-        // merge the bean and update the fieldGroup with the merged bean, so that updating
-        // of field values in turn of the commit are can not cause LazyInitializationExeptions
-        // the bean still has the original values at this point
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - merging bean into session");
-        mergedBean((DTO) preSaveEvent.getBean());
-    }
-
     /**
      * @return
      *
@@ -79,6 +63,24 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return getRepo().startTransaction(true);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
+    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+        if(!isFromOwnView(preSaveEvent)){
+            return;
+        }
+
+        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
+        tx = startTransaction();
+        // merge the bean and update the fieldGroup with the merged bean, so that updating
+        // of field values in turn of the commit are can not cause LazyInitializationExeptions
+        // the bean still has the original values at this point
+        logger.trace(this._toString() + ".onEditorPreSaveEvent - merging bean into session");
+        mergedBean((DTO) preSaveEvent.getBean());
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
@@ -88,16 +90,17 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         // the bean is now updated with the changes made by the user
         Session session = getSession();
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
-        // merge the changes into the session, ...
-        DTO bean = mergedBean((DTO) saveEvent.getBean());
-
+        DTO bean = (DTO) saveEvent.getBean();
         Type changeEventType;
         if(bean.getId() > 1){
             changeEventType = Type.MODIFIED;
         } else {
             changeEventType = Type.CREATED;
         }
-        getRepo().getCommonService().saveOrUpdate(bean);
+        bean = handleTransientProperties(bean);
+        // merge the changes into the session, ...
+        DTO mergedBean = mergedBean(bean);
+        getRepo().getCommonService().saveOrUpdate(mergedBean);
         session.flush();
         logger.trace(this._toString() + ".onEditorSaveEvent - session flushed");
         getRepo().commitTransaction(tx);
@@ -106,7 +109,20 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             session.close();
         }
         logger.trace(this._toString() + ".onEditorSaveEvent - transaction comitted");
-        eventBus.publishEvent(new EntityChangeEvent(bean.getClass(), bean.getId(), changeEventType));
+        eventBus.publishEvent(new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType));
+    }
+
+    /**
+     * EditorPresneters for beans with transient properties should overwrite this method to
+     * update the beanItem with the changes made to the transient properties.
+     * <p>
+     * This is necessary because Vaadin MethodProperties are readonly when no setter is
+     * available. This can be the case with transient properties. Automatic updating
+     * of the property during the fieldGroup commit does not work in this case.
+     */
+    protected DTO handleTransientProperties(DTO bean) {
+        // no need to handle transient properties in the generic case
+        return bean;
     }
 
     /**

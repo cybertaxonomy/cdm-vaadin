@@ -8,10 +8,14 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
@@ -22,6 +26,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
  * @author a.kohlbecker
@@ -55,6 +61,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS,1);
+
+    private Set<F> nestedFields = new HashSet<>() ;
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
@@ -168,6 +176,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            nestedFields .add(field);
             addStyledComponent(field);
             grid.addComponent(field, 0, row);
             grid.addComponent(buttonGroup(field), 1, row);
@@ -238,6 +247,32 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void registerParentFieldGroup(FieldGroup parent) {
         parentFieldGroup = parent;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+        nestedFields.forEach(f -> f.commit());
+        // calling super.commit() is useless if operating on a transient property!!
+        super.commit();
+    }
+
+    /**
+     * Obtains the List of values directly from the nested fields and ignores the
+     * value of the <code>propertyDataSource</code>. This is useful when the ToManyRelatedEntitiesListSelect
+     * is operating on a transient field, in which case the property is considered being read only by vaadin
+     * so that the commit is doing nothing.
+     *
+     * See also {@link AbstractCdmEditorPresenter#handleTransientProperties(DTO bean)}
+     *
+     * @return
+     */
+    public List<V> getValueFromNestedFields() {
+        List<V> nestedValues = new ArrayList<>();
+        nestedFields.forEach(f -> nestedValues.add(f.getValue()));
+        return nestedValues;
     }
 
     /**

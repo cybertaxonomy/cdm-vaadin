@@ -75,6 +75,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         this.captionGenerator = captionGenerator;
     }
 
+
     /**
      * {@inheritDoc}
      */
