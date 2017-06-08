@@ -10,6 +10,8 @@ package eu.etaxonomy.vaadin.component;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
@@ -30,6 +32,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private static final long serialVersionUID = 4670707714503199599L;
 
+    private static final Logger logger = Logger.getLogger(ToManyRelatedEntitiesListSelect.class);
+
     protected Class<F> fieldType;
 
     protected Class<V> itemType;
@@ -43,7 +47,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     //NOTE: Managing the item
     //      IDs makes BeanContainer more complex to use, but it is necessary in some cases where the
     //      equals() or hashCode() methods have been reimplemented in the bean.
-    //      TODO CdmBase an a reimplemented equals method, do we need to use the BeanContainer instead?
+    //      TODO CdmBase has a reimplemented equals method, do we need to use the BeanContainer instead?
     private BeanItemContainer<V> beans;
 
    //private LinkedList<V> itemList = new LinkedList<>();
@@ -144,7 +148,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected void setInternalValue(List<V> newValue) {
         super.setInternalValue(newValue);
 
-        // newValue is already converted, need to use the original value from the dataasource
+        // newValue is already converted, need to use the original value from the data source
         isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
 
         beans.addAll(newValue);
@@ -180,6 +184,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
+     *
      * @param val
      * @return
      * @throws InstantiationException
@@ -193,12 +198,46 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
+     * Handle the data binding of the sub fields. Sub-fields can either be composite editor fields
+     * or 'simple' fields, usually select fields.
+     * <p>
+     * Composite editor fields allow editing the nested bean Items and must implement the
+     * {@link NestedFieldGroup} interface. Simple fields are only instantiated in
+     * {@link #newFieldInstance(Object)} where the value of the field is set. No further binding is needed
+     * for these 'simple' fields.
+     *
      * @param field
      */
     protected void nestFieldGroup(F field) {
         if(NestedFieldGroup.class.isAssignableFrom(fieldType) && parentFieldGroup != null){
             ((NestedFieldGroup)field).registerParentFieldGroup(parentFieldGroup);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * However, this class has no local fieldGroup but must delegate to the nested NestedFieldGroup
+     * if there are any. This happens in {@link #nestFieldGroup(AbstractField)}.
+     * <p>
+     */
+    @Override
+    public FieldGroup getFieldGroup() {
+        return null;
+    }
+
+    /**
+     * This ToMany-CompositeCustomField has no own fields and this no local fieldGroup (see {@link #getFieldGroup()})
+     * which allow changing data. Editing of the list items is delegated to
+     * a list of sub-fields which are responsible for editing and committing the changes.
+     * Therefore the <code>parentFieldGroup</code> is only stored in a local field so that it can
+     * be passed to per item fields in {@link #nestFieldGroup}
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public void registerParentFieldGroup(FieldGroup parent) {
+        parentFieldGroup = parent;
     }
 
     /**
@@ -226,32 +265,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // no default styles
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * However, this class has no local fieldGroup but must delegate to the nested NestedFieldGroup
-     * if there are any. This happens in {@link #nestFieldGroup(AbstractField)}.
-     * <p>
-     */
-    @Override
-    public FieldGroup getFieldGroup() {
-        return null;
-    }
-
-    @Override
-    public void registerParentFieldGroup(FieldGroup parent) {
-        parentFieldGroup = parent;
-    }
-
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
     }
-
-
-
-
-
-
-
 
 }
