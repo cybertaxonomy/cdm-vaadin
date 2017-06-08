@@ -21,26 +21,14 @@ import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
-import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.Column;
-import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.renderers.ButtonRenderer;
-import com.vaadin.ui.renderers.DateRenderer;
-import com.vaadin.ui.renderers.HtmlRenderer;
 
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
-import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
-import eu.etaxonomy.cdm.vaadin.util.converter.UrlStringConverter;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
  * @author a.kohlbecker
@@ -60,8 +48,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private CssLayout listContainer;
 
-    private Grid grid;
-
     private CssLayout toolBar;
 
     public ListViewBean() {
@@ -72,13 +58,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     protected void initContent() {
         toolBar = new CssLayout();
         toolBar.setWidth(100, Unit.PERCENTAGE);
-        toolBar.addComponent(new Button("As grid", e -> toggleListType(e)));
+        // toolBar.addComponent();
         getLayout().addComponent(toolBar);
 
         buildList();
-        buildGrid();
-
-        showList();
+        getLayout().addComponent(listContainer);
 
     }
 
@@ -98,48 +82,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer.setWidth(100, Unit.PERCENTAGE);
     }
 
-    private void buildGrid() {
-        grid = new Grid();
-        grid.setSizeFull();
-        grid.setEditorEnabled(false);
-        grid.setId("registration-list");
-        grid.setCellStyleGenerator(cellRef -> cellRef.getPropertyId().toString());
-        grid.setSelectionMode(SelectionMode.NONE);
-        grid.setHeightMode(HeightMode.CSS);
-        // add status as class  attribute to the rows to allow styling with css
-        grid.setRowStyleGenerator(rowRef -> {return "status-" + rowRef.getItem().getItemProperty("status").getValue().toString();});
-    }
-
-    /**
-     * @param e
-     * @return
-     */
-    private Object toggleListType(ClickEvent e) {
-        Button button = e.getButton();
-        if(button.getCaption().equals("As grid")){
-            button.setCaption("As list");
-            showGrid();
-        } else {
-            button.setCaption("As grid");
-            showList();
-        }
-        return null;
-    }
-
-    private void showList() {
-        if(grid != null){
-            getLayout().removeComponent(grid);
-        }
-        getLayout().addComponent(listContainer);
-    }
-
-    private void showGrid() {
-        if(listContainer != null){
-            getLayout().removeComponent(listContainer);
-        }
-        getLayout().addComponent(grid);
-    }
-
 
     /**
      * {@inheritDoc}
@@ -154,58 +96,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         registrations = new ArrayList<RegistrationDTO>(registrations);
 
-        populateGrid(registrations);
         populateList(registrations);
-    }
-
-
-    public void populateGrid(Collection<RegistrationDTO> registrations) {
-
-        BeanContainer<String, RegistrationDTO> registrationItems = new BeanContainer<String, RegistrationDTO>(RegistrationDTO.class);
-        registrationItems.setBeanIdProperty("specificIdentifier");
-        registrationItems.addAll(registrations);
-
-        grid.setContainerDataSource(buildGeneratedProperties(registrationItems));
-
-        grid.removeAllColumns();
-
-        Column typeColumn = grid.addColumn("registrationType");
-        typeColumn.setRenderer(new HtmlRenderer(), new RegistrationTypeConverter());
-        typeColumn.setHeaderCaption("");
-
-        Column statusColumn = grid.addColumn("status");
-
-        Column citationColumn = grid.addColumn("citation");
-        citationColumn.setHeaderCaption("Publication");
-
-
-        Column summaryColumn = grid.addColumn("summary");
-
-        Column regidColumn = grid.addColumn("identifier");
-        regidColumn.setHeaderCaption("Id");
-        regidColumn.setRenderer(new HtmlRenderer(), new UrlStringConverter("http://pyhcobank.org/"));
-
-        Column createdColumn = grid.addColumn("created");
-        createdColumn.setRenderer(new DateRenderer(), new JodaDateTimeConverter());
-        createdColumn.setHidable(true);
-        createdColumn.setHidden(true);
-
-        Column regDateColumn = grid.addColumn("registrationDate");
-        // regDateColumn.setHeaderCaption("Date");
-        regDateColumn.setRenderer(new DateRenderer(), new JodaDateTimeConverter());
-        regDateColumn.setHidable(true);
-        regDateColumn.setHidden(true);
-
-
-        Column buttonColumn = grid.addColumn("operation");
-        buttonColumn.setRenderer(new ButtonRenderer(e -> eventBus.publishEvent(new NavigationEvent(
-                RegistrationWorkflowViewBean.NAME,
-                RegistrationWorkflowViewBean.ACTION_EDIT,
-                e.getItemId().toString()
-                ))));
-        buttonColumn.setSortable(false);
-
-        grid.setFrozenColumnCount(1);
     }
 
     public void populateList(Collection<RegistrationDTO> registrations) {
