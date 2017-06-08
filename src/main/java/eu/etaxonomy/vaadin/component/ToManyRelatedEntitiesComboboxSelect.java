@@ -40,8 +40,6 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         // TODO this.fieldTyp = LazyComboBox.class does not work
         LazyComboBox<V> field = new LazyComboBox<V>(itemType);
         this.fieldType = (Class<LazyComboBox<V>>) field.getClass();
-
-
     }
 
     /**
@@ -59,6 +57,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
             field.setCaptionGenerator(captionGenerator);
         }
         field.setValue(val);
+        field.setWidth(100, Unit.PERCENTAGE);
         return field;
     }
 
