@@ -9,9 +9,9 @@
 package eu.etaxonomy.vaadin.component;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -30,6 +30,9 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
+ * Manages the a collection of items internally as LinkedList<V>. If the Collection to operate on is a Set a Converter must be
+ * set. THe internally used fields are used in un-buffered mode.
+ *
  * @author a.kohlbecker
  * @since May 11, 2017
  *
@@ -50,64 +53,116 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private boolean withEditButton = false;
 
+    private static final int GRID_X_FIELD = 0;
+
+    protected boolean addEmptyRowOnInitContent = true;
+
     //NOTE: Managing the item
     //      IDs makes BeanContainer more complex to use, but it is necessary in some cases where the
-    //      equals() or hashCode() methods have been reimplemented in the bean.
-    //      TODO CdmBase has a reimplemented equals method, do we need to use the BeanContainer instead?
+    //      equals() or hashCode() methods have been re-implemented in the bean.
+    //      TODO CdmBase has a re-implemented equals method, do we need to use the BeanContainer instead?
     private BeanItemContainer<V> beans;
 
    //private LinkedList<V> itemList = new LinkedList<>();
 
     private int GRID_COLS = 2;
 
-    private GridLayout grid = new GridLayout(GRID_COLS,1);
-
-    private Set<F> nestedFields = new HashSet<>() ;
+    private GridLayout grid = new GridLayout(GRID_COLS, 1);
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
         this.itemType = itemType;
         setCaption(caption);
         beans = new BeanItemContainer<V>(itemType);
+
     }
 
-    private Component buttonGroup(F field){
-
-        CssLayout buttonGroup = new CssLayout();
-        Button add = new Button(FontAwesome.PLUS);
-        ClickListener addclickListerner = newRemoveButtonClicklistener(field);
-        if(addclickListerner != null){
-            add.addClickListener(addclickListerner);
-        }
-
-        if(withEditButton){
-            Button edit = new Button(FontAwesome.EDIT);
-            ClickListener editClickListerner = newEditButtonClicklistener(field);
-            if(editClickListerner != null){
-                edit.addClickListener(editClickListerner);
+    /**
+     * @param field
+     * @return
+     */
+    protected Integer findRow(F field) {
+        Integer row = null;
+        for(int r = 0; r < grid.getRows(); r++){
+            if(grid.getComponent(GRID_X_FIELD, r).equals(field)){
+                row = r;
+                break;
             }
-            buttonGroup.addComponent(edit);
-            addStyledComponents(edit);
         }
+        return row;
+    }
 
-        Button remove = new Button(FontAwesome.MINUS);
-        ClickListener removeclickListerner = newRemoveButtonClicklistener(field);
-        if(removeclickListerner != null){
-            remove.addClickListener(removeclickListerner);
+    /**
+     * @param field
+     * @return
+     */
+    private void addRowAfter(F field) {
+
+        Integer row = findRow(field);
+
+        grid.insertRow(row + 1);
+
+        addNewRow(row + 1, null);
+        updateValue();
+
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    private void removeRow(F field) {
+
+        Integer row = findRow(field);
+        grid.removeRow(row);
+        updateValue();
+        updateButtonStates();
+
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    private void moveRowDown(F field) {
+
+        Integer row = findRow(field);
+        swapRows(row);
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    private void moveRowUp(F field) {
+
+        Integer row = findRow(field);
+        swapRows(row - 1);
+    }
+
+    /**
+     * @param i
+     */
+    private void swapRows(int i) {
+        if(i >= 0 && i + 1 < grid.getRows()){
+            grid.replaceComponent(grid.getComponent(GRID_X_FIELD, i), grid.getComponent(GRID_X_FIELD, i + 1));
+            grid.replaceComponent(grid.getComponent(GRID_X_FIELD  + 1 , i), grid.getComponent(GRID_X_FIELD + 1, i + 1));
+            updateButtonStates();
+            updateValue();
+        } else {
+            throw new RuntimeException("Cannot swap rows out of the grid bounds");
         }
+    }
 
-        buttonGroup.addComponent(add);
-        buttonGroup.addComponent(remove);
-        addStyledComponents(add, remove);
-        if(isOrderedCollection){
-            Button moveUp = new Button(FontAwesome.ARROW_UP);
-            Button moveDown = new Button(FontAwesome.ARROW_DOWN);
-            buttonGroup.addComponents(moveUp, moveDown);
-            addStyledComponents(moveUp, moveDown);
+    /**
+     *
+     */
+    protected void updateValue() {
+        try {
+            setValue(getValueFromNestedFields());
+        } catch (ReadOnlyException e){
+            logger.debug("datasource is readonly, only internal value was updated");
         }
-        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-
-        return buttonGroup;
     }
 
     /**
@@ -138,6 +193,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     protected Component initContent() {
         grid.setColumnExpandRatio(0, 1.0f);
+        // set internal value to null to add an empty row
+
+        if(addEmptyRowOnInitContent){
+            // add an empty row
+            setInternalValue(null);
+        }
         return grid;
     }
 
@@ -154,17 +215,37 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     @Override
     protected void setInternalValue(List<V> newValue) {
-        super.setInternalValue(newValue);
 
-        // newValue is already converted, need to use the original value from the data source
-        isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+         grid.removeAllComponents();
+         grid.setRows(1);
 
-        beans.addAll(newValue);
+        if(newValue != null){
+            // FIMXE is it really needed to backup as linked list?
+            LinkedList<V> linkedList;
+            if(newValue instanceof LinkedList){
+                linkedList = (LinkedList<V>) newValue;
+            } else {
+                linkedList = new LinkedList<>(newValue);
+            }
+            super.setInternalValue(linkedList);
 
-        grid.setRows(newValue.size());
-        int row = 0;
-        for(V val : newValue){
-            row = addNewRow(row, val);
+            // newValue is already converted, need to use the original value from the data source
+            isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+
+            //FIXME is beans really used?
+            beans.addAll(linkedList);
+
+            int row = 0;
+            if(newValue.size() > 0){
+                for(V val : linkedList){
+                    row = addNewRow(row, val);
+                }
+            }
+        }
+
+        if(newValue == null || newValue.isEmpty()) {
+            // add an empty row
+            addNewRow(0, null);
         }
     }
 
@@ -176,10 +257,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
-            nestedFields .add(field);
             addStyledComponent(field);
-            grid.addComponent(field, 0, row);
+
+            // important! all fields must be un-buffered
+            field.setBuffered(false);
+
+            if(getNestedFields().size() == grid.getRows()){
+                grid.setRows(grid.getRows() + 1);
+            }
+            grid.addComponent(field, GRID_X_FIELD, row);
             grid.addComponent(buttonGroup(field), 1, row);
+            updateButtonStates();
             nestFieldGroup(field);
             row++;
         } catch (InstantiationException e) {
@@ -190,6 +278,81 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             e.printStackTrace();
         }
         return row;
+    }
+
+    private Component buttonGroup(F field){
+
+        CssLayout buttonGroup = new CssLayout();
+        Button add = new Button(FontAwesome.PLUS);
+        add.addClickListener(e -> addRowAfter(field));
+
+        if(withEditButton){
+            Button edit = new Button(FontAwesome.EDIT);
+            ClickListener editClickListerner = newEditButtonClicklistener(field);
+            if(editClickListerner != null){
+                edit.addClickListener(editClickListerner);
+            }
+            buttonGroup.addComponent(edit);
+            addStyledComponents(edit);
+        }
+
+        Button remove = new Button(FontAwesome.MINUS);
+        remove.addClickListener(e -> removeRow(field));
+
+
+        buttonGroup.addComponent(add);
+        buttonGroup.addComponent(remove);
+        addStyledComponents(add, remove);
+        if(isOrderedCollection){
+            Button moveUp = new Button(FontAwesome.ARROW_UP);
+            moveUp.addClickListener(e -> moveRowUp(field));
+            Button moveDown = new Button(FontAwesome.ARROW_DOWN);
+            moveDown.addClickListener(e -> moveRowDown(field));
+
+
+            buttonGroup.addComponents(moveUp, moveDown);
+            addStyledComponents(moveUp, moveDown);
+        }
+        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+
+        return buttonGroup;
+    }
+
+    private void updateButtonStates(){
+
+        int fieldsCount = getNestedFields().size();
+        for(int row = 0; row < fieldsCount; row++){
+
+            boolean isFirst = row == 0;
+            boolean isLast = row == fieldsCount - 1;
+
+            CssLayout buttonGroup = (CssLayout) grid.getComponent(GRID_X_FIELD + 1, row);
+
+            // add
+            buttonGroup.getComponent(0).setEnabled(isLast || isOrderedCollection);
+            // remove
+            buttonGroup.getComponent(1).setEnabled(!isFirst);
+            // up
+            if(buttonGroup.getComponentCount() > 2){
+                buttonGroup.getComponent(2).setEnabled(!isFirst);
+                // down
+                buttonGroup.getComponent(3).setEnabled(!isLast);
+            }
+        }
+    }
+
+
+    protected List<F> getNestedFields(){
+        List<F> nestedFields = new ArrayList<>(grid.getRows());
+        for(int r = 0; r < grid.getRows(); r++){
+            F f = (F) grid.getComponent(GRID_X_FIELD, r);
+            if(f == null){
+                logger.debug(String.format("NULL field at %d,%d", GRID_X_FIELD, r));
+            } else {
+                nestedFields.add(f);
+            }
+        }
+        return Collections.unmodifiableList(nestedFields);
     }
 
     /**
@@ -254,7 +417,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        nestedFields.forEach(f -> f.commit());
+        getNestedFields().forEach(f -> f.commit());
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
     }
@@ -271,7 +434,15 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     public List<V> getValueFromNestedFields() {
         List<V> nestedValues = new ArrayList<>();
-        nestedFields.forEach(f -> nestedValues.add(f.getValue()));
+        getNestedFields().forEach(f -> {
+                logger.trace(String.format("getValueFromNestedFields() - %s:%s",
+                       f != null ? f.getClass().getSimpleName() : "null",
+                       f != null ? f.getValue() : "null"
+                ));
+                if(f != null){
+                    nestedValues.add(f.getValue());
+                }
+            });
         return nestedValues;
     }
 
