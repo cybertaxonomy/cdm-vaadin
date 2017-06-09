@@ -284,6 +284,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         CssLayout buttonGroup = new CssLayout();
         Button add = new Button(FontAwesome.PLUS);
+        add.setDescription("Add item");
         add.addClickListener(e -> addRowAfter(field));
 
         if(withEditButton){
@@ -297,6 +298,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
 
         Button remove = new Button(FontAwesome.MINUS);
+        remove.setDescription("Remove item");
         remove.addClickListener(e -> removeRow(field));
 
 
@@ -305,10 +307,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         addStyledComponents(add, remove);
         if(isOrderedCollection){
             Button moveUp = new Button(FontAwesome.ARROW_UP);
+            moveUp.setDescription("Move up");
             moveUp.addClickListener(e -> moveRowUp(field));
             Button moveDown = new Button(FontAwesome.ARROW_DOWN);
             moveDown.addClickListener(e -> moveRowDown(field));
-
+            moveDown.setDescription("Move down");
 
             buttonGroup.addComponents(moveUp, moveDown);
             addStyledComponents(moveUp, moveDown);
