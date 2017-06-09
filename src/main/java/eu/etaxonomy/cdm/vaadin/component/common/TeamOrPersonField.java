@@ -11,9 +11,12 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -21,8 +24,8 @@ import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
-import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 
 /**
  * @author a.kohlbecker
@@ -36,7 +39,12 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private static final String PRIMARY_STYLE = "v-team-or-person-field";
 
     private CssLayout root = new CssLayout();
+    private CssLayout toolBar= new CssLayout();
     private CssLayout compositeWrapper = new CssLayout();
+
+    private Button removeButton = new Button(FontAwesome.REMOVE);
+    private Button personButton = new Button(FontAwesome.USER);
+    private Button teamButton = new Button(FontAwesome.USERS);
 
     // Fields for case when value is a Person
     private PersonField personField = new PersonField();
@@ -56,6 +64,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addStyledComponent(titleField);
         addStyledComponent(nomenclaturalTitleField);
         addStyledComponent(personsListEditor);
+        addStyledComponents(removeButton, personButton, teamButton);
+
 
         addSizedComponent(root);
         addSizedComponent(compositeWrapper);
@@ -70,8 +80,31 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      */
     @Override
     protected Component initContent() {
-        root.setPrimaryStyleName(PRIMARY_STYLE);
+
+        removeButton.addClickListener(e -> {
+            setValue(null);
+            updateToolBarButtonStates();
+        });
+        removeButton.setDescription("Remove");
+
+        personButton.addClickListener(e -> {
+            setValue(Person.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            updateToolBarButtonStates();
+        });
+        personButton.setDescription("Add person");
+        teamButton.addClickListener(e -> {
+            setValue(Team.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            updateToolBarButtonStates();
+        });
+        teamButton.setDescription("Add team");
+
+        toolBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP + " toolbar");
+        toolBar.addComponents(removeButton, personButton, teamButton);
+
         compositeWrapper.setStyleName("margin-wrapper");
+        compositeWrapper.addComponent(toolBar);
+
+        root.setPrimaryStyleName(PRIMARY_STYLE);
         root.addComponent(compositeWrapper);
         return root;
     }
@@ -84,6 +117,13 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return TeamOrPersonBase.class;
     }
 
+    private void updateToolBarButtonStates(){
+        TeamOrPersonBase<?> val = getInternalValue();
+        removeButton.setEnabled(val != null);
+        personButton.setEnabled(val == null);
+        teamButton.setEnabled(val == null);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -93,6 +133,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         super.setInternalValue(newValue);
 
         newValue = HibernateProxyHelper.deproxy(newValue);
+
+        compositeWrapper.removeAllComponents();
+        compositeWrapper.addComponent(toolBar);
 
         if(newValue == null) {
             return;
@@ -123,6 +166,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
         }
 
+        updateToolBarButtonStates();
         checkUserPermissions(newValue);
     }
 

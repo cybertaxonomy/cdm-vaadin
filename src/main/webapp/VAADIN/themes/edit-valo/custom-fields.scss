@@ -121,8 +121,14 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     
    // team-or-person-field
    .v-team-or-person-field {
+   
+        .toolbar {
+            float: right;
+            height: $v-unit-size;
+        }
         .margin-wrapper {
             @include composite-field-wrapper;
+            
         }
     }
     
