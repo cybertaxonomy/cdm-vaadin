@@ -132,7 +132,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registrationListPanel.setCaption("Registrations");
 
 
-        registration.addComponent(createWorkflowTabSheet(workingset, null));
+        // registration.addComponent(createWorkflowTabSheet(workingset, null));
         RegistrationItem registrationItem = new RegistrationItem(workingset, this);
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
             registrationItem.getSubmitterLabel().setVisible(true);
