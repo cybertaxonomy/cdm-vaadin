@@ -44,8 +44,19 @@ public class TypeDesignationConverter {
     private final String separator = ", ";
 
     private Collection<TypeDesignationBase> typeDesignations;
-    private Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByType;
+
+    /**
+     * Groups the EntityReferences for each of the TypeDesignatinos by the according TypeDesignationStatus.
+     * The TypeDesignationStatusBase keys are already ordered by the term order defined in the vocabulary.
+     */
+    private LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByOrderedTypes = new LinkedHashMap<>();
+
+    /**
+     * Groups the EntityReferences for each of the TypeDesignatinos by the label representations of the
+     * according TypeDesignationStatus. The labels are ordered by the term order defined in the vocabulary.
+     */
     private LinkedHashMap<String, Collection<EntityReference>> orderedRepresentations = new LinkedHashMap<>();
+
     private EntityReference typifiedName;
 
     private String finalString = null;
@@ -59,13 +70,14 @@ public class TypeDesignationConverter {
      */
     public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
-        orderedStringsByType = new HashMap<>();
-        typeDesignations.forEach(td -> putString(td.getTypeStatus(), new EntityReference(td.getId(), stringify(td))));
+        Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByType = new HashMap<>();
+        typeDesignations.forEach(td -> putString(orderedStringsByType, td.getTypeStatus(), new EntityReference(td.getId(), stringify(td))));
+        orderedStringsByOrderedTypes = orderedByType(orderedStringsByType);
         orderedRepresentations = buildOrderedRepresentations();
         this.typifiedName = findTypifiedName();
     }
 
-    private LinkedHashMap buildOrderedRepresentations(){
+    private LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedByType(Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByType){
 
         // 1. order by SpecimenType, NameType
 
@@ -83,7 +95,17 @@ public class TypeDesignationConverter {
         });
         // NameTypes.........
 
-        keyList.forEach(key -> orderedRepresentations.put(getTypeDesignationStytusLabel(key), orderedStringsByType.get(key)));
+        keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, orderedStringsByType.get(key)));
+        return orderedStringsByOrderedTypes;
+    }
+
+    private LinkedHashMap<String, Collection<EntityReference>> buildOrderedRepresentations(){
+
+        orderedStringsByOrderedTypes.keySet().forEach(
+                key -> orderedRepresentations.put(
+                        getTypeDesignationStytusLabel(key),
+                        orderedStringsByOrderedTypes.get(key))
+                );
         return orderedRepresentations;
     }
 
@@ -270,7 +292,7 @@ public class TypeDesignationConverter {
         return sb.toString();
     }
 
-    private void putString(TypeDesignationStatusBase<?> status, EntityReference idAndString){
+    private void putString(Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByType, TypeDesignationStatusBase<?> status, EntityReference idAndString){
         // the cdm orderd term bases are ordered invers, fixing this for here
         if(status == null){
             status = SpecimenTypeDesignationStatus.TYPE();

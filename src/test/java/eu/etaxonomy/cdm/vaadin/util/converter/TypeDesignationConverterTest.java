@@ -8,9 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.util.converter;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -54,21 +56,32 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
 
         typifiedName.addTypeDesignation(ntd, false);
 
-        SpecimenTypeDesignation std = SpecimenTypeDesignation.NewInstance();
-        DerivedUnit specimen = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
-        specimen.setTitleCache("OHA", true);
-        std.setTypeSpecimen(specimen);
-        std.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
+        SpecimenTypeDesignation std_HT = SpecimenTypeDesignation.NewInstance();
+        DerivedUnit specimen_HT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
+        specimen_HT.setTitleCache("OHA", true);
+        std_HT.setTypeSpecimen(specimen_HT);
+        std_HT.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
+        typifiedName.addTypeDesignation(std_HT, false);
 
-        typifiedName.addTypeDesignation(std, false);
+        SpecimenTypeDesignation std_IT = SpecimenTypeDesignation.NewInstance();
+        DerivedUnit specimen_IT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
+        specimen_IT.setTitleCache("BER", true);
+        std_IT.setTypeSpecimen(specimen_IT);
+        std_IT.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
+        typifiedName.addTypeDesignation(std_IT, false);
 
         List<TypeDesignationBase> tds = new ArrayList<>();
         tds.add(ntd);
-        tds.add(std);
+        tds.add(std_IT);
+        tds.add(std_HT);
 
-        String result = new TypeDesignationConverter(tds).buildString().print();
+        TypeDesignationConverter typeDesignationConverter = new TypeDesignationConverter(tds);
+        String result = typeDesignationConverter.buildString().print();
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
+        Iterator<String> keyIt = typeDesignationConverter.getOrderedTypeDesignationRepresentations().keySet().iterator();
+        assertEquals("Holotype", keyIt.next());
+        assertEquals("Isotype", keyIt.next());
     }
 
 }
