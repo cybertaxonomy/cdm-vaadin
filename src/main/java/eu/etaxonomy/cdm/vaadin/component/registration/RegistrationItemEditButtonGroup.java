@@ -43,8 +43,10 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         setWidth(100, Unit.PERCENTAGE);
 
         if(regDto.getName() != null){
-            nameButton = new IdButton(regDto.getName().getId(), new Button(regDto.getName().getLabel()));
-            addComponent(nameButton.getButton());
+            nameButton = new IdButton(regDto.getName().getId(), new Button("Name:"));
+            Label nameLabel = new Label(regDto.getName().getLabel());
+            nameLabel.setWidthUndefined();
+            addComponents(nameButton.getButton(), nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
             addComponent(new Label(regDto.getTypifiedName().getLabel()));

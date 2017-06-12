@@ -34,6 +34,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypedesignationsEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
@@ -155,6 +156,17 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         getRepo().commitTransaction(tx);
     }
 
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
+    public void onTypedesignationsEditorAction(TypedesignationsEditorAction event) {
+        TransactionStatus tx = getRepo().startTransaction(false);
+        TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
+        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        popup.showInEditor(taxonName);
+        popup.withDeleteButton(true);
+        // in the registration application inReferences should only edited centrally
+        popup.getNomReferenceCombobox().setEnabled(false);
+        getRepo().commitTransaction(tx);
+    }
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
     public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments

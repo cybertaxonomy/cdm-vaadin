@@ -67,6 +67,11 @@ public class TypeDesignationConverter {
 
     private LinkedHashMap buildOrderedRepresentations(){
 
+        // 1. order by SpecimenType, NameType
+
+        // SpecimenTypes.........
+        // Order SpecimenTypes by GatheringEvent
+
         List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(orderedStringsByType.keySet());
 
         Collections.sort(keyList, new Comparator<TypeDesignationStatusBase>() {
@@ -76,6 +81,7 @@ public class TypeDesignationConverter {
                 return -1 * o1.compareTo(o2);
             }
         });
+        // NameTypes.........
 
         keyList.forEach(key -> orderedRepresentations.put(getTypeDesignationStytusLabel(key), orderedStringsByType.get(key)));
         return orderedRepresentations;

@@ -26,6 +26,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -43,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypedesignationsEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
@@ -73,6 +75,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     public static final String ACTION_NEW = "new";
 
     public static final String ACTION_EDIT = "edit";
+
+    private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
 
     public RegistrationType regType = null;
 
@@ -234,37 +238,79 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         messageButton.setCaptionAsHtml(true);
         buttonGroup.addComponent(messageButton);
 
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
-        Button editButton = new Button(FontAwesome.EDIT);
-        editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
-        editButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
-            AbstractEditorAction.Action.EDIT,
-            dto.getId(),
-            null,
-            this
-            )));
-        buttonGroup.addComponent(editButton);
-        }
-
         TypeStateLabel typeStateLabel = new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus());
-        namesTypesList.addComponent(typeStateLabel, 0, row);
-        namesTypesList.setComponentAlignment(typeStateLabel, Alignment.MIDDLE_LEFT);
 
-        RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
-        if(editButtonGroup.getNameButton() != null){
 
-            editButtonGroup.getNameButton().getButton().addClickListener(e -> {
-                Integer nameId = editButtonGroup.getNameButton().getId();
-                getEventBus().publishEvent(new TaxonNameEditorAction(
-                    AbstractEditorAction.Action.EDIT,
-                    nameId
-                    )
-                );
-            });
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
+            Button editRegistrationButton = new Button(FontAwesome.COG);
+            editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editRegistrationButton.setDescription("Edit registration");
+            editRegistrationButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+                AbstractEditorAction.Action.EDIT,
+                dto.getId(),
+                null,
+                this
+                )));
+            buttonGroup.addComponent(editRegistrationButton);
         }
-        namesTypesList.addComponent(editButtonGroup, 1, row);
+
+        Button editNameButton = new Button(FontAwesome.TAG);
+        editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
+        editNameButton.setDescription("Edit name");
+        if(dto.getName() != null){
+            editNameButton.addClickListener(e -> {
+                    Integer nameId = dto.getName().getId();
+                    getEventBus().publishEvent(new TaxonNameEditorAction(
+                        AbstractEditorAction.Action.EDIT,
+                        nameId
+                        )
+                    );
+                });
+        } else {
+            editNameButton.setEnabled(false);
+        }
+
+        Button editTypesButton = new Button(FontAwesome.LEAF);
+        editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
+        editTypesButton.setDescription("Edit type designations");
+        if(!dto.getTypeDesignations().isEmpty()){
+            editTypesButton.addClickListener(e -> {
+                int regId = dto.getId();
+                    getEventBus().publishEvent(new TypedesignationsEditorAction(
+                        AbstractEditorAction.Action.EDIT,
+                        regId
+                        )
+                    );
+                });
+        } else {
+            editTypesButton.setEnabled(false);
+        }
+        buttonGroup.addComponents(editNameButton, editTypesButton);
+
+        Component regItem;
+        if(REG_ITEM_AS_BUTTON_GROUP){
+            RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
+            if(editButtonGroup.getNameButton() != null){
+
+                editButtonGroup.getNameButton().getButton().addClickListener(e -> {
+                    Integer nameId = editButtonGroup.getNameButton().getId();
+                    getEventBus().publishEvent(new TaxonNameEditorAction(
+                        AbstractEditorAction.Action.EDIT,
+                        nameId
+                        )
+                    );
+                });
+            }
+            regItem = editButtonGroup;
+        } else {
+            regItem = new Label(dto.getSummary());
+        }
+
+        namesTypesList.addComponent(typeStateLabel, 0, row);
+        namesTypesList.setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
+        namesTypesList.addComponent(regItem, 1, row);
         namesTypesList.addComponent(buttonGroup, 2, row);
-        namesTypesList.setComponentAlignment(buttonGroup, Alignment.MIDDLE_LEFT);
+        namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
     }
 
 
