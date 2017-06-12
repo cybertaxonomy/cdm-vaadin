@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,9 +25,11 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
 
 public class RegistrationDTO{
@@ -230,8 +233,12 @@ public class RegistrationDTO{
         return name;
     }
 
-    public Map<String, Collection<EntityReference>> getTypeDesignations() {
-        return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignationRepresentations() : null;
+    public LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> getOrderdTypeDesignationEntitiyReferences() {
+        return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignations() : null;
+    }
+
+    public Collection<TypeDesignationBase> getTypeDesignations() {
+        return typeDesignationConverter != null ? typeDesignationConverter.getTypeDesignations() : null;
     }
 
     /**

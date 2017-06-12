@@ -273,7 +273,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         Button editTypesButton = new Button(FontAwesome.LEAF);
         editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
         editTypesButton.setDescription("Edit type designations");
-        if(!dto.getTypeDesignations().isEmpty()){
+        if(!dto.getOrderdTypeDesignationEntitiyReferences().isEmpty()){
             editTypesButton.addClickListener(e -> {
                 int regId = dto.getId();
                     getEventBus().publishEvent(new TypedesignationsEditorAction(

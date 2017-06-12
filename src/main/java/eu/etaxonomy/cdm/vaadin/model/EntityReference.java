@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.model;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 public class EntityReference {
     int id;
     String label;
@@ -24,4 +26,30 @@ public class EntityReference {
     public String getLabel() {
         return label;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 31)
+                .append(label)
+                .append(id)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        try {
+            EntityReference other = (EntityReference) obj;
+            return id == other.id && label.equals(other.label);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

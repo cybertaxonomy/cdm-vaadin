@@ -16,6 +16,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -51,18 +52,19 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             // no name in the registration! we only show the typified name as label
             addComponent(new Label(regDto.getTypifiedName().getLabel()));
         }
-        if(regDto.getTypeDesignations() != null){
-            regDto.getTypeDesignations().keySet().iterator().forEachRemaining(key -> {
-                Label label = new Label(key   + ":");
+        if(regDto.getOrderdTypeDesignationEntitiyReferences() != null){
+            regDto.getOrderdTypeDesignationEntitiyReferences().keySet().iterator().forEachRemaining(baseEntityRef -> {
+                String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
+                Button tdButton = new Button(buttonLabel + ":");
+                addComponent(tdButton);
+                typeDesignationButtons.add(new IdButton(baseEntityRef.getId(), tdButton));
+
+                Label label = new Label(baseEntityRef.getLabel());
                 label.setWidthUndefined();
                 addComponent(label);
                 labels.add(label);
 
-                regDto.getTypeDesignations().get(key).forEach(value -> {
-                    Button tdButton = new Button(value.getLabel());
-                    addComponent(tdButton);
-                    typeDesignationButtons.add(new IdButton(value.getId(), tdButton));
-                }) ;
+
             });
         }
         Button addTypeDesignationButton = new Button(FontAwesome.PLUS);

@@ -210,11 +210,10 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(
-                    reg -> reg.getTypeDesignations().values().stream().anyMatch(
-                            tds -> tds.stream().anyMatch(
-                                    td -> td.getId() == event.getEntityId()
-                                    ))
+                    reg -> reg.getTypeDesignations().stream().anyMatch(
+                            td -> td.getId() == event.getEntityId()
                             )
+                        )
                     ){
                 refreshView();
             }
