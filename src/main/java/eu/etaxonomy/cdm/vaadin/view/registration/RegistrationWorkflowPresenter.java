@@ -147,7 +147,12 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
     public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
-        TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
+        // FIXME optional:
+        // A) allow full initialization of the entity here the Preseneter of the Editor should
+        //    provide the intiStratirey via a static method so that it can be used
+        // B) only pass the identifier (Object) to the View and the Presenter is reponsible for
+        //    loading and initializing  the entitiy
+	TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.showInEditor(taxonName);
         popup.withDeleteButton(true);

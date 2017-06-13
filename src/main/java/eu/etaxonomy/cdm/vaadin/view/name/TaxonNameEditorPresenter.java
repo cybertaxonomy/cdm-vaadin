@@ -49,6 +49,18 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
     }
 
+    @Override
+    protected TaxonName prepareAsFieldGroupDataSource(TaxonName bean){
+        TaxonName initializedBean = getRepo().getNameService().load(bean.getUuid(), Arrays.asList(
+                "$",
+                "basionymAuthorship",
+                "combinationAuthorship",
+                "exCombinationAuthorship",
+                "exBasionymAuthorship",
+                "nomenclaturalReference.authorship.teamMembers"));
+        return initializedBean;
+    }
+
 
     /**
      * {@inheritDoc}

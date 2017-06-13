@@ -31,6 +31,20 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     @Autowired
     protected ApplicationEventPublisher eventBus;
 
+    /**
+     * This method is called directly before setting the bean as item data source to
+     * the field group of the editor.
+     * <p>
+     * Override this method to pre-process the bean if needed. This can be the case if
+     * you are using a persistence layer with short running session like Hibernate.
+     *
+     * @param bean
+     * @return
+     */
+    protected DTO prepareAsFieldGroupDataSource(DTO bean){
+        return bean;
+    }
+
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
