@@ -99,9 +99,10 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     /**
     *
     * @param editorAction
+     * @throws EditorEntityBeanException
     */
    @EventListener(condition = "#editorAction.sourceComponent != null")
-   public void onReferenceEditorAction(ReferenceEditorAction editorAction){
+   public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
        if(!isFromOwnView(editorAction)){
            return;
        }

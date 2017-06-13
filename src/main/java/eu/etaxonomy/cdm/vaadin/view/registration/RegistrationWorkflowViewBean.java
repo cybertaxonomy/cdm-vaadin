@@ -359,6 +359,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                 e -> addNewTypeRegistrationWorkingset(SpecimenTypeDesignation.class, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
                 e -> addNewTypeRegistrationWorkingset(NameTypeDesignation.class, typeDesignationTypeCooser));
+        newNameTypeDesignationButton.setEnabled(false);
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
         layout.setMargin(true);

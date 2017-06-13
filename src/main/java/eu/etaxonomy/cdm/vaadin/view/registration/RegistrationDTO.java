@@ -97,7 +97,7 @@ public class RegistrationDTO{
         case TYPIFICATION:
         default:
             try {
-                typeDesignationConverter = new TypeDesignationConverter(reg.getTypeDesignations());
+                typeDesignationConverter = new TypeDesignationConverter(reg, reg.getTypeDesignations());
                 summary = typeDesignationConverter.buildString().print();
             } catch (RegistrationValidationException e) {
                 messages.add("Validation errors: " + e.getMessage());

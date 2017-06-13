@@ -52,6 +52,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
     @Test
     public void test1() throws RegistrationValidationException{
 
+
         TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
         typifiedName.setTitleCache("Prionus coriatius L.", true);
 
@@ -122,7 +123,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
         tds.add(std_IT_2);
         tds.add(std_IT_3);
 
-        TypeDesignationConverter typeDesignationConverter = new TypeDesignationConverter(tds);
+        TypeDesignationConverter typeDesignationConverter = new TypeDesignationConverter(typifiedName, tds);
         String result = typeDesignationConverter.buildString().print();
         System.err.println(result);
 

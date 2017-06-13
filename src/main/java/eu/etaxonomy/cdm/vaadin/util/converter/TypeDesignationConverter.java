@@ -73,16 +73,16 @@ public class TypeDesignationConverter {
      * @throws RegistrationValidationException
      *
      */
-    public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
+    public TypeDesignationConverter(CdmBase containgEntity, Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
         Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus = new HashMap<>();
-        typeDesignations.forEach(td -> mapTypeDesignation(byBaseEntityByTypeStatus, td));
+        typeDesignations.forEach(td -> mapTypeDesignation(containgEntity, byBaseEntityByTypeStatus, td));
         orderedByTypesByBaseEntity = orderByTypeByBaseEntity(byBaseEntityByTypeStatus);
         this.typifiedName = findTypifiedName();
     }
 
 
-    private void mapTypeDesignation(Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus,
+    private void mapTypeDesignation(CdmBase containgEntity, Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus,
             TypeDesignationBase<?> td){
 
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
@@ -93,7 +93,8 @@ public class TypeDesignationConverter {
 
         TypeDesignationWorkingSet typedesignationWorkingSet;
         if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
-            byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet());
+            TypedEntityReference containigEntityReference = new TypedEntityReference(containgEntity.getClass(), containgEntity.getId(), containgEntity.toString());
+            byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet(containigEntityReference, baseEntityReference));
         }
 
         typedesignationWorkingSet = byBaseEntityByTypeStatus.get(baseEntityReference);
@@ -163,7 +164,7 @@ public class TypeDesignationConverter {
                 }
             });
             // new LinkedHashMap for the ordered TypeDesignationStatusBase keys
-            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet();
+            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(typeDesignationWorkingSet.getContainigEntityReference(), baseEntityRef);
             keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, typeDesignationWorkingSet.get(key)));
             stringsOrderedbyBaseEntityOrderdByType.put(baseEntityRef, orderedStringsByOrderedTypes);
        }
@@ -472,8 +473,19 @@ public class TypeDesignationConverter {
 
         String workingSetRepresentation = null;
 
+        TypedEntityReference containigEntityReference;
+
+        TypedEntityReference baseEntityReference;
 
         private static final long serialVersionUID = -1329007606500890729L;
+
+        /**
+         * @param baseEntityReference
+         */
+        public TypeDesignationWorkingSet(TypedEntityReference containigEntityReference, TypedEntityReference baseEntityReference) {
+            this.containigEntityReference = containigEntityReference;
+            this.baseEntityReference = baseEntityReference;
+        }
 
         public List<EntityReference> getTypeDesignations() {
             List<EntityReference> typeDesignations = new ArrayList<>();
@@ -494,7 +506,6 @@ public class TypeDesignationConverter {
                 put(status, new ArrayList<EntityReference>());
             }
             get(status).add(typeDesignationEntityReference);
-
         }
 
         public String getRepresentation() {
@@ -503,6 +514,27 @@ public class TypeDesignationConverter {
 
         public void setRepresentation(String representation){
             this.workingSetRepresentation = representation;
+        }
+
+        /**
+         * A reference to the entity which is the common base entity for all TypeDesignations in this workingset.
+         * For a {@link SpecimenTypeDesignation} this is usually the {@link FieldUnit} if it is present. Otherwise it can also be
+         * a {@link DerivedUnit} or something else depending on the specific use case.
+         *
+         * @return the baseEntityReference
+         */
+        public TypedEntityReference getBaseEntityReference() {
+            return baseEntityReference;
+        }
+
+        /**
+         * A reference to the entity which contains the TypeDesignations bundled in this working set.
+         * This can be for example a {@link TaxonName} or a {@link Registration} entity.
+         *
+         * @return the baseEntityReference
+         */
+        public TypedEntityReference getContainigEntityReference() {
+            return containigEntityReference;
         }
 
         @Override
