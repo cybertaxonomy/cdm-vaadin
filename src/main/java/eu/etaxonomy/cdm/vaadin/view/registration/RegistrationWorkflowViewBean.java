@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -31,10 +32,17 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.IdSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
@@ -44,7 +52,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.TypedesignationsEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
@@ -277,14 +285,14 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
             editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
             editTypesButton.setDescription("Edit type designations");
             if(dto.getOrderdTypeDesignationWorkingSets() != null && !dto.getOrderdTypeDesignationWorkingSets().isEmpty()){
-                editTypesButton.addClickListener(e -> {
-                    int regId = dto.getId();
-                        getEventBus().publishEvent(new TypedesignationsEditorAction(
-                            AbstractEditorAction.Action.EDIT,
-                            regId
-                            )
-                        );
-                    });
+//                editTypesButton.addClickListener(e -> {
+//                    int regId = dto.getId();
+//                        getEventBus().publishEvent(new TypeDesignationSetEditorAction(
+//                            AbstractEditorAction.Action.EDIT,
+//                            regId
+//                            )
+//                        );
+//                    });
             } else {
                 editTypesButton.setEnabled(false);
             }
@@ -300,10 +308,29 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                     Integer nameId = editButtonGroup.getNameButton().getId();
                     getEventBus().publishEvent(new TaxonNameEditorAction(
                         AbstractEditorAction.Action.EDIT,
-                        nameId
+                        nameId,
+                        e.getButton(),
+                        this
                         )
                     );
                 });
+
+                for(IdSetButton idSetButton : editButtonGroup.getTypeDesignationButtons()){
+                    idSetButton.getButton().addClickListener(e -> {
+                        Set<Integer> ids = idSetButton.getIds();
+                        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                                AbstractEditorAction.Action.EDIT,
+                                ids,
+                                e.getButton(),
+                                this
+                                )
+                            );
+                    });
+                }
+
+                editButtonGroup.getAddTypeDesignationButton().addClickListener(
+                        e -> chooseNewTypeRegistrationWorkingset(e.getButton())
+                        );
             }
             regItem = editButtonGroup;
         } else {
@@ -315,6 +342,46 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         namesTypesList.addComponent(regItem, 1, row);
         namesTypesList.addComponent(buttonGroup, 2, row);
         namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+    }
+
+    /**
+     * @param button
+     *
+     */
+    protected void chooseNewTypeRegistrationWorkingset(Button button) {
+
+        Window typeDesignationTypeCooser = new Window();
+        typeDesignationTypeCooser.setModal(true);
+        typeDesignationTypeCooser.setResizable(false);
+        typeDesignationTypeCooser.setCaption("Add new type designation");
+        Label label = new Label("Please select kind of type designation to be created.");
+        Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
+                e -> addNewTypeRegistrationWorkingset(SpecimenTypeDesignation.class, typeDesignationTypeCooser));
+        Button newNameTypeDesignationButton = new Button("Name type designation",
+                e -> addNewTypeRegistrationWorkingset(NameTypeDesignation.class, typeDesignationTypeCooser));
+
+        VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
+        layout.setMargin(true);
+        layout.setSpacing(true);
+        layout.setComponentAlignment(newSpecimenTypeDesignationButton, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(newNameTypeDesignationButton, Alignment.MIDDLE_CENTER);
+        typeDesignationTypeCooser.setContent(layout);
+        UI.getCurrent().addWindow(typeDesignationTypeCooser);
+
+    }
+
+    /**
+     * @param button
+     *
+     */
+    protected void addNewTypeRegistrationWorkingset(Class<? extends TypeDesignationBase<?>> newEntityType, Window typeDesignationTypeCooser) {
+        UI.getCurrent().removeWindow(typeDesignationTypeCooser);
+        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                AbstractEditorAction.Action.ADD,
+                newEntityType,
+                null,
+                this
+                ));
     }
 
 

@@ -57,6 +57,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
         if(regDto.getName() != null){
             Button nameButton = new Button("Name:");
+            nameButton.setDescription("Edit the Name");
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
             Label nameLabel = new Label(regDto.getName().getLabel());
             nameLabel.setWidthUndefined();
@@ -70,12 +71,13 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
+                tdButton.setDescription("Edit the type designation working set");
                 addComponent(tdButton);
                 Set<Integer> idSet = new HashSet<>();
                 typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
                 typeDesignationButtons.add(new IdSetButton<TypeDesignationWorkingSet>(TypeDesignationWorkingSet.class, idSet, tdButton));
                 String labelText = typeDesignationWorkingSet.getRepresentation();
-                labelText = labelText.replaceAll("^[^:]+:", ""); // remove Type:, NameType: from the beginning
+                labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
                 Label label = new Label(labelText);
 
                 label.setWidthUndefined();
@@ -84,6 +86,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             }
         }
         addTypeDesignationButton = new Button(FontAwesome.PLUS);
+        addTypeDesignationButton.setDescription("Add a new type designation");
         addComponent(addTypeDesignationButton);
 
 
@@ -94,6 +97,14 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     public IdButton<TaxonName> getNameButton() {
         return nameIdButton;
+    }
+
+    public List<IdSetButton<TypeDesignationWorkingSet>> getTypeDesignationButtons() {
+        return typeDesignationButtons;
+    }
+
+    public Button getAddTypeDesignationButton() {
+        return addTypeDesignationButton;
     }
 
     /**

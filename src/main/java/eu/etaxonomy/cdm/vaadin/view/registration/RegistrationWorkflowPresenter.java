@@ -34,7 +34,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.TypedesignationsEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
@@ -157,7 +157,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
-    public void onTypedesignationsEditorAction(TypedesignationsEditorAction event) {
+    public void onTypedesignationsEditorAction(TypeDesignationWorkingsetEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
