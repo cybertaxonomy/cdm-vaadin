@@ -408,7 +408,7 @@ public class TypeDesignationConverter {
                     result += du.getTitleCache();
                 } else {
                     DerivedUnitFacadeCacheStrategy cacheStrategy = new DerivedUnitFacadeCacheStrategy();
-                    result += cacheStrategy.getTitleCache(du);
+                    result += cacheStrategy.getTitleCache(du, true);
                 }
             }
         }
