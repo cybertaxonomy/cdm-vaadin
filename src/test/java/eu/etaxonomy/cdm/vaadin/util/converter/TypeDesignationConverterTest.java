@@ -134,7 +134,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
                 );
 
         LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedTypeDesignations =
-                typeDesignationConverter.getOrderedTypeDesignations();
+                typeDesignationConverter.getOrderdTypeDesignationWorkingSets();
         Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> byStatusMap = orderedTypeDesignations.values().iterator().next();
         Iterator<TypeDesignationStatusBase<?>> keyIt = byStatusMap.keySet().iterator();
         assertEquals("Holotype", keyIt.next().getLabel());

@@ -232,8 +232,8 @@ public class RegistrationDTO{
         return name;
     }
 
-    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationEntitiyReferences() {
-        return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignations() : null;
+    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
+        return typeDesignationConverter != null ? typeDesignationConverter.getOrderdTypeDesignationWorkingSets() : null;
     }
 
     public Collection<TypeDesignationBase> getTypeDesignations() {

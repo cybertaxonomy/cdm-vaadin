@@ -87,6 +87,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     private String headerText = "-- empty --";
     private String subheaderText = SUBHEADER_DEEFAULT;
 
+    private boolean addNameAndTypeEditButtons = false;
+
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -254,38 +256,40 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
             buttonGroup.addComponent(editRegistrationButton);
         }
 
-        Button editNameButton = new Button(FontAwesome.TAG);
-        editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
-        editNameButton.setDescription("Edit name");
-        if(dto.getName() != null){
-            editNameButton.addClickListener(e -> {
-                    Integer nameId = dto.getName().getId();
-                    getEventBus().publishEvent(new TaxonNameEditorAction(
-                        AbstractEditorAction.Action.EDIT,
-                        nameId
-                        )
-                    );
-                });
-        } else {
-            editNameButton.setEnabled(false);
-        }
+        if(addNameAndTypeEditButtons ){
+            Button editNameButton = new Button(FontAwesome.TAG);
+            editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editNameButton.setDescription("Edit name");
+            if(dto.getName() != null){
+                editNameButton.addClickListener(e -> {
+                        Integer nameId = dto.getName().getId();
+                        getEventBus().publishEvent(new TaxonNameEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            nameId
+                            )
+                        );
+                    });
+            } else {
+                editNameButton.setEnabled(false);
+            }
 
-        Button editTypesButton = new Button(FontAwesome.LEAF);
-        editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
-        editTypesButton.setDescription("Edit type designations");
-        if(!dto.getOrderdTypeDesignationEntitiyReferences().isEmpty()){
-            editTypesButton.addClickListener(e -> {
-                int regId = dto.getId();
-                    getEventBus().publishEvent(new TypedesignationsEditorAction(
-                        AbstractEditorAction.Action.EDIT,
-                        regId
-                        )
-                    );
-                });
-        } else {
-            editTypesButton.setEnabled(false);
+            Button editTypesButton = new Button(FontAwesome.LEAF);
+            editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editTypesButton.setDescription("Edit type designations");
+            if(dto.getOrderdTypeDesignationWorkingSets() != null && !dto.getOrderdTypeDesignationWorkingSets().isEmpty()){
+                editTypesButton.addClickListener(e -> {
+                    int regId = dto.getId();
+                        getEventBus().publishEvent(new TypedesignationsEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            regId
+                            )
+                        );
+                    });
+            } else {
+                editTypesButton.setEnabled(false);
+            }
+            buttonGroup.addComponents(editNameButton, editTypesButton);
         }
-        buttonGroup.addComponents(editNameButton, editTypesButton);
 
         Component regItem;
         if(REG_ITEM_AS_BUTTON_GROUP){

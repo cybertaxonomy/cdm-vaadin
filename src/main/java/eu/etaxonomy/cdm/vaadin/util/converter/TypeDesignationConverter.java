@@ -318,7 +318,7 @@ public class TypeDesignationConverter {
         return typeDesignations;
     }
 
-    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderedTypeDesignations() {
+    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
         return orderedByTypesByBaseEntity;
     }
 

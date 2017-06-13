@@ -414,7 +414,12 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         margin-top: round($v-unit-size/10);
         .v-button {
             padding: 0 round($v-unit-size/4);
+            height: round(2 * $v-unit-size/3 )
             // margin: 0 round($v-unit-size/4);
+        }
+        .v-label {
+            display: inline;
+            white-space: normal;
         }
     }
     
