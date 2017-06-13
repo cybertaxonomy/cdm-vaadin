@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
@@ -127,8 +128,12 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
 
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
+        assertEquals(
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); NameType: Unknown type category, Prionus L. Species Platarum; Type: (Isotype, M)"
+                , result
+                );
 
-        LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> orderedTypeDesignations =
+        LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedTypeDesignations =
                 typeDesignationConverter.getOrderedTypeDesignations();
         Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> byStatusMap = orderedTypeDesignations.values().iterator().next();
         Iterator<TypeDesignationStatusBase<?>> keyIt = byStatusMap.keySet().iterator();

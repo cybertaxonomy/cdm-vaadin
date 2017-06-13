@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,12 +24,12 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
-import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
 
 public class RegistrationDTO{
 
@@ -233,7 +232,7 @@ public class RegistrationDTO{
         return name;
     }
 
-    public LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> getOrderdTypeDesignationEntitiyReferences() {
+    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationEntitiyReferences() {
         return typeDesignationConverter != null ? typeDesignationConverter.getOrderedTypeDesignations() : null;
     }
 

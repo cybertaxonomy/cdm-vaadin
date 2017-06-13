@@ -58,10 +58,11 @@ public class TypeDesignationConverter {
     private Collection<TypeDesignationBase> typeDesignations;
 
     /**
-     * Groups the EntityReferences for each of the TypeDesignatinos by the according TypeDesignationStatus.
+     * Groups the EntityReferences for each of the TypeDesignations by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys are already ordered by the term order defined in the vocabulary.
      */
-    private LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> orderedByTypesByBaseEntity;
+    private LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedByTypesByBaseEntity;
+
 
     private EntityReference typifiedName;
 
@@ -74,14 +75,14 @@ public class TypeDesignationConverter {
      */
     public TypeDesignationConverter(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
-        Map<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> byBaseEntityByTypeStatus = new HashMap<>();
+        Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus = new HashMap<>();
         typeDesignations.forEach(td -> mapTypeDesignation(byBaseEntityByTypeStatus, td));
         orderedByTypesByBaseEntity = orderByTypeByBaseEntity(byBaseEntityByTypeStatus);
         this.typifiedName = findTypifiedName();
     }
 
 
-    private void mapTypeDesignation(Map<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> byBaseEntityByTypeStatus,
+    private void mapTypeDesignation(Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus,
             TypeDesignationBase<?> td){
 
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
@@ -90,21 +91,13 @@ public class TypeDesignationConverter {
 
         EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
 
-        Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> stringsOrderdByType;
+        TypeDesignationWorkingSet typedesignationWorkingSet;
         if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
-            byBaseEntityByTypeStatus.put(baseEntityReference, new LinkedHashMap<>());
+            byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet());
         }
 
-        stringsOrderdByType = byBaseEntityByTypeStatus.get(baseEntityReference);
-
-        // the cdm ordered term bases are ordered inverse, fixing this for here
-        if(status == null){
-            status = SpecimenTypeDesignationStatus.TYPE();
-        }
-        if(!stringsOrderdByType.containsKey(status)){
-            stringsOrderdByType.put(status, new ArrayList<EntityReference>());
-        }
-        stringsOrderdByType.get(status).add(typeDesignationEntityReference);
+        typedesignationWorkingSet = byBaseEntityByTypeStatus.get(baseEntityReference);
+        typedesignationWorkingSet.insert(status, typeDesignationEntityReference);
     }
 
     /**
@@ -140,8 +133,8 @@ public class TypeDesignationConverter {
     }
 
 
-    private LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> orderByTypeByBaseEntity(
-            Map<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> stringsByTypeByBaseEntity){
+    private LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderByTypeByBaseEntity(
+            Map<TypedEntityReference, TypeDesignationWorkingSet> stringsByTypeByBaseEntity){
 
        // order the FieldUnit TypeName keys
        List<TypedEntityReference> baseEntityKeyList = new LinkedList<>(stringsByTypeByBaseEntity.keySet());
@@ -155,13 +148,13 @@ public class TypeDesignationConverter {
         }});
 
        // new LinkedHashMap for the ordered FieldUnitOrTypeName keys
-       LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> stringsOrderedbyBaseEntityOrderdByType = new LinkedHashMap<>(stringsByTypeByBaseEntity.size());
+       LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> stringsOrderedbyBaseEntityOrderdByType = new LinkedHashMap<>(stringsByTypeByBaseEntity.size());
 
        for(TypedEntityReference baseEntityRef : baseEntityKeyList){
 
-           Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> stringsByType = stringsByTypeByBaseEntity.get(baseEntityRef);
+           TypeDesignationWorkingSet typeDesignationWorkingSet = stringsByTypeByBaseEntity.get(baseEntityRef);
            // order the TypeDesignationStatusBase keys
-            List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(stringsByType.keySet());
+            List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(typeDesignationWorkingSet.keySet());
             Collections.sort(keyList, new Comparator<TypeDesignationStatusBase>() {
                 @Override
                 public int compare(TypeDesignationStatusBase o1, TypeDesignationStatusBase o2) {
@@ -170,8 +163,8 @@ public class TypeDesignationConverter {
                 }
             });
             // new LinkedHashMap for the ordered TypeDesignationStatusBase keys
-            LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedStringsByOrderedTypes = new LinkedHashMap<>();
-            keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, stringsByType.get(key)));
+            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet();
+            keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, typeDesignationWorkingSet.get(key)));
             stringsOrderedbyBaseEntityOrderdByType.put(baseEntityRef, orderedStringsByOrderedTypes);
        }
 
@@ -193,14 +186,15 @@ public class TypeDesignationConverter {
     public TypeDesignationConverter buildString(){
 
         if(finalString == null){
-            StringBuilder sb = new StringBuilder();
 
+            finalString = "";
             if(getTypifiedNameCache() != null){
-                sb.append(getTypifiedNameCache()).append(" ");
+                finalString += getTypifiedNameCache() + " ";
             }
 
             int typeCount = 0;
             for(TypedEntityReference baseEntityRef : orderedByTypesByBaseEntity.keySet()) {
+                StringBuilder sb = new StringBuilder();
                 if(typeCount++ > 0){
                     sb.append(TYPE_SEPARATOR);
                 }
@@ -214,16 +208,16 @@ public class TypeDesignationConverter {
                 if(!baseEntityRef.getLabel().isEmpty()){
                     sb.append(baseEntityRef.getLabel()).append(" ");
                 }
-                Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> orderedRepresentations = orderedByTypesByBaseEntity.get(baseEntityRef);
+                TypeDesignationWorkingSet typeDesignationWorkingSet = orderedByTypesByBaseEntity.get(baseEntityRef);
                 if(!isNameTypeDesignation ){
                     sb.append("(");
                 }
                 int typeStatusCount = 0;
-                for(TypeDesignationStatusBase<?> typeStatus : orderedRepresentations.keySet()) {
+                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()) {
                     if(typeStatusCount++  > 0){
                         sb.append(TYPE_STATUS_SEPARATOR);
                     }
-                    boolean isPlural = orderedRepresentations.get(typeStatus).size() > 1;
+                    boolean isPlural = typeDesignationWorkingSet.get(typeStatus).size() > 1;
                     sb.append(typeStatus.getLabel());
                     if(isPlural){
                         sb.append("s: ");
@@ -231,19 +225,20 @@ public class TypeDesignationConverter {
                         sb.append(", ");
                     }
                     int typeDesignationCount = 0;
-                    for(EntityReference typeDesignationEntityReference : orderedRepresentations.get(typeStatus)) {
+                    for(EntityReference typeDesignationEntityReference : typeDesignationWorkingSet.get(typeStatus)) {
                         if(typeDesignationCount++  > 0){
                             sb.append(TYPE_DESIGNATION_SEPARATOR);
                         }
                         sb.append(typeDesignationEntityReference.getLabel());
-                    };
-                };
+                    }
+                }
                 if(!isNameTypeDesignation ){
                     sb.append(")");
                 }
-            };
+                typeDesignationWorkingSet.setRepresentation(sb.toString());
+                finalString += typeDesignationWorkingSet.getRepresentation();
+            }
 
-            finalString  = sb.toString();
         }
         return this;
     }
@@ -323,7 +318,7 @@ public class TypeDesignationConverter {
         return typeDesignations;
     }
 
-    public LinkedHashMap<TypedEntityReference, Map<TypeDesignationStatusBase<?>, Collection<EntityReference>>> getOrderedTypeDesignations() {
+    public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderedTypeDesignations() {
         return orderedByTypesByBaseEntity;
     }
 
@@ -465,105 +460,60 @@ public class TypeDesignationConverter {
         return null;
     }
 
-
     public String print() {
         return finalString;
     }
 
-/**
- *
- * @author a.kohlbecker
- * @since Jun 12, 2017
- *
- */
-    public class FieldUnitOrTypeName {
+    /**
+     * Groups the EntityReferences for TypeDesignations by the according TypeDesignationStatus.
+     * The TypeDesignationStatusBase keys can be ordered by the term order defined in the vocabulary.
+     */
+    public class TypeDesignationWorkingSet extends LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> {
 
-        FieldUnit fieldUnit = null;
+        String workingSetRepresentation = null;
 
-        TaxonName typeName = null;
+
+        private static final long serialVersionUID = -1329007606500890729L;
+
+        public List<EntityReference> getTypeDesignations() {
+            List<EntityReference> typeDesignations = new ArrayList<>();
+            this.values().forEach(typeDesignationReferences -> typeDesignationReferences.forEach(td -> typeDesignations.add(td)));
+            return typeDesignations;
+        }
 
         /**
-         * @param fieldUnit
-         * @param typeName
+         * @param status
+         * @param typeDesignationEntityReference
          */
-        private FieldUnitOrTypeName(FieldUnit fieldUnit, TaxonName typeName) {
-            this.fieldUnit = fieldUnit;
-            this.typeName = typeName;
-            if(fieldUnit != null && typeName != null){
-                throw new RuntimeException("FieldUnitOrTypeName must not contain two non null fields");
+        public void insert(TypeDesignationStatusBase<?> status, EntityReference typeDesignationEntityReference) {
+
+            if(status == null){
+                status = SpecimenTypeDesignationStatus.TYPE();
             }
-
-            if(fieldUnit == null && typeName == null){
-                throw new NullPointerException("FieldUnitOrTypeName must not contain two null fields");
+            if(!containsKey(status)){
+                put(status, new ArrayList<EntityReference>());
             }
+            get(status).add(typeDesignationEntityReference);
+
         }
 
-        /**
-         * @return the fieldUnit
-         */
-        public FieldUnit getFieldUnit() {
-            return fieldUnit;
+        public String getRepresentation() {
+            return workingSetRepresentation;
         }
 
-        /**
-         * @return the typeName
-         */
-        public TaxonName getTypeName() {
-            return typeName;
+        public void setRepresentation(String representation){
+            this.workingSetRepresentation = representation;
         }
 
-        /**
-         * @return the fieldUnit
-         */
-        public boolean isFieldUnit() {
-            return fieldUnit != null;
-        }
-
-        /**
-         * @return the typeName
-         */
-        public boolean isTypeName() {
-            return typeName != null;
-        }
-
-        public int getEntitiyId() {
-            if(isFieldUnit()){
-                return fieldUnit.getId();
+        @Override
+        public String toString(){
+            if(workingSetRepresentation != null){
+                return workingSetRepresentation;
             } else {
-                return typeName.getId();
+                return super.toString();
             }
         }
-
-        /**
-         * @return
-         */
-        public String getTypeLabel() {
-            if(isFieldUnit()){
-                return "Type";
-            } else {
-                return "NameType";
-            }
-        }
-
-        /**
-         * @return
-         */
-        public String getTitleCache() {
-            if(isFieldUnit()){
-                return fieldUnit.getTitleCache();
-            } else {
-                return typeName.getTitleCache();
-            }
-        }
-
-        public boolean matches(FieldUnit fieldUnit, TaxonName typeName){
-            boolean fuMatch = this.fieldUnit == null && fieldUnit == null || this.fieldUnit.equals(fieldUnit);
-            boolean nameMatch = this.typeName == null && typeName == null || this.typeName.equals(typeName);
-            return fuMatch && nameMatch;
-        }
-
-
-
 
     }
+
 }
