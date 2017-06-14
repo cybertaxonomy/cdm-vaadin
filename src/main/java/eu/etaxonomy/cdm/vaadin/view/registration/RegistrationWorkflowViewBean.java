@@ -309,7 +309,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                     getEventBus().publishEvent(new TaxonNameEditorAction(
                         AbstractEditorAction.Action.EDIT,
                         nameId,
-                        e.getButton(),
+                        null, //e.getButton(),
                         this
                         )
                     );
@@ -321,7 +321,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                                 AbstractEditorAction.Action.EDIT,
                                 ids,
-                                e.getButton(),
+                                null, //e.getButton(),
                                 this
                                 )
                             );
