@@ -493,6 +493,8 @@ public class TypeDesignationConverter {
      */
     public class TypeDesignationWorkingSet extends LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> {
 
+        private static final long serialVersionUID = -1329007606500890729L;
+
         String workingSetRepresentation = null;
 
         TypedEntityReference containigEntityReference;
@@ -500,10 +502,6 @@ public class TypeDesignationConverter {
         TypedEntityReference baseEntityReference;
 
         int workingSetId = workingSetIdAutoIncrement++;
-
-        private static final long serialVersionUID = -1329007606500890729L;
-
-        private List<String> problems = new ArrayList<>();
 
         /**
          * @param baseEntityReference
@@ -586,22 +584,9 @@ public class TypeDesignationConverter {
             }
         }
 
-        /**
-         * @return the problems
-         */
-        public List<String> getProblems() {
-            return problems;
-        }
-
-        /**
-         * @param problems the problems to set
-         */
-        public void setProblems(List<String> problems) {
-            this.problems = problems;
-        }
-
     }
 
+    @SuppressWarnings({ "deprecation", "serial" })
     class NullTypeDesignationStatus extends TypeDesignationStatusBase<NullTypeDesignationStatus>{
 
         /**
