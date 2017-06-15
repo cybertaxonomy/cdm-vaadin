@@ -130,7 +130,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); NameType: Unknown type category, Prionus L. Species Platarum; Type: (Isotype, M)"
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); Type: (Isotype, M); NameType: Prionus L. Species Platarum"
                 , result
                 );
 
