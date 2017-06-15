@@ -57,6 +57,8 @@ public class TypeDesignationConverter {
 
     private Collection<TypeDesignationBase> typeDesignations;
 
+    private int workingSetIdAutoIncrement = 0;
+
     /**
      * Groups the EntityReferences for each of the TypeDesignations by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys are already ordered by the term order defined in the vocabulary.
@@ -140,12 +142,28 @@ public class TypeDesignationConverter {
        // order the FieldUnit TypeName keys
        List<TypedEntityReference> baseEntityKeyList = new LinkedList<>(stringsByTypeByBaseEntity.keySet());
        Collections.sort(baseEntityKeyList, new Comparator<TypedEntityReference>(){
+        /**
+         * Sorts the base entitoes (TypedEntityReference) in nthe following order:
+         *
+         * 1. FieldUnits
+         * 2. DerivedUnit (in case of missing FieldUnit we expect the base type to be DerivedUnit)
+         * 3. NameType
+         *
+         * {@inheritDoc}
+         */
         @Override
         public int compare(TypedEntityReference o1, TypedEntityReference o2) {
             if(!o1.getType().equals(o2.getType())) {
-                return o1.getType().equals(FieldUnit.class) ? -1 : 1;
+                if(o1.equals(FieldUnit.class) || o2.equals(FieldUnit.class)){
+                    // FieldUnits first
+                    return o1.getType().equals(FieldUnit.class) ? -1 : 1;
+                } else {
+                    // name types last (in case of missing FieldUnit we expect the base type to be DerivedUnit which comes into the middle)
+                    return o2.getType().equals(TaxonName.class) ? -1 : 1;
+                }
+            } else {
+                return o1.getLabel().compareTo(o2.getLabel());
             }
-            return o1.getLabel().compareTo(o2.getLabel());
         }});
 
        // new LinkedHashMap for the ordered FieldUnitOrTypeName keys
@@ -157,6 +175,7 @@ public class TypeDesignationConverter {
            // order the TypeDesignationStatusBase keys
             List<TypeDesignationStatusBase<?>> keyList = new LinkedList<>(typeDesignationWorkingSet.keySet());
             Collections.sort(keyList, new Comparator<TypeDesignationStatusBase>() {
+                @SuppressWarnings("unchecked")
                 @Override
                 public int compare(TypeDesignationStatusBase o1, TypeDesignationStatusBase o2) {
                     // fix inverted order of cdm terms by -1*
@@ -165,6 +184,7 @@ public class TypeDesignationConverter {
             });
             // new LinkedHashMap for the ordered TypeDesignationStatusBase keys
             TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(typeDesignationWorkingSet.getContainigEntityReference(), baseEntityRef);
+            orderedStringsByOrderedTypes.setWorkingSetId(typeDesignationWorkingSet.workingSetId); // preserve original workingSetId
             keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, typeDesignationWorkingSet.get(key)));
             stringsOrderedbyBaseEntityOrderdByType.put(baseEntityRef, orderedStringsByOrderedTypes);
        }
@@ -318,6 +338,21 @@ public class TypeDesignationConverter {
     public Collection<TypeDesignationBase> getTypeDesignations() {
         return typeDesignations;
     }
+
+    /**
+     * @param ref
+     * @return
+     */
+    public TypeDesignationBase findTypeDesignation(EntityReference typeDesignationRef) {
+        for(TypeDesignationBase td : typeDesignations){
+            if(td.getId() == typeDesignationRef.getId()){
+                return td;
+            }
+        }
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 
     public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
         return orderedByTypesByBaseEntity;
@@ -477,6 +512,8 @@ public class TypeDesignationConverter {
 
         TypedEntityReference baseEntityReference;
 
+        int workingSetId = workingSetIdAutoIncrement++;
+
         private static final long serialVersionUID = -1329007606500890729L;
 
         /**
@@ -506,6 +543,20 @@ public class TypeDesignationConverter {
                 put(status, new ArrayList<EntityReference>());
             }
             get(status).add(typeDesignationEntityReference);
+        }
+
+        /**
+         * @return the workingSetId
+         */
+        public int getWorkingSetId() {
+            return workingSetId;
+        }
+
+        /**
+         * @param workingSetId the workingSetId to set
+         */
+        public void setWorkingSetId(int workingSetId) {
+            this.workingSetId = workingSetId;
         }
 
         public String getRepresentation() {
