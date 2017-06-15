@@ -22,10 +22,9 @@ import java.util.Set;
 
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
@@ -69,6 +68,8 @@ public class TypeDesignationConverter {
     private EntityReference typifiedName;
 
     private String finalString = null;
+
+    final NullTypeDesignationStatus NULL_STATUS = new NullTypeDesignationStatus();
 
     /**
      * @param taxonName
@@ -239,11 +240,13 @@ public class TypeDesignationConverter {
                         sb.append(TYPE_STATUS_SEPARATOR);
                     }
                     boolean isPlural = typeDesignationWorkingSet.get(typeStatus).size() > 1;
-                    sb.append(typeStatus.getLabel());
-                    if(isPlural){
-                        sb.append("s: ");
-                    } else {
-                        sb.append(", ");
+                    if(!typeStatus.equals(NULL_STATUS)) {
+                        sb.append(typeStatus.getLabel());
+                        if(isPlural){
+                            sb.append("s: ");
+                        } else {
+                            sb.append(", ");
+                        }
                     }
                     int typeDesignationCount = 0;
                     for(EntityReference typeDesignationEntityReference : typeDesignationWorkingSet.get(typeStatus)) {
@@ -356,22 +359,6 @@ public class TypeDesignationConverter {
 
     public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
         return orderedByTypesByBaseEntity;
-    }
-
-
-
-    /**
-     * @param key
-     * @return
-     */
-    protected String getTypeDesignationStytusLabel(TypeDesignationStatusBase<?> key) {
-        String typeLable;
-        if(key.equals( SpecimenTypeDesignationStatus.TYPE())){
-            typeLable = "Type";
-        } else {
-            typeLable = key.getPreferredRepresentation(Language.DEFAULT()).getLabel();
-        }
-        return typeLable;
     }
 
     /**
@@ -516,6 +503,8 @@ public class TypeDesignationConverter {
 
         private static final long serialVersionUID = -1329007606500890729L;
 
+        private List<String> problems = new ArrayList<>();
+
         /**
          * @param baseEntityReference
          */
@@ -537,7 +526,7 @@ public class TypeDesignationConverter {
         public void insert(TypeDesignationStatusBase<?> status, EntityReference typeDesignationEntityReference) {
 
             if(status == null){
-                status = SpecimenTypeDesignationStatus.TYPE();
+                status = NULL_STATUS;
             }
             if(!containsKey(status)){
                 put(status, new ArrayList<EntityReference>());
@@ -596,6 +585,43 @@ public class TypeDesignationConverter {
                 return super.toString();
             }
         }
+
+        /**
+         * @return the problems
+         */
+        public List<String> getProblems() {
+            return problems;
+        }
+
+        /**
+         * @param problems the problems to set
+         */
+        public void setProblems(List<String> problems) {
+            this.problems = problems;
+        }
+
+    }
+
+    class NullTypeDesignationStatus extends TypeDesignationStatusBase<NullTypeDesignationStatus>{
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void resetTerms() {
+            // empty
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void setDefaultTerms(TermVocabulary<NullTypeDesignationStatus> termVocabulary) {
+            // empty
+        }
+
+
 
     }
 
