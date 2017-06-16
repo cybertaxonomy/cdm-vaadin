@@ -144,7 +144,7 @@ public class TypeDesignationConverter {
        List<TypedEntityReference> baseEntityKeyList = new LinkedList<>(stringsByTypeByBaseEntity.keySet());
        Collections.sort(baseEntityKeyList, new Comparator<TypedEntityReference>(){
         /**
-         * Sorts the base entitoes (TypedEntityReference) in nthe following order:
+         * Sorts the base entities (TypedEntityReference) in the following order:
          *
          * 1. FieldUnits
          * 2. DerivedUnit (in case of missing FieldUnit we expect the base type to be DerivedUnit)
@@ -154,13 +154,17 @@ public class TypeDesignationConverter {
          */
         @Override
         public int compare(TypedEntityReference o1, TypedEntityReference o2) {
-            if(!o1.getType().equals(o2.getType())) {
-                if(o1.equals(FieldUnit.class) || o2.equals(FieldUnit.class)){
+
+            Class type1 = o1.getType();
+            Class type2 = o2.getType();
+
+            if(!type1.equals(type2)) {
+                if(type1.equals(FieldUnit.class) || type2.equals(FieldUnit.class)){
                     // FieldUnits first
-                    return o1.getType().equals(FieldUnit.class) ? -1 : 1;
+                    return type1.equals(FieldUnit.class) ? -1 : 1;
                 } else {
                     // name types last (in case of missing FieldUnit we expect the base type to be DerivedUnit which comes into the middle)
-                    return o2.getType().equals(TaxonName.class) ? -1 : 1;
+                    return type2.equals(TaxonName.class) ? -1 : 1;
                 }
             } else {
                 return o1.getLabel().compareTo(o2.getLabel());
@@ -582,6 +586,13 @@ public class TypeDesignationConverter {
             } else {
                 return super.toString();
             }
+        }
+
+        /**
+         * @return
+         */
+        public boolean isSpecimenTypeDesigationWorkingSet() {
+            return baseEntityReference.getType().isAssignableFrom(SpecimenOrObservationBase.class);
         }
 
     }
