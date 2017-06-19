@@ -38,13 +38,13 @@ import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
- * Manages a collection of {@link TypeDesignationBase TypeDesignations} for the same same typified name.
+ * Manages a collection of {@link TypeDesignationBase TypeDesignations} for the same typified name.
  *
  * Type designations are ordered by the base type which is a {@link TaxonName} for {@link NameTypeDesignation NameTypeDesignations} or
  * in case of {@link SpecimenTypeDesignation SpecimenTypeDesignations} the  associate {@link FieldUnit} or the {@link DerivedUnit}
  * if the former is missing. The type designations per base type are furthermore ordered by the {@link TypeDesignationStatusBase}.
  *
- * The TypeDesignationConverter also provides string representations of the whole ordered set of all
+ * The TypeDesignationSetManager also provides string representations of the whole ordered set of all
  * {@link TypeDesignationBase TypeDesignations} and of the TypeDesignationWorkingSets:
  * <ul>
  *  <li>{@link #print()})
@@ -56,7 +56,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  * @since Mar 10, 2017
  *
  */
-public class TypeDesignationConverter {
+public class TypeDesignationSetManager {
 
 
     private static final String TYPE_STATUS_SEPARATOR = "; ";
@@ -88,7 +88,7 @@ public class TypeDesignationConverter {
      * @throws RegistrationValidationException
      *
      */
-    public TypeDesignationConverter(CdmBase containgEntity, Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
+    public TypeDesignationSetManager(CdmBase containgEntity, Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
         Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus = new HashMap<>();
         typeDesignations.forEach(td -> mapTypeDesignation(containgEntity, byBaseEntityByTypeStatus, td));
@@ -237,7 +237,7 @@ public class TypeDesignationConverter {
     }
 */
 
-    public TypeDesignationConverter buildString(){
+    public TypeDesignationSetManager buildString(){
 
         if(finalString == null){
 

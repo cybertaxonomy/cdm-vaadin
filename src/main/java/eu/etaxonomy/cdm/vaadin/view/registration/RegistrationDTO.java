@@ -32,8 +32,8 @@ import eu.etaxonomy.cdm.model.reference.IReference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 
 public class RegistrationDTO{
 
@@ -51,7 +51,7 @@ public class RegistrationDTO{
 
     private EntityReference name = null;
 
-    private TypeDesignationConverter typeDesignationConverter;
+    private TypeDesignationSetManager typeDesignationManager;
 
     private Registration reg;
 
@@ -101,8 +101,8 @@ public class RegistrationDTO{
         case TYPIFICATION:
         default:
             try {
-                typeDesignationConverter = new TypeDesignationConverter(reg, reg.getTypeDesignations());
-                summary = typeDesignationConverter.buildString().print();
+                typeDesignationManager = new TypeDesignationSetManager(reg, reg.getTypeDesignations());
+                summary = typeDesignationManager.buildString().print();
             } catch (RegistrationValidationException e) {
                 messages.add("Validation errors: " + e.getMessage());
             }
@@ -229,7 +229,7 @@ public class RegistrationDTO{
     }
 
     public EntityReference getTypifiedName() {
-        return typeDesignationConverter != null ? typeDesignationConverter.getTypifiedName() : null;
+        return typeDesignationManager != null ? typeDesignationManager.getTypifiedName() : null;
     }
 
     public EntityReference getName() {
@@ -237,14 +237,14 @@ public class RegistrationDTO{
     }
 
     public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
-        return typeDesignationConverter != null ? typeDesignationConverter.getOrderdTypeDesignationWorkingSets() : null;
+        return typeDesignationManager != null ? typeDesignationManager.getOrderdTypeDesignationWorkingSets() : null;
     }
 
     /**
      * @param baseEntityReference
      */
     public TypeDesignationWorkingSet getTypeDesignationWorkingSet(TypedEntityReference baseEntityReference) {
-        return typeDesignationConverter != null ? typeDesignationConverter.getOrderdTypeDesignationWorkingSets().get(baseEntityReference) : null;
+        return typeDesignationManager != null ? typeDesignationManager.getOrderdTypeDesignationWorkingSets().get(baseEntityReference) : null;
 
     }
 
@@ -288,11 +288,11 @@ public class RegistrationDTO{
      * @return
      */
     private TypeDesignationBase findTypeDesignation(EntityReference ref) {
-        return typeDesignationConverter != null ? typeDesignationConverter.findTypeDesignation(ref) : null;
+        return typeDesignationManager != null ? typeDesignationManager.findTypeDesignation(ref) : null;
     }
 
     public Collection<TypeDesignationBase> getTypeDesignations() {
-        return typeDesignationConverter != null ? typeDesignationConverter.getTypeDesignations() : null;
+        return typeDesignationManager != null ? typeDesignationManager.getTypeDesignations() : null;
     }
 
     /**

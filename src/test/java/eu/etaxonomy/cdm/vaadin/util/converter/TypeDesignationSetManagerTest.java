@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
@@ -46,7 +46,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  * @since Mar 10, 2017
  *
  */
-public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
+public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
 
 
     @Test
@@ -123,8 +123,8 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
         tds.add(std_IT_2);
         tds.add(std_IT_3);
 
-        TypeDesignationConverter typeDesignationConverter = new TypeDesignationConverter(typifiedName, tds);
-        String result = typeDesignationConverter.buildString().print();
+        TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName, tds);
+        String result = typeDesignationManager.buildString().print();
         System.err.println(result);
 
         Logger.getLogger(this.getClass()).debug(result);
@@ -135,7 +135,7 @@ public class TypeDesignationConverterTest extends CdmVaadinBaseTest{
                 );
 
         LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedTypeDesignations =
-                typeDesignationConverter.getOrderdTypeDesignationWorkingSets();
+                typeDesignationManager.getOrderdTypeDesignationWorkingSets();
         Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> byStatusMap = orderedTypeDesignations.values().iterator().next();
         Iterator<TypeDesignationStatusBase<?>> keyIt = byStatusMap.keySet().iterator();
         assertEquals("Holotype", keyIt.next().getLabel());

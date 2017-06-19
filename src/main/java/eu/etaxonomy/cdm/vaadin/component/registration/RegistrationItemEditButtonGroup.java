@@ -19,7 +19,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.remote.dto.tdwg.voc.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
