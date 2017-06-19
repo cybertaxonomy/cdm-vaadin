@@ -38,11 +38,20 @@ import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
- * Converts a collection of TypeDesignations, which should belong to the
- * same name of course, into a string representation.
+ * Manages a collection of {@link TypeDesignationBase TypeDesignations} for the same same typified name.
  *
- * Order of TypeDesignations in the resulting string:
- *  Type, Holotype, Lectotype, Epitypes
+ * Type designations are ordered by the base type which is a {@link TaxonName} for {@link NameTypeDesignation NameTypeDesignations} or
+ * in case of {@link SpecimenTypeDesignation SpecimenTypeDesignations} the  associate {@link FieldUnit} or the {@link DerivedUnit}
+ * if the former is missing. The type designations per base type are furthermore ordered by the {@link TypeDesignationStatusBase}.
+ *
+ * The TypeDesignationConverter also provides string representations of the whole ordered set of all
+ * {@link TypeDesignationBase TypeDesignations} and of the TypeDesignationWorkingSets:
+ * <ul>
+ *  <li>{@link #print()})
+ *  <li>{@link #getOrderdTypeDesignationWorkingSets()} ... {@link TypeDesignationWorkingSet#getRepresentation()}
+ * </ul>
+ * Prior using the representations you need to trigger their generation by calling {@link #buildString()}
+ *
  * @author a.kohlbecker
  * @since Mar 10, 2017
  *
