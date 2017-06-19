@@ -9,9 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
@@ -36,7 +34,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
     /**
      *
      */
-    private static final String DEFAULT_BUTTON_STYLES = ""; // ValoTheme.BUTTON_LINK;
+    private static final String DEFAULT_BUTTON_STYLES = "";
 
     private static final long serialVersionUID = -5059163772392864050L;
 
@@ -44,7 +42,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private IdButton<TaxonName> nameIdButton = null;
 
-    private List<IdSetButton<TypeDesignationWorkingSet>> typeDesignationButtons = new ArrayList<>();
+    private List<IdButton<TypeDesignationWorkingSet>> typeDesignationButtons = new ArrayList<>();
 
     private List<Label> labels = new ArrayList<>();
 
@@ -73,9 +71,14 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
                 addComponent(tdButton);
-                Set<Integer> idSet = new HashSet<>();
-                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
-                typeDesignationButtons.add(new IdSetButton<TypeDesignationWorkingSet>(TypeDesignationWorkingSet.class, idSet, tdButton));
+//                Set<Integer> idSet = new HashSet<>();
+//                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
+
+                typeDesignationButtons.add(new IdButton<TypeDesignationWorkingSet>(
+                        TypeDesignationWorkingSet.class,
+                        typeDesignationWorkingSet.getWorkingSetId(),
+                        tdButton)
+                        );
                 String labelText = typeDesignationWorkingSet.getRepresentation();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
                 Label label = new Label(labelText);
@@ -99,7 +102,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         return nameIdButton;
     }
 
-    public List<IdSetButton<TypeDesignationWorkingSet>> getTypeDesignationButtons() {
+    public List<IdButton<TypeDesignationWorkingSet>> getTypeDesignationButtons() {
         return typeDesignationButtons;
     }
 
@@ -134,40 +137,6 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
          */
         public Integer getId() {
             return id;
-        }
-
-        /**
-         * @return the button
-         */
-        public Button getButton() {
-            return button;
-        }
-
-        /**
-         * @return the type
-         */
-        public Class<T> getType() {
-            return type;
-        }
-
-    }
-
-    public class IdSetButton<T> {
-        private Set<Integer> ids;
-        private Class<T> type;
-        private Button button;
-
-        public IdSetButton(Class<T> type, Set<Integer> ids, Button button){
-            this.type = type;
-            this.ids = ids;
-            this.button = button;
-        }
-
-        /**
-         * @return the id
-         */
-        public Set<Integer> getIds() {
-            return ids;
         }
 
         /**

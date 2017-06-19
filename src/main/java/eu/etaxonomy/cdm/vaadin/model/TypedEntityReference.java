@@ -15,13 +15,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @since Jun 12, 2017
  *
  */
-public class TypedEntityReference extends EntityReference {
+public class TypedEntityReference<T> extends EntityReference {
 
     /**
      * @param id
      * @param label
      */
-    public TypedEntityReference(Class type, int id, String label) {
+    public TypedEntityReference(Class<T> type, int id, String label) {
         super(id, label);
         this.type = type;
     }
@@ -29,18 +29,18 @@ public class TypedEntityReference extends EntityReference {
     /**
      * @return the type
      */
-    public Class getType() {
+    public Class<T> getType() {
         return type;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(Class type) {
+    public void setType(Class<T> type) {
         this.type = type;
     }
 
-    private Class type;
+    private Class<T> type;
 
 
 
@@ -58,6 +58,7 @@ public class TypedEntityReference extends EntityReference {
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object obj) {
         try {

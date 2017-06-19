@@ -22,7 +22,9 @@ import java.util.Set;
 
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -64,12 +66,13 @@ public class TypeDesignationConverter {
      */
     private LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedByTypesByBaseEntity;
 
-
     private EntityReference typifiedName;
 
     private String finalString = null;
 
     final NullTypeDesignationStatus NULL_STATUS = new NullTypeDesignationStatus();
+
+    private List<String> probelms = new ArrayList<>();
 
     /**
      * @param taxonName
@@ -90,48 +93,62 @@ public class TypeDesignationConverter {
 
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
 
-        final TypedEntityReference baseEntityReference = baseEntityReference(td);
+        try {
+            final IdentifiableEntity<?> baseEntity = baseEntity(td);
+            final TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = makeEntityReference(baseEntity);
 
-        EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
+            EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
 
-        TypeDesignationWorkingSet typedesignationWorkingSet;
-        if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
-            TypedEntityReference containigEntityReference = new TypedEntityReference(containgEntity.getClass(), containgEntity.getId(), containgEntity.toString());
-            byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet(containigEntityReference, baseEntityReference));
+            TypeDesignationWorkingSet typedesignationWorkingSet;
+            if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
+                TypedEntityReference containigEntityReference = new TypedEntityReference(containgEntity.getClass(), containgEntity.getId(), containgEntity.toString());
+                byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet(containigEntityReference, baseEntity, baseEntityReference));
+            }
+
+            typedesignationWorkingSet = byBaseEntityByTypeStatus.get(baseEntityReference);
+            typedesignationWorkingSet.insert(status, typeDesignationEntityReference);
+        } catch (DataIntegrityException e){
+            probelms.add(e.getMessage());
         }
+    }
 
-        typedesignationWorkingSet = byBaseEntityByTypeStatus.get(baseEntityReference);
-        typedesignationWorkingSet.insert(status, typeDesignationEntityReference);
+    /**
+     * @param td
+     * @return
+     * @throws DataIntegrityException
+     */
+    protected IdentifiableEntity<?> baseEntity(TypeDesignationBase<?> td) throws DataIntegrityException {
+
+        IdentifiableEntity<?> baseEntity = null;
+        if(td  instanceof SpecimenTypeDesignation){
+            SpecimenTypeDesignation std = (SpecimenTypeDesignation) td;
+            FieldUnit fu = findFieldUnit(std);
+            if(fu != null){
+                baseEntity = fu;
+            } else if(((SpecimenTypeDesignation) td).getTypeSpecimen() != null){
+                baseEntity = ((SpecimenTypeDesignation) td).getTypeSpecimen();
+            }
+        } else if(td instanceof NameTypeDesignation){
+            baseEntity = ((NameTypeDesignation)td).getTypeName();
+        }
+        if(baseEntity == null) {
+            throw new DataIntegrityException("Incomplete TypeDesignation, no type missin in " + td.toString());
+        }
+        return baseEntity;
     }
 
     /**
      * @param td
      * @return
      */
-    protected TypedEntityReference baseEntityReference(TypeDesignationBase<?> td) {
-
-        CdmBase baseEntity = null;
+    protected TypedEntityReference<IdentifiableEntity<?>> makeEntityReference(IdentifiableEntity<?> baseEntity) {
+;
         String label = "";
-        if(td  instanceof SpecimenTypeDesignation){
-            SpecimenTypeDesignation std = (SpecimenTypeDesignation) td;
-            FieldUnit fu = findFieldUnit(std);
-            if(fu != null){
-                baseEntity = fu;
-                label = fu.getTitleCache();
-            } else if(((SpecimenTypeDesignation) td).getTypeSpecimen() != null){
-                baseEntity = ((SpecimenTypeDesignation) td).getTypeSpecimen();
-                label = ""; // empty label to avoid repeating the DerivedUnit details
-            }
-        } else if(td instanceof NameTypeDesignation){
-            baseEntity = ((NameTypeDesignation)td).getTypeName();
-            label = "";
-        }
-        if(baseEntity == null) {
-            baseEntity = td;
-            label = "INCOMPLETE DATA";
+        if(baseEntity  instanceof FieldUnit){
+                label = ((FieldUnit)baseEntity).getTitleCache();
         }
 
-        TypedEntityReference baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
+        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
 
         return baseEntityReference;
     }
@@ -188,7 +205,9 @@ public class TypeDesignationConverter {
                 }
             });
             // new LinkedHashMap for the ordered TypeDesignationStatusBase keys
-            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(typeDesignationWorkingSet.getContainigEntityReference(), baseEntityRef);
+            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(typeDesignationWorkingSet.getContainigEntityReference(),
+                    typeDesignationWorkingSet.getBaseEntity(),
+                    baseEntityRef);
             orderedStringsByOrderedTypes.setWorkingSetId(typeDesignationWorkingSet.workingSetId); // preserve original workingSetId
             keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, typeDesignationWorkingSet.get(key)));
             stringsOrderedbyBaseEntityOrderdByType.put(baseEntityRef, orderedStringsByOrderedTypes);
@@ -501,18 +520,30 @@ public class TypeDesignationConverter {
 
         String workingSetRepresentation = null;
 
-        TypedEntityReference containigEntityReference;
+        TypedEntityReference<?> containigEntityReference;
 
-        TypedEntityReference baseEntityReference;
+        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference;
+
+        IdentifiableEntity<?> baseEntity;
+
+        List<DerivedUnit> derivedUnits = null;
 
         int workingSetId = workingSetIdAutoIncrement++;
 
         /**
          * @param baseEntityReference
          */
-        public TypeDesignationWorkingSet(TypedEntityReference containigEntityReference, TypedEntityReference baseEntityReference) {
+        public TypeDesignationWorkingSet(TypedEntityReference<? extends VersionableEntity> containigEntityReference, IdentifiableEntity<?> baseEntity, TypedEntityReference<IdentifiableEntity<?>> baseEntityReference) {
             this.containigEntityReference = containigEntityReference;
+            this.baseEntity = baseEntity;
             this.baseEntityReference = baseEntityReference;
+        }
+
+        /**
+         * @return
+         */
+        public IdentifiableEntity<?> getBaseEntity() {
+            return baseEntity;
         }
 
         public List<EntityReference> getTypeDesignations() {
@@ -592,7 +623,7 @@ public class TypeDesignationConverter {
          * @return
          */
         public boolean isSpecimenTypeDesigationWorkingSet() {
-            return baseEntityReference.getType().isAssignableFrom(SpecimenOrObservationBase.class);
+            return SpecimenOrObservationBase.class.isAssignableFrom(baseEntityReference.getType());
         }
 
     }

@@ -528,7 +528,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public void showInEditor(DTO beanToEdit) {
 
         DTO preparedBean = getPresenter().prepareAsFieldGroupDataSource(beanToEdit);
-	fieldGroup.setItemDataSource(preparedBean);
+        fieldGroup.setItemDataSource(preparedBean);
         afterItemDataSourceSet();
     }
 

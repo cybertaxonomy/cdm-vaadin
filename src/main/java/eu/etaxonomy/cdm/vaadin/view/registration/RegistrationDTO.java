@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -20,14 +21,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
 
@@ -234,6 +238,57 @@ public class RegistrationDTO{
 
     public LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> getOrderdTypeDesignationWorkingSets() {
         return typeDesignationConverter != null ? typeDesignationConverter.getOrderdTypeDesignationWorkingSets() : null;
+    }
+
+    /**
+     * @param baseEntityReference
+     */
+    public TypeDesignationWorkingSet getTypeDesignationWorkingSet(TypedEntityReference baseEntityReference) {
+        return typeDesignationConverter != null ? typeDesignationConverter.getOrderdTypeDesignationWorkingSets().get(baseEntityReference) : null;
+
+    }
+
+    /**
+     * @param baseEntityReference
+     */
+    public Set<TypeDesignationBase> getTypeDesignationsInWorkingSet(TypedEntityReference baseEntityReference) {
+        Set<TypeDesignationBase> typeDesignations = new HashSet<>();
+        TypeDesignationWorkingSet workingSet = getTypeDesignationWorkingSet(baseEntityReference);
+        for(EntityReference ref :  workingSet.getTypeDesignations()){
+            typeDesignations.add(findTypeDesignation(ref));
+        }
+        return typeDesignations;
+    }
+
+    public SpecimenTypeDesignationWorkingSetDTO getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
+        Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
+        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
+        typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
+        IdentifiableEntity<?> baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
+        SpecimenTypeDesignationWorkingSetDTO dto = new SpecimenTypeDesignationWorkingSetDTO(reg, baseEntity, specimenTypeDesignations);
+        return dto;
+    }
+
+    /**
+     *
+     * @param workingSetId
+     * @return the TypeDesignationWorkingSet in this DTO with the matching workingSetId or NULL
+     */
+    public TypeDesignationWorkingSet getTypeDesignationWorkingSet(int workingSetId) {
+        Optional<TypeDesignationWorkingSet> workingSetOptional = getOrderdTypeDesignationWorkingSets().values().stream().filter(workingSet -> workingSet.getWorkingSetId() == workingSetId).findFirst();
+        if(workingSetOptional.isPresent()){
+            return workingSetOptional.get();
+        }
+        return null;
+
+    }
+
+    /**
+     * @param ref
+     * @return
+     */
+    private TypeDesignationBase findTypeDesignation(EntityReference ref) {
+        return typeDesignationConverter != null ? typeDesignationConverter.findTypeDesignation(ref) : null;
     }
 
     public Collection<TypeDesignationBase> getTypeDesignations() {

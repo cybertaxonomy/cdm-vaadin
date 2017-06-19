@@ -23,6 +23,7 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
@@ -37,6 +38,8 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -148,11 +151,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
         TransactionStatus tx = getRepo().startTransaction(false);
         // FIXME optional:
-        // A) allow full initialization of the entity here the Preseneter of the Editor should
-        //    provide the intiStratirey via a static method so that it can be used
-        // B) only pass the identifier (Object) to the View and the Presenter is reponsible for
-        //    loading and initializing  the entitiy
-	TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
+        // A) allow full initialization of the entity here, the Presenter of the Editor should
+        //    provide the intiStrategy via a static method so that it can be used
+        // B) only pass the identifier (Object) to the View and the Presenter is responsible for
+        //    loading and initializing  the entity
+        TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.showInEditor(taxonName);
         popup.withDeleteButton(true);
@@ -162,15 +165,34 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
-    public void onTypedesignationsEditorAction(TypeDesignationWorkingsetEditorAction event) {
-        TransactionStatus tx = getRepo().startTransaction(false);
-        TaxonName taxonName = getRepo().getNameService().find(event.getEntityId());
-        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
-        popup.showInEditor(taxonName);
-        popup.withDeleteButton(true);
-        // in the registration application inReferences should only edited centrally
-        popup.getNomReferenceCombobox().setEnabled(false);
-        getRepo().commitTransaction(tx);
+    public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
+
+            TransactionStatus tx = getRepo().startTransaction(false);
+            Registration reg = getRepo().getRegistrationService().find(event.getRegistrationId());
+            RegistrationDTO regDTO = new RegistrationDTO(reg);
+            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(event.getEntityId());
+            if(typeDesignationWorkingSet.isSpecimenTypeDesigationWorkingSet()){
+                // check SpecimenTypeDesignation
+                SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+                popup.showInEditor(regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference()));
+            } else {
+                // FIXME implement NameTypeDesignationWorkingsetPopupEditor
+            }
+            getRepo().commitTransaction(tx);
+    }
+
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")
+    public void onTypeDesignationsEditorActionAdd(TypeDesignationWorkingsetEditorAction event) {
+
+        if(event.getNewEntityType().equals(SpecimenTypeDesignation.class)){
+            TransactionStatus tx = getRepo().startTransaction(false);
+            Registration reg = getRepo().getRegistrationService().find(event.getRegistrationId());
+            RegistrationDTO regDTO = new RegistrationDTO(reg);
+            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+            popup.showInEditor(null);
+            popup.withDeleteButton(true);
+            getRepo().commitTransaction(tx);
+        }
     }
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")

@@ -14,8 +14,8 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.ui.GridLayout;
 
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationConverter.TypeDesignationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 /**
@@ -23,14 +23,22 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  * @since May 15, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupEditor<TypeDesignationWorkingSet, SpecimenTypeDesignationWorkingsetEditorPresenter>
+public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView {
+
+    /**
+     * @param layout
+     * @param dtoType
+     */
+    public SpecimenTypeDesignationWorkingsetPopupEditor() {
+        super(new GridLayout(), SpecimenTypeDesignationWorkingSetDTO.class);
+        GridLayout grid = (GridLayout) getFieldLayout();
+        grid.setMargin(true);
+        grid.setSpacing(true);
+    }
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-    public SpecimenTypeDesignationWorkingsetPopupEditor() {
-        super(new GridLayout(), TypeDesignationWorkingSet.class);
-    }
 
     /**
      * {@inheritDoc}

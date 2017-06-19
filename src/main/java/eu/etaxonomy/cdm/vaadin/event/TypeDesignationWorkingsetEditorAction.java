@@ -8,8 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
-import java.util.Set;
-
 import com.vaadin.ui.Component;
 
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
@@ -22,32 +20,29 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction {
 
-    private Set<Integer> entityIds;
-
     private Class<? extends TypeDesignationBase<?>> newEntityType;
+
+    private int registrationId;
 
     /**
      * @param edit
      * @param ids
      */
-    public TypeDesignationWorkingsetEditorAction(Action action, Set<Integer> ids, Component source, AbstractView sourceView) {
-        super(action, null, source, sourceView);
-        this.entityIds = ids;
+    public TypeDesignationWorkingsetEditorAction(Action action, Integer typeDesignationWorkingsetId, int registrationId, Component source, AbstractView sourceView) {
+        super(action, typeDesignationWorkingsetId, source, sourceView);
+        this.registrationId = registrationId;
     }
 
     /**
      * Constructor which is mainly suitable for ADD actions.
      * @param
      */
-    public TypeDesignationWorkingsetEditorAction(Action action, Class<? extends TypeDesignationBase<?>> newEntityType, Component source, AbstractView sourceView) {
+    public TypeDesignationWorkingsetEditorAction(Action action, Class<? extends TypeDesignationBase<?>> newEntityType, int registrationId,
+            Component source, AbstractView sourceView) {
         super(action, null, source, sourceView);
         this.newEntityType = newEntityType;
+        this.registrationId = registrationId;
     }
-
-    public Set<Integer> getEntityIds() {
-        return entityIds;
-    }
-
 
     /**
      * In case of an ADD action the receiver of the event needs to know the specific type of the
@@ -55,20 +50,16 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      *
      * @return the newEntityType
      */
-    protected Class<? extends TypeDesignationBase<?>> getNewEntityType() {
+    public Class<? extends TypeDesignationBase<?>> getNewEntityType() {
         return newEntityType;
     }
 
     /**
-     * {@inheritDoc}
-     * @deprecated this method must not be used in TypeDesignationSetEditorAction
+     * @return the registrationId
      */
-    @Deprecated
-    @Override
-    public Integer getEntityId() {
-        throw new RuntimeException("getEntityId() is not supported, use getEntityIds() instead.");
+    public int getRegistrationId() {
+        return registrationId;
     }
-
 
 
 
