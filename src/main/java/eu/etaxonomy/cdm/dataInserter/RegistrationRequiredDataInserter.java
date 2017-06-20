@@ -43,6 +43,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 
 /**
@@ -89,6 +90,12 @@ private void insertRequiredData() {
     if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
         repo.getGrantedAuthorityService().saveOrUpdate(roleCuration.asNewGrantedAuthority());
         repo.getGrantedAuthorityService().getSession().flush();
+    }
+    if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
+        repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
+    }
+    if(repo.getTermService().find(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid()) == null){
+        repo.getTermService().save(DerivationEventTypes.UNPUBLISHED_IMAGE());
     }
 
 }
