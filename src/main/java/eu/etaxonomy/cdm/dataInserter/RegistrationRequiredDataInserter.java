@@ -83,22 +83,25 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
     }
 
     /**
- *
- */
-private void insertRequiredData() {
-    Role roleCuration = RolesAndPermissions.ROLE_CURATION;
-    if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
-        repo.getGrantedAuthorityService().saveOrUpdate(roleCuration.asNewGrantedAuthority());
-        repo.getGrantedAuthorityService().getSession().flush();
-    }
-    if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
-        repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
-    }
-    if(repo.getTermService().find(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid()) == null){
-        repo.getTermService().save(DerivationEventTypes.UNPUBLISHED_IMAGE());
-    }
+     *
+     */
+    private void insertRequiredData() {
+        Role roleCuration = RolesAndPermissions.ROLE_CURATION;
+        if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
+            repo.getGrantedAuthorityService().saveOrUpdate(roleCuration.asNewGrantedAuthority());
+        }
+        if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
+            repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
+        }
+        if(repo.getTermService().find(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid()) == null){
+            repo.getTermService().save(DerivationEventTypes.UNPUBLISHED_IMAGE());
+        }
+        if(repo.getTermService().find(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid()) == null){
+            repo.getTermService().save(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE());
+        }
+        repo.getSession().flush();
 
-}
+    }
 
     /**
      *
