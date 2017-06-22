@@ -14,13 +14,13 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.validator.DoubleRangeValidator;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
+import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -78,20 +78,22 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         int row = 0;
         countrySelectField = new ListSelect("Country");
         addField(countrySelectField, "country", 1, row , 2, row);
-        setToFullWidth(countrySelectField);
+        countrySelectField.setWidth("100%");
         countrySelectField.setItemCaptionMode(ItemCaptionMode.PROPERTY);
         countrySelectField.setItemCaptionPropertyId("label");
         countrySelectField.setRows(1);
 
-        // -------
-
         row++;
         TextArea localityField = new TextArea("Locality");
         addField(localityField, "locality", 0, row , 2, row);
-        setToFullWidth(localityField);
-        localityField.setRows(3);
+        localityField.setWidth("100%");
+        // NOTE: setRows and SetCold breaks he width setting,
+        //        see https://github.com/vaadin/framework/issues/3617
 
-        // TODO ExactLocation as PointField
+        row++;
+        GeoLocationField exactLocation = new GeoLocationField("Geo location");
+        addField(exactLocation, "exactLocation", 0, row, 2, row);
+        exactLocation.setWidth("100%");
 
         row++;
         MinMaxTextField absElevationMinMax = new MinMaxTextField("Altitude", "m");
@@ -133,13 +135,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         PartialDateField collectionDateField = new PartialDateField("Collection date");
         addField(collectionDateField, "gatheringDate", 0, row);
         TextField fieldNumberField = addTextField("Field number", "fieldNumber", 2, row);
-        //
-    }
-
-    protected void setToFullWidth(Component component){
-        //component.setWidth(100, Unit.PERCENTAGE);
-    }
-
+     }
 
 
     /**

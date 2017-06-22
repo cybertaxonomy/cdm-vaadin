@@ -151,4 +151,11 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         @include composite-field-wrapper;
     }
     
+    // ------------ v-geolocation-field ------------- //
+    .v-geolocation-field {
+        .wrapper{
+          @include composite-field-wrapper;
+        }
+    }
+    
 } 
