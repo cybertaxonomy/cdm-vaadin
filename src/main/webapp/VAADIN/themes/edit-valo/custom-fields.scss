@@ -56,11 +56,11 @@
     @include icon-button-field-button($button-style-name, $button-count, $button-alignment, $button-width);
 }
 
-// ===================== Styles ==============================//
+// ===================== Styles ===================== //
 
 body .edit-valo { // increasing specifity to allow overriding the valo default field themes
   
-  // TimePeriodField
+  // ------------  TimePeriodField ------------ //
   .v-time-period-field {
       .margin-wrapper {
           @include composite-field-wrapper;
@@ -81,12 +81,12 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
           border-radius: $v-border-radius;
    }
   
-  // v-switchable-textfield
+  // ------------ v-switchable-textfield ------------ //
   .v-switchable-textfield {
     @include icon-button-field('v-textfield', 'v-switch', 1, 'right');
   }
   
-  // v-person-field
+  // ------------ v-person-field ------------ //
   .v-person-field {
     .v-caption {
         display: block;
@@ -119,7 +119,7 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         }
     }
     
-   // team-or-person-field
+   // ------------ team-or-person-field ------------ // 
    .v-team-or-person-field {
    
         .toolbar {
@@ -132,17 +132,23 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         }
     }
     
-    // v-related-entity-list-select
+    // ------------ v-related-entity-list-select ------------ //
+
     .v-related-entity-list-select {
         @include icon-button-field('v-select', 'v-button', 2, 'right', $v-unit-size);
     }
     
-    // v-related-entity-combobox
+    // ------------ v-related-entity-combobox ------------ //
     .v-related-entity-combobox {
         @include icon-button-field('v-filterselect', 'v-button', 2, 'right', $v-unit-size);
         .v-filterselect-button {
             right: $v-unit-size * 2 + 1px;
         }
+    }
+    
+    // ------------ minMaxTextField ------------ //
+    .v-min-max-text-field {
+        @include composite-field-wrapper;
     }
     
 } 

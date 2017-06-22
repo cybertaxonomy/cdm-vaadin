@@ -29,7 +29,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
 
     private int pageSize = 20;
 
-    private IIdentifiableEntityService<T> service;
+    protected IIdentifiableEntityService<T> service;
 
     private MatchMode matchMode = MatchMode.ANYWHERE;
 
@@ -65,6 +65,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     }
 
     /**
+     * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
+     *
      * @param service
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {

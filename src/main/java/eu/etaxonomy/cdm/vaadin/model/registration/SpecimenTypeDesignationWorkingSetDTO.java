@@ -13,12 +13,15 @@ import java.util.Set;
 
 import org.joda.time.Partial;
 
-import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.location.Point;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
+import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 
 /**
  * @author a.kohlbecker
@@ -45,6 +48,9 @@ public class SpecimenTypeDesignationWorkingSetDTO {
         this.baseEntity = baseEntity;
         if(baseEntity instanceof FieldUnit){
             this.fieldUnit = (FieldUnit) baseEntity;
+            if(fieldUnit.getGatheringEvent() == null){
+                fieldUnit.setGatheringEvent(GatheringEvent.NewInstance());
+            }
         }
         this.specimenTypeDesignations = specimenTypeDesignations;
     }
@@ -85,9 +91,7 @@ public class SpecimenTypeDesignationWorkingSetDTO {
     }
 
     // ====== FieldUnit Wrapper methods ====== //
-    public Person getPrimaryCollector() {
-        return fieldUnit.getPrimaryCollector();
-    }
+
 
     public String getFieldNumber() {
         return fieldUnit.getFieldNumber();
@@ -103,12 +107,17 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     // ====== GateringEvent Wrapper methods ====== //
 
-    public LanguageString getLocality(){
-        return fieldUnit.getGatheringEvent().getLocality();
+    public String getLocality(){
+        if(fieldUnit.getGatheringEvent().getLocality() != null){
+            return fieldUnit.getGatheringEvent().getLocality().getText();
+        }
+        return null;
     }
 
-    public void setLocality(LanguageString locality){
-        fieldUnit.getGatheringEvent().setLocality(locality);
+    public void setLocality(String locality){
+        fieldUnit.getGatheringEvent().setLocality(
+                LanguageString.NewInstance(locality, Language.DEFAULT())
+                );
     }
     public NamedArea getCountry() {
         return fieldUnit.getGatheringEvent().getCountry();
@@ -116,6 +125,14 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     public void setCountry(NamedArea country) {
         fieldUnit.getGatheringEvent().setCountry(country);
+    }
+
+    public Point getExactLocation() {
+        return fieldUnit.getGatheringEvent().getExactLocation();
+    }
+
+    public void setExactLocation(Point exactLocation) {
+        fieldUnit.getGatheringEvent().setExactLocation(exactLocation);
     }
 
     public Integer getAbsoluteElevation() {
@@ -185,6 +202,14 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     public String getDistanceToGroundText() {
         return fieldUnit.getGatheringEvent().getDistanceToGroundText();
+    }
+
+    public AgentBase getCollector(){
+        return fieldUnit.getGatheringEvent().getActor();
+    }
+
+    public void setCollector(AgentBase collector){
+        fieldUnit.getGatheringEvent().setActor(collector);
     }
 
     public void setDistanceToGroundText(String distanceToGroundText) {

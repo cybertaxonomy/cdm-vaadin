@@ -426,6 +426,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         applyDefaultComponentStyles(component);
     }
 
+    protected void bindField(Field field, String propertyId){
+        fieldGroup.bind(field, propertyId);
+    }
+
     /**
      * @param component
      */

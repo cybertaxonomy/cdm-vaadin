@@ -13,6 +13,7 @@ import java.util.Set;
 import org.hibernate.Session;
 
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
+import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
@@ -20,6 +21,7 @@ import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEventType;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
+import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -37,10 +39,16 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView> {
 
     private static final long serialVersionUID = 4255636253714476918L;
-    private Registration registration;
 
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handleViewEntered() {
+        SelectFieldFactory selectFactory = new SelectFieldFactory(getRepo());
+        getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+    }
 
     /**
      * {@inheritDoc}

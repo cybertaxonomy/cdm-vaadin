@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,11 +21,12 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
+import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.vaadin.component.ToOneRelatedEntityListSelect;
 
 /**
  * @author a.kohlbecker
@@ -45,6 +47,22 @@ public class SelectFieldFactory {
     static {
         orderHints.add(OrderHint.BY_ORDER_INDEX);
         orderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
+    }
+
+    /**
+     * Constructor for the Spring Bean Factory
+     */
+    public SelectFieldFactory(){
+        this.repo = null;
+    }
+
+    /**
+     * Constructor to be used by presenter classes directly
+     *
+     * @param repo
+     */
+    public SelectFieldFactory(CdmRepository repo){
+        this.repo = repo;
     }
 
     public ListSelect createListSelect(String caption, TermType termType){
@@ -96,40 +114,11 @@ public class SelectFieldFactory {
         return select;
     }
 
-    /**
-    *
-    * @param caption
-    * @param type
-    * @param orderHints
-    * @param propertyId the property id from which to read the label
-    * @return
-    */
-   public <T extends CdmBase> ToOneRelatedEntityListSelect<T> createListSelectEditor(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
-
-       if(orderHints == null){
-           orderHints = OrderHint.defaultOrderHintsFor(type);
-       }
-
-       BeanItemContainer<T> termItemContainer = buildBeanItemContainer(type, orderHints);
-       ToOneRelatedEntityListSelect<T> selectEditor = new ToOneRelatedEntityListSelect<T>(caption, type, termItemContainer);
-
-    // guess property id to use for display
-       if(propertyId == null) {
-           if(orderHints != null && !orderHints.isEmpty()){
-               propertyId = orderHints.get(0).getPropertyName();
-           }
-       }
-       if(propertyId != null){
-           selectEditor.getSelect().setItemCaptionPropertyId(propertyId);
-       }
-       return selectEditor;
-   }
-
 
     /**
      * @param termType
      */
-    private BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
+    public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
         // TODO use TermCacher?
         List<DefinedTermBase> terms = repo.getTermService().listByTermType(termType, null, null, orderHints, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
@@ -140,7 +129,19 @@ public class SelectFieldFactory {
     /**
      * @param termType
      */
-    private <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
+    public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(UUID vocabularyUuid) {
+
+        TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
+        Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
+        BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
+        termItemContainer.addAll(terms.getRecords());
+        return termItemContainer;
+    }
+
+    /**
+     * @param termType
+     */
+    public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
 
         List<T> terms = repo.getCommonService().list(type, (Integer)null, (Integer)null,
                 orderHints,
