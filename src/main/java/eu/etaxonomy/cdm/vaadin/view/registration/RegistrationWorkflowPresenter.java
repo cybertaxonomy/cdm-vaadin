@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -59,6 +60,17 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     private IRegistrationWorkingSetService workingSetService;
 
     private RegistrationWorkingSet workingset;
+
+    private List<String> specimenTypeDesignationWorkingsetInitStrategy = Arrays.asList(new String[]{
+            "typeDesignations.typeStatus.representations",
+            "typeDesignations.typeSpecimen.sources",
+            "typeDesignations.typeSpecimen.mediaSpecimen.representations.parts",
+            "typeDesignations.typeSpecimen.collection",
+            "typeDesignations.typeSpecimen.derivedFrom.type",
+            "typeDesignations.typeSpecimen.derivedFrom.derivatives",
+            // Need to initialize all properties of the DerivedUnit to avoid LIEs while converting DerivedUnit with the DerivedUnitConverter:
+            "typeDesignations.typeSpecimen.*",
+    });
 
     /**
      *
@@ -168,7 +180,9 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
 
             TransactionStatus tx = getRepo().startTransaction(false);
-            Registration reg = getRepo().getRegistrationService().find(event.getRegistrationId());
+            List<Integer> ids = new ArrayList<>();
+            ids.add(event.getRegistrationId());
+            Registration reg = getRepo().getRegistrationService().loadByIds(ids, specimenTypeDesignationWorkingsetInitStrategy).get(0);
             RegistrationDTO regDTO = new RegistrationDTO(reg);
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(event.getEntityId());
             if(typeDesignationWorkingSet.isSpecimenTypeDesigationWorkingSet()){

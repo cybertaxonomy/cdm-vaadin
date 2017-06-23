@@ -56,6 +56,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
 
+    private static int windowPixelWidth = 1200;
+
     /**
      * @return the countrySelectField
      */
@@ -75,7 +77,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         grid.setMargin(true);
         grid.setColumns(3);
         grid.setRows(9);
-        grid.setWidth("1200px");
 
         //TODO typifyingAuthors
 
@@ -219,6 +220,16 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         return true;
     }
 
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getWindowPixelWidth() {
+        return windowPixelWidth;
+    }
 
     // ------- SpecimenTypeDesignationWorkingsetPopupEditorView methods ---- //
     @Override

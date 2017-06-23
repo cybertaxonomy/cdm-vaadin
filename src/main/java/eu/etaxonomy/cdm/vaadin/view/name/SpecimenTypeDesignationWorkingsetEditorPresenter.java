@@ -9,12 +9,10 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Set;
-import java.util.UUID;
 
 import org.hibernate.Session;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -30,6 +28,7 @@ import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -66,26 +65,62 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             @Override
             public SpecimenTypeDesignationDTORow create() {
+
                 SpecimenTypeDesignationDTORow row = new SpecimenTypeDesignationDTORow();
 
-                row.typeStatus.setContainerDataSource(selectFactory.buildBeanItemContainer(TermType.SpecimenTypeDesignationStatus));
-                row.derivationEventType.setContainerDataSource(selectFactory.buildTermItemContainer(new UUID[]{
-                    DerivationEventType.GATHERING_IN_SITU().getUuid(),
-                    DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid(),
-                    DerivationEventTypes.PUBLISHED_IMAGE().getUuid(),
-                    DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid()
-                }));
+                row.derivationEventType.setContainerDataSource(selectFactory.buildTermItemContainer(
+                        RegistrationTermLists.DERIVATION_EVENT_TYPE_UUIDS())
+                        );
+                row.derivationEventType.setNullSelectionAllowed(false);
 
-                row.collection.loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
-                row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
+                row.derivationEventType.addValueChangeListener(e -> {
+                    SpecimenTypeDesignationDTORow currentRow = row;
+                    updateRowItemEnablement(currentRow);
+                });
 
-                row.mediaSpecimenReference.loadFrom(referencePagingProvider, referencePagingProvider, collectionPagingProvider.getPageSize());
-                row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+                row.typeStatus.setContainerDataSource(selectFactory.buildTermItemContainer(
+                        RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS())
+                        );
+                row.typeStatus.setNullSelectionAllowed(false);
+
+
+                row.collection.loadFrom(
+                        collectionPagingProvider,
+                        collectionPagingProvider,
+                        collectionPagingProvider.getPageSize()
+                        );
+                row.collection.getSelect().setCaptionGenerator(
+                        new CdmTitleCacheCaptionGenerator<Collection>()
+                        );
+
+                row.mediaSpecimenReference.loadFrom(
+                        referencePagingProvider,
+                        referencePagingProvider,
+                        collectionPagingProvider.getPageSize()
+                        );
+                row.mediaSpecimenReference.getSelect().setCaptionGenerator(
+                        new CdmTitleCacheCaptionGenerator<Reference>()
+                        );
 
                 getView().applyDefaultComponentStyle(row.components());
+
+                updateRowItemEnablement(row);
+
                 return row;
             }
 
+            private void updateRowItemEnablement(SpecimenTypeDesignationDTORow row) {
+
+                DerivationEventType derivationEventType = (DerivationEventType)row.derivationEventType.getValue();
+
+                boolean publishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.PUBLISHED_IMAGE());
+                boolean unPublishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.UNPUBLISHED_IMAGE());
+
+                row.mediaSpecimenReference.setEnabled(publishedImageType);
+                row.mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
+                row.mediaUri.setEnabled(unPublishedImageType);
+
+            }
         });
     }
 
@@ -96,6 +131,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO prepareAsFieldGroupDataSource(SpecimenTypeDesignationWorkingSetDTO bean) {
+
         if(bean.getFieldUnit() == null){
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
             // so that they are based on an empty FieldUnit with an associated Gathering Event

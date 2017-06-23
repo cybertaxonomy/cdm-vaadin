@@ -142,8 +142,15 @@ public class SelectFieldFactory {
      * @param termType
      */
     public BeanItemContainer<DefinedTermBase> buildTermItemContainer(UUID ... termUuid) {
-        // TODO use TermCacher?
-        List<DefinedTermBase> terms = repo.getTermService().load(Arrays.asList(termUuid), INIT_STRATEGY);
+        return buildTermItemContainer(Arrays.asList(termUuid));
+    }
+
+    /**
+     * @param derivation_EVENT_TYPE_UUIDS
+     * @return
+     */
+    public BeanItemContainer<DefinedTermBase> buildTermItemContainer(List<UUID> termsUuids) {
+        List<DefinedTermBase> terms = repo.getTermService().load(termsUuids, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
         termItemContainer.addAll(terms);
         return termItemContainer;
@@ -161,5 +168,6 @@ public class SelectFieldFactory {
         termItemContainer.addAll(terms);
         return termItemContainer;
     }
+
 
 }
