@@ -11,11 +11,14 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.data.validator.DoubleRangeValidator;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
@@ -23,6 +26,7 @@ import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -47,8 +51,10 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
     }
 
     private static final long serialVersionUID = 5418275817834009509L;
+
     private ListSelect countrySelectField;
 
+    private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
 
     /**
      * @return the countrySelectField
@@ -68,8 +74,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         grid.setSpacing(true);
         grid.setMargin(true);
         grid.setColumns(3);
-        grid.setRows(8);
-        //grid.setWidth("600px");
+        grid.setRows(9);
+        grid.setWidth("1200px");
 
         //TODO typifyingAuthors
 
@@ -135,6 +141,33 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         PartialDateField collectionDateField = new PartialDateField("Collection date");
         addField(collectionDateField, "gatheringDate", 0, row);
         TextField fieldNumberField = addTextField("Field number", "fieldNumber", 2, row);
+
+        row++;
+
+        // FIXME: can we use the Grid instaed?
+        typeDesignationsCollectionField = new ElementCollectionField<>(
+                SpecimenTypeDesignationDTO.class,
+                SpecimenTypeDesignationDTORow.class
+                );
+        typeDesignationsCollectionField.withCaption("Types");
+        typeDesignationsCollectionField.getLayout().setSpacing(false);
+        typeDesignationsCollectionField.getLayout().setColumns(3);
+
+        typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
+        typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
+        typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
+
+        // typeDesignationsCollectionField.getLayout().setMargin(false);
+        // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
+        // addField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs", 0, row, 2, row);
+
+        Panel scrollPanel = new Panel(typeDesignationsCollectionField.getLayout());
+        scrollPanel.setCaption("Types");
+        scrollPanel.setWidth(800, Unit.PIXELS);
+
+        bindField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs");
+        addComponent(scrollPanel, 0, row, 2, row);
+
      }
 
 
@@ -185,6 +218,21 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
     public boolean isResizable() {
         return true;
     }
+
+
+    // ------- SpecimenTypeDesignationWorkingsetPopupEditorView methods ---- //
+    @Override
+    public ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField() {
+        return typeDesignationsCollectionField;
+    }
+
+    @Override
+    public void applyDefaultComponentStyle(Component ... components){
+        for(int i = 0; i <components.length; i++){
+            components[i].setStyleName(getDefaultComponentStyles());
+        }
+    }
+
 
 
 

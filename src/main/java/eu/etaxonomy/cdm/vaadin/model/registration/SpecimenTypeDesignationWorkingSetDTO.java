@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,6 +37,8 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     List<SpecimenTypeDesignation> specimenTypeDesignations;
 
+    List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
+
     VersionableEntity owner;
 
     /**
@@ -53,6 +56,7 @@ public class SpecimenTypeDesignationWorkingSetDTO {
             }
         }
         this.specimenTypeDesignations = specimenTypeDesignations;
+        specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
     }
 
     /**
@@ -78,6 +82,10 @@ public class SpecimenTypeDesignationWorkingSetDTO {
      */
     public List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
         return specimenTypeDesignations;
+    }
+
+    public List<SpecimenTypeDesignationDTO> getSpecimenTypeDesignationDTOs(){
+        return specimenTypeDesignationsDTOs;
     }
 
     /**

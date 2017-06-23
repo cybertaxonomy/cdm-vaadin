@@ -9,24 +9,31 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.Session;
+import org.vaadin.viritin.fields.AbstractElementCollection;
 
+import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEventType;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
+import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
-
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -44,10 +51,42 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
+
         SelectFieldFactory selectFactory = new SelectFieldFactory(getRepo());
         getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+
+        getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
+
+            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService());
+
+            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
+
+            @Override
+            public SpecimenTypeDesignationDTORow create() {
+                SpecimenTypeDesignationDTORow row = new SpecimenTypeDesignationDTORow();
+
+                row.typeStatus.setContainerDataSource(selectFactory.buildBeanItemContainer(TermType.SpecimenTypeDesignationStatus));
+                row.derivationEventType.setContainerDataSource(selectFactory.buildTermItemContainer(new UUID[]{
+                    DerivationEventType.GATHERING_IN_SITU().getUuid(),
+                    DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid(),
+                    DerivationEventTypes.PUBLISHED_IMAGE().getUuid(),
+                    DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid()
+                }));
+
+                row.collection.loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
+                row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
+
+                row.mediaSpecimenReference.loadFrom(referencePagingProvider, referencePagingProvider, collectionPagingProvider.getPageSize());
+                row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+
+                getView().applyDefaultComponentStyle(row.components());
+                return row;
+            }
+
+        });
     }
 
     /**

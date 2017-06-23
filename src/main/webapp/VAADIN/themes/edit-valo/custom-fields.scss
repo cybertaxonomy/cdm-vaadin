@@ -60,6 +60,10 @@
 
 body .edit-valo { // increasing specifity to allow overriding the valo default field themes
   
+  .composite-field-wrapper {
+        @include composite-field-wrapper;
+    }
+  
   // ------------  TimePeriodField ------------ //
   .v-time-period-field {
       .margin-wrapper {

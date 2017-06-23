@@ -8,8 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import org.vaadin.viritin.fields.ElementCollectionField;
+
+import com.vaadin.ui.Component;
 import com.vaadin.ui.ListSelect;
 
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -20,4 +24,8 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends ApplicationView<SpecimenTypeDesignationWorkingsetEditorPresenter> {
 
     public ListSelect getCountrySelectField();
+
+    ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField();
+
+    void applyDefaultComponentStyle(Component ... components);
 }
