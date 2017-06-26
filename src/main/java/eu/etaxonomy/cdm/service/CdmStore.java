@@ -17,6 +17,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -41,7 +42,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     TransactionStatus tx = null;
 
-    Session session = null;
+    ConversationHolder conversationHolder = null;
 
     /**
      *
@@ -54,13 +55,41 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
         this.repo = repo;
         this.service = service;
+
     }
 
+
+    public TransactionStatus startConversationalTransaction() {
+        checkExistingTransaction();
+        getConversationHolder().bind();
+        tx = getConversationHolder().startTransaction();
+        return tx;
+    }
+
+
+    /**
+     * @return
+     */
+    protected ConversationHolder getConversationHolder() {
+        if(conversationHolder == null){
+            conversationHolder = (ConversationHolder) repo.getBean("conversationHolder");
+        }
+        return conversationHolder;
+    }
     /**
      * @return
      *
      */
-    public TransactionStatus startTransaction() {
+    private TransactionStatus startTransaction(boolean readOnly) {
+        checkExistingTransaction();
+        return repo.startTransaction(readOnly);
+    }
+
+
+    /**
+     *
+     */
+    protected void checkExistingTransaction() {
         if (tx != null) {
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we
@@ -76,7 +105,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             // @formatter:on
             throw new RuntimeException("Can't process a second save operation while another one is in progress.");
         }
-        return repo.startTransaction(true);
     }
 
     /**
@@ -89,6 +117,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      *         was not necessary.
      */
     public T mergedBean(T bean) {
+
         Session session = getSession();
 
         // session.clear();
@@ -113,10 +142,12 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      * @return
      */
-    protected Session getSession() {
+    public Session getSession() {
+
         Session session = repo.getSession();
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
                 + ((SessionImplementor) session).getPersistenceContext() + " - " + session.toString());
+
         return session;
     }
 
@@ -127,6 +158,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      *
      * @param bean
+     * @param tx2
+     * @param presaveSession
      * @return the merged bean, this bean is <b>not reloaded</b> from the
      *         persistent storage.
      */
@@ -138,21 +171,17 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         } else {
             changeEventType = Type.CREATED;
         }
-
-        // Session session = getSession();
-        logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session);
+        Session session = getSession();
+        if(tx == null){
+            startTransaction(false);
+        }
+        logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
         // merge the changes into the session, ...
         T mergedBean = mergedBean(bean);
         repo.getCommonService().saveOrUpdate(mergedBean);
-        session.flush();
-        logger.trace(this._toString() + ".onEditorSaveEvent - session flushed");
-        repo.commitTransaction(tx);
-        tx = null;
-        if (session.isOpen()) {
-            session.close();
-        }
-        logger.trace(this._toString() + ".onEditorSaveEvent - transaction comitted");
+        flushCommitAndCloseConversationTransaction();
+
         return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType);
     }
 
@@ -162,17 +191,15 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @return a EntityChangeEvent in case the deletion was successful otherwise <code>null</code>.
      */
     public final EntityChangeEvent deleteBean(T bean) {
+
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-        tx = startTransaction();
+
+        startTransaction(false);
         logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
         DeleteResult result = service.delete(bean);
         if (result.isOk()) {
-            Session session = getSession();
-            session.flush();
-            logger.trace(this._toString() + ".deleteBean - session flushed");
-            repo.commitTransaction(tx);
-            tx = null;
-            session.close();
+
+            flushCommitAndClose();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
             return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED);
         } else {
@@ -208,6 +235,32 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             tx = null;
         }
         return null;
+    }
+
+    /**
+     * @param session
+     */
+    protected void flushCommitAndClose() {
+        Session session = getSession();
+        session.flush();
+        logger.trace(this._toString() + "session flushed");
+        repo.commitTransaction(tx);
+        tx = null;
+        if(session.isOpen()){
+            session.close();
+        }
+        session = null;
+
+        logger.trace(this._toString() + "transaction comitted and session closed");
+    }
+
+    protected void flushCommitAndCloseConversationTransaction() {
+        getConversationHolder().getSession().flush();
+        logger.trace(this._toString() + "conversational session flushed");
+        getConversationHolder().commit();
+        getConversationHolder().close();
+        tx = null;
+        logger.trace(this._toString() + "conversational transaction comitted and session closed");
     }
 
 }

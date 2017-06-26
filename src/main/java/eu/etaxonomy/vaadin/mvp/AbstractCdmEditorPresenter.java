@@ -9,9 +9,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 import org.springframework.context.event.EventListener;
-import org.springframework.transaction.TransactionStatus;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -32,10 +30,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     private static final long serialVersionUID = 2218185546277084261L;
 
     private static final Logger logger = Logger.getLogger(AbstractCdmEditorPresenter.class);
-
-    TransactionStatus tx = null;
-
-    Session session = null;
 
     CdmStore<DTO, IService<DTO>> store ;
 
@@ -64,11 +58,10 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
-
-        session = getSession();
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - session: " + session);
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-        tx = getStore().startTransaction();
+        logger.trace("===================================================================");
+        getStore().startConversationalTransaction();
+        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting conversational transaction");
+        // getStore().startTransaction(false);
         // merge the bean and update the fieldGroup with the merged bean, so that updating
         // of field values in turn of the commit are can not cause LazyInitializationExeptions
         // the bean still has the original values at this point
@@ -87,6 +80,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         DTO bean = (DTO) saveEvent.getBean();
         bean = handleTransientProperties(bean);
         EntityChangeEvent changeEvent = getStore().saveBean(bean);
+
+        logger.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         if(changeEvent != null){
             eventBus.publishEvent(changeEvent);
         }
