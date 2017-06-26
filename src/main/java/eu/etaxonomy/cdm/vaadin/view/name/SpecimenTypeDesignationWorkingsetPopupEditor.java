@@ -56,8 +56,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
 
-    private static int windowPixelWidth = 900;
-
     /**
      * @return the countrySelectField
      */

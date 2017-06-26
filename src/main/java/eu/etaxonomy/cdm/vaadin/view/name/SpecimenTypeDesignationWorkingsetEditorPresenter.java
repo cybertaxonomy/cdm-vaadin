@@ -175,7 +175,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     @Override
     protected void saveBean(SpecimenTypeDesignationWorkingSetDTO bean) {
-        // TODO Auto-generated method stub
+        Session session = getSession();
+        getRepo().startTransaction();
 
     }
 

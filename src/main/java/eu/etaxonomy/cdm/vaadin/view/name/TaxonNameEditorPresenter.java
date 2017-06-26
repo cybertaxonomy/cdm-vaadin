@@ -14,8 +14,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import eu.etaxonomy.cdm.api.service.DeleteResult;
-import eu.etaxonomy.cdm.api.service.config.NameDeletionConfigurator;
+import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -63,15 +62,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DeleteResult executeServiceDeleteOperation(TaxonName bean) {
-        NameDeletionConfigurator config = new NameDeletionConfigurator();
-        return getRepo().getNameService().delete(bean.getUuid(), config);
-    }
-
     @Override
     protected TaxonName handleTransientProperties(TaxonName bean) {
         logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
@@ -92,8 +82,16 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             }
         }
         return bean;
-
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected INameService getService() {
+        return getRepo().getNameService();
+    }
+
 
 
 }

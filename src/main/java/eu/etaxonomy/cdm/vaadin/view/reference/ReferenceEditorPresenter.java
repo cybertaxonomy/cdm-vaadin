@@ -18,7 +18,7 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
-import eu.etaxonomy.cdm.api.service.DeleteResult;
+import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -143,8 +143,10 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected DeleteResult executeServiceDeleteOperation(Reference bean) {
-        return getRepo().getReferenceService().delete(bean);
+    protected IService<Reference> getService() {
+        return getRepo().getReferenceService();
     }
+
+
 
 }
