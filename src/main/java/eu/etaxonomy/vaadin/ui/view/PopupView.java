@@ -19,6 +19,11 @@ public interface PopupView extends CanCastComponent {
 
     boolean isResizable();
 
+    /**
+     * @return a positive number to define the initial with of the windows.
+     * A negative number implies <b>unspecified size</b> (terminal is free
+     * to set the size).
+     */
     int getWindowPixelWidth();
 
     boolean isModal();

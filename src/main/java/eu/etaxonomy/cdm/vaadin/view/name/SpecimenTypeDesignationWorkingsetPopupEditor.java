@@ -56,7 +56,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
 
-    private static int windowPixelWidth = 1200;
+    private static int windowPixelWidth = 900;
 
     /**
      * @return the countrySelectField
@@ -220,16 +220,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         return true;
     }
 
-
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getWindowPixelWidth() {
-        return windowPixelWidth;
-    }
 
     // ------- SpecimenTypeDesignationWorkingsetPopupEditorView methods ---- //
     @Override
