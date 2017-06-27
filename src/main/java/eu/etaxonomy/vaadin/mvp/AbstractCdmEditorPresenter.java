@@ -31,12 +31,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     private static final Logger logger = Logger.getLogger(AbstractCdmEditorPresenter.class);
 
-    CdmStore<DTO, IService<DTO>> store ;
 
     public AbstractCdmEditorPresenter() {
         super();
         logger.trace(this._toString() + " constructor");
     }
+
+    CdmStore<DTO, IService<DTO>> store ;
 
     protected CdmStore<DTO, IService<DTO>> getStore() {
         if(store == null){

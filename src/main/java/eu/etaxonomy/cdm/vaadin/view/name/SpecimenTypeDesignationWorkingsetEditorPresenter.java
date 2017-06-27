@@ -8,11 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.Session;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
+import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -21,10 +24,13 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEventType;
+import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
+import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
@@ -45,6 +51,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView> {
 
     private static final long serialVersionUID = 4255636253714476918L;
+
+    CdmStore<Registration, IRegistrationService> store ;
+
+    protected CdmStore<Registration, IRegistrationService> getStore() {
+        if(store == null){
+            store = new CdmStore<>(getRepo(), getRepo().getRegistrationService());
+        }
+        return store;
+    }
 
 
     /**
@@ -174,10 +189,37 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * {@inheritDoc}
      */
     @Override
-    protected void saveBean(SpecimenTypeDesignationWorkingSetDTO bean) {
-        Session session = getSession();
-        getRepo().startTransaction();
+    protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
 
+        getStore().startTransaction(false);
+        Registration reg = (Registration) dto.getOwner();
+
+        // associate all type designations with the fieldUnit
+        // 1. new ones are not yet associated
+        // 2. ones which had incomplete data are also not connected
+        for(SpecimenTypeDesignation std : dto.getSpecimenTypeDesignations()){
+            try {
+                SpecimenOrObservationBase<?> original = findEarliestOriginal(std.getTypeSpecimen());
+                if(original instanceof DerivedUnit){
+                    DerivedUnit du = (DerivedUnit)original;
+                    du.getDerivedFrom().addOriginal(dto.getFieldUnit());
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        // add newly added typeDesignations
+        Set<SpecimenTypeDesignation> addCandidates = new HashSet<>();
+        for(SpecimenTypeDesignation std : dto.getSpecimenTypeDesignations()){
+            if(!reg.getTypeDesignations().stream().filter(td -> td.equals(std)).findFirst().isPresent()){
+                addCandidates.add(std);
+            }
+        }
+        addCandidates.forEach(std -> reg.addTypeDesignation(std));
+
+        getStore().saveBean(reg);
     }
 
     /**
@@ -187,6 +229,36 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     protected void deleteBean(SpecimenTypeDesignationWorkingSetDTO bean) {
         // TODO Auto-generated method stub
 
+    }
+
+
+    /**
+     * @param std
+     * @return
+     * @throws Exception
+     */
+    private SpecimenOrObservationBase<?> findEarliestOriginal(DerivedUnit du) throws Exception {
+    
+        SpecimenOrObservationBase original = du;
+    
+        while(du != null && du.getDerivedFrom() != null && !du.getDerivedFrom().getOriginals().isEmpty()) {
+            Iterator<SpecimenOrObservationBase> it = du.getDerivedFrom().getOriginals().iterator();
+            SpecimenOrObservationBase nextOriginal = it.next();
+            if(nextOriginal == null){
+                break;
+            }
+            original = nextOriginal;
+            if(original instanceof DerivedUnit){
+                du = (DerivedUnit)original;
+            } else {
+                // so this must be a FieldUnit,
+               break;
+            }
+            if(it.hasNext()){
+                throw new Exception(String.format("%s has more than one originals", du.toString()));
+            }
+        }
+        return original;
     }
 
 

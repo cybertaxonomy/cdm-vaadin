@@ -36,7 +36,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  * @since May 15, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
+public class SpecimenTypeDesignationWorkingsetPopupEditor
+    extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView {
 
     /**
@@ -49,6 +50,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor extends AbstractPopupE
         grid.setMargin(true);
         grid.setSpacing(true);
     }
+
+
 
     private static final long serialVersionUID = 5418275817834009509L;
 

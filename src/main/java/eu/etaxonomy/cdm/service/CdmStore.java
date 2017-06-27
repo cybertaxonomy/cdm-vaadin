@@ -80,7 +80,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @return
      *
      */
-    private TransactionStatus startTransaction(boolean readOnly) {
+    public TransactionStatus startTransaction(boolean readOnly) {
         checkExistingTransaction();
         return repo.startTransaction(readOnly);
     }
@@ -142,7 +142,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      * @return
      */
-    public Session getSession() {
+    private Session getSession() {
 
         Session session = repo.getSession();
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
@@ -158,8 +158,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      *
      * @param bean
-     * @param tx2
-     * @param presaveSession
+
      * @return the merged bean, this bean is <b>not reloaded</b> from the
      *         persistent storage.
      */
@@ -172,15 +171,21 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             changeEventType = Type.CREATED;
         }
         Session session = getSession();
+        boolean conversationTransaction = true;
         if(tx == null){
-            startTransaction(false);
+            conversationTransaction = false;
+            tx = startTransaction(false);
         }
         logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
         // merge the changes into the session, ...
         T mergedBean = mergedBean(bean);
         repo.getCommonService().saveOrUpdate(mergedBean);
-        flushCommitAndCloseConversationTransaction();
+        if(conversationTransaction){
+            flushCommitAndCloseConversationTransaction();
+        } else {
+            flushCommitAndClose();
+        }
 
         return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType);
     }

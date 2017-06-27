@@ -229,7 +229,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
-            logger.debug("preCommit, publishing EditorPreSaveEvent");
+            logger.debug("preCommit(), publishing EditorPreSaveEvent");
             // notify the presenter to start a transaction
             eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
         }

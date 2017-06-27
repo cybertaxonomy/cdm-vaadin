@@ -161,6 +161,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
     public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
+
         TransactionStatus tx = getRepo().startTransaction(false);
         // FIXME optional:
         // A) allow full initialization of the entity here, the Presenter of the Editor should
