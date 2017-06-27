@@ -42,8 +42,8 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.IdButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
@@ -247,7 +247,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         messageButton.setCaptionAsHtml(true);
         buttonGroup.addComponent(messageButton);
 
-        TypeStateLabel typeStateLabel = new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus());
+        RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
 
 
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
@@ -338,8 +338,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
             regItem = new Label(dto.getSummary());
         }
 
-        namesTypesList.addComponent(typeStateLabel, 0, row);
-        namesTypesList.setComponentAlignment(typeStateLabel, Alignment.TOP_LEFT);
+        namesTypesList.addComponent(stateLabel, 0, row);
+        namesTypesList.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
         namesTypesList.addComponent(regItem, 1, row);
         namesTypesList.addComponent(buttonGroup, 2, row);
         namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);

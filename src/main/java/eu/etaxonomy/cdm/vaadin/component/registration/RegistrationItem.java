@@ -69,7 +69,8 @@ public class RegistrationItem extends GridLayout {
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
     // --------------------------------------------------
-    private TypeStateLabel typeStateLabel = new TypeStateLabel();
+
+    private RegistrationStateLabel stateLabel = new RegistrationStateLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
@@ -104,15 +105,15 @@ public class RegistrationItem extends GridLayout {
         addStyleName("registration-list-item");
 
         CssLayout stateUserContainer = new CssLayout();
-        typeStateLabel.setStyleName(LABEL_NOWRAP + " registration-state");
-        typeStateLabel.setVisible(false);
+        stateLabel.setStyleName(LABEL_NOWRAP + " registration-state");
+        stateLabel.setVisible(false);
 
         submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
         submitterLabel.setIcon(FontAwesome.USER);
         submitterLabel.setContentMode(ContentMode.HTML);
         submitterLabel.setVisible(false);
 
-        stateUserContainer.addComponents(typeStateLabel, submitterLabel);
+        stateUserContainer.addComponents(stateLabel, submitterLabel);
         addComponent(stateUserContainer, 0, 0);
         setComponentAlignment(stateUserContainer, Alignment.TOP_LEFT);
 
@@ -246,8 +247,8 @@ public class RegistrationItem extends GridLayout {
         if(regDto != null){
             labelMarkup.append("</br>").append(regDto.getSummary());
 
-            typeStateLabel.setVisible(true);
-            typeStateLabel.update(regDto.getRegistrationType(), regDto.getStatus());
+            stateLabel.setVisible(true);
+            stateLabel.update(regDto.getStatus());
             getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
             //TODO make responsive and use specificIdentifier in case the space gets too narrow
             getIdentifierLink().setVisible(true);
@@ -284,7 +285,7 @@ public class RegistrationItem extends GridLayout {
      * @return the typeStateLabel
      */
     public Label getTypeStateLabel() {
-        return typeStateLabel;
+        return stateLabel;
     }
 
     /**
