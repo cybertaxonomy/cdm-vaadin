@@ -41,11 +41,13 @@
 
     
 
-    <inherits name="org.vaadin.teemu.switchui.SwitchComponentWidgetset" />
+    
 
     
 
     
 
     <inherits name="eu.etaxonomy.vaadin.ui.DevDayWidgetset" />
+
+    <inherits name="org.vaadin.teemu.switchui.SwitchComponentWidgetset" />
 </module>

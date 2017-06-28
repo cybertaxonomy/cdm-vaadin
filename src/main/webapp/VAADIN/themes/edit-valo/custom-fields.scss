@@ -88,11 +88,9 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   // ------------ v-switchable-textfield ------------ //
   .v-switchable-textfield {
     @include icon-button-field('v-textfield', 'v-switch', 1, 'right');
-    .v-switch-icon{
-        height: 1.3em; // TODO fix in addon
-        font-size: $v-unit-size; // 40px
-        width: 54px;
-        top: 10px;
+    .v-switch {
+        top: round($v-unit-size * 0.75);
+        right: round($v-unit-size / 4);
     }
   }
   
@@ -106,10 +104,9 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     }
     .v-switch {
         z-index: 10;
-        width: $v-unit-size;
         position: absolute;
-        right: 1px;
-        bottom: 1px;
+        right: round($v-unit-size / 4) + 3px; // + boxshadow width from $v-shadow, TODO extract value from variable?
+        bottom: 15px;
     } 
   }
   .v-person-field-cache-mode {
@@ -167,5 +164,61 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
           @include composite-field-wrapper;
         }
     }
+    
+    // Switch 
+    
+    $widget-height: round($v-unit-size / 2);
+    $widget-width: $v-unit-size;
+    $widget-border-width: 1px; // must match the value as set in $v-border
+    $widget-border-radius: round($widget-height / 2);
+    
+    $knob-border-width: 1px; // must match the value as set in $v-border
+    $slider-height: $widget-height - 2 * $widget-border-width;
+    $knob-inner-height: $slider-height - 2 * $knob-border-width;
+    
+    $knob-border-width: 1px; // must match the value as set in $v-border
+    $slider-width: round($widget-width - 2 * $widget-border-width - $slider-height / 2) * 2;
+    $knob-border-radius: round($knob-height / 2);
+    $knob-left: round(($slider-width - $slider-height) / 2);
+    
+    .v-switch-dom {
+        height: $widget-height;
+        width: $widget-width;
+        border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+        border-radius: $v-border-radius;
+        @include box-shadow(valo-bevel-and-shadow($bevel: $v-bevel, $shadow: $v-shadow, $background-color: $v-background-color, $gradient: $v-gradient));
+        
+        .v-switch-slider {
+            height: $slider-height; 
+            width: $slider-width;
+            background: none;
+        }
+        
+        .v-switch-on-plate, .v-switch-off-plate {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height: inherit;
+            width: round($slider-width / 2);
+            background-color: $v-focus-color;
+        }
+        
+        .v-switch-off-plate {
+            left: round($slider-width / 2);
+            background-color: $v-textfield-background-color;
+        }
+        
+        .v-switch-knob {
+            position: absolute;
+            top: 0px;
+            left: $knob-left;
+            height: $slider-height;
+            width: $slider-height;
+            background-color: $v-background-color;
+            border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+            border-radius: $knob-border-radius;
+        }
+    }
+
     
 } 

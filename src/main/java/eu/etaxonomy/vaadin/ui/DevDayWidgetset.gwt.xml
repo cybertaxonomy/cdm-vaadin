@@ -15,9 +15,11 @@
 
     
 
+    
+
+    
+
+    
+
     <inherits name="org.vaadin.teemu.switchui.SwitchComponentWidgetset" />
-
-    
-
-    
 </module>

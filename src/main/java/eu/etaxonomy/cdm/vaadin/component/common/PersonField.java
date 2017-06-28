@@ -209,7 +209,7 @@ public class PersonField extends CompositeCustomField<Person> {
     protected void addDefaultStyles(){
         cacheField.addStyleName("cache-field");
         detailsContainer.addStyleName("details-fields");
-        unlockSwitch.addStyleName(Switch.ICON_STYLE);
+        unlockSwitch.addStyleName(Switch.DOM_STYLE);
     }
 
     /**

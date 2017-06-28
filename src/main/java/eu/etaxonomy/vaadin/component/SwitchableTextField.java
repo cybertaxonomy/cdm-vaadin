@@ -101,7 +101,7 @@ public class SwitchableTextField extends CompositeCustomField<String> {
      */
     @Override
     protected void addDefaultStyles() {
-        unlockSwitch.addStyleName(Switch.ICON_STYLE);
+        unlockSwitch.addStyleName(Switch.DOM_STYLE);
     }
 
     /**
