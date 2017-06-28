@@ -88,6 +88,12 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   // ------------ v-switchable-textfield ------------ //
   .v-switchable-textfield {
     @include icon-button-field('v-textfield', 'v-switch', 1, 'right');
+    .v-switch-icon{
+        height: 1.3em; // TODO fix in addon
+        font-size: $v-unit-size; // 40px
+        width: 54px;
+        top: 10px;
+    }
   }
   
   // ------------ v-person-field ------------ //

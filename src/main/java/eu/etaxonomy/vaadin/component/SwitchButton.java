@@ -21,6 +21,10 @@ public class SwitchButton extends Switch {
 
     private ValueChangeListener valueSetListener = null;
 
+    public SwitchButton() {
+        super();
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -50,6 +50,7 @@ public class SwitchableTextField extends CompositeCustomField<String> {
 
         addStyledComponent(textField);
         addStyledComponent(unlockSwitch);
+        addDefaultStyles();
     }
 
     /**
@@ -100,8 +101,7 @@ public class SwitchableTextField extends CompositeCustomField<String> {
      */
     @Override
     protected void addDefaultStyles() {
-        // no default styles
-
+        unlockSwitch.addStyleName(Switch.ICON_STYLE);
     }
 
     /**

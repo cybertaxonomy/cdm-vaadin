@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import org.vaadin.teemu.switchui.Switch;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.ui.Component;
@@ -207,6 +209,7 @@ public class PersonField extends CompositeCustomField<Person> {
     protected void addDefaultStyles(){
         cacheField.addStyleName("cache-field");
         detailsContainer.addStyleName("details-fields");
+        unlockSwitch.addStyleName(Switch.ICON_STYLE);
     }
 
     /**
