@@ -96,17 +96,18 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   
   // ------------ v-person-field ------------ //
   .v-person-field {
+    position: relative;
     .v-caption {
         display: block;
     }
     .cache-field, .details-fields  {
-        padding-right: $v-unit-size;
+        padding-right: round($v-unit-size * 1.5);
     }
     .v-switch {
         z-index: 10;
         position: absolute;
-        right: round($v-unit-size / 4) + 3px; // + boxshadow width from $v-shadow, TODO extract value from variable?
-        bottom: 15px;
+        right: 3px; // boxshadow width (3px) from $v-shadow, TODO extract value from variable?
+        top: 4px; // boxshadow width (3px) + 1 
     } 
   }
   .v-person-field-cache-mode {
