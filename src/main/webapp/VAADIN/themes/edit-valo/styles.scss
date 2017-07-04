@@ -10,4 +10,5 @@
 .edit-valo {
   @include addons;
   @include edit-valo;
+  @include switch-dom-style();
 }
