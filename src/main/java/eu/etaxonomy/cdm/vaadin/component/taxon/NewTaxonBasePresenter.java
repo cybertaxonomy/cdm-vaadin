@@ -26,7 +26,7 @@ import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.INonViralName;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
@@ -81,8 +81,8 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     }
 
     private boolean checkIfNameExists(INonViralName nvn) {
-        TaxonNameBase<?,?> name = TaxonNameBase.castAndDeproxy(nvn);
-        Pager<TaxonNameBase> names = nameService.findByName(name.getClass(),
+        TaxonName name = TaxonName.castAndDeproxy(nvn);
+        Pager<TaxonName> names = nameService.findByName(name.getClass(),
                 name.getNameCache(),
                 MatchMode.EXACT,
                 null,

@@ -1,14 +1,74 @@
 // styles for custom fields
 
+// ===================== Mixins ==============================//
+
+@mixin composite-field-wrapper() {
+  border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
+  border-radius: $v-border-radius;
+  background-color: $v-app-background-color;
+  padding: round($v-unit-size / 4);
+}
+
+@mixin icon-button-field-button($button-style-name, $button-count: 1, $button-alignment: 'right', $button-width: $v-unit-size, $button-index: 0){
+
+   $sibling-selector:'';
+   @if $button-index > 0 {
+    $sibling-selector:'+';
+   }
+    
+  #{$sibling-selector} .#{$button-style-name} {
+        z-index: 10;
+        width: $button-width;
+        position: absolute;
+        @if $button-alignment == 'left' {
+            left: $button-width * $button-index + 1px;
+        }
+        @if $button-alignment == 'right' {
+            right: $button-width * ($button-count - 1 - $button-index) + 1px;
+        }
+        @if $button-index < $button-count - 1 {
+            $button-index: $button-index + 1;
+            @include icon-button-field-button($button-style-name, $button-count, $button-alignment, $button-width, $button-index);
+        }
+    }
+}
+
+
+@mixin icon-button-field($field-stylename, $button-style-name, $button-count: 1, $button-alignment: 'right', $button-width: $v-unit-size) {
+    position: relative; // needs to be a positioned element
+    height: $v-line-height * 2;
+    .v-caption {
+        display: block;
+    }   
+    .#{$field-stylename} {
+        @if $button-alignment == 'left' {
+            padding-left: $button-count * $button-width; 
+        }
+        @if $button-alignment == 'right' {
+            $more-padding: 0px;
+            @if $field-stylename == 'v-select' {
+                $more-padding: 8px;
+            }
+            padding-right: $button-count * $button-width + $more-padding; 
+        }        
+    }
+    // recursive include
+    @include icon-button-field-button($button-style-name, $button-count, $button-alignment, $button-width);
+}
+
+
+// ===================== Styles ===================== //
+
 body .edit-valo { // increasing specifity to allow overriding the valo default field themes
   
-  // TimePeriodField
+  .composite-field-wrapper {
+        @include composite-field-wrapper;
+    }
+  
+  // ------------  TimePeriodField ------------ //
   .v-time-period-field {
       .margin-wrapper {
-          border: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
-          border-radius: $v-border-radius;
-          background-color: $v-app-background-color;
-          padding: round($v-unit-size / 4);
+          @include composite-field-wrapper;
       }
       .to-label {
         padding: 0 round($v-unit-size / 2);
@@ -24,5 +84,87 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
           color: $helper-color;
           background-color: valo-font-color($helper-color);
           border-radius: $v-border-radius;
-      }
+   }
+  
+  // ------------ v-switchable-textfield ------------ //
+  .v-switchable-textfield {
+    @include icon-button-field('v-textfield', 'v-switch', 1, 'right');
+    .v-switch {
+        top: round($v-unit-size * 0.75);
+        right: round($v-unit-size / 4);
+    }
+  }
+  
+  // ------------ v-person-field ------------ //
+  .v-person-field {
+    position: relative;
+    .v-caption {
+        display: block;
+    }
+    .cache-field, .details-fields  {
+        padding-right: round($v-unit-size * 1.5);
+    }
+    .v-switch {
+        z-index: 10;
+        position: absolute;
+        right: 3px; // boxshadow width (3px) from $v-shadow, TODO extract value from variable?
+        top: 4px; // boxshadow width (3px) + 1 
+    } 
+  }
+  .v-person-field-cache-mode {
+        .cache-field {
+            display: block;
+        }
+        .details-fields {
+            display: none;
+        }
+    }
+   .v-person-field-details-mode {
+        .cache-field {
+            display: none;
+        }
+        .details-fields {
+            display: block;
+        }
+    }
+    
+   // ------------ team-or-person-field ------------ // 
+   .v-team-or-person-field {
+   
+        .toolbar {
+            float: right;
+            height: $v-unit-size;
+        }
+        .margin-wrapper {
+            @include composite-field-wrapper;
+            
+        }
+    }
+    
+    // ------------ v-related-entity-list-select ------------ //
+
+    .v-related-entity-list-select {
+        @include icon-button-field('v-select', 'v-button', 2, 'right', $v-unit-size);
+    }
+    
+    // ------------ v-related-entity-combobox ------------ //
+    .v-related-entity-combobox {
+        @include icon-button-field('v-filterselect', 'v-button', 2, 'right', $v-unit-size);
+        .v-filterselect-button {
+            right: $v-unit-size * 2 + 1px;
+        }
+    }
+    
+    // ------------ minMaxTextField ------------ //
+    .v-min-max-text-field {
+        @include composite-field-wrapper;
+    }
+    
+    // ------------ v-geolocation-field ------------- //
+    .v-geolocation-field {
+        .wrapper{
+          @include composite-field-wrapper;
+        }
+    }   
+    
 } 

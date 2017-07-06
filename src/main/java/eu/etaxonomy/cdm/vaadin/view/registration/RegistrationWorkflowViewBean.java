@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.navigator.View;
@@ -32,20 +31,32 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.IdButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.component.registration.TypeStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
-import eu.etaxonomy.cdm.vaadin.event.EntityEventType;
-import eu.etaxonomy.cdm.vaadin.event.ReferenceEvent;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.event.TaxonNameEvent;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -72,6 +83,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public static final String ACTION_EDIT = "edit";
 
+    private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
+
     public RegistrationType regType = null;
 
     private CssLayout workflow;
@@ -81,10 +94,15 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     private String headerText = "-- empty --";
     private String subheaderText = SUBHEADER_DEEFAULT;
 
+    private boolean addNameAndTypeEditButtons = false;
+
 
     public RegistrationWorkflowViewBean() {
         super();
+    }
 
+    @Override
+    protected void initContent() {
         workflow = new CssLayout();
         workflow.setSizeFull();
         workflow.setId(DOM_ID_WORKFLOW);
@@ -122,16 +140,21 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         registration.setId(DOM_ID_WORKINGSET);
         registration.setWidth(100, Unit.PERCENTAGE);
 
-        Panel namesTypesPanel = createNamesAndTypesList(workingset);
-        namesTypesPanel.setStyleName("names-types-list");
-        namesTypesPanel.setCaption("Names & Types");
+        Panel registrationListPanel = createRegistrationsList(workingset);
+        registrationListPanel.setStyleName("registration-list");
+        registrationListPanel.setCaption("Registrations");
 
 
-        registration.addComponent(createWorkflowTabSheet(workingset, null));
-        registration.addComponent(new RegistrationItem(workingset, this));
-        registration.addComponent(namesTypesPanel);
+        // registration.addComponent(createWorkflowTabSheet(workingset, null));
+        RegistrationItem registrationItem = new RegistrationItem(workingset, this);
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
+            registrationItem.getSubmitterLabel().setVisible(true);
+        };
+        registration.addComponent(registrationItem);
+        registration.addComponent(registrationListPanel);
 
         registrations.add(registration);
+        workflow.removeAllComponents();
         workflow.addComponent(registration);
     }
 
@@ -179,43 +202,14 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param workingset
      * @return
      */
-    public Panel createNamesAndTypesList(RegistrationWorkingSet workingset) {
+    public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
         // prepare name and type list
         GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
-
-            Button messageButton = new Button(FontAwesome.COMMENT);
-            messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-            if(dto.getMessages().isEmpty()){
-                messageButton.setEnabled(false);
-            } else {
-                messageButton.addClickListener(e -> eventBus.publishEvent(
-                        new ShowDetailsEvent<RegistrationDTO, Integer>(
-                            e,
-                            RegistrationDTO.class,
-                            dto.getId(),
-                            "messages"
-                            )
-                        )
-                    );
-            }
-            messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
-            messageButton.setCaptionAsHtml(true);
-
-            Button editButton = new Button(FontAwesome.EDIT);
-            editButton.setStyleName(ValoTheme.BUTTON_TINY + " " + ValoTheme.BUTTON_PRIMARY);
-
-            namesTypesList.addComponent(new TypeStateLabel().update(dto.getRegistrationType(), dto.getStatus()), 0, row);
-            namesTypesList.addComponent(new Label(dto.getSummary()), 1, row);
-            CssLayout buttonGroup = new CssLayout();
-            buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-            buttonGroup.addComponent(messageButton);
-            buttonGroup.addComponent(editButton);
-            namesTypesList.addComponent(buttonGroup, 2, row);
-            namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_RIGHT);
-            row++;
+            registrationListComponent(namesTypesList, row++, dto);
         }
+
         namesTypesList.setSizeUndefined();
         namesTypesList.setWidth(100, Unit.PERCENTAGE);
         namesTypesList.setColumnExpandRatio(0, 0.1f);
@@ -225,6 +219,174 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         return namesTypesPanel;
     }
 
+    /**
+     * @param namesTypesList
+     * @param row
+     * @param dto
+     */
+    protected void registrationListComponent(GridLayout namesTypesList, int row, RegistrationDTO dto) {
+        CssLayout buttonGroup = new CssLayout();
+        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+
+        Button messageButton = new Button(FontAwesome.COMMENT);
+        messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
+        if(dto.getMessages().isEmpty()){
+            messageButton.setEnabled(false);
+        } else {
+            messageButton.addClickListener(e -> eventBus.publishEvent(
+                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                        e,
+                        RegistrationDTO.class,
+                        dto.getId(),
+                        "messages"
+                        )
+                    )
+                );
+        }
+        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
+        messageButton.setCaptionAsHtml(true);
+        buttonGroup.addComponent(messageButton);
+
+        RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
+
+
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
+            Button editRegistrationButton = new Button(FontAwesome.COG);
+            editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editRegistrationButton.setDescription("Edit registration");
+            editRegistrationButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+                AbstractEditorAction.Action.EDIT,
+                dto.getId(),
+                null,
+                this
+                )));
+            buttonGroup.addComponent(editRegistrationButton);
+        }
+
+        if(addNameAndTypeEditButtons ){
+            Button editNameButton = new Button(FontAwesome.TAG);
+            editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editNameButton.setDescription("Edit name");
+            if(dto.getName() != null){
+                editNameButton.addClickListener(e -> {
+                        Integer nameId = dto.getName().getId();
+                        getEventBus().publishEvent(new TaxonNameEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            nameId
+                            )
+                        );
+                    });
+            } else {
+                editNameButton.setEnabled(false);
+            }
+
+            Button editTypesButton = new Button(FontAwesome.LEAF);
+            editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
+            editTypesButton.setDescription("Edit type designations");
+            if(dto.getOrderdTypeDesignationWorkingSets() != null && !dto.getOrderdTypeDesignationWorkingSets().isEmpty()){
+//                editTypesButton.addClickListener(e -> {
+//                    int regId = dto.getId();
+//                        getEventBus().publishEvent(new TypeDesignationSetEditorAction(
+//                            AbstractEditorAction.Action.EDIT,
+//                            regId
+//                            )
+//                        );
+//                    });
+            } else {
+                editTypesButton.setEnabled(false);
+            }
+            buttonGroup.addComponents(editNameButton, editTypesButton);
+        }
+
+        Component regItem;
+        if(REG_ITEM_AS_BUTTON_GROUP){
+            RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
+            if(editButtonGroup.getNameButton() != null){
+
+                editButtonGroup.getNameButton().getButton().addClickListener(e -> {
+                    Integer nameId = editButtonGroup.getNameButton().getId();
+                    getEventBus().publishEvent(new TaxonNameEditorAction(
+                        AbstractEditorAction.Action.EDIT,
+                        nameId,
+                        null, //e.getButton(), the listener method expects this to be null
+                        this
+                        )
+                    );
+                });
+
+                for(IdButton idButton : editButtonGroup.getTypeDesignationButtons()){
+                    idButton.getButton().addClickListener(e -> {
+                        Integer typeDesignationWorkingsetId = idButton.getId();
+                        Integer registrationEntityID = dto.getId();
+                        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                                AbstractEditorAction.Action.EDIT,
+                                typeDesignationWorkingsetId,
+                                registrationEntityID,
+                                null, //e.getButton(), the listener method expects this to be null
+                                this
+                                )
+                            );
+                    });
+                }
+
+                editButtonGroup.getAddTypeDesignationButton().addClickListener(
+                        e -> chooseNewTypeRegistrationWorkingset(e.getButton(), dto.getId())
+                        );
+            }
+            regItem = editButtonGroup;
+        } else {
+            regItem = new Label(dto.getSummary());
+        }
+
+        namesTypesList.addComponent(stateLabel, 0, row);
+        namesTypesList.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
+        namesTypesList.addComponent(regItem, 1, row);
+        namesTypesList.addComponent(buttonGroup, 2, row);
+        namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+    }
+
+    /**
+     * @param button
+     * @param registrationEntityId
+     *
+     */
+    protected void chooseNewTypeRegistrationWorkingset(Button button, Integer registrationEntityId) {
+
+        Window typeDesignationTypeCooser = new Window();
+        typeDesignationTypeCooser.setModal(true);
+        typeDesignationTypeCooser.setResizable(false);
+        typeDesignationTypeCooser.setCaption("Add new type designation");
+        Label label = new Label("Please select kind of type designation to be created.");
+        Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
+                e -> addNewTypeRegistrationWorkingset(SpecimenTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+        Button newNameTypeDesignationButton = new Button("Name type designation",
+                e -> addNewTypeRegistrationWorkingset(NameTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+        newNameTypeDesignationButton.setEnabled(false);
+
+        VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
+        layout.setMargin(true);
+        layout.setSpacing(true);
+        layout.setComponentAlignment(newSpecimenTypeDesignationButton, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(newNameTypeDesignationButton, Alignment.MIDDLE_CENTER);
+        typeDesignationTypeCooser.setContent(layout);
+        UI.getCurrent().addWindow(typeDesignationTypeCooser);
+    }
+
+    /**
+     * @param button
+     *
+     */
+    protected void addNewTypeRegistrationWorkingset(Class<? extends TypeDesignationBase<?>> newEntityType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
+        UI.getCurrent().removeWindow(typeDesignationTypeCooser);
+        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                AbstractEditorAction.Action.ADD,
+                newEntityType,
+                registrationEntityId,
+                null,
+                this
+                ));
+    }
+
 
     /**
     *
@@ -232,9 +394,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
    private void addBulletWorkflowName() {
        WorkflowSteps steps = new WorkflowSteps();
        steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-               e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+               e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
        steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
-               e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+               e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
        steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
        steps.appendNewWorkflowItem(4, "Awaiting publication", null);
        getWorkflow().addComponent(steps);
@@ -246,22 +408,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
   private void addBulletWorkflowTypification() {
       WorkflowSteps steps = new WorkflowSteps();
       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-              e -> eventBus.publishEvent(new ReferenceEvent(EntityEventType.EDIT)));
+              e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
       steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
-              e -> eventBus.publishEvent(new TaxonNameEvent(EntityEventType.EDIT)));
+              e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
       getWorkflow().addComponent(steps);
   }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Autowired
-    @Override
-    protected void injectPresenter(RegistrationWorkflowPresenter presenter) {
-        setPresenter(presenter);
-    }
 
     /**
      * {@inheritDoc}

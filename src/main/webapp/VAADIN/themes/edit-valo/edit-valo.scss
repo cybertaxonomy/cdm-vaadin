@@ -1,7 +1,7 @@
 // Global variable overrides. Must be declared before importing Valo.
 
 // Defines the plaintext font size, weight and family. Font size affects general component sizing.
-//$v-font-size: 16px;
+$v-font-size: 14px; // default in valo is 16px
 //$v-font-weight: 300;
 $v-font-family: "Open Sans", sans-serif;
 
@@ -234,8 +234,14 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 
     #workingset {
             padding: round($v-unit-size / 2);
-            .names-types-list, .registration-list-item {
+            .registration-list, .registration-list-item {
                 margin-top: round($v-unit-size / 2);
+            }
+        
+            .registration-list {
+                .v-gridlayout-slot {
+                    border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
+                }
             }
     }
 
@@ -244,6 +250,12 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     .registration-list-item {
         border-top: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
         padding-top: 4px; // avoid button group to overlap with border
+        .v-label-registration-state {
+            margin-right: round($v-unit-size / 4);
+        }            
+        .v-caption-submitter {
+            margin-right: round($v-unit-size / 8);
+        }
     }
 
    .registration-workflow-item {
@@ -393,7 +405,32 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
                 color: $status-ready-color;
             }
         }
+
     }
+    
+    // ---------------- custom components ----------------------- //
+    
+    .edit-button-group {
+        margin-top: round($v-unit-size/10);
+        .v-button {
+            padding: 0 round($v-unit-size/4);
+            height: round(2 * $v-unit-size/3 )
+            // margin: 0 round($v-unit-size/4);
+        }
+        .v-label {
+            display: inline;
+            white-space: normal;
+        }
+    }
+    
+    // ---------- popup editor windows ---------------------------------//
+    .v-window-top-toolbar {
+        margin-bottom: round($v-unit-size/4);
+        .v-component-group {
+            float: right;
+        }
+    }
+    
 
 
 }

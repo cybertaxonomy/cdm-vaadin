@@ -15,9 +15,8 @@ import java.util.Set;
 
 import org.joda.time.DateTime;
 
-import eu.etaxonomy.cdm.mock.Registration;
-import eu.etaxonomy.cdm.mock.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
@@ -60,7 +59,7 @@ public class RegistrationWorkingSet {
 
     /**
      * Validate and add all Registrations to the working set which are referring to the same publication
-     * which is either the citation of the nomenclatural reference of the {@link TaxonNameBase} or the
+     * which is either the citation of the nomenclatural reference of the {@link TaxonName} or the
      * citation of the {@link TypeDesignations}. Registration with a differing publication are not added to
      * the working set, instead a {@link RegistrationValidationException} is thrown which is a container for
      * all validation problems.
@@ -76,7 +75,7 @@ public class RegistrationWorkingSet {
         for(RegistrationDTO regDto : candidates){
                 if(citationId == null){
                     citationId = regDto.getCitationID();
-                    citation = regDto.getCitation();
+                    citation = regDto.getCitation().getTitleCache();
                 } else {
                     if(regDto.getCitationID() != citationId){
                         problems.add("Removing Registration " + regDto.registration().toString() + " from set since this refers to a different citation.");

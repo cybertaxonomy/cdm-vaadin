@@ -17,10 +17,6 @@ import com.vaadin.data.Container;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.VaadinSession;
 
-import eu.etaxonomy.cdm.api.service.IClassificationService;
-import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
-import eu.etaxonomy.cdm.api.service.ITermService;
-import eu.etaxonomy.cdm.api.service.IVocabularyService;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
@@ -38,17 +34,11 @@ public class SettingsPresenter {
 
     private Container distributionContainer;
     private Container distributionStatusContainer;
-    private IVocabularyService vocabularyService;
-    private ITermService termService;
-    private ITaxonNodeService taxonNodeService;
-    private IClassificationService classificationService;
     private UUID termUUID;
 
 
 
     public SettingsPresenter(){
-        taxonNodeService = CdmSpringContextHelper.getTaxonNodeService();
-        classificationService = CdmSpringContextHelper.getClassificationService();
 		Object selectedVocabularyUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
 		if(selectedVocabularyUuidString!=null){
 			termUUID = UUID.fromString(selectedVocabularyUuidString.toString());
@@ -60,7 +50,7 @@ public class SettingsPresenter {
     public List<TaxonNode> getChosenTaxonNodes(){
     	List<UUID> nodeUuids = (List<UUID>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
     	if(nodeUuids!=null){
-    		return taxonNodeService.load(nodeUuids, null);
+    		return CdmSpringContextHelper.getTaxonNodeService().load(nodeUuids, null);
     	}
     	return Collections.emptyList();
     }
@@ -68,53 +58,45 @@ public class SettingsPresenter {
     public Classification getChosenClassification(){
     	UUID uuid = (UUID) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
     	if(uuid!=null){
-    		return classificationService.load(uuid);
+    		return CdmSpringContextHelper.getClassificationService().load(uuid);
     	}
     	return null;
     }
 
     public TermVocabulary getChosenArea(){
-        return vocabularyService.load(termUUID);
+        return CdmSpringContextHelper.getVocabularyService().load(termUUID);
     }
 
     public Container getDistributionContainer() {
         return distributionContainer;
     }
-    
-    public void setDistributionContainer(Container distributionContainer) {
-        this.distributionContainer = distributionContainer;
-    }
-    
+
     public Container getDistributionStatusContainer() {
         return distributionStatusContainer;
     }
-    
-    public void setDistributionStatusContainer(Container distributionStatusContainer) {
-        this.distributionStatusContainer = distributionStatusContainer;
-    }
 
     private List<TermVocabulary<DefinedTermBase>> getNamedAreaList() {
-        vocabularyService = CdmSpringContextHelper.getVocabularyService();
-        List<TermVocabulary<DefinedTermBase>> termList = vocabularyService.findByTermType(TermType.NamedArea);
-        //FIXME: is this necessary??
-        for (TermVocabulary<DefinedTermBase> termVocabulary : termList) {
-			termVocabulary.setTitleCache(null);
-		}
+        List<TermVocabulary<DefinedTermBase>> termList = CdmSpringContextHelper.getVocabularyService().findByTermType(TermType.NamedArea, VOCABULARY_INIT_STRATEGY);
         return termList;
     }
-    
+
     private List<DefinedTermBase<?>> getPresenceAbsenceVocabulary(){
-        termService = CdmSpringContextHelper.getTermService();
-        return termService.listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
+        return CdmSpringContextHelper.getTermService().listByTermType(TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
     }
 
-    protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
+    protected static final List<String> VOCABULARY_INIT_STRATEGY = Arrays.asList(new String []{
     		"$",
-    		"annotations",
-    		"markers",
-    		"sources.citation.authorship",
-    		"sources.nameUsedInSource",
-    		"media",
+    		"terms",
+    		"terms.*",
+    });
+
+    protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
+            "$",
+            "annotations",
+            "markers",
+            "sources.citation.authorship",
+            "sources.nameUsedInSource",
+            "media",
     });
 
 }

@@ -8,25 +8,96 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
+import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
 
 /**
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractEditorPresenter<DTO extends Object> extends AbstractPresenter {
+public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>> extends AbstractPresenter<V> {
 
-    @SuppressWarnings("unchecked")
+
+    private static final long serialVersionUID = -6677074110764145236L;
+
+    @Autowired
+    protected ApplicationEventPublisher eventBus;
+
+    /**
+     * This method is called directly before setting the bean as item data source to
+     * the field group of the editor.
+     * <p>
+     * Override this method to pre-process the bean if needed. This can be the case if
+     * you are using a persistence layer with short running session like Hibernate.
+     *
+     * @param bean
+     * @return
+     */
+    protected DTO prepareAsFieldGroupDataSource(DTO bean){
+        return bean;
+    }
+
     @EventListener
-    public void onEditorSaveEvent(EditorSaveEvent saveEvent){
-        // casting to BeanFieldGroup<DTO> must be possible here!
-        DTO bean = ((BeanFieldGroup<DTO>)saveEvent.getCommitEvent().getFieldBinder()).getItemDataSource().getBean();
+    public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
+        if(!isFromOwnView(preSaveEvent)){
+            return;
+        }
+    }
+
+    /**
+     *
+     * @param saveEvent
+     */
+    @EventListener
+    public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
+        if(!isFromOwnView(saveEvent)){
+            return;
+        }
+        DTO bean = saveEvent.getBean();
         saveBean(bean);
     }
 
+    /**
+    *
+    * @param saveEvent
+    */
+   @EventListener
+   public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
+       if(!isFromOwnView(deleteEvent)){
+           return;
+       }
+       deleteBean(deleteEvent.getBean());
+   }
+
+    /**
+     * @param saveEvent
+     * @return
+     */
+    protected boolean isFromOwnView(EditorViewEvent saveEvent) {
+        return saveEvent.getView().equals(getView());
+    }
+
+    protected Class<V> getViewType() {
+        return (Class<V>) super.getView().getClass();
+    }
+
+    protected boolean isFromOwnView(AbstractEditorAction action){
+        return action.getSourceView() != null && getView().equals(action.getSourceView());
+    }
+
     protected abstract void saveBean(DTO bean);
+
+    /**
+     * @param bean
+     */
+    protected abstract void deleteBean(DTO bean);
 
 }

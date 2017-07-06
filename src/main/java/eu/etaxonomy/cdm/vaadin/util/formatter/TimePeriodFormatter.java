@@ -34,10 +34,10 @@ public class TimePeriodFormatter {
            return timePeriod.getFreeText();
         }else{
             StringBuffer sb = new StringBuffer();
-            if (timePeriod.getStart() != null) {
+            if (timePeriod.getStart() != null && timePeriod.getStart().getFields().length > 0) {
                 sb.append(partialFormatter.print(timePeriod.getStart()));
             }
-            if (timePeriod.getEnd() != null) {
+            if (timePeriod.getEnd() != null && timePeriod.getEnd().getFields().length > 0) {
                 if (sb.length() > 0) {
                     sb.append(" - ");
                 }

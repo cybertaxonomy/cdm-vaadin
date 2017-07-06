@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
-import eu.etaxonomy.cdm.model.name.TaxonNameBase;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 
 
@@ -47,8 +47,8 @@ public class DbTableDTO implements Serializable {
 	 * @return
 	 */
 	public String getFullTitleCache() {
-		TaxonNameBase name = taxon.getName();
-		name = CdmBase.deproxy(name, TaxonNameBase.class);
+		TaxonName name = taxon.getName();
+		name = CdmBase.deproxy(name);
 		if(name ==  null){
 			return "-";
 		}

@@ -4,14 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
-import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
+import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 public class TaxonNodeContainer extends HierarchicalContainer {
 
@@ -21,8 +19,6 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 
 	private Map<Object, Object> itemCache = new HashMap<>();
 
-	@Autowired
-	private ITaxonNodeService taxonNodeService;
 	/**
      * Creates a new taxon node container
 	 * @param roots the root elements of the table
@@ -55,14 +51,14 @@ public class TaxonNodeContainer extends HierarchicalContainer {
      */
     public void addChildItems(UuidAndTitleCache<TaxonNode> parent) {
         if(itemCache.get(parent.getId()).equals(Boolean.FALSE)){
-            Collection<UuidAndTitleCache<TaxonNode>> children = taxonNodeService.listChildNodesAsUuidAndTitleCache(parent);
+            Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
             setChildrenAllowed(parent, !children.isEmpty());
             for (UuidAndTitleCache<TaxonNode> child : children) {
                 Item childItem = addItem(child);
                 if(childItem!=null){
                     setParent(child, parent);
                 }
-                Collection<UuidAndTitleCache<TaxonNode>> grandChildren = taxonNodeService.listChildNodesAsUuidAndTitleCache(child);
+                Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
                 setChildrenAllowed(child, !grandChildren.isEmpty());
             }
             itemCache.put(parent.getId(), true);

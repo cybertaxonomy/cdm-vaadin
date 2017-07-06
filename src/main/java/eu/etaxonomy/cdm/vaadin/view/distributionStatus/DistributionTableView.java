@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
+import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
@@ -130,7 +131,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     final Item item = event.getItem();
                     Property<?> itemProperty = item.getItemProperty("uuid");
                     UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-                    final Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+                    final Taxon taxon = HibernateProxyHelper.deproxy(CdmSpringContextHelper.getTaxonService().load(uuid), Taxon.class);
                     final String areaID = (String) event.getPropertyId();
                     PresenceAbsenceTerm presenceAbsenceTerm = null;
                     Object statusValue = item.getItemProperty(areaID).getValue();
@@ -148,7 +149,7 @@ public class DistributionTableView extends CustomComponent implements View{
                     }
                     termSelect.setValue(presenceAbsenceTerm);
                     termSelect.addValueChangeListener(new ValueChangeListener() {
-						
+
 						private static final long serialVersionUID = 1883728509174752769L;
 
 						@Override
@@ -178,8 +179,13 @@ public class DistributionTableView extends CustomComponent implements View{
 	   this.listener = listener;
 	}
 
+
 	@Override
 	public void enter(ViewChangeEvent event) {
+	    update();
+	}
+
+	public void update(){
 		try {
 			container = listener.getSQLContainer();
 		} catch (SQLException e) {
@@ -221,7 +227,7 @@ public class DistributionTableView extends CustomComponent implements View{
 				Object selectedItemId = DistributionTableView.this.table.getValue();
 				if(selectedItemId!=null){
 					final UUID uuid = UUID.fromString(table.getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
-					Taxon taxon = HibernateProxyHelper.deproxy(listener.getTaxonService().load(uuid), Taxon.class);
+					Taxon taxon = HibernateProxyHelper.deproxy(CdmSpringContextHelper.getTaxonService().load(uuid), Taxon.class);
 					List<DescriptionElementBase> listDescriptions = listener.listDescriptionElementsForTaxon(taxon, null);
 					DetailWindow detailWindow = new DetailWindow(taxon, listDescriptions);
 					Window window = detailWindow.createWindow();

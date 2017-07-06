@@ -10,40 +10,21 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 /**
  * @author a.kohlbecker
- * @since Mar 22, 2017
+ * @since May 10, 2017
  *
  */
-public abstract class AbstractEntityEvent {
-
-
-    private EntityEventType eventType;
+public abstract class AbstractEntityEvent<T extends Enum> {
 
     private Integer entityId = null;
 
-    public AbstractEntityEvent(EntityEventType eventType, Integer entityId) {
-        this.eventType = eventType;
-        if(eventType == null){
+    protected T type;
+
+    public AbstractEntityEvent(T type, Integer entityId) {
+        this.entityId = entityId;
+        this.type = type;
+        if(type == null){
             throw new NullPointerException();
         }
-        this.setEntityId(entityId);
-    }
-
-    public AbstractEntityEvent(EntityEventType eventType) {
-        this(eventType, null);
-    }
-
-    public EntityEventType getEventType() {
-        return eventType;
-    }
-
-    public boolean isAddEvent() {
-        return eventType.equals(EntityEventType.ADD);
-    }
-    public boolean isEditEvent() {
-        return eventType.equals(EntityEventType.EDIT);
-    }
-    public boolean isRemoveEvent() {
-        return eventType.equals(EntityEventType.REMOVE);
     }
 
     /**
@@ -53,11 +34,8 @@ public abstract class AbstractEntityEvent {
         return entityId;
     }
 
-    /**
-     * @param entityId the entityId to set
-     */
-    private void setEntityId(Integer entityId) {
-        this.entityId = entityId;
+    public T getType() {
+        return type;
     }
 
 }

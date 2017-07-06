@@ -48,11 +48,11 @@ public class CdmQueryFactory {
     public static QueryDelegate generateTaxonTreeQuery(String name_id, String classificationId)  {
         String FROM_QUERY = " FROM TaxonBase tb " +
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
-                "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
+                "INNER JOIN TaxonName n on tb.name_id=n.id " +
                 "INNER JOIN Classification cl on cl.id=tn.classification_id and cl.id='"+classificationId+"'";
         String SELECT_QUERY="SELECT tn.id as " + ID +
                 ", tb.uuid as " + UUID_ID +
-                ", tnb.titleCache as " + name_id +
+                ", n.titleCache as " + name_id +
                 ", tn.parent_id as parent" +
                 FROM_QUERY;
         String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
@@ -68,11 +68,11 @@ public class CdmQueryFactory {
             String has_syn_id)  {
         String FROM_QUERY = " FROM TaxonBase tb " +
                 "INNER JOIN TaxonNode tn on tn.taxon_id=tb.id " +
-                "INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
-                "INNER JOIN DefinedTermBase dtb on tnb.rank_id = dtb.id";
+                "INNER JOIN TaxonName n on tb.name_id=n.id " +
+                "INNER JOIN DefinedTermBase dtb on n.rank_id = dtb.id";
         String SELECT_QUERY="SELECT tb.id as " + ID +
                 ", tb.uuid as " + UUID_ID +
-                ", tnb.titleCache as " + name_id +
+                ", n.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
                 ", tn.unplaced as " + unp_id +
                 ", dtb.titleCache as " + rank_id +
@@ -96,10 +96,10 @@ public class CdmQueryFactory {
 			}
 		}
         String FROM_QUERY =
-                "FROM TaxonNameBase tnb "
-                + "INNER JOIN TaxonBase tb on tnb.id = tb.name_id and tb.DTYPE='Taxon' " + // # name<->taxon
+                "FROM TaxonName n "
+                + "INNER JOIN TaxonBase tb on n.id = tb.name_id and tb.DTYPE='Taxon' " + // # name<->taxon
         "INNER JOIN TaxonNode tn on tn.taxon_id = tb.id "+
-        "INNER JOIN DefinedTermBase rank on tnb.rank_id = rank.id "+// # rank <-> name
+        "INNER JOIN DefinedTermBase rank on n.rank_id = rank.id "+// # rank <-> name
         "LEFT OUTER JOIN DescriptionBase descr on descr.taxon_id = tb.id "+// # taxon <-> taxon description (not every taxon has a description)
         "LEFT OUTER JOIN DescriptionElementBase descrEl on descrEl.indescription_id = descr.id and descrEl.DTYPE = 'Distribution' "+// # distribution <-> description
         "LEFT OUTER JOIN DefinedTermBase statusTerm on statusTerm.id = descrEl.status_id "+
@@ -174,10 +174,10 @@ public class CdmQueryFactory {
 
     public static QueryDelegate generateSynonymOfTaxonQuery(String name_id)  {
     	String FROM_QUERY = " FROM TaxonBase tb " +
-    			"INNER JOIN TaxonNameBase tnb on tb.name_id=tnb.id " +
+    			"INNER JOIN TaxonName n on tb.name_id=n.id " +
     			"INNER JOIN TaxonBase acc on tb.acceptedTaxon_id = acc.id "; //or s.id = ?
     	String SELECT_QUERY="SELECT tb.id as " + ID +
-    			", tnb.titleCache as " + name_id +
+    			", n.titleCache as " + name_id +
     			FROM_QUERY;
     	String COUNT_QUERY = "SELECT count(*) " + FROM_QUERY;
     	String CONTAINS_QUERY = "SELECT * FROM TaxonBase syn WHERE syn.id = ?"; //or s.id = ?

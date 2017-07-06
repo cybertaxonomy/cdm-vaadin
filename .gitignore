@@ -9,6 +9,7 @@ src/main/webapp/VAADIN/themes/*/addons.scss
 /spy.log
 src/main/resources/test.txt
 cdmTest.lock.db
+src/test/resources/eu/etaxonomy/cdm/database/schema/*.xsd
 .designer
 .vaadin-designer
 .idea
