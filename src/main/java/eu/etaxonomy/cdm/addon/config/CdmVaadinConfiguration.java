@@ -23,6 +23,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Lazy;
 
+import com.vaadin.server.DeploymentConfiguration;
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.VaadinServletService;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.annotation.UIScope;
@@ -32,6 +35,7 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
 import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
+import eu.etaxonomy.cdm.vaadin.server.CdmSpringVaadinServletService;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.InactiveUIException;
@@ -86,6 +90,22 @@ public class CdmVaadinConfiguration {
     public static class Servlet extends SpringVaadinServlet {
 
         private static final long serialVersionUID = -2615042297393028775L;
+
+        @Override
+        protected VaadinServletService createServletService(
+                DeploymentConfiguration deploymentConfiguration)
+                throws ServiceException {
+
+            //  - The SpringVaadinServletService is needed when using a custom service URL
+            //  - The CdmSpringVaadinServletService allows to attach listeners to the requestEnd and 
+            //    requestStart method this is important for proper unbinding of Conversations from 
+            //    the request threads.
+            //    see ViewScopeConversationHolder
+            CdmSpringVaadinServletService service = new CdmSpringVaadinServletService(
+                    this, deploymentConfiguration, getServiceUrlPath());
+            service.init();
+            return service;
+        }
 
         /**
          *

@@ -21,6 +21,9 @@ public final class CdmTitleCacheCaptionGenerator<T extends IdentifiableEntity> i
 
     private static final long serialVersionUID = 3151383366731447990L;
 
+    public CdmTitleCacheCaptionGenerator(){
+    }
+
     @Override
     public String getCaption(T option) {
         return option.getTitleCache();

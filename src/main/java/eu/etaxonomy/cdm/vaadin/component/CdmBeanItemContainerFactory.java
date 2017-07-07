@@ -13,12 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
@@ -33,11 +28,8 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @since Apr 6, 2017
  *
  */
-@SpringComponent
-public class SelectFieldFactory {
+public class CdmBeanItemContainerFactory {
 
-    @Autowired
-    @Qualifier("cdmRepository")
     private CdmRepository repo;
 
     private final static List<String> INIT_STRATEGY = Arrays.asList(new String[]{"$", "representations"});
@@ -50,70 +42,13 @@ public class SelectFieldFactory {
     }
 
     /**
-     * Constructor for the Spring Bean Factory
-     */
-    public SelectFieldFactory(){
-        this.repo = null;
-    }
-
-    /**
      * Constructor to be used by presenter classes directly
      *
      * @param repo
      */
-    public SelectFieldFactory(CdmRepository repo){
+    public CdmBeanItemContainerFactory(CdmRepository repo){
         this.repo = repo;
     }
-
-    public ListSelect createListSelect(String caption, TermType termType){
-        BeanItemContainer<DefinedTermBase> termItemContainer = buildBeanItemContainer(termType);
-        ListSelect select = new ListSelect(caption, termItemContainer);
-        return select;
-    }
-
-    /**
-     *
-     * @param caption
-     * @param type
-     * @return
-     */
-    public <T extends CdmBase> ListSelect createListSelect(String caption, Class<T> type){
-        return createListSelect(caption, type, null);
-    }
-
-    public <T extends CdmBase> ListSelect createListSelect(String caption, Class<T> type, List<OrderHint> orderHints){
-        return createListSelect(caption, type, orderHints, null);
-    }
-
-    /**
-     *
-     * @param caption
-     * @param type
-     * @param orderHints
-     * @param propertyId the property id from which to read the label
-     * @return
-     */
-    public <T extends CdmBase> ListSelect createListSelect(String caption, Class<T> type, List<OrderHint> orderHints, String propertyId){
-
-        if(orderHints == null){
-            orderHints = OrderHint.defaultOrderHintsFor(type);
-        }
-
-        BeanItemContainer<T> termItemContainer = buildBeanItemContainer(type, orderHints);
-        ListSelect select = new ListSelect(caption, termItemContainer);
-
-        // guess property id to use for display
-        if(propertyId == null) {
-            if(orderHints != null && !orderHints.isEmpty()){
-                propertyId = orderHints.get(0).getPropertyName();
-            }
-        }
-        if(propertyId != null){
-            select.setItemCaptionPropertyId(propertyId);
-        }
-        return select;
-    }
-
 
     /**
      * @param termType
@@ -161,12 +96,20 @@ public class SelectFieldFactory {
      */
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
 
+        if(orderHints == null){
+            orderHints = OrderHint.defaultOrderHintsFor(type);
+        }
+
         List<T> terms = repo.getCommonService().list(type, (Integer)null, (Integer)null,
                 orderHints,
                 Arrays.asList(new String[]{"$"}));
         BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(type);
         termItemContainer.addAll(terms);
         return termItemContainer;
+    }
+
+    public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type) {
+        return buildBeanItemContainer(type, null);
     }
 
 

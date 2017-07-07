@@ -8,17 +8,20 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.session.ViewScopeConversationHolder;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
 
 /**
+ *
  * @author a.kohlbecker
  * @since Apr 5, 2017
  *
@@ -28,8 +31,19 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     private static final long serialVersionUID = -6677074110764145236L;
 
+    FlushMode previousPreSaveEvenFlushMode = null;
+
     @Autowired
     protected ApplicationEventPublisher eventBus;
+
+    /**
+     * Load the bean to be edited in the editor freshly from the persitstend storage.
+     * Ore create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
+     *
+     * @param identifier
+     * @return
+     */
+    protected abstract DTO loadBeanById(Object identifier);
 
     /**
      * This method is called directly before setting the bean as item data source to
@@ -42,17 +56,28 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      * @return
      */
     protected DTO prepareAsFieldGroupDataSource(DTO bean){
+
         return bean;
     }
 
+    /**
+     * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
+     *
+     * @param preSaveEvent
+     */
     @EventListener
     public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
+        ensureBoundConversation();
+        previousPreSaveEvenFlushMode = getConversationHolder().getSession().getFlushMode();
+        getConversationHolder().getSession().setFlushMode(FlushMode.AUTO);
+
     }
 
     /**
+     * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
      *
      * @param saveEvent
      */
@@ -63,9 +88,12 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         }
         DTO bean = saveEvent.getBean();
         saveBean(bean);
+        getConversationHolder().getSession().setFlushMode(previousPreSaveEvenFlushMode);
+        previousPreSaveEvenFlushMode = null;
     }
 
     /**
+    * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
     *
     * @param saveEvent
     */
@@ -74,7 +102,13 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
        if(!isFromOwnView(deleteEvent)){
            return;
        }
+       if(!conversationBound){
+           bindConversation();
+       }
+       FlushMode previousFlushMode = getSession().getFlushMode();
+       getConversationHolder().getSession().setFlushMode(FlushMode.AUTO);
        deleteBean(deleteEvent.getBean());
+       getConversationHolder().getSession().setFlushMode(previousFlushMode);
    }
 
     /**

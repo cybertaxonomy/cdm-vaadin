@@ -14,17 +14,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
+import javax.sql.DataSource;
+
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
-import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.cdm.vaadin.session.ViewScopeConversationHolder;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -49,11 +52,18 @@ public class PopupEditorFactory {
     private CdmRepository repo;
 
     @Autowired
-    private SelectFieldFactory selectFieldFactory;
+    private SessionFactory sessionFactory;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private PlatformTransactionManager transactionManager;
 
     @Autowired
     @Lazy
     private NavigationManager navigationManager;
+
 
     private Field presenterRepoField;
     private Field presenterNavigationManagerField;
@@ -64,7 +74,7 @@ public class PopupEditorFactory {
 
     private Method viewInitMethod;
 
-    private Field selectFieldFactoryField;
+    private Field conversationHolderField;
 
     public PopupEditorFactory(){
         initFieldsAccess();
@@ -86,6 +96,9 @@ public class PopupEditorFactory {
             presenterEventBusField = AbstractEditorPresenter.class.getDeclaredField("eventBus");
             presenterEventBusField.setAccessible(true);
 
+            conversationHolderField = AbstractPresenter.class.getDeclaredField("conversationHolder");
+            conversationHolderField.setAccessible(true);
+
             viewEventBusField = AbstractView.class.getDeclaredField("eventBus");
             viewEventBusField.setAccessible(true);
 
@@ -94,9 +107,6 @@ public class PopupEditorFactory {
 
             viewInitMethod = AbstractView.class.getDeclaredMethod("init");
             viewInitMethod.setAccessible(true);
-
-            selectFieldFactoryField = AbstractCdmPopupEditor.class.getDeclaredField("selectFieldFactory");
-            selectFieldFactoryField.setAccessible(true);
 
         } catch (NoSuchFieldException | SecurityException | NoSuchMethodException  e) {
             throw new RuntimeException("Severe error during initialization. Please check the classes AbstractPresenter, AbstractEditorPresenter, AbstractView for modificactions.", e);
@@ -125,10 +135,6 @@ public class PopupEditorFactory {
                 viewInjectPresenterMethod.invoke(abstractView, presenter);
                 // invoke the @PostConstruct method
 
-                if(AbstractCdmPopupEditor.class.isAssignableFrom(popupViewClass)){
-                    selectFieldFactoryField.set(view, selectFieldFactory);
-                }
-
                 viewInitMethod.invoke(abstractView);
             }
             return view;
@@ -147,6 +153,7 @@ public class PopupEditorFactory {
             Class<? extends AbstractPresenter<?>> presenterClass, P presenter) throws IllegalAccessException {
         presenterRepoField.set(presenter, repo);
         presenterNavigationManagerField.set(presenter, navigationManager);
+        conversationHolderField.set(presenter, new ViewScopeConversationHolder(dataSource, sessionFactory, transactionManager));
 
         if(AbstractEditorPresenter.class.isAssignableFrom(presenterClass)){
             presenterEventBusField.set(presenter, eventBus);

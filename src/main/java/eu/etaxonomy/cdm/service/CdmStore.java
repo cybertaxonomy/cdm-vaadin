@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
@@ -40,9 +41,18 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     private S service;
 
-    TransactionStatus tx = null;
+    TransactionStatus txNonConversational = null;
 
     ConversationHolder conversationHolder = null;
+
+    /**
+     * @return the conversationHolder
+     */
+    public ConversationHolder getConversationHolder() {
+        return conversationHolder;
+    }
+
+    protected DefaultTransactionDefinition txDefinition = null;
 
     /**
      *
@@ -58,39 +68,43 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     }
 
-
-    public TransactionStatus startConversationalTransaction() {
-        checkExistingTransaction();
-        getConversationHolder().bind();
-        tx = getConversationHolder().startTransaction();
-        return tx;
-    }
-
-
     /**
-     * @return
+     * constructor which takes a ConversationHolder. The supplying class of the conversationHolder needs
+     * to care for <code>bind()</code>, <code>unbind()</code> and <code>close()</code> since the store is
+     * only responsible for starting and committing of transactions.
+     *
+     * @param repo
+     * @param service
+     * @param conversationHolder
      */
-    protected ConversationHolder getConversationHolder() {
-        if(conversationHolder == null){
-            conversationHolder = (ConversationHolder) repo.getBean("conversationHolder");
-        }
-        return conversationHolder;
+    public CdmStore(CdmRepository repo, S service, ConversationHolder conversationHolder) {
+
+        this.repo = repo;
+        this.service = service;
+        this.conversationHolder = conversationHolder;
+
     }
+
     /**
      * @return
      *
      */
-    public TransactionStatus startTransaction(boolean readOnly) {
-        checkExistingTransaction();
-        return repo.startTransaction(readOnly);
+    public TransactionStatus startTransaction() {
+        if(conversationHolder != null && !conversationHolder.isTransactionActive()){
+            //conversationHolder.setDefinition(getTransactionDefinition());
+            return conversationHolder.startTransaction();
+        } else {
+            checkExistingTransaction();
+            txNonConversational = repo.startTransaction();
+            return txNonConversational;
+        }
     }
-
 
     /**
      *
      */
     protected void checkExistingTransaction() {
-        if (tx != null) {
+        if (txNonConversational != null) {
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we
             // should change the save operation
@@ -103,7 +117,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             // 2. passing the TransactionState to the view also doesn't seem
             // like a good idea.
             // @formatter:on
-            throw new RuntimeException("Can't process a second save operation while another one is in progress.");
+            throw new RuntimeException("Opening a second transaction in the same" + this.getClass().getSimpleName() + " is not supported");
         }
     }
 
@@ -144,7 +158,12 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      */
     private Session getSession() {
 
-        Session session = repo.getSession();
+        Session session;
+        if(conversationHolder != null){
+            session = conversationHolder.getSession();
+        } else {
+            session = repo.getSession();
+        }
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
                 + ((SessionImplementor) session).getPersistenceContext() + " - " + session.toString());
 
@@ -170,22 +189,21 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         } else {
             changeEventType = Type.CREATED;
         }
+
         Session session = getSession();
-        boolean conversationTransaction = true;
-        if(tx == null){
-            conversationTransaction = false;
-            tx = startTransaction(false);
-        }
         logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
+
+        if(txNonConversational == null || (conversationHolder != null && !conversationHolder.isTransactionActive())){
+            // no running transaction, start one ...
+            startTransaction();
+        }
+
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
         // merge the changes into the session, ...
         T mergedBean = mergedBean(bean);
         repo.getCommonService().saveOrUpdate(mergedBean);
-        if(conversationTransaction){
-            flushCommitAndCloseConversationTransaction();
-        } else {
-            flushCommitAndClose();
-        }
+        session.flush();
+        commitTransction();
 
         return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType);
     }
@@ -199,12 +217,13 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
 
-        startTransaction(false);
+        startTransaction();
         logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
         DeleteResult result = service.delete(bean);
         if (result.isOk()) {
 
-            flushCommitAndClose();
+            getSession().flush();
+            commitTransction();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
             return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED);
         } else {
@@ -237,35 +256,33 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             Notification notification = new Notification(notificationTitle, messageBody.toString(),
                     com.vaadin.ui.Notification.Type.ERROR_MESSAGE, true);
             notification.show(UI.getCurrent().getPage());
-            tx = null;
+            txNonConversational = null;
         }
         return null;
     }
 
-    /**
-     * @param session
-     */
-    protected void flushCommitAndClose() {
-        Session session = getSession();
-        session.flush();
-        logger.trace(this._toString() + "session flushed");
-        repo.commitTransaction(tx);
-        tx = null;
-        if(session.isOpen()){
-            session.close();
+
+    protected void commitTransction() {
+
+        if(conversationHolder != null){
+            conversationHolder.commit();
+        } else {
+            repo.commitTransaction(txNonConversational);
+            txNonConversational = null;
         }
-        session = null;
-
-        logger.trace(this._toString() + "transaction comitted and session closed");
     }
 
-    protected void flushCommitAndCloseConversationTransaction() {
-        getConversationHolder().getSession().flush();
-        logger.trace(this._toString() + "conversational session flushed");
-        getConversationHolder().commit();
-        getConversationHolder().close();
-        tx = null;
-        logger.trace(this._toString() + "conversational transaction comitted and session closed");
+    /**
+     * @param entityId
+     */
+    public T loadBean(int entityId) {
+        conversationHolder.startTransaction();
+        return service.find(entityId);
     }
+
+    public S getService() {
+        return service;
+    }
+
 
 }

@@ -8,8 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -31,12 +34,13 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
-import eu.etaxonomy.cdm.vaadin.component.SelectFieldFactory;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 /**
@@ -52,6 +56,17 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private static final long serialVersionUID = 4255636253714476918L;
 
+    private List<String> specimenTypeDesignationWorkingsetInitStrategy = Arrays.asList(new String[]{
+            "typeDesignations.typeStatus.representations",
+            "typeDesignations.typeSpecimen.sources",
+            "typeDesignations.typeSpecimen.mediaSpecimen.representations.parts",
+            "typeDesignations.typeSpecimen.collection",
+            "typeDesignations.typeSpecimen.derivedFrom.type",
+            "typeDesignations.typeSpecimen.derivedFrom.derivatives",
+            // Need to initialize all properties of the DerivedUnit to avoid LIEs while converting DerivedUnit with the DerivedUnitConverter:
+            "typeDesignations.typeSpecimen.*",
+    });
+
     CdmStore<Registration, IRegistrationService> store ;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
@@ -65,18 +80,40 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     /**
      * {@inheritDoc}
      */
+    @Override
+    protected SpecimenTypeDesignationWorkingSetDTO loadBeanById(Object identifier) {
+
+        SpecimenTypeDesignationWorkingSetDTO workingSet;
+        if(identifier != null){
+            RegistrationAndWorkingsetId registrationAndWorkingsetId = (RegistrationAndWorkingsetId)identifier;
+            List<Integer> ids = new ArrayList<>();
+            ids.add(registrationAndWorkingsetId.registrationId);
+            Registration reg = getRepo().getRegistrationService().loadByIds(ids, specimenTypeDesignationWorkingsetInitStrategy).get(0);
+            RegistrationDTO regDTO = new RegistrationDTO(reg);
+            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(registrationAndWorkingsetId.workingsetId);
+            workingSet = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
+        } else {
+            workingSet = null;
+        }
+        return workingSet;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
 
-        SelectFieldFactory selectFactory = new SelectFieldFactory(getRepo());
+        CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
 
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
-            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService());
+            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
 
-            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
+            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
 
             @Override
             public SpecimenTypeDesignationDTORow create() {
@@ -104,18 +141,14 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider,
                         collectionPagingProvider.getPageSize()
                         );
-                row.collection.getSelect().setCaptionGenerator(
-                        new CdmTitleCacheCaptionGenerator<Collection>()
-                        );
+                row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
                         referencePagingProvider,
                         collectionPagingProvider.getPageSize()
                         );
-                row.mediaSpecimenReference.getSelect().setCaptionGenerator(
-                        new CdmTitleCacheCaptionGenerator<Reference>()
-                        );
+                row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
 
                 getView().applyDefaultComponentStyle(row.components());
 
@@ -191,7 +224,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
 
-        getStore().startTransaction(false);
         Registration reg = (Registration) dto.getOwner();
 
         // associate all type designations with the fieldUnit
@@ -238,9 +270,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * @throws Exception
      */
     private SpecimenOrObservationBase<?> findEarliestOriginal(DerivedUnit du) throws Exception {
-    
+
         SpecimenOrObservationBase original = du;
-    
+
         while(du != null && du.getDerivedFrom() != null && !du.getDerivedFrom().getOriginals().isEmpty()) {
             Iterator<SpecimenOrObservationBase> it = du.getDerivedFrom().getOriginals().iterator();
             SpecimenOrObservationBase nextOriginal = it.next();

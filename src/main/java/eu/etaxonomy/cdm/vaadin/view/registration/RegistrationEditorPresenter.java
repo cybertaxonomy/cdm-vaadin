@@ -9,7 +9,10 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.model.agent.Institution;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -28,6 +31,38 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     protected IRegistrationService getService() {
         return getRepo().getRegistrationService();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Registration loadBeanById(Object identifier) {
+
+        Registration reg;
+        if(identifier != null){
+            reg = getRepo().getRegistrationService().find((Integer)identifier);
+        } else {
+            reg = Registration.NewInstance();
+        }
+        return reg;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handleViewEntered() {
+        super.handleViewEntered();
+
+        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
+
+        getView().getInstitutionField().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(Institution.class));
+        getView().getInstitutionField().setItemCaptionPropertyId("titleCache");
+
+        getView().getSubmitterField().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
+        getView().getSubmitterField().setItemCaptionPropertyId("username");
+    }
+
 
 
 }

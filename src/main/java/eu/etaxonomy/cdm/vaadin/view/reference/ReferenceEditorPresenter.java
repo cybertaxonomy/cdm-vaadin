@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.event.EventListener;
-import org.springframework.transaction.TransactionStatus;
 import org.vaadin.viritin.fields.CaptionGenerator;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
@@ -44,7 +43,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     ReferencePopupEditor inReferencePopup = null;
 
     public ReferenceEditorPresenter() {
-        logger.trace("CONTRUCTOR");
+        
     }
 
     /**
@@ -97,6 +96,20 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Reference loadBeanById(Object identifier) {
+        Reference reference;
+        if(identifier != null){
+            reference = getRepo().getReferenceService().find((Integer)identifier);
+        } else {
+            reference = ReferenceFactory.newGeneric();
+        }
+        return reference;
+    }
+
+    /**
     *
     * @param editorAction
      * @throws EditorEntityBeanException
@@ -108,17 +121,13 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        }
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
            if(editorAction.isAddAction()){
-               Reference reference = ReferenceFactory.newGeneric();
                inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
-               inReferencePopup.showInEditor(reference);
+               inReferencePopup.loadInEditor(null);
            }
            if(editorAction.isEditAction()){
-               TransactionStatus tx = getRepo().startTransaction(false);
-               Reference reference = getRepo().getReferenceService().find(editorAction.getEntityId());
                ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
                popup.withDeleteButton(true);
-               popup.showInEditor(reference);
-               getRepo().commitTransaction(tx);
+               popup.loadInEditor(editorAction.getEntityId());
            }
        }
    }

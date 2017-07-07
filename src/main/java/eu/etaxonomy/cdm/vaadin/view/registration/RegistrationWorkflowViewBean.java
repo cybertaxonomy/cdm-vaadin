@@ -36,12 +36,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.IdButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
@@ -57,6 +54,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -314,13 +312,15 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                     );
                 });
 
-                for(IdButton idButton : editButtonGroup.getTypeDesignationButtons()){
-                    idButton.getButton().addClickListener(e -> {
-                        Integer typeDesignationWorkingsetId = idButton.getId();
+                for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
+                    workingsetButton.getButton().addClickListener(e -> {
+                        Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                        TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                         Integer registrationEntityID = dto.getId();
                         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                                 AbstractEditorAction.Action.EDIT,
                                 typeDesignationWorkingsetId,
+                                workingsetType,
                                 registrationEntityID,
                                 null, //e.getButton(), the listener method expects this to be null
                                 this
@@ -358,9 +358,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeRegistrationWorkingset(SpecimenTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeRegistrationWorkingset(NameTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         newNameTypeDesignationButton.setEnabled(false);
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
@@ -376,11 +376,11 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param button
      *
      */
-    protected void addNewTypeRegistrationWorkingset(Class<? extends TypeDesignationBase<?>> newEntityType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
+    protected void addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                 AbstractEditorAction.Action.ADD,
-                newEntityType,
+                newWorkingsetType,
                 registrationEntityId,
                 null,
                 this

@@ -21,7 +21,6 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -177,7 +176,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         int row = 0;
 
-        rankSelect = selectFieldFactory.createListSelect("Rank", Rank.class, OrderHint.BY_ORDER_INDEX.asList(), "label");
+        rankSelect = new ListSelect("Rank");
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setRows(1);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
@@ -350,6 +349,14 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox() {
         return basionymCombobox;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ListSelect getRankSelect() {
+        return rankSelect;
     }
 
 

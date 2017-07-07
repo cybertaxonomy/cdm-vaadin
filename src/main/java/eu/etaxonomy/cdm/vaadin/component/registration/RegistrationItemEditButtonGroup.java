@@ -20,6 +20,7 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.remote.dto.tdwg.voc.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -42,7 +43,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private IdButton<TaxonName> nameIdButton = null;
 
-    private List<IdButton<TypeDesignationWorkingSet>> typeDesignationButtons = new ArrayList<>();
+    private List<TypeDesignationWorkingSetButton> typeDesignationButtons = new ArrayList<>();
 
     private List<Label> labels = new ArrayList<>();
 
@@ -74,8 +75,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 //                Set<Integer> idSet = new HashSet<>();
 //                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
 
-                typeDesignationButtons.add(new IdButton<TypeDesignationWorkingSet>(
-                        TypeDesignationWorkingSet.class,
+                typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
+                        typeDesignationWorkingSet.getWorkingsetType(),
                         typeDesignationWorkingSet.getWorkingSetId(),
                         tdButton)
                         );
@@ -102,7 +103,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         return nameIdButton;
     }
 
-    public List<IdButton<TypeDesignationWorkingSet>> getTypeDesignationButtons() {
+    public List<TypeDesignationWorkingSetButton> getTypeDesignationButtons() {
         return typeDesignationButtons;
     }
 
@@ -121,12 +122,12 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         addTypeDesignationButton.addStyleName(DEFAULT_BUTTON_STYLES);
     }
 
-    public class IdButton<T> {
+    public class TypeDesignationWorkingSetButton {
         private Integer id;
-        private Class<T> type;
+        private TypeDesignationWorkingSetType type;
         private Button button;
 
-        public IdButton(Class<T> type, Integer id, Button button){
+        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, Integer id, Button button){
             this.type = type;
             this.id = id;
             this.button = button;
@@ -149,8 +150,42 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         /**
          * @return the type
          */
-        public Class<T> getType() {
+        public TypeDesignationWorkingSetType getType() {
             return type;
+        }
+
+    }
+
+    public class IdButton<T> {
+        private Integer id;
+        private Class<T> entityType;
+        private Button button;
+
+        public IdButton(Class<T> type, Integer id, Button button){
+            this.entityType = type;
+            this.id = id;
+            this.button = button;
+        }
+
+        /**
+         * @return the id
+         */
+        public Integer getId() {
+            return id;
+        }
+
+        /**
+         * @return the button
+         */
+        public Button getButton() {
+            return button;
+        }
+
+        /**
+         * @return the type
+         */
+        public Class<T> getType() {
+            return entityType;
         }
 
     }
