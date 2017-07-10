@@ -11,6 +11,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  *
  * @param <P>
  */
+@SuppressWarnings("serial")
 public abstract class AbstractPopupView<P extends AbstractPresenter> extends AbstractView<P> implements PopupView  {
 
 	private Window window;

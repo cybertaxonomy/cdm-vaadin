@@ -254,6 +254,8 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
             conversationHolder.unbind();
             conversationBound = false;
 	    }
+	    logger.trace(String.format("<<<<< %s onViewExit() close()", _toString()));
+	    conversationHolder.close();
         VaadinService service = UI.getCurrent().getSession().getService();
         if(service instanceof CdmSpringVaadinServletService){
             logger.trace(String.format("~~~~~ %s un-register as request listener", _toString()));
