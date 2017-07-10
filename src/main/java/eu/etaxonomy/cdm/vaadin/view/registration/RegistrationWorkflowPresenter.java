@@ -240,6 +240,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
      *
      */
     protected void refreshView() {
+        getConversationHolder().getSession().clear();
         presentWorkingSet(workingset.getCitationId());
     }
 
