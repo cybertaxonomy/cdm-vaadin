@@ -430,25 +430,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             float: right;
         }
     }
-    
-    // -------- geplocation component ---- //
-    .v-geolocation-field {
-        .map-wrapper {
-          .v-label {
-            position: absolute;
-            color: black;
-            margin-left: 60px;
-            z-index: 10;
-          }
-          .v-leaflet{
-            position: absolute;
-            .leaflet-container{
-                margin-left: 10px;
-            }
-          }
-        }
-    }
-    
 
 
 }
