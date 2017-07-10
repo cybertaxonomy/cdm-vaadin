@@ -466,6 +466,11 @@
       <artifactId>viritin</artifactId>
       <version>1.61</version>
     </dependency>
+    <dependency>
+      <groupId>org.vaadin.addon</groupId>
+      <artifactId>v-leaflet</artifactId>
+      <version>1.0.3</version>
+    </dependency>
     <!-- 
     <dependency>
         <groupId>org.vaadin.spring.extensions</groupId>
