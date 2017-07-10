@@ -73,8 +73,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         fieldGroup.bind(errorRadiusField, "errorRadius");
         fieldGroup.bind(referenceSystemField, "referenceSystem");
 
-        referenceSystemField.setEnabled(false); // disabled since not fully implemented
-
         return root;
     }
 
@@ -92,7 +90,10 @@ public class GeoLocationField extends CompositeCustomField<Point> {
             newValue = Point.NewInstance();
         }
         super.setInternalValue(newValue);
-            fieldGroup.setItemDataSource(new BeanItem<Point>(newValue));
+        fieldGroup.setItemDataSource(new BeanItem<Point>(newValue));
+
+        referenceSystemField.setEnabled(false); // disabled since not fully implemented
+
     }
 
     /**

@@ -95,7 +95,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         TextArea localityField = new TextArea("Locality");
         addField(localityField, "locality", 0, row , 2, row);
         localityField.setWidth("100%");
-        // NOTE: setRows and SetCold breaks he width setting,
+        // NOTE: setRows and SetCold breaks the width setting,
         //        see https://github.com/vaadin/framework/issues/3617
 
         row++;
