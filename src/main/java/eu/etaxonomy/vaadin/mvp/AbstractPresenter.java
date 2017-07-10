@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.IllegalTransactionStateException;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.vaadin.server.ServletPortletHelper;
 import com.vaadin.server.VaadinRequest;
@@ -59,10 +61,27 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	@Autowired
 	private NavigationManager navigationManager;
 
-	@Autowired
 	private ViewScopeConversationHolder conversationHolder;
 
+	protected DefaultTransactionDefinition definition = null;
+
     protected boolean conversationBound;
+
+	@Autowired
+	private void setConversationHolder(ViewScopeConversationHolder conversationHolder){
+	    this.conversationHolder = conversationHolder;
+	    this.conversationHolder.setDefinition(getTransactionDefinition());
+	}
+
+	protected TransactionDefinition getTransactionDefinition(){
+	    if(definition == null){
+    	    definition = new DefaultTransactionDefinition();
+    	    definition.setReadOnly(true);
+	    }
+	    return definition;
+	}
+
+
 
 
 	/**

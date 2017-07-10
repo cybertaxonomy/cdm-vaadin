@@ -74,7 +74,7 @@ public class PopupEditorFactory {
 
     private Method viewInitMethod;
 
-    private Field conversationHolderField;
+    private Method conversationHolderMethod;
 
     public PopupEditorFactory(){
         initFieldsAccess();
@@ -96,8 +96,8 @@ public class PopupEditorFactory {
             presenterEventBusField = AbstractEditorPresenter.class.getDeclaredField("eventBus");
             presenterEventBusField.setAccessible(true);
 
-            conversationHolderField = AbstractPresenter.class.getDeclaredField("conversationHolder");
-            conversationHolderField.setAccessible(true);
+            conversationHolderMethod = AbstractPresenter.class.getDeclaredMethod("setConversationHolder", ViewScopeConversationHolder.class);
+            conversationHolderMethod.setAccessible(true);
 
             viewEventBusField = AbstractView.class.getDeclaredField("eventBus");
             viewEventBusField.setAccessible(true);
@@ -148,12 +148,14 @@ public class PopupEditorFactory {
      * @param presenterClass
      * @param presenter
      * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws IllegalArgumentException
      */
     public <P extends AbstractPresenter> void injectPresenterBeans(
-            Class<? extends AbstractPresenter<?>> presenterClass, P presenter) throws IllegalAccessException {
+            Class<? extends AbstractPresenter<?>> presenterClass, P presenter) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         presenterRepoField.set(presenter, repo);
         presenterNavigationManagerField.set(presenter, navigationManager);
-        conversationHolderField.set(presenter, new ViewScopeConversationHolder(dataSource, sessionFactory, transactionManager));
+        conversationHolderMethod.invoke(presenter, new ViewScopeConversationHolder(dataSource, sessionFactory, transactionManager));
 
         if(AbstractEditorPresenter.class.isAssignableFrom(presenterClass)){
             presenterEventBusField.set(presenter, eventBus);

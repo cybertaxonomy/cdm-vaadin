@@ -12,6 +12,7 @@ import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
+import org.springframework.transaction.TransactionDefinition;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.session.ViewScopeConversationHolder;
@@ -58,6 +59,15 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected DTO prepareAsFieldGroupDataSource(DTO bean){
 
         return bean;
+    }
+
+    @Override
+    protected TransactionDefinition getTransactionDefinition(){
+        super.getTransactionDefinition();
+        if(definition.isReadOnly()){
+            definition.setReadOnly(false);
+        }
+        return definition;
     }
 
     /**
