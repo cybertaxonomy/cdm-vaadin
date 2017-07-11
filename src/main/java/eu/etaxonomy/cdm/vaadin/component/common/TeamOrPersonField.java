@@ -23,6 +23,7 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
@@ -73,6 +74,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addSizedComponent(titleField);
         addSizedComponent(nomenclaturalTitleField);
         addSizedComponent(personsListEditor);
+
+        setConverter(new CdmBaseDeproxyConverter<TeamOrPersonBase<?>>());
     }
 
     /**

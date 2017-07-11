@@ -147,7 +147,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
 
-        // FIXME: can we use the Grid instaed?
+        // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
                 SpecimenTypeDesignationDTORow.class
