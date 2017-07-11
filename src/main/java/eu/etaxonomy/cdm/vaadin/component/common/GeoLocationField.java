@@ -49,7 +49,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     TextField errorRadiusField = new TextField("Error radius (m)");
     TextField referenceSystemField = new TextField("ReferenceSystem");
 
-    private LMap leafletMap = new LMap();
+    private LMap map = new LMap();
+    private LMarker mapMarker = new LMarker();
 
     private CssLayout mapWrapper;
 
@@ -81,18 +82,21 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.addComponent(errorRadiusField, 0, 1);
         root.addComponent(referenceSystemField, 1, 1);
 
-        leafletMap = new LMap();
-        leafletMap.setZoomLevel(7);
-        leafletMap.addBaseLayer(new LOpenStreetMapLayer(), null);
+        map = new LMap();
+        map.addBaseLayer(new LOpenStreetMapLayer(), null);
+        map.setDraggingEnabled(false);
+        map.setScrollWheelZoomEnabled(false);
+        map.removeControl(map.getLayersControl());
 
         root.setColumnExpandRatio(2, 1.0f);
         root.setRowExpandRatio(1, 1.0f);
 
-        root.addComponent(leafletMap, 2, 1);
-        mapWrapper = new CssLayout(longLatParsed, leafletMap);
+        root.addComponent(map, 2, 1);
+        mapWrapper = new CssLayout(longLatParsed, map);
         root.addComponent(mapWrapper, 2, 0, 2, 1);
         mapWrapper.setSizeFull();
         mapWrapper.setStyleName("map-wrapper");
+        longLatParsed.setWidthUndefined();
 
         longitudeField.addTextChangeListener(e -> updateParsedValue(longitudeField, e.getText()));
         latitudeField.addTextChangeListener(e -> updateParsedValue(latitudeField, e.getText()));
@@ -136,10 +140,15 @@ public class GeoLocationField extends CompositeCustomField<Point> {
      */
     protected void updateMap() {
         longLatParsed.setValue(parsedPoint.getLongitudeSexagesimal() + "/" + parsedPoint.getLatitudeSexagesimal());
-        leafletMap.removeAllComponents();
+        map.removeComponent(mapMarker);
         if(parsedPoint.getLongitude() != null && parsedPoint.getLatitude() != null){
-            leafletMap.setCenter(parsedPoint.getLongitude(), parsedPoint.getLatitude());
-            leafletMap.addComponents(new LMarker(parsedPoint.getLongitude(), parsedPoint.getLatitude()));
+            map.setZoomLevel(10);
+            mapMarker.setPoint(new org.vaadin.addon.leaflet.shared.Point(parsedPoint.getLongitude(), parsedPoint.getLatitude()));
+            map.addComponents(mapMarker);
+            map.setCenter(parsedPoint.getLongitude(), parsedPoint.getLatitude());
+        } else {
+            map.setZoomLevel(1);
+            map.setCenter(40, 0);
         }
     }
 

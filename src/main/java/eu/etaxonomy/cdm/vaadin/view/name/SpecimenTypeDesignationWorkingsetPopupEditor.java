@@ -141,6 +141,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
         PartialDateField collectionDateField = new PartialDateField("Collection date");
+        collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row);
         TextField fieldNumberField = addTextField("Field number", "fieldNumber", 2, row);
 
