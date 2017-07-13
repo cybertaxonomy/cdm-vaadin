@@ -49,7 +49,6 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -77,10 +76,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public static final String NAME = "workflow";
 
-    public static final String ACTION_NEW = "new";
-
-    public static final String ACTION_EDIT = "edit";
-
     private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
 
     public RegistrationType regType = null;
@@ -94,6 +89,16 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private boolean addNameAndTypeEditButtons = false;
 
+    private ViewParameters viewParameters;
+
+
+    /**
+     * @return the viewParameters
+     */
+    @Override
+    public ViewParameters getViewParameters() {
+        return viewParameters;
+    }
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -113,18 +118,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
-           String[] params = event.getParameters().split("/");
+            this.viewParameters = new ViewParameters(event.getParameters().split("/"));
 
-           if(params[0].equals(ACTION_NEW)) {
-               regType = RegistrationType.valueOf(params[1]);
-               headerText = regType.name() + " ...";
-               eventBus.publishEvent(new RegistrationWorkflowEvent(regType));
-
-           } else if( params[0].equals(ACTION_EDIT)) {
-               headerText = params[1];
-               eventBus.publishEvent(new RegistrationWorkflowEvent(Integer.parseInt(params[1])));
-           }
-           updateHeader();
+            getPresenter().handleViewEntered();
         }
     }
 
@@ -202,7 +198,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
         // prepare name and type list
-        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
+        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size() + 1);
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
             registrationListComponent(namesTypesList, row++, dto);
@@ -448,6 +444,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void setHeaderText(String text) {
         this.headerText = text;
+        updateHeader();
 
     }
 
@@ -464,6 +461,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void setSubheaderText(String text) {
         subheaderText = text;
+        updateHeader();
     }
 
     /**
@@ -508,6 +506,17 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    protected class ViewParameters {
+
+        String action;
+        Integer referenceId;
+
+        public ViewParameters(String[] params){
+            action = params[0];
+            referenceId = Integer.parseInt(params[1]);
+        }
     }
 
 }

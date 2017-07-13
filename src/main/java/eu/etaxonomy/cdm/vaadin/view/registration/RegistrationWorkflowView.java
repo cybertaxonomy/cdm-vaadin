@@ -14,6 +14,7 @@ import java.util.UUID;
 import com.vaadin.ui.CssLayout;
 
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean.ViewParameters;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -22,6 +23,10 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  *
  */
 public interface RegistrationWorkflowView extends ApplicationView{
+
+    public static final String ACTION_NEW = "new";
+
+    public static final String ACTION_EDIT = "edit";
 
 
     CssLayout getWorkflow();
@@ -64,6 +69,9 @@ public interface RegistrationWorkflowView extends ApplicationView{
      * @param messages
      */
     void openDetailsPopup(String caption, List<String> messages);
+
+
+    ViewParameters getViewParameters();
 
 
 

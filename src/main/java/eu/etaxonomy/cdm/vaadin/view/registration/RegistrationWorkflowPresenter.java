@@ -8,11 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 
@@ -20,10 +18,8 @@ import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
-import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
@@ -33,13 +29,13 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.name.RegistrationAndWorkingsetId;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean.ViewParameters;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -49,7 +45,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkflowPresenter extends AbstractPresenter<RegistrationWorkflowView> implements Serializable{
+public class RegistrationWorkflowPresenter extends AbstractPresenter<RegistrationWorkflowView> {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,6 +62,8 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     private RegistrationWorkingSet workingset;
 
+    private Reference citation;
+
 
     /**
      *
@@ -73,31 +71,25 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public RegistrationWorkflowPresenter() {
     }
 
-    @EventListener
-    protected void onRegistrationStartEvent(RegistrationWorkflowEvent event){
 
-        boolean HACK = true;
-        if(workingset != null && !HACK){
-            Logger.getLogger(RegistrationWorkflowPresenter.class).warn("Can't start a new workflow over an existing one.");
-            return;
-        }
 
-        if(event.isStart()) {
-            workingset = new RegistrationWorkingSet();
-            Registration reg = Registration.NewInstance();
-            reg.setName(TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES()));
-            getView().setHeaderText("New Registration");
-            try {
-                workingset.add(reg);
-            } catch (RegistrationValidationException error) {
-                getView().getWorkflow().setComponentError(new SystemError(error));
-            }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handleViewEntered() {
+
+        super.handleViewEntered();
+        ViewParameters viewParams = getView().getViewParameters();
+        if(viewParams.action.equals(RegistrationWorkflowView.ACTION_NEW)){
+            citation = getRepo().getReferenceService().find(viewParams.referenceId);
+            workingset = new RegistrationWorkingSet(citation);
+            getView().setHeaderText("Registration for " + workingset.getCitation());
             getView().setWorkingset(workingset);
-        } else {
-            Integer citationID = event.getCitationID();
-            presentWorkingSetByRegID(citationID);
         }
-
+        if(viewParams.action.equals(RegistrationWorkflowView.ACTION_EDIT)){
+            presentWorkingSetByRegID(viewParams.referenceId);
+        }
     }
 
     /**
@@ -206,6 +198,9 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     @EventListener
     public void onEntityChangeEvent(EntityChangeEvent event){
+        if(workingset == null){
+            return;
+        }
         if(Reference.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getCitationId().equals(event.getEntityId())){
                 refreshView();

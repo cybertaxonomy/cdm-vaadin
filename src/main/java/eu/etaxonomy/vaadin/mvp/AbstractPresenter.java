@@ -208,6 +208,9 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     /**
 	 * Extending classes should overwrite this method in order to perform logic
 	 * after presenter has finished initializing.
+	 *
+	 * At this point in the life cycle of the MVP the {@link AbstractView#initContent() initContent()}
+	 * method has been executed already.
 	 */
 	protected void onPresenterReady() {
 	    logger.trace(String.format("Presenter %s ready", _toString()));
@@ -267,6 +270,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
 	public final void onViewExit() {
 	    logger.trace(String.format("%s onViewExit()", _toString()));
+	    handleViewExit();
 	    // un-register as request start and end listener
 	    if(conversationBound){
     	    logger.trace(String.format("<<<<< %s onViewExit() unbind()", _toString()));
@@ -285,7 +289,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         } else {
             throw new RuntimeException("Using the CdmSpringVaadinServletService is required for proper per view conversation handling");
         }
-	    handleViewExit();
 	}
 
 	/**
@@ -301,7 +304,8 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     /**
      * Extending classes may overwrite this method to react to
      * the event when user leaves the view that this presenter
-     * governs.
+     * governs. This method is executed before un-binding and closing the
+     * conversation holder.
      */
     public void handleViewExit() {
     }

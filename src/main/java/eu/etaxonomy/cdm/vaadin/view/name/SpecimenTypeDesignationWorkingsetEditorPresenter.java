@@ -55,7 +55,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private static final long serialVersionUID = 4255636253714476918L;
 
-    CdmStore<Registration, IRegistrationService> store ;
+    CdmStore<Registration, IRegistrationService> store;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){

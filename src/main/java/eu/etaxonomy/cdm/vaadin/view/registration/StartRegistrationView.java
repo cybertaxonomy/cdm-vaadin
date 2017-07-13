@@ -8,45 +8,37 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.viritin.fields.LazyComboBox;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
-import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 
-import eu.etaxonomy.cdm.vaadin.design.registration.StartRegistrationDesign;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
+import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
  *
  */
-@SpringView(name=StartRegistrationView.NAME)
-public class StartRegistrationView extends StartRegistrationDesign implements View {
+public interface StartRegistrationView extends ApplicationView<StartRegistrationPresenter>  {
 
-    private static final long serialVersionUID = -213040114015958970L;
+    Button getNewPublicationButton();
 
-    public static final String NAME = "regStart";
-
-    @Autowired
-    ApplicationEventPublisher eventBus;
-
-    public StartRegistrationView() {
-        buttonName.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(
-                RegistrationWorkflowViewBean.NAME,
-                RegistrationWorkflowViewBean.ACTION_NEW,
-                RegistrationType.NAME.name()
-                )));
-    }
+    LazyComboBox<Reference> getReferenceCombobox();
 
     /**
-     * {@inheritDoc}
+     * @return
      */
-    @Override
-    public void enter(ViewChangeEvent event) {
+    Button getRemoveNewPublicationButton();
 
-    }
+    /**
+     * @return
+     */
+    Button getContinueButton();
+
+    Label getNewPublicationLabel();
+
+
 
 }
