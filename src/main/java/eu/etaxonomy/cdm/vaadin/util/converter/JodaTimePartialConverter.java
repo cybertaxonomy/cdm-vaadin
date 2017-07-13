@@ -127,8 +127,10 @@ public class JodaTimePartialConverter implements Converter<String, Partial> {
            switch(format) {
             case ISO8601:
                 text = formatIso8601(value);
+                break;
             case DAY_MONTH_YEAR_DOT:
                 text = formatYyyymmddDot(value);
+                break;
             default:
                 text = "JodaTimePartialConverter Error: unsupported format";
            }
