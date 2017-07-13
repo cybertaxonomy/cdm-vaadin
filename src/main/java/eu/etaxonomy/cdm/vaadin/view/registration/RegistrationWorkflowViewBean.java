@@ -70,8 +70,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public static final String DOM_ID_WORKINGSET = "workingset";
 
-    public static final String SUBHEADER_DEEFAULT = "Advance step by step through the registration workflow.";
-
     private static final long serialVersionUID = -213040114015958970L;
 
     public static final String NAME = "workflow";
@@ -85,7 +83,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     private List<CssLayout> registrations = new ArrayList<>();
 
     private String headerText = "-- empty --";
-    private String subheaderText = SUBHEADER_DEEFAULT;
+    private String subheaderText = "";
 
     private boolean addNameAndTypeEditButtons = false;
 

@@ -77,9 +77,8 @@ public class RegistrationUI extends UI {
     }
     //---------------------------------------------
 
-    // public static final String INITIAL_VIEW = "workflow/edit/10";
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
-    static boolean debugMode = true;
+
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -130,7 +129,7 @@ public class RegistrationUI extends UI {
         //navigate to initial view
         String state = pageFragmentAsState();
 
-        if(debugMode && state != null){
+        if(state != null){
             eventBus.publishEvent(new NavigationEvent(state));
         } else {
             eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
