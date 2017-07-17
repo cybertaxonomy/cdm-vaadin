@@ -129,9 +129,8 @@ public class RegistrationUI extends UI {
         //navigate to initial view
         String state = pageFragmentAsState();
 
-        if(state != null){
-            eventBus.publishEvent(new NavigationEvent(state));
-        } else {
+        if(state == null){
+            // the case when state != null is handled in the UI base class
             eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
         }
     }

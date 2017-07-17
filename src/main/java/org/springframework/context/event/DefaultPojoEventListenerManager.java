@@ -8,6 +8,7 @@
 */
 package org.springframework.context.event;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +40,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @UIScope
-public class DefaultPojoEventListenerManager implements PojoEventListenerManager, ApplicationContextAware {
+public class DefaultPojoEventListenerManager implements PojoEventListenerManager, ApplicationContextAware, Serializable {
+
+    private static final long serialVersionUID = -6814417168274166953L;
 
     public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 

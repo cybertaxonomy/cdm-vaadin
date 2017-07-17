@@ -26,6 +26,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
@@ -87,16 +88,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private boolean addNameAndTypeEditButtons = false;
 
-    private ViewParameters viewParameters;
+    private Integer citationID;
 
+    private Button addNewNameRegistrationButton;
 
-    /**
-     * @return the viewParameters
-     */
-    @Override
-    public ViewParameters getViewParameters() {
-        return viewParameters;
-    }
+    private Button addExistingNameRegistrationButton;
+
+    private GridLayout registrationsGrid;
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -116,7 +114,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
-            this.viewParameters = new ViewParameters(event.getParameters().split("/"));
+            this.citationID = Integer.valueOf(event.getParameters());
 
             getPresenter().handleViewEntered();
         }
@@ -195,28 +193,49 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @return
      */
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
-        // prepare name and type list
-        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size() + 1);
+
+        registrationsGrid = new GridLayout(3, 1);
+        registrationsGrid.setSizeUndefined();
+        registrationsGrid.setColumnExpandRatio(0, 0.1f);
+        registrationsGrid.setColumnExpandRatio(1, 0.9f);
+
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
-            registrationListComponent(namesTypesList, row++, dto);
+            putRegistrationListComponent(registrationsGrid, row++, dto);
         }
 
-        namesTypesList.setSizeUndefined();
-        namesTypesList.setWidth(100, Unit.PERCENTAGE);
-        namesTypesList.setColumnExpandRatio(0, 0.1f);
-        namesTypesList.setColumnExpandRatio(1, 0.9f);
-        Panel namesTypesPanel = new Panel(namesTypesList);
+
+        Label addRegistrationLabel = new Label("Add a registration for a");
+
+        addNewNameRegistrationButton = new Button("new name");
+        addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
+        addNewNameRegistrationButton.addClickListener(e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.ADD, addNewNameRegistrationButton)));
+
+        addExistingNameRegistrationButton = new Button("existing name");
+        addExistingNameRegistrationButton.setDescription("A name which was previously published in a earlier publication.");
+
+
+        HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel, addNewNameRegistrationButton, addExistingNameRegistrationButton);
+        buttonContainer.setSpacing(true);
+        buttonContainer.setWidth(100, Unit.PERCENTAGE);
+        buttonContainer.setComponentAlignment(addRegistrationLabel, Alignment.MIDDLE_LEFT);
+        registrationsGrid.addComponent(buttonContainer, 1, row, 1, row);
+
+        Panel namesTypesPanel = new Panel(registrationsGrid);
         namesTypesPanel.setHeight("300px");
         return namesTypesPanel;
     }
 
+
     /**
-     * @param namesTypesList
-     * @param row
+     * @param grid
+     * @param row If null, the new row will be inserted as last registration item, that is before the button row.
      * @param dto
      */
-    protected void registrationListComponent(GridLayout namesTypesList, int row, RegistrationDTO dto) {
+    protected void putRegistrationListComponent(GridLayout grid, int row, RegistrationDTO dto) {
+
+        grid.setRows(grid.getRows() + 1);
+
         CssLayout buttonGroup = new CssLayout();
         buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
@@ -332,11 +351,11 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
             regItem = new Label(dto.getSummary());
         }
 
-        namesTypesList.addComponent(stateLabel, 0, row);
-        namesTypesList.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
-        namesTypesList.addComponent(regItem, 1, row);
-        namesTypesList.addComponent(buttonGroup, 2, row);
-        namesTypesList.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+        grid.addComponent(stateLabel, 0, row);
+        grid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
+        grid.addComponent(regItem, 1, row);
+        grid.addComponent(buttonGroup, 2, row);
+        grid.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
     }
 
     /**
@@ -506,15 +525,30 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         return null;
     }
 
-    protected class ViewParameters {
-
-        String action;
-        Integer referenceId;
-
-        public ViewParameters(String[] params){
-            action = params[0];
-            referenceId = Integer.parseInt(params[1]);
-        }
+    /**
+     * @return the addNewNameRegistrationButton
+     */
+    @Override
+    public Button getAddNewNameRegistrationButton() {
+        return addNewNameRegistrationButton;
     }
+
+    /**
+     * @return the addExistingNameRegistrationButton
+     */
+    @Override
+    public Button getAddExistingNameRegistrationButton() {
+        return addExistingNameRegistrationButton;
+    }
+
+    /**
+     * @return the citationID
+     */
+    @Override
+    public Integer getCitationID() {
+        return citationID;
+    }
+
+
 
 }

@@ -169,7 +169,6 @@ public class RegistrationItem extends GridLayout {
         if(regDto.getCitationID() != null) {
             navigationEvent = new NavigationEvent(
                     RegistrationWorkflowViewBean.NAME,
-                    RegistrationWorkflowViewBean.ACTION_EDIT,
                     Integer.toString(regDto.getCitationID())
                     );
         } else {
