@@ -89,7 +89,6 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@EventListener
 	protected void onUIInitialized(UIInitializedEvent e) {
 		init(UI.getCurrent(), uriFragmentManager, viewDisplay);
-		addProvider(viewProvider);
 		addViewChangeListener(viewChangeListener);
 	}
 
@@ -104,7 +103,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Override
 	public void navigateTo(String navigationState) {
 		super.navigateTo(navigationState);
-		eventBus.publishEvent(new NavigationEvent(navigationState));
+		//eventBus.publishEvent(new NavigationEvent(navigationState));
 	}
 
 	@EventListener
