@@ -22,6 +22,7 @@ import com.vaadin.ui.CustomComponent;
  * @author Peter / Vaadin
  * @param <V>
  */
+@SuppressWarnings("serial")
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
 		implements ApplicationContextAware {
 

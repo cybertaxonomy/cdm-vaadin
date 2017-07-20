@@ -17,6 +17,7 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
@@ -38,7 +39,9 @@ public class RegistrationWorkingSet {
     /**
      * Creates an empty working set
      */
-    public RegistrationWorkingSet() {
+    public RegistrationWorkingSet(Reference citation) {
+        citationId = citation.getId();
+        this.citation= citation.getTitleCache();
 
     }
 

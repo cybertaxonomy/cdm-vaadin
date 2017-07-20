@@ -165,6 +165,23 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         .wrapper{
           @include composite-field-wrapper;
         }
-    }   
-    
+        .map-wrapper {
+            .v-label {
+              position: absolute;
+              color: black;
+              margin-left: 60px;
+              z-index: 1000;
+              font-weight: bold;
+              background-color: white;
+              border-radius: $v-border-radius;
+            }
+            .v-leaflet{
+              position: absolute;
+              .leaflet-container{
+                  border-radius: $v-border-radius;
+                  margin-left: 10px;
+              }
+            }
+          }
+    }
 } 

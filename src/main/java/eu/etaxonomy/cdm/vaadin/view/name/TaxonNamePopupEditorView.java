@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import com.vaadin.ui.ListSelect;
+
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -30,5 +32,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox();
+
+    public ListSelect getRankSelect();
 
 }

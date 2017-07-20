@@ -48,6 +48,14 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
 
+    /**
+     * @return the workingSetService
+     */
+    public IRegistrationWorkingSetService getWorkingSetService() {
+        ensureBoundConversation();
+        return workingSetService;
+    }
+
     @Override
     public void handleViewEntered() {
         getView().populate(listRegistrations());
@@ -77,13 +85,13 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             // no parameter provided:  IGNORE
         }
 
-        Collection<RegistrationDTO> dtos = workingSetService.listDTOs(submitter, includeStatus);
+        Collection<RegistrationDTO> dtos = getWorkingSetService().listDTOs(submitter, includeStatus);
         return dtos;
     }
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
     public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
-        RegistrationDTO regDto = workingSetService.loadDtoById((Integer)event.getIdentifier());
+        RegistrationDTO regDto = getWorkingSetService().loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
             if(getView() != null){
                 getView().openDetailsPopup("Messages", regDto.getMessages());

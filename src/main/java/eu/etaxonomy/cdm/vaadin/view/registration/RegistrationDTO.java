@@ -221,6 +221,14 @@ public class RegistrationDTO{
         return citation;
     }
 
+    public void setCitation(IReference citation) throws Exception {
+        if(this.citation == null){
+            this.citation = citation;
+        } else {
+            throw new Exception("Can not set the citation on a non emtpy RegistrationDTO");
+        }
+    }
+
     /**
      * @return the citationID
      */

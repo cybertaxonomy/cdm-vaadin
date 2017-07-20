@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -20,38 +20,47 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction {
 
-    private Class<? extends TypeDesignationBase<?>> newEntityType;
+    private TypeDesignationWorkingSetType workingSetType;
 
     private int registrationId;
 
     /**
-     * @param edit
-     * @param ids
+     *
+     * @param action
+     * @param typeDesignationWorkingsetId
+     * @param workingSetType
+     * @param registrationId
+     * @param source
+     * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(Action action, Integer typeDesignationWorkingsetId, int registrationId, Component source, AbstractView sourceView) {
+    public TypeDesignationWorkingsetEditorAction(Action action, Integer typeDesignationWorkingsetId, TypeDesignationWorkingSetType workingSetType, int registrationId,
+            Component source, AbstractView sourceView) {
         super(action, typeDesignationWorkingsetId, source, sourceView);
         this.registrationId = registrationId;
+        this.workingSetType = workingSetType;
     }
 
     /**
-     * Constructor which is mainly suitable for ADD actions.
-     * @param
+     *
+     * @param action
+     * @param workingSetType
+     * @param registrationId
+     * @param source
+     * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(Action action, Class<? extends TypeDesignationBase<?>> newEntityType, int registrationId,
+    public TypeDesignationWorkingsetEditorAction(Action action, TypeDesignationWorkingSetType workingSetType, int registrationId,
             Component source, AbstractView sourceView) {
         super(action, null, source, sourceView);
-        this.newEntityType = newEntityType;
+        this.workingSetType = workingSetType;
         this.registrationId = registrationId;
     }
 
     /**
-     * In case of an ADD action the receiver of the event needs to know the specific type of the
-     * TypeDesignationBase instance to be created.
      *
-     * @return the newEntityType
+     * @return
      */
-    public Class<? extends TypeDesignationBase<?>> getNewEntityType() {
-        return newEntityType;
+    public TypeDesignationWorkingSetType getWorkingSetType() {
+        return workingSetType;
     }
 
     /**

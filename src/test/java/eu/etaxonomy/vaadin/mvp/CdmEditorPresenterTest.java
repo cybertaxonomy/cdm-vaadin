@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationEventPublisher;
 import org.unitils.dbunit.annotation.DataSet;
@@ -46,7 +48,7 @@ public class CdmEditorPresenterTest {
 
     @DataSet
     // @Test test setup not jet working :(
-    public void testSaveReference() throws IllegalAccessException {
+    public void testSaveReference() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
         ReferenceEditorPresenter referencePresenter = new ReferenceEditorPresenter();
         factory.injectPresenterBeans(ReferenceEditorPresenter.class, referencePresenter);

@@ -122,17 +122,20 @@ public class JodaTimePartialConverter implements Converter<String, Partial> {
     @Override
     public String convertToPresentation(Partial value, Class<? extends String> targetType, Locale locale)
             throws com.vaadin.data.util.converter.Converter.ConversionException {
+        String text = null;
         if(value != null){
-            switch(format) {
+           switch(format) {
             case ISO8601:
-                return formatIso8601(value);
+                text = formatIso8601(value);
+                break;
             case DAY_MONTH_YEAR_DOT:
-                return formatYyyymmddDot(value);
+                text = formatYyyymmddDot(value);
+                break;
             default:
-                return "JodaTimePartialConverter Error: unsupported format";
+                text = "JodaTimePartialConverter Error: unsupported format";
            }
         }
-        return "";
+        return text;
     }
 
     /**

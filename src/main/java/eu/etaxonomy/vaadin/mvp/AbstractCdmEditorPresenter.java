@@ -56,33 +56,27 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
+
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
-        logger.trace("===================================================================");
-        getStore().startConversationalTransaction();
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting conversational transaction");
-        // getStore().startTransaction(false);
-        // merge the bean and update the fieldGroup with the merged bean, so that updating
-        // of field values in turn of the commit are can not cause LazyInitializationExeptions
-        // the bean still has the original values at this point
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - merging bean into session");
-        mergedBean((DTO) preSaveEvent.getBean());
+        super.onEditorPreSaveEvent(preSaveEvent);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
     public void onEditorSaveEvent(EditorSaveEvent saveEvent){
+
         if(!isFromOwnView(saveEvent)){
             return;
         }
+
         // the bean is now updated with the changes made by the user
         DTO bean = (DTO) saveEvent.getBean();
         bean = handleTransientProperties(bean);
         EntityChangeEvent changeEvent = getStore().saveBean(bean);
 
-        logger.trace("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
         if(changeEvent != null){
             eventBus.publishEvent(changeEvent);
         }
@@ -102,6 +96,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     protected DTO handleTransientProperties(DTO bean) {
         // no need to handle transient properties in the generic case
         return bean;
+    }
+
+    @Override
+    protected DTO prepareAsFieldGroupDataSource(DTO bean){
+        DTO mergedBean = getStore().mergedBean(bean);
+        // DTO mergedBean = bean;
+        return mergedBean;
     }
 
     /**

@@ -18,8 +18,6 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.model.agent.Institution;
-import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -39,6 +37,12 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     TextField identifierField;
     TextField specificIdentifierField;
+
+
+    private ListSelect submitterField;
+
+
+    private ListSelect institutionField;
 
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
@@ -65,12 +69,12 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         statusSelect.setRows(1);
         addField(statusSelect, "status");
 
-        ListSelect submitterField = selectFieldFactory.createListSelect("Submitter", User.class);
+        submitterField = new ListSelect("Submitter");
         submitterField.setEnabled(false);
         submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
-        ListSelect institutionField = selectFieldFactory.createListSelect("Institution", Institution.class);
+        institutionField = new ListSelect("Institution");
         institutionField.setEnabled(false);
         institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
@@ -125,5 +129,21 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    /**
+     * @return the submitterField
+     */
+    @Override
+    public ListSelect getSubmitterField() {
+        return submitterField;
+    }
+
+    /**
+     * @return the institutionField
+     */
+    @Override
+    public ListSelect getInstitutionField() {
+        return institutionField;
     }
 }

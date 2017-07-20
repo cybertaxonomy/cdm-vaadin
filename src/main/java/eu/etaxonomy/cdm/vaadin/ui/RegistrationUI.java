@@ -31,10 +31,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
-import eu.etaxonomy.cdm.vaadin.view.LoginViewBean;
+import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
-import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationView;
+import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -73,13 +73,12 @@ public class RegistrationUI extends UI {
     SpringViewProvider viewProvider;
 
     protected void configureAccessDeniedView() {
-        viewProvider.setAccessDeniedViewClass(LoginViewBean.class);
+        viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
     }
     //---------------------------------------------
 
-    // public static final String INITIAL_VIEW = "workflow/edit/10";
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
-    static boolean debugMode = false;
+
 
     /*
      * this HACKY solution forces the bean to be instantiated, TODO do it properly
@@ -111,7 +110,7 @@ public class RegistrationUI extends UI {
         phycoBankLogo.addStyleName(ValoTheme.LABEL_HUGE);
         mainMenu.addMenuComponent(phycoBankLogo);
 
-        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationView.NAME );
+        mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationViewBean.NAME );
         mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
         mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
 
@@ -130,7 +129,7 @@ public class RegistrationUI extends UI {
         //navigate to initial view
         String state = pageFragmentAsState();
 
-        if(debugMode && state != null){
+        if(state != null){
             eventBus.publishEvent(new NavigationEvent(state));
         } else {
             eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));

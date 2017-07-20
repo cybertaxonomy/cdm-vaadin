@@ -36,12 +36,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.IdButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
@@ -52,11 +49,11 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -73,15 +70,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     public static final String DOM_ID_WORKINGSET = "workingset";
 
-    public static final String SUBHEADER_DEEFAULT = "Advance step by step through the registration workflow.";
-
     private static final long serialVersionUID = -213040114015958970L;
 
     public static final String NAME = "workflow";
-
-    public static final String ACTION_NEW = "new";
-
-    public static final String ACTION_EDIT = "edit";
 
     private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
 
@@ -92,10 +83,20 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     private List<CssLayout> registrations = new ArrayList<>();
 
     private String headerText = "-- empty --";
-    private String subheaderText = SUBHEADER_DEEFAULT;
+    private String subheaderText = "";
 
     private boolean addNameAndTypeEditButtons = false;
 
+    private ViewParameters viewParameters;
+
+
+    /**
+     * @return the viewParameters
+     */
+    @Override
+    public ViewParameters getViewParameters() {
+        return viewParameters;
+    }
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -115,18 +116,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
-           String[] params = event.getParameters().split("/");
+            this.viewParameters = new ViewParameters(event.getParameters().split("/"));
 
-           if(params[0].equals(ACTION_NEW)) {
-               regType = RegistrationType.valueOf(params[1]);
-               headerText = regType.name() + " ...";
-               eventBus.publishEvent(new RegistrationWorkflowEvent(regType));
-
-           } else if( params[0].equals(ACTION_EDIT)) {
-               headerText = params[1];
-               eventBus.publishEvent(new RegistrationWorkflowEvent(Integer.parseInt(params[1])));
-           }
-           updateHeader();
+            getPresenter().handleViewEntered();
         }
     }
 
@@ -204,7 +196,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
         // prepare name and type list
-        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size());
+        GridLayout namesTypesList = new GridLayout(3, workingset.getRegistrationDTOs().size() + 1);
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
             registrationListComponent(namesTypesList, row++, dto);
@@ -314,13 +306,15 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                     );
                 });
 
-                for(IdButton idButton : editButtonGroup.getTypeDesignationButtons()){
-                    idButton.getButton().addClickListener(e -> {
-                        Integer typeDesignationWorkingsetId = idButton.getId();
+                for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
+                    workingsetButton.getButton().addClickListener(e -> {
+                        Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                        TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                         Integer registrationEntityID = dto.getId();
                         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                                 AbstractEditorAction.Action.EDIT,
                                 typeDesignationWorkingsetId,
+                                workingsetType,
                                 registrationEntityID,
                                 null, //e.getButton(), the listener method expects this to be null
                                 this
@@ -358,9 +352,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeRegistrationWorkingset(SpecimenTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeRegistrationWorkingset(NameTypeDesignation.class, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         newNameTypeDesignationButton.setEnabled(false);
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
@@ -376,11 +370,11 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param button
      *
      */
-    protected void addNewTypeRegistrationWorkingset(Class<? extends TypeDesignationBase<?>> newEntityType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
+    protected void addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                 AbstractEditorAction.Action.ADD,
-                newEntityType,
+                newWorkingsetType,
                 registrationEntityId,
                 null,
                 this
@@ -448,6 +442,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void setHeaderText(String text) {
         this.headerText = text;
+        updateHeader();
 
     }
 
@@ -464,6 +459,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public void setSubheaderText(String text) {
         subheaderText = text;
+        updateHeader();
     }
 
     /**
@@ -508,6 +504,17 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    protected class ViewParameters {
+
+        String action;
+        Integer referenceId;
+
+        public ViewParameters(String[] params){
+            action = params[0];
+            referenceId = Integer.parseInt(params[1]);
+        }
     }
 
 }

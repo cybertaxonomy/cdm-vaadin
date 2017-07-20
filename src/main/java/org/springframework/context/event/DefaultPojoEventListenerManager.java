@@ -29,6 +29,10 @@ import com.vaadin.spring.annotation.UIScope;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
+ * The DefaultPojoEventListenerManager helps sending events to  event listener methods defined in beans
+ * which are not manages by the Spring {@link ApplicationEventMulticaster}. The {@link ApplicationEventMulticaster}
+ * for example misses sending events to spring beans with scope "Prototype".
+ *
  * @author a.kohlbecker
  * @since May 29, 2017
  *

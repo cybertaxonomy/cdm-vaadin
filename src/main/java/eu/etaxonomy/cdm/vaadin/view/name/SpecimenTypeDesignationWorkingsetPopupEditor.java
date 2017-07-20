@@ -141,12 +141,13 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
         PartialDateField collectionDateField = new PartialDateField("Collection date");
+        collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row);
         TextField fieldNumberField = addTextField("Field number", "fieldNumber", 2, row);
 
         row++;
 
-        // FIXME: can we use the Grid instaed?
+        // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
                 SpecimenTypeDesignationDTORow.class

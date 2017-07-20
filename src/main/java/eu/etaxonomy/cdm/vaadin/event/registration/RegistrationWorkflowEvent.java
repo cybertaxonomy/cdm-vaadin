@@ -8,8 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.registration;
 
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationType;
-
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
@@ -17,7 +15,6 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationType;
  */
 public class RegistrationWorkflowEvent {
 
-    private RegistrationType type = null;
     private Action action;
     private Integer citationID = null;
 
@@ -26,21 +23,9 @@ public class RegistrationWorkflowEvent {
      * @param citationID the id of a {@link Reference} denoting a
      * complete registration working set.
      */
-    public RegistrationWorkflowEvent(int citationID){
-        this.action = Action.open;
+    public RegistrationWorkflowEvent(int citationID, Action action){
+        this.action = action;
         this.citationID = citationID;
-    }
-
-    public RegistrationWorkflowEvent(RegistrationType type){
-        this.type = type;
-        this.action = Action.start;
-    }
-
-    /**
-     * @return the type
-     */
-    public RegistrationType getType() {
-        return type;
     }
 
     /**
@@ -62,7 +47,7 @@ public class RegistrationWorkflowEvent {
     }
 
 
-    enum Action {
+    public enum Action {
         start, open;
     }
 

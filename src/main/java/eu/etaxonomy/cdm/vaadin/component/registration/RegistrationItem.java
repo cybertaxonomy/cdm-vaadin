@@ -190,9 +190,14 @@ public class RegistrationItem extends GridLayout {
         } else {
             referenceEditorAction = new ReferenceEditorAction(Action.ADD);
         }
-        TimePeriod datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
+        TimePeriod datePublished = null;
+        String submitterName = null;
+        if(workingSet.getRegistrationDTOs().size() > 0){
+            datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
+            submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
+        }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
-                referenceEditorAction, FontAwesome.EDIT, null, workingSet.getRegistrationDTOs().get(0).getSubmitterUserName());
+                referenceEditorAction, FontAwesome.EDIT, null, submitterName);
     }
 
     /**
@@ -264,7 +269,9 @@ public class RegistrationItem extends GridLayout {
 
 
     private void updateDateLabels(DateTime created, TimePeriod datePublished, DateTime released) {
-        getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
+        if(created != null){
+            getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
+        }
         if(datePublished != null){
             getPublishedLabel().setVisible(true);
             getPublishedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_PUBLISHED + "</span>&nbsp;" + timePeriodFormatter.print(datePublished));

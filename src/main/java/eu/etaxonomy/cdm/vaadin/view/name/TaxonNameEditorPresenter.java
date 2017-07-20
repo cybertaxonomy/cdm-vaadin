@@ -8,16 +8,19 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.model.common.TermType;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -37,30 +40,39 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      */
     @Override
     public void handleViewEntered() {
+
         super.handleViewEntered();
 
+        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
+        getView().getRankSelect().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(TermType.Rank));
+        getView().getRankSelect().setItemCaptionPropertyId("label");
+
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
+        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), TaxonNameEditorPresenter.this);
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
 
 
         getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService());
+        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService(), TaxonNameEditorPresenter.this);
         getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
     }
 
-    @Override
-    protected TaxonName prepareAsFieldGroupDataSource(TaxonName bean){
-        TaxonName initializedBean = getRepo().getNameService().load(bean.getUuid(), Arrays.asList(
-                "$",
-                "basionymAuthorship",
-                "combinationAuthorship",
-                "exCombinationAuthorship",
-                "exBasionymAuthorship",
-                "nomenclaturalReference.authorship.teamMembers"));
-        return initializedBean;
-    }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TaxonName loadBeanById(Object identifier) {
+
+        TaxonName bean;
+        if(identifier != null){
+            bean = getRepo().getNameService().find((Integer)identifier);
+        } else {
+            bean = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
+        }
+        return bean;
+    }
 
     @Override
     protected TaxonName handleTransientProperties(TaxonName bean) {
@@ -69,6 +81,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         Set<TaxonName> oldBasionyms = bean.getBasionyms();
         boolean updateBasionyms = false;
         for(TaxonName newB : newBasionymNames){
+
             updateBasionyms = updateBasionyms || !oldBasionyms.contains(newB);
         }
         for(TaxonName oldB : oldBasionyms){
@@ -77,8 +90,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         if(updateBasionyms){
             bean.removeBasionyms();
             for(TaxonName basionymName :newBasionymNames){
-                getSession().merge(basionymName);
-                bean.addBasionym(basionymName);
+                if(basionymName != null){
+                    if(basionymName .getUuid() != null){
+                        // reload
+                        basionymName = getRepo().getNameService().load(basionymName.getUuid());
+                    }
+                    bean.addBasionym(basionymName);
+                }
             }
         }
         return bean;

@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import com.vaadin.ui.ListSelect;
+
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -17,4 +19,14 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface RegistrationPopEditorView extends ApplicationView<RegistrationEditorPresenter> {
 
+
+    /**
+     * @return the submitterField
+     */
+    public ListSelect getSubmitterField();
+
+    /**
+     * @return the institutionField
+     */
+    public ListSelect getInstitutionField();
 }

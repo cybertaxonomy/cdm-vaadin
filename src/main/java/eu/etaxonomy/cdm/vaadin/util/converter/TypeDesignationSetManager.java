@@ -635,6 +635,15 @@ public class TypeDesignationSetManager {
             return SpecimenOrObservationBase.class.isAssignableFrom(baseEntityReference.getType());
         }
 
+        public TypeDesignationWorkingSetType getWorkingsetType() {
+            return isSpecimenTypeDesigationWorkingSet() ? TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET : TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET;
+        }
+
+    }
+
+    public enum TypeDesignationWorkingSetType {
+        SPECIMEN_TYPE_DESIGNATION_WORKINGSET,
+        NAME_TYPE_DESIGNATION_WORKINGSET,
     }
 
     @SuppressWarnings({ "deprecation", "serial" })
@@ -656,8 +665,6 @@ public class TypeDesignationSetManager {
         protected void setDefaultTerms(TermVocabulary<NullTypeDesignationStatus> termVocabulary) {
             // empty
         }
-
-
 
     }
 

@@ -36,7 +36,7 @@ public class DashBoardView extends DashBoardDesign implements View {
 
     public DashBoardView() {
         Responsive.makeResponsive(dashboard);
-        buttonNew.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(StartRegistrationView.NAME)));
+        buttonNew.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(StartRegistrationViewBean.NAME)));
         buttonContinue.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS)));
         buttonList.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL)));
     }

@@ -25,6 +25,8 @@ import eu.etaxonomy.cdm.vaadin.util.converter.JodaTimePartialConverter;
  */
 public class PartialDateField extends TextField {
 
+    private static final long serialVersionUID = -347319052346135100L;
+
     JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.DAY_MONTH_YEAR_DOT;
 
     /**
