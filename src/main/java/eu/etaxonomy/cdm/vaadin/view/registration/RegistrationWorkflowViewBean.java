@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -37,6 +38,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
@@ -50,6 +52,7 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -92,9 +95,13 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private Button addNewNameRegistrationButton;
 
-    private Button addExistingNameRegistrationButton;
+    private LazyComboBox<TaxonName> existingNameCombobox;
+
+    // private Button addExistingNameRegistrationButton;
 
     private GridLayout registrationsGrid;
+
+    private Button addExistingNameButton;
 
     public RegistrationWorkflowViewBean() {
         super();
@@ -205,20 +212,32 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         }
 
 
-        Label addRegistrationLabel = new Label("Add a registration for a");
+        Label addRegistrationLabel_1 = new Label("Add a new registration for a");
+        Label addRegistrationLabel_2 = new Label("or an");
 
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
-        addNewNameRegistrationButton.addClickListener(e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.ADD, addNewNameRegistrationButton)));
+        addNewNameRegistrationButton.addClickListener(
+                e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.ADD, addNewNameRegistrationButton))
+                );
 
-        addExistingNameRegistrationButton = new Button("existing name");
-        addExistingNameRegistrationButton.setDescription("A name which was previously published in a earlier publication.");
+        addExistingNameButton = new Button("existing name:");
+        addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
+        addExistingNameButton.setEnabled(false);
+        addExistingNameButton.addClickListener(
+                e -> eventBus.publishEvent(new RegistrationWorkflowEvent(citationID, RegistrationWorkflowEvent.Action.start))
+                );
 
+        existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
+        existingNameCombobox.addValueChangeListener(
+                e -> addExistingNameButton.setEnabled(e.getProperty().getValue() != null)
+                );
 
-        HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel, addNewNameRegistrationButton, addExistingNameRegistrationButton);
+        HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel_1, addNewNameRegistrationButton, addRegistrationLabel_2, addExistingNameButton, existingNameCombobox);
         buttonContainer.setSpacing(true);
         buttonContainer.setWidth(100, Unit.PERCENTAGE);
-        buttonContainer.setComponentAlignment(addRegistrationLabel, Alignment.MIDDLE_LEFT);
+        buttonContainer.setComponentAlignment(addRegistrationLabel_1, Alignment.MIDDLE_LEFT);
+        buttonContainer.setComponentAlignment(addRegistrationLabel_2, Alignment.MIDDLE_LEFT);
         registrationsGrid.addComponent(buttonContainer, 1, row, 1, row);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
@@ -312,8 +331,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         Component regItem;
         if(REG_ITEM_AS_BUTTON_GROUP){
             RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
-            if(editButtonGroup.getNameButton() != null){
 
+            if(editButtonGroup.getNameButton() != null){
                 editButtonGroup.getNameButton().getButton().addClickListener(e -> {
                     Integer nameId = editButtonGroup.getNameButton().getId();
                     getEventBus().publishEvent(new TaxonNameEditorAction(
@@ -324,28 +343,28 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
                         )
                     );
                 });
-
-                for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
-                    workingsetButton.getButton().addClickListener(e -> {
-                        Integer typeDesignationWorkingsetId = workingsetButton.getId();
-                        TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
-                        Integer registrationEntityID = dto.getId();
-                        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
-                                AbstractEditorAction.Action.EDIT,
-                                typeDesignationWorkingsetId,
-                                workingsetType,
-                                registrationEntityID,
-                                null, //e.getButton(), the listener method expects this to be null
-                                this
-                                )
-                            );
-                    });
-                }
-
-                editButtonGroup.getAddTypeDesignationButton().addClickListener(
-                        e -> chooseNewTypeRegistrationWorkingset(e.getButton(), dto.getId())
-                        );
             }
+
+            for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
+                workingsetButton.getButton().addClickListener(e -> {
+                    Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                    TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
+                    Integer registrationEntityID = dto.getId();
+                    getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                            AbstractEditorAction.Action.EDIT,
+                            typeDesignationWorkingsetId,
+                            workingsetType,
+                            registrationEntityID,
+                            null, //e.getButton(), the listener method expects this to be null
+                            this
+                            )
+                        );
+                });
+            }
+
+            editButtonGroup.getAddTypeDesignationButton().addClickListener(
+                    e -> chooseNewTypeRegistrationWorkingset(dto.getId())
+                    );
             regItem = editButtonGroup;
         } else {
             regItem = new Label(dto.getSummary());
@@ -363,7 +382,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param registrationEntityId
      *
      */
-    protected void chooseNewTypeRegistrationWorkingset(Button button, Integer registrationEntityId) {
+    @Override
+    public void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId) {
 
         Window typeDesignationTypeCooser = new Window();
         typeDesignationTypeCooser.setModal(true);
@@ -371,9 +391,9 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         newNameTypeDesignationButton.setEnabled(false);
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
@@ -389,7 +409,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * @param button
      *
      */
-    protected void addNewTypeRegistrationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
+    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                 AbstractEditorAction.Action.ADD,
@@ -533,12 +553,14 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
         return addNewNameRegistrationButton;
     }
 
-    /**
-     * @return the addExistingNameRegistrationButton
-     */
     @Override
     public Button getAddExistingNameRegistrationButton() {
-        return addExistingNameRegistrationButton;
+        return addExistingNameButton;
+    }
+
+    @Override
+    public LazyComboBox<TaxonName> getAddExistingNameCombobox() {
+        return existingNameCombobox;
     }
 
     /**

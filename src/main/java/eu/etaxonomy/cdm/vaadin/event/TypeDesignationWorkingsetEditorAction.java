@@ -70,6 +70,10 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
         return registrationId;
     }
 
+    public Integer getTypeDesignationWorkingsetId(){
+        return getEntityId();
+    }
+
 
 
 

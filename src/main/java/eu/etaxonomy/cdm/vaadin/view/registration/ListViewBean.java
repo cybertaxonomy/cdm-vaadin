@@ -123,6 +123,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
      * @param registrationItems
      * @return
      */
+    @Deprecated
     private GeneratedPropertyContainer buildGeneratedProperties(
             BeanContainer<String, RegistrationDTO> registrationItems) {
         GeneratedPropertyContainer gpContainer = new GeneratedPropertyContainer(registrationItems);

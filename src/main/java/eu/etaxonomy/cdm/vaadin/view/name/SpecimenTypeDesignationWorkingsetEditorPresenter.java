@@ -8,10 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -22,6 +21,7 @@ import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
@@ -37,6 +37,7 @@ import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
@@ -57,6 +58,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     CdmStore<Registration, IRegistrationService> store;
 
+    private Reference citation;
+
+    private TaxonName typifiedName;
+
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
             store = new CdmStore<>(getRepo(), getRepo().getRegistrationService());
@@ -66,24 +71,40 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
 
     /**
-     * {@inheritDoc}
+     * Loads an existing working set from the database. This process actually involves
+     * loading the Registration specified by the <code>RegistrationAndWorkingsetId.registrationId</code> and in
+     * a second step to find the workingset by the <code>registrationAndWorkingsetId.workingsetId</code>.
+     * <p>
+     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetEditorIdSet} whereas the field <code>egistrationId</code>
+     * must be present, the field <code>workingsetId</code>,  however can be null. I this case a new workingset with a new {@link FieldUnit} as
+     * base entity is being created.
+     *
+     * @param identifier a {@link TypeDesignationWorkingsetEditorIdSet}
      */
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO loadBeanById(Object identifier) {
 
-        SpecimenTypeDesignationWorkingSetDTO workingSet;
+        SpecimenTypeDesignationWorkingSetDTO workingSetDto;
         if(identifier != null){
-            RegistrationAndWorkingsetId registrationAndWorkingsetId = (RegistrationAndWorkingsetId)identifier;
-            List<Integer> ids = new ArrayList<>();
-            ids.add(registrationAndWorkingsetId.registrationId);
-            Registration reg = getRepo().getRegistrationService().loadByIds(ids, null).get(0);
-            RegistrationDTO regDTO = new RegistrationDTO(reg);
-            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(registrationAndWorkingsetId.workingsetId);
-            workingSet = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
+            TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
+            Registration reg = getRepo().getRegistrationService().loadByIds(Arrays.asList(idset.registrationId), null).get(0);
+            if(idset.workingsetId != null){
+                RegistrationDTO regDTO = new RegistrationDTO(reg);
+                // find the working set
+                TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
+                workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
+                citation = (Reference) regDTO.getCitation();
+            } else {
+                // create a new workingset, for a new fieldunit which is the base for the workingset
+                FieldUnit newfieldUnit = FieldUnit.NewInstance();
+                workingSetDto = new SpecimenTypeDesignationWorkingSetDTO(reg, newfieldUnit, null);
+                citation = getRepo().getReferenceService().find(idset.publicationId);
+                typifiedName = getRepo().getNameService().find(idset.typifiedNameId);
+            }
         } else {
-            workingSet = null;
+            workingSetDto = null;
         }
-        return workingSet;
+        return workingSetDto;
     }
 
 
@@ -217,9 +238,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         // associate all type designations with the fieldUnit
         // 1. new ones are not yet associated
         // 2. ones which had incomplete data are also not connected
-        for(SpecimenTypeDesignation std : dto.getSpecimenTypeDesignations()){
+        for(SpecimenTypeDesignationDTO stdDTO : dto.getSpecimenTypeDesignationDTOs()){
             try {
-                SpecimenOrObservationBase<?> original = findEarliestOriginal(std.getTypeSpecimen());
+                SpecimenOrObservationBase<?> original = findEarliestOriginal(stdDTO.asSpecimenTypeDesignation().getTypeSpecimen());
                 if(original instanceof DerivedUnit){
                     DerivedUnit du = (DerivedUnit)original;
                     du.getDerivedFrom().addOriginal(dto.getFieldUnit());
@@ -232,8 +253,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         // add newly added typeDesignations
         Set<SpecimenTypeDesignation> addCandidates = new HashSet<>();
-        for(SpecimenTypeDesignation std : dto.getSpecimenTypeDesignations()){
-            if(!reg.getTypeDesignations().stream().filter(td -> td.equals(std)).findFirst().isPresent()){
+        for(SpecimenTypeDesignationDTO stdDTO : dto.getSpecimenTypeDesignationDTOs()){
+            SpecimenTypeDesignation std = stdDTO.asSpecimenTypeDesignation();
+            if(reg.getTypeDesignations().isEmpty() || !reg.getTypeDesignations().stream().filter(td -> td.equals(std)).findFirst().isPresent()){
+                std.setCitation(citation);
+                typifiedName.addTypeDesignation(std, false);
                 addCandidates.add(std);
             }
         }

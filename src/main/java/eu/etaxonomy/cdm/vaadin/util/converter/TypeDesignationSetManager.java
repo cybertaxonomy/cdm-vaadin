@@ -557,8 +557,18 @@ public class TypeDesignationSetManager {
     }
 
     /**
-     * Groups the EntityReferences for TypeDesignations by the according TypeDesignationStatus.
+     * TypeDesignations which refer to the same FieldUnit (SpecimenTypeDesignation) or TaxonName
+     * (NameTypeDesignation) form a working set. The <code>TypeDesignationWorkingSet</code> internally
+     * works with EnityReferences to the actual TypeDesignations.
+     *
+     * The EntityReferences for TypeDesignations are grouped by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys can be ordered by the term order defined in the vocabulary.
+     *
+     * A workingset can be referenced by the <code>workingSetId</code>, this is a autoincrement
+     * value which is created during the process of determining the workingsets in a collection of
+     * TypeDesignations.
+     *
+     * TODO: consider using a concatenation of baseEntity.getClass() + baseEntity.getId() as workingset identifier
      */
     public class TypeDesignationWorkingSet extends LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> {
 

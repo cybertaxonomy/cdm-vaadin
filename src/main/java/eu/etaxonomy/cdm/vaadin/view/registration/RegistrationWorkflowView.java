@@ -11,9 +11,13 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.List;
 import java.util.UUID;
 
+import org.vaadin.viritin.fields.LazyComboBox;
+
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 
+import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -70,12 +74,28 @@ public interface RegistrationWorkflowView extends ApplicationView{
      */
     void openDetailsPopup(String caption, List<String> messages);
 
-    Button getAddExistingNameRegistrationButton();
-
-
     Button getAddNewNameRegistrationButton();
 
+    /**
+     * @return
+     */
+    Button getAddExistingNameRegistrationButton();
+
+    public LazyComboBox<TaxonName> getAddExistingNameCombobox();
+
     Integer getCitationID();
+
+
+    /**
+     * selecting a type will cause a {@link TypeDesignationWorkingsetEditorAction} to be emitted.
+     * On Cancel .. TODO
+     * @param registrationEntityId
+     */
+    void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId);
+
+
+
+
 
 
 

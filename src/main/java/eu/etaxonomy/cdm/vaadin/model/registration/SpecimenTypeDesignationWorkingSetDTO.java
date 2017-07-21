@@ -35,15 +35,17 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     VersionableEntity baseEntity;
 
-    List<SpecimenTypeDesignation> specimenTypeDesignations;
+    List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>();
 
     List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
 
     VersionableEntity owner;
 
     /**
-     * @param fieldUnit
-     * @param derivedUnits
+     *
+     * @param owner
+     * @param baseEntity
+     * @param specimenTypeDesignations can be <code>null</code>
      */
     public SpecimenTypeDesignationWorkingSetDTO(VersionableEntity owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations) {
         super();
@@ -55,8 +57,10 @@ public class SpecimenTypeDesignationWorkingSetDTO {
                 fieldUnit.setGatheringEvent(GatheringEvent.NewInstance());
             }
         }
-        this.specimenTypeDesignations = specimenTypeDesignations;
-        specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
+        if(specimenTypeDesignations != null){
+            this.specimenTypeDesignations = specimenTypeDesignations;
+            this.specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
+        }
     }
 
     /**
@@ -80,7 +84,7 @@ public class SpecimenTypeDesignationWorkingSetDTO {
     /**
      * @return the derivedUnits
      */
-    public List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
+    protected List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
         return specimenTypeDesignations;
     }
 

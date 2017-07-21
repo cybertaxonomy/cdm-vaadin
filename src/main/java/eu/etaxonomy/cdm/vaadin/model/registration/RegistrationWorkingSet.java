@@ -9,14 +9,17 @@
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
@@ -68,7 +71,8 @@ public class RegistrationWorkingSet {
      * all validation problems.
      *
      * @param candidates
-     * @param problems Problems detected in prior validation and processing passed to this method to be completed.
+     * @param problems
+     *    Problems detected in prior validation and processing passed to this method to be completed. Can be <code>null</code>.
      * @throws RegistrationValidationException
      */
     private void validateAndAddDTOs(List<RegistrationDTO> candidates, List<String> problems) throws RegistrationValidationException {
@@ -105,6 +109,10 @@ public class RegistrationWorkingSet {
         Set<Registration> candidates = new HashSet<>();
         candidates.add(reg);
         validateAndAdd(candidates);
+    }
+
+    public void add(RegistrationDTO regDTO) throws RegistrationValidationException {
+        validateAndAddDTOs(Arrays.asList(regDTO), null);
     }
 
     /**
@@ -152,6 +160,10 @@ public class RegistrationWorkingSet {
      */
     public List<RegistrationDTO> getRegistrationDTOs() {
         return registrationDTOs;
+    }
+
+    public Optional<RegistrationDTO> getRegistrationDTO(int registrationId) {
+        return registrationDTOs.stream().filter(r -> r.getId() == registrationId).findFirst();
     }
 
     /**

@@ -26,9 +26,11 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.IReference;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -101,7 +103,7 @@ public class RegistrationDTO{
         case TYPIFICATION:
         default:
             try {
-                typeDesignationManager = new TypeDesignationSetManager(reg, reg.getTypeDesignations());
+                typeDesignationManager = new TypeDesignationSetManager(reg.getTypeDesignations());
                 summary = typeDesignationManager.buildString().print();
             } catch (RegistrationValidationException e) {
                 messages.add("Validation errors: " + e.getMessage());
@@ -112,6 +114,21 @@ public class RegistrationDTO{
         // trigger initialization of the reference
         getNomenclaturalCitationString();
 
+    }
+
+    /**
+     * To create an initially empty DTO for which only the <code>typifiedName</code> and the <code>publication</code> are defined.
+     * All TypeDesignations added to the <code>Registration</code> need to refer to the same <code>typifiedName</code> and must be
+     * published in the same <code>publication</code>.
+     *
+     * @param reg
+     * @param typifiedName
+     */
+    public RegistrationDTO(Registration reg, TaxonName typifiedName, Reference publication) {
+        this.reg = reg;
+        citation = publication;
+        // create a TypeDesignationSetManager with only a reference to the typifiedName for validation
+        typeDesignationManager = new TypeDesignationSetManager(typifiedName);
     }
 
     /**

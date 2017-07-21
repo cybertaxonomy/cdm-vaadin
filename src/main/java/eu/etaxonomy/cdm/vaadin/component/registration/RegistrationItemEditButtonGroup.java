@@ -63,7 +63,9 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             addComponents(nameIdButton.getButton(), nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
-            addComponent(new Label(regDto.getTypifiedName().getLabel()));
+            if(regDto.getTypifiedName() != null){
+                addComponent(new Label(regDto.getTypifiedName().getLabel()));
+            }
         }
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
@@ -90,7 +92,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             }
         }
         addTypeDesignationButton = new Button(FontAwesome.PLUS);
-        addTypeDesignationButton.setDescription("Add a new type designation");
+        addTypeDesignationButton.setDescription("Add a new type designation workingset");
         addComponent(addTypeDesignationButton);
 
 
@@ -117,7 +119,9 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
     @Override
     protected void addDefaultStyles() {
         addStyleName(STYLE_NAMES);
-        nameIdButton.getButton().addStyleName(DEFAULT_BUTTON_STYLES);
+        if(nameIdButton != null){
+            nameIdButton.getButton().addStyleName(DEFAULT_BUTTON_STYLES);
+        }
         typeDesignationButtons.forEach(idb -> idb.getButton().addStyleName(DEFAULT_BUTTON_STYLES));
         addTypeDesignationButton.addStyleName(DEFAULT_BUTTON_STYLES);
     }
