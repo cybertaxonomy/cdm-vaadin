@@ -90,7 +90,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         setWidthUndefined();
 
         mainLayout = new VerticalLayout();
-        mainLayout.setWidthUndefined();
+        // IMPORTANT: mainLayout must be set to full size otherwise the
+        // popup window may have problems with automatic resizing of its
+        // content.
+        mainLayout.setSizeFull();
 
         fieldGroup = new BeanFieldGroup<>(dtoType);
         fieldGroup.addCommitHandler(new SaveHandler());

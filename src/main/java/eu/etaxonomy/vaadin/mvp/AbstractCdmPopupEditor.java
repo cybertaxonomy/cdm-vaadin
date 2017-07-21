@@ -39,11 +39,19 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
     private Button advancedModeButton;
 
     /**
+     * The supplied layout will be set to full size, to avoid problems with
+     * automatic resizing of the inner content.
+     *
+     *
      * @param layout
      * @param dtoType
      */
     public AbstractCdmPopupEditor(Layout layout, Class<DTO> dtoType) {
         super(layout, dtoType);
+        // IMPORTANT: the layout must be set to full size otherwise the
+        // popup window may have problems with automatic resizing of its
+        // content.
+        layout.setSizeFull();
         if(MarginHandler.class.isAssignableFrom(getFieldLayout().getClass())){
             ((MarginHandler)getFieldLayout()).setMargin(new MarginInfo(false, true, true, true));
         }

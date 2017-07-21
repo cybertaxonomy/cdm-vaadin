@@ -83,6 +83,8 @@ public class TypeDesignationSetManager {
 
     private List<String> probelms = new ArrayList<>();
 
+    private boolean printCitation = false;
+
     /**
      * @param containgEntity
      * @param taxonName
@@ -500,8 +502,12 @@ public class TypeDesignationSetManager {
             }
         }
 
-        if(td.getCitation() != null){
-            result += " " + td.getCitation().getTitleCache();
+        if(isPrintCitation() && td.getCitation() != null){
+            if(td.getCitation().getAbbrevTitle() != null){
+                result += " " + td.getCitation().getAbbrevTitle();
+            } else {
+                result += " " + td.getCitation().getTitleCache();
+            }
             if(td.getCitationMicroReference() != null){
                 result += " :" + td.getCitationMicroReference();
             }
@@ -554,6 +560,20 @@ public class TypeDesignationSetManager {
 
     public String print() {
         return finalString.trim();
+    }
+
+    /**
+     * @return the printCitation
+     */
+    public boolean isPrintCitation() {
+        return printCitation;
+    }
+
+    /**
+     * @param printCitation the printCitation to set
+     */
+    public void setPrintCitation(boolean printCitation) {
+        this.printCitation = printCitation;
     }
 
     /**
