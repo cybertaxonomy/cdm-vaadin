@@ -87,18 +87,15 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
-        setWidthUndefined();
-
         mainLayout = new VerticalLayout();
         // IMPORTANT: mainLayout must be set to full size otherwise the
         // popup window may have problems with automatic resizing of its
         // content.
         mainLayout.setSizeFull();
+        setCompositionRoot(mainLayout);
 
         fieldGroup = new BeanFieldGroup<>(dtoType);
         fieldGroup.addCommitHandler(new SaveHandler());
-
-        setCompositionRoot(mainLayout);
 
         toolBar.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
         toolBar.setWidth(100, Unit.PERCENTAGE);

@@ -130,6 +130,12 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		window.setModal(true);
 		window.setCaptionAsHtml(popupView.isWindowCaptionAsHtml());
 		window.setWidth(popupView.getWindowPixelWidth(), Unit.PIXELS);
+		// setting 100% as default height. If the height
+		// would be undefined the window, will fit the size of
+		// the content and will sometimes exceed the height of the
+		// main window and will not get a scroll bar in this situation.
+		// see #6843
+		window.setHeight("100%");
 		window.setContent(popupView.asComponent());
 		// window.addCloseListener(e -> popupView.cancel());
 		UI.getCurrent().addWindow(window);
