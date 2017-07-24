@@ -35,6 +35,7 @@ public class RegistrationStateLabel extends Label {
 
        setValue(StringUtils.capitalize((status.name().toLowerCase())));
        addStyleName("status-" + status.name());
+       setWidth("90px");
        return this;
    }
 

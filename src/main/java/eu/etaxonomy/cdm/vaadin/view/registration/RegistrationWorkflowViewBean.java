@@ -22,6 +22,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -69,9 +70,6 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationWorkflowPresenter>
     implements RegistrationWorkflowView, View, AccessRestrictedView {
 
-
-    public static final String DOM_ID_WORKFLOW = "workflow-container";
-
     public static final String DOM_ID_WORKINGSET = "workingset";
 
     private static final long serialVersionUID = -213040114015958970L;
@@ -81,8 +79,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
 
     public RegistrationType regType = null;
-
-    private CssLayout workflow;
 
     private List<CssLayout> registrations = new ArrayList<>();
 
@@ -97,23 +93,28 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private LazyComboBox<TaxonName> existingNameCombobox;
 
-    // private Button addExistingNameRegistrationButton;
-
     private GridLayout registrationsGrid;
 
     private Button addExistingNameButton;
+
+    private RegistrationItem workingsetHeader;
+
+    private Panel registrationListPanel;
 
     public RegistrationWorkflowViewBean() {
         super();
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void initContent() {
-        workflow = new CssLayout();
-        workflow.setSizeFull();
-        workflow.setId(DOM_ID_WORKFLOW);
-        getLayout().addComponent(workflow);
+        getLayout().setId(NAME);
+        // all content is added in createRegistrationsList()
     }
+
 
     /**
      * {@inheritDoc}
@@ -132,27 +133,22 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      */
     @Override
     public void setWorkingset(RegistrationWorkingSet workingset) {
+        if(workingsetHeader != null){
+            getLayout().removeComponent(workingsetHeader);
+            getLayout().removeComponent(registrationListPanel);
+        }
 
-        CssLayout registration = new CssLayout();
-        registration.setId(DOM_ID_WORKINGSET);
-        registration.setWidth(100, Unit.PERCENTAGE);
-
-        Panel registrationListPanel = createRegistrationsList(workingset);
+        registrationListPanel = createRegistrationsList(workingset);
         registrationListPanel.setStyleName("registration-list");
         registrationListPanel.setCaption("Registrations");
 
-
-        // registration.addComponent(createWorkflowTabSheet(workingset, null));
-        RegistrationItem registrationItem = new RegistrationItem(workingset, this);
+        workingsetHeader = new RegistrationItem(workingset, this);
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
-            registrationItem.getSubmitterLabel().setVisible(true);
-        };
-        registration.addComponent(registrationItem);
-        registration.addComponent(registrationListPanel);
+            workingsetHeader.getSubmitterLabel().setVisible(true);
+        }
+        addContentComponent(workingsetHeader, null);
+        addContentComponent(registrationListPanel, 1.0f);
 
-        registrations.add(registration);
-        workflow.removeAllComponents();
-        workflow.addComponent(registration);
     }
 
     /**
@@ -202,15 +198,17 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
 
         registrationsGrid = new GridLayout(3, 1);
-        registrationsGrid.setSizeUndefined();
-        registrationsGrid.setColumnExpandRatio(0, 0.1f);
-        registrationsGrid.setColumnExpandRatio(1, 0.9f);
+        registrationsGrid.setWidth("100%");
+        // allow vertical scrolling:
+        registrationsGrid.setHeightUndefined();
+
+        //registrationsGrid.setColumnExpandRatio(0, 0.1f);
+        registrationsGrid.setColumnExpandRatio(1, 1f);
 
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
             putRegistrationListComponent(registrationsGrid, row++, dto);
         }
-
 
         Label addRegistrationLabel_1 = new Label("Add a new registration for a");
         Label addRegistrationLabel_2 = new Label("or an");
@@ -235,13 +233,14 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
         HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel_1, addNewNameRegistrationButton, addRegistrationLabel_2, addExistingNameButton, existingNameCombobox);
         buttonContainer.setSpacing(true);
-        buttonContainer.setWidth(100, Unit.PERCENTAGE);
+//        buttonContainer.setWidth(100, Unit.PERCENTAGE);
         buttonContainer.setComponentAlignment(addRegistrationLabel_1, Alignment.MIDDLE_LEFT);
         buttonContainer.setComponentAlignment(addRegistrationLabel_2, Alignment.MIDDLE_LEFT);
-        registrationsGrid.addComponent(buttonContainer, 1, row, 1, row);
+        registrationsGrid.addComponent(buttonContainer, 0, row, 2, row);
+        registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
-        namesTypesPanel.setHeight("300px");
+        namesTypesPanel.setSizeFull();
         return namesTypesPanel;
     }
 
@@ -513,8 +512,8 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
      * {@inheritDoc}
      */
     @Override
-    public CssLayout getWorkflow() {
-        return workflow;
+    public AbstractLayout getWorkflow() {
+        return getLayout();
     }
 
     /**
@@ -570,7 +569,6 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     public Integer getCitationID() {
         return citationID;
     }
-
 
 
 }

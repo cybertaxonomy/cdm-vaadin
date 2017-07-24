@@ -13,8 +13,8 @@ import java.util.UUID;
 
 import org.vaadin.viritin.fields.LazyComboBox;
 
+import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CssLayout;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
@@ -33,7 +33,7 @@ public interface RegistrationWorkflowView extends ApplicationView{
     public static final String ACTION_EDIT = "edit";
 
 
-    CssLayout getWorkflow();
+    AbstractLayout getWorkflow();
 
 
     /**

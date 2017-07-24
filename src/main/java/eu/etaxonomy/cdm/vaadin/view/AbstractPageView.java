@@ -8,9 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.AbstractLayout;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -27,7 +32,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public abstract class AbstractPageView<P extends AbstractPresenter> extends AbstractView<P>  {
 
-    private CssLayout layout;
+    private VerticalLayout layout;
+
+    private List<Component> contentComponents = new ArrayList<>();
 
     private Label header;
 
@@ -36,7 +43,7 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
      *
      */
     public AbstractPageView() {
-        layout = new CssLayout();
+        layout = new VerticalLayout();
         layout.setSizeFull();
 
         header = new Label();
@@ -51,15 +58,32 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
     }
 
     /**
-     * 
+     *
      */
     public void updateHeader() {
         header.setValue("<div id=\"header\">" + getHeaderText() + "</div><div id=\"subheader\">" + getSubHeaderText() + "</div>");
     }
 
-    protected CssLayout getLayout() {
+    protected AbstractLayout getLayout() {
         return layout;
     }
+
+    protected void removeContentComponents(){
+        for(Component c : contentComponents){
+            layout.removeComponent(c);
+        }
+
+    }
+
+    protected void addContentComponent(Component component, Float expandRatio){
+        contentComponents.add(component);
+        layout.addComponent(component);
+        if(expandRatio != null){
+            layout.setExpandRatio(component, expandRatio);
+        }
+    }
+
+
 
     /**
      * Provides the sub header text

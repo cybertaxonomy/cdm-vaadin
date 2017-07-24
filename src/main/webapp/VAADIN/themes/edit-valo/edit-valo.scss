@@ -167,12 +167,20 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
       }
     }
 
-
     // ===== workflow ==== // 
-
-    #workflow-container {
-        text-align: center;
-        margin-top: $v-unit-size;
+    
+    #workflow {
+        .registration-list {
+                .v-gridlayout-slot {
+                    border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
+                }
+                .v-panel-content {
+                    padding-left: round($v-unit-size / 4);
+                }
+            }
+         .v-gridlayout-registration-list-item {
+            padding: 0 round($v-unit-size / 4);
+         }
     }
     
     $workflow-icon-size: 110px;
@@ -231,6 +239,8 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             }
         }
     }
+    
+   // --------------------------------------------------- //
 
     #workingset {
             padding: round($v-unit-size / 2);
