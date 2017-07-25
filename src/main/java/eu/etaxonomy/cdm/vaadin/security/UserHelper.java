@@ -36,6 +36,8 @@ public interface UserHelper {
 
     boolean userHasPermission(Class<? extends CdmBase> cdmType, Integer entitiyId, Object ... args);
 
+    boolean userHasPermission(Class<? extends CdmBase> cdmType, Object ... args);
+
     boolean userHasPermission(CdmBase entity, Object ... args);
 
     boolean userIsRegistrationCurator();
@@ -47,5 +49,6 @@ public interface UserHelper {
     boolean userIsAnnonymous();
 
     boolean userIsAutheticated();
+
 
 }

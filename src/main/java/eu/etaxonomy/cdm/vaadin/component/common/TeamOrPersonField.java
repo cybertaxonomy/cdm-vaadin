@@ -76,6 +76,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addSizedComponent(personsListEditor);
 
         setConverter(new CdmBaseDeproxyConverter<TeamOrPersonBase<?>>());
+
+        updateToolBarButtonStates();
     }
 
     /**
@@ -122,9 +124,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void updateToolBarButtonStates(){
         TeamOrPersonBase<?> val = getInternalValue();
+        boolean userCanCreate = UserHelper.fromSession().userHasPermission(Person.class, "CREATE");
         removeButton.setEnabled(val != null);
-        personButton.setEnabled(val == null);
-        teamButton.setEnabled(val == null);
+        personButton.setEnabled(userCanCreate && val == null);
+        teamButton.setEnabled(userCanCreate && val == null);
     }
 
     /**

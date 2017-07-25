@@ -109,7 +109,18 @@ public class CdmUserHelper extends VaadinUserHelper {
     public boolean userHasPermission(Class<? extends CdmBase> cdmType, Integer entitiyId, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
-        return permissionEvaluator.hasPermission(getAuthentication(), cdmType, entitiyId.toString(), crudSet);
+            return permissionEvaluator.hasPermission(getAuthentication(), cdmType, entitiyId.toString(), crudSet);
+        } catch (PermissionDeniedException e){
+            //IGNORE
+        }
+        return false;
+    }
+
+    @Override
+    public boolean userHasPermission(Class<? extends CdmBase> cdmType, Object ... args){
+        EnumSet<CRUD> crudSet = crudSetFromArgs(args);
+        try {
+            return permissionEvaluator.hasPermission(getAuthentication(), cdmType, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
         }
