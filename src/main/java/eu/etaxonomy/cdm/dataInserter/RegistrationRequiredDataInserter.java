@@ -123,7 +123,6 @@ public class RegistrationRequiredDataInserter extends RunAsAuthenticator impleme
 
         Group groupEditor = repo.getGroupService().load(Group.groupEditorUuid, Arrays.asList("grantedAuthorities"));
         assureGroupHas(groupEditor, "REGISTRATION[CREATE,READ]");
-        assureGroupHas(groupEditor, "PERSON[CREATE,READ]");
         repo.getGroupService().saveOrUpdate(groupEditor);
 
         if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
