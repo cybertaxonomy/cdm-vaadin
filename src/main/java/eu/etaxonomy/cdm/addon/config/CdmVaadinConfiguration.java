@@ -44,7 +44,6 @@ import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessCo
 import eu.etaxonomy.cdm.vaadin.server.CdmSpringVaadinServletService;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
-import eu.etaxonomy.cdm.vaadin.ui.InactiveUIException;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
@@ -125,12 +124,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
                         @Override
                         public void error(ErrorEvent errorEvent) {
-                            if(errorEvent.getThrowable() instanceof InactiveUIException){
-                                //TODO redirect to an ErrorUI or show and error Page
-                                // better use Spring MVC Error handlers instead?
-                            } else {
-                                doDefault(errorEvent);
-                            }
+                            // ...
                         }
 
                     });
@@ -148,7 +142,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Bean
     @UIScope
-    public ConceptRelationshipUI conceptRelationshipUI() throws InactiveUIException {
+    public ConceptRelationshipUI conceptRelationshipUI() {
         if(isUIEnabled(ConceptRelationshipUI.class)){
             return new ConceptRelationshipUI();
         }
@@ -157,7 +151,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Bean
     @UIScope
-    public RegistrationUI registrationUI() throws InactiveUIException {
+    public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
             return new RegistrationUI();
         }
@@ -165,7 +159,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     }
 
     @Bean
-    public RegistrationRequiredDataInserter registrationRequiredDataInserter() throws BeansException, InactiveUIException{
+    public RegistrationRequiredDataInserter registrationRequiredDataInserter() throws BeansException{
         RegistrationRequiredDataInserter inserter = null;
         if(isUIEnabled(RegistrationUI.class)){
             inserter = new RegistrationRequiredDataInserter();
@@ -177,7 +171,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Bean
     @UIScope
-    public DistributionStatusUI distributionStatusUI() throws InactiveUIException {
+    public DistributionStatusUI distributionStatusUI() {
         if(isUIEnabled(DistributionStatusUI.class)){
             return new DistributionStatusUI();
         }
@@ -186,7 +180,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Bean
     @UIScope
-    public StatusEditorUI statusEditorUI() throws InactiveUIException {
+    public StatusEditorUI statusEditorUI() {
         if(isUIEnabled(StatusEditorUI.class)){
             return new StatusEditorUI();
         }
@@ -221,9 +215,8 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
      *
      * @param type
      * @return
-     * @throws InactiveUIException
      */
-    private boolean isUIEnabled(Class<? extends UI>uiClass) throws InactiveUIException {
+    private boolean isUIEnabled(Class<? extends UI>uiClass) {
 
         String path = uiClass.getAnnotation(SpringUI.class).path().trim();
 
@@ -240,7 +233,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
                     return true;
                 }
             }
-            throw new InactiveUIException(path); // FIXME should return false instead
+            return false;
         } catch (IOException e) {
             logger.error("Error reading the vaadin ui properties file. File corrupted?. Stopping instance ...");
             throw new RuntimeException(e);
