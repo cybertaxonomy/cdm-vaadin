@@ -21,7 +21,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,8 +30,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.application.RunAsAuthenticator;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
@@ -53,7 +52,7 @@ import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
  * @since May 9, 2017
  *
  */
-public class RegistrationRequiredDataInserter extends RunAsAuthenticator implements ApplicationListener<ContextRefreshedEvent>{
+public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     protected static final String PARAM_NAME_CREATE = "registrationCreate";
 

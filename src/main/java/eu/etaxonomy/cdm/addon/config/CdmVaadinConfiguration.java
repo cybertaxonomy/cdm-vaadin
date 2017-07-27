@@ -36,7 +36,9 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.application.DummyDataInserter;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
@@ -159,14 +161,17 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     }
 
     @Bean
-    public RegistrationRequiredDataInserter registrationRequiredDataInserter() throws BeansException{
-        RegistrationRequiredDataInserter inserter = null;
+    public AbstractDataInserter registrationRequiredDataInserter() throws BeansException{
         if(isUIEnabled(RegistrationUI.class)){
-            inserter = new RegistrationRequiredDataInserter();
+            RegistrationRequiredDataInserter inserter = new RegistrationRequiredDataInserter();
             inserter.setRunAsAuthenticationProvider((AuthenticationProvider) applicationContext.getBean("runAsAuthenticationProvider"));
             inserter.setCdmRepository((CdmRepository) applicationContext.getBean("cdmRepository"));
+            return inserter;
+        } else {
+            // the return type implements ApplicationListener and thus must not be null,
+            // therefore we return a empty dummy implementation.
+            return new DummyDataInserter();
         }
-        return inserter;
     }
 
     @Bean
