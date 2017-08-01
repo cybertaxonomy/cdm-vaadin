@@ -120,7 +120,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupCurator, "REGISTRATION[CREATE,READ,UPDATE,DELETE]");
         repo.getGroupService().saveOrUpdate(groupCurator);
 
-        Group groupEditor = repo.getGroupService().load(Group.groupEditorUuid, Arrays.asList("grantedAuthorities"));
+        Group groupEditor = repo.getGroupService().load(Group.GROUP_EDITOR_UUID, Arrays.asList("grantedAuthorities"));
         assureGroupHas(groupEditor, "REGISTRATION[CREATE,READ]");
         repo.getGroupService().saveOrUpdate(groupEditor);
 
