@@ -209,7 +209,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         int pageIndex = 0;
         if(createCmd != null && createCmd.equals("iapt")){
 
-            DateTimeFormatter dateFormat = org.joda.time.format.DateTimeFormat.forPattern("dd.MM.yy").withPivotYear(1950);
+            DateTimeFormatter dateFormat1 = org.joda.time.format.DateTimeFormat.forPattern("dd.MM.yy").withPivotYear(1950);
+            DateTimeFormatter dateFormat2 = org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd").withPivotYear(1950);
 
             TransactionStatus tx = repo.startTransaction(false);
             while(true) {
@@ -237,18 +238,24 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
                         DateTime regDate = null;
                         if(iaptData.getDate() != null){
+                            DateTimeFormatter dateFormat;
+                            if(iaptData.getDate().matches("\\d{4}-\\d{2}-\\d{2}")){
+                                dateFormat = dateFormat2;
+                            } else {
+                                dateFormat = dateFormat1;
+                            }
                             try {
                                 regDate = dateFormat.parseDateTime(iaptData.getDate());
                                 regDate.getYear();
                             } catch (Exception e) {
-                                logger.error("Error parsing date: " + iaptData.getDate(), e);
+                                logger.error("Error parsing date : " + iaptData.getDate(), e);
                                 continue;
                             }
                         }
 
                         Registration reg = Registration.NewInstance();
                         reg.setStatus(RegistrationStatus.PUBLISHED);
-                        reg.setIdentifier("http://phycobank/" + iaptData.getRegId());
+                        reg.setIdentifier("http://phycobank.org/" + iaptData.getRegId());
                         reg.setSpecificIdentifier(iaptData.getRegId().toString());
                         reg.setInstitution(getInstitution(iaptData.getOffice()));
                         reg.setName(name);
