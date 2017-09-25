@@ -15,13 +15,17 @@ import java.util.Properties;
 import javax.servlet.annotation.WebServlet;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.AuthenticationProvider;
 
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ServiceException;
@@ -32,13 +36,16 @@ import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.server.SpringVaadinServlet;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
+import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.application.DummyDataInserter;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
+import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
 import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.server.CdmSpringVaadinServletService;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
-import eu.etaxonomy.cdm.vaadin.ui.InactiveUIException;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
@@ -53,9 +60,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @ComponentScan(basePackages={
         "eu.etaxonomy.vaadin.ui",
         "eu.etaxonomy.cdm.vaadin",
-        "eu.etaxonomy.cdm.dataInserter",
         "eu.etaxonomy.cdm.service",
-        "eu.etaxonomy.cdm.vaadin.component", // for the FieldFactories
         "org.springframework.context.event"
         },
         // exclude UI classes, these are provided via the @Bean annotated methods below
@@ -67,7 +72,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
-public class CdmVaadinConfiguration {
+public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     /**
      *
@@ -97,8 +102,8 @@ public class CdmVaadinConfiguration {
                 throws ServiceException {
 
             //  - The SpringVaadinServletService is needed when using a custom service URL
-            //  - The CdmSpringVaadinServletService allows to attach listeners to the requestEnd and 
-            //    requestStart method this is important for proper unbinding of Conversations from 
+            //  - The CdmSpringVaadinServletService allows to attach listeners to the requestEnd and
+            //    requestStart method this is important for proper unbinding of Conversations from
             //    the request threads.
             //    see ViewScopeConversationHolder
             CdmSpringVaadinServletService service = new CdmSpringVaadinServletService(
@@ -121,12 +126,7 @@ public class CdmVaadinConfiguration {
 
                         @Override
                         public void error(ErrorEvent errorEvent) {
-                            if(errorEvent.getThrowable() instanceof InactiveUIException){
-                                //TODO redirect to an ErrorUI or show and error Page
-                                // better use Spring MVC Error handlers instead?
-                            } else {
-                                doDefault(errorEvent);
-                            }
+                            // ...
                         }
 
                     });
@@ -144,7 +144,7 @@ public class CdmVaadinConfiguration {
 
     @Bean
     @UIScope
-    public ConceptRelationshipUI conceptRelationshipUI() throws InactiveUIException {
+    public ConceptRelationshipUI conceptRelationshipUI() {
         if(isUIEnabled(ConceptRelationshipUI.class)){
             return new ConceptRelationshipUI();
         }
@@ -153,7 +153,7 @@ public class CdmVaadinConfiguration {
 
     @Bean
     @UIScope
-    public RegistrationUI registrationUI() throws InactiveUIException {
+    public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
             return new RegistrationUI();
         }
@@ -161,8 +161,22 @@ public class CdmVaadinConfiguration {
     }
 
     @Bean
+    public AbstractDataInserter registrationRequiredDataInserter() throws BeansException{
+        if(isUIEnabled(RegistrationUI.class)){
+            RegistrationRequiredDataInserter inserter = new RegistrationRequiredDataInserter();
+            inserter.setRunAsAuthenticationProvider((AuthenticationProvider) applicationContext.getBean("runAsAuthenticationProvider"));
+            inserter.setCdmRepository((CdmRepository) applicationContext.getBean("cdmRepository"));
+            return inserter;
+        } else {
+            // the return type implements ApplicationListener and thus must not be null,
+            // therefore we return a empty dummy implementation.
+            return new DummyDataInserter();
+        }
+    }
+
+    @Bean
     @UIScope
-    public DistributionStatusUI distributionStatusUI() throws InactiveUIException {
+    public DistributionStatusUI distributionStatusUI() {
         if(isUIEnabled(DistributionStatusUI.class)){
             return new DistributionStatusUI();
         }
@@ -171,18 +185,18 @@ public class CdmVaadinConfiguration {
 
     @Bean
     @UIScope
-    public StatusEditorUI statusEditorUI() throws InactiveUIException {
+    public StatusEditorUI statusEditorUI() {
         if(isUIEnabled(StatusEditorUI.class)){
             return new StatusEditorUI();
         }
         return null;
     }
 
-
-
     static final String PROPERTIES_NAME = "vaadin-apps";
 
     private Properties appProps = null;
+
+    private ApplicationContext applicationContext;
 
     //@formatter:off
     private static final String APP_FILE_CONTENT=
@@ -206,9 +220,9 @@ public class CdmVaadinConfiguration {
      *
      * @param type
      * @return
-     * @throws InactiveUIException
      */
-    private boolean isUIEnabled(Class<? extends UI>uiClass) throws InactiveUIException {
+    private boolean isUIEnabled(Class<? extends UI>uiClass) {
+
         String path = uiClass.getAnnotation(SpringUI.class).path().trim();
 
         try {
@@ -224,11 +238,20 @@ public class CdmVaadinConfiguration {
                     return true;
                 }
             }
-            throw new InactiveUIException(path);
+            return false;
         } catch (IOException e) {
             logger.error("Error reading the vaadin ui properties file. File corrupted?. Stopping instance ...");
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+
     }
 
 

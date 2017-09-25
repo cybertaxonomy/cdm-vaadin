@@ -143,9 +143,9 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         map.removeComponent(mapMarker);
         if(parsedPoint.getLongitude() != null && parsedPoint.getLatitude() != null){
             map.setZoomLevel(10);
-            mapMarker.setPoint(new org.vaadin.addon.leaflet.shared.Point(parsedPoint.getLongitude(), parsedPoint.getLatitude()));
+            mapMarker.setPoint(new org.vaadin.addon.leaflet.shared.Point(parsedPoint.getLatitude(), parsedPoint.getLongitude()));
             map.addComponents(mapMarker);
-            map.setCenter(parsedPoint.getLongitude(), parsedPoint.getLatitude());
+            map.setCenter(parsedPoint.getLatitude(), parsedPoint.getLongitude());
         } else {
             map.setZoomLevel(1);
             map.setCenter(40, 0);

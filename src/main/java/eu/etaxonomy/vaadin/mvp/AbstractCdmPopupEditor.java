@@ -39,6 +39,10 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
     private Button advancedModeButton;
 
     /**
+     * The supplied layout will be set to full size, to avoid problems with
+     * automatic resizing of the inner content.
+     *
+     *
      * @param layout
      * @param dtoType
      */

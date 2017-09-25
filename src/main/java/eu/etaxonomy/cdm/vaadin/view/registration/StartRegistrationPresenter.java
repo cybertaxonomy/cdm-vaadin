@@ -138,7 +138,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
-        if(getView().getContinueButton().equals(event.getSourceComponent())){
+        if(getView().getContinueButton() != event.getSourceComponent()){
             return;
         }
         Integer referenceId = null;
@@ -155,7 +155,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowViewBean.NAME, "new", Integer.toString(referenceId)));
+        eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowViewBean.NAME, Integer.toString(referenceId)));
 
     }
 

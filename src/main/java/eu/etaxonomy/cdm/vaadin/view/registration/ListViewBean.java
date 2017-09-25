@@ -56,13 +56,15 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     @Override
     protected void initContent() {
+        getLayout().setId(NAME);
         toolBar = new CssLayout();
         toolBar.setWidth(100, Unit.PERCENTAGE);
-        // toolBar.addComponent();
-        getLayout().addComponent(toolBar);
+        addContentComponent(toolBar, null);
 
-        buildList();
-        getLayout().addComponent(listContainer);
+        listContainer = new CssLayout();
+        listContainer.setId("registration-list");
+        listContainer.setWidth(100, Unit.PERCENTAGE);
+        addContentComponent(listContainer, 1f);
 
     }
 
@@ -74,12 +76,6 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Override
     protected String getSubHeaderText() {
         return "This is the list of all your registrations in progress.";
-    }
-
-    private void buildList() {
-        listContainer = new CssLayout();
-        listContainer.setId("registration-list");
-        listContainer.setWidth(100, Unit.PERCENTAGE);
     }
 
 
@@ -123,6 +119,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
      * @param registrationItems
      * @return
      */
+    @Deprecated
     private GeneratedPropertyContainer buildGeneratedProperties(
             BeanContainer<String, RegistrationDTO> registrationItems) {
         GeneratedPropertyContainer gpContainer = new GeneratedPropertyContainer(registrationItems);

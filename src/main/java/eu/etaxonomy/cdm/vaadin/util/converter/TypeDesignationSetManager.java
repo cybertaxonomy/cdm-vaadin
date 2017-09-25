@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.util.converter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,7 +25,6 @@ import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
-import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -83,21 +83,60 @@ public class TypeDesignationSetManager {
 
     private List<String> probelms = new ArrayList<>();
 
+    private boolean printCitation = false;
+
     /**
+     * @param containgEntity
      * @param taxonName
      * @throws RegistrationValidationException
      *
      */
-    public TypeDesignationSetManager(CdmBase containgEntity, Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
+    public TypeDesignationSetManager(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
-        Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus = new HashMap<>();
-        typeDesignations.forEach(td -> mapTypeDesignation(containgEntity, byBaseEntityByTypeStatus, td));
-        orderedByTypesByBaseEntity = orderByTypeByBaseEntity(byBaseEntityByTypeStatus);
         this.typifiedName = findTypifiedName();
+        mapAndSort();
+    }
+
+    /**
+     * @param typifiedName2
+     */
+    public TypeDesignationSetManager(TaxonName typifiedName) {
+        this.typeDesignations = new ArrayList<>();
+        this.typifiedName = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+    }
+
+    /**
+     * Add one or more TypeDesignations to the manager. This causes re-grouping and re-ordering
+     * of all managed TypeDesignations.
+     *
+     * @param containgEntity
+     * @param typeDesignations
+     */
+    public void addTypeDesigations(CdmBase containgEntity, TypeDesignationBase ... typeDesignations){
+       this.typeDesignations.addAll(Arrays.asList(typeDesignations));
+       mapAndSort();
+    }
+
+    /**
+     * Groups and orders all managed TypeDesignations.
+     *
+     * @param containgEntity
+     */
+    protected void mapAndSort() {
+        finalString = null;
+        Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus = new HashMap<>();
+        this.typeDesignations.forEach(td -> mapTypeDesignation(byBaseEntityByTypeStatus, td));
+        orderedByTypesByBaseEntity = orderByTypeByBaseEntity(byBaseEntityByTypeStatus);
     }
 
 
-    private void mapTypeDesignation(CdmBase containgEntity, Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus,
+    /**
+     *
+     * @param containgEntity
+     * @param byBaseEntityByTypeStatus
+     * @param td
+     */
+    private void mapTypeDesignation(Map<TypedEntityReference, TypeDesignationWorkingSet> byBaseEntityByTypeStatus,
             TypeDesignationBase<?> td){
 
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
@@ -110,8 +149,7 @@ public class TypeDesignationSetManager {
 
             TypeDesignationWorkingSet typedesignationWorkingSet;
             if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
-                TypedEntityReference containigEntityReference = new TypedEntityReference(containgEntity.getClass(), containgEntity.getId(), containgEntity.toString());
-                byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet(containigEntityReference, baseEntity, baseEntityReference));
+                byBaseEntityByTypeStatus.put(baseEntityReference, new TypeDesignationWorkingSet(baseEntity, baseEntityReference));
             }
 
             typedesignationWorkingSet = byBaseEntityByTypeStatus.get(baseEntityReference);
@@ -214,7 +252,7 @@ public class TypeDesignationSetManager {
                 }
             });
             // new LinkedHashMap for the ordered TypeDesignationStatusBase keys
-            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(typeDesignationWorkingSet.getContainigEntityReference(),
+            TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(
                     typeDesignationWorkingSet.getBaseEntity(),
                     baseEntityRef);
             orderedStringsByOrderedTypes.setWorkingSetId(typeDesignationWorkingSet.workingSetId); // preserve original workingSetId
@@ -247,54 +285,55 @@ public class TypeDesignationSetManager {
             }
 
             int typeCount = 0;
-            for(TypedEntityReference baseEntityRef : orderedByTypesByBaseEntity.keySet()) {
-                StringBuilder sb = new StringBuilder();
-                if(typeCount++ > 0){
-                    sb.append(TYPE_SEPARATOR);
-                }
-                boolean isNameTypeDesignation = false;
-                if(SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType())){
-                    sb.append("Type: ");
-                } else {
-                    sb.append("NameType: ");
-                    isNameTypeDesignation = true;
-                }
-                if(!baseEntityRef.getLabel().isEmpty()){
-                    sb.append(baseEntityRef.getLabel()).append(" ");
-                }
-                TypeDesignationWorkingSet typeDesignationWorkingSet = orderedByTypesByBaseEntity.get(baseEntityRef);
-                if(!isNameTypeDesignation ){
-                    sb.append("(");
-                }
-                int typeStatusCount = 0;
-                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()) {
-                    if(typeStatusCount++  > 0){
-                        sb.append(TYPE_STATUS_SEPARATOR);
+            if(orderedByTypesByBaseEntity != null){
+                for(TypedEntityReference baseEntityRef : orderedByTypesByBaseEntity.keySet()) {
+                    StringBuilder sb = new StringBuilder();
+                    if(typeCount++ > 0){
+                        sb.append(TYPE_SEPARATOR);
                     }
-                    boolean isPlural = typeDesignationWorkingSet.get(typeStatus).size() > 1;
-                    if(!typeStatus.equals(NULL_STATUS)) {
-                        sb.append(typeStatus.getLabel());
-                        if(isPlural){
-                            sb.append("s: ");
-                        } else {
-                            sb.append(", ");
+                    boolean isNameTypeDesignation = false;
+                    if(SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType())){
+                        sb.append("Type: ");
+                    } else {
+                        sb.append("NameType: ");
+                        isNameTypeDesignation = true;
+                    }
+                    if(!baseEntityRef.getLabel().isEmpty()){
+                        sb.append(baseEntityRef.getLabel()).append(" ");
+                    }
+                    TypeDesignationWorkingSet typeDesignationWorkingSet = orderedByTypesByBaseEntity.get(baseEntityRef);
+                    if(!isNameTypeDesignation ){
+                        sb.append("(");
+                    }
+                    int typeStatusCount = 0;
+                    for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()) {
+                        if(typeStatusCount++  > 0){
+                            sb.append(TYPE_STATUS_SEPARATOR);
+                        }
+                        boolean isPlural = typeDesignationWorkingSet.get(typeStatus).size() > 1;
+                        if(!typeStatus.equals(NULL_STATUS)) {
+                            sb.append(typeStatus.getLabel());
+                            if(isPlural){
+                                sb.append("s: ");
+                            } else {
+                                sb.append(", ");
+                            }
+                        }
+                        int typeDesignationCount = 0;
+                        for(EntityReference typeDesignationEntityReference : typeDesignationWorkingSet.get(typeStatus)) {
+                            if(typeDesignationCount++  > 0){
+                                sb.append(TYPE_DESIGNATION_SEPARATOR);
+                            }
+                            sb.append(typeDesignationEntityReference.getLabel());
                         }
                     }
-                    int typeDesignationCount = 0;
-                    for(EntityReference typeDesignationEntityReference : typeDesignationWorkingSet.get(typeStatus)) {
-                        if(typeDesignationCount++  > 0){
-                            sb.append(TYPE_DESIGNATION_SEPARATOR);
-                        }
-                        sb.append(typeDesignationEntityReference.getLabel());
+                    if(!isNameTypeDesignation ){
+                        sb.append(")");
                     }
+                    typeDesignationWorkingSet.setRepresentation(sb.toString());
+                    finalString += typeDesignationWorkingSet.getRepresentation();
                 }
-                if(!isNameTypeDesignation ){
-                    sb.append(")");
-                }
-                typeDesignationWorkingSet.setRepresentation(sb.toString());
-                finalString += typeDesignationWorkingSet.getRepresentation();
             }
-
         }
         return this;
     }
@@ -463,8 +502,12 @@ public class TypeDesignationSetManager {
             }
         }
 
-        if(td.getCitation() != null){
-            result += " " + td.getCitation().getTitleCache();
+        if(isPrintCitation() && td.getCitation() != null){
+            if(td.getCitation().getAbbrevTitle() != null){
+                result += " " + td.getCitation().getAbbrevTitle();
+            } else {
+                result += " " + td.getCitation().getTitleCache();
+            }
             if(td.getCitationMicroReference() != null){
                 result += " :" + td.getCitationMicroReference();
             }
@@ -516,20 +559,42 @@ public class TypeDesignationSetManager {
     }
 
     public String print() {
-        return finalString;
+        return finalString.trim();
     }
 
     /**
-     * Groups the EntityReferences for TypeDesignations by the according TypeDesignationStatus.
+     * @return the printCitation
+     */
+    public boolean isPrintCitation() {
+        return printCitation;
+    }
+
+    /**
+     * @param printCitation the printCitation to set
+     */
+    public void setPrintCitation(boolean printCitation) {
+        this.printCitation = printCitation;
+    }
+
+    /**
+     * TypeDesignations which refer to the same FieldUnit (SpecimenTypeDesignation) or TaxonName
+     * (NameTypeDesignation) form a working set. The <code>TypeDesignationWorkingSet</code> internally
+     * works with EnityReferences to the actual TypeDesignations.
+     *
+     * The EntityReferences for TypeDesignations are grouped by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys can be ordered by the term order defined in the vocabulary.
+     *
+     * A workingset can be referenced by the <code>workingSetId</code>, this is a autoincrement
+     * value which is created during the process of determining the workingsets in a collection of
+     * TypeDesignations.
+     *
+     * TODO: consider using a concatenation of baseEntity.getClass() + baseEntity.getId() as workingset identifier
      */
     public class TypeDesignationWorkingSet extends LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> {
 
         private static final long serialVersionUID = -1329007606500890729L;
 
         String workingSetRepresentation = null;
-
-        TypedEntityReference<?> containigEntityReference;
 
         TypedEntityReference<IdentifiableEntity<?>> baseEntityReference;
 
@@ -542,8 +607,7 @@ public class TypeDesignationSetManager {
         /**
          * @param baseEntityReference
          */
-        public TypeDesignationWorkingSet(TypedEntityReference<? extends VersionableEntity> containigEntityReference, IdentifiableEntity<?> baseEntity, TypedEntityReference<IdentifiableEntity<?>> baseEntityReference) {
-            this.containigEntityReference = containigEntityReference;
+        public TypeDesignationWorkingSet(IdentifiableEntity<?> baseEntity, TypedEntityReference<IdentifiableEntity<?>> baseEntityReference) {
             this.baseEntity = baseEntity;
             this.baseEntityReference = baseEntityReference;
         }
@@ -607,16 +671,6 @@ public class TypeDesignationSetManager {
          */
         public TypedEntityReference getBaseEntityReference() {
             return baseEntityReference;
-        }
-
-        /**
-         * A reference to the entity which contains the TypeDesignations bundled in this working set.
-         * This can be for example a {@link TaxonName} or a {@link Registration} entity.
-         *
-         * @return the baseEntityReference
-         */
-        public TypedEntityReference getContainigEntityReference() {
-            return containigEntityReference;
         }
 
         @Override

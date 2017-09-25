@@ -68,39 +68,9 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
      * {@inheritDoc}
      */
     @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getHeaderText() {
-        return "New Registration";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getSubHeaderText() {
-        return SUBHEADER_DEEFAULT;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void initContent() {
+
+        getLayout().setId(NAME);
 
         VerticalLayout vlayout = new VerticalLayout();
         vlayout.setSpacing(true);
@@ -177,10 +147,40 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         vlayout.setComponentAlignment(publicationLayout, Alignment.TOP_CENTER);
         vlayout.setComponentAlignment(continueButton, Alignment.TOP_CENTER);
 
-        getLayout().addComponent(vlayout);
+        addContentComponent(vlayout, 1f);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getHeaderText() {
+        return "New Registration";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getSubHeaderText() {
+        return SUBHEADER_DEEFAULT;
+    }
 
     /**
      * {@inheritDoc}

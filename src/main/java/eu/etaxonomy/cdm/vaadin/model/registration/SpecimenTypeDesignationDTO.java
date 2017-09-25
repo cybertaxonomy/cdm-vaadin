@@ -53,6 +53,13 @@ public class SpecimenTypeDesignationDTO {
     SpecimenTypeDesignation std;
 
     /**
+     * @return the std
+     */
+    public SpecimenTypeDesignation asSpecimenTypeDesignation() {
+        return std;
+    }
+
+    /**
      * Creates an new new instance of SpecimenTypeDesignationDTO which is backed up
      * by an newly instantiated <code>SpecimenTypeDesignation.typeSpecimen.derivedFrom.type</code> object graph.
      */

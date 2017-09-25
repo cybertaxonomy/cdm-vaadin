@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.dataInserter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,23 +21,23 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaadin.spring.annotation.SpringComponent;
 
+import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
+import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
+import eu.etaxonomy.cdm.model.common.Group;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -51,13 +52,15 @@ import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
  * @since May 9, 2017
  *
  */
-@SpringComponent
-@Transactional(readOnly=true)
-public class RegistrationRequiredDataInserter implements ApplicationListener<ContextRefreshedEvent>{
+public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     protected static final String PARAM_NAME_CREATE = "registrationCreate";
 
     protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
+
+//    protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
+
+    protected static final UUID GROUP_CURATOR_UUID = UUID.fromString("135210d3-3db7-4a81-ab36-240444637d45");
 
     private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
@@ -67,9 +70,14 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
 
     public static boolean commandsExecuted = false;
 
-    @Autowired
-    @Qualifier("cdmRepository")
     private CdmRepository repo;
+
+    private boolean hasRun = false;
+
+    public void setCdmRepository(CdmRepository repo){
+      this.repo = repo;
+    }
+
 
  // ==================== Registration creation ======================= //
 
@@ -78,18 +86,44 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+
+        if(hasRun){
+            return;
+        }
+
+        runAsAuthentication(Role.ROLE_ADMIN);
+
         insertRequiredData();
         executeSuppliedCommands();
+
+        restoreAuthentication();
+
+        hasRun = true;
     }
 
     /**
      *
      */
     private void insertRequiredData() {
+
         Role roleCuration = RolesAndPermissions.ROLE_CURATION;
         if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
             repo.getGrantedAuthorityService().saveOrUpdate(roleCuration.asNewGrantedAuthority());
         }
+
+        Group groupCurator = repo.getGroupService().load(GROUP_CURATOR_UUID, Arrays.asList("grantedAuthorities"));
+        if(groupCurator == null){
+            groupCurator = Group.NewInstance();
+            groupCurator.setUuid(GROUP_CURATOR_UUID);
+            groupCurator.setName("Curator");
+        }
+        assureGroupHas(groupCurator, "REGISTRATION[CREATE,READ,UPDATE,DELETE]");
+        repo.getGroupService().saveOrUpdate(groupCurator);
+
+        Group groupEditor = repo.getGroupService().load(Group.GROUP_EDITOR_UUID, Arrays.asList("grantedAuthorities"));
+        assureGroupHas(groupEditor, "REGISTRATION[CREATE,READ]");
+        repo.getGroupService().saveOrUpdate(groupEditor);
+
         if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
             repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
         }
@@ -101,6 +135,33 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
         }
         repo.getSession().flush();
 
+    }
+
+    private void assureGroupHas(Group group, String authorityString){
+        boolean authorityExists = false;
+
+        for(GrantedAuthority ga : group.getGrantedAuthorities()){
+            if((authorityExists = ga.getAuthority().equals(authorityString)) == true){
+                break;
+            }
+        }
+        if(!authorityExists){
+            group.addGrantedAuthority(findGrantedAuthority(authorityString));
+        }
+    }
+
+    private GrantedAuthorityImpl findGrantedAuthority(String authorityString){
+        GrantedAuthorityImpl ga = null;
+        try{
+            ga = repo.getGrantedAuthorityService().findAuthorityString(authorityString);
+        } catch (AuthenticationCredentialsNotFoundException e){
+            e.printStackTrace();
+        }
+        if(ga == null){
+            ga = GrantedAuthorityImpl.NewInstance(authorityString);
+            repo.getGrantedAuthorityService().save(ga);
+        }
+        return ga;
     }
 
     /**
@@ -148,7 +209,8 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
         int pageIndex = 0;
         if(createCmd != null && createCmd.equals("iapt")){
 
-            DateTimeFormatter dateFormat = org.joda.time.format.DateTimeFormat.forPattern("dd.MM.yy").withPivotYear(1950);
+            DateTimeFormatter dateFormat1 = org.joda.time.format.DateTimeFormat.forPattern("dd.MM.yy").withPivotYear(1950);
+            DateTimeFormatter dateFormat2 = org.joda.time.format.DateTimeFormat.forPattern("yyyy-MM-dd").withPivotYear(1950);
 
             TransactionStatus tx = repo.startTransaction(false);
             while(true) {
@@ -176,18 +238,24 @@ public class RegistrationRequiredDataInserter implements ApplicationListener<Con
 
                         DateTime regDate = null;
                         if(iaptData.getDate() != null){
+                            DateTimeFormatter dateFormat;
+                            if(iaptData.getDate().matches("\\d{4}-\\d{2}-\\d{2}")){
+                                dateFormat = dateFormat2;
+                            } else {
+                                dateFormat = dateFormat1;
+                            }
                             try {
                                 regDate = dateFormat.parseDateTime(iaptData.getDate());
                                 regDate.getYear();
                             } catch (Exception e) {
-                                logger.error("Error parsing date: " + iaptData.getDate(), e);
+                                logger.error("Error parsing date : " + iaptData.getDate(), e);
                                 continue;
                             }
                         }
 
                         Registration reg = Registration.NewInstance();
                         reg.setStatus(RegistrationStatus.PUBLISHED);
-                        reg.setIdentifier("http://phycobank/" + iaptData.getRegId());
+                        reg.setIdentifier("http://phycobank.org/" + iaptData.getRegId());
                         reg.setSpecificIdentifier(iaptData.getRegId().toString());
                         reg.setInstitution(getInstitution(iaptData.getOffice()));
                         reg.setName(name);

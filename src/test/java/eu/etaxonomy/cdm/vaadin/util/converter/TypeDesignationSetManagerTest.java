@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -49,22 +50,23 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
 public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
 
 
-    @Test
-    public void test1() throws RegistrationValidationException{
+    private NameTypeDesignation ntd;
+    private SpecimenTypeDesignation std_IT;
+    private SpecimenTypeDesignation std_HT;
+    private SpecimenTypeDesignation std_IT_2;
+    private SpecimenTypeDesignation std_IT_3;
 
+    @Before
+    public void init(){
 
-        TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
-        typifiedName.setTitleCache("Prionus coriatius L.", true);
-
-        NameTypeDesignation ntd = NameTypeDesignation.NewInstance();
+        ntd = NameTypeDesignation.NewInstance();
         ntd.setId(1);
         TaxonName typeName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
         typeName.setTitleCache("Prionus L.", true);
         ntd.setTypeName(typeName);
         Reference citation = ReferenceFactory.newGeneric();
-        citation.setTitleCache("Species Platarum", true);
+        citation.setTitleCache("Species Plantarum", true);
         ntd.setCitation(citation);
-        typifiedName.addTypeDesignation(ntd, false);
 
         FieldUnit fu_1 = FieldUnit.NewInstance();
         fu_1.setId(1);
@@ -74,7 +76,7 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         fu_2.setId(2);
         fu_2.setTitleCache("Dreamland, near Kissingen, A.Kohlbecker 66211, 2017", true);
 
-        SpecimenTypeDesignation std_HT = SpecimenTypeDesignation.NewInstance();
+        std_HT = SpecimenTypeDesignation.NewInstance();
         std_HT.setId(1);
         DerivedUnit specimen_HT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_HT.setTitleCache("OHA", true);
@@ -84,9 +86,8 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         specimen_HT.getOriginals().add(fu_1);
         std_HT.setTypeSpecimen(specimen_HT);
         std_HT.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
-        typifiedName.addTypeDesignation(std_HT, false);
 
-        SpecimenTypeDesignation std_IT = SpecimenTypeDesignation.NewInstance();
+        std_IT = SpecimenTypeDesignation.NewInstance();
         std_IT.setId(2);
         DerivedUnit specimen_IT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT.setTitleCache("BER", true);
@@ -95,9 +96,8 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         derivationEvent_2.addDerivative(specimen_IT);
         std_IT.setTypeSpecimen(specimen_IT);
         std_IT.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
-        typifiedName.addTypeDesignation(std_IT, false);
 
-        SpecimenTypeDesignation std_IT_2 = SpecimenTypeDesignation.NewInstance();
+        std_IT_2 = SpecimenTypeDesignation.NewInstance();
         std_IT_2.setId(3);
         DerivedUnit specimen_IT_2 = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT_2.setTitleCache("KEW", true);
@@ -106,15 +106,17 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         derivationEvent_3.addDerivative(specimen_IT_2);
         std_IT_2.setTypeSpecimen(specimen_IT_2);
         std_IT_2.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
-        typifiedName.addTypeDesignation(std_IT_2, false);
 
-        SpecimenTypeDesignation std_IT_3 = SpecimenTypeDesignation.NewInstance();
+        std_IT_3 = SpecimenTypeDesignation.NewInstance();
         std_IT_3.setId(4);
         DerivedUnit specimen_IT_3 = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT_3.setTitleCache("M", true);
         std_IT_3.setTypeSpecimen(specimen_IT_3);
         std_IT_3.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
-        typifiedName.addTypeDesignation(std_IT_3, false);
+    }
+
+    @Test
+    public void test1() throws RegistrationValidationException{
 
         List<TypeDesignationBase> tds = new ArrayList<>();
         tds.add(ntd);
@@ -123,14 +125,22 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         tds.add(std_IT_2);
         tds.add(std_IT_3);
 
-        TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName, tds);
+        TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
+        typifiedName.setTitleCache("Prionus coriatius L.", true);
+
+        typifiedName.addTypeDesignation(ntd, false);
+        typifiedName.addTypeDesignation(std_HT, false);
+        typifiedName.addTypeDesignation(std_IT, false);
+        typifiedName.addTypeDesignation(std_IT_2, false);
+        typifiedName.addTypeDesignation(std_IT_3, false);
+
+        TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(tds);
         String result = typeDesignationManager.buildString().print();
-        System.err.println(result);
 
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); Type: (Isotype, M); NameType: Prionus L. Species Platarum"
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); Type: (Isotype, M); NameType: Prionus L. Species Plantarum"
                 , result
                 );
 
@@ -142,4 +152,37 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
         assertEquals("Isotype", keyIt.next().getLabel());
     }
 
+    @Test
+    public void test2() throws RegistrationValidationException{
+
+        TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
+        typifiedName.setTitleCache("Prionus coriatius L.", true);
+
+        TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName);
+        String result = typeDesignationManager.buildString().print();
+        Logger.getLogger(this.getClass()).debug(result);
+        assertNotNull(result);
+        assertEquals(
+                "Prionus coriatius L."
+                , result
+                );
+
+        typifiedName.addTypeDesignation(ntd, false);
+        typeDesignationManager.addTypeDesigations(null, ntd);
+
+        assertEquals(
+                "Prionus coriatius L. NameType: Prionus L. Species Plantarum"
+                , typeDesignationManager.buildString().print()
+                );
+
+        typifiedName.addTypeDesignation(std_HT, false);
+        typeDesignationManager.addTypeDesigations(null, std_HT);
+
+        assertEquals(
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA); NameType: Prionus L. Species Plantarum"
+                , typeDesignationManager.buildString().print()
+                );
+
+    }
 }
+

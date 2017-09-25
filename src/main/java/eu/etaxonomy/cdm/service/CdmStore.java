@@ -200,8 +200,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
         logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
         // merge the changes into the session, ...
-        //T mergedBean = mergedBean(bean);
-        T mergedBean = bean;
+        T mergedBean = mergedBean(bean);
+        //T mergedBean = bean;
         repo.getCommonService().saveOrUpdate(mergedBean);
         session.flush();
         commitTransction();

@@ -13,15 +13,23 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.core.Authentication;
 
 import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
+import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -29,14 +37,17 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
-import eu.etaxonomy.cdm.vaadin.view.name.RegistrationAndWorkingsetId;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkflowViewBean.ViewParameters;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -62,7 +73,9 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
     private RegistrationWorkingSet workingset;
 
-    private Reference citation;
+    private TaxonName newTaxonNameForRegistration = null;
+
+    private RegistrationDTO newRegistrationDTOWithExistingName;
 
 
     /**
@@ -72,6 +85,54 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
 
+    /**
+     * Always create a new Store
+     *
+     * @return
+     */
+    protected CdmStore<Registration, IRegistrationService> getRegistrationStore(){
+        return new CdmStore<Registration, IRegistrationService>(getRepo(), getRepo().getRegistrationService());
+    }
+
+    /**
+     * Always create a new Store
+     *
+     * @return
+     */
+    protected CdmStore<TaxonName, INameService> getTaxonNameStore(){
+        return new  CdmStore<TaxonName, INameService>(getRepo(), getRepo().getNameService());
+    }
+
+
+    /**
+     * @param taxonNameId
+     * @return
+     */
+    protected Registration createNewRegistrationForName(Integer taxonNameId) {
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // move into RegistrationWorkflowStateMachine
+        long identifier = System.currentTimeMillis();
+        Registration reg = Registration.NewInstance(
+                "http://phycobank.org/" + identifier,
+                "" + identifier,
+                taxonNameId != null ? getRepo().getNameService().find(taxonNameId) : null,
+                null);
+        Authentication authentication = currentSecurityContext().getAuthentication();
+        reg.setSubmitter((User)authentication.getPrincipal());
+        EntityChangeEvent event = getRegistrationStore().saveBean(reg);
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        return getRepo().getRegistrationService().find(event.getEntityId());
+    }
+
+
+    /**
+     *
+     */
+    protected void refreshView() {
+        getConversationHolder().getSession().clear();
+        presentWorkingSet(workingset.getCitationId());
+    }
+
 
     /**
      * {@inheritDoc}
@@ -80,34 +141,19 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     public void handleViewEntered() {
 
         super.handleViewEntered();
-        ViewParameters viewParams = getView().getViewParameters();
-        if(viewParams.action.equals(RegistrationWorkflowView.ACTION_NEW)){
-            citation = getRepo().getReferenceService().find(viewParams.referenceId);
-            workingset = new RegistrationWorkingSet(citation);
-            getView().setHeaderText("Registration for " + workingset.getCitation());
-            getView().setWorkingset(workingset);
-        }
-        if(viewParams.action.equals(RegistrationWorkflowView.ACTION_EDIT)){
-            presentWorkingSetByRegID(viewParams.referenceId);
-        }
+
+        presentWorkingSet(getView().getCitationID());
+
+        CdmFilterablePagingProvider<TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName>(
+                getRepo().getNameService(), this);
+        CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<TaxonName>();
+        getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenrator);
+        getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
     /**
-     * @param registrationID
-     * @deprecated use other method working sets should only be addressed by the referenceID
-     */
-    @Deprecated
-    private void presentWorkingSetByRegID(Integer citationID) {
-        try {
-            workingset = getWorkingSetService().loadWorkingSetByCitationID(citationID);
-        } catch (RegistrationValidationException error) {
-            getView().getWorkflow().setComponentError(new SystemError(error));
-        }
-        getView().setHeaderText("Registrations in " + workingset.getCitation());
-        getView().setWorkingset(workingset);
-    }
-
-    /**
+     * Loads the WorkingSet from the data base and passes it to the view.
+     *
      * @param registrationID
      */
     private void presentWorkingSet(Integer referenceID) {
@@ -116,7 +162,11 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         } catch (RegistrationValidationException error) {
             getView().getWorkflow().setComponentError(new SystemError(error));
         }
-        getView().setHeaderText("Registration for " + workingset.getCitation());
+        if(workingset == null || workingset.getCitationId() == null){
+            Reference citation = getRepo().getReferenceService().find(referenceID);
+            workingset = new RegistrationWorkingSet(citation);
+        }
+        getView().setHeaderText("Registrations for " + workingset.getCitation());
         getView().setWorkingset(workingset);
     }
 
@@ -140,7 +190,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
-    public void onTaxonNameEditorAction(TaxonNameEditorAction event) {
+    public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
 
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.withDeleteButton(true);
@@ -148,7 +198,74 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
         // the in the registration application inReferences should only edited centrally
         popup.getNomReferenceCombobox().setEnabled(false);
         popup.loadInEditor(event.getEntityId());
+    }
 
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
+
+        newTaxonNameForRegistration = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
+        newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
+        EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration);
+        newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityId());
+        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        popup.withDeleteButton(true);
+        popup.loadInEditor(newTaxonNameForRegistration.getId());
+        // disable NomReferenceCombobox:
+        // the in the registration application inReferences should only edited centrally
+        popup.getNomReferenceCombobox().setEnabled(false);
+    }
+
+    /**
+     * Creates a new <code>Registration</code> for a new name that has just been edited
+     * using the <code>TaxonNamePopupEditor</code>. The new name was previously created
+     * in this presenter as <code>newTaxonNameForRegistration</code> (see {@link #onTaxonNameEditorActionAdd(TaxonNameEditorAction)})
+     * and is either filled with data (<code>Reason.SAVE</code>) or it is still empty
+     * (<code>Reason.CANCEL</code>).
+     *
+     *
+     * @param event
+     * @throws RegistrationValidationException
+     */
+    @EventListener
+    public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
+        if(event.getPopup() instanceof TaxonNamePopupEditor){
+            if(newTaxonNameForRegistration != null && event.getReason().equals(Reason.SAVE)){
+                int taxonNameId = newTaxonNameForRegistration.getId();
+                Registration reg = createNewRegistrationForName(taxonNameId);
+                workingset.add(reg);
+                refreshView();
+            } else if(event.getReason().equals(Reason.CANCEL)){
+                // clean up
+                getTaxonNameStore().deleteBean(newTaxonNameForRegistration);
+            }
+            newTaxonNameForRegistration = null;
+        }
+    }
+
+
+    /**
+     * Creates a new Registration for an exiting (previously published name).
+     *
+     * @param event
+     * @throws RegistrationValidationException
+     */
+    @EventListener(condition = "#event.action == T(eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent.Action).start")
+    public void onRegistrationWorkflowEventActionStart(RegistrationWorkflowEvent event) throws RegistrationValidationException {
+
+        getView().getAddExistingNameCombobox().commit();
+        TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
+        if(typifiedName != null){
+            Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
+            Reference citation = getRepo().getReferenceService().find(workingset.getCitationId());
+            newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
+            workingset.add(newRegistrationDTOWithExistingName);
+            // tell the view to update the workingset
+            getView().setWorkingset(workingset);
+            getView().getAddExistingNameRegistrationButton().setEnabled(false);
+            getView().getAddExistingNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
+        } else {
+            logger.error("Seletced name is NULL");
+        }
 
     }
 
@@ -157,23 +274,71 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
 
             if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
                 SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
-                popup.loadInEditor(new RegistrationAndWorkingsetId(event.getRegistrationId(), event.getEntityId()));
+                popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
             } else {
                 // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
                 // FIXME implement NameTypeDesignationWorkingsetPopupEditor
             }
-
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")
-    public void onTypeDesignationsEditorActionAdd(TypeDesignationWorkingsetEditorAction event) {
+    public void onAddNewTypeDesignationWorkingset(TypeDesignationWorkingsetEditorAction event) {
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
-            popup.loadInEditor(null);
+            TypeDesignationWorkingsetEditorIdSet identifierSet;
+            Integer typifiedNameId;
+            if(newRegistrationDTOWithExistingName != null){
+                typifiedNameId = newRegistrationDTOWithExistingName.getTypifiedName().getId();
+            } else {
+                typifiedNameId = workingset.getRegistrationDTO(event.getRegistrationId())
+                        .get()
+                        .getTypifiedName()
+                        .getId();
+            }
+            identifierSet = new TypeDesignationWorkingsetEditorIdSet(
+                    event.getRegistrationId(),
+                    getView().getCitationID(),
+                    typifiedNameId
+                    );
+            popup.loadInEditor(identifierSet
+                 );
             popup.withDeleteButton(true);
+        } else {
+            // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
+            // FIXME implement NameTypeDesignationWorkingsetPopupEditor
         }
     }
+
+    /**
+     * Performs final actions after a TypeDesignationEditor which has been
+     * opened to add a TypeDesignation to a Registration object which was
+     * created for an previously published name. Prior adding a typedesignation,
+     * the according Registration object is dangling, that has no association to
+     * any entity denoting an nomenclatural act which has a reference to a
+     * publication. This means that the registration object is not in the
+     * working set.
+     *
+     *
+     * @param event
+     * @throws RegistrationValidationException
+     */
+    @EventListener
+    public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
+        if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
+            if(event.getReason().equals(Reason.SAVE)){
+                 refreshView();
+            } else if(event.getReason().equals(Reason.CANCEL)){
+                // clean up
+                if(newRegistrationDTOWithExistingName != null){
+                    getRegistrationStore().deleteBean(newRegistrationDTOWithExistingName.registration());
+                }
+            }
+            // set newRegistrationDTOWithExistingName NULL in any case
+            newRegistrationDTOWithExistingName = null;
+        }
+    }
+
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
     public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
@@ -229,14 +394,6 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             }
         }
 
-    }
-
-    /**
-     *
-     */
-    protected void refreshView() {
-        getConversationHolder().getSession().clear();
-        presentWorkingSet(workingset.getCitationId());
     }
 
 }
