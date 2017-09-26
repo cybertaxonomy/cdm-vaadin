@@ -63,6 +63,20 @@ public class RegistrationUI extends UI {
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
     }
+
+    /**
+     * @return
+     */
+    private String pageFragmentAsState() {
+        Page page = Page.getCurrent();
+        String fragment = page.getUriFragment();
+        String state = null;
+        if(fragment != null && fragment.startsWith("!")){
+            state = fragment.substring(1, fragment.length());
+        }
+        return state;
+    }
+
     //---------------------------------------------
 
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
@@ -121,18 +135,5 @@ public class RegistrationUI extends UI {
             // the case when state != null is handled in the UI base class
             eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
         }
-    }
-
-    /**
-     * @return
-     */
-    private String pageFragmentAsState() {
-        Page page = Page.getCurrent();
-        String fragment = page.getUriFragment();
-        String state = null;
-        if(fragment != null && fragment.startsWith("!")){
-            state = fragment.substring(1, fragment.length());
-        }
-        return state;
     }
 }
