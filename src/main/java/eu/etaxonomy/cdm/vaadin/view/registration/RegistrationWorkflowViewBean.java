@@ -82,7 +82,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private List<CssLayout> registrations = new ArrayList<>();
 
-    private String headerText = "-- empty --";
+    private String headerText = "Registration Workingset Editor";
     private String subheaderText = "";
 
     private boolean addNameAndTypeEditButtons = false;
@@ -112,6 +112,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
     @Override
     protected void initContent() {
         getLayout().setId(NAME);
+        updateHeader();
         // all content is added in createRegistrationsList()
     }
 

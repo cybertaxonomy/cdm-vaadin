@@ -166,7 +166,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
             Reference citation = getRepo().getReferenceService().find(referenceID);
             workingset = new RegistrationWorkingSet(citation);
         }
-        getView().setHeaderText("Registrations for " + workingset.getCitation());
+        // getView().setHeaderText("Registrations for " + workingset.getCitation());
         getView().setWorkingset(workingset);
     }
 
