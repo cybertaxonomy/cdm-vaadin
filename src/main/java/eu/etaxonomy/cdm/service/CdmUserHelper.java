@@ -127,6 +127,12 @@ public class CdmUserHelper extends VaadinUserHelper {
         return false;
     }
 
+    public void logout() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(null);
+        SecurityContextHolder.clearContext();
+    }
+
 
     private EnumSet<CRUD> crudSetFromArgs(Object[] args) {
         EnumSet<CRUD> crudSet = EnumSet.noneOf(CRUD.class);

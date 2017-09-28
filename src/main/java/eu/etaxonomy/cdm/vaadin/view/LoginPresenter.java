@@ -23,6 +23,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
+import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
@@ -70,7 +71,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
             log.debug("user '" + userName + "' authenticated");
             currentSecurityContext().setAuthentication(authentication);
             if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
-               /// eventBus.publishEvent(new AuthenticationSuccessEvent(userName));
+                eventBus.publishEvent(new AuthenticationSuccessEvent(userName));
                 log.debug("redirecting to " + redirectToState);
                 eventBus.publishEvent(new NavigationEvent(redirectToState));
             }
@@ -85,8 +86,19 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
      */
     @Override
     public void handleViewEntered() {
+
         List<String> redirectToStateTokens = getNavigationManager().getCurrentViewParameters();
-        redirectToState = String.join("/", redirectToStateTokens);
+        String currentViewName = getNavigationManager().getCurrentViewName();
+
+        if(currentViewName.equals(LoginViewBean.NAME) && redirectToStateTokens.isEmpty()){
+            // login view is shown in turn to an explicit login request of the user (e.g. login button pressed)
+            // use the redirectToStateTokens 1-n as redirectToState
+            //FIXME implement : redirectToState = UserView.NAME
+
+        } else {
+            // the login view is shown instead of the requested view for which the user needs to login
+            redirectToState = String.join("/", redirectToStateTokens);
+        }
 
         // attempt to auto login
         if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){

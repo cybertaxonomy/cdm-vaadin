@@ -10,6 +10,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 
+import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 
 /**
@@ -23,25 +24,34 @@ import eu.etaxonomy.vaadin.ui.MainMenu;
 
 @SpringComponent
 @UIScope
-class ViewAreaBean extends HorizontalLayout implements ViewDisplay {
+class ViewAreaBean extends HorizontalLayout implements ViewDisplay, ToolbarDisplay {
 
     private static final long serialVersionUID = -3763800167385449693L;
 
 	private MainMenu mainMenu;
 
+	private Component toolbar = null;
+
 	private CssLayout contentArea;
 
-	public ViewAreaBean() {
-		setSizeFull();
+	private CssLayout mainArea;
 
-		contentArea = new CssLayout();
-		contentArea.setPrimaryStyleName("valo-content");
-		contentArea.addStyleName("v-scrollable");
-		contentArea.setSizeFull();
+    public ViewAreaBean() {
 
-		addComponent(contentArea);
-		setExpandRatio(contentArea, 1);
-	}
+        setSizeFull();
+
+        mainArea = new CssLayout();
+        mainArea.setPrimaryStyleName("valo-toolbar");
+        mainArea.setSizeFull();
+        contentArea = new CssLayout();
+        contentArea.setPrimaryStyleName("valo-content");
+        contentArea.addStyleName("v-scrollable");
+        contentArea.setSizeFull();
+
+        mainArea.addComponent(contentArea);
+        addComponent(mainArea);
+        setExpandRatio(mainArea, 1);
+    }
 
 	@Autowired
 	public void setMainMenu(MainMenu mainMenu) {
@@ -49,19 +59,14 @@ class ViewAreaBean extends HorizontalLayout implements ViewDisplay {
 	    addComponentAsFirst(this.mainMenu.asComponent());
 	}
 
-// TODO was this needed to avoid bean loading problems? Otherwise remove it
-//	private MainMenu mainMenuInstantiator;
-//	@PostConstruct
-//	protected void initialize() {
-//		if (mainMenuInstantiator.isAmbiguous()) {
-//			throw new RuntimeException("Ambiguous main menu implementations available, please refine your deployment");
-//		}
-//
-//		if (!mainMenuInstantiator.isUnsatisfied()) {
-//			mainMenu = mainMenuInstantiator.get();
-//			addComponentAsFirst(mainMenu.asComponent());
-//		}
-//	}
+
+    @Override
+    public void setToolbar(Toolbar toolbar) {
+        toolbar.initialize();
+        this.toolbar = toolbar.asComponent();
+        this.toolbar.setPrimaryStyleName("valo-navigation-bar");
+        mainArea.addComponentAsFirst(this.toolbar);
+    }
 
 	@Override
 	public void showView(View view) {

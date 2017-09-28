@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.annotations.Theme;
@@ -29,6 +30,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
@@ -36,6 +38,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
+import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 
 /**
  * @author a.kohlbecker
@@ -92,6 +95,10 @@ public class RegistrationUI extends UI {
     private MainMenu mainMenu;
 
     @Autowired
+    @Qualifier("registrationToolbar")
+    private Toolbar toolbar;
+
+    @Autowired
     ApplicationEventPublisher eventBus;
 
     public RegistrationUI() {
@@ -115,6 +122,10 @@ public class RegistrationUI extends UI {
         mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationViewBean.NAME );
         mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
         mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
+
+        if(ToolbarDisplay.class.isAssignableFrom(viewDisplay.getClass())){
+            ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
+        }
 
         eventBus.publishEvent(new UIInitializedEvent());
 
