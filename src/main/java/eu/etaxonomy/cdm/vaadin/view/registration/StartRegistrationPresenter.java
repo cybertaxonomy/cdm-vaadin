@@ -155,7 +155,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowViewBean.NAME, Integer.toString(referenceId)));
+        eventBus.publishEvent(new NavigationEvent(RegistrationWorksetViewBean.NAME, Integer.toString(referenceId)));
 
     }
 

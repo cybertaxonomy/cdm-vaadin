@@ -66,9 +66,9 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  * @since Mar 2, 2017
  *
  */
-@SpringView(name=RegistrationWorkflowViewBean.NAME)
-public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationWorkflowPresenter>
-    implements RegistrationWorkflowView, View, AccessRestrictedView {
+@SpringView(name=RegistrationWorksetViewBean.NAME)
+public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
+    implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
     public static final String DOM_ID_WORKINGSET = "workingset";
 
@@ -101,7 +101,7 @@ public class RegistrationWorkflowViewBean extends AbstractPageView<RegistrationW
 
     private Panel registrationListPanel;
 
-    public RegistrationWorkflowViewBean() {
+    public RegistrationWorksetViewBean() {
         super();
     }
 

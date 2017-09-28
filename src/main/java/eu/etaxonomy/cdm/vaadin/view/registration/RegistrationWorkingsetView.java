@@ -26,7 +26,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Mar 3, 2017
  *
  */
-public interface RegistrationWorkflowView extends ApplicationView{
+public interface RegistrationWorkingsetView extends ApplicationView{
 
     public static final String ACTION_NEW = "new";
 

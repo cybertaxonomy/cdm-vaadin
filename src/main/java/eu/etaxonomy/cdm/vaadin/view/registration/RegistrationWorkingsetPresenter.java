@@ -56,7 +56,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkflowPresenter extends AbstractPresenter<RegistrationWorkflowView> {
+public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,7 +81,7 @@ public class RegistrationWorkflowPresenter extends AbstractPresenter<Registratio
     /**
      *
      */
-    public RegistrationWorkflowPresenter() {
+    public RegistrationWorkingsetPresenter() {
     }
 
 
