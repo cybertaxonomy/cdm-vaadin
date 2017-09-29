@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -53,6 +55,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private Label nameLabel = null;
 
+    private Link identifierLink;
 
     public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
 
@@ -106,6 +109,12 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         addTypeDesignationButton.setDescription("Add a new type designation workingset");
         addTypeDesignationButton.setVisible(!isRegistrationLocked);
         addComponent(addTypeDesignationButton);
+
+        //TODO make responsive and use specificIdentifier in case the space gets too narrow
+        identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
+        identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
+
+        addComponents(identifierLink);
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
         addDefaultStyles();

@@ -30,6 +30,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
@@ -254,9 +255,10 @@ public class RegistrationItem extends GridLayout {
             stateLabel.setVisible(true);
             stateLabel.update(regDto.getStatus());
             getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            getIdentifierLink().setCaption(regDto.getIdentifier());
             //TODO make responsive and use specificIdentifier in case the space gets too narrow
             getIdentifierLink().setVisible(true);
-            getIdentifierLink().setCaption(regDto.getIdentifier());
+            getIdentifierLink().setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
 
             registrationDate = regDto.getRegistrationDate();
         }
