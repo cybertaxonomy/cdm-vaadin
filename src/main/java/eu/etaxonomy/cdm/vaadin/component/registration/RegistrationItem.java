@@ -31,10 +31,13 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -176,19 +179,22 @@ public class RegistrationItem extends GridLayout {
             setComponentError(new UserError("Citation is missing"));
         }
 
-        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(),
-                regDto.getMessages().size(),
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 
     public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
         this.parentView = parentView;
 
-        ReferenceEditorAction referenceEditorAction;
+        ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationId() != null){
-            referenceEditorAction = new ReferenceEditorAction(Action.EDIT, workingSet.getCitationId());
+            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
+                referenceEditorAction = new ReferenceEditorAction(Action.EDIT, workingSet.getCitationId());
+            }
         } else {
-            referenceEditorAction = new ReferenceEditorAction(Action.ADD);
+            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE)){
+                referenceEditorAction = new ReferenceEditorAction(Action.ADD);
+            }
         }
         TimePeriod datePublished = null;
         String submitterName = null;
