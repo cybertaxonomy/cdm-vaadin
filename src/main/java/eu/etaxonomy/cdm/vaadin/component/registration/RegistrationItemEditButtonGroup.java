@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import com.vaadin.server.FontAwesome;
@@ -16,6 +17,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.remote.dto.tdwg.voc.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
@@ -52,6 +54,10 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
 
+        boolean isRegistrationLocked = EnumSet.of(
+                RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
+                .contains(regDto.getStatus());
+
         setWidth(100, Unit.PERCENTAGE);
 
         if(regDto.getName() != null){
@@ -60,6 +66,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
             Label nameLabel = new Label(regDto.getName().getLabel());
             nameLabel.setWidthUndefined();
+            nameButton.setEnabled(!isRegistrationLocked);
             addComponents(nameIdButton.getButton(), nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
@@ -73,6 +80,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
+                tdButton.setEnabled(!isRegistrationLocked);
                 addComponent(tdButton);
 //                Set<Integer> idSet = new HashSet<>();
 //                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
@@ -93,8 +101,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         }
         addTypeDesignationButton = new Button(FontAwesome.PLUS);
         addTypeDesignationButton.setDescription("Add a new type designation workingset");
+        addTypeDesignationButton.setVisible(!isRegistrationLocked);
         addComponent(addTypeDesignationButton);
-
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
         addDefaultStyles();

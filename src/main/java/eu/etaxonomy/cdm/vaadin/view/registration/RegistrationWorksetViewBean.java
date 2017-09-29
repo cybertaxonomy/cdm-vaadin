@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
@@ -293,11 +295,19 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             buttonGroup.addComponent(editRegistrationButton);
         }
 
-        if(addNameAndTypeEditButtons ){
+        if(addNameAndTypeEditButtons){
+
+            boolean isNamePresent = dto.getName() != null;
+            boolean areTypesPresent = dto.getOrderdTypeDesignationWorkingSets() != null
+                    && !dto.getOrderdTypeDesignationWorkingSets().isEmpty();
+            boolean isRegistrationLocked = !EnumSet.of(
+                    RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
+                    .contains(dto.getStatus());
+
             Button editNameButton = new Button(FontAwesome.TAG);
             editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
             editNameButton.setDescription("Edit name");
-            if(dto.getName() != null){
+            if(isNamePresent){
                 editNameButton.addClickListener(e -> {
                         Integer nameId = dto.getName().getId();
                         getEventBus().publishEvent(new TaxonNameEditorAction(
@@ -306,9 +316,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                             )
                         );
                     });
-            } else {
-                editNameButton.setEnabled(false);
             }
+            editNameButton.setEnabled(isNamePresent && !isRegistrationLocked);
 
             Button editTypesButton = new Button(FontAwesome.LEAF);
             editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
@@ -322,9 +331,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 //                            )
 //                        );
 //                    });
-            } else {
-                editTypesButton.setEnabled(false);
             }
+
+            editTypesButton.setEnabled(areTypesPresent && !isRegistrationLocked);
+
+
             buttonGroup.addComponents(editNameButton, editTypesButton);
         }
 
