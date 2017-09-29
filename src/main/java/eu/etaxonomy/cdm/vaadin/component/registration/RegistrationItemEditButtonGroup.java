@@ -51,6 +51,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private Button addTypeDesignationButton;
 
+    private Label nameLabel = null;
+
 
     public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
 
@@ -71,7 +73,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         } else {
             // no name in the registration! we only show the typified name as label
             if(regDto.getTypifiedName() != null){
-                addComponent(new Label(regDto.getTypifiedName().getLabel()));
+                nameLabel = new Label(regDto.getTypifiedName().getLabel());
+                addComponent(nameLabel);
             }
         }
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
@@ -129,6 +132,9 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         addStyleName(STYLE_NAMES);
         if(nameIdButton != null){
             nameIdButton.getButton().addStyleName(DEFAULT_BUTTON_STYLES);
+        }
+        if(nameLabel != null){
+            nameLabel.addStyleName("v-disabled");
         }
         typeDesignationButtons.forEach(idb -> idb.getButton().addStyleName(DEFAULT_BUTTON_STYLES));
         addTypeDesignationButton.addStyleName(DEFAULT_BUTTON_STYLES);
