@@ -10,7 +10,6 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +39,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
@@ -78,16 +76,12 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     public static final String NAME = "workflow";
 
-    private static final boolean REG_ITEM_AS_BUTTON_GROUP = true;
-
     public RegistrationType regType = null;
 
     private List<CssLayout> registrations = new ArrayList<>();
 
     private String headerText = "Registration Workingset Editor";
     private String subheaderText = "";
-
-    private boolean addNameAndTypeEditButtons = false;
 
     private Integer citationID;
 
@@ -295,91 +289,45 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             buttonGroup.addComponent(editRegistrationButton);
         }
 
-        if(addNameAndTypeEditButtons){
+        Component regItem;
 
-            boolean isNamePresent = dto.getName() != null;
-            boolean areTypesPresent = dto.getOrderdTypeDesignationWorkingSets() != null
-                    && !dto.getOrderdTypeDesignationWorkingSets().isEmpty();
-            boolean isRegistrationLocked = !EnumSet.of(
-                    RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
-                    .contains(dto.getStatus());
+        RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
 
-            Button editNameButton = new Button(FontAwesome.TAG);
-            editNameButton.setStyleName(ValoTheme.BUTTON_TINY);
-            editNameButton.setDescription("Edit name");
-            if(isNamePresent){
-                editNameButton.addClickListener(e -> {
-                        Integer nameId = dto.getName().getId();
-                        getEventBus().publishEvent(new TaxonNameEditorAction(
-                            AbstractEditorAction.Action.EDIT,
-                            nameId
-                            )
-                        );
-                    });
-            }
-            editNameButton.setEnabled(isNamePresent && !isRegistrationLocked);
-
-            Button editTypesButton = new Button(FontAwesome.LEAF);
-            editTypesButton.setStyleName(ValoTheme.BUTTON_TINY);
-            editTypesButton.setDescription("Edit type designations");
-            if(dto.getOrderdTypeDesignationWorkingSets() != null && !dto.getOrderdTypeDesignationWorkingSets().isEmpty()){
-//                editTypesButton.addClickListener(e -> {
-//                    int regId = dto.getId();
-//                        getEventBus().publishEvent(new TypeDesignationSetEditorAction(
-//                            AbstractEditorAction.Action.EDIT,
-//                            regId
-//                            )
-//                        );
-//                    });
-            }
-
-            editTypesButton.setEnabled(areTypesPresent && !isRegistrationLocked);
-
-
-            buttonGroup.addComponents(editNameButton, editTypesButton);
+        if(editButtonGroup.getNameButton() != null){
+            editButtonGroup.getNameButton().getButton().addClickListener(e -> {
+                Integer nameId = editButtonGroup.getNameButton().getId();
+                getEventBus().publishEvent(new TaxonNameEditorAction(
+                    AbstractEditorAction.Action.EDIT,
+                    nameId,
+                    null, //e.getButton(), the listener method expects this to be null
+                    this
+                    )
+                );
+            });
         }
 
-        Component regItem;
-        if(REG_ITEM_AS_BUTTON_GROUP){
-            RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
-
-            if(editButtonGroup.getNameButton() != null){
-                editButtonGroup.getNameButton().getButton().addClickListener(e -> {
-                    Integer nameId = editButtonGroup.getNameButton().getId();
-                    getEventBus().publishEvent(new TaxonNameEditorAction(
+        for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
+            workingsetButton.getButton().addClickListener(e -> {
+                Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
+                Integer registrationEntityID = dto.getId();
+                getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                         AbstractEditorAction.Action.EDIT,
-                        nameId,
+                        typeDesignationWorkingsetId,
+                        workingsetType,
+                        registrationEntityID,
                         null, //e.getButton(), the listener method expects this to be null
                         this
                         )
                     );
-                });
-            }
-
-            for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
-                workingsetButton.getButton().addClickListener(e -> {
-                    Integer typeDesignationWorkingsetId = workingsetButton.getId();
-                    TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
-                    Integer registrationEntityID = dto.getId();
-                    getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
-                            AbstractEditorAction.Action.EDIT,
-                            typeDesignationWorkingsetId,
-                            workingsetType,
-                            registrationEntityID,
-                            null, //e.getButton(), the listener method expects this to be null
-                            this
-                            )
-                        );
-                });
-            }
-
-            editButtonGroup.getAddTypeDesignationButton().addClickListener(
-                    e -> chooseNewTypeRegistrationWorkingset(dto.getId())
-                    );
-            regItem = editButtonGroup;
-        } else {
-            regItem = new Label(dto.getSummary());
+            });
         }
+
+        editButtonGroup.getAddTypeDesignationButton().addClickListener(
+                e -> chooseNewTypeRegistrationWorkingset(dto.getId())
+                );
+        regItem = editButtonGroup;
+
 
         grid.addComponent(stateLabel, 0, row);
         grid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
