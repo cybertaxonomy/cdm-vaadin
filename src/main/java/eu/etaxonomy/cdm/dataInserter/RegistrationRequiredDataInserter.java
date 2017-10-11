@@ -58,7 +58,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
 
-//    protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
+    protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
 
     protected static final UUID GROUP_CURATOR_UUID = UUID.fromString("135210d3-3db7-4a81-ab36-240444637d45");
 
@@ -120,9 +120,16 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupCurator, "REGISTRATION[CREATE,READ,UPDATE,DELETE]");
         repo.getGroupService().saveOrUpdate(groupCurator);
 
-        Group groupEditor = repo.getGroupService().load(Group.GROUP_EDITOR_UUID, Arrays.asList("grantedAuthorities"));
-        assureGroupHas(groupEditor, "REGISTRATION[CREATE,READ]");
-        repo.getGroupService().saveOrUpdate(groupEditor);
+        Group groupSubmitter = repo.getGroupService().load(GROUP_SUBMITTER_UUID, Arrays.asList("grantedAuthorities"));
+        if(groupSubmitter == null){
+            groupSubmitter = Group.NewInstance();
+            groupSubmitter.setUuid(GROUP_SUBMITTER_UUID);
+            groupSubmitter.setName("Submitter");
+        }
+        assureGroupHas(groupSubmitter, "TAXONNAME.[CREATE,READ]");
+        assureGroupHas(groupSubmitter, "TEAMORPERSONBASE.[CREATE,READ]");
+        assureGroupHas(groupSubmitter, "REGISTRATION[CREATE,READ]");
+        repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
             repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
