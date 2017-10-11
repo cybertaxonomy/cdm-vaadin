@@ -15,9 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 
-import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
@@ -160,7 +163,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         try {
             workingset = getWorkingSetService().loadWorkingSetByReferenceID(referenceID);
         } catch (RegistrationValidationException error) {
-            getView().getWorkflow().setComponentError(new SystemError(error));
+            logger.error(error);
+            Window errorDialog = new Window("Validation Error");
+            errorDialog.setModal(true);
+            VerticalLayout subContent = new VerticalLayout();
+            subContent.setMargin(true);
+            errorDialog.setContent(subContent);
+            subContent.addComponent(new Label(error.getMessage()));
+            UI.getCurrent().addWindow(errorDialog);
         }
         if(workingset == null || workingset.getCitationId() == null){
             Reference citation = getRepo().getReferenceService().find(referenceID);

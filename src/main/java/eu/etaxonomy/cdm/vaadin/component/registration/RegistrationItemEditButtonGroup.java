@@ -20,9 +20,12 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
-import eu.etaxonomy.cdm.remote.dto.tdwg.voc.TaxonName;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -71,8 +74,11 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
             Label nameLabel = new Label(regDto.getName().getLabel());
             nameLabel.setWidthUndefined();
-            nameButton.setEnabled(!isRegistrationLocked);
-            addComponents(nameIdButton.getButton(), nameLabel);
+            nameButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(TaxonName.class, regDto.getName().getId(), CRUD.UPDATE));
+
+            addComponent(nameIdButton.getButton());
+            // PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(), CRUD.UPDATE);
+            addComponent(nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
             if(regDto.getTypifiedName() != null){
@@ -81,12 +87,12 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             }
         }
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
-            for(TypedEntityReference baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
+            for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                tdButton.setEnabled(!isRegistrationLocked);
+                tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
                 addComponent(tdButton);
 //                Set<Integer> idSet = new HashSet<>();
 //                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
