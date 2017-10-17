@@ -102,7 +102,9 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      * @throws RegistrationValidationException
      */
     @Override
+    @Deprecated
     public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
+
         Reference reference = repo.getReferenceService().find(referenceID);
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, null);
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));

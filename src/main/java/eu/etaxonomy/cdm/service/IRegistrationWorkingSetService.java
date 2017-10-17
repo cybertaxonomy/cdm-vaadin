@@ -38,7 +38,9 @@ public interface IRegistrationWorkingSetService {
      * @param  id the CDM Entity id
      * @return
      * @throws RegistrationValidationException
+     * @deprecated Use {@link  #loadWorkingSetByReferenceID(Integer) instead
      */
+    @Deprecated
     public RegistrationWorkingSet loadWorkingSetByCitationID(Integer id) throws RegistrationValidationException;
 
     /**

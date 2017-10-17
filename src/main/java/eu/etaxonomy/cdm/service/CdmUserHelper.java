@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.service;
 import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -38,6 +40,10 @@ public class CdmUserHelper extends VaadinUserHelper {
 
     @Autowired
     private ICdmPermissionEvaluator permissionEvaluator;
+
+    @Autowired
+    @Qualifier("cdmRepository")
+    private CdmRepository repo;
 
     public CdmUserHelper(){
         super();
@@ -98,7 +104,7 @@ public class CdmUserHelper extends VaadinUserHelper {
     public boolean userHasPermission(CdmBase entity, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
-        return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
         }
@@ -109,7 +115,8 @@ public class CdmUserHelper extends VaadinUserHelper {
     public boolean userHasPermission(Class<? extends CdmBase> cdmType, Integer entitiyId, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
-            return permissionEvaluator.hasPermission(getAuthentication(), cdmType, entitiyId.toString(), crudSet);
+            CdmBase entity = repo.getCommonService().find(cdmType, entitiyId);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
         }

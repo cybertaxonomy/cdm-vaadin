@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.dataInserter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +43,9 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
@@ -61,6 +65,9 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
 
     protected static final UUID GROUP_CURATOR_UUID = UUID.fromString("135210d3-3db7-4a81-ab36-240444637d45");
+
+    private static final EnumSet<CRUD> CREATE_READ = EnumSet.of(CRUD.CREATE, CRUD.READ);
+    private static final EnumSet<CRUD> CREATE_READ_UPDATE_DELETE = EnumSet.of(CRUD.CREATE, CRUD.READ, CRUD.UPDATE, CRUD.DELETE);
 
     private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
@@ -117,7 +124,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             groupCurator.setUuid(GROUP_CURATOR_UUID);
             groupCurator.setName("Curator");
         }
-        assureGroupHas(groupCurator, "REGISTRATION[CREATE,READ,UPDATE,DELETE]");
+        assureGroupHas(groupCurator, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ_UPDATE_DELETE).toString());
         repo.getGroupService().saveOrUpdate(groupCurator);
 
         Group groupSubmitter = repo.getGroupService().load(GROUP_SUBMITTER_UUID, Arrays.asList("grantedAuthorities"));
@@ -126,9 +133,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             groupSubmitter.setUuid(GROUP_SUBMITTER_UUID);
             groupSubmitter.setName("Submitter");
         }
-        assureGroupHas(groupSubmitter, "TAXONNAME.[CREATE,READ]");
-        assureGroupHas(groupSubmitter, "TEAMORPERSONBASE.[CREATE,READ]");
-        assureGroupHas(groupSubmitter, "REGISTRATION[CREATE,READ]");
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TAXONNAME, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TEAMORPERSONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){

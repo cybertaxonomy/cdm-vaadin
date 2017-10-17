@@ -22,6 +22,7 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -52,8 +53,24 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Autowired
 	private PopupEditorFactory popupEditorFactory;
 
+	/**
+	 * This reference will cause the scoped UserHelper being initialized
+	 * It is not used in this class but attaches itself to the vaadin session
+	 * from where it will be accessible via UserHelper.fromSession()
+	 */
 	@Autowired
     private UserHelper userHelper;
+
+    /**
+     * This reference will cause the scoped PermissionDebugUtils being initialized.
+     * It is not used in this class but attaches itself to the vaadin session
+     * from where it will be accessible via UserHelper.fromSession()
+     *
+     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
+     * See
+     */
+    @Autowired(required=false)
+    private PermissionDebugUtils permissionDebugUtils;
 
 	private Map<PopupView, Window> popupMap;
 
@@ -179,6 +196,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
      *
      * @return the current view name or <code>null</code>
      */
+    @Override
     public String getCurrentViewName() {
         SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
         if(springViewAnnotation != null){

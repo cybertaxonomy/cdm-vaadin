@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
@@ -74,10 +75,11 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
             Label nameLabel = new Label(regDto.getName().getLabel());
             nameLabel.setWidthUndefined();
-            nameButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(TaxonName.class, regDto.getName().getId(), CRUD.UPDATE));
+            boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
+            nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
 
             addComponent(nameIdButton.getButton());
-            // PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(), CRUD.UPDATE);
+            PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             addComponent(nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
@@ -94,8 +96,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 tdButton.setDescription("Edit the type designation working set");
                 tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
                 addComponent(tdButton);
-//                Set<Integer> idSet = new HashSet<>();
-//                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
+
+                PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class, baseEntityRef.getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
