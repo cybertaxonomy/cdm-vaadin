@@ -61,7 +61,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private Link identifierLink;
 
-    public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
+    public RegistrationItemEditButtonGroup(RegistrationDTO regDto) {
 
         boolean isRegistrationLocked = EnumSet.of(
                 RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)

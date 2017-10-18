@@ -8,12 +8,15 @@
 */
 package eu.etaxonomy.cdm.vaadin.security;
 
+import java.util.EnumSet;
+
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 
 /**
- * UserHelper interface. Imeplemtations should use the {@link #VADDIN_SESSION_KEY} to auto registers
+ * UserHelper interface. Implementations should use the {@link #VADDIN_SESSION_KEY} to auto registers
  * in the VaadinSession.
  *
  * @author a.kohlbecker
@@ -49,6 +52,15 @@ public interface UserHelper {
     boolean userIsAnnonymous();
 
     boolean userIsAutheticated();
+
+    public void createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud);
+
+    /**
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     */
+    void createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud);
 
 
 }

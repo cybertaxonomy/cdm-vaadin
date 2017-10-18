@@ -14,10 +14,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
@@ -29,10 +25,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
-import sun.security.provider.PolicyParser.ParsingException;
 
 /**
  * PermissionDebugUtils provide the following tools:
@@ -87,33 +80,11 @@ public class PermissionDebugUtils {
     public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud){
 
        Button button = new Button(FontAwesome.BOLT);
-       button.addClickListener(e -> createAuthority(cdmType, entitiyId, crud));
+       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyId, crud));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
 
     }
 
-    /**
-     * @param cdmType
-     * @param entitiyId
-     * @param crud
-     * @return
-     */
-    private void createAuthority(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud) {
-        String username = UserHelper.fromSession().userName();
-        UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
-        if(userDetails != null){
-            User user = (User)userDetails;
-            CdmBase entity = repo.getCommonService().find(cdmType, entitiyId);
-            CdmAuthority authority = new CdmAuthority(entity, crud);
-            try {
-                user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
-            } catch (ParsingException e) {
-                throw new RuntimeException(e);
-            }
-            repo.getUserService().saveOrUpdate(user);
-            Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-    }
+
 }

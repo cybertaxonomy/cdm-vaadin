@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
@@ -42,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
@@ -216,6 +219,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         newTaxonNameForRegistration = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
         EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration);
+        UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, nameSaveEvent.getEntityId(), EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.withDeleteButton(true);
@@ -239,10 +243,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventListener
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
-            if(newTaxonNameForRegistration != null && event.getReason().equals(Reason.SAVE)){
-                int taxonNameId = newTaxonNameForRegistration.getId();
-                Registration reg = createNewRegistrationForName(taxonNameId);
-                workingset.add(reg);
+            if(event.getReason().equals(Reason.SAVE)){
+                if(newTaxonNameForRegistration != null){
+                    int taxonNameId = newTaxonNameForRegistration.getId();
+                    Registration reg = createNewRegistrationForName(taxonNameId);
+                    workingset.add(reg);
+                }
                 refreshView();
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // clean up
