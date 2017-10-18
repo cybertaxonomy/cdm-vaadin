@@ -1,3 +1,11 @@
+/**
+* Copyright (C) 2017 EDIT
+* European Distributed Institute of Taxonomy
+* http://www.e-taxonomy.eu
+*
+* The contents of this file are subject to the Mozilla Public License Version 1.1
+* See LICENSE.TXT at the top of this package for the full license terms.
+*/
 package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
 
 import java.sql.SQLException;
@@ -12,6 +20,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -32,19 +42,22 @@ import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
+/**
+ * @author freimeier
+ * @since 18.10.2017
+ *
+ */
+@SpringComponent
+@ViewScope
+public class DistributionTablePresenter extends AbstractPresenter<DistributionTableView> {
 
-public class DistributionTablePresenter {
+	private static final long serialVersionUID = 3313043335587777217L;
 
-	private final DistributionTableView view;
-
-	public DistributionTablePresenter(DistributionTableView dtv){
-	    this.view = dtv;
-	    view.addListener(this);
-	}
-
-    public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
+	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
+	    Set<NamedArea> termSet = getTermSet();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
 	    	Representation representation = term.getRepresentation(Language.DEFAULT());
@@ -114,8 +127,9 @@ public class DistributionTablePresenter {
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
-		TermVocabulary<DefinedTermBase> term = CdmSpringContextHelper.getVocabularyService().load(termUUID);
-		term = CdmBase.deproxy(term, TermVocabulary.class);
+		getConversationHolder().getSession();
+		TermVocabulary<DefinedTermBase> term = CdmSpringContextHelper.getVocabularyService().load(termUUID, Arrays.asList("terms.representations"));
+		term = CdmBase.deproxy(term);
 		return term.getTerms();
 	}
 
@@ -141,7 +155,7 @@ public class DistributionTablePresenter {
 	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
-	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(termUUID);
+	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(termUUID, Arrays.asList("terms.representations"));
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
 	}
@@ -170,14 +184,14 @@ public class DistributionTablePresenter {
 	}
 
 	public List<Distribution> getDistributions(Taxon taxon) {
-		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
+		Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		return listTaxonDescription;
 
 	}
 
 	public List<TaxonNode> getAllNodes(){
-		List<TaxonNode> allNodes = new ArrayList<TaxonNode>();
+		List<TaxonNode> allNodes = new ArrayList<>();
 
 		List<TaxonNode> taxonNodes = getChosenTaxonNodes();
 		for (TaxonNode taxonNode : taxonNodes) {
@@ -208,7 +222,7 @@ public class DistributionTablePresenter {
 	}
 
 	public CdmSQLContainer getSQLContainer() throws SQLException{
-		List<Integer> nodeIds = new ArrayList<Integer>();
+		List<Integer> nodeIds = new ArrayList<>();
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
@@ -244,7 +258,6 @@ public class DistributionTablePresenter {
     });
 
 	/**Helper Methods*/
-
 	private void sort(List<DescriptionElementBase> list){
 		Collections.sort(list, new Comparator<DescriptionElementBase>() {
 

@@ -19,6 +19,7 @@ import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 
 public class HorizontalToolbar extends HorizontalLayout implements Serializable{
@@ -42,18 +43,19 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
 	private final Button logoutButton= new Button("Logout");
 
-	private final Authentication authentication;
+//	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
 
 	public HorizontalToolbar() {
 //		authentication = (Authentication) VaadinSession.getCurrent().getAttribute("authentication");
-		CdmVaadinAuthentication authentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
-		this.authentication = authentication.getAuthentication(Page.getCurrent().getLocation(), VaadinServlet.getCurrent().getServletContext().getContextPath());
+//		CdmVaadinAuthentication authentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
+//		this.authentication = authentication.getAuthentication(Page.getCurrent().getLocation(), VaadinServlet.getCurrent().getServletContext().getContextPath());
 		init();
 	}
 
     public void init() {
-		if(authentication != null && authentication.isAuthenticated()){
+    	String userName = UserHelper.fromSession().userName();
+		if(userName != null){
 			setMargin(true);
 			setSpacing(true);
 			setStyleName("toolbar");
@@ -77,7 +79,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
 			//		SecurityContext context = (SecurityContext)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("context");
 			SecurityContext context = SecurityContextHolder.getContext();
-			Label loginName = new Label(authentication.getName().toString());
+			Label loginName = new Label(userName);
 			loginName.setIcon(new ThemeResource("icons/32/user.png"));
 
 			HorizontalLayout rightLayout = new HorizontalLayout();
@@ -101,10 +103,8 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
 				@Override
                 public void buttonClick(ClickEvent event) {
-
+					SecurityContextHolder.getContext().setAuthentication(null);
 					VaadinSession.getCurrent().close();
-					authentication.setAuthenticated(false);
-					UI.getCurrent().getNavigator().navigateTo("abstractAuthenticatedUI");
 				}
 			});
 		}
