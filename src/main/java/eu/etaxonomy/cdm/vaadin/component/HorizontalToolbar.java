@@ -2,25 +2,12 @@ package eu.etaxonomy.cdm.vaadin.component;
 
 import java.io.Serializable;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Image;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
-import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 
 public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
@@ -41,8 +28,6 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 
 	private final Button settingsButton =  new Button("Settings");
 
-	private final Button logoutButton= new Button("Logout");
-
 //	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
 
@@ -54,8 +39,7 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 	}
 
     public void init() {
-    	String userName = UserHelper.fromSession().userName();
-		if(userName != null){
+		if(UserHelper.fromSession().userIsAutheticated()){
 			setMargin(true);
 			setSpacing(true);
 			setStyleName("toolbar");
@@ -75,45 +59,24 @@ public class HorizontalToolbar extends HorizontalLayout implements Serializable{
 			detailButton.setIcon(new ThemeResource("icons/32/document-txt.png"));
 			settingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
 			distributionSettingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
-			logoutButton.setIcon(new ThemeResource("icons/32/cancel.png"));
 
-			//		SecurityContext context = (SecurityContext)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("context");
-			SecurityContext context = SecurityContextHolder.getContext();
-			Label loginName = new Label(userName);
-			loginName.setIcon(new ThemeResource("icons/32/user.png"));
+//          SecurityContext context = (SecurityContext)VaadinService.getCurrentRequest().getWrappedSession().getAttribute("context");
+//			SecurityContext context = SecurityContextHolder.getContext();
 
 			HorizontalLayout rightLayout = new HorizontalLayout();
-			Image image = new Image(null, new ThemeResource("icons/32/vseparator1.png"));
 			rightLayout.addComponent(settingsButton);
 			rightLayout.addComponent(distributionSettingsButton);
-			rightLayout.addComponent(logoutButton);
-			rightLayout.addComponent(image);
-			rightLayout.addComponent(loginName);
 
 			addComponent(rightLayout);
 			setComponentAlignment(rightLayout, Alignment.MIDDLE_RIGHT);
 			setExpandRatio(rightLayout, 1);
-
-			logoutButton.addClickListener(new ClickListener() {
-
-				/**
-				 *  automatically generated ID
-				 */
-				private static final long serialVersionUID = 8380401487511285303L;
-
-				@Override
-                public void buttonClick(ClickEvent event) {
-					SecurityContextHolder.getContext().setAuthentication(null);
-					VaadinSession.getCurrent().close();
-				}
-			});
 		}
     }
 
     public Button getSettingsButton(){
         return settingsButton;
     }
-    
+
     public Button getDistributionSettingsButton() {
 		return distributionSettingsButton;
 	}
