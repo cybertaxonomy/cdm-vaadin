@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -113,7 +114,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
-	    if(navigationState == null){
+	    if(StringUtils.isEmpty(navigationState)){
             navigationState = defaultViewName;
         }
 		if (fireNavigationEvent) {
@@ -125,7 +126,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public void navigateTo(String navigationState) {
-	    if(navigationState == null){
+	    if(StringUtils.isEmpty(navigationState)){
 	        navigationState = defaultViewName;
 	    }
 		super.navigateTo(navigationState);
