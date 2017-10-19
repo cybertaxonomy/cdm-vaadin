@@ -117,8 +117,24 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
      * {@inheritDoc}
      */
     @Override
+    public void setAddButtonEnabled(boolean enabled) {
+        addButton.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEditButtonEnabled(boolean enabled) {
+        editButton.setEnabled(enabled);
     }
 
     /**

@@ -18,12 +18,26 @@ import com.vaadin.ui.Button.ClickListener;
 public interface ToOneRelatedEntityField<V extends Object> {
 
     /**
+     * Set the enabled state of the edit button
+     *
+     * @param enabled
+     */
+    public void setEditButtonEnabled(boolean enabled);
+
+    /**
      * Adds the click listener to the add-entity-button.
      *
      * @param listener
      *            the Listener to be added.
      */
     public void addClickListenerAddEntity(ClickListener listener);
+
+    /**
+     * Set the enabled state of the add button
+     *
+     * @param enabled
+     */
+    public void setAddButtonEnabled(boolean enabled);
 
     /**
      * Adds the click listener to the edit-entity-button.

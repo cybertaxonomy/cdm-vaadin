@@ -24,6 +24,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -43,7 +44,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     ReferencePopupEditor inReferencePopup = null;
 
     public ReferenceEditorPresenter() {
-        
+
     }
 
     /**
@@ -93,6 +94,8 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                     return page.getCount().intValue();
                 }}
             , 20);
+
+        getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
     }
 
     /**

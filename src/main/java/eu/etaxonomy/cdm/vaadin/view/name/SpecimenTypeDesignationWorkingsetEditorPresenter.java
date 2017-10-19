@@ -34,6 +34,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
@@ -151,6 +152,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider.getPageSize()
                         );
                 row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
+                row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
@@ -158,6 +160,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider.getPageSize()
                         );
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+                row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
 
                 getView().applyDefaultComponentStyle(row.components());
 

@@ -109,9 +109,27 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
      * {@inheritDoc}
      */
     @Override
+    public void setAddButtonEnabled(boolean enabled) {
+        addButton.setEnabled(enabled);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addClickListenerAddEntity(ClickListener listener) {
         addButton.addClickListener(listener);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEditButtonEnabled(boolean enabled) {
+        editButton.setEnabled(enabled);
+    }
+
 
     /**
      * {@inheritDoc}
