@@ -43,6 +43,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -307,10 +308,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(newRegistrationDTOWithExistingName != null){
                 typifiedNameId = newRegistrationDTOWithExistingName.getTypifiedName().getId();
             } else {
-                typifiedNameId = workingset.getRegistrationDTO(event.getRegistrationId())
-                        .get()
-                        .getTypifiedName()
-                        .getId();
+                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+                EntityReference typifiedNameRef = registrationDTO.getTypifiedName();
+                if(typifiedNameRef != null){
+                    // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
+                    typifiedNameId = typifiedNameRef.getId();
+                } else {
+                    // case of registrations with a name in the nomenclatural act.
+                    typifiedNameId = registrationDTO.getName().getId();
+                }
             }
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
                     event.getRegistrationId(),
