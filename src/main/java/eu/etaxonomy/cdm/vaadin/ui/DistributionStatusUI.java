@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableViewBean;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 
 @Theme("macosx")
@@ -39,6 +39,9 @@ public class DistributionStatusUI extends UI{
     //---- pull into abstract super class ? ---------
     @Autowired
     SpringViewProvider viewProvider;
+
+    @Autowired
+    NavigationManagerBean navigator;
 
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
@@ -85,13 +88,7 @@ public class DistributionStatusUI extends UI{
 
         eventBus.publishEvent(new UIInitializedEvent());
 
-        //navigate to initial view
-        String state = pageFragmentAsState();
+        navigator.setDefaultViewName(INITIAL_VIEW);
 
-        if(state != null){
-            eventBus.publishEvent(new NavigationEvent(state));
-        } else {
-            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
-        }
 	}
 }

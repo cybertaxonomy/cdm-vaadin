@@ -37,7 +37,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 
 /**
@@ -62,6 +62,9 @@ public class RegistrationUI extends UI {
     //---- pull into abstract super class ? ---------
     @Autowired
     SpringViewProvider viewProvider;
+
+    @Autowired
+    NavigationManagerBean navigator;
 
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
@@ -139,12 +142,15 @@ public class RegistrationUI extends UI {
         Resource registryCssFile = new ExternalResource("vaadin://branding/" + brand + "/css/branding.css");
         Page.getCurrent().getStyles().add(registryCssFile);
 
-        //navigate to initial view
-        String state = pageFragmentAsState();
+        navigator.setDefaultViewName(INITIAL_VIEW);
 
-        if(state == null){
-            // the case when state != null is handled in the UI base class
-            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
-        }
+        //navigate to initial view
+//        String state = pageFragmentAsState();
+
+
+//        if(state == null){
+//            // the case when state != null is handled in the UI base class
+//            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
+//        }
     }
 }

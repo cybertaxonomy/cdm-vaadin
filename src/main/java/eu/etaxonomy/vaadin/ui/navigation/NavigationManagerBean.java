@@ -74,14 +74,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	private Map<PopupView, Window> popupMap;
 
-	public NavigationManagerBean() {
-		popupMap = new HashMap<>();
-	}
-
-
-    private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
-        return popupEditorFactory.newPopupView(popupViewClass);
-    }
+	private String defaultViewName = null;
 
     /*
      * Why UriFragmentManager must be initialized lazily:
@@ -103,6 +96,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Autowired
 	ApplicationEventPublisher eventBus;
 
+
+	public NavigationManagerBean() {
+	    popupMap = new HashMap<>();
+	}
+
+
+	private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
+	    return popupEditorFactory.newPopupView(popupViewClass);
+	}
+
 	@EventListener
 	protected void onUIInitialized(UIInitializedEvent e) {
 		init(UI.getCurrent(), uriFragmentManager, viewDisplay);
@@ -110,6 +113,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
+	    if(navigationState == null){
+            navigationState = defaultViewName;
+        }
 		if (fireNavigationEvent) {
 			navigateTo(navigationState);
 		} else {
@@ -119,6 +125,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public void navigateTo(String navigationState) {
+	    if(navigationState == null){
+	        navigationState = defaultViewName;
+	    }
 		super.navigateTo(navigationState);
 		//eventBus.publishEvent(new NavigationEvent(navigationState));
 	}
@@ -198,9 +207,11 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
      */
     @Override
     public String getCurrentViewName() {
-        SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
-        if(springViewAnnotation != null){
-            return springViewAnnotation.name();
+        if(getCurrentView() != null){
+            SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
+            if(springViewAnnotation != null){
+                return springViewAnnotation.name();
+            }
         }
         return null;
     }
@@ -223,5 +234,21 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     public List<AbstractEditorPresenter<?, ?>> getPopupEditorPresenters() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    /**
+     * @return the defaultViewName
+     */
+    public String getDefaultViewName() {
+        return defaultViewName;
+    }
+
+
+    /**
+     * @param defaultViewName the defaultViewName to set
+     */
+    public void setDefaultViewName(String defaultViewName) {
+        this.defaultViewName = defaultViewName;
     }
 }
