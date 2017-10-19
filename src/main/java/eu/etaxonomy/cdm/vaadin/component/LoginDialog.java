@@ -26,6 +26,8 @@ public class LoginDialog extends LoginDialogDesign {
 
     public LoginDialog() {
         addSelectedTabChangeListener(e -> focusFirstElement(e.getTabSheet()));
+        getTab(1).setEnabled(false);
+        getTab(2).setEnabled(false);
     }
 
     /**
