@@ -2,27 +2,24 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableViewBean;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
-import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 
 @Theme("macosx")
 @Title("Distribution Editor")
@@ -33,7 +30,6 @@ public class DistributionStatusUI extends UI{
 
     private final static Logger logger = Logger.getLogger(DistributionStatusUI.class);
 
-    @Autowired
     private ViewDisplay viewDisplay;
 
     //---- pull into abstract super class ? ---------
@@ -63,9 +59,9 @@ public class DistributionStatusUI extends UI{
 
     public static final String INITIAL_VIEW =  DistributionTableViewBean.NAME;
 
-    @Autowired
-    @Qualifier("registrationToolbar")
-    private Toolbar toolbar;
+//    @Autowired
+//    @Qualifier("registrationToolbar")
+//    private Toolbar toolbar;
 
     @Autowired
     ApplicationEventPublisher eventBus;
@@ -80,11 +76,13 @@ public class DistributionStatusUI extends UI{
 
         Responsive.makeResponsive(this);
 
-        setContent((Component) viewDisplay);
+        viewDisplay = new Navigator.SingleComponentContainerViewDisplay(this);
+        navigator.setViewDisplay(viewDisplay);
+        //setContent((Component) viewDisplay);
 
-        if(ToolbarDisplay.class.isAssignableFrom(viewDisplay.getClass())){
-            ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
-        }
+//        if(ToolbarDisplay.class.isAssignableFrom(viewDisplay.getClass())){
+//            ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
+//        }
 
         eventBus.publishEvent(new UIInitializedEvent());
 

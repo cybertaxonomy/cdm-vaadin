@@ -22,7 +22,7 @@ import eu.etaxonomy.vaadin.ui.MainMenu;
  * @author Andreas Kohlbecker - ported to Spring
  */
 
-@SpringComponent
+@SpringComponent("viewAreaBean")
 @UIScope
 class ViewAreaBean extends HorizontalLayout implements ViewDisplay, ToolbarDisplay {
 

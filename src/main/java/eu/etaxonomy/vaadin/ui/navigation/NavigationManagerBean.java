@@ -39,7 +39,11 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	private final static Logger logger = Logger.getLogger(NavigationManagerBean.class);
 
-	@Autowired
+	// injecting the viewDisplay as spring bean causes problems with older cdm vaadin code
+	// SingleComponentContainerViewDisplay for example can't be used
+	// the viewDisplay should be configurable per UI therefore it seems more elegant to
+	// let the UI pass the viewDisplay to the Navigator
+//	@Autowired
 	private ViewDisplay viewDisplay;
 
 	@Autowired
@@ -251,5 +255,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
      */
     public void setDefaultViewName(String defaultViewName) {
         this.defaultViewName = defaultViewName;
+    }
+
+    public void setViewDisplay(ViewDisplay viewDisplay){
+        this.viewDisplay = viewDisplay;
     }
 }

@@ -57,6 +57,7 @@ public class RegistrationUI extends UI {
     private static final long serialVersionUID = -8626236111335323691L;
 
     @Autowired
+    @Qualifier("viewAreaBean")
     private ViewDisplay viewDisplay;
 
     //---- pull into abstract super class ? ---------
@@ -111,6 +112,7 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
+        navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();
 
         addStyleName(ValoTheme.UI_WITH_MENU);

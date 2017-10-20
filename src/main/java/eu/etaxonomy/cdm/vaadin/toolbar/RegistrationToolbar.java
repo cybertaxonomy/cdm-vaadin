@@ -87,7 +87,13 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar {
 
     @EventListener
     public void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event){
-        updateAuthenticationButtons();
+        boolean isInitialized = userButton != null;
+        // The RegistrationToolbar is being initialize even if not needed only because it is a EventListener
+        // which causes Spring to initialize it.
+        // TODO After switching to an other event bus this check can be removed
+        if(isInitialized){
+            updateAuthenticationButtons();
+        }
     }
 
     /**
