@@ -71,7 +71,7 @@ public class DistributionTablePresenter extends AbstractPresenter<DistributionTa
 
 	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
-	    taxon = (Taxon)getRepo().getTaxonService().find(taxon.getUuid());
+	    taxon = (Taxon)repo.getTaxonService().find(taxon.getUuid());
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
@@ -134,6 +134,7 @@ public class DistributionTablePresenter extends AbstractPresenter<DistributionTa
 	    }
 	    else{//update distribution
            distribution.setStatus((PresenceAbsenceTerm)comboValue);
+           repo.getCommonService().saveOrUpdate(distribution);
            repo.commitTransaction(tx);
            return 0;
         }
@@ -144,9 +145,9 @@ public class DistributionTablePresenter extends AbstractPresenter<DistributionTa
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
-		getConversationHolder().getSession();
+//		getConversationHolder().getSession();
 		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms.representations"));
-		voc = CdmBase.deproxy(voc);
+//		voc = CdmBase.deproxy(voc);
 		return voc.getTerms();
 	}
 
