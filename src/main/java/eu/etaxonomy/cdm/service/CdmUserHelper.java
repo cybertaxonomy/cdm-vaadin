@@ -186,12 +186,12 @@ public class CdmUserHelper extends VaadinUserHelper {
      * @return
      */
     @Override
-    public void createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud) {
+    public void createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
         UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
         if(userDetails != null){
             User user = (User)userDetails;
             CdmBase entity = repo.getCommonService().find(cdmType, entitiyId);
-            CdmAuthority authority = new CdmAuthority(entity, crud);
+            CdmAuthority authority = new CdmAuthority(entity, property, crud);
             try {
                 user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
             } catch (CdmAuthorityParsingException e) {
@@ -212,8 +212,8 @@ public class CdmUserHelper extends VaadinUserHelper {
      * @return
      */
     @Override
-    public void createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud) {
-        createAuthorityFor(userName(), cdmType, entitiyId, crud);
+    public void createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
+        createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
     }
 
 }

@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,10 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
@@ -53,6 +57,7 @@ import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -126,20 +131,20 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      */
     @Override
     public void setWorkingset(RegistrationWorkingSet workingset) {
+
         if(workingsetHeader != null){
             getLayout().removeComponent(workingsetHeader);
             getLayout().removeComponent(registrationListPanel);
         }
-
-        registrationListPanel = createRegistrationsList(workingset);
-        registrationListPanel.setStyleName("registration-list");
-        registrationListPanel.setCaption("Registrations");
-
         workingsetHeader = new RegistrationItem(workingset, this);
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
             workingsetHeader.getSubmitterLabel().setVisible(true);
         }
         addContentComponent(workingsetHeader, null);
+
+        registrationListPanel = createRegistrationsList(workingset);
+        registrationListPanel.setStyleName("registration-list");
+        registrationListPanel.setCaption("Registrations");
         addContentComponent(registrationListPanel, 1.0f);
 
     }
@@ -256,6 +261,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 )));
             buttonGroup.addComponent(editRegistrationButton);
         }
+
+        PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
+                EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
         Component regItem;
 

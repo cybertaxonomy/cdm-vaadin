@@ -69,18 +69,19 @@ public class PermissionDebugUtils {
         return (PermissionDebugUtils)VaadinSession.getCurrent().getAttribute(VADDIN_SESSION_KEY);
      }
 
-    public Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud){
-        Button button = gainPerEntityPermissionButton(cdmType, entitiyId, crud);
+    public Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType,
+            Integer entitiyId, EnumSet<CRUD> crud, String property){
+        Button button = gainPerEntityPermissionButton(cdmType, entitiyId, crud, property);
         if(button != null){
             toContainer.addComponent(button);
         }
         return button;
     }
 
-    public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud){
+    public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property){
 
        Button button = new Button(FontAwesome.BOLT);
-       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyId, crud));
+       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyId, crud, property));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
 

@@ -79,7 +79,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
 
             addComponent(nameIdButton.getButton());
-            PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(),
+                    EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             addComponent(nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
@@ -97,7 +98,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
                 addComponent(tdButton);
 
-                PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class, baseEntityRef.getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
+                        baseEntityRef.getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
