@@ -19,7 +19,6 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.AbstractLayout;
@@ -32,8 +31,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -55,7 +52,6 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.model.registration.WorkflowStep;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
@@ -74,7 +70,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private static final long serialVersionUID = -213040114015958970L;
 
-    public static final String NAME = "workflow";
+    public static final String NAME = "workingset";
 
     public RegistrationType regType = null;
 
@@ -158,34 +154,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
         // add the blocking registration
 
-    }
-
-    private Component createWorkflowTabSheet(RegistrationWorkingSet workingset, Component namesTypesPanel){
-
-        if(namesTypesPanel == null){
-            namesTypesPanel = new CssLayout();
-        }
-        Component citationComponent = new CssLayout(); // new Label(workingset.getCitation());
-        Component curationComponent = new CssLayout(); // new Label("Curation in progress ...")
-        Component releaseComponent = new CssLayout(); // new Label("Not yet published")
-
-        GenericFontIcon tabIcon = new GenericFontIcon("IcoMoon", 0xe900);
-        TabSheet tabsheet = new TabSheet();
-        // tabsheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
-        //tabsheet.addStyleName(ValoTheme.TABSHEET_PADDED_TABBAR);
-        tabsheet.addStyleName("workflow-tabsheet");
-
-        Tab pubDetailsTab = tabsheet.addTab(citationComponent, WorkflowStep.PUBLICATION_DETAILS.getRepresentation(), tabIcon);
-        Tab namesTypesTab = tabsheet.addTab(namesTypesPanel, WorkflowStep.NAMES_N_TYPES.getRepresentation(), tabIcon);
-        Tab curationTab = tabsheet.addTab(curationComponent, WorkflowStep.CURATION.getRepresentation(), tabIcon);
-        Tab awaitingPubTab = tabsheet.addTab(releaseComponent, WorkflowStep.AWAITING_PUBLICATION.getRepresentation(), tabIcon);
-
-        pubDetailsTab.setStyleName("bg-status-" + WorkflowStep.PUBLICATION_DETAILS.name());
-        namesTypesTab.setStyleName("bg-status-" + WorkflowStep.NAMES_N_TYPES.name());
-        curationTab.setStyleName("bg-status-" + WorkflowStep.CURATION.name());
-        awaitingPubTab.setStyleName("bg-status-" + WorkflowStep.AWAITING_PUBLICATION.name());
-
-        return tabsheet;
     }
 
     /**
