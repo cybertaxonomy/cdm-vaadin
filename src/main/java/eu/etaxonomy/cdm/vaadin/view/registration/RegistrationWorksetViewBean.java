@@ -143,6 +143,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
+        registrationListPanel.setHeight("100%");
         registrationListPanel.setStyleName("registration-list");
         registrationListPanel.setCaption("Registrations");
         addContentComponent(registrationListPanel, 1.0f);
@@ -210,7 +211,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
-        namesTypesPanel.setSizeFull();
         return namesTypesPanel;
     }
 

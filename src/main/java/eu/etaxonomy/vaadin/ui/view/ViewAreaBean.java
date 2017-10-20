@@ -4,11 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -32,23 +33,21 @@ class ViewAreaBean extends HorizontalLayout implements ViewDisplay, ToolbarDispl
 
 	private Component toolbar = null;
 
-	private CssLayout contentArea;
+	// private VerticalLayout contentArea;
 
-	private CssLayout mainArea;
+	private VerticalLayout mainArea;
+
+	private Component currentViewComponent = null;
 
     public ViewAreaBean() {
 
         setSizeFull();
 
-        mainArea = new CssLayout();
+        mainArea = new VerticalLayout();
         mainArea.setPrimaryStyleName("valo-toolbar");
         mainArea.setSizeFull();
-        contentArea = new CssLayout();
-        contentArea.setPrimaryStyleName("valo-content");
-        contentArea.addStyleName("v-scrollable");
-        contentArea.setSizeFull();
+        mainArea.setMargin(new MarginInfo(false, false, true, false));
 
-        mainArea.addComponent(contentArea);
         addComponent(mainArea);
         setExpandRatio(mainArea, 1);
     }
@@ -70,8 +69,12 @@ class ViewAreaBean extends HorizontalLayout implements ViewDisplay, ToolbarDispl
 
 	@Override
 	public void showView(View view) {
-		contentArea.removeAllComponents();
-		contentArea.addComponent(Component.class.cast(view));
+	    if(currentViewComponent != null){
+	        mainArea.removeComponent(currentViewComponent);
+	    }
+	    currentViewComponent = Component.class.cast(view);
+	    mainArea.addComponent(currentViewComponent);
+	    mainArea.setExpandRatio(Component.class.cast(view), 1);
 	}
 
 }
