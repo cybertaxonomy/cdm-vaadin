@@ -28,11 +28,13 @@ import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
@@ -42,7 +44,7 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
@@ -127,6 +129,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         Authentication authentication = currentSecurityContext().getAuthentication();
         reg.setSubmitter((User)authentication.getPrincipal());
         EntityChangeEvent event = getRegistrationStore().saveBean(reg);
+        UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityId(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return getRepo().getRegistrationService().find(event.getEntityId());
     }
@@ -247,6 +250,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
                 if(newTaxonNameForRegistration != null){
                     int taxonNameId = newTaxonNameForRegistration.getId();
+                    getRepo().getSession().refresh(newTaxonNameForRegistration);
                     Registration reg = createNewRegistrationForName(taxonNameId);
                     workingset.add(reg);
                 }
@@ -266,8 +270,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param event
      * @throws RegistrationValidationException
      */
-    @EventListener(condition = "#event.action == T(eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent.Action).start")
-    public void onRegistrationWorkflowEventActionStart(RegistrationWorkflowEvent event) throws RegistrationValidationException {
+    @EventListener(condition = "#event.action == T(eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction.Action).start")
+    public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws RegistrationValidationException {
 
         getView().getAddExistingNameCombobox().commit();
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();

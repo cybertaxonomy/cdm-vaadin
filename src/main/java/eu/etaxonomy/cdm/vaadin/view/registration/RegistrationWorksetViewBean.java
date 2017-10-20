@@ -54,7 +54,7 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkflowEvent;
+import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
@@ -193,7 +193,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
-                e -> eventBus.publishEvent(new RegistrationWorkflowEvent(citationID, RegistrationWorkflowEvent.Action.start))
+                e -> eventBus.publishEvent(new RegistrationWorkingsetAction(citationID, RegistrationWorkingsetAction.Action.start))
                 );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
