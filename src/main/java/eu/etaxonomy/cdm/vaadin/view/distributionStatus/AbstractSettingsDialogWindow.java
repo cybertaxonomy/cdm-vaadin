@@ -46,12 +46,12 @@ public abstract class AbstractSettingsDialogWindow extends CustomComponent {
 		return buttonToolBar;
 	}
 
-	public Window createWindow() {
+	public Window createWindow(String caption) {
 	    window = new Window();
 	    window.setModal(true);
 	    window.setWidth("60%");
 	    window.setHeight("80%");
-	    window.setCaption("Distribution Settings");
+	    window.setCaption(caption);
 	    window.setContent(mainLayout);
 	    return window;
 	}

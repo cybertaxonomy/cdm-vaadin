@@ -96,6 +96,7 @@ public class CdmSpringContextHelper {
         return connPool;
     }
 
+
 //    public static JDBCConnectionPool createConnectionPool() {
 //        return new J2EEConnectionPool(getCurrent().getDataSource());
 //    }
@@ -157,7 +158,6 @@ public class CdmSpringContextHelper {
     public static IDescriptionService getDescriptionService() {
         return (IDescriptionService)getCurrent().getBean(IDescriptionService.class);
     }
-
 
 
 }

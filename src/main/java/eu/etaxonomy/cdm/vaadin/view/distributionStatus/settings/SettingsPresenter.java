@@ -24,24 +24,29 @@ import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.SettingsConfigWindow;
 
 /**
+ * Note: This presenter is used for {@link SettingsConfigWindow} AND {@link DistributionSettingsConfigWindow}
+ *
  * @author alex
  * @date 22.04.2015
+ *
  *
  */
 public class SettingsPresenter {
 
     private Container distributionContainer;
     private Container distributionStatusContainer;
-    private UUID termUUID;
+    private UUID vocUUID;
 
 
 
     public SettingsPresenter(){
-		Object selectedVocabularyUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
+		Object selectedVocabularyUuidString = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 		if(selectedVocabularyUuidString!=null){
-			termUUID = UUID.fromString(selectedVocabularyUuidString.toString());
+			vocUUID = UUID.fromString(selectedVocabularyUuidString.toString());
 		}
 		distributionContainer = new IndexedContainer(getNamedAreaList());
 		distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
@@ -63,8 +68,8 @@ public class SettingsPresenter {
     	return null;
     }
 
-    public TermVocabulary getChosenArea(){
-        return CdmSpringContextHelper.getVocabularyService().load(termUUID);
+    public TermVocabulary getChosenAreaVoc(){
+        return CdmSpringContextHelper.getVocabularyService().load(vocUUID);
     }
 
     public Container getDistributionContainer() {

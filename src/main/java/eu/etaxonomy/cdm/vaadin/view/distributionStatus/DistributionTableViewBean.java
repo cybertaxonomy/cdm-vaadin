@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Item;
@@ -39,7 +40,7 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
-import eu.etaxonomy.cdm.vaadin.component.HorizontalToolbar;
+import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -60,7 +61,9 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 	private static final long serialVersionUID = 1L;
     public static final String NAME = "distTable";
 
-    private HorizontalToolbar toolbar;
+    @Autowired
+    private DistributionToolbar toolbar;
+
 	private Table table;
 	private Grid grid;
 
@@ -81,7 +84,6 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 		setHeight("100.0%");
 
 		//Horizontal Toolbar
-		toolbar = new HorizontalToolbar();
 		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;");
 
 		// table + formatting
@@ -166,7 +168,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
             }
         });
 
-		mainLayout.addComponent(table, "top:75px;right:0.0px;");
+		mainLayout.addComponent(table, "top:75px;right:10.0px;left:10.0px;");
 
 		return mainLayout;
 	}
@@ -215,9 +217,11 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 		Button detailButton = toolbar.getDetailButton();
 		detailButton.setCaption("Detail View");
 		detailButton.addClickListener(event -> {
-				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
+				Object selectedItemId = DistributionTableViewBean.this.table.getValue();
+//				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
 				if(selectedItemId!=null){
-					final UUID uuid = UUID.fromString(grid.getContainerDataSource().getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+				    final UUID uuid = UUID.fromString(table.getContainerDataSource().getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+//					final UUID uuid = UUID.fromString(grid.getContainerDataSource().getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
 					Taxon taxon = HibernateProxyHelper.deproxy(CdmSpringContextHelper.getTaxonService().load(uuid), Taxon.class);
 					List<DescriptionElementBase> listDescriptions = getPresenter().listDescriptionElementsForTaxon(taxon, null);
 					DetailWindow detailWindow = new DetailWindow(taxon, listDescriptions);
@@ -244,7 +248,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 	@Override
 	public void openSettings() {
 		SettingsConfigWindow cw = new SettingsConfigWindow(this);
-		Window window  = cw.createWindow();
+		Window window  = cw.createWindow("Status");
 		UI.getCurrent().addWindow(window);
 	}
 
@@ -256,7 +260,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 		if(distributionSettingConfigWindow==null){
 			distributionSettingConfigWindow = new DistributionSettingsConfigWindow(this);
 		}
-        Window window  = distributionSettingConfigWindow.createWindow();
+        Window window  = distributionSettingConfigWindow.createWindow("Areas and Taxa");
         UI.getCurrent().addWindow(window);
 	}
 

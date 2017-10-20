@@ -105,13 +105,14 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         taxonFilter.addValueChangeListener(this);
         taxonTree.addExpandListener(this);
 
-        TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
+        //init areas
+        TermVocabulary<NamedArea> chosenAreaVoc = presenter.getChosenAreaVoc();
         distAreaBox.setContainerDataSource(presenter.getDistributionContainer());
-        distAreaBox.setValue(chosenArea);
+        distAreaBox.setValue(chosenAreaVoc);
         distAreaBox.addValueChangeListener(this);
 
-        if(chosenArea!=null){
-            NamedAreaContainer container = new NamedAreaContainer(chosenArea);
+        if(chosenAreaVoc!=null){
+            NamedAreaContainer container = new NamedAreaContainer(chosenAreaVoc);
             namedAreaList.setContainerDataSource(container);
         }
         Object selectedAreas = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
@@ -261,7 +262,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         Object source = event.getSource();
         if(source==okButton){
             List<UUID> taxonNodes = new ArrayList<>();
-            TermVocabulary<NamedArea> term = null;
+            TermVocabulary<NamedArea> areaVoc = null;
             String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue();
             UUID classificationUuid = UUID.fromString(uuidString);
             Set<UuidAndTitleCache<TaxonNode>> treeSelection = (Set<UuidAndTitleCache<TaxonNode>>) taxonTree.getValue();
@@ -270,9 +271,9 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 					taxonNodes.add(uuidAndTitleCache.getUuid());
 				}
             }
-            term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
+            areaVoc = (TermVocabulary<NamedArea>) distAreaBox.getValue();
             Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-            DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, term, selectedAreas, classificationUuid);
+            DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, areaVoc, selectedAreas, classificationUuid);
             window.close();
         }
         else if(source==cancelButton){
