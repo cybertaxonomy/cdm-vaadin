@@ -34,6 +34,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
@@ -100,7 +101,7 @@ public class DistributionTableViewBean
 				if(value instanceof String){
 					presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) value);
 				}
-				if(presenceAbsenceTerm!=null){
+				if(presenceAbsenceTerm != null){
 					Representation representation = presenceAbsenceTerm.getRepresentation(Language.DEFAULT());
 					if(representation!=null){
 						if(DistributionEditorUtil.isAbbreviatedLabels()){
@@ -137,9 +138,9 @@ public class DistributionTableViewBean
                 final Item item = event.getItem();
                 Property<?> itemProperty = item.getItemProperty("uuid");
                 UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-                final Taxon taxon = HibernateProxyHelper.deproxy(CdmSpringContextHelper.getTaxonService()
+                final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
                 		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
-                final String areaID = (String) event.getPropertyId();
+                final String areaID = (String)event.getPropertyId();
                 PresenceAbsenceTerm presenceAbsenceTerm = null;
                 Object statusValue = item.getItemProperty(areaID).getValue();
                 if(statusValue instanceof String){
@@ -150,13 +151,15 @@ public class DistributionTableViewBean
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
                 termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
-                termSelect.setNullSelectionAllowed(presenceAbsenceTerm!=null);
-                if(presenceAbsenceTerm!=null){
+                termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
+                if(presenceAbsenceTerm != null){
                 	termSelect.setNullSelectionItemId("[no status]");
+                }else{
+                    logger.debug("No distribution status exists yet for area");
                 }
                 termSelect.setValue(presenceAbsenceTerm);
                 termSelect.addValueChangeListener(valueChangeEvent -> {
-						System.out.println(valueChangeEvent);
+//						System.out.println(valueChangeEvent);
 						Object distributionStatus = valueChangeEvent.getProperty().getValue();
 						getPresenter().updateDistributionField(areaID, distributionStatus, taxon);
 						container.refresh();
@@ -216,8 +219,9 @@ public class DistributionTableViewBean
 	}
 
 	private void createEditClickListener(){
-		Button detailButton = toolbar.getDetailButton();
-		detailButton.setCaption("Detail View");
+		//details
+	    Button detailButton = toolbar.getDetailButton();
+		detailButton.setCaption("Taxon Details");
 		detailButton.addClickListener(event -> {
 				Object selectedItemId = DistributionTableViewBean.this.table.getValue();
 //				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
@@ -237,18 +241,20 @@ public class DistributionTableViewBean
 			}
 		);
 
-		Button distributionSettingsButton = toolbar.getDistributionSettingsButton();
-		distributionSettingsButton.addClickListener(event -> openDistributionSettings());
+		//area and taxon
+		Button areaAndTaxonSettingsButton = toolbar.getDistributionSettingsButton();
+		areaAndTaxonSettingsButton.addClickListener(event -> openAreaAndTaxonSettings());
 
-		Button settingsButton = toolbar.getSettingsButton();
-		settingsButton.addClickListener(event -> openSettings());
+		//distr status
+		Button distrStatusButton = toolbar.getSettingsButton();
+		distrStatusButton.addClickListener(event -> openStatusSettings());
 	}
 
     /**
      * {@inheritDoc}
      */
 	@Override
-	public void openSettings() {
+	public void openStatusSettings() {
 		DistributionStatusSettingsConfigWindow cw = new DistributionStatusSettingsConfigWindow(this);
 		Window window  = cw.createWindow("Status");
 		UI.getCurrent().addWindow(window);
@@ -258,7 +264,7 @@ public class DistributionTableViewBean
      * {@inheritDoc}
      */
 	@Override
-	public void openDistributionSettings() {
+	public void openAreaAndTaxonSettings() {
 		if(distributionSettingConfigWindow==null){
 			distributionSettingConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
 		}

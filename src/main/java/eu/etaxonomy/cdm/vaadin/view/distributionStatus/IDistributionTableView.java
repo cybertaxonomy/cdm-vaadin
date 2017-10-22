@@ -25,13 +25,13 @@ public interface IDistributionTableView extends ApplicationView<DistributionTabl
 	public void update();
 
 	/**
-	 * Opens the setting window to change available distribution status.
+	 * Opens the status setting window to change available distribution status.
 	 */
-	public void openSettings();
+	public void openStatusSettings();
 
 	/**
-	 * Opens the distribution-setting window to change available areas and chose classification.
+	 * Opens the area and taxon setting window to change available areas and chose classification.
 	 */
-	public void openDistributionSettings();
+	public void openAreaAndTaxonSettings();
 
 }

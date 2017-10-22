@@ -305,7 +305,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 //        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS, selectedAreas);
 //        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION, classificationUuid);
 	    if(userHelper.userIsAutheticated() && !userHelper.userIsAnnonymous()) {
-            getView().openDistributionSettings();
+            getView().openAreaAndTaxonSettings();
         }
     }
 }
