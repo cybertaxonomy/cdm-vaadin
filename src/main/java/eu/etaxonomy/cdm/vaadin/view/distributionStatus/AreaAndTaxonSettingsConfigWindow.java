@@ -111,17 +111,17 @@ public class AreaAndTaxonSettingsConfigWindow
 
         //init areas
         TermVocabulary<NamedArea> chosenAreaVoc = presenter.getChosenAreaVoc();
-        Container areaContainer = presenter.getAreaContainer();
-        if (areaContainer.size() == 1){
-            chosenAreaVoc = (TermVocabulary<NamedArea>)areaContainer.getItemIds().iterator().next();
+        Container areaVocContainer = presenter.getAreaContainer();
+        if (areaVocContainer.size() == 1){
+            chosenAreaVoc = (TermVocabulary<NamedArea>)areaVocContainer.getItemIds().iterator().next();
         }
-        distAreaBox.setContainerDataSource(areaContainer);
+        distAreaBox.setContainerDataSource(areaVocContainer);
         distAreaBox.setValue(chosenAreaVoc);
         distAreaBox.addValueChangeListener(this);
 
         if(chosenAreaVoc!=null){
-            NamedAreaContainer container = new NamedAreaContainer(chosenAreaVoc);
-            namedAreaList.setContainerDataSource(container);
+            NamedAreaContainer areaContainer = new NamedAreaContainer(chosenAreaVoc);
+            namedAreaList.setContainerDataSource(areaContainer);
         }
         Object selectedAreas = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
         namedAreaList.setValue(selectedAreas);
