@@ -16,7 +16,10 @@ import com.vaadin.data.fieldgroup.FieldGroup;
  *
  */
 public class NoCommitFieldGroup extends FieldGroup{
-	@Override
+
+    private static final long serialVersionUID = -1666206997756640330L;
+
+    @Override
 	public boolean isReadOnly() {
 		return false;
 	}

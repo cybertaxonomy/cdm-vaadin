@@ -11,7 +11,7 @@ import com.vaadin.ui.Notification.Type;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableView;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 
 public class DistributionEditorUtil {
 
@@ -31,7 +31,7 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
-    public static void updateDistributionView(DistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc, Set<NamedArea> selectedAreas, UUID classificationUuid) {
+    public static void updateDistributionView(IDistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc, Set<NamedArea> selectedAreas, UUID classificationUuid) {
 	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, taxonNodes);
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREA_VOCABULARY_UUID, areaVoc.getUuid());
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, selectedAreas);

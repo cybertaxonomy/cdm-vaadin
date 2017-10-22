@@ -50,13 +50,16 @@ import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.AreaAndTaxonSettingsPresenter;
 
 /**
  *
  * @author pplitzner
  *
  */
-public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener, ExpandListener{
+public class AreaAndTaxonSettingsConfigWindow
+            extends SettingsDialogWindowBase<AreaAndTaxonSettingsPresenter>
+            implements ValueChangeListener, ClickListener, ExpandListener{
 
     private static final long serialVersionUID = 1439411115014088780L;
     private ComboBox classificationBox;
@@ -64,7 +67,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
-    DistributionTableView distributionTableView;
+    IDistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -74,7 +77,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
      * visual editor.
      * @param distributionTableView
      */
-    public DistributionSettingsConfigWindow(DistributionTableView distributionTableView) {
+    public AreaAndTaxonSettingsConfigWindow(IDistributionTableView distributionTableView) {
         super();
         this.distributionTableView = distributionTableView;
     }
@@ -215,14 +218,14 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     @Override
     public void valueChange(ValueChangeEvent event) {
-        Property property = event.getProperty();
+        Property<?> property = event.getProperty();
         if(property==classificationBox){
         	UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
             showClassificationTaxa(parent);
         }
         else if(property==taxonFilter){
             String filterText = taxonFilter.getValue();
-            Property uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
+            Property<?> uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
             if(uuidProperty==null){
             	Notification.show("Please select a classification");
             }
@@ -300,7 +303,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
-        Property rootNodeContainerProperty = null;
+        Property<?> rootNodeContainerProperty = null;
 
         Collection<?> ids = classificationBox.getContainerPropertyIds();
         //use for loop here because the case of the root node id columns differs between some DBs
@@ -315,6 +318,15 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
         return parent;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected AreaAndTaxonSettingsPresenter getPresenter() {
+        return new AreaAndTaxonSettingsPresenter();
     }
 
     private class TreeUpdater extends Thread{
@@ -344,4 +356,5 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 			});
     	}
     }
+
 }

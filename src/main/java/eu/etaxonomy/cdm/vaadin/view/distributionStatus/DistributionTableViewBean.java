@@ -56,7 +56,9 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  *
  */
 @SpringView(name=DistributionTableViewBean.NAME)
-public class DistributionTableViewBean extends AbstractPageView<DistributionTablePresenter> implements DistributionTableView, AccessRestrictedView {
+public class DistributionTableViewBean
+            extends AbstractPageView<DistributionTablePresenter>
+            implements IDistributionTableView, AccessRestrictedView {
 
 	private static final long serialVersionUID = 1L;
     public static final String NAME = "distTable";
@@ -68,7 +70,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 	private Grid grid;
 
     private CdmSQLContainer container;
-	private DistributionSettingsConfigWindow distributionSettingConfigWindow;
+	private AreaAndTaxonSettingsConfigWindow distributionSettingConfigWindow;
 
 	public DistributionTableViewBean() {
 		super();
@@ -247,7 +249,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
      */
 	@Override
 	public void openSettings() {
-		SettingsConfigWindow cw = new SettingsConfigWindow(this);
+		DistributionStatusSettingsConfigWindow cw = new DistributionStatusSettingsConfigWindow(this);
 		Window window  = cw.createWindow("Status");
 		UI.getCurrent().addWindow(window);
 	}
@@ -258,7 +260,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 	@Override
 	public void openDistributionSettings() {
 		if(distributionSettingConfigWindow==null){
-			distributionSettingConfigWindow = new DistributionSettingsConfigWindow(this);
+			distributionSettingConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
 		}
         Window window  = distributionSettingConfigWindow.createWindow("Areas and Taxa");
         UI.getCurrent().addWindow(window);

@@ -7,24 +7,26 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.SettingsPresenter;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.SettingsPresenterBase;
 
 @SuppressWarnings("serial")
-public abstract class AbstractSettingsDialogWindow extends CustomComponent {
+public abstract class SettingsDialogWindowBase<P extends SettingsPresenterBase> extends CustomComponent {
 
 	protected Button okButton;
 	protected Button cancelButton;
-	protected final SettingsPresenter presenter;
+	protected final P presenter;
 	protected Window window;
 	protected AbstractOrderedLayout mainLayout;
 
-	public AbstractSettingsDialogWindow() {
+	public SettingsDialogWindowBase() {
         buildMainLayout();
-        presenter = new SettingsPresenter();
+        presenter = getPresenter();
         init();
 	}
 
-	protected abstract AbstractLayout buildMainLayout();
+    protected abstract P getPresenter();
+
+    protected abstract AbstractLayout buildMainLayout();
 
 	protected abstract void init();
 

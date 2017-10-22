@@ -58,7 +58,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class DistributionTablePresenter extends AbstractPresenter<DistributionTableView> {
+public class DistributionTablePresenter extends AbstractPresenter<IDistributionTableView> {
 
 	private static final long serialVersionUID = 3313043335587777217L;
 
@@ -179,7 +179,7 @@ public class DistributionTablePresenter extends AbstractPresenter<DistributionTa
 	}
 
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
-		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
+		Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<DescriptionElementBase> listTaxonDescription = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		HashMap<DescriptionElementBase, Distribution> map = null;
 		for(DescriptionElementBase deb : listTaxonDescription){

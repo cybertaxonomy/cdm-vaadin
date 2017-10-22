@@ -22,18 +22,21 @@ import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStatusSettingsPresenter;
 
 /**
  * @author alex
  * @date 22.04.2015
  *
  */
-public class SettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener{
+public class DistributionStatusSettingsConfigWindow
+            extends SettingsDialogWindowBase<DistributionStatusSettingsPresenter>
+            implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
     private TwinColSelect distStatusSelect;
     private CheckBox boxToggleAbbreviatedLabels;
-    private DistributionTableView distributionTableView;
+    private IDistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -43,7 +46,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
      * visual editor.
      * @param distributionTableView
      */
-    public SettingsConfigWindow(DistributionTableView distributionTableView) {
+    public DistributionStatusSettingsConfigWindow(IDistributionTableView distributionTableView) {
     	super();
     	this.distributionTableView = distributionTableView;
     }
@@ -98,7 +101,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 
 	@Override
 	public void valueChange(ValueChangeEvent event) {
-		Property property = event.getProperty();
+		Property<?> property = event.getProperty();
 		if(property==boxToggleAbbreviatedLabels){
 			VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS, event.getProperty().getValue());
 		}
@@ -116,5 +119,13 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 			window.close();
 		}
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DistributionStatusSettingsPresenter getPresenter() {
+        return new DistributionStatusSettingsPresenter();
+    }
 
 }

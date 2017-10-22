@@ -17,7 +17,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since 18.10.2017
  *
  */
-public interface DistributionTableView extends ApplicationView<DistributionTablePresenter>, View {
+public interface IDistributionTableView extends ApplicationView<DistributionTablePresenter>, View {
 
     /**
      * Updates Distribution Table.
