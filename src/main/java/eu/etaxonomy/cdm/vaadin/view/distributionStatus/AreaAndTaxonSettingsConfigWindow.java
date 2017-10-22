@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -67,7 +68,7 @@ public class AreaAndTaxonSettingsConfigWindow
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
-    IDistributionTableView distributionTableView;
+    private IDistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -110,7 +111,11 @@ public class AreaAndTaxonSettingsConfigWindow
 
         //init areas
         TermVocabulary<NamedArea> chosenAreaVoc = presenter.getChosenAreaVoc();
-        distAreaBox.setContainerDataSource(presenter.getDistributionContainer());
+        Container areaContainer = presenter.getAreaContainer();
+        if (areaContainer.size() == 1){
+            chosenAreaVoc = (TermVocabulary<NamedArea>)areaContainer.getItemIds().iterator().next();
+        }
+        distAreaBox.setContainerDataSource(areaContainer);
         distAreaBox.setValue(chosenAreaVoc);
         distAreaBox.addValueChangeListener(this);
 

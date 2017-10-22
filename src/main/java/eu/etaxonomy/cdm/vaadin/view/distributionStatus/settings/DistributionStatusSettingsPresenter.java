@@ -10,12 +10,15 @@ package eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.util.IndexedContainer;
 
-import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.TermType;
+import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
+import eu.etaxonomy.cdm.model.metadata.CdmPreference;
+import eu.etaxonomy.cdm.model.metadata.PreferencePredicate;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 /**
@@ -32,20 +35,27 @@ public class DistributionStatusSettingsPresenter extends SettingsPresenterBase {
      */
     public DistributionStatusSettingsPresenter() {
         super();
-        distributionStatusContainer = new IndexedContainer(getPresenceAbsenceVocabulary());
+        distributionStatusContainer = new IndexedContainer(getDistributionStatusList());
     }
 
-    private List<DefinedTermBase<?>> getPresenceAbsenceVocabulary(){
-        return CdmSpringContextHelper.getTermService().listByTermType(
-                TermType.PresenceAbsenceTerm, null, null, null, DESCRIPTION_INIT_STRATEGY);
+    private List<PresenceAbsenceTerm> getDistributionStatusList(){
+        CdmPreference statusPref = CdmSpringContextHelper.getPreferenceService().findVaadin(PreferencePredicate.AvailableDistributionStatus);
+        if (statusPref != null){
+            List<UUID> uuidList = statusPref.getValueUuidList();
+            return (List)CdmSpringContextHelper.getTermService().load(uuidList, TERMS_INIT_STRATEGY);
+        }else{
+            return CdmSpringContextHelper.getTermService().listByTermType(
+                    TermType.PresenceAbsenceTerm, null, null, null, TERMS_INIT_STRATEGY);
+        }
     }
+
 
 
     public Container getDistributionStatusContainer() {
         return distributionStatusContainer;
     }
 
-    protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
+    protected static final List<String> TERMS_INIT_STRATEGY = Arrays.asList(new String []{
             "$",
             "representations",
     });
