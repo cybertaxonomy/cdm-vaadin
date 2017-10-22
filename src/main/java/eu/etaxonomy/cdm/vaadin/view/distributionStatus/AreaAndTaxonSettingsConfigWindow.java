@@ -303,7 +303,7 @@ public class AreaAndTaxonSettingsConfigWindow
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
-        Property<?> rootNodeContainerProperty = null;
+        Property<Integer> rootNodeContainerProperty = null;
 
         Collection<?> ids = classificationBox.getContainerPropertyIds();
         //use for loop here because the case of the root node id columns differs between some DBs
@@ -313,7 +313,7 @@ public class AreaAndTaxonSettingsConfigWindow
 				break;
 			}
 		}
-		int id = (int) rootNodeContainerProperty.getValue();
+		int id = rootNodeContainerProperty.getValue();
         String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
