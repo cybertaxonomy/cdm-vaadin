@@ -300,11 +300,17 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	 */
 	@Override
 	protected void onPresenterReady() {
-//        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID, taxonNodes);
-//        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID, voc.getUuid());
-//        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS, selectedAreas);
-//        VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION, classificationUuid);
-	    if(userHelper.userIsAutheticated() && !userHelper.userIsAnnonymous()) {
+	    /*
+         * This method is called twice. One time before and one time after login.
+         * The area and taxon settings window should only be displayed after login
+         * and only when no classification and areas are chosen yet.
+         */
+	    VaadinSession vaadinSession = VaadinSession.getCurrent();
+	    if(userHelper.userIsAutheticated()
+	            && !userHelper.userIsAnnonymous()
+	            && (vaadinSession.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION) == null
+	            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID) == null
+	            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS) == null)) {
             getView().openAreaAndTaxonSettings();
         }
     }
