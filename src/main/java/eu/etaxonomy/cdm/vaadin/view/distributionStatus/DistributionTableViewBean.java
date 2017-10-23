@@ -45,6 +45,7 @@ import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -71,7 +72,8 @@ public class DistributionTableViewBean
 	private Grid grid;
 
     private CdmSQLContainer container;
-	private AreaAndTaxonSettingsConfigWindow distributionSettingConfigWindow;
+	private AreaAndTaxonSettingsConfigWindow areaAndTaxonConfigWindow;;
+	private DistributionStatusSettingsConfigWindow distributionStatusConfigWindow;
 
 	public DistributionTableViewBean() {
 		super();
@@ -255,9 +257,11 @@ public class DistributionTableViewBean
      */
 	@Override
 	public void openStatusSettings() {
-		DistributionStatusSettingsConfigWindow cw = new DistributionStatusSettingsConfigWindow(this);
-		Window window  = cw.createWindow("Status");
-		UI.getCurrent().addWindow(window);
+        if(distributionStatusConfigWindow==null){
+            distributionStatusConfigWindow = new DistributionStatusSettingsConfigWindow(this);
+        }
+        Window window  = distributionStatusConfigWindow.createWindow("Status");
+        UI.getCurrent().addWindow(window);
 	}
 
     /**
@@ -265,10 +269,10 @@ public class DistributionTableViewBean
      */
 	@Override
 	public void openAreaAndTaxonSettings() {
-		if(distributionSettingConfigWindow==null){
-			distributionSettingConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
+		if(areaAndTaxonConfigWindow==null){
+			areaAndTaxonConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
 		}
-        Window window  = distributionSettingConfigWindow.createWindow("Areas and Taxa");
+        Window window  = areaAndTaxonConfigWindow.createWindow("Areas and Taxa");
         UI.getCurrent().addWindow(window);
 	}
 
@@ -313,8 +317,16 @@ public class DistributionTableViewBean
      */
 	@Override
 	protected void initContent() {
-		AbsoluteLayout mainLayout = initLayout();
-		setCompositionRoot(mainLayout);
-		createEditClickListener();
+	    /*
+	     * This method is called twice. One time before and one time after login.
+	     * Initializing the layout and click listeners twice is unnecessary and produces
+	     * strange behavior (e.g. one click on settings-button opens settings-window several times),
+	     * so we check for user authentication first.
+	     */
+	    if(UserHelper.fromSession().userIsAutheticated() && !UserHelper.fromSession().userIsAnnonymous()) {
+	        AbsoluteLayout mainLayout = initLayout();
+    		setCompositionRoot(mainLayout);
+    		createEditClickListener();
+	    }
 	}
 }
