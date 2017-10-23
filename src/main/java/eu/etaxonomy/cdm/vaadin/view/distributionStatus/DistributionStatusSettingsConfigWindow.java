@@ -18,7 +18,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -34,7 +34,7 @@ public class DistributionStatusSettingsConfigWindow
             implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
-    private TwinColSelect distStatusSelect;
+    private ListSelect distStatusSelect;
     private CheckBox boxToggleAbbreviatedLabels;
     private IDistributionTableView distributionTableView;
 
@@ -55,6 +55,8 @@ public class DistributionStatusSettingsConfigWindow
     protected void init() {
         boxToggleAbbreviatedLabels.addValueChangeListener(this);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
+        Object selectedStatus = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_DISTRIBUTION_STATUS);
+        distStatusSelect.setValue(selectedStatus);
 
         okButton.addClickListener(this);
         cancelButton.addClickListener(this);
@@ -71,8 +73,9 @@ public class DistributionStatusSettingsConfigWindow
         mainLayout.setSpacing(true);
 
         //distribution status
-        distStatusSelect = new TwinColSelect("Distribution Status:");
+        distStatusSelect = new ListSelect("Distribution Status:");
         distStatusSelect.setImmediate(false);
+        distStatusSelect.setMultiSelect(true);
         distStatusSelect.setSizeFull();
         distStatusSelect.setWidth("100%");
 

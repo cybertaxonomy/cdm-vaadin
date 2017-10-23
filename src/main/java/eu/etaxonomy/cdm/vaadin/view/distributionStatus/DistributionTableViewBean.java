@@ -259,6 +259,8 @@ public class DistributionTableViewBean
             distributionStatusConfigWindow = new DistributionStatusSettingsConfigWindow(this);
         }
         Window window  = distributionStatusConfigWindow.createWindow("Status");
+        window.setWidth("25%");
+        window.setHeight("60%");
         UI.getCurrent().addWindow(window);
 	}
 
