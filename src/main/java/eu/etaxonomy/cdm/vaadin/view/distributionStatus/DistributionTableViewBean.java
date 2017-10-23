@@ -45,7 +45,6 @@ import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -317,16 +316,8 @@ public class DistributionTableViewBean
      */
 	@Override
 	protected void initContent() {
-	    /*
-	     * This method is called twice. One time before and one time after login.
-	     * Initializing the layout and click listeners twice is unnecessary and produces
-	     * strange behavior (e.g. one click on settings-button opens settings-window several times),
-	     * so we check for user authentication first.
-	     */
-	    if(UserHelper.fromSession().userIsAutheticated() && !UserHelper.fromSession().userIsAnnonymous()) {
-	        AbsoluteLayout mainLayout = initLayout();
-    		setCompositionRoot(mainLayout);
-    		createEditClickListener();
-	    }
+        AbsoluteLayout mainLayout = initLayout();
+        setCompositionRoot(mainLayout);
+        createEditClickListener();
 	}
 }

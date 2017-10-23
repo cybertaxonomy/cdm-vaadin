@@ -12,7 +12,7 @@ import org.springframework.context.event.EventListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -24,7 +24,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
 @SpringComponent("distributionToolbar")
-@UIScope
+@ViewScope
 public class DistributionToolbar extends HorizontalLayout implements Serializable{
 
 	/**
