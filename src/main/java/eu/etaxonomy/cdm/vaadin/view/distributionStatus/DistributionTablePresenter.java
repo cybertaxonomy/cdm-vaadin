@@ -70,8 +70,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     @Qualifier("cdmRepository")
     private CdmRepository repo;
 
-    private PresenceAbsenceTermContainer presenceAbsenceTermContainer = PresenceAbsenceTermContainer.getInstance();
-
 	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
 	    taxon = (Taxon)repo.getTaxonService().find(taxon.getUuid());
@@ -256,7 +254,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	public PresenceAbsenceTermContainer getPresenceAbsenceTermContainer() {
-	    return this.presenceAbsenceTermContainer;
+	    return PresenceAbsenceTermContainer.getInstance();
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{

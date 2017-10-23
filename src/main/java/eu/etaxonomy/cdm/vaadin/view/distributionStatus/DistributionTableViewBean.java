@@ -315,8 +315,12 @@ public class DistributionTableViewBean
      */
 	@Override
 	protected void initContent() {
+	    // initialize term cacher for table formatting
+	    getPresenter().getPresenceAbsenceTermContainer();
+	    // initialize layout
         AbsoluteLayout mainLayout = initLayout();
         setCompositionRoot(mainLayout);
+        // add click listener on DistributionToolbar-buttons
         createEditClickListener();
 	}
 }
