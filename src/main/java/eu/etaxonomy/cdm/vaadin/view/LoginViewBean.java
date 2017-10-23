@@ -14,6 +14,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.LoginDialog;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
@@ -78,4 +79,18 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         getPresenter().onViewEnter();
     }
 
+    @Override
+    public void showErrorMessage(String text){
+        loginDialog.getMessageLabel().setVisible(true);
+        loginDialog.getMessageLabel().setStyleName(ValoTheme.BUTTON_TINY + " " +  ValoTheme.LABEL_FAILURE);
+        loginDialog.getMessageLabel().setValue(text);
+    }
+
+
+    @Override
+    public void clearMessage(){
+        loginDialog.getMessageLabel().setVisible(false);
+        loginDialog.getMessageLabel().setStyleName("");
+        loginDialog.getMessageLabel().setValue("");
+    }
 }

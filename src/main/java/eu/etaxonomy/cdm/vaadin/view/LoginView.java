@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import com.vaadin.ui.themes.ValoTheme;
+
 import eu.etaxonomy.cdm.vaadin.component.LoginDialog;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -19,5 +21,9 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 public interface LoginView extends ApplicationView<LoginPresenter>  {
 
     LoginDialog getLoginDialog();
+
+    void clearMessage();
+
+    void showErrorMessage(String text);
 
 }

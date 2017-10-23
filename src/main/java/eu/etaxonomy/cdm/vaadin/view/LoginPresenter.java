@@ -18,6 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
@@ -61,20 +62,25 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
 
     private String redirectToState;
 
-    public boolean authenticate(String userName, String password){
+    public boolean authenticate(String userName, String password) {
+
+        getView().clearMessage();
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userName, password);
         AuthenticationManager authenticationManager = getRepo().getAuthenticationManager();
-        Authentication authentication = authenticationManager.authenticate(token);
-
-        if(authentication != null && authentication.isAuthenticated()) {
-            log.debug("user '" + userName + "' authenticated");
-            currentSecurityContext().setAuthentication(authentication);
-            if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
-                eventBus.publishEvent(new AuthenticationSuccessEvent(userName));
-                log.debug("redirecting to " + redirectToState);
-                eventBus.publishEvent(new NavigationEvent(redirectToState));
+        try {
+            Authentication authentication = authenticationManager.authenticate(token);
+            if(authentication != null && authentication.isAuthenticated()) {
+                log.debug("user '" + userName + "' authenticated");
+                currentSecurityContext().setAuthentication(authentication);
+                if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
+                    eventBus.publishEvent(new AuthenticationSuccessEvent(userName));
+                    log.debug("redirecting to " + redirectToState);
+                    eventBus.publishEvent(new NavigationEvent(redirectToState));
+                }
             }
+        } catch (AuthenticationException e){
+            getView().showErrorMessage("Login failed! Please check your username and password.");
         }
         return false;
     }
