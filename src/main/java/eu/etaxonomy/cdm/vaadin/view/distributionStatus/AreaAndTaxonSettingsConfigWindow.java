@@ -354,6 +354,8 @@ public class AreaAndTaxonSettingsConfigWindow
 			        notification.setDelayMsec(500);
 			        notification.show(Page.getCurrent());
 			        taxonTree.setEnabled(true);
+			        taxonTree.setSortContainerPropertyId("titleCache");
+			        taxonTree.sort();
 
 			        //disable polling when all taxa are loaded
 			        UI.getCurrent().setPollInterval(-1);
