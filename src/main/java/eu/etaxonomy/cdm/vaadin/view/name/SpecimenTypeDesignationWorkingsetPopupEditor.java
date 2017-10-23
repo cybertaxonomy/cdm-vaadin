@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.ElementCollectionField;
@@ -22,6 +23,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
@@ -29,6 +31,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
 /**
@@ -38,7 +41,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  */
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
-    implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView {
+    implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
 
     /**
      * @param layout
@@ -58,6 +61,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     private ListSelect countrySelectField;
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
+
+    private EnumSet<CRUD> crud;
 
     /**
      * @return the countrySelectField
@@ -234,6 +239,15 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         for(int i = 0; i <components.length; i++){
             components[i].setStyleName(getDefaultComponentStyles());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void grantToCurrentUser(EnumSet<CRUD> crud) {
+        getPresenter().setGrantsForCurrentUser(crud);
+
     }
 
 

@@ -295,6 +295,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
             if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
                 SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+                popup.withDeleteButton(true);
                 popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
             } else {
                 // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
@@ -327,8 +328,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     getView().getCitationID(),
                     typifiedNameId
                     );
-            popup.loadInEditor(identifierSet
-                 );
+            popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE));
+            popup.loadInEditor(identifierSet);
             popup.withDeleteButton(true);
         } else {
             // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
@@ -353,7 +354,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
-                 refreshView();
+                refreshView();
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // clean up
                 if(newRegistrationDTOWithExistingName != null){

@@ -53,6 +53,8 @@ public interface UserHelper {
 
     boolean userIsAutheticated();
 
+    public void createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property);
+
     public void createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property);
 
     /**
@@ -61,6 +63,13 @@ public interface UserHelper {
      * @param crud
      */
     void createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property);
+
+    /**
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     */
+    void createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property);
 
 
 }

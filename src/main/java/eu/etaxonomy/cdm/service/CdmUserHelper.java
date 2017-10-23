@@ -216,4 +216,36 @@ public class CdmUserHelper extends VaadinUserHelper {
         createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+        UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
+        if(userDetails != null){
+            User user = (User)userDetails;
+            CdmAuthority authority = new CdmAuthority(cdmEntity, property, crud);
+            try {
+                user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
+            } catch (CdmAuthorityParsingException e) {
+                throw new RuntimeException(e);
+            }
+            repo.getSession().flush();
+            logger.debug("new authority for " + username + ": " + authority.toString());
+            Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            logger.debug("security context refreshed with user " + username);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+        createAuthorityFor(userName(), cdmEntity, crud, property);
+
+    }
+
 }

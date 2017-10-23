@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -31,6 +32,7 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -40,6 +42,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -62,6 +65,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private Reference citation;
 
     private TaxonName typifiedName;
+
+    /**
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * granted to the current use as long this grant is not assigned yet.
+     */
+    private EnumSet<CRUD> crud = null;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -87,8 +96,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         SpecimenTypeDesignationWorkingSetDTO workingSetDto;
         if(identifier != null){
+
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             Registration reg = getRepo().getRegistrationService().loadByIds(Arrays.asList(idset.registrationId), null).get(0);
+
             if(idset.workingsetId != null){
                 RegistrationDTO regDTO = new RegistrationDTO(reg);
                 // find the working set
@@ -102,6 +113,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 citation = getRepo().getReferenceService().find(idset.publicationId);
                 typifiedName = getRepo().getNameService().find(idset.typifiedNameId);
             }
+
         } else {
             workingSetDto = null;
         }
@@ -266,6 +278,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         }
         addCandidates.forEach(std -> reg.addTypeDesignation(std));
 
+
+        if(crud != null){
+            UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
+        }
+
         getStore().saveBean(reg);
     }
 
@@ -306,6 +323,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             }
         }
         return original;
+    }
+
+
+    /**
+     * @param crud
+     */
+    public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
+        this.crud = crud;
+
     }
 
 
