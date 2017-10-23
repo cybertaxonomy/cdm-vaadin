@@ -38,7 +38,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected ApplicationEventPublisher eventBus;
 
     /**
-     * Load the bean to be edited in the editor freshly from the persitstend storage.
+     * Load the bean to be edited in the editor freshly from the persistent storage.
      * Ore create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
      *
      * @param identifier

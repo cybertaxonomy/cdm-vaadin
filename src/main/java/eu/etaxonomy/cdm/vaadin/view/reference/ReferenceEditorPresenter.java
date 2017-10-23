@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -102,14 +103,36 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected Reference loadBeanById(Object identifier) {
+    protected Reference loadCdmEntityById(Integer identifier) {
+
         Reference reference;
         if(identifier != null){
-            reference = getRepo().getReferenceService().find((Integer)identifier);
+            reference = getRepo().getReferenceService().find(identifier);
         } else {
             reference = ReferenceFactory.newGeneric();
         }
         return reference;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Reference.class, identifier, crud, null);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Reference bean) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+        }
     }
 
     /**

@@ -190,16 +190,19 @@ public class CdmUserHelper extends VaadinUserHelper {
 
     /**
      * {@inheritDoc}
+     *
      */
     @Override
-    public void createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+    public CdmAuthority createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
         UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
+        boolean newAuthorityAdded = false;
+        CdmAuthority authority = null;
         if(userDetails != null){
             runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
             User user = (User)userDetails;
-            CdmAuthority authority = new CdmAuthority(cdmEntity, property, crud);
+            authority = new CdmAuthority(cdmEntity, property, crud);
             try {
-                user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
+                newAuthorityAdded = user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
             } catch (CdmAuthorityParsingException e) {
                 throw new RuntimeException(e);
             }
@@ -210,6 +213,7 @@ public class CdmUserHelper extends VaadinUserHelper {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.debug("security context refreshed with user " + username);
         }
+        return newAuthorityAdded ? authority : null;
 
     }
 
@@ -221,19 +225,18 @@ public class CdmUserHelper extends VaadinUserHelper {
      * @return
      */
     @Override
-    public void createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
+    public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
 
         CdmBase cdmEntity = repo.getCommonService().find(cdmType, entitiyId);
-
-        createAuthorityFor(username,cdmEntity, crud, property);
+        return createAuthorityFor(username,cdmEntity, crud, property);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
-        createAuthorityFor(userName(), cdmEntity, crud, property);
+    public CdmAuthority createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmEntity, crud, property);
 
     }
 
@@ -244,8 +247,37 @@ public class CdmUserHelper extends VaadinUserHelper {
      * @return
      */
     @Override
-    public void createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
-        createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
+    public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAuthorityForCurrentUser(CdmAuthority cdmAuthority) {
+        removeAuthorityForCurrentUser(userName(), cdmAuthority);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAuthorityForCurrentUser(String username, CdmAuthority cdmAuthority) {
+
+        UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
+        if(userDetails != null){
+            runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
+            User user = (User)userDetails;
+            user.getGrantedAuthorities().remove(cdmAuthority);
+            repo.getSession().flush();
+            runAsAutheticator.restoreAuthentication();
+            Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            logger.debug("security context refreshed with user " + username);
+        }
+
     }
 
 }

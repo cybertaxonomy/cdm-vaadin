@@ -223,9 +223,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         newTaxonNameForRegistration = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
         EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration);
-        UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, nameSaveEvent.getEntityId(), EnumSet.of(CRUD.UPDATE,CRUD.DELETE), null);
+       // UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, nameSaveEvent.getEntityId(), EnumSet.of(CRUD.UPDATE,CRUD.DELETE), null);
         newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityId());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         popup.withDeleteButton(true);
         popup.loadInEditor(newTaxonNameForRegistration.getId());
         // disable NomReferenceCombobox:

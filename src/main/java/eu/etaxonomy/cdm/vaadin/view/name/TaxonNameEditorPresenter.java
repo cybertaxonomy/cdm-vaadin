@@ -22,6 +22,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -64,15 +65,36 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      * {@inheritDoc}
      */
     @Override
-    protected TaxonName loadBeanById(Object identifier) {
+    protected TaxonName loadCdmEntityById(Integer identifier) {
 
         TaxonName bean;
         if(identifier != null){
-            bean = getRepo().getNameService().find((Integer)identifier);
+            bean = getRepo().getNameService().find(identifier);
         } else {
             bean = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         }
         return bean;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, identifier, crud, null);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(TaxonName bean) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+        }
     }
 
     @Override

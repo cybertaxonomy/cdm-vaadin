@@ -19,6 +19,12 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
  */
 public interface PerEntityAuthorityGrantingEditor {
 
+    /**
+     * The editor will create a per entity authority for the bean being loaded in the editor and will
+     * grant this authority to the current user.
+     *
+     * @param crud
+     */
     public void grantToCurrentUser(EnumSet<CRUD> crud);
 
 }
