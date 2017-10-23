@@ -43,7 +43,6 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
-import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
@@ -151,7 +150,7 @@ public class DistributionTableViewBean
                 final Window popup = new Window("Choose distribution status");
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
-                termSelect.setContainerDataSource(PresenceAbsenceTermContainer.getInstance());
+                termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
                 termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
                 if(presenceAbsenceTerm != null){
                 	termSelect.setNullSelectionItemId("[no status]");

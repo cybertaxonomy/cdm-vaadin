@@ -46,6 +46,7 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.service.CdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -68,6 +69,8 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
+
+    private PresenceAbsenceTermContainer presenceAbsenceTermContainer = PresenceAbsenceTermContainer.getInstance();
 
 	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
@@ -252,6 +255,10 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		return null;
 	}
 
+	public PresenceAbsenceTermContainer getPresenceAbsenceTermContainer() {
+	    return this.presenceAbsenceTermContainer;
+	}
+
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
             "$",
             "elements.*",
@@ -301,7 +308,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	@Override
 	protected void onPresenterReady() {
 	    /*
-         * This method is called twice. One time before and one time after login.
          * The area and taxon settings window should only be displayed after login
          * and only when no classification and areas are chosen yet.
          */
@@ -314,4 +320,5 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
             getView().openAreaAndTaxonSettings();
         }
     }
+
 }
