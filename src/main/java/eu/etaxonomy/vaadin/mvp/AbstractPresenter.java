@@ -289,6 +289,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         } else {
             throw new RuntimeException("Using the CdmSpringVaadinServletService is required for proper per view conversation handling");
         }
+        conversationHolder = null;
 	}
 
 	/**
