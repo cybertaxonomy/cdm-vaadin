@@ -70,7 +70,7 @@ public class AreaAndTaxonSettingsPresenter extends SettingsPresenterBase {
 
 
     public TermVocabulary<NamedArea> getChosenAreaVoc(){
-        return CdmSpringContextHelper.getVocabularyService().load(areaVocabUUID);
+        return CdmSpringContextHelper.getVocabularyService().load(areaVocabUUID, VOCABULARY_INIT_STRATEGY);
     }
 
 
