@@ -279,6 +279,11 @@ public class AreaAndTaxonSettingsConfigWindow
 					taxonNodes.add(uuidAndTitleCache.getUuid());
 				}
             }
+			if(treeSelection.isEmpty() && CdmUtils.isNotBlank(taxonFilter.getValue())) {
+                for (UuidAndTitleCache<TaxonNode> uuidAndTitleCache : (Collection<UuidAndTitleCache<TaxonNode>>) taxonTree.getItemIds()) {
+                    taxonNodes.add(uuidAndTitleCache.getUuid());
+                }
+			}
             areaVoc = (TermVocabulary<NamedArea>) distAreaBox.getValue();
             Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
             DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, areaVoc, selectedAreas, classificationUuid);
