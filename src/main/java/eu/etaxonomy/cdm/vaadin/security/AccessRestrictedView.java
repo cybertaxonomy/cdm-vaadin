@@ -17,7 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
  * @since Apr 25, 2017
  *
  */
-public interface AccessRestrictedView {
+public interface AccessRestrictedView extends ReleasableResourcesView {
 
     /**
      * @return
