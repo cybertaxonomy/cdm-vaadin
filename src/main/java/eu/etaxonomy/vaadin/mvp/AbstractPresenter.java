@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
@@ -189,9 +190,17 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     protected void unbindConversation() {
         logger.trace(String.format("<<<<< %s unbind()", _toString()));
         conversationHolder.unbind();
-        if(conversationHolder.isTransactionActive()){
+        // FIXME conversationHolder.isTransactionActive() always returns true
+        // see https://dev.e-taxonomy.eu/redmine/issues/6780
+        if(false && conversationHolder.isTransactionActive()){
             logger.trace(String.format("<<    %s comitting transaction ", _toString()));
-            conversationHolder.commit(false);
+            try{
+                conversationHolder.commit(false);
+            } catch (IllegalTransactionStateException | IllegalStateException e){
+                // log this exception, but stop from propagating
+                // FIXME remove this catch once https://dev.e-taxonomy.eu/redmine/issues/6780 is fixed
+                logger.error(e.getMessage());
+            }
         }
         conversationBound = false;
     }
