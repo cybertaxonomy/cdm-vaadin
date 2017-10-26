@@ -92,17 +92,17 @@ public class AreaAndTaxonSettingsConfigWindow
         } catch (SQLException e) {
             DistributionEditorUtil.showSqlError(e);
         }
-        RowId parent = null;
+        RowId classificationRow = null;
         if(classification!=null){
-        	parent = new RowId(classification.getRootNode().getId());
+            classificationRow = new RowId(classification.getId());
         }
         else if(classificationBox.getItemIds().size()==1){
             //only one classification exists
-            parent = (RowId) classificationBox.getItemIds().iterator().next();
+            classificationRow = (RowId) classificationBox.getItemIds().iterator().next();
         }
-        if(parent!=null){
-            classificationBox.setValue(new RowId(parent.getId()));
-            showClassificationTaxa(getUuidAndTitleCacheFromRowId(parent));
+        if(classificationRow!=null){
+            classificationBox.setValue(classificationRow);
+            showClassificationTaxa(getUuidAndTitleCacheFromRowId(classificationRow));
         }
 
         classificationBox.addValueChangeListener(this);
@@ -300,8 +300,8 @@ public class AreaAndTaxonSettingsConfigWindow
         ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
-    private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> parent) {
-        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+    private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> rootNode) {
+        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(rootNode);
         // Enable polling and set frequency to 0.5 seconds
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
