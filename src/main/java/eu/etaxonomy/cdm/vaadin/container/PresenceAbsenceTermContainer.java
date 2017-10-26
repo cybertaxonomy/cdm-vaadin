@@ -10,7 +10,6 @@ import java.util.UUID;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinSession;
 
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.metadata.CdmPreference;
 import eu.etaxonomy.cdm.model.metadata.PreferencePredicate;
@@ -34,13 +33,8 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
     private void initDataModel() {
         Collection<PresenceAbsenceTerm> distributionStatus = getDistributionStatusList(TERMS_INIT_STRATEGY);
-
         defaultDistributionStatus = distributionStatus;
-		TermCacher termCacher = TermCacher.getInstance();
 		addAll(distributionStatus);
-		for (PresenceAbsenceTerm presenceAbsenceTerm : distributionStatus) {
-			termCacher.addPresenceAbsenceTerm(presenceAbsenceTerm);
-		}
     }
 
 	public static PresenceAbsenceTermContainer getInstance(){
@@ -66,8 +60,7 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
             List<UUID> uuidList = statusPref.getValueUuidList();
             return (List)CdmSpringContextHelper.getTermService().load(uuidList, propertyPath);
         }else{
-            return CdmSpringContextHelper.getTermService().listByTermType(
-                    TermType.PresenceAbsenceTerm, null, null, null, propertyPath);
+            return TermCacher.getInstance().getDistributionStatusTermList();
         }
     }
 
