@@ -8,6 +8,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
@@ -16,6 +17,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableViewBean;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
@@ -72,6 +74,17 @@ public class DistributionStatusUI extends UI{
 
 	@Override
 	protected void init(VaadinRequest request) {
+
+	    addDetachListener(e -> {
+	        for(String viewName : viewProvider.getViewNamesForCurrentUI()){
+	            View view = viewProvider.getView(viewName);
+	            if(view != null && view instanceof ReleasableResourcesView) {
+	                ((ReleasableResourcesView)view).releaseResourcesOnAccessDenied();
+	            }
+	        }
+
+	    });
+
         configureAccessDeniedView();
 
         Responsive.makeResponsive(this);
