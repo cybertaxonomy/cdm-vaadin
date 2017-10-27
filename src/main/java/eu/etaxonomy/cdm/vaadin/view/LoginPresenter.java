@@ -21,7 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
+import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
@@ -46,7 +46,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  *
  */
 @SpringComponent
-@UIScope // DO NOT CHANGE !!! LoginPresenter must be in UIScope so that the LoginPresenter is available to all Views.
+@ViewScope
 public class LoginPresenter extends AbstractPresenter<LoginView> {
 
     private static final long serialVersionUID = 4020699735656994791L;
