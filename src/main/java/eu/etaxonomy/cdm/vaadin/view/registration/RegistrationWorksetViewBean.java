@@ -262,7 +262,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             buttonGroup.addComponent(editRegistrationButton);
         }
 
-        PermissionDebugUtils.fromSession().addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
+        PermissionDebugUtils.addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
                 EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
         Component regItem;

@@ -11,19 +11,13 @@ package eu.etaxonomy.cdm.vaadin.security;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Profile;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 
@@ -44,9 +38,6 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
  * @since Oct 11, 2017
  *
  */
-@SpringComponent
-@UIScope
-@Profile("debug")
 public class PermissionDebugUtils {
 
 
@@ -57,10 +48,6 @@ public class PermissionDebugUtils {
     public static final String SYSTEM_PROP_KEY = "GainPerEntityPermissionButtons";
 
 
-    @Autowired
-    @Qualifier("cdmRepository")
-    private CdmRepository repo;
-
     public PermissionDebugUtils() {
         VaadinSession.getCurrent().setAttribute(VADDIN_SESSION_KEY, this);
     }
@@ -69,13 +56,18 @@ public class PermissionDebugUtils {
         return (PermissionDebugUtils)VaadinSession.getCurrent().getAttribute(VADDIN_SESSION_KEY);
      }
 
-    public Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType,
+    public static Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType,
             Integer entitiyId, EnumSet<CRUD> crud, String property){
-        Button button = gainPerEntityPermissionButton(cdmType, entitiyId, crud, property);
-        if(button != null){
-            toContainer.addComponent(button);
+
+        PermissionDebugUtils pu = PermissionDebugUtils.fromSession();
+        if(pu != null){
+            Button button = pu.gainPerEntityPermissionButton(cdmType, entitiyId, crud, property);
+            if(button != null){
+                toContainer.addComponent(button);
+            }
+            return button;
         }
-        return button;
+        return null;
     }
 
     public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property){
