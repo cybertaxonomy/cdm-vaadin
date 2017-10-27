@@ -88,7 +88,9 @@ public class AreaAndTaxonSettingsConfigWindow
         //init classification
         Classification classification = presenter.getChosenClassification();
         try {
-            classificationBox.setContainerDataSource(new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification")));
+            CdmSQLContainer classificationContainer = new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification"));
+            classificationContainer.sort(new Object[] {"titleCache"}, new boolean[] {true});
+            classificationBox.setContainerDataSource(classificationContainer);
         } catch (SQLException e) {
             DistributionEditorUtil.showSqlError(e);
         }
