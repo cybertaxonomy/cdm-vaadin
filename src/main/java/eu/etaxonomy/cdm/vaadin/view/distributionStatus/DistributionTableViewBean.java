@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -211,6 +212,25 @@ public class DistributionTableViewBean
 		columnHeaders.remove(CdmQueryFactory.ID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.UUID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
+		columnHeaders.sort(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                if(o1.equals(CdmQueryFactory.TAXON_COLUMN) || o2.equals(CdmQueryFactory.TAXON_COLUMN)) {
+                    return o1.equals(CdmQueryFactory.TAXON_COLUMN) ? -1 : 1;
+                }
+                if(o1.equals(CdmQueryFactory.RANK_COLUMN) || o2.equals(CdmQueryFactory.RANK_COLUMN)) {
+                    return o1.equals(CdmQueryFactory.RANK_COLUMN) ? -1 : 1;
+                }
+
+                // TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
+                if(o1.equals("DE") || o1.equals("Deutschland")
+                        || o2.equals("DE") || o2.equals("Deutschland")) {
+                    return (o1.equals("DE") || o1.equals("Deutschland")) ? -1 : 1;
+                }
+
+                return o1.compareTo(o2);
+            }
+		});
 
 		List<String> columnList = new ArrayList<>(columnHeaders);
 
