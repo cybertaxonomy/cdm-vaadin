@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
@@ -37,7 +38,8 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
  * @param <V>
  *            type of the view this presenter governs
  */
-public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, IntraViewConversationDirector, RequestStartListener {
+public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, IntraViewConversationDirector,
+    RequestStartListener, DisposableBean {
 
 
     private static final long serialVersionUID = 5260910510283481832L;
@@ -272,13 +274,21 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	    logger.trace(String.format("%s onViewExit()", _toString()));
 	    handleViewExit();
 	    // un-register as request start and end listener
-	    if(conversationBound){
-    	    logger.trace(String.format("<<<<< %s onViewExit() unbind()", _toString()));
-            conversationHolder.unbind();
-            conversationBound = false;
-	    }
-	    logger.trace(String.format("<<<<< %s onViewExit() close()", _toString()));
-	    conversationHolder.close();
+	    cleanupConversation();
+        cleanupRequestListeners();
+	}
+
+    @Override
+    public void destroy() {
+        cleanupConversation();
+        cleanupRequestListeners();
+        view = null;
+    }
+
+    /**
+     *
+     */
+    protected void cleanupRequestListeners() {
         VaadinService service = UI.getCurrent().getSession().getService();
         if(service instanceof CdmSpringVaadinServletService){
             logger.trace(String.format("~~~~~ %s un-register as request listener", _toString()));
@@ -289,7 +299,20 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         } else {
             throw new RuntimeException("Using the CdmSpringVaadinServletService is required for proper per view conversation handling");
         }
-	}
+    }
+
+    /**
+     *
+     */
+    protected void cleanupConversation() {
+        if(conversationBound){
+    	    logger.trace(String.format("<<<<< %s cleanupConversation() unbind()", _toString()));
+            conversationHolder.unbind(); // TODO remove, unbind is done on close below
+            conversationBound = false;
+	    }
+	    logger.trace(String.format("<<<<< %s cleanupConversation() close()", _toString()));
+	    conversationHolder.close();
+    }
 
 	/**
 	 * Extending classes should overwrite this method to react to the event when

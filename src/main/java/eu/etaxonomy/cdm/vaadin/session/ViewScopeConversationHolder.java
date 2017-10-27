@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 
 import org.hibernate.FlushMode;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -48,7 +49,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
  */
 @SpringComponent
 @ViewScope
-public class ViewScopeConversationHolder extends ConversationHolder implements Serializable {
+public class ViewScopeConversationHolder extends ConversationHolder implements Serializable, DisposableBean {
 
 
     private static final long serialVersionUID = 1001768184000981106L;
@@ -78,6 +79,14 @@ public class ViewScopeConversationHolder extends ConversationHolder implements S
         setDefaultFlushMode(FlushMode.MANUAL);
         TransactionDefinition definition = new DefaultTransactionDefinition(TransactionDefinition.PROPAGATION_NESTED);
         setDefinition(definition );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        close();
     }
 
 

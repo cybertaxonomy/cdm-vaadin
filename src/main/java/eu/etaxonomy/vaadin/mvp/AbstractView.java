@@ -4,6 +4,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -26,7 +27,7 @@ import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
-		implements ApplicationContextAware, ReleasableResourcesView {
+		implements ApplicationContextAware, ReleasableResourcesView, DisposableBean {
 
 
     public static final Logger logger = Logger.getLogger(AbstractView.class);
@@ -41,6 +42,12 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	@SuppressWarnings("unchecked")
     @PostConstruct
 	protected final void init() {
+
+//	    addDetachListener(e -> {
+//	        getPresenter().onViewExit();
+//	        }
+//	    );
+
 		Logger.getLogger(getClass().getSimpleName()).info("View init");
 		if(!ApplicationView.class.isAssignableFrom(this.getClass())){
 		    throw new RuntimeException("Any view bean must implement the ApplicationView interface: ViewBean ---> ViewInterface ---> ApplicationView");
@@ -99,4 +106,9 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
     public void releaseResourcesOnAccessDenied() {
         getPresenter().onViewExit();
     }
+
+   @Override
+   public void destroy() {
+       presenter = null;
+   }
 }

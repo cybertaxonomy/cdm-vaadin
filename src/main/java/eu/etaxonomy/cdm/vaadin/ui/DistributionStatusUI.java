@@ -1,6 +1,7 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -8,7 +9,6 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
-import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
 import com.vaadin.server.Page;
 import com.vaadin.server.Responsive;
@@ -17,7 +17,6 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableViewBean;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
@@ -28,7 +27,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 @SpringUI(path="distribution")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
-public class DistributionStatusUI extends UI{
+public class DistributionStatusUI extends UI implements DisposableBean {
 
     private final static Logger logger = Logger.getLogger(DistributionStatusUI.class);
 
@@ -75,16 +74,6 @@ public class DistributionStatusUI extends UI{
 	@Override
 	protected void init(VaadinRequest request) {
 
-	    addDetachListener(e -> {
-	        for(String viewName : viewProvider.getViewNamesForCurrentUI()){
-	            View view = viewProvider.getView(viewName);
-	            if(view != null && view instanceof ReleasableResourcesView) {
-	                ((ReleasableResourcesView)view).releaseResourcesOnAccessDenied();
-	            }
-	        }
-
-	    });
-
         configureAccessDeniedView();
 
         Responsive.makeResponsive(this);
@@ -102,4 +91,13 @@ public class DistributionStatusUI extends UI{
         navigator.setDefaultViewName(INITIAL_VIEW);
 
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        navigator.setDefaultViewName(null);
+        viewDisplay = null;
+    }
 }
