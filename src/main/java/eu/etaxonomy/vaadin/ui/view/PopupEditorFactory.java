@@ -27,7 +27,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.vaadin.session.ViewScopeConversationHolder;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -61,20 +62,21 @@ public class PopupEditorFactory {
     private PlatformTransactionManager transactionManager;
 
     @Autowired
+    private IRegistrationWorkingSetService registrationWorkingSetService;
+
+    @Autowired
     @Lazy
     private NavigationManager navigationManager;
-
 
     private Field presenterRepoField;
     private Field presenterNavigationManagerField;
     private Field presenterEventBusField;
 
     private Field viewEventBusField;
+    private Field registrationWorkingSetServiceField;
     private Method viewInjectPresenterMethod;
 
     private Method viewInitMethod;
-
-    private Method conversationHolderMethod;
 
     public PopupEditorFactory(){
         initFieldsAccess();
@@ -96,9 +98,6 @@ public class PopupEditorFactory {
             presenterEventBusField = AbstractEditorPresenter.class.getDeclaredField("eventBus");
             presenterEventBusField.setAccessible(true);
 
-            conversationHolderMethod = AbstractPresenter.class.getDeclaredMethod("setConversationHolder", ViewScopeConversationHolder.class);
-            conversationHolderMethod.setAccessible(true);
-
             viewEventBusField = AbstractView.class.getDeclaredField("eventBus");
             viewEventBusField.setAccessible(true);
 
@@ -107,6 +106,9 @@ public class PopupEditorFactory {
 
             viewInitMethod = AbstractView.class.getDeclaredMethod("init");
             viewInitMethod.setAccessible(true);
+
+            registrationWorkingSetServiceField = SpecimenTypeDesignationWorkingsetEditorPresenter.class.getDeclaredField("registrationWorkingSetService");
+            registrationWorkingSetServiceField.setAccessible(true);
 
         } catch (NoSuchFieldException | SecurityException | NoSuchMethodException  e) {
             throw new RuntimeException("Severe error during initialization. Please check the classes AbstractPresenter, AbstractEditorPresenter, AbstractView for modificactions.", e);
@@ -155,10 +157,12 @@ public class PopupEditorFactory {
             Class<? extends AbstractPresenter<?>> presenterClass, P presenter) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         presenterRepoField.set(presenter, repo);
         presenterNavigationManagerField.set(presenter, navigationManager);
-        conversationHolderMethod.invoke(presenter, new ViewScopeConversationHolder(dataSource, sessionFactory, transactionManager));
 
         if(AbstractEditorPresenter.class.isAssignableFrom(presenterClass)){
             presenterEventBusField.set(presenter, eventBus);
+        }
+        if(SpecimenTypeDesignationWorkingsetEditorPresenter.class.equals(presenterClass)){
+            registrationWorkingSetServiceField.set(presenter, registrationWorkingSetService);
         }
     }
 

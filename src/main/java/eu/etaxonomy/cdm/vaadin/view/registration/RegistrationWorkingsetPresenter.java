@@ -15,6 +15,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -76,7 +77,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @return the workingSetService
      */
     public IRegistrationWorkingSetService getWorkingSetService() {
-        ensureBoundConversation();
         return workingSetService;
     }
 
@@ -120,6 +120,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     protected Registration createNewRegistrationForName(Integer taxonNameId) {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // move into RegistrationWorkflowStateMachine
+        TransactionStatus txStatus = getRepo().startTransaction();
         long identifier = System.currentTimeMillis();
         Registration reg = Registration.NewInstance(
                 "http://phycobank.org/" + identifier,
@@ -130,17 +131,21 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         reg.setSubmitter((User)authentication.getPrincipal());
         EntityChangeEvent event = getRegistrationStore().saveBean(reg);
         UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityId(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
+        getRepo().commitTransaction(txStatus);
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return getRepo().getRegistrationService().find(event.getEntityId());
     }
 
 
     /**
+     * @param doReload TODO
      *
      */
-    protected void refreshView() {
-        getConversationHolder().getSession().clear();
-        presentWorkingSet(workingset.getCitationId());
+    protected void refreshView(boolean doReload) {
+        if(doReload){
+            loadWorkingSet(workingset.getCitationId());
+        }
+        getView().setWorkingset(workingset);
     }
 
 
@@ -152,21 +157,21 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         super.handleViewEntered();
 
-        presentWorkingSet(getView().getCitationID());
+        loadWorkingSet(getView().getCitationID());
+        getView().setWorkingset(workingset);
 
         CdmFilterablePagingProvider<TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName>(
-                getRepo().getNameService(), this);
+                getRepo().getNameService());
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
+
     /**
-     * Loads the WorkingSet from the data base and passes it to the view.
-     *
-     * @param registrationID
+     * @param referenceID
      */
-    private void presentWorkingSet(Integer referenceID) {
+    protected void loadWorkingSet(Integer referenceID) {
         try {
             workingset = getWorkingSetService().loadWorkingSetByReferenceID(referenceID);
         } catch (RegistrationValidationException error) {
@@ -183,8 +188,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             Reference citation = getRepo().getReferenceService().find(referenceID);
             workingset = new RegistrationWorkingSet(citation);
         }
-        // getView().setHeaderText("Registrations for " + workingset.getCitation());
-        getView().setWorkingset(workingset);
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")
@@ -247,18 +250,22 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventListener
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
+            TransactionStatus txStatus = getRepo().startTransaction();
             if(event.getReason().equals(Reason.SAVE)){
                 if(newTaxonNameForRegistration != null){
                     int taxonNameId = newTaxonNameForRegistration.getId();
                     getRepo().getSession().refresh(newTaxonNameForRegistration);
                     Registration reg = createNewRegistrationForName(taxonNameId);
+                    // reload workingset into current session
+                    loadWorkingSet(workingset.getCitationId());
                     workingset.add(reg);
                 }
-                refreshView();
+                refreshView(false);
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // clean up
                 getTaxonNameStore().deleteBean(newTaxonNameForRegistration);
             }
+            getRepo().commitTransaction(txStatus);
             newTaxonNameForRegistration = null;
         }
     }
@@ -354,7 +361,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
-                refreshView();
+                refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // clean up
                 if(newRegistrationDTOWithExistingName != null){
@@ -395,19 +402,19 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
         if(Reference.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getCitationId().equals(event.getEntityId())){
-                refreshView();
+                refreshView(true);
             }
         } else
         if(Registration.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getId() == event.getEntityId())){
-                refreshView();
+                refreshView(true);
             }
         } else
         if(TaxonName.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
                 reg.getTypifiedName() != null
                 && reg.getTypifiedName().getId() == event.getEntityId())){
-                    refreshView();
+                    refreshView(true);
             }
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
@@ -417,7 +424,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                             )
                         )
                     ){
-                refreshView();
+                refreshView(true);
             }
         }
 

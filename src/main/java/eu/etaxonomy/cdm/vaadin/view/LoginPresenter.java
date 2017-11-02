@@ -81,8 +81,6 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
             }
         } catch (AuthenticationException e){
             getView().showErrorMessage("Login failed! Please check your username and password.");
-        } finally {
-            unbindConversation();
         }
         return false;
     }

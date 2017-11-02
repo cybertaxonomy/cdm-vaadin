@@ -8,13 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
@@ -35,6 +36,8 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.service.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
@@ -47,6 +50,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
+import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -65,6 +69,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private Reference citation;
 
     private TaxonName typifiedName;
+
+    /**
+     * This object for this field will either be injected by the {@link PopupEditorFactory} or by a Spring
+     * {@link BeanFactory}
+     */
+    @Autowired
+    private IRegistrationWorkingSetService registrationWorkingSetService;
 
     /**
      * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
@@ -98,10 +109,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         if(identifier != null){
 
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
-            Registration reg = getRepo().getRegistrationService().loadByIds(Arrays.asList(idset.registrationId), null).get(0);
 
             if(idset.workingsetId != null){
-                RegistrationDTO regDTO = new RegistrationDTO(reg);
+                RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
                 // find the working set
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
                 workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
@@ -109,6 +119,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 FieldUnit newfieldUnit = FieldUnit.NewInstance();
+                Registration reg = getRepo().getRegistrationService().load(idset.registrationId,
+                        RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
+                //TODO checkif passing reg as owner parameter is needed at all
                 workingSetDto = new SpecimenTypeDesignationWorkingSetDTO(reg, newfieldUnit, null);
                 citation = getRepo().getReferenceService().find(idset.publicationId);
                 typifiedName = getRepo().getNameService().find(idset.typifiedNameId);
@@ -133,9 +146,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
-            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
+            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService());
 
-            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
+            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
 
             @Override
             public SpecimenTypeDesignationDTORow create() {

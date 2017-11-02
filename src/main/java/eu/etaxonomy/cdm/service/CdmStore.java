@@ -18,7 +18,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.conversation.ConversationHolder;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -41,16 +40,16 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     private S service;
 
-    TransactionStatus txNonConversational = null;
+    TransactionStatus txStatus = null;
 
-    ConversationHolder conversationHolder = null;
-
-    /**
-     * @return the conversationHolder
-     */
-    public ConversationHolder getConversationHolder() {
-        return conversationHolder;
-    }
+//    ConversationHolder conversationHolder = null;
+//
+//    /**
+//     * @return the conversationHolder
+//     */
+//    public ConversationHolder getConversationHolder() {
+//        return conversationHolder;
+//    }
 
     protected DefaultTransactionDefinition txDefinition = null;
 
@@ -68,43 +67,43 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     }
 
-    /**
-     * constructor which takes a ConversationHolder. The supplying class of the conversationHolder needs
-     * to care for <code>bind()</code>, <code>unbind()</code> and <code>close()</code> since the store is
-     * only responsible for starting and committing of transactions.
-     *
-     * @param repo
-     * @param service
-     * @param conversationHolder
-     */
-    public CdmStore(CdmRepository repo, S service, ConversationHolder conversationHolder) {
-
-        this.repo = repo;
-        this.service = service;
-        this.conversationHolder = conversationHolder;
-
-    }
+//    /**
+//     * constructor which takes a ConversationHolder. The supplying class of the conversationHolder needs
+//     * to care for <code>bind()</code>, <code>unbind()</code> and <code>close()</code> since the store is
+//     * only responsible for starting and committing of transactions.
+//     *
+//     * @param repo
+//     * @param service
+//     * @param conversationHolder
+//     */
+//    public CdmStore(CdmRepository repo, S service, ConversationHolder conversationHolder) {
+//
+//        this.repo = repo;
+//        this.service = service;
+//        this.conversationHolder = conversationHolder;
+//
+//    }
 
     /**
      * @return
      *
      */
     public TransactionStatus startTransaction() {
-        if(conversationHolder != null && !conversationHolder.isTransactionActive()){
-            //conversationHolder.setDefinition(getTransactionDefinition());
-            return conversationHolder.startTransaction();
-        } else {
+//        if(conversationHolder != null && !conversationHolder.isTransactionActive()){
+//            //conversationHolder.setDefinition(getTransactionDefinition());
+//            return conversationHolder.startTransaction();
+//        } else {
             checkExistingTransaction();
-            txNonConversational = repo.startTransaction();
-            return txNonConversational;
-        }
+            txStatus = repo.startTransaction();
+            return txStatus;
+//        }
     }
 
     /**
      *
      */
     protected void checkExistingTransaction() {
-        if (txNonConversational != null) {
+        if (txStatus != null) {
             // @formatter:off
             // holding the TransactionStatus as state is not good design. we
             // should change the save operation
@@ -159,11 +158,11 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     private Session getSession() {
 
         Session session;
-        if(conversationHolder != null){
-            session = conversationHolder.getSession();
-        } else {
+//        if(conversationHolder != null){
+//            session = conversationHolder.getSession();
+//        } else {
             session = repo.getSession();
-        }
+//        }
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
                 + ((SessionImplementor) session).getPersistenceContext() + " - " + session.toString());
 
@@ -193,7 +192,9 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         Session session = getSession();
         logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
 
-        if(txNonConversational == null || (conversationHolder != null && !conversationHolder.isTransactionActive())){
+        if(txStatus == null
+//                || (conversationHolder != null && !conversationHolder.isTransactionActive())
+                ){
             // no running transaction, start one ...
             startTransaction();
         }
@@ -259,7 +260,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             Notification notification = new Notification(notificationTitle, messageBody.toString(),
                     com.vaadin.ui.Notification.Type.ERROR_MESSAGE, true);
             notification.show(UI.getCurrent().getPage());
-            txNonConversational = null;
+            txStatus = null;
         }
         return null;
     }
@@ -267,19 +268,19 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     protected void commitTransction() {
 
-        if(conversationHolder != null){
-            conversationHolder.commit();
-        } else {
-            repo.commitTransaction(txNonConversational);
-            txNonConversational = null;
-        }
+//        if(conversationHolder != null){
+//            conversationHolder.commit();
+//        } else {
+            repo.commitTransaction(txStatus);
+            txStatus = null;
+//        }
     }
 
     /**
      * @param entityId
      */
     public T loadBean(int entityId) {
-        conversationHolder.startTransaction();
+//        conversationHolder.startTransaction();
         return service.find(entityId);
     }
 

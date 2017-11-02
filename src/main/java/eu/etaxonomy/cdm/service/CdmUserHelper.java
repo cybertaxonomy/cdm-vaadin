@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
@@ -194,6 +195,8 @@ public class CdmUserHelper extends VaadinUserHelper {
      */
     @Override
     public CdmAuthority createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+
+        TransactionStatus txStatus = repo.startTransaction();
         UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
         boolean newAuthorityAdded = false;
         CdmAuthority authority = null;
@@ -213,6 +216,7 @@ public class CdmUserHelper extends VaadinUserHelper {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.debug("security context refreshed with user " + username);
         }
+        repo.commitTransaction(txStatus);
         return newAuthorityAdded ? authority : null;
 
     }
@@ -228,7 +232,7 @@ public class CdmUserHelper extends VaadinUserHelper {
     public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
 
         CdmBase cdmEntity = repo.getCommonService().find(cdmType, entitiyId);
-        return createAuthorityFor(username,cdmEntity, crud, property);
+        return createAuthorityFor(username, cdmEntity, crud, property);
     }
 
     /**

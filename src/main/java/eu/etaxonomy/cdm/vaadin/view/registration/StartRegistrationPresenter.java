@@ -58,7 +58,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.onPresenterReady();
 
         CdmFilterablePagingProvider<Reference> pagingProvider = new CdmFilterablePagingProvider<Reference>(
-                getRepo().getReferenceService(), this);
+                getRepo().getReferenceService());
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());

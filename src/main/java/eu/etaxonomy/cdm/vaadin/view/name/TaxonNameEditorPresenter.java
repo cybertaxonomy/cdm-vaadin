@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -50,13 +51,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), TaxonNameEditorPresenter.this);
+        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
 
 
         getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService(), TaxonNameEditorPresenter.this);
+        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService());
         getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
 
     }
@@ -67,9 +68,31 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     @Override
     protected TaxonName loadCdmEntityById(Integer identifier) {
 
+        List<String> initStrategy = Arrays.asList(new String []{
+
+                "$",
+                "rank.representations",
+
+                "nomenclaturalReference.authorship",
+                "nomenclaturalReference.inReference",
+
+                "status.type.representations",
+
+                "combinationAuthorship",
+                "exCombinationAuthorship",
+                "basionymAuthorship",
+                "exBasionymAuthorship",
+
+                "basionyms.rank.representations",
+                "basionyms.nomenclaturalReference.authorship",
+                "basionyms.nomenclaturalReference.inReference",
+
+                }
+        );
+
         TaxonName bean;
         if(identifier != null){
-            bean = getRepo().getNameService().find(identifier);
+            bean = getRepo().getNameService().load(identifier, initStrategy);
         } else {
             bean = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         }
