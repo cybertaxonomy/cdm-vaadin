@@ -178,8 +178,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
         boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        titleField.setEnabled(userCanEdit);
-        nomenclaturalTitleField.setEnabled(userCanEdit);
+        setEnabled(userCanEdit);
+        personsListEditor.setEnabled(userCanEdit);
     }
 
     /**
