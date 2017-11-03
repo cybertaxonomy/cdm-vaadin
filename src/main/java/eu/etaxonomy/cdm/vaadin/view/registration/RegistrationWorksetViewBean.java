@@ -280,7 +280,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     )
                 );
             });
-            editButtonGroup.getNameButton().getButton().addFocusListener(e -> System.out.println("###"));
         }
 
         for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){

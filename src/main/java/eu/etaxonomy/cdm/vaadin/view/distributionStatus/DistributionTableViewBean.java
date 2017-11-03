@@ -163,7 +163,6 @@ public class DistributionTableViewBean
                 }
                 termSelect.setValue(presenceAbsenceTerm);
                 termSelect.addValueChangeListener(valueChangeEvent -> {
-//						System.out.println(valueChangeEvent);
 						Object distributionStatus = valueChangeEvent.getProperty().getValue();
 						getPresenter().updateDistributionField(areaID, distributionStatus, taxon);
 						container.refresh();
