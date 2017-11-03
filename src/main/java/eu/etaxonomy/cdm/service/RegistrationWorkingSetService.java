@@ -183,9 +183,15 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                     for(@SuppressWarnings("rawtypes") SpecimenOrObservationBase sob : sobs){
                         if(sob instanceof DerivedUnit) {
                             defaultBeanInitializer.initialize(sob, Arrays.asList(new String[]{
-                                    "$",
+                                    "collection",
+                                    "storedUnder",
+                                    "preservation",
+                                    "recordBasis",
+                                    "sex.representations",
+                                    "lifeStage.representations",
+                                    "kindOfUnit.representations",
                                     "derivedFrom.$",
-                                    "derivedFrom.type"
+                                    "derivedFrom.type.representations"
                             }));
                             nextSobs = ((DerivedUnit)sob).getOriginals();
                         }
