@@ -59,7 +59,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService());
         getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
-
     }
 
     /**
@@ -72,6 +71,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 "$",
                 "rank.representations",
+                "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalReference.authorship",
                 "nomenclaturalReference.inReference",

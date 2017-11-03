@@ -262,8 +262,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 }
                 refreshView(false);
             } else if(event.getReason().equals(Reason.CANCEL)){
-                // clean up
-                getTaxonNameStore().deleteBean(newTaxonNameForRegistration);
+                if(newTaxonNameForRegistration != null){
+                    // clean up
+                    getTaxonNameStore().deleteBean(newTaxonNameForRegistration);
+                }
             }
             getRepo().commitTransaction(txStatus);
             newTaxonNameForRegistration = null;

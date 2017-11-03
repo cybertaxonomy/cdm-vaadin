@@ -105,9 +105,16 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     @Override
     protected Reference loadCdmEntityById(Integer identifier) {
 
+        List<String> initStrategy = Arrays.asList(new String []{
+
+                "$",
+
+                }
+        );
+
         Reference reference;
         if(identifier != null){
-            reference = getRepo().getReferenceService().find(identifier);
+            reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
             reference = ReferenceFactory.newGeneric();
         }

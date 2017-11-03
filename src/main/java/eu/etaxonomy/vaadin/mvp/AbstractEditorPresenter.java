@@ -44,29 +44,6 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      */
     protected abstract DTO loadBeanById(Object identifier);
 
-    /**
-     * This method is called directly before setting the bean as item data source to
-     * the field group of the editor.
-     * <p>
-     * Override this method to pre-process the bean if needed. This can be the case if
-     * you are using a persistence layer with short running session like Hibernate.
-     *
-     * @param bean
-     * @return
-     */
-    protected DTO prepareAsFieldGroupDataSource(DTO bean){
-
-        return bean;
-    }
-
-//    @Override
-//    protected TransactionDefinition getTransactionDefinition(){
-//        super.getTransactionDefinition();
-//        if(definition.isReadOnly()){
-//            definition.setReadOnly(false);
-//        }
-//        return definition;
-//    }
 
     /**
      * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}

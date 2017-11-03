@@ -116,6 +116,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
                 workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
                 citation = (Reference) regDTO.getCitation();
+                workingSetDto = fixMissingFieldUnit(workingSetDto);
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 FieldUnit newfieldUnit = FieldUnit.NewInstance();
@@ -209,13 +210,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         });
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * see also {@link SpecimenTypeDesignationWorkingsetPopupEditor#showInEditor()}
-     */
-    @Override
-    protected SpecimenTypeDesignationWorkingSetDTO prepareAsFieldGroupDataSource(SpecimenTypeDesignationWorkingSetDTO bean) {
+
+    private SpecimenTypeDesignationWorkingSetDTO fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO bean) {
 
         if(bean.getFieldUnit() == null){
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
@@ -250,7 +246,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 throw new RuntimeException("Usupported owner type " + bean.getOwner().getClass() + ", needs to be implemented.");
             }
         }
-        return super.prepareAsFieldGroupDataSource(bean);
+        return bean;
     }
 
 

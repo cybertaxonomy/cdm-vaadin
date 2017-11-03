@@ -157,12 +157,12 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return bean;
     }
 
-    @Override
-    protected DTO prepareAsFieldGroupDataSource(DTO bean){
-        DTO mergedBean = getStore().mergedBean(bean);
-        // DTO mergedBean = bean;
-        return mergedBean;
-    }
+//    @Override
+//    protected DTO prepareAsFieldGroupDataSource(DTO bean){
+//        DTO mergedBean = getStore().mergedBean(bean);
+//        // DTO mergedBean = bean;
+//        return mergedBean;
+//    }
 
     /**
      * If the bean is contained in the session it is being updated by

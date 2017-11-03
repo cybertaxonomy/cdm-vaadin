@@ -8,6 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.Arrays;
+import java.util.List;
+
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.User;
@@ -41,7 +44,8 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
 
         Registration reg;
         if(identifier != null){
-            reg = getRepo().getRegistrationService().find(identifier);
+            List<String> initStrategy = Arrays.asList(new String[] {"$"});
+            reg = getRepo().getRegistrationService().load(identifier, initStrategy );
         } else {
             reg = Registration.NewInstance();
         }
