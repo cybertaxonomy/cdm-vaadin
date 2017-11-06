@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.Partial;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -39,10 +40,12 @@ import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
+import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
@@ -273,15 +276,58 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         reg.setIdentifier("http://phycobank.org/" + iaptData.getRegId());
                         reg.setSpecificIdentifier(iaptData.getRegId().toString());
                         reg.setInstitution(getInstitution(iaptData.getOffice()));
-                        reg.setName(name);
+
+                        boolean isPhycobankID = false; // Integer.valueOf(reg.getSpecificIdentifier()) >= 100000;
+
+                        Partial youngestDate = null;
+                        Reference youngestPub = null;
+
+                        // find youngest publication
+
+                        // NOTE:
+                        // data imported from IAPT does not have typedesignation citations and sometimes no nomref
+
+                        if(isPhycobankID){
+                            youngestPub = (Reference) name.getNomenclaturalReference();
+                            youngestDate = partial(youngestPub.getDatePublished());
+
+                            if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
+                                for(TypeDesignationBase td : name.getTypeDesignations()){
+                                    if(td.getCitation() == null){
+                                        continue;
+                                    }
+                                    Partial pubdate = partial(td.getCitation().getDatePublished());
+                                        if(youngestDate.compareTo(pubdate) < 0){
+                                            youngestDate = pubdate;
+                                            youngestPub = td.getCitation();
+                                        }
+                                }
+                            }
+                        }
+
+                        if((isPhycobankID && youngestPub == name.getNomenclaturalReference()) || !isPhycobankID) {
+                            reg.setName(name);
+                        } else {
+                            logger.debug("skipping name published in older referece");
+                        }
                         if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
                             // do not add the collection directly to avoid "Found shared references to a collection" problem
                             HashSet<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
-                            typeDesignations.addAll(name.getTypeDesignations());
+                            for(TypeDesignationBase td : name.getTypeDesignations()){
+                                if(td.getCitation() == null && isPhycobankID){
+                                    logger.error("Missing TypeDesignation Citation in Phycobank data");
+                                    continue;
+                                }
+                                if((isPhycobankID && youngestPub == td.getCitation()) || !isPhycobankID){
+                                    typeDesignations.add(td);
+                                } else {
+                                    logger.debug("skipping typedesignation published in older reference");
+                                }
+                            }
                             reg.setTypeDesignations(typeDesignations);
                         }
                         reg.setRegistrationDate(regDate);
-                        logger.debug("IAPT Registraion for " + name.getTitleCache());
+                        logger.debug("IAPT Registration for " + name.getTitleCache());
                         newRegs.add(reg);
 
                     } catch (JsonParseException e) {
@@ -300,6 +346,22 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             }
             repo.commitTransaction(tx);
         }
+    }
+
+
+    /**
+     * @param datePublished
+     * @return
+     */
+    private Partial partial(TimePeriod datePublished) {
+        if(datePublished != null){
+            if(datePublished.getEnd() != null){
+                return datePublished.getEnd();
+            } else {
+                return datePublished.getStart();
+            }
+        }
+        return null;
     }
 
 
