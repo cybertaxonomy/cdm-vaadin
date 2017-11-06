@@ -119,6 +119,10 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
                 newReference = newReferencePopup.getBean();
 
+                // TODO the bean contained in the popup editor is not yet updated at this point.
+                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                newReference = getRepo().getReferenceService().find(newReference.getUuid());
+
                 getView().getReferenceCombobox().setValue(null);  // deselect
                 getView().getReferenceCombobox().setEnabled(false);
 
