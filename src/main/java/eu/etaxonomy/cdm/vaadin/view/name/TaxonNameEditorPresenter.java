@@ -70,20 +70,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         List<String> initStrategy = Arrays.asList(new String []{
 
                 "$",
-                "rank.representations",
                 "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalReference.authorship",
                 "nomenclaturalReference.inReference",
 
-                "status.type.representations",
+                "status.type",
 
                 "combinationAuthorship",
                 "exCombinationAuthorship",
                 "basionymAuthorship",
                 "exBasionymAuthorship",
 
-                "basionyms.rank.representations",
+                "basionyms.rank",
                 "basionyms.nomenclaturalReference.authorship",
                 "basionyms.nomenclaturalReference.inReference",
 

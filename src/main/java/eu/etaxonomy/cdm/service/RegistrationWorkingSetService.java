@@ -62,7 +62,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
     public static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(new String []{
             // typeDesignation
-            "typeDesignations.typeStatus.representations",
+            "typeDesignations.typeStatus",
             "typeDesignations.typifiedNames",
             "typeDesignations.typeSpecimen",
             "typeDesignations.typeName",
@@ -72,8 +72,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "name.$",
             "name.nomenclaturalReference.authorship",
             "name.nomenclaturalReference.inReference",
-            "name.rank.representations",
-            "name.status.type.representations",
+            "name.rank",
+            "name.status.type",
             // institution
             "institution",
             }
@@ -187,11 +187,11 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                                     "storedUnder",
                                     "preservation",
                                     "recordBasis",
-                                    "sex.representations",
-                                    "lifeStage.representations",
-                                    "kindOfUnit.representations",
+                                    "sex",
+                                    "lifeStage",
+                                    "kindOfUnit",
                                     "derivedFrom.$",
-                                    "derivedFrom.type.representations"
+                                    "derivedFrom.type"
                             }));
                             nextSobs = ((DerivedUnit)sob).getOriginals();
                         }
@@ -199,8 +199,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                             defaultBeanInitializer.initialize(sob, Arrays.asList(new String[]{
                                     "$",
                                     "gatheringEvent.$",
-                                    "gatheringEvent.country.representations",
-                                    "gatheringEvent.collectingAreas.representations",
+                                    "gatheringEvent.country",
+                                    "gatheringEvent.collectingAreas",
                                     "gatheringEvent.actor"
                             }));
                             int i = 0;

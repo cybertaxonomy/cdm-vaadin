@@ -148,7 +148,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 //		getConversationHolder().getSession();
-		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms.representations"));
+		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
 //		voc = CdmBase.deproxy(voc);
 		return voc.getTerms();
 	}
@@ -175,7 +175,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
-	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms.representations"));
+	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
 	}
@@ -277,8 +277,8 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
             "multilanguageText",
             "media",
             "name.$",
-            "name.rank.representations",
-            "name.status.type.representations",
+            "name.rank",
+            "name.status.type",
             "taxon2.name",
     });
 
