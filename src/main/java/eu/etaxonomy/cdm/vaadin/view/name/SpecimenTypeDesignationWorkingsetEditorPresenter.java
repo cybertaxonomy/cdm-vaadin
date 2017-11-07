@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -41,7 +42,7 @@ import eu.etaxonomy.cdm.service.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
+import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -156,12 +157,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 SpecimenTypeDesignationDTORow row = new SpecimenTypeDesignationDTORow();
 
-                row.derivationEventType.setContainerDataSource(selectFactory.buildTermItemContainer(
-                        RegistrationTermLists.DERIVATION_EVENT_TYPE_UUIDS())
+                row.kindOfUnit.setContainerDataSource(selectFactory.buildTermItemContainer(
+                        RegistrationTermLists.KIND_OF_UNIT_TERM_UUIDS())
                         );
-                row.derivationEventType.setNullSelectionAllowed(false);
+                row.kindOfUnit.setNullSelectionAllowed(false);
 
-                row.derivationEventType.addValueChangeListener(e -> {
+                row.kindOfUnit.addValueChangeListener(e -> {
                     SpecimenTypeDesignationDTORow currentRow = row;
                     updateRowItemEnablement(currentRow);
                 });
@@ -197,10 +198,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             private void updateRowItemEnablement(SpecimenTypeDesignationDTORow row) {
 
-                DerivationEventType derivationEventType = (DerivationEventType)row.derivationEventType.getValue();
+                DefinedTerm kindOfUnit = (DefinedTerm)row.kindOfUnit.getValue();
 
-                boolean publishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.PUBLISHED_IMAGE());
-                boolean unPublishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.UNPUBLISHED_IMAGE());
+                boolean publishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.PUBLISHED_IMAGE());
+                boolean unPublishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE());
 
                 row.mediaSpecimenReference.setEnabled(publishedImageType);
                 row.mediaSpecimenReferenceDetail.setEnabled(publishedImageType);

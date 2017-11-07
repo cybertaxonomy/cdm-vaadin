@@ -85,7 +85,7 @@ public class RegistrationWorkingSet {
                     citation = regDto.getCitation().getTitleCache();
                 } else {
                     if(!regDto.getCitationID().equals(citationId)){
-                        problems.add("Removing Registration " + regDto.registration().toString() + " from set since this refers to a different citation.");
+                        problems.add("Removing Registration " + regDto.getSummary() + " from set since this refers to a different citation.");
                         continue;
                     }
                 }
