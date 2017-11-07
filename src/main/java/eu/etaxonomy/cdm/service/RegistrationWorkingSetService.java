@@ -80,6 +80,33 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     );
 
     /**
+    *
+    */
+   private static final List<String> FIELDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
+           "$",
+           "gatheringEvent.$",
+           "gatheringEvent.country",
+           "gatheringEvent.collectingAreas",
+           "gatheringEvent.actor"
+   });
+
+   /**
+    *
+    */
+   private static final List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
+           "collection",
+           "storedUnder",
+           "preservation",
+           "recordBasis",
+           "sex",
+           "lifeStage",
+           "kindOfUnit",
+           "derivedFrom.$",
+           "derivedFrom.type",
+           "specimenTypeDesignations"
+   });
+
+    /**
      *
      */
     private static final int PAGE_SIZE = 50;
@@ -182,27 +209,11 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                     Set<SpecimenOrObservationBase> nextSobs = null;
                     for(@SuppressWarnings("rawtypes") SpecimenOrObservationBase sob : sobs){
                         if(sob instanceof DerivedUnit) {
-                            defaultBeanInitializer.initialize(sob, Arrays.asList(new String[]{
-                                    "collection",
-                                    "storedUnder",
-                                    "preservation",
-                                    "recordBasis",
-                                    "sex",
-                                    "lifeStage",
-                                    "kindOfUnit",
-                                    "derivedFrom.$",
-                                    "derivedFrom.type"
-                            }));
+                            defaultBeanInitializer.initialize(sob, DERIVEDUNIT_INIT_STRATEGY);
                             nextSobs = ((DerivedUnit)sob).getOriginals();
                         }
                         if(sob instanceof FieldUnit){
-                            defaultBeanInitializer.initialize(sob, Arrays.asList(new String[]{
-                                    "$",
-                                    "gatheringEvent.$",
-                                    "gatheringEvent.country",
-                                    "gatheringEvent.collectingAreas",
-                                    "gatheringEvent.actor"
-                            }));
+                            defaultBeanInitializer.initialize(sob, FIELDUNIT_INIT_STRATEGY);
                             int i = 0;
                         }
                     }
