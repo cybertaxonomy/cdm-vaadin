@@ -11,7 +11,7 @@ import com.vaadin.ui.Notification.Type;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableView;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 
 public class DistributionEditorUtil {
 
@@ -19,7 +19,7 @@ public class DistributionEditorUtil {
 
 	public static final String SATTR_SELECTED_AREAS = "selectedAreas";
 
-    public static final String SATTR_SELECTED_VOCABULARY_UUID = "selectedVocabularyUuid";
+    public static final String SATTR_SELECTED_AREA_VOCABULARY_UUID = "selectedVocabularyUuid";
 
 	public static final String SATTR_TAXON_NODES_UUID = "taxonNodesUUID";
 
@@ -31,9 +31,9 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
-    public static void updateDistributionView(DistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> term, Set<NamedArea> selectedAreas, UUID classificationUuid) {
+    public static void updateDistributionView(IDistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc, Set<NamedArea> selectedAreas, UUID classificationUuid) {
 	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, taxonNodes);
-	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_VOCABULARY_UUID, term.getUuid());
+	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREA_VOCABULARY_UUID, areaVoc.getUuid());
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, selectedAreas);
 	    VaadinSession.getCurrent().setAttribute(SATTR_CLASSIFICATION, classificationUuid);
 	    distributionTableView.update();
@@ -41,7 +41,7 @@ public class DistributionEditorUtil {
 
     public static void clearSessionAttributes(){
     	VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, null);
-    	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_VOCABULARY_UUID, null);
+    	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREA_VOCABULARY_UUID, null);
     	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, null);
     	VaadinSession.getCurrent().setAttribute(SATTR_CLASSIFICATION, null);
     }

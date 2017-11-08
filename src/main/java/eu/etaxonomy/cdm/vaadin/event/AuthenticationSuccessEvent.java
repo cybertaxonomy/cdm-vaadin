@@ -27,4 +27,8 @@ public class AuthenticationSuccessEvent implements AuthenticationEvent {
         this.userName = userName;
     }
 
+    public String getUserName(){
+        return userName;
+    }
+
 }

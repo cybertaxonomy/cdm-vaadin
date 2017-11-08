@@ -8,13 +8,19 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.EnumSet;
+
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 
@@ -31,6 +37,12 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     private static final Logger logger = Logger.getLogger(AbstractCdmEditorPresenter.class);
 
+    /**
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * granted to the current use as long this grant is not assigned yet.
+     */
+    protected EnumSet<CRUD> crud = null;
+
 
     public AbstractCdmEditorPresenter() {
         super();
@@ -39,6 +51,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     CdmStore<DTO, IService<DTO>> store ;
 
+    protected CdmAuthority newAuthorityCreated;
+
     protected CdmStore<DTO, IService<DTO>> getStore() {
         if(store == null){
             store = new CdmStore<>(getRepo(), getService());
@@ -46,6 +60,43 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return store;
     }
 
+    @Override
+    protected DTO loadBeanById(Object identifier) {
+
+        if(identifier != null) {
+            Integer integerID = (Integer)identifier;
+            // CdmAuthority is needed before the bean is loaded into the session.
+            // otherwise adding the authority to the user would cause a flush
+            guaranteePerEntityCRUDPermissions(integerID);
+            return loadCdmEntityById(integerID);
+        } else {
+            DTO cdmEntitiy = loadCdmEntityById(null);
+            if(cdmEntitiy != null){
+                guaranteePerEntityCRUDPermissions(cdmEntitiy);
+            }
+            return cdmEntitiy;
+        }
+
+    }
+
+
+    /**
+     * @param identifier
+     * @return
+     */
+    protected abstract DTO loadCdmEntityById(Integer identifier);
+
+    /**
+     * Grant per entity CdmAuthority to the current user <b>for the bean which is not yet loaded</b>
+     * into the editor. The <code>CRUD</code> to be granted are stored in the <code>crud</code> field.
+     */
+    protected abstract void guaranteePerEntityCRUDPermissions(Integer identifier);
+
+    /**
+     * Grant per entity CdmAuthority to the current user for the bean which is loaded
+     * into the editor. The <code>CRUD</code> to be granted are stored in the <code>crud</code> field.
+     */
+     protected abstract void guaranteePerEntityCRUDPermissions(DTO bean);
 
     /**
      * @return
@@ -72,13 +123,21 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             return;
         }
 
+
         // the bean is now updated with the changes made by the user
         DTO bean = (DTO) saveEvent.getBean();
-        bean = handleTransientProperties(bean);
-        EntityChangeEvent changeEvent = getStore().saveBean(bean);
 
-        if(changeEvent != null){
-            eventBus.publishEvent(changeEvent);
+        bean = handleTransientProperties(bean);
+        try {
+            EntityChangeEvent changeEvent = getStore().saveBean(bean);
+
+            if(changeEvent != null){
+                eventBus.publishEvent(changeEvent);
+            }
+        } catch (HibernateException e){
+            if(newAuthorityCreated != null){
+                UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
+            }
         }
     }
 
@@ -98,12 +157,12 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return bean;
     }
 
-    @Override
-    protected DTO prepareAsFieldGroupDataSource(DTO bean){
-        DTO mergedBean = getStore().mergedBean(bean);
-        // DTO mergedBean = bean;
-        return mergedBean;
-    }
+//    @Override
+//    protected DTO prepareAsFieldGroupDataSource(DTO bean){
+//        DTO mergedBean = getStore().mergedBean(bean);
+//        // DTO mergedBean = bean;
+//        return mergedBean;
+//    }
 
     /**
      * If the bean is contained in the session it is being updated by
@@ -134,5 +193,14 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         }
 
     }
+
+    /**
+     * @param crud
+     */
+    public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
+        this.crud = crud;
+
+    }
+
 
 }

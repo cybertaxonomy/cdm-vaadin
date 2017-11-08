@@ -11,6 +11,8 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import com.vaadin.ui.CustomComponent;
 
+import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
+
 /**
  * AbstractView is the base class of all MVP views. It takes care of finding
  * appropriate presenter component for the view.
@@ -24,7 +26,7 @@ import com.vaadin.ui.CustomComponent;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
-		implements ApplicationContextAware {
+		implements ApplicationContextAware, ReleasableResourcesView {
 
 
     public static final Logger logger = Logger.getLogger(AbstractView.class);
@@ -92,4 +94,9 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	public ApplicationEventPublisher getEventBus(){
 	    return eventBus;
 	}
+
+   @Override
+    public void releaseResourcesOnAccessDenied() {
+        getPresenter().onViewExit();
+    }
 }

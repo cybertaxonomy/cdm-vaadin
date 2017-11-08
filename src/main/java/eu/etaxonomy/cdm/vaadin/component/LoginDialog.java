@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component;
 
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextField;
@@ -26,6 +27,9 @@ public class LoginDialog extends LoginDialogDesign {
 
     public LoginDialog() {
         addSelectedTabChangeListener(e -> focusFirstElement(e.getTabSheet()));
+        getMessageLabel().setVisible(false);
+        getTab(1).setEnabled(false);
+        getTab(2).setEnabled(false);
     }
 
     /**
@@ -118,6 +122,10 @@ public class LoginDialog extends LoginDialogDesign {
      */
     public Button getSendOnetimeLogin() {
         return sendOnetimeLogin;
+    }
+
+    public Label getMessageLabel() {
+        return message;
     }
 
 

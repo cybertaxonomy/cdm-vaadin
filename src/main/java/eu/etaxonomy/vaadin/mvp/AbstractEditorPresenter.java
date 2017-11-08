@@ -12,10 +12,8 @@ import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.transaction.TransactionDefinition;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
-import eu.etaxonomy.cdm.vaadin.session.ViewScopeConversationHolder;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -38,7 +36,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected ApplicationEventPublisher eventBus;
 
     /**
-     * Load the bean to be edited in the editor freshly from the persitstend storage.
+     * Load the bean to be edited in the editor freshly from the persistent storage.
      * Ore create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
      *
      * @param identifier
@@ -46,29 +44,6 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      */
     protected abstract DTO loadBeanById(Object identifier);
 
-    /**
-     * This method is called directly before setting the bean as item data source to
-     * the field group of the editor.
-     * <p>
-     * Override this method to pre-process the bean if needed. This can be the case if
-     * you are using a persistence layer with short running session like Hibernate.
-     *
-     * @param bean
-     * @return
-     */
-    protected DTO prepareAsFieldGroupDataSource(DTO bean){
-
-        return bean;
-    }
-
-    @Override
-    protected TransactionDefinition getTransactionDefinition(){
-        super.getTransactionDefinition();
-        if(definition.isReadOnly()){
-            definition.setReadOnly(false);
-        }
-        return definition;
-    }
 
     /**
      * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
@@ -80,9 +55,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
-        ensureBoundConversation();
-        previousPreSaveEvenFlushMode = getConversationHolder().getSession().getFlushMode();
-        getConversationHolder().getSession().setFlushMode(FlushMode.AUTO);
+        getSession().setFlushMode(FlushMode.AUTO);
 
     }
 
@@ -98,7 +71,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         }
         DTO bean = saveEvent.getBean();
         saveBean(bean);
-        getConversationHolder().getSession().setFlushMode(previousPreSaveEvenFlushMode);
+        getSession().setFlushMode(previousPreSaveEvenFlushMode);
         previousPreSaveEvenFlushMode = null;
     }
 
@@ -112,13 +85,10 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
        if(!isFromOwnView(deleteEvent)){
            return;
        }
-       if(!conversationBound){
-           bindConversation();
-       }
        FlushMode previousFlushMode = getSession().getFlushMode();
-       getConversationHolder().getSession().setFlushMode(FlushMode.AUTO);
+       getSession().setFlushMode(FlushMode.AUTO);
        deleteBean(deleteEvent.getBean());
-       getConversationHolder().getSession().setFlushMode(previousFlushMode);
+       getSession().setFlushMode(previousFlushMode);
    }
 
     /**
@@ -136,6 +106,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected boolean isFromOwnView(AbstractEditorAction action){
         return action.getSourceView() != null && getView().equals(action.getSourceView());
     }
+
 
     protected abstract void saveBean(DTO bean);
 

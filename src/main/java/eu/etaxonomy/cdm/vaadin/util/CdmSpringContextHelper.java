@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.ICommonService;
 import eu.etaxonomy.cdm.api.service.IDescriptionService;
 import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.api.service.IPreferenceService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.ITaxonNodeService;
@@ -96,6 +97,7 @@ public class CdmSpringContextHelper {
         return connPool;
     }
 
+
 //    public static JDBCConnectionPool createConnectionPool() {
 //        return new J2EEConnectionPool(getCurrent().getDataSource());
 //    }
@@ -158,6 +160,9 @@ public class CdmSpringContextHelper {
         return (IDescriptionService)getCurrent().getBean(IDescriptionService.class);
     }
 
+    public static IPreferenceService getPreferenceService() {
+        return (IPreferenceService)getCurrent().getBean(IPreferenceService.class);
+    }
 
 
 }

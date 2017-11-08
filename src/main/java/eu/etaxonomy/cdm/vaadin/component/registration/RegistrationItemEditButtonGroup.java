@@ -9,16 +9,24 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
-import eu.etaxonomy.cdm.remote.dto.tdwg.voc.TaxonName;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -49,8 +57,15 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private Button addTypeDesignationButton;
 
+    private Label nameLabel = null;
 
-    public RegistrationItemEditButtonGroup(RegistrationDTO regDto){
+    private Link identifierLink;
+
+    public RegistrationItemEditButtonGroup(RegistrationDTO regDto) {
+
+        boolean isRegistrationLocked = EnumSet.of(
+                RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
+                .contains(regDto.getStatus());
 
         setWidth(100, Unit.PERCENTAGE);
 
@@ -60,22 +75,31 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
             Label nameLabel = new Label(regDto.getName().getLabel());
             nameLabel.setWidthUndefined();
-            addComponents(nameIdButton.getButton(), nameLabel);
+            boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
+            nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
+
+            addComponent(nameIdButton.getButton());
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(),
+                    EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            addComponent(nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
             if(regDto.getTypifiedName() != null){
-                addComponent(new Label(regDto.getTypifiedName().getLabel()));
+                nameLabel = new Label(regDto.getTypifiedName().getLabel());
+                addComponent(nameLabel);
             }
         }
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
-            for(TypedEntityReference baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
+            for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
+                tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
                 addComponent(tdButton);
-//                Set<Integer> idSet = new HashSet<>();
-//                typeDesignationWorkingSet.getTypeDesignations().forEach(td -> idSet.add(td.getId()));
+
+                PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
+                        baseEntityRef.getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
@@ -93,8 +117,14 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         }
         addTypeDesignationButton = new Button(FontAwesome.PLUS);
         addTypeDesignationButton.setDescription("Add a new type designation workingset");
+        addTypeDesignationButton.setVisible(!isRegistrationLocked);
         addComponent(addTypeDesignationButton);
 
+        //TODO make responsive and use specificIdentifier in case the space gets too narrow
+        identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
+        identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
+
+        addComponents(identifierLink);
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
         addDefaultStyles();
@@ -121,6 +151,9 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         addStyleName(STYLE_NAMES);
         if(nameIdButton != null){
             nameIdButton.getButton().addStyleName(DEFAULT_BUTTON_STYLES);
+        }
+        if(nameLabel != null){
+            nameLabel.addStyleName("v-disabled");
         }
         typeDesignationButtons.forEach(idb -> idb.getButton().addStyleName(DEFAULT_BUTTON_STYLES));
         addTypeDesignationButton.addStyleName(DEFAULT_BUTTON_STYLES);

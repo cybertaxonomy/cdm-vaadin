@@ -14,12 +14,12 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.LoginDialog;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.PasswordRevoveryEvent;
 import eu.etaxonomy.cdm.vaadin.event.RegisterNewUserEvent;
-import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -53,8 +53,9 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         loginDialog.getLoginButton().addClickListener(e -> handleLoginClick(e));
         loginDialog.getRegisterButton().addClickListener(e -> eventBus.publishEvent(new RegisterNewUserEvent(e)));
         loginDialog.getSendOnetimeLogin().addClickListener(e -> eventBus.publishEvent(new PasswordRevoveryEvent(e)));
-        loginDialog.getCancelLoginButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(RegistrationUI.INITIAL_VIEW)));
-        loginDialog.getCancelRegistrationButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(RegistrationUI.INITIAL_VIEW)));
+        // NOTE: null viewName will be replaced by the default view name in NavigationManagerBean
+        loginDialog.getCancelLoginButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(null)));
+        loginDialog.getCancelRegistrationButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(null)));
     }
 
     /**
@@ -78,4 +79,18 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         getPresenter().onViewEnter();
     }
 
+    @Override
+    public void showErrorMessage(String text){
+        loginDialog.getMessageLabel().setVisible(true);
+        loginDialog.getMessageLabel().setStyleName(ValoTheme.BUTTON_TINY + " " +  ValoTheme.LABEL_FAILURE);
+        loginDialog.getMessageLabel().setValue(text);
+    }
+
+
+    @Override
+    public void clearMessage(){
+        loginDialog.getMessageLabel().setVisible(false);
+        loginDialog.getMessageLabel().setStyleName("");
+        loginDialog.getMessageLabel().setValue("");
+    }
 }

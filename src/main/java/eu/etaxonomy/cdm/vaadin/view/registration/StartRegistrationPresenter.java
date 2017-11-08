@@ -58,7 +58,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.onPresenterReady();
 
         CdmFilterablePagingProvider<Reference> pagingProvider = new CdmFilterablePagingProvider<Reference>(
-                getRepo().getReferenceService(), this);
+                getRepo().getReferenceService());
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
@@ -119,6 +119,10 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
                 newReference = newReferencePopup.getBean();
 
+                // TODO the bean contained in the popup editor is not yet updated at this point.
+                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                newReference = getRepo().getReferenceService().find(newReference.getUuid());
+
                 getView().getReferenceCombobox().setValue(null);  // deselect
                 getView().getReferenceCombobox().setEnabled(false);
 
@@ -155,7 +159,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        eventBus.publishEvent(new NavigationEvent(RegistrationWorkflowViewBean.NAME, Integer.toString(referenceId)));
+        eventBus.publishEvent(new NavigationEvent(RegistrationWorksetViewBean.NAME, Integer.toString(referenceId)));
 
     }
 

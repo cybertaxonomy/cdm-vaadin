@@ -18,22 +18,25 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TwinColSelect;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStatusSettingsPresenter;
 
 /**
  * @author alex
  * @date 22.04.2015
  *
  */
-public class SettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener{
+public class DistributionStatusSettingsConfigWindow
+            extends SettingsDialogWindowBase<DistributionStatusSettingsPresenter>
+            implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
-    private TwinColSelect distStatusSelect;
+    private ListSelect distStatusSelect;
     private CheckBox boxToggleAbbreviatedLabels;
-    private DistributionTableView distributionTableView;
+    private IDistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -43,7 +46,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
      * visual editor.
      * @param distributionTableView
      */
-    public SettingsConfigWindow(DistributionTableView distributionTableView) {
+    public DistributionStatusSettingsConfigWindow(IDistributionTableView distributionTableView) {
     	super();
     	this.distributionTableView = distributionTableView;
     }
@@ -52,6 +55,8 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
     protected void init() {
         boxToggleAbbreviatedLabels.addValueChangeListener(this);
         distStatusSelect.setContainerDataSource(presenter.getDistributionStatusContainer());
+        Object selectedStatus = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_DISTRIBUTION_STATUS);
+        distStatusSelect.setValue(selectedStatus);
 
         okButton.addClickListener(this);
         cancelButton.addClickListener(this);
@@ -68,8 +73,9 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
         mainLayout.setSpacing(true);
 
         //distribution status
-        distStatusSelect = new TwinColSelect("Distribution Status:");
+        distStatusSelect = new ListSelect("Distribution Status:");
         distStatusSelect.setImmediate(false);
+        distStatusSelect.setMultiSelect(true);
         distStatusSelect.setSizeFull();
         distStatusSelect.setWidth("100%");
 
@@ -98,7 +104,7 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 
 	@Override
 	public void valueChange(ValueChangeEvent event) {
-		Property property = event.getProperty();
+		Property<?> property = event.getProperty();
 		if(property==boxToggleAbbreviatedLabels){
 			VaadinSession.getCurrent().setAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS, event.getProperty().getValue());
 		}
@@ -116,5 +122,13 @@ public class SettingsConfigWindow extends AbstractSettingsDialogWindow implement
 			window.close();
 		}
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DistributionStatusSettingsPresenter getPresenter() {
+        return new DistributionStatusSettingsPresenter();
+    }
 
 }

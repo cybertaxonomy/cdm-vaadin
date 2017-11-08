@@ -88,11 +88,7 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     private void checkUserPermissions(Person newValue) {
         boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        cacheField.setEnabled(userCanEdit);
-        firstNameField.setEnabled(userCanEdit);
-        lastNameField.setEnabled(userCanEdit);
-        prefixField.setEnabled(userCanEdit);
-        suffixField.setEnabled(userCanEdit);
+        setEnabled(userCanEdit);
     }
 
     private void setMode(Mode mode){

@@ -1,3 +1,11 @@
+/**
+* Copyright (C) 2017 EDIT
+* European Distributed Institute of Taxonomy
+* http://www.e-taxonomy.eu
+*
+* The contents of this file are subject to the Mozilla Public License Version 1.1
+* See LICENSE.TXT at the top of this package for the full license terms.
+*/
 package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
 
 import java.sql.SQLException;
@@ -11,14 +19,22 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.TransactionStatus;
+
 import com.vaadin.server.VaadinSession;
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.description.DescriptionBase;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.Distribution;
 import eu.etaxonomy.cdm.model.description.Feature;
@@ -28,22 +44,36 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.service.CdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+
+/**
+ * @author freimeier
+ * @since 18.10.2017
+ *
+ */
+@SpringComponent
+@ViewScope
+public class DistributionTablePresenter extends AbstractPresenter<IDistributionTableView> {
+
+	private static final long serialVersionUID = 3313043335587777217L;
+
+    @Autowired
+    private CdmUserHelper userHelper;
+
+    @Autowired
+    @Qualifier("cdmRepository")
+    private CdmRepository repo;
 
 
-public class DistributionTablePresenter {
-
-	private final DistributionTableView view;
-
-	public DistributionTablePresenter(DistributionTableView dtv){
-	    this.view = dtv;
-	    view.addListener(this);
-	}
-
-    public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
+	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
+	    TransactionStatus tx = repo.startTransaction();
+	    taxon = (Taxon)repo.getTaxonService().find(taxon.getUuid());
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
 	    NamedArea namedArea = null;
 	    for(DefinedTermBase term:chosenTerms){
@@ -69,6 +99,7 @@ public class DistributionTablePresenter {
 	    }
 	    if(namedArea==null){
 	    	Notification.show("Error during update of distribution term!");
+	    	repo.commitTransaction(tx);
 	    	return -1;
 	    }
 	    List<Distribution> distributions = getDistributions(taxon);
@@ -87,42 +118,45 @@ public class DistributionTablePresenter {
 			    for (TaxonDescription desc : descriptions) {
 			        // add to first taxon description
 			        desc.addElement(distribution);
-			        CdmSpringContextHelper.getTaxonService().saveOrUpdate(taxon);
+			        repo.commitTransaction(tx);
 			        return 0;
 			    }
 			} else {// there are no TaxonDescription yet.
 			    TaxonDescription taxonDescription = TaxonDescription.NewInstance(taxon);
 			    taxonDescription.addElement(distribution);
-			    taxon.addDescription(taxonDescription);
-			    CdmSpringContextHelper.getTaxonService().saveOrUpdate(taxon);
+			    repo.commitTransaction(tx);
 			    return 0;
 			}
 	    }
 	    else if(comboValue == null){//delete descriptionElementBase
-	    	distribution.getInDescription().removeElement(distribution);
-	    	CdmSpringContextHelper.getTaxonService().saveOrUpdate(taxon);
+	        DescriptionBase<?> desc = distribution.getInDescription();
+	        desc.removeElement(distribution);
+	    	repo.commitTransaction(tx);
             return 1;
 	    }
-	    else{
+	    else{//update distribution
            distribution.setStatus((PresenceAbsenceTerm)comboValue);
-           CdmSpringContextHelper.getTaxonService().saveOrUpdate(taxon);
+           repo.getCommonService().saveOrUpdate(distribution);
+           repo.commitTransaction(tx);
            return 0;
         }
+	    repo.commitTransaction(tx);
 	    return -1;
 	}
 
 	public Set<DefinedTermBase> getChosenTerms() {
 		VaadinSession session = VaadinSession.getCurrent();
-		UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
-		TermVocabulary<DefinedTermBase> term = CdmSpringContextHelper.getVocabularyService().load(termUUID);
-		term = CdmBase.deproxy(term, TermVocabulary.class);
-		return term.getTerms();
+		UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
+//		getConversationHolder().getSession();
+		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
+//		voc = CdmBase.deproxy(voc);
+		return voc.getTerms();
 	}
 
 	public List<String> getAbbreviatedTermList() {
 		Set<NamedArea> terms = getTermSet();
-		List<String> list = new ArrayList<String>();
-		for(DefinedTermBase dtb: terms){
+		List<String> list = new ArrayList<>();
+		for(DefinedTermBase<?> dtb: terms){
 		    for(Representation r : dtb.getRepresentations()){
 		        list.add(r.getAbbreviatedLabel());
 		    }
@@ -140,14 +174,14 @@ public class DistributionTablePresenter {
 
 	private Set<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
-	    UUID termUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_VOCABULARY_UUID);
-	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(termUUID);
+	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
+	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
 	}
 
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
-		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
+		Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
 		List<DescriptionElementBase> listTaxonDescription = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		HashMap<DescriptionElementBase, Distribution> map = null;
 		for(DescriptionElementBase deb : listTaxonDescription){
@@ -170,14 +204,15 @@ public class DistributionTablePresenter {
 	}
 
 	public List<Distribution> getDistributions(Taxon taxon) {
-		Set<Feature> setFeature = new HashSet<Feature>(Arrays.asList(Feature.DISTRIBUTION()));
-		List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
+		Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
+		List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
+		        .listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
 		return listTaxonDescription;
 
 	}
 
 	public List<TaxonNode> getAllNodes(){
-		List<TaxonNode> allNodes = new ArrayList<TaxonNode>();
+		List<TaxonNode> allNodes = new ArrayList<>();
 
 		List<TaxonNode> taxonNodes = getChosenTaxonNodes();
 		for (TaxonNode taxonNode : taxonNodes) {
@@ -208,7 +243,7 @@ public class DistributionTablePresenter {
 	}
 
 	public CdmSQLContainer getSQLContainer() throws SQLException{
-		List<Integer> nodeIds = new ArrayList<Integer>();
+		List<Integer> nodeIds = new ArrayList<>();
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
@@ -217,6 +252,10 @@ public class DistributionTablePresenter {
 			return new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namedAreas));
 		}
 		return null;
+	}
+
+	public PresenceAbsenceTermContainer getPresenceAbsenceTermContainer() {
+	    return PresenceAbsenceTermContainer.getInstance();
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
@@ -238,13 +277,12 @@ public class DistributionTablePresenter {
             "multilanguageText",
             "media",
             "name.$",
-            "name.rank.representations",
-            "name.status.type.representations",
-            "taxon2.name"
+            "name.rank",
+            "name.status.type",
+            "taxon2.name",
     });
 
 	/**Helper Methods*/
-
 	private void sort(List<DescriptionElementBase> list){
 		Collections.sort(list, new Comparator<DescriptionElementBase>() {
 
@@ -261,4 +299,25 @@ public class DistributionTablePresenter {
 			}
 		});
 	}
+
+	/**
+	 *
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void onPresenterReady() {
+	    /*
+         * The area and taxon settings window should only be displayed after login
+         * and only when no classification and areas are chosen yet.
+         */
+	    VaadinSession vaadinSession = VaadinSession.getCurrent();
+	    if(userHelper.userIsAutheticated()
+	            && !userHelper.userIsAnnonymous()
+	            && (vaadinSession.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION) == null
+	            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID) == null
+	            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS) == null)) {
+            getView().openAreaAndTaxonSettings();
+        }
+    }
+
 }

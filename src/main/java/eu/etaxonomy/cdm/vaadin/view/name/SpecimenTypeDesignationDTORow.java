@@ -30,8 +30,8 @@ public class SpecimenTypeDesignationDTORow {
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
      */
-    ListSelect derivationEventType = new ListSelect(); // "Kind of unit");
-    ListSelect typeStatus = new ListSelect(); // "Kind of unit");
+    ListSelect kindOfUnit = new ListSelect(); // "Kind of unit");
+    ListSelect typeStatus = new ListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
     TextField accessionNumber = new TextField(); // "Accession number");
@@ -41,7 +41,7 @@ public class SpecimenTypeDesignationDTORow {
     TextField mediaSpecimenReferenceDetail = new TextField(); //"Image reference detail");
 
     public SpecimenTypeDesignationDTORow(){
-        derivationEventType.setRows(1);
+        kindOfUnit.setRows(1);
         typeStatus.setRows(1);
         accessionNumber.setWidth(100, Unit.PIXELS);
         collection.setWidth(150, Unit.PIXELS);
@@ -55,7 +55,7 @@ public class SpecimenTypeDesignationDTORow {
      */
     public Component[] components() {
         return new Component[]{
-                derivationEventType, typeStatus,
+                kindOfUnit, typeStatus,
                 collection, accessionNumber,
                 mediaUri, mediaSpecimenReference,
                 mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail

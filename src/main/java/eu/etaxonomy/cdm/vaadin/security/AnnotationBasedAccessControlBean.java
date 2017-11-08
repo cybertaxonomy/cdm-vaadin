@@ -42,8 +42,8 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
         // no RequireAuthentication annotation => grant access
 
         if(AccessRestrictedView.class.isAssignableFrom(view.getClass())){
-            AccessRestrictedView resticedView = (AccessRestrictedView)view;
-            if(resticedView.allowAnonymousAccess()){
+            AccessRestrictedView restricedView = (AccessRestrictedView)view;
+            if(restricedView.allowAnonymousAccess()){
                 if(logger.isTraceEnabled()){
                     logger.trace("anonymous access to " + view.getClass().getName() + " allowed");
                 }
@@ -60,6 +60,7 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
                 if(logger.isTraceEnabled()){
                     logger.trace("denying access to " + view.getClass().getName());
                 }
+                restricedView.releaseResourcesOnAccessDenied();
                 return false;
                 // FIMXE implement further checks
                 // TODO use the UserHelperBean?

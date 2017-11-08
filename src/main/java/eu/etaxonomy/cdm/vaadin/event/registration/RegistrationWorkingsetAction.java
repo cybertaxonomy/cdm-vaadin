@@ -13,7 +13,7 @@ package eu.etaxonomy.cdm.vaadin.event.registration;
  * @since Mar 3, 2017
  *
  */
-public class RegistrationWorkflowEvent {
+public class RegistrationWorkingsetAction {
 
     private Action action;
     private Integer citationID = null;
@@ -23,7 +23,7 @@ public class RegistrationWorkflowEvent {
      * @param citationID the id of a {@link Reference} denoting a
      * complete registration working set.
      */
-    public RegistrationWorkflowEvent(int citationID, Action action){
+    public RegistrationWorkingsetAction(int citationID, Action action){
         this.action = action;
         this.citationID = citationID;
     }

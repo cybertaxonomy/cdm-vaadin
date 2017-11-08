@@ -24,6 +24,8 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -43,7 +45,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     ReferencePopupEditor inReferencePopup = null;
 
     public ReferenceEditorPresenter() {
-        
+
     }
 
     /**
@@ -93,20 +95,51 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                     return page.getCount().intValue();
                 }}
             , 20);
+
+        getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Reference loadBeanById(Object identifier) {
+    protected Reference loadCdmEntityById(Integer identifier) {
+
+        List<String> initStrategy = Arrays.asList(new String []{
+
+                "$",
+
+                }
+        );
+
         Reference reference;
         if(identifier != null){
-            reference = getRepo().getReferenceService().find((Integer)identifier);
+            reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
             reference = ReferenceFactory.newGeneric();
         }
         return reference;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Reference.class, identifier, crud, null);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Reference bean) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+        }
     }
 
     /**

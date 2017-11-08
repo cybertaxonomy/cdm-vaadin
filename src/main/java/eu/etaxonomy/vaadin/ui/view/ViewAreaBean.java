@@ -4,12 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 
+import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 
 /**
@@ -21,27 +23,34 @@ import eu.etaxonomy.vaadin.ui.MainMenu;
  * @author Andreas Kohlbecker - ported to Spring
  */
 
-@SpringComponent
+@SpringComponent("viewAreaBean")
 @UIScope
-class ViewAreaBean extends HorizontalLayout implements ViewDisplay {
+class ViewAreaBean extends HorizontalLayout implements ViewDisplay, ToolbarDisplay {
 
     private static final long serialVersionUID = -3763800167385449693L;
 
 	private MainMenu mainMenu;
 
-	private CssLayout contentArea;
+	private Component toolbar = null;
 
-	public ViewAreaBean() {
-		setSizeFull();
+	// private VerticalLayout contentArea;
 
-		contentArea = new CssLayout();
-		contentArea.setPrimaryStyleName("valo-content");
-		contentArea.addStyleName("v-scrollable");
-		contentArea.setSizeFull();
+	private VerticalLayout mainArea;
 
-		addComponent(contentArea);
-		setExpandRatio(contentArea, 1);
-	}
+	private Component currentViewComponent = null;
+
+    public ViewAreaBean() {
+
+        setSizeFull();
+
+        mainArea = new VerticalLayout();
+        mainArea.setPrimaryStyleName("valo-toolbar");
+        mainArea.setSizeFull();
+        mainArea.setMargin(new MarginInfo(false, false, true, false));
+
+        addComponent(mainArea);
+        setExpandRatio(mainArea, 1);
+    }
 
 	@Autowired
 	public void setMainMenu(MainMenu mainMenu) {
@@ -49,24 +58,23 @@ class ViewAreaBean extends HorizontalLayout implements ViewDisplay {
 	    addComponentAsFirst(this.mainMenu.asComponent());
 	}
 
-// TODO was this needed to avoid bean loading problems? Otherwise remove it
-//	private MainMenu mainMenuInstantiator;
-//	@PostConstruct
-//	protected void initialize() {
-//		if (mainMenuInstantiator.isAmbiguous()) {
-//			throw new RuntimeException("Ambiguous main menu implementations available, please refine your deployment");
-//		}
-//
-//		if (!mainMenuInstantiator.isUnsatisfied()) {
-//			mainMenu = mainMenuInstantiator.get();
-//			addComponentAsFirst(mainMenu.asComponent());
-//		}
-//	}
+
+    @Override
+    public void setToolbar(Toolbar toolbar) {
+        toolbar.initialize();
+        this.toolbar = toolbar.asComponent();
+        this.toolbar.setPrimaryStyleName("valo-navigation-bar");
+        mainArea.addComponentAsFirst(this.toolbar);
+    }
 
 	@Override
 	public void showView(View view) {
-		contentArea.removeAllComponents();
-		contentArea.addComponent(Component.class.cast(view));
+	    if(currentViewComponent != null){
+	        mainArea.removeComponent(currentViewComponent);
+	    }
+	    currentViewComponent = Component.class.cast(view);
+	    mainArea.addComponent(currentViewComponent);
+	    mainArea.setExpandRatio(Component.class.cast(view), 1);
 	}
 
 }

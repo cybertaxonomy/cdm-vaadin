@@ -8,15 +8,18 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.hibernate.Session;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -31,18 +34,24 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.service.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
+import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
+import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -61,6 +70,19 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private Reference citation;
 
     private TaxonName typifiedName;
+
+    /**
+     * This object for this field will either be injected by the {@link PopupEditorFactory} or by a Spring
+     * {@link BeanFactory}
+     */
+    @Autowired
+    private IRegistrationWorkingSetService registrationWorkingSetService;
+
+    /**
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * granted to the current use as long this grant is not assigned yet.
+     */
+    private EnumSet<CRUD> crud = null;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -86,21 +108,27 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         SpecimenTypeDesignationWorkingSetDTO workingSetDto;
         if(identifier != null){
+
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
-            Registration reg = getRepo().getRegistrationService().loadByIds(Arrays.asList(idset.registrationId), null).get(0);
+
             if(idset.workingsetId != null){
-                RegistrationDTO regDTO = new RegistrationDTO(reg);
+                RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
                 // find the working set
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
                 workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
                 citation = (Reference) regDTO.getCitation();
+                workingSetDto = fixMissingFieldUnit(workingSetDto);
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 FieldUnit newfieldUnit = FieldUnit.NewInstance();
+                Registration reg = getRepo().getRegistrationService().load(idset.registrationId,
+                        RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
+                //TODO checkif passing reg as owner parameter is needed at all
                 workingSetDto = new SpecimenTypeDesignationWorkingSetDTO(reg, newfieldUnit, null);
                 citation = getRepo().getReferenceService().find(idset.publicationId);
                 typifiedName = getRepo().getNameService().find(idset.typifiedNameId);
             }
+
         } else {
             workingSetDto = null;
         }
@@ -120,21 +148,21 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
-            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
+            CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService());
 
-            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), SpecimenTypeDesignationWorkingsetEditorPresenter.this);
+            CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
 
             @Override
             public SpecimenTypeDesignationDTORow create() {
 
                 SpecimenTypeDesignationDTORow row = new SpecimenTypeDesignationDTORow();
 
-                row.derivationEventType.setContainerDataSource(selectFactory.buildTermItemContainer(
-                        RegistrationTermLists.DERIVATION_EVENT_TYPE_UUIDS())
+                row.kindOfUnit.setContainerDataSource(selectFactory.buildTermItemContainer(
+                        RegistrationTermLists.KIND_OF_UNIT_TERM_UUIDS())
                         );
-                row.derivationEventType.setNullSelectionAllowed(false);
+                row.kindOfUnit.setNullSelectionAllowed(false);
 
-                row.derivationEventType.addValueChangeListener(e -> {
+                row.kindOfUnit.addValueChangeListener(e -> {
                     SpecimenTypeDesignationDTORow currentRow = row;
                     updateRowItemEnablement(currentRow);
                 });
@@ -151,6 +179,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider.getPageSize()
                         );
                 row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
+                row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
@@ -158,6 +187,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider.getPageSize()
                         );
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+                row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
 
                 getView().applyDefaultComponentStyle(row.components());
 
@@ -168,10 +198,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             private void updateRowItemEnablement(SpecimenTypeDesignationDTORow row) {
 
-                DerivationEventType derivationEventType = (DerivationEventType)row.derivationEventType.getValue();
+                DefinedTerm kindOfUnit = (DefinedTerm)row.kindOfUnit.getValue();
 
-                boolean publishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.PUBLISHED_IMAGE());
-                boolean unPublishedImageType = derivationEventType != null && derivationEventType.equals(DerivationEventTypes.UNPUBLISHED_IMAGE());
+                boolean publishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.PUBLISHED_IMAGE());
+                boolean unPublishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE());
 
                 row.mediaSpecimenReference.setEnabled(publishedImageType);
                 row.mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
@@ -181,13 +211,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         });
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * see also {@link SpecimenTypeDesignationWorkingsetPopupEditor#showInEditor()}
-     */
-    @Override
-    protected SpecimenTypeDesignationWorkingSetDTO prepareAsFieldGroupDataSource(SpecimenTypeDesignationWorkingSetDTO bean) {
+
+    private SpecimenTypeDesignationWorkingSetDTO fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO bean) {
 
         if(bean.getFieldUnit() == null){
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
@@ -222,7 +247,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 throw new RuntimeException("Usupported owner type " + bean.getOwner().getClass() + ", needs to be implemented.");
             }
         }
-        return super.prepareAsFieldGroupDataSource(bean);
+        return bean;
     }
 
 
@@ -262,6 +287,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             }
         }
         addCandidates.forEach(std -> reg.addTypeDesignation(std));
+
+
+        if(crud != null){
+            UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
+        }
 
         getStore().saveBean(reg);
     }
@@ -303,6 +333,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             }
         }
         return original;
+    }
+
+
+    /**
+     * @param crud
+     */
+    public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
+        this.crud = crud;
+
     }
 
 

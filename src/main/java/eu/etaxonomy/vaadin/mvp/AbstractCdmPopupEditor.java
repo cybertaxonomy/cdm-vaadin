@@ -10,6 +10,7 @@ package eu.etaxonomy.vaadin.mvp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 
 import com.vaadin.server.FontAwesome;
@@ -21,14 +22,16 @@ import com.vaadin.ui.Layout.MarginHandler;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 
 /**
  * @author a.kohlbecker
  * @since May 5, 2017
  *
  */
-public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
-    extends AbstractPopupEditor<DTO, P> {
+public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends AbstractCdmEditorPresenter<DTO, ? extends ApplicationView>>
+    extends AbstractPopupEditor<DTO, P> implements PerEntityAuthorityGrantingEditor {
 
     private static final long serialVersionUID = -5025937489746256070L;
 
@@ -87,6 +90,12 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
 
     public void registerAdvancedModeComponents(Component ... c){
         advancedModeComponents.addAll(Arrays.asList(c));
+    }
+
+
+    @Override
+    public void grantToCurrentUser(EnumSet<CRUD> crud){
+        getPresenter().setGrantsForCurrentUser(crud);
     }
 
 }

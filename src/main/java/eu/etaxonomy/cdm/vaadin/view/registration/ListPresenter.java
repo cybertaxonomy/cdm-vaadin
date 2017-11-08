@@ -52,7 +52,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      * @return the workingSetService
      */
     public IRegistrationWorkingSetService getWorkingSetService() {
-        ensureBoundConversation();
         return workingSetService;
     }
 

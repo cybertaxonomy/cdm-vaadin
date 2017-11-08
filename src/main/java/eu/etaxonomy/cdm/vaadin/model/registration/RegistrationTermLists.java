@@ -13,9 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
-import eu.etaxonomy.cdm.model.occurrence.DerivationEventType;
 /**
  * @author a.kohlbecker
  * @since Jun 23, 2017
@@ -23,11 +23,11 @@ import eu.etaxonomy.cdm.model.occurrence.DerivationEventType;
  */
 public class RegistrationTermLists {
 
-    public static final List<DerivationEventType> DERIVATION_EVENT_TYPE = Arrays.asList(new DerivationEventType[]{
-            DerivationEventType.GATHERING_IN_SITU(),
-            DerivationEventTypes.UNPUBLISHED_IMAGE(),
-            DerivationEventTypes.PUBLISHED_IMAGE(),
-            DerivationEventTypes.CULTURE_METABOLIC_INACTIVE()
+    public static final List<DefinedTerm> KIND_OF_UNIT_TERMS = Arrays.asList(new DefinedTerm[]{
+            KindOfUnitTerms.SPECIMEN(),
+            KindOfUnitTerms.UNPUBLISHED_IMAGE(),
+            KindOfUnitTerms.PUBLISHED_IMAGE(),
+            KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE()
         });
 
     public static final List<SpecimenTypeDesignationStatus> SPECIMEN_TYPE_DESIGNATION_STATUS = Arrays.asList(new SpecimenTypeDesignationStatus[]{
@@ -56,15 +56,15 @@ public class RegistrationTermLists {
 
     public static final List<NameTypeDesignationStatus> NAME_TYPE_DESIGNATION_STATUS = Arrays.asList(new NameTypeDesignationStatus[]{
             NameTypeDesignationStatus.LECTOTYPE()
-            // TODO add morem see https://dev.e-taxonomy.eu/redmine/issues/6193
+            // TODO add more see https://dev.e-taxonomy.eu/redmine/issues/6193
     });
 
 
 
 
-    public static List<UUID> DERIVATION_EVENT_TYPE_UUIDS(){
+    public static List<UUID> KIND_OF_UNIT_TERM_UUIDS(){
         List<UUID> uuids = new ArrayList<>();
-        DERIVATION_EVENT_TYPE.forEach(t -> uuids.add(t.getUuid()));
+        KIND_OF_UNIT_TERMS.forEach(t -> uuids.add(t.getUuid()));
         return uuids;
     }
 

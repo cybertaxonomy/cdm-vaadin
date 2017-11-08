@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.dataInserter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.Partial;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -38,13 +40,18 @@ import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
+import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
-import eu.etaxonomy.cdm.vaadin.model.registration.DerivationEventTypes;
+import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 
 /**
@@ -58,9 +65,12 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
 
-//    protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
+    protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
 
     protected static final UUID GROUP_CURATOR_UUID = UUID.fromString("135210d3-3db7-4a81-ab36-240444637d45");
+
+    private static final EnumSet<CRUD> CREATE_READ = EnumSet.of(CRUD.CREATE, CRUD.READ);
+    private static final EnumSet<CRUD> CREATE_READ_UPDATE_DELETE = EnumSet.of(CRUD.CREATE, CRUD.READ, CRUD.UPDATE, CRUD.DELETE);
 
     private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
@@ -117,22 +127,49 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             groupCurator.setUuid(GROUP_CURATOR_UUID);
             groupCurator.setName("Curator");
         }
-        assureGroupHas(groupCurator, "REGISTRATION[CREATE,READ,UPDATE,DELETE]");
+        assureGroupHas(groupCurator, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ_UPDATE_DELETE).toString());
         repo.getGroupService().saveOrUpdate(groupCurator);
 
-        Group groupEditor = repo.getGroupService().load(Group.GROUP_EDITOR_UUID, Arrays.asList("grantedAuthorities"));
-        assureGroupHas(groupEditor, "REGISTRATION[CREATE,READ]");
-        repo.getGroupService().saveOrUpdate(groupEditor);
+        Group groupSubmitter = repo.getGroupService().load(GROUP_SUBMITTER_UUID, Arrays.asList("grantedAuthorities"));
+        if(groupSubmitter == null){
+            groupSubmitter = Group.NewInstance();
+            groupSubmitter.setUuid(GROUP_SUBMITTER_UUID);
+            groupSubmitter.setName("Submitter");
+        }
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TAXONNAME, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TEAMORPERSONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
+        repo.getGroupService().saveOrUpdate(groupSubmitter);
 
-        if(repo.getTermService().find(DerivationEventTypes.PUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(DerivationEventTypes.PUBLISHED_IMAGE());
+        if(repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid()) == null){
+            repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
         }
-        if(repo.getTermService().find(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(DerivationEventTypes.UNPUBLISHED_IMAGE());
+        if(repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid()) == null){
+            repo.getTermService().save(KindOfUnitTerms.PUBLISHED_IMAGE());
         }
-        if(repo.getTermService().find(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid()) == null){
-            repo.getTermService().save(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE());
+        if(repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid()) == null){
+            repo.getTermService().save(KindOfUnitTerms.UNPUBLISHED_IMAGE());
         }
+        if(repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid()) == null){
+            repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
+        }
+
+        // --- remove after release 4.12.0 ------------------------------------------------------
+        // delete old DerivationEventTypes terms which are no longer used, see #7059
+        // UUID_PUBLISHED_IMAGE = UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3");
+        // UUID UUID_UNPUBLISHED_IMAGE = UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890");
+        // UUID UUID_CULTURE_METABOLIC_INACTIVE = UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2");
+        for(UUID uuid : new UUID[]{
+                UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3"),
+                UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890"),
+                UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2")}){
+            if(repo.getTermService().find(uuid) != null){
+                repo.getTermService().delete(uuid);
+            }
+        }
+        // --------------------------------------------------------------------------------------
+
         repo.getSession().flush();
 
     }
@@ -258,15 +295,58 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         reg.setIdentifier("http://phycobank.org/" + iaptData.getRegId());
                         reg.setSpecificIdentifier(iaptData.getRegId().toString());
                         reg.setInstitution(getInstitution(iaptData.getOffice()));
-                        reg.setName(name);
+
+                        boolean isPhycobankID = false; // Integer.valueOf(reg.getSpecificIdentifier()) >= 100000;
+
+                        Partial youngestDate = null;
+                        Reference youngestPub = null;
+
+                        // find youngest publication
+
+                        // NOTE:
+                        // data imported from IAPT does not have typedesignation citations and sometimes no nomref
+
+                        if(isPhycobankID){
+                            youngestPub = (Reference) name.getNomenclaturalReference();
+                            youngestDate = partial(youngestPub.getDatePublished());
+
+                            if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
+                                for(TypeDesignationBase td : name.getTypeDesignations()){
+                                    if(td.getCitation() == null){
+                                        continue;
+                                    }
+                                    Partial pubdate = partial(td.getCitation().getDatePublished());
+                                        if(youngestDate.compareTo(pubdate) < 0){
+                                            youngestDate = pubdate;
+                                            youngestPub = td.getCitation();
+                                        }
+                                }
+                            }
+                        }
+
+                        if((isPhycobankID && youngestPub == name.getNomenclaturalReference()) || !isPhycobankID) {
+                            reg.setName(name);
+                        } else {
+                            logger.debug("skipping name published in older referece");
+                        }
                         if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
                             // do not add the collection directly to avoid "Found shared references to a collection" problem
                             HashSet<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
-                            typeDesignations.addAll(name.getTypeDesignations());
+                            for(TypeDesignationBase td : name.getTypeDesignations()){
+                                if(td.getCitation() == null && isPhycobankID){
+                                    logger.error("Missing TypeDesignation Citation in Phycobank data");
+                                    continue;
+                                }
+                                if((isPhycobankID && youngestPub == td.getCitation()) || !isPhycobankID){
+                                    typeDesignations.add(td);
+                                } else {
+                                    logger.debug("skipping typedesignation published in older reference");
+                                }
+                            }
                             reg.setTypeDesignations(typeDesignations);
                         }
                         reg.setRegistrationDate(regDate);
-                        logger.debug("IAPT Registraion for " + name.getTitleCache());
+                        logger.debug("IAPT Registration for " + name.getTitleCache());
                         newRegs.add(reg);
 
                     } catch (JsonParseException e) {
@@ -285,6 +365,22 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             }
             repo.commitTransaction(tx);
         }
+    }
+
+
+    /**
+     * @param datePublished
+     * @return
+     */
+    private Partial partial(TimePeriod datePublished) {
+        if(datePublished != null){
+            if(datePublished.getEnd() != null){
+                return datePublished.getEnd();
+            } else {
+                return datePublished.getStart();
+            }
+        }
+        return null;
     }
 
 

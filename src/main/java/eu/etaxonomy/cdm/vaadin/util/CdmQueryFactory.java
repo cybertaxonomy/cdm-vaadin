@@ -96,7 +96,7 @@ public class CdmQueryFactory {
 			}
 		}
         String FROM_QUERY =
-                "FROM TaxonName n "
+                " FROM TaxonName n "
                 + "INNER JOIN TaxonBase tb on n.id = tb.name_id and tb.DTYPE='Taxon' " + // # name<->taxon
         "INNER JOIN TaxonNode tn on tn.taxon_id = tb.id "+
         "INNER JOIN DefinedTermBase rank on n.rank_id = rank.id "+// # rank <-> name
@@ -105,7 +105,7 @@ public class CdmQueryFactory {
         "LEFT OUTER JOIN DefinedTermBase statusTerm on statusTerm.id = descrEl.status_id "+
         "LEFT OUTER JOIN DefinedTermBase area on area.id = descrEl.area_id ";
         if(CdmUtils.isNotBlank(idString)){
-        	FROM_QUERY += "WHERE tn.id IN ("+ idString +") ";
+        	FROM_QUERY += " WHERE tn.id IN ("+ idString +") ";
         }
 
         String GROUP_BY = " GROUP BY tb.uuid, tn.id ";

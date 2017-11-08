@@ -241,6 +241,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 3, row, 3, row);
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
 
+
         // Basionym
         row++;
         basionymCombobox = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Basionym");

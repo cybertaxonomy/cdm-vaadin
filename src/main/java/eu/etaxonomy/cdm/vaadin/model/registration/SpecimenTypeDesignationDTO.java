@@ -16,6 +16,7 @@ import org.apache.commons.collections.CollectionUtils;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
 import eu.etaxonomy.cdm.model.media.Media;
 import eu.etaxonomy.cdm.model.media.MediaRepresentation;
@@ -88,15 +89,15 @@ public class SpecimenTypeDesignationDTO {
         }
     }
 
-    public DerivationEventType getDerivationEventType(){
-        return std.getTypeSpecimen().getDerivedFrom().getType();
+    public DefinedTerm getKindOfUnit(){
+        return std.getTypeSpecimen().getKindOfUnit();
     }
 
-    public void setDerivationEventType(DerivationEventType derivationEventType) throws DerivedUnitConversionException{
+    public void setKindOfUnit(DefinedTerm kindOfUnit) throws DerivedUnitConversionException{
 
-        std.getTypeSpecimen().getDerivedFrom().setType(derivationEventType);
+        std.getTypeSpecimen().setKindOfUnit(kindOfUnit);
 
-        Class<? extends DerivedUnit> requiredSpecimenType = specimenTypeFor(derivationEventType);
+        Class<? extends DerivedUnit> requiredSpecimenType = specimenTypeFor(kindOfUnit);
 
         if(!requiredSpecimenType.equals(std.getTypeSpecimen())){
 
@@ -104,10 +105,10 @@ public class SpecimenTypeDesignationDTO {
 
             if(requiredSpecimenType.equals(MediaSpecimen.class)){
                 DerivedUnitConverter<MediaSpecimen> converter = new DerivedUnitConverter<MediaSpecimen> (std.getTypeSpecimen());
-                convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, specimenOrObservationTypeFor(derivationEventType));
+                convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, specimenOrObservationTypeFor(kindOfUnit));
             } else {
                 DerivedUnitConverter<DerivedUnit> converter = new DerivedUnitConverter<DerivedUnit> (std.getTypeSpecimen());
-                convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, specimenOrObservationTypeFor(derivationEventType));
+                convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, specimenOrObservationTypeFor(kindOfUnit));
             }
 
             std.setTypeSpecimen(convertedSpecimen);
@@ -118,43 +119,43 @@ public class SpecimenTypeDesignationDTO {
     /**
      * See constructor doc.
      *
-     * @param derivationEventType
+     * @param kindOfUnit
      * @return
      *      either <code>DerivedUnit</code> or <code>MediaSpecimen</code> never null.
      *  <code>DerivedUnit</code> is the fall back return value.
      */
-    private Class<?  extends DerivedUnit> specimenTypeFor(DerivationEventType derivationEventType) {
+    private Class<?  extends DerivedUnit> specimenTypeFor(DefinedTerm derivationEventType) {
         UUID detUuid = derivationEventType.getUuid();
 
-        if(detUuid.equals(DerivationEventType.GATHERING_IN_SITU().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.SPECIMEN().getUuid())) {
             return DerivedUnit.class;
         }
-        if(detUuid.equals(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid())) {
             return DerivedUnit.class;
         }
-        if(detUuid.equals(DerivationEventTypes.PUBLISHED_IMAGE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid())) {
             return MediaSpecimen.class;
         }
-        if(detUuid.equals(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid())) {
             return MediaSpecimen.class;
         }
         return DerivedUnit.class;
     }
 
-    private SpecimenOrObservationType specimenOrObservationTypeFor(DerivationEventType derivationEventType) {
+    private SpecimenOrObservationType specimenOrObservationTypeFor(DefinedTerm derivationEventType) {
 
         UUID detUuid = derivationEventType.getUuid();
 
-        if(detUuid.equals(DerivationEventType.GATHERING_IN_SITU().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.SPECIMEN().getUuid())) {
             return SpecimenOrObservationType.PreservedSpecimen;
         }
-        if(detUuid.equals(DerivationEventTypes.CULTURE_METABOLIC_INACTIVE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid())) {
             return SpecimenOrObservationType.LivingSpecimen;
         }
-        if(detUuid.equals(DerivationEventTypes.PUBLISHED_IMAGE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid())) {
             return SpecimenOrObservationType.StillImage;
         }
-        if(detUuid.equals(DerivationEventTypes.UNPUBLISHED_IMAGE().getUuid())) {
+        if(detUuid.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid())) {
             return SpecimenOrObservationType.StillImage;
         }
        return SpecimenOrObservationType.PreservedSpecimen;

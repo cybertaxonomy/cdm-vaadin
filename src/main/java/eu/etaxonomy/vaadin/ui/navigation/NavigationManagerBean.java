@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,6 +23,7 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -37,7 +39,11 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	private final static Logger logger = Logger.getLogger(NavigationManagerBean.class);
 
-	@Autowired
+	// injecting the viewDisplay as spring bean causes problems with older cdm vaadin code
+	// SingleComponentContainerViewDisplay for example can't be used
+	// the viewDisplay should be configurable per UI therefore it seems more elegant to
+	// let the UI pass the viewDisplay to the Navigator
+//	@Autowired
 	private ViewDisplay viewDisplay;
 
 	@Autowired
@@ -52,19 +58,28 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Autowired
 	private PopupEditorFactory popupEditorFactory;
 
+	/**
+	 * This reference will cause the scoped UserHelper being initialized
+	 * It is not used in this class but attaches itself to the vaadin session
+	 * from where it will be accessible via UserHelper.fromSession()
+	 */
 	@Autowired
     private UserHelper userHelper;
 
+    /**
+     * This reference will cause the scoped PermissionDebugUtils being initialized.
+     * It is not used in this class but attaches itself to the vaadin session
+     * from where it will be accessible via UserHelper.fromSession()
+     *
+     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
+     * See
+     */
+    @Autowired(required=false)
+    private PermissionDebugUtils permissionDebugUtils;
+
 	private Map<PopupView, Window> popupMap;
 
-	public NavigationManagerBean() {
-		popupMap = new HashMap<>();
-	}
-
-
-    private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
-        return popupEditorFactory.newPopupView(popupViewClass);
-    }
+	private String defaultViewName = null;
 
     /*
      * Why UriFragmentManager must be initialized lazily:
@@ -86,6 +101,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@Autowired
 	ApplicationEventPublisher eventBus;
 
+
+	public NavigationManagerBean() {
+	    popupMap = new HashMap<>();
+	}
+
+
+	private <P extends PopupView> PopupView findPopupView(Class<P> popupViewClass){
+	    return popupEditorFactory.newPopupView(popupViewClass);
+	}
+
 	@EventListener
 	protected void onUIInitialized(UIInitializedEvent e) {
 		init(UI.getCurrent(), uriFragmentManager, viewDisplay);
@@ -93,6 +118,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
+	    if(StringUtils.isEmpty(navigationState)){
+            navigationState = defaultViewName;
+        }
 		if (fireNavigationEvent) {
 			navigateTo(navigationState);
 		} else {
@@ -102,6 +130,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public void navigateTo(String navigationState) {
+	    if(StringUtils.isEmpty(navigationState)){
+	        navigationState = defaultViewName;
+	    }
 		super.navigateTo(navigationState);
 		//eventBus.publishEvent(new NavigationEvent(navigationState));
 	}
@@ -179,10 +210,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
      *
      * @return the current view name or <code>null</code>
      */
+    @Override
     public String getCurrentViewName() {
-        SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
-        if(springViewAnnotation != null){
-            return springViewAnnotation.name();
+        if(getCurrentView() != null){
+            SpringView springViewAnnotation = getCurrentView().getClass().getAnnotation(SpringView.class);
+            if(springViewAnnotation != null){
+                return springViewAnnotation.name();
+            }
         }
         return null;
     }
@@ -205,5 +239,25 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     public List<AbstractEditorPresenter<?, ?>> getPopupEditorPresenters() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+
+    /**
+     * @return the defaultViewName
+     */
+    public String getDefaultViewName() {
+        return defaultViewName;
+    }
+
+
+    /**
+     * @param defaultViewName the defaultViewName to set
+     */
+    public void setDefaultViewName(String defaultViewName) {
+        this.defaultViewName = defaultViewName;
+    }
+
+    public void setViewDisplay(ViewDisplay viewDisplay){
+        this.viewDisplay = viewDisplay;
     }
 }

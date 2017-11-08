@@ -8,12 +8,16 @@
 */
 package eu.etaxonomy.cdm.vaadin.security;
 
+import java.util.EnumSet;
+
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 
 /**
- * UserHelper interface. Imeplemtations should use the {@link #VADDIN_SESSION_KEY} to auto registers
+ * UserHelper interface. Implementations should use the {@link #VADDIN_SESSION_KEY} to auto registers
  * in the VaadinSession.
  *
  * @author a.kohlbecker
@@ -49,6 +53,58 @@ public interface UserHelper {
     boolean userIsAnnonymous();
 
     boolean userIsAutheticated();
+
+    /**
+     *
+     * @param username
+     * @param cdmEntity
+     * @param crud
+     * @param property
+     * @return the newly created CdmAuthority only if a new CdmAuthority has been added to the user otherwise
+     * <code>null</code> in case the operation failed of if the user was already granted with this authority.
+     */
+    public CdmAuthority createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property);
+
+    /**
+     *
+     * @param username
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     * @param property
+     * @return the newly created CdmAuthority only if a new CdmAuthority has been added to the user otherwise
+     * <code>null</code> in case the operation failed of if the user was already granted with this authority.
+     */
+    public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property);
+
+    /**
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     * @return the newly created CdmAuthority only if a new CdmAuthority has been added to the user otherwise
+     * <code>null</code> in case the operation failed of if the user was already granted with this authority.
+     */
+    public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property);
+
+    /**
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     * @return the newly created CdmAuthority only if a new CdmAuthority has been added to the user otherwise
+     * <code>null</code> in case the operation failed of if the user was already granted with this authority.
+     */
+    public CdmAuthority createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property);
+
+    /**
+     * @param newAuthority
+     */
+    public void removeAuthorityForCurrentUser(CdmAuthority newAuthority);
+
+    /**
+     * @param username
+     * @param newAuthority
+     */
+    public void removeAuthorityForCurrentUser(String username, CdmAuthority newAuthority);
 
 
 }

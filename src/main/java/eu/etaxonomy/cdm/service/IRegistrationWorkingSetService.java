@@ -35,13 +35,6 @@ public interface IRegistrationWorkingSetService {
     public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus);
 
     /**
-     * @param  id the CDM Entity id
-     * @return
-     * @throws RegistrationValidationException
-     */
-    public RegistrationWorkingSet loadWorkingSetByCitationID(Integer id) throws RegistrationValidationException;
-
-    /**
      * @param referenceID
      * @return
      */

@@ -10,18 +10,29 @@ package eu.etaxonomy.cdm.service;
 
 import java.util.EnumSet;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
+import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
+import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.application.RunAsAuthenticator;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthorityParsingException;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.ICdmPermissionEvaluator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
@@ -36,11 +47,25 @@ import eu.etaxonomy.cdm.vaadin.security.VaadinUserHelper;
 @UIScope
 public class CdmUserHelper extends VaadinUserHelper {
 
+    public static final Logger logger = Logger.getLogger(CdmUserHelper.class);
+
     @Autowired
     private ICdmPermissionEvaluator permissionEvaluator;
 
+    @Autowired
+    @Qualifier("cdmRepository")
+    private CdmRepository repo;
+
+    @Autowired
+    @Qualifier("runAsAuthenticationProvider")
+    AuthenticationProvider runAsAuthenticationProvider;
+
+    RunAsAuthenticator runAsAutheticator = new RunAsAuthenticator();
+
     public CdmUserHelper(){
         super();
+        runAsAutheticator.setRunAsAuthenticationProvider(runAsAuthenticationProvider);
+
     }
 
     @Override
@@ -98,7 +123,7 @@ public class CdmUserHelper extends VaadinUserHelper {
     public boolean userHasPermission(CdmBase entity, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
-        return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
         }
@@ -109,7 +134,8 @@ public class CdmUserHelper extends VaadinUserHelper {
     public boolean userHasPermission(Class<? extends CdmBase> cdmType, Integer entitiyId, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
-            return permissionEvaluator.hasPermission(getAuthentication(), cdmType, entitiyId.toString(), crudSet);
+            CdmBase entity = repo.getCommonService().find(cdmType, entitiyId);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
         }
@@ -125,6 +151,12 @@ public class CdmUserHelper extends VaadinUserHelper {
             //IGNORE
         }
         return false;
+    }
+
+    public void logout() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(null);
+        SecurityContextHolder.clearContext();
     }
 
 
@@ -155,6 +187,101 @@ public class CdmUserHelper extends VaadinUserHelper {
      */
     private Authentication getAuthentication() {
         return currentSecurityContext().getAuthentication();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     */
+    @Override
+    public CdmAuthority createAuthorityFor(String username, CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+
+        TransactionStatus txStatus = repo.startTransaction();
+        UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
+        boolean newAuthorityAdded = false;
+        CdmAuthority authority = null;
+        if(userDetails != null){
+            runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
+            User user = (User)userDetails;
+            authority = new CdmAuthority(cdmEntity, property, crud);
+            try {
+                newAuthorityAdded = user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
+            } catch (CdmAuthorityParsingException e) {
+                throw new RuntimeException(e);
+            }
+            repo.getSession().flush();
+            runAsAutheticator.restoreAuthentication();
+            logger.debug("new authority for " + username + ": " + authority.toString());
+            Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            logger.debug("security context refreshed with user " + username);
+        }
+        repo.commitTransaction(txStatus);
+        return newAuthorityAdded ? authority : null;
+
+    }
+
+    /**
+     * @param username
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
+
+        CdmBase cdmEntity = repo.getCommonService().find(cdmType, entitiyId);
+        return createAuthorityFor(username, cdmEntity, crud, property);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CdmAuthority createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmEntity, crud, property);
+
+    }
+
+    /**
+     * @param cdmType
+     * @param entitiyId
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAuthorityForCurrentUser(CdmAuthority cdmAuthority) {
+        removeAuthorityForCurrentUser(userName(), cdmAuthority);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeAuthorityForCurrentUser(String username, CdmAuthority cdmAuthority) {
+
+        UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
+        if(userDetails != null){
+            runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
+            User user = (User)userDetails;
+            user.getGrantedAuthorities().remove(cdmAuthority);
+            repo.getSession().flush();
+            runAsAutheticator.restoreAuthentication();
+            Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            logger.debug("security context refreshed with user " + username);
+        }
+
     }
 
 }

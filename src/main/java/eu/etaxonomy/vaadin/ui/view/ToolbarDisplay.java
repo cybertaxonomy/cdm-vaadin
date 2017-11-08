@@ -6,18 +6,17 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.server;
+package eu.etaxonomy.vaadin.ui.view;
 
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
+import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 
 /**
  * @author a.kohlbecker
- * @since Jul 4, 2017
+ * @since Sep 28, 2017
  *
  */
-public interface RequestEndListener {
+public interface ToolbarDisplay {
 
-    public void onRequestEnd(VaadinRequest request, VaadinSession session);
+    void setToolbar(Toolbar toolbar);
 
 }

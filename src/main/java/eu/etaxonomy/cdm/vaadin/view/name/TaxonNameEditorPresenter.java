@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,8 @@ import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
@@ -48,30 +51,72 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService(), TaxonNameEditorPresenter.this);
+        CdmFilterablePagingProvider<Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference>(getRepo().getReferenceService());
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
 
 
         getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService(), TaxonNameEditorPresenter.this);
+        CdmFilterablePagingProvider<TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName>(getRepo().getNameService());
         getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
     }
-
-
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected TaxonName loadBeanById(Object identifier) {
+    protected TaxonName loadCdmEntityById(Integer identifier) {
+
+        List<String> initStrategy = Arrays.asList(new String []{
+
+                "$",
+                "rank.vocabulary", // needed for comparing ranks
+
+                "nomenclaturalReference.authorship",
+                "nomenclaturalReference.inReference",
+
+                "status.type",
+
+                "combinationAuthorship",
+                "exCombinationAuthorship",
+                "basionymAuthorship",
+                "exBasionymAuthorship",
+
+                "basionyms.rank",
+                "basionyms.nomenclaturalReference.authorship",
+                "basionyms.nomenclaturalReference.inReference",
+
+                }
+        );
 
         TaxonName bean;
         if(identifier != null){
-            bean = getRepo().getNameService().find((Integer)identifier);
+            bean = getRepo().getNameService().load(identifier, initStrategy);
         } else {
             bean = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         }
         return bean;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, identifier, crud, null);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void guaranteePerEntityCRUDPermissions(TaxonName bean) {
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+        }
     }
 
     @Override

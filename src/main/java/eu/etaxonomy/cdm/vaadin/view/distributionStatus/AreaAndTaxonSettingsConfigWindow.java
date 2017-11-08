@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -50,13 +51,16 @@ import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.AreaAndTaxonSettingsPresenter;
 
 /**
  *
  * @author pplitzner
  *
  */
-public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWindow implements ValueChangeListener, ClickListener, ExpandListener{
+public class AreaAndTaxonSettingsConfigWindow
+            extends SettingsDialogWindowBase<AreaAndTaxonSettingsPresenter>
+            implements ValueChangeListener, ClickListener, ExpandListener{
 
     private static final long serialVersionUID = 1439411115014088780L;
     private ComboBox classificationBox;
@@ -64,7 +68,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
     private ComboBox distAreaBox;
     private ListSelect namedAreaList;
     private TreeTable taxonTree;
-    DistributionTableView distributionTableView;
+    private IDistributionTableView distributionTableView;
 
     /**
      * The constructor should first build the main layout, set the
@@ -74,7 +78,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
      * visual editor.
      * @param distributionTableView
      */
-    public DistributionSettingsConfigWindow(DistributionTableView distributionTableView) {
+    public AreaAndTaxonSettingsConfigWindow(IDistributionTableView distributionTableView) {
         super();
         this.distributionTableView = distributionTableView;
     }
@@ -84,35 +88,42 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         //init classification
         Classification classification = presenter.getChosenClassification();
         try {
-            classificationBox.setContainerDataSource(new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification")));
+            CdmSQLContainer classificationContainer = new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification"));
+            classificationContainer.sort(new Object[] {"titleCache"}, new boolean[] {true});
+            classificationBox.setContainerDataSource(classificationContainer);
         } catch (SQLException e) {
             DistributionEditorUtil.showSqlError(e);
         }
-        RowId parent = null;
+        RowId classificationRow = null;
         if(classification!=null){
-        	parent = new RowId(classification.getRootNode().getId());
+            classificationRow = new RowId(classification.getId());
         }
         else if(classificationBox.getItemIds().size()==1){
             //only one classification exists
-            parent = (RowId) classificationBox.getItemIds().iterator().next();
+            classificationRow = (RowId) classificationBox.getItemIds().iterator().next();
         }
-        if(parent!=null){
-            classificationBox.setValue(new RowId(parent.getId()));
-            showClassificationTaxa(getUuidAndTitleCacheFromRowId(parent));
+        if(classificationRow!=null){
+            classificationBox.setValue(classificationRow);
+            showClassificationTaxa(getUuidAndTitleCacheFromRowId(classificationRow));
         }
 
         classificationBox.addValueChangeListener(this);
         taxonFilter.addValueChangeListener(this);
         taxonTree.addExpandListener(this);
 
-        TermVocabulary<NamedArea> chosenArea = presenter.getChosenArea();
-        distAreaBox.setContainerDataSource(presenter.getDistributionContainer());
-        distAreaBox.setValue(chosenArea);
+        //init areas
+        TermVocabulary<NamedArea> chosenAreaVoc = presenter.getChosenAreaVoc();
+        Container areaVocContainer = presenter.getAreaContainer();
+        if (areaVocContainer.size() == 1){
+            chosenAreaVoc = (TermVocabulary<NamedArea>)areaVocContainer.getItemIds().iterator().next();
+        }
+        distAreaBox.setContainerDataSource(areaVocContainer);
+        distAreaBox.setValue(chosenAreaVoc);
         distAreaBox.addValueChangeListener(this);
 
-        if(chosenArea!=null){
-            NamedAreaContainer container = new NamedAreaContainer(chosenArea);
-            namedAreaList.setContainerDataSource(container);
+        if(chosenAreaVoc!=null){
+            NamedAreaContainer areaContainer = new NamedAreaContainer(chosenAreaVoc);
+            namedAreaList.setContainerDataSource(areaContainer);
         }
         Object selectedAreas = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
         namedAreaList.setValue(selectedAreas);
@@ -214,14 +225,14 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     @Override
     public void valueChange(ValueChangeEvent event) {
-        Property property = event.getProperty();
+        Property<?> property = event.getProperty();
         if(property==classificationBox){
         	UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
             showClassificationTaxa(parent);
         }
         else if(property==taxonFilter){
             String filterText = taxonFilter.getValue();
-            Property uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
+            Property<?> uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
             if(uuidProperty==null){
             	Notification.show("Please select a classification");
             }
@@ -261,7 +272,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         Object source = event.getSource();
         if(source==okButton){
             List<UUID> taxonNodes = new ArrayList<>();
-            TermVocabulary<NamedArea> term = null;
+            TermVocabulary<NamedArea> areaVoc = null;
             String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue();
             UUID classificationUuid = UUID.fromString(uuidString);
             Set<UuidAndTitleCache<TaxonNode>> treeSelection = (Set<UuidAndTitleCache<TaxonNode>>) taxonTree.getValue();
@@ -270,9 +281,14 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 					taxonNodes.add(uuidAndTitleCache.getUuid());
 				}
             }
-            term = (TermVocabulary<NamedArea>) distAreaBox.getValue();
+			if(treeSelection.isEmpty() && CdmUtils.isNotBlank(taxonFilter.getValue())) {
+                for (UuidAndTitleCache<TaxonNode> uuidAndTitleCache : (Collection<UuidAndTitleCache<TaxonNode>>) taxonTree.getItemIds()) {
+                    taxonNodes.add(uuidAndTitleCache.getUuid());
+                }
+			}
+            areaVoc = (TermVocabulary<NamedArea>) distAreaBox.getValue();
             Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
-            DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, term, selectedAreas, classificationUuid);
+            DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, areaVoc, selectedAreas, classificationUuid);
             window.close();
         }
         else if(source==cancelButton){
@@ -286,8 +302,8 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
         ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
-    private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> parent) {
-        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+    private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> rootNode) {
+        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(rootNode);
         // Enable polling and set frequency to 0.5 seconds
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
@@ -299,7 +315,7 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
-        Property rootNodeContainerProperty = null;
+        Property<Integer> rootNodeContainerProperty = null;
 
         Collection<?> ids = classificationBox.getContainerPropertyIds();
         //use for loop here because the case of the root node id columns differs between some DBs
@@ -309,11 +325,20 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 				break;
 			}
 		}
-		int id = (int) rootNodeContainerProperty.getValue();
+		int id = rootNodeContainerProperty.getValue();
         String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
         return parent;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected AreaAndTaxonSettingsPresenter getPresenter() {
+        return new AreaAndTaxonSettingsPresenter();
     }
 
     private class TreeUpdater extends Thread{
@@ -336,6 +361,8 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 			        notification.setDelayMsec(500);
 			        notification.show(Page.getCurrent());
 			        taxonTree.setEnabled(true);
+			        taxonTree.setSortContainerPropertyId("titleCache");
+			        taxonTree.sort();
 
 			        //disable polling when all taxa are loaded
 			        UI.getCurrent().setPollInterval(-1);
@@ -343,4 +370,5 @@ public class DistributionSettingsConfigWindow extends AbstractSettingsDialogWind
 			});
     	}
     }
+
 }

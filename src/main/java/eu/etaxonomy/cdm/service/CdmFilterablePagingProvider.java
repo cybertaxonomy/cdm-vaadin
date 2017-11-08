@@ -19,7 +19,6 @@ import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.cdm.vaadin.session.ConversationDirector;
 
 /**
  * @author a.kohlbecker
@@ -35,8 +34,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     private MatchMode matchMode = MatchMode.ANYWHERE;
 
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
-
-    private ConversationDirector conversationDirector;
 
 
     /**
@@ -72,10 +69,9 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
      *
      * @param service
      */
-    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, ConversationDirector conversationDirector) {
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
         super();
         this.service = service;
-        this.conversationDirector = conversationDirector;
     }
 
     /**
@@ -83,12 +79,11 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
      * @param matchMode
      * @param orderHints
      */
-    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, ConversationDirector conversationDirector) {
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
         super();
         this.service = service;
         this.matchMode = matchMode;
         this.orderHints = orderHints;
-        this.conversationDirector = conversationDirector;
     }
 
     /**
@@ -97,7 +92,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     @Override
     public List<T> findEntities(int firstRow, String filter) {
 
-        conversationDirector.ensureBoundConversation();
         Pager<T> page = service.findByTitle(
                 null,
                 filter,
@@ -117,7 +111,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     @Override
     public int size(String filter) {
 
-        conversationDirector.ensureBoundConversation();
         Pager<T> page = service.findByTitle(
                 null,
                 filter,

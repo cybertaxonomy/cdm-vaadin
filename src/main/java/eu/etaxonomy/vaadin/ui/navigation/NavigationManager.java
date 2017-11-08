@@ -17,6 +17,8 @@ public interface NavigationManager {
 
 	void reloadCurrentView();
 
+	public String getCurrentViewName();
+
 	/**
 	 *
 	 * @return

@@ -248,6 +248,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 // notify the NavigationManagerBean to close the window and to dispose the view
                 eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
             } catch (Exception e) {
+                logger.error(e);
                 throw new CommitException("Failed to store data to backend", e);
             }
         }
@@ -532,9 +533,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public final void loadInEditor(Object identifier) {
 
         DTO beanToEdit = getPresenter().loadBeanById(identifier);
-
-        DTO preparedBean = getPresenter().prepareAsFieldGroupDataSource(beanToEdit);
-        fieldGroup.setItemDataSource(preparedBean);
+        fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
     }
 
