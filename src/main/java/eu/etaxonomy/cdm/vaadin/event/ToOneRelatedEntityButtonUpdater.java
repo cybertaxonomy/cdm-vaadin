@@ -27,8 +27,12 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Val
 
     ToOneRelatedEntityField<CDM>  toOneRelatedEntityField;
 
+    private Class<? extends CDM> type;
+
+
     public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
+        this.type = toOneRelatedEntityField.getType();
     }
 
     /**
@@ -39,8 +43,8 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Val
 
         CdmBase value = (CdmBase)event.getProperty().getValue();
 
-        boolean userIsAllowedToUpdate = UserHelper.fromSession().userHasPermission(value, CRUD.UPDATE);
-        boolean userIsAllowedToCreate = UserHelper.fromSession().userHasPermission(value.getClass(), CRUD.CREATE);
+        boolean userIsAllowedToUpdate = value != null && UserHelper.fromSession().userHasPermission(value, CRUD.UPDATE);
+        boolean userIsAllowedToCreate = UserHelper.fromSession().userHasPermission(type, CRUD.CREATE);
 
         toOneRelatedEntityField.setAddButtonEnabled(userIsAllowedToCreate);
         toOneRelatedEntityField.setEditButtonEnabled(userIsAllowedToUpdate);

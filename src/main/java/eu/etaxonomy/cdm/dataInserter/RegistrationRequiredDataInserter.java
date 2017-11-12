@@ -55,6 +55,17 @@ import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 
 /**
+ *
+ * Can create missing registrations for names which have Extensions of the Type <code>IAPTRegdata.json</code>.
+ * See https://dev.e-taxonomy.eu/redmine/issues/6621 for further details.
+ * This feature can be activated by by supplying one of the following jvm command line arguments:
+ * <ul>
+ * <li><code>-DregistrationCreate=iapt</code>: create all iapt Registrations if missing</li>
+ * <li><code>-DregistrationWipeout=iapt</code>: remove all iapt Registrations</li>
+ * <li><code>-DregistrationWipeout=all</code>: remove all Registrations</li>
+ * </ul>
+ * The <code>-DregistrationWipeout</code> commands are executed before the <code>-DregistrationCreate</code> and will not change the name and type designations.
+ *
  * @author a.kohlbecker
  * @since May 9, 2017
  *

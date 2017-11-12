@@ -40,16 +40,6 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
 
 /**
  * Provides RegistrationDTOs and RegistrationWorkingsets for Registrations in the database.
- * <p>
- * Can create missing registrations for names which have Extensions of the Type <code>IAPTRegdata.json</code>.
- * See https://dev.e-taxonomy.eu/redmine/issues/6621 for further details.
- * This feature can be activated by by supplying one of the following jvm command line arguments:
- * <ul>
- * <li><code>-DregistrationCreate=iapt</code>: create all iapt Registrations if missing</li>
- * <li><code>-DregistrationWipeout=iapt</code>: remove all iapt Registrations</li>
- * <li><code>-DregistrationWipeout=all</code>: remove all Registrations</li>
- * </ul>
- * The <code>-DregistrationWipeout</code> commands are executed before the <code>-DregistrationCreate</code> and will not change the name and type designations.
  *
  *
  * @author a.kohlbecker
@@ -63,7 +53,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     public static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(new String []{
             // typeDesignation
             "typeDesignations.typeStatus",
-            "typeDesignations.typifiedNames",
+            "typeDesignations.typifiedNames.typeDesignations", // important !!
             "typeDesignations.typeSpecimen",
             "typeDesignations.typeName",
             "typeDesignations.citation",
@@ -74,26 +64,16 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "name.nomenclaturalReference.inReference",
             "name.rank",
             "name.status.type",
+            "name.typeDesignations", // important !!"
             // institution
             "institution",
             }
     );
 
-    /**
-    *
-    */
-   private static final List<String> FIELDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
-           "$",
-           "gatheringEvent.$",
-           "gatheringEvent.country",
-           "gatheringEvent.collectingAreas",
-           "gatheringEvent.actor"
-   });
-
    /**
     *
     */
-   private static final List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
+   private  List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
            "collection",
            "storedUnder",
            "preservation",
@@ -103,8 +83,21 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
            "kindOfUnit",
            "derivedFrom.$",
            "derivedFrom.type",
-           "specimenTypeDesignations"
+           "derivedFrom.originals.derivationEvents", // important!!
+           "specimenTypeDesignations.typifiedNames.typeDesignations", // important!!
    });
+
+   /**
+   *
+   */
+  private List<String> FIELDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
+          "$",
+          "gatheringEvent.$",
+          "gatheringEvent.country",
+          "gatheringEvent.collectingAreas",
+          "gatheringEvent.actor",
+          "derivationEvents.derivatives" // important, otherwise the DerivedUnits are not included into the graph of initialized entities!!!
+  });
 
     /**
      *
@@ -196,6 +189,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      * @param reg
      */
     protected void inititializeSpecimen(Registration reg) {
+
         for(TypeDesignationBase<?> td : reg.getTypeDesignations()){
             if(td instanceof SpecimenTypeDesignation){
 
@@ -214,7 +208,6 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                         }
                         if(sob instanceof FieldUnit){
                             defaultBeanInitializer.initialize(sob, FIELDUNIT_INIT_STRATEGY);
-                            int i = 0;
                         }
                     }
                     sobs = nextSobs;

@@ -49,4 +49,6 @@ public interface ToOneRelatedEntityField<V extends Object> {
 
     public void selectNewItem(V bean);
 
+    public Class<? extends V> getType();
+
 }

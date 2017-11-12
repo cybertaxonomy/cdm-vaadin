@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.hcore.util.impl.HibernateHelper;
+
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
@@ -189,7 +191,8 @@ public class TypeDesignationSetManager {
      * @return
      */
     protected TypedEntityReference<IdentifiableEntity<?>> makeEntityReference(IdentifiableEntity<?> baseEntity) {
-;
+
+        baseEntity = (IdentifiableEntity<?>) HibernateHelper.unproxy(baseEntity);
         String label = "";
         if(baseEntity  instanceof FieldUnit){
                 label = ((FieldUnit)baseEntity).getTitleCache();

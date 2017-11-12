@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
  * @since Jun 16, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingSetDTO {
+public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntity> {
 
     FieldUnit fieldUnit;
 
@@ -39,7 +39,11 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
 
-    VersionableEntity owner;
+    OWNER owner;
+
+    private Integer citationEntityID;
+
+    private Integer typifiedNameEntityID;
 
     /**
      *
@@ -47,7 +51,7 @@ public class SpecimenTypeDesignationWorkingSetDTO {
      * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationWorkingSetDTO(VersionableEntity owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations) {
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations) {
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
@@ -61,6 +65,19 @@ public class SpecimenTypeDesignationWorkingSetDTO {
             this.specimenTypeDesignations = specimenTypeDesignations;
             this.specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
         }
+    }
+
+    /**
+     * @param reg
+     * @param newfieldUnit
+     * @param citationEntityID
+     * @param typifiedNameEntityID
+     */
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, Integer citationEntityID,
+            Integer typifiedNameEntityID) {
+        this(reg, newfieldUnit, null);
+        this.citationEntityID = citationEntityID;
+        this.typifiedNameEntityID = typifiedNameEntityID;
     }
 
     /**
@@ -93,12 +110,12 @@ public class SpecimenTypeDesignationWorkingSetDTO {
     }
 
     /**
-     * The IdentifiableEntity which contains the DerivedUnit in this working set.
-     *
+     * The {@link VersionableEntity} which contains the DerivedUnit in this working set.
+     * This can be for example a {@link Registration} entity
      *
      * @return
      */
-    public VersionableEntity getOwner() {
+    public OWNER getOwner() {
         return owner;
     }
 
@@ -261,6 +278,36 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     public void getGatheringDate(Partial gatheringDate){
         fieldUnit.getGatheringEvent().setGatheringDate(gatheringDate);
+    }
+
+    /**
+     * @param id
+     */
+    public void setCitationEntityID(int id) {
+        citationEntityID = id;
+
+    }
+
+    /**
+     * @return
+     */
+    public int getCitationEntityID() {
+        return citationEntityID;
+    }
+
+    /**
+     * @param id
+     */
+    public void setTypifiedNameEntityID(int id) {
+        typifiedNameEntityID = id;
+
+    }
+
+    /**
+     * @return
+     */
+    public int getTypifiedNameEntityID() {
+        return typifiedNameEntityID;
     }
 
 }

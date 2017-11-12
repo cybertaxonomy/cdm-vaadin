@@ -49,7 +49,7 @@
     </bean>
 
     <!-- enable the configuration of transactional behavior based on annotations -->
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <tx:annotation-driven transaction-manager="transactionManager"/>
   	
   	<!-- import additional beans into the root context (this is in cdmlib-remote-webapp) -->
   	<!-- <import resource="applicationContext.views.xml" />  -->

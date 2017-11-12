@@ -285,12 +285,12 @@ public class RegistrationDTO{
         return typeDesignations;
     }
 
-    public SpecimenTypeDesignationWorkingSetDTO getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
         Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
         IdentifiableEntity<?> baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
-        SpecimenTypeDesignationWorkingSetDTO dto = new SpecimenTypeDesignationWorkingSetDTO(reg, baseEntity, specimenTypeDesignations);
+        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, baseEntity, specimenTypeDesignations);
         return dto;
     }
 

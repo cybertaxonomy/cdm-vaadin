@@ -42,7 +42,9 @@ public class SpecimenTypeDesignationDTORow {
 
     public SpecimenTypeDesignationDTORow(){
         kindOfUnit.setRows(1);
+        kindOfUnit.setRequired(true);
         typeStatus.setRows(1);
+        typeStatus.setRequired(true);
         accessionNumber.setWidth(100, Unit.PIXELS);
         collection.setWidth(150, Unit.PIXELS);
         mediaUri.setWidth(150, Unit.PIXELS);

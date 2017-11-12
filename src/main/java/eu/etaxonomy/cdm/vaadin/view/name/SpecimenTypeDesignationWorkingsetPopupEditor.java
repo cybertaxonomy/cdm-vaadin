@@ -42,7 +42,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
-
     /**
      * @param layout
      * @param dtoType
@@ -53,8 +52,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         grid.setMargin(true);
         grid.setSpacing(true);
     }
-
-
 
     private static final long serialVersionUID = 5418275817834009509L;
 
@@ -155,6 +152,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
+                //getPresenter().specimenTypeDesignationDTOInstantiator(getBean());
                 SpecimenTypeDesignationDTORow.class
                 );
         typeDesignationsCollectionField.withCaption("Types");

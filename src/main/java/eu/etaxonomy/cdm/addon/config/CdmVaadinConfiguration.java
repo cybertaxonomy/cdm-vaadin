@@ -68,6 +68,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
+// @EnableTransactionManagement(mode=AdviceMode.ASPECTJ) // has no effect here
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     /**
