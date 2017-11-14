@@ -16,6 +16,7 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
+import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 
 /**
@@ -50,13 +51,13 @@ public class SpecimenTypeDesignationDTORow {
         accessionNumber.setWidth(100, Unit.PIXELS);
         collection.setWidth(150, Unit.PIXELS);
         mediaUri.setWidth(150, Unit.PIXELS);
+        mediaUri.setConverter(new UriConverter());
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->
                 updateRowItemEnablement()
         );
-        mediaSpecimenReferenceDetail.setReadOnly(true);
 
     }
 
