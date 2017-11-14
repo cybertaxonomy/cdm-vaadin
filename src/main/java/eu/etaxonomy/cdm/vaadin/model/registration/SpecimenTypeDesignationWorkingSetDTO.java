@@ -57,6 +57,12 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
+        if(citation == null){
+            throw new NullPointerException("citation must not be null");
+        }
+        if(typifiedName == null){
+            throw new NullPointerException("typifiedName must not be null");
+        }
         this.citation = citation;
         this.typifiedName = typifiedName;
         if(baseEntity instanceof FieldUnit){

@@ -43,14 +43,20 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
     @Override
     public void valueChange(ValueChangeEvent event) {
 
+
         CDM value = (CDM)event.getProperty().getValue();
+        if(value == null) {
+            return;
+        }
         value = HibernateProxyHelper.deproxy(value);
 
         EntityCache cache = cachingPresenter.getCache();
         if(cache != null){
             cache.update();
             CDM cachedEntity = cache.find(value);
-            if(cachedEntity != null && cachedEntity != value){
+            if(cachedEntity == null){
+                cache.add(value);
+            } else if(cachedEntity != value){
                 toOneRelatedEntityField.removeValueChangeListener(this);
                 toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
                 toOneRelatedEntityField.setValue(cachedEntity);

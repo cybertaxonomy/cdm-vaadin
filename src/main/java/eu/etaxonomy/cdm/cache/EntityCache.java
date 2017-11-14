@@ -25,6 +25,8 @@ public interface EntityCache {
 
     public boolean update();
 
+    public <CDM extends CdmBase> void add(CDM value);
+
     /**
      * @param type
      * @param id

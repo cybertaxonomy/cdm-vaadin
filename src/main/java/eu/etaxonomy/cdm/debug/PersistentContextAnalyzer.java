@@ -43,6 +43,11 @@ public class PersistentContextAnalyzer {
     /**
      *
      */
+    private static final char HASH_SEPARATOR = '.';
+
+    /**
+     *
+     */
     private static final String COPY_ENTITY = "!";
 
     /**
@@ -65,6 +70,8 @@ public class PersistentContextAnalyzer {
     private Set<EntityKey> copyEntitiyKeys = new HashSet<>();
 
     private Set<Object> objectsSeen = new HashSet<>();
+
+    private boolean showHashCodes = false;
 
 
     public PersistentContextAnalyzer(CdmBase entity, Session session){
@@ -107,8 +114,9 @@ public class PersistentContextAnalyzer {
      */
     protected void printLegend(PrintStream printStream) {
         printStream.println("PersistentContextAnalyzer legend: ");
-        printStream.println("    - '*': entity mapped in persistent context");
+        printStream.println("    - '.{objectHash}': unique copy entity, followed by object hash (only shown when showHashCodes is enabled)");
         printStream.println("    - '!{objectHash}': detected copy entity, followed by object hash");
+        printStream.println("    - '*': entity mapped in persistent context");
     }
 
     /**
@@ -122,12 +130,18 @@ public class PersistentContextAnalyzer {
         String flags = "";
         CdmBase mappedEntity = entityyMap.put(entityKey, bean);
 
+        boolean hashAdded = false;
+
         if(session != null && session.contains(bean)){
             flags += IN_PERSITENT_CONTEXT;
         }
         if(mappedEntity != null && mappedEntity != bean) {
             copyEntitiyKeys.add(entityKey);
             flags += COPY_ENTITY + bean.hashCode();
+            hashAdded = true;
+        }
+        if(showHashCodes && ! hashAdded){
+            flags += HASH_SEPARATOR + bean.hashCode();
         }
         if(!flags.isEmpty()){
             propertyPath += "(" + flags + ")";
@@ -204,6 +218,24 @@ public class PersistentContextAnalyzer {
                 logger.error(message);
             }
 
+        }
+    }
+
+    /**
+     * @return the showHashCodes
+     */
+    public boolean isShowHashCodes() {
+        return showHashCodes;
+    }
+
+    /**
+     * @param showHashCodes the showHashCodes to set
+     */
+    public void setShowHashCodes(boolean showHashCodes) {
+        boolean runUpdate = this.showHashCodes != showHashCodes;
+        this.showHashCodes = showHashCodes;
+        if(runUpdate){
+            update();
         }
     }
 

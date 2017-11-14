@@ -44,7 +44,7 @@ public class CdmEntityCache implements EntityCache {
 
     private static final String COPY_ENTITY = "!";
 
-    private CdmBase entity;
+    private Set<CdmBase> entities = new HashSet<>();
 
     private Map<EntityKey, CdmBase> entityyMap = new HashMap<>();
 
@@ -57,7 +57,7 @@ public class CdmEntityCache implements EntityCache {
     private Set<Object> objectsSeen = new HashSet<>();
 
     public CdmEntityCache(CdmBase entity){
-        this.entity = entity;
+        this.entities.add(entity);
         update();
     }
 
@@ -69,9 +69,9 @@ public class CdmEntityCache implements EntityCache {
         objectsSeen.clear();
         copyEntitiyKeys.clear();
 
-        String propertyPath = "";
-
-        analyzeEntity(entity, propertyPath);
+        for(CdmBase entity : entities){
+        analyzeEntity(entity, "");
+        }
 
         return copyEntitiyKeys.isEmpty();
     }
@@ -269,8 +269,11 @@ public class CdmEntityCache implements EntityCache {
      */
     @Override
     public <CDM extends CdmBase> CDM find(CDM value) {
-        EntityKey entityKey = new EntityKey(HibernateProxyHelper.deproxy(value));
-        return (CDM) entityyMap.get(entityKey);
+        if(value != null){
+            EntityKey entityKey = new EntityKey(HibernateProxyHelper.deproxy(value));
+            return (CDM) entityyMap.get(entityKey);
+        }
+        return null;
     }
 
     /**
@@ -280,6 +283,15 @@ public class CdmEntityCache implements EntityCache {
     public <CDM extends CdmBase> CDM find(Class<CDM> type, int id) {
         EntityKey entityKey = new EntityKey(type, id);
         return (CDM) entityyMap.get(entityKey);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <CDM extends CdmBase> void add(CDM value) {
+        entities.add(value);
+        analyzeEntity(value, "");
     }
 
 

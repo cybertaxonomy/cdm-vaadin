@@ -154,7 +154,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
-                row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(), SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
+                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
@@ -164,6 +165,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
+                row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
+                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
 
                 getView().applyDefaultComponentStyle(row.components());
 

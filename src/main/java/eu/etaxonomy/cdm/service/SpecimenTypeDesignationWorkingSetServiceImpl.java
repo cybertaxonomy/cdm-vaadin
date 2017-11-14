@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -77,7 +78,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationId, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
         TaxonName typifiedName = repo.getNameService().load(typifiedNameId, TAXON_NAME_INIT_STRATEGY);
-        Reference citation = repo.getReferenceService().load(registrationId, Arrays.asList("$"));
+        Reference citation = repo.getReferenceService().load(publicationId, Arrays.asList("$"));
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
@@ -157,7 +158,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             Session session = repo.getSession();
 
+            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
+            regAnalyzer.printEntityGraph(System.out);
+            regAnalyzer.printCopyEntities(System.out);
+
             session.merge(dto.getOwner());
+
 
             session.flush();
         }

@@ -82,7 +82,7 @@ public class SpecimenTypeDesignationDTORow {
 
         mediaSpecimenReference.setEnabled(publishedImageType);
         mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
-        mediaUri.setEnabled(unPublishedImageType);
+        mediaUri.setEnabled(publishedImageType || unPublishedImageType);
 
     }
 }
