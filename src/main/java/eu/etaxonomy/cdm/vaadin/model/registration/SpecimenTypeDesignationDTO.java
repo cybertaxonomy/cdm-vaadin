@@ -326,7 +326,7 @@ public class SpecimenTypeDesignationDTO {
      * @return
      */
     private MediaSpecimen findMediaSpecimen() {
-        DerivedUnit sp = std.getTypeSpecimen();
+        DerivedUnit sp = HibernateProxyHelper.deproxy(std.getTypeSpecimen());
         if(MediaSpecimen.class.isAssignableFrom(sp.getClass())){
             return (MediaSpecimen) sp;
         }

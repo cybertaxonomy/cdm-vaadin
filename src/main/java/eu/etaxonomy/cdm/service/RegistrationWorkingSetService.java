@@ -80,7 +80,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
            "derivedFrom.type",
            "derivedFrom.originals.derivationEvents", // important!!
            "specimenTypeDesignations.typifiedNames.typeDesignations", // important!!
-           "MediaSpecimen.sources"
+           "mediaSpecimen.sources"
    });
 
    /**
