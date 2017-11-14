@@ -295,6 +295,7 @@ public class SpecimenTypeDesignationDTO {
         IdentifiableSource source ;
         Media media = findMediaSpecimen().getMediaSpecimen();
         if(media == null){
+            media = Media.NewInstance();
             findMediaSpecimen().setMediaSpecimen(Media.NewInstance());
         }
         if(CollectionUtils.isEmpty(media.getSources())){
