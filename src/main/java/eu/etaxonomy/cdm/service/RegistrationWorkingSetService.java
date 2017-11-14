@@ -74,13 +74,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     *
     */
    private  List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
-           "collection",
-           "storedUnder",
-           "preservation",
-           "recordBasis",
-           "sex",
-           "lifeStage",
-           "kindOfUnit",
+           "*", // initialize all related entities to allow DerivedUnit conversion, see DerivedUnitConverter.copyPropertiesTo()
            "derivedFrom.$",
            "derivedFrom.type",
            "derivedFrom.originals.derivationEvents", // important!!
