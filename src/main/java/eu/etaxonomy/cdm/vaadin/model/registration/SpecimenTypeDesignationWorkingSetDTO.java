@@ -21,8 +21,10 @@ import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.location.Point;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
+import eu.etaxonomy.cdm.model.reference.Reference;
 
 /**
  * @author a.kohlbecker
@@ -41,9 +43,9 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
 
     OWNER owner;
 
-    private Integer citationEntityID;
+    private Reference citation;
 
-    private Integer typifiedNameEntityID;
+    private TaxonName typifiedName;
 
     /**
      *
@@ -51,10 +53,12 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations) {
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, Reference citation, TaxonName typifiedName) {
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
+        this.citation = citation;
+        this.typifiedName = typifiedName;
         if(baseEntity instanceof FieldUnit){
             this.fieldUnit = (FieldUnit) baseEntity;
             if(fieldUnit.getGatheringEvent() == null){
@@ -73,11 +77,8 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param citationEntityID
      * @param typifiedNameEntityID
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, Integer citationEntityID,
-            Integer typifiedNameEntityID) {
-        this(reg, newfieldUnit, null);
-        this.citationEntityID = citationEntityID;
-        this.typifiedNameEntityID = typifiedNameEntityID;
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, Reference citation, TaxonName typifiedName) {
+        this(reg, newfieldUnit, null, citation, typifiedName);
     }
 
     /**
@@ -281,33 +282,32 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
     }
 
     /**
-     * @param id
+     * @return the citation
      */
-    public void setCitationEntityID(int id) {
-        citationEntityID = id;
-
+    public Reference getCitation() {
+        return citation;
     }
 
     /**
-     * @return
+     * @param citation the citation to set
      */
-    public int getCitationEntityID() {
-        return citationEntityID;
+    public void setCitation(Reference citation) {
+        this.citation = citation;
     }
 
     /**
-     * @param id
+     * @return the typifiedName
      */
-    public void setTypifiedNameEntityID(int id) {
-        typifiedNameEntityID = id;
-
+    public TaxonName getTypifiedName() {
+        return typifiedName;
     }
 
     /**
-     * @return
+     * @param typifiedName the typifiedName to set
      */
-    public int getTypifiedNameEntityID() {
-        return typifiedNameEntityID;
+    public void setTypifiedName(TaxonName typifiedName) {
+        this.typifiedName = typifiedName;
     }
+
 
 }

@@ -8,8 +8,10 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Session;
@@ -49,6 +51,16 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
     private final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingSetServiceImpl.class);
 
+    public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
+            "name.$",
+            "name.nomenclaturalReference.authorship",
+            "name.nomenclaturalReference.inReference",
+            "name.rank",
+            "name.status.type",
+            "name.typeDesignations"
+            }
+    );
+
     @Autowired
     IRegistrationWorkingSetService registrationWorkingSetService;
 
@@ -64,7 +76,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(int registrationId, int publicationId, int typifiedNameId) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationId, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, publicationId, typifiedNameId);
+        TaxonName typifiedName = repo.getNameService().load(typifiedNameId, TAXON_NAME_INIT_STRATEGY);
+        Reference citation = repo.getReferenceService().load(registrationId, Arrays.asList("$"));
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
 
@@ -78,8 +92,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         // find the working set
         TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(workingsetId);
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
-        workingSetDto.setCitationEntityID(regDTO.getCitation().getId());
-        workingSetDto.setTypifiedNameEntityID(regDTO.getTypifiedName().getId());
         return workingSetDto;
     }
 
@@ -119,7 +131,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     @Override
     @Transactional(readOnly=false)
-    public void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto, Reference citation, TaxonName typifiedName) {
+    public void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto) {
 
         if(dto.getOwner() instanceof Registration){
             Registration regPremerge = (Registration) dto.getOwner();
@@ -132,8 +144,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
-                std.setCitation(citation);
-                typifiedName.addTypeDesignation(std, false);
+                std.setCitation(dto.getCitation());
+                dto.getTypifiedName().addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }
 

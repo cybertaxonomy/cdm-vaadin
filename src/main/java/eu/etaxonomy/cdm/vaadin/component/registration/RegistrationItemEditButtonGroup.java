@@ -69,23 +69,23 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
         setWidth(100, Unit.PERCENTAGE);
 
-        if(regDto.getName() != null){
+        if(regDto.getNameRef() != null){
             Button nameButton = new Button("Name:");
             nameButton.setDescription("Edit the Name");
-            nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getName().getId(), nameButton);
-            Label nameLabel = new Label(regDto.getName().getLabel());
+            nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getId(), nameButton);
+            Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
             boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
             nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
 
             addComponent(nameIdButton.getButton());
-            PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getName().getId(),
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getId(),
                     EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             addComponent(nameLabel);
         } else {
             // no name in the registration! we only show the typified name as label
-            if(regDto.getTypifiedName() != null){
-                nameLabel = new Label(regDto.getTypifiedName().getLabel());
+            if(regDto.getTypifiedNameRef() != null){
+                nameLabel = new Label(regDto.getTypifiedNameRef().getLabel());
                 addComponent(nameLabel);
             }
         }

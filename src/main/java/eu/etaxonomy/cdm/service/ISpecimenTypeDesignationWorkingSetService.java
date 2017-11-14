@@ -10,8 +10,6 @@ package eu.etaxonomy.cdm.service;
 
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
-import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 
 /**
@@ -36,14 +34,12 @@ public interface ISpecimenTypeDesignationWorkingSetService {
      * Saves the SpecimenTypeDesignationWorkingSetDTO and takes care for consistency in the working set:
      * <ul>
      *  <li>New TypeDesignations are associated with the OWNER.</li>
-     *  <li>The citation and typified name of newly created TypeDesignations are set to the supplied entities.</li>
+     *  <li>The citation and typified name of newly created TypeDesignations are set.</li>
      *  <li>All type specimens are assured to be derivatives of the FieldUnit which is the base entity of the set.</li>
      * </ul>
      *
      * @param dto the DTO to be persisted
-     * @param citation The Reference entity to be used for new TypeDesignations.
-     * @param typifiedName
      */
-    void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto,  Reference citation, TaxonName typifiedName);
+    void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto);
 
 }

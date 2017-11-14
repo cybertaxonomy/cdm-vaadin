@@ -19,7 +19,6 @@ import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
-import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -205,9 +204,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
         }
 
-        Reference citation = cache.find(Reference.class, dto.getCitationEntityID());
-        TaxonName typifiedName =  cache.find(TaxonName.class, dto.getTypifiedNameEntityID());
-        specimenTypeDesignationWorkingSetService.save(dto, citation, typifiedName);
+        specimenTypeDesignationWorkingSetService.save(dto);
     }
 
     /**

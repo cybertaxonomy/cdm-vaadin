@@ -77,7 +77,9 @@ public class TypeDesignationSetManager {
      */
     private LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedByTypesByBaseEntity;
 
-    private EntityReference typifiedName;
+    private EntityReference typifiedNameRef;
+
+    private TaxonName typifiedName;
 
     private String finalString = null;
 
@@ -95,7 +97,7 @@ public class TypeDesignationSetManager {
      */
     public TypeDesignationSetManager(Collection<TypeDesignationBase> typeDesignations) throws RegistrationValidationException {
         this.typeDesignations = typeDesignations;
-        this.typifiedName = findTypifiedName();
+        findTypifiedName();
         mapAndSort();
     }
 
@@ -104,7 +106,7 @@ public class TypeDesignationSetManager {
      */
     public TypeDesignationSetManager(TaxonName typifiedName) {
         this.typeDesignations = new ArrayList<>();
-        this.typifiedName = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+        this.typifiedNameRef = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
     }
 
     /**
@@ -347,7 +349,7 @@ public class TypeDesignationSetManager {
      * @return
      * @throws RegistrationValidationException
      */
-    private EntityReference findTypifiedName() throws RegistrationValidationException {
+    private void findTypifiedName() throws RegistrationValidationException {
 
         List<String> problems = new ArrayList<>();
 
@@ -385,9 +387,11 @@ public class TypeDesignationSetManager {
         }
 
         if(typifiedName != null){
-            return new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+            // ON SUCCESS -------------------
+            this.typifiedName = typifiedName;
+            this.typifiedNameRef = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+
         }
-        return null;
     }
 
 
@@ -395,8 +399,8 @@ public class TypeDesignationSetManager {
      * @return the title cache of the typifying name or <code>null</code>
      */
     public String getTypifiedNameCache() {
-        if(typifiedName != null){
-            return typifiedName.getLabel();
+        if(typifiedNameRef != null){
+            return typifiedNameRef.getLabel();
         }
         return null;
     }
@@ -404,9 +408,9 @@ public class TypeDesignationSetManager {
     /**
      * @return the title cache of the typifying name or <code>null</code>
      */
-    public EntityReference getTypifiedName() {
+    public EntityReference getTypifiedNameRef() {
 
-       return typifiedName;
+       return typifiedNameRef;
     }
 
     /**
@@ -577,6 +581,13 @@ public class TypeDesignationSetManager {
      */
     public void setPrintCitation(boolean printCitation) {
         this.printCitation = printCitation;
+    }
+
+    /**
+     * @return the typifiedName
+     */
+    public TaxonName getTypifiedName() {
+        return typifiedName;
     }
 
     /**
