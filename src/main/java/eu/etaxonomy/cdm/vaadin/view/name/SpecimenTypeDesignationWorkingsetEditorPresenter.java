@@ -16,7 +16,6 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
 import eu.etaxonomy.cdm.cache.EntityCache;
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
@@ -28,7 +27,6 @@ import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
@@ -143,11 +141,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.kindOfUnit.setNullSelectionAllowed(false);
 
-                row.kindOfUnit.addValueChangeListener(e -> {
-                    SpecimenTypeDesignationDTORow currentRow = row;
-                    updateRowItemEnablement(currentRow);
-                });
-
                 row.typeStatus.setContainerDataSource(selectFactory.buildTermItemContainer(
                         RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS())
                         );
@@ -174,24 +167,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 getView().applyDefaultComponentStyle(row.components());
 
-                updateRowItemEnablement(row);
-
                 return row;
             }
 
-            private void updateRowItemEnablement(SpecimenTypeDesignationDTORow row) {
-
-                DefinedTerm kindOfUnit = (DefinedTerm)row.kindOfUnit.getValue();
-
-                boolean publishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.PUBLISHED_IMAGE());
-                boolean unPublishedImageType = kindOfUnit != null && kindOfUnit.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE());
-
-                row.mediaSpecimenReference.setEnabled(publishedImageType);
-                row.mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
-                row.mediaUri.setEnabled(unPublishedImageType);
-
-            }
         });
+
     }
 
 
@@ -235,6 +215,5 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             return null;
         }
     }
-
 
 }

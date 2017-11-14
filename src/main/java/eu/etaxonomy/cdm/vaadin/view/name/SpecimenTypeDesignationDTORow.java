@@ -13,7 +13,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 
 /**
@@ -30,7 +32,7 @@ public class SpecimenTypeDesignationDTORow {
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
      */
-    ListSelect kindOfUnit = new ListSelect(); // "Kind of unit");
+    ListSelect kindOfUnit = new ListSelect();
     ListSelect typeStatus = new ListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
@@ -50,6 +52,12 @@ public class SpecimenTypeDesignationDTORow {
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
+
+        kindOfUnit.addValueChangeListener(e ->
+                updateRowItemEnablement()
+        );
+        mediaSpecimenReferenceDetail.setReadOnly(true);
+
     }
 
     /**
@@ -62,5 +70,18 @@ public class SpecimenTypeDesignationDTORow {
                 mediaUri, mediaSpecimenReference,
                 mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail
                 };
+    }
+
+    public void updateRowItemEnablement() {
+
+        DefinedTerm kindOfUnitTerm = (DefinedTerm)kindOfUnit.getValue();
+
+        boolean publishedImageType = kindOfUnitTerm != null && kindOfUnitTerm.equals(KindOfUnitTerms.PUBLISHED_IMAGE());
+        boolean unPublishedImageType = kindOfUnitTerm != null && kindOfUnitTerm.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE());
+
+        mediaSpecimenReference.setEnabled(publishedImageType);
+        mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
+        mediaUri.setEnabled(unPublishedImageType);
+
     }
 }
