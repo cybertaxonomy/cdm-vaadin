@@ -96,19 +96,27 @@ public class SpecimenTypeDesignationDTO {
     public void setKindOfUnit(DefinedTerm kindOfUnit) throws DerivedUnitConversionException{
 
         std.getTypeSpecimen().setKindOfUnit(kindOfUnit);
+        DerivedUnit typeSpecimen = HibernateProxyHelper.deproxy(std.getTypeSpecimen());
 
         Class<? extends DerivedUnit> requiredSpecimenType = specimenTypeFor(kindOfUnit);
+        Class<? extends DerivedUnit> currentType = typeSpecimen.getClass();
 
-        if(!requiredSpecimenType.equals(std.getTypeSpecimen())){
+        if(!requiredSpecimenType.equals(currentType)){
 
             DerivedUnit convertedSpecimen;
 
+            SpecimenOrObservationType convertToType = specimenOrObservationTypeFor(kindOfUnit);
             if(requiredSpecimenType.equals(MediaSpecimen.class)){
-                DerivedUnitConverter<MediaSpecimen> converter = new DerivedUnitConverter<MediaSpecimen> (std.getTypeSpecimen());
-                convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, specimenOrObservationTypeFor(kindOfUnit));
+                DerivedUnitConverter<MediaSpecimen> converter = new DerivedUnitConverter<MediaSpecimen> (typeSpecimen);
+                convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, convertToType);
             } else {
-                DerivedUnitConverter<DerivedUnit> converter = new DerivedUnitConverter<DerivedUnit> (std.getTypeSpecimen());
-                convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, specimenOrObservationTypeFor(kindOfUnit));
+                 if(currentType == MediaSpecimen.class){
+                     MediaSpecimen mediaSpecimen = (MediaSpecimen)typeSpecimen;
+                     // set null to allow conversion
+                     mediaSpecimen.setMediaSpecimen(null);
+                 }
+                DerivedUnitConverter<DerivedUnit> converter = new DerivedUnitConverter<DerivedUnit> (typeSpecimen);
+                convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, convertToType);
             }
 
             std.setTypeSpecimen(convertedSpecimen);

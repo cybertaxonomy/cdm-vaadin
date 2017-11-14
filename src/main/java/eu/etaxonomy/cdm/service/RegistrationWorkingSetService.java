@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -79,6 +80,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
            "derivedFrom.type",
            "derivedFrom.originals.derivationEvents", // important!!
            "specimenTypeDesignations.typifiedNames.typeDesignations", // important!!
+           "MediaSpecimen.sources"
    });
 
    /**
@@ -196,7 +198,8 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                     @SuppressWarnings("rawtypes")
                     Set<SpecimenOrObservationBase> nextSobs = null;
                     for(@SuppressWarnings("rawtypes") SpecimenOrObservationBase sob : sobs){
-                        if(sob instanceof DerivedUnit) {
+                        sob = HibernateProxyHelper.deproxy(sob);
+                        if(DerivedUnit.class.isAssignableFrom(sob.getClass())) {
                             defaultBeanInitializer.initialize(sob, DERIVEDUNIT_INIT_STRATEGY);
                             nextSobs = ((DerivedUnit)sob).getOriginals();
                         }
