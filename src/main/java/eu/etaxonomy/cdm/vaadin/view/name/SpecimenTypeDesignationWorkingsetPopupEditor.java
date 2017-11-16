@@ -24,6 +24,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
@@ -247,6 +248,21 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         getPresenter().setGrantsForCurrentUser(crud);
 
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void afterItemDataSourceSet() {
+        super.afterItemDataSourceSet();
+        GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
+        for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){
+            Component item = gridLayout.getComponent(0, rowIndex);
+            ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
+        }
+    }
+
+
 
 
 }

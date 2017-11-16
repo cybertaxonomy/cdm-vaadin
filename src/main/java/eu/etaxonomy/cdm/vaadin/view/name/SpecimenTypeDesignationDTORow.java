@@ -15,6 +15,8 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRow;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -27,13 +29,13 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
  * @since Jun 22, 2017
  *
  */
-public class SpecimenTypeDesignationDTORow {
+public class SpecimenTypeDesignationDTORow implements CollectionRow {
 
     /* CONVENTION!
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
      */
-    ListSelect kindOfUnit = new ListSelect();
+    RowListSelect kindOfUnit = new RowListSelect();
     ListSelect typeStatus = new ListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
@@ -46,6 +48,7 @@ public class SpecimenTypeDesignationDTORow {
     public SpecimenTypeDesignationDTORow(){
         kindOfUnit.setRows(1);
         kindOfUnit.setRequired(true);
+        kindOfUnit.setRow(this);
         typeStatus.setRows(1);
         typeStatus.setRequired(true);
         accessionNumber.setWidth(100, Unit.PIXELS);
@@ -56,7 +59,7 @@ public class SpecimenTypeDesignationDTORow {
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->
-                updateRowItemEnablement()
+                updateRowItemsEnablement()
         );
 
     }
@@ -73,7 +76,8 @@ public class SpecimenTypeDesignationDTORow {
                 };
     }
 
-    public void updateRowItemEnablement() {
+    @Override
+    public void updateRowItemsEnablement() {
 
         DefinedTerm kindOfUnitTerm = (DefinedTerm)kindOfUnit.getValue();
 
@@ -85,4 +89,23 @@ public class SpecimenTypeDesignationDTORow {
         mediaUri.setEnabled(publishedImageType || unPublishedImageType);
 
     }
+
+    class RowListSelect extends ListSelect implements CollectionRowRepresentative {
+
+        private static final long serialVersionUID = 3235653923633494213L;
+
+        CollectionRow row;
+
+        protected void setRow(CollectionRow row){
+            this.row = row;
+        }
+
+        @Override
+        public void updateRowItemsEnabledStates() {
+            row.updateRowItemsEnablement();
+
+        }
+
+    }
+
 }
