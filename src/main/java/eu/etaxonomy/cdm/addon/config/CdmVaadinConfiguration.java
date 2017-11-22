@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.addon.config;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.annotation.WebServlet;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 
 import com.vaadin.spring.annotation.EnableVaadin;
@@ -68,19 +70,22 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
-// @EnableTransactionManagement(mode=AdviceMode.ASPECTJ) // has no effect here
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
-    /**
-     *
-     */
-    private static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
+
+    public static final String CDM_DATA_SOURCE_ID = "cdm.dataSource.id";
+
+    public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
     @Autowired
+    Environment env;
+
+    @Autowired
     @Lazy
     //FIXME consider to set the instanceName (instanceID) in the spring environment to avoid a bean reference here
+    // key CDM_DATA_SOURCE_ID is already declared here
     private DataSourceConfigurer dataSourceConfigurer;
 
     /*
@@ -92,6 +97,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public static class Servlet extends SpringVaadinServlet {
 
         private static final long serialVersionUID = -2615042297393028775L;
+
 
         /**
          *
@@ -145,6 +151,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public AbstractDataInserter registrationRequiredDataInserter() throws BeansException{
         if(isUIEnabled(RegistrationUI.class)){
             RegistrationRequiredDataInserter inserter = new RegistrationRequiredDataInserter();
+
             inserter.setRunAsAuthenticationProvider((AuthenticationProvider) applicationContext.getBean("runAsAuthenticationProvider"));
             inserter.setCdmRepository((CdmRepository) applicationContext.getBean("cdmRepository"));
             return inserter;
@@ -179,6 +186,8 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     private ApplicationContext applicationContext;
 
+    private List<String> activeUIpaths;
+
     //@formatter:off
     private static final String APP_FILE_CONTENT=
             "########################################################\n"+
@@ -206,24 +215,38 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
         String path = uiClass.getAnnotation(SpringUI.class).path().trim();
 
-        try {
-            if(appProps == null){
-                String currentDataSourceId = dataSourceConfigurer.dataSourceProperties().getCurrentDataSourceId();
-                appProps = new ConfigFileUtil()
-                        .setDefaultContent(APP_FILE_CONTENT)
-                        .getProperties(currentDataSourceId, PROPERTIES_NAME);
-            }
-            if(appProps.get(CDM_VAADIN_UI_ACTIVATED) != null){
-                String[] uiPaths = appProps.get(CDM_VAADIN_UI_ACTIVATED).toString().split("\\s*,\\s*");
-                if(Arrays.asList(uiPaths).stream().anyMatch(p -> p.trim().equals(path))){
-                    return true;
+        if(activeUIpaths == null){
+            try {
+                String currentDataSourceId = env.getProperty(CDM_DATA_SOURCE_ID);
+                String activatedVaadinUIs = env.getProperty(CDM_VAADIN_UI_ACTIVATED);
+                if(activatedVaadinUIs == null){
+                    // not in environment? Read it from the config file!
+                    if(appProps == null){
+                        if(currentDataSourceId == null){
+                            currentDataSourceId = dataSourceConfigurer.dataSourceProperties().getCurrentDataSourceId();
+                        }
+                        appProps = new ConfigFileUtil()
+                                .setDefaultContent(APP_FILE_CONTENT)
+                                .getProperties(currentDataSourceId, PROPERTIES_NAME);
+                    }
+                    if(appProps.get(CDM_VAADIN_UI_ACTIVATED) != null){
+                        activatedVaadinUIs = appProps.get(CDM_VAADIN_UI_ACTIVATED).toString();
+                    }
                 }
+                if(activatedVaadinUIs != null) {
+                    String[] uiPaths = activatedVaadinUIs.split("\\s*,\\s*");
+                    this.activeUIpaths = Arrays.asList(uiPaths);
+                }
+            } catch (IOException e) {
+                logger.error("Error reading the vaadin ui properties file. File corrupted?. Stopping instance ...");
+                throw new RuntimeException(e);
             }
-            return false;
-        } catch (IOException e) {
-            logger.error("Error reading the vaadin ui properties file. File corrupted?. Stopping instance ...");
-            throw new RuntimeException(e);
         }
+        if(activeUIpaths.stream().anyMatch(p -> p.trim().equals(path))){
+            return true;
+        }
+        return false;
+
     }
 
     /**
