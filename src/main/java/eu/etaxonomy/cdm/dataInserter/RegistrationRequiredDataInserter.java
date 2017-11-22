@@ -27,6 +27,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -125,7 +126,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     /**
      *
      */
+    @Transactional
     private void insertRequiredData() {
+
+        TransactionStatus txStatus = repo.startTransaction(false);
 
         Role roleCuration = RolesAndPermissions.ROLE_CURATION;
         if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
@@ -180,8 +184,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             }
         }
         // --------------------------------------------------------------------------------------
-
-        repo.getSession().flush();
+        txStatus.flush();
+        repo.commitTransaction(txStatus);
 
     }
 
@@ -370,7 +374,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
                 }
                 repo.getRegistrationService().save(newRegs);
-                repo.getRegistrationService().getSession().flush();
+                tx.flush();
                 logger.debug("Registrations saved");
                 pageIndex++;
             }
