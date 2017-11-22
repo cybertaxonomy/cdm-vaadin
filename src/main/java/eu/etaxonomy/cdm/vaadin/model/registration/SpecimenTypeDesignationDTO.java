@@ -194,6 +194,14 @@ public class SpecimenTypeDesignationDTO {
         std.getTypeSpecimen().setAccessionNumber(accessionNumber);
     }
 
+    public URI getPreferredStableUri(){
+        return std.getTypeSpecimen().getPreferredStableUri();
+    }
+
+    public void setPreferredStableUri(URI uri){
+        std.getTypeSpecimen().setPreferredStableUri(uri);
+    }
+
     public URI getMediaUri(){
         if(checkMediaSpecimen()){
             MediaRepresentationPart part = findMediaRepresentationPart();

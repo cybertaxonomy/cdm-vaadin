@@ -22,6 +22,7 @@ import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 
 /**
+ * CollectionRow for {@link SpecimenTypeDesignationDTO}
  * SpecimenTypeDesignationDTORow needs to be instantiated by a EditorInstantiator which can only be provided by the presenter
  *  {@link SpecimenTypeDesignationWorkingsetEditorPresenter#handleViewEntered()}
  *
@@ -39,8 +40,9 @@ public class SpecimenTypeDesignationDTORow implements CollectionRow {
     ListSelect typeStatus = new ListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
-    TextField accessionNumber = new TextField(); // "Accession number");
-    TextField mediaUri = new TextField(); // "Image URI");
+    TextField accessionNumber = new TextField();
+    TextField preferredStableUri = new TextField();
+    TextField mediaUri = new TextField();
     ToOneRelatedEntityCombobox<Reference> mediaSpecimenReference =
             new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
     TextField mediaSpecimenReferenceDetail = new TextField(); //"Image reference detail");
@@ -52,6 +54,8 @@ public class SpecimenTypeDesignationDTORow implements CollectionRow {
         typeStatus.setRows(1);
         typeStatus.setRequired(true);
         accessionNumber.setWidth(100, Unit.PIXELS);
+        preferredStableUri.setWidth(150, Unit.PIXELS);
+        preferredStableUri.setConverter(new UriConverter());
         collection.setWidth(150, Unit.PIXELS);
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
@@ -71,6 +75,7 @@ public class SpecimenTypeDesignationDTORow implements CollectionRow {
         return new Component[]{
                 kindOfUnit, typeStatus,
                 collection, accessionNumber,
+                preferredStableUri,
                 mediaUri, mediaSpecimenReference,
                 mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail
                 };

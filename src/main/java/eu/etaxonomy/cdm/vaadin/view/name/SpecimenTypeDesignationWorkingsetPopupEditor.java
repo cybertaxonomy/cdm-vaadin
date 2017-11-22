@@ -161,6 +161,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         typeDesignationsCollectionField.getLayout().setColumns(3);
 
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
+        typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
 

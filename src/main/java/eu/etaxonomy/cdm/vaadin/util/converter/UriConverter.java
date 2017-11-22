@@ -22,6 +22,8 @@ import com.vaadin.data.util.converter.Converter;
  */
 public final class UriConverter implements Converter<String, URI> {
 
+    private static final long serialVersionUID = -6695362724769275484L;
+
     public UriConverter() {
 
     }
