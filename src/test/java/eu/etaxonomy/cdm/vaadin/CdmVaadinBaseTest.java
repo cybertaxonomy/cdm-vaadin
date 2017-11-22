@@ -24,6 +24,7 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.addon.config.CdmVaadinConfiguration;
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 
 @Ignore
@@ -62,6 +63,7 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
     public static void createNewServletEnvironment() {
 		servletContext = new MockServletContext("/webapp");
+		servletContext.setInitParameter(CdmVaadinConfiguration.CDM_VAADIN_UI_ACTIVATED, "concept,distribution,editstatus");
 
         ServletContextListener listener = new ContextLoaderListener();
         ServletContextEvent event = new ServletContextEvent(servletContext);

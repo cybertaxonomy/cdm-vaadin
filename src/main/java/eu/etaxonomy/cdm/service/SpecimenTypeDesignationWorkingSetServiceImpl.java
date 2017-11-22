@@ -157,12 +157,14 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             }
 
             Session session = repo.getSession();
+            session.clear();
 
-            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
+            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(regPremerge, session);
+            regAnalyzer.setShowHashCodes(true);
             regAnalyzer.printEntityGraph(System.out);
             regAnalyzer.printCopyEntities(System.out);
 
-            session.merge(dto.getOwner());
+            session.merge(regPremerge);
 
 
             session.flush();
