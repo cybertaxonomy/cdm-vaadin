@@ -89,7 +89,14 @@ public class PersistentContextAnalyzer {
      */
     private void update() {
 
+        entityyMap.clear();
+        entityPathList.clear();
+        entityPathsMap.clear();
+        copyEntitiyKeys.clear();
+        objectsSeen.clear();
+
         String propertyPath = "";
+
         analyzeEntity(entity, propertyPath);
     }
 
