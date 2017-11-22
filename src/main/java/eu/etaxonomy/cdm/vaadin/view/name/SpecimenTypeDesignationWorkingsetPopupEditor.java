@@ -256,9 +256,24 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     protected void afterItemDataSourceSet() {
         super.afterItemDataSourceSet();
         GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
-        for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){
+        for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){ // first row is header
             Component item = gridLayout.getComponent(0, rowIndex);
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
+        }
+        updateAllowDelete();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateAllowDelete(){
+        // disable the delete button if there is only one typeDesignation
+        // if this typeDesignation is deleted the fieldUnit would become orphan in the
+        // TypeDesignationWorkingSet
+        GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
+        if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
+            gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);
         }
     }
 

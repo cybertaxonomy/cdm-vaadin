@@ -9,16 +9,22 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
 import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
+import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -28,6 +34,7 @@ import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -65,6 +72,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private CdmEntityCache cache = null;
 
+    SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
+
+    Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations = new HashSet<>();
+
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
             store = new CdmStore<>(getRepo(), getRepo().getRegistrationService());
@@ -87,7 +98,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> loadBeanById(Object identifier) {
 
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
         if(identifier != null){
 
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
@@ -125,6 +135,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
 
+        getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
+        getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             CdmFilterablePagingProvider<Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection>(getRepo().getCollectionService());
@@ -183,11 +195,31 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     @Override
     protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
+
         if(crud != null){
             UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
         }
 
         specimenTypeDesignationWorkingSetService.save(dto);
+
+        SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
+        specimenDeleteConfigurer.setDeleteChildren(false);
+        specimenDeleteConfigurer.setDeleteFromDescription(true);
+        specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
+        specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
+        specimenDeleteConfigurer.setDeleteMolecularData(true);
+
+        for(SpecimenTypeDesignation std : deletedSpecimenTypeDesignations){
+            DerivedUnit du = std.getTypeSpecimen();
+            du.removeSpecimenTypeDesignation(std);
+            DerivationEvent derivationEvent = du.getDerivedFrom();
+            derivationEvent.removeDerivative(du);
+            getRepo().getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
+            getRepo().getOccurrenceService().delete(du, specimenDeleteConfigurer);
+//            if(derivationEvent.getDerivatives().size() == 0){
+//                getRepo().getEventBaseService().delete(derivationEvent);
+//            }
+        }
     }
 
     /**
@@ -197,6 +229,35 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     protected void deleteBean(SpecimenTypeDesignationWorkingSetDTO bean) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * @param element
+     * @return
+     */
+    private void addTypeDesignation(SpecimenTypeDesignationDTO element) {
+        getView().updateAllowDelete();
+    }
+
+
+    /**
+     * In this method the SpecimenTypeDesignation is dissociated from the Registration.
+     * The actual deletion of the SpecimenTypeDesignation and DerivedUnit will take place in {@link #saveBean(SpecimenTypeDesignationWorkingSetDTO)}
+     *
+     * TODO once https://dev.e-taxonomy.eu/redmine/issues/7077 is fixed dissociating from the Registration could be removed here
+     *
+     * @param e
+     * @return
+     */
+    private void deleteTypeDesignation(SpecimenTypeDesignationDTO element) {
+
+        Registration reg = workingSetDto.getOwner();
+        SpecimenTypeDesignation std = element.asSpecimenTypeDesignation();
+
+        reg.getTypeDesignations().remove(std);
+
+        deletedSpecimenTypeDesignations.add(std);
+        getView().updateAllowDelete();
     }
 
     /**
