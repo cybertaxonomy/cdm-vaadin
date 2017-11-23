@@ -42,4 +42,9 @@ public interface ISpecimenTypeDesignationWorkingSetService {
      */
     void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto);
 
+    /**
+     * @param bean
+     */
+    public void delete(SpecimenTypeDesignationWorkingSetDTO bean);
+
 }

@@ -9,22 +9,17 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
-import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
 import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
-import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
-import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -73,8 +68,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private CdmEntityCache cache = null;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
-
-    Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations = new HashSet<>();
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -201,25 +194,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         }
 
         specimenTypeDesignationWorkingSetService.save(dto);
-
-        SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
-        specimenDeleteConfigurer.setDeleteChildren(false);
-        specimenDeleteConfigurer.setDeleteFromDescription(true);
-        specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
-        specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
-        specimenDeleteConfigurer.setDeleteMolecularData(true);
-
-        for(SpecimenTypeDesignation std : deletedSpecimenTypeDesignations){
-            DerivedUnit du = std.getTypeSpecimen();
-            du.removeSpecimenTypeDesignation(std);
-            DerivationEvent derivationEvent = du.getDerivedFrom();
-            derivationEvent.removeDerivative(du);
-            getRepo().getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
-            getRepo().getOccurrenceService().delete(du, specimenDeleteConfigurer);
-//            if(derivationEvent.getDerivatives().size() == 0){
-//                getRepo().getEventBaseService().delete(derivationEvent);
-//            }
-        }
     }
 
     /**
@@ -227,8 +201,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     @Override
     protected void deleteBean(SpecimenTypeDesignationWorkingSetDTO bean) {
-        // TODO Auto-generated method stub
-
+        specimenTypeDesignationWorkingSetService.delete(bean);
     }
 
     /**
@@ -256,7 +229,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         reg.getTypeDesignations().remove(std);
 
-        deletedSpecimenTypeDesignations.add(std);
         getView().updateAllowDelete();
     }
 

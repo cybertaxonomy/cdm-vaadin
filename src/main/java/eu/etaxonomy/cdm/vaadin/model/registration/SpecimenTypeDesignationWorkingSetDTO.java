@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,13 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
     VersionableEntity baseEntity;
 
     List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>();
+
+    /**
+     * List of all SpecimenTypeDesignation that have been loaded into the
+     * DTO. By comparing this list with <code>specimenTypeDesignations</code>
+     * it is possible to find those that have been deleted.
+     */
+    List<SpecimenTypeDesignation> specimenTypeDesignationsLoaded = new ArrayList<>();
 
     List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
 
@@ -315,5 +323,14 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
         this.typifiedName = typifiedName;
     }
 
+    /**
+     *
+     * @return the set of SpecimenTypeDesignation that haven been deleted from the <code>SpecimenTypeDesignationWorkingSetDTO</code>.
+     */
+    public Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations() {
+        Set<SpecimenTypeDesignation> deletedEntities = new HashSet<>(specimenTypeDesignationsLoaded);
+        deletedEntities.removeAll(specimenTypeDesignations);
+        return deletedEntities;
+    }
 
 }
