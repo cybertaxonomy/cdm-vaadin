@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -39,7 +40,6 @@ import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.view.name.stdDTOs;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 
 /**
@@ -52,6 +52,15 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTypeDesignationWorkingSetService {
 
     private final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingSetServiceImpl.class);
+
+    static SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
+    static {
+        specimenDeleteConfigurer.setDeleteChildren(true);
+        specimenDeleteConfigurer.setDeleteFromDescription(true);
+        specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
+        specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
+        specimenDeleteConfigurer.setDeleteMolecularData(true);
+    }
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
             "name.$",
@@ -167,30 +176,31 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
-            SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
-            specimenDeleteConfigurer.setDeleteChildren(false);
-            specimenDeleteConfigurer.setDeleteFromDescription(true);
-            specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
-            specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
-            specimenDeleteConfigurer.setDeleteMolecularData(true);
-
             for(SpecimenTypeDesignation std : dto.deletedSpecimenTypeDesignations()){
-                DerivedUnit du = std.getTypeSpecimen();
-                du.removeSpecimenTypeDesignation(std);
-                DerivationEvent derivationEvent = du.getDerivedFrom();
-                derivationEvent.removeDerivative(du);
-                repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
-                repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
-//                if(derivationEvent.getDerivatives().size() == 0){
-//                    getRepo().getEventBaseService().delete(derivationEvent);
-//                }
+                deleteSpecimenTypeDesignation(dto, std);
             }
-            // -------------------------
-
 
         }
 
 
+    }
+
+    /**
+     * @param dto
+     * @param specimenDeleteConfigurer
+     * @param std
+     */
+    protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
+
+        DerivedUnit du = std.getTypeSpecimen();
+        du.removeSpecimenTypeDesignation(std);
+        DerivationEvent derivationEvent = du.getDerivedFrom();
+        derivationEvent.removeDerivative(du);
+        repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
+        repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
+//        if(derivationEvent.getDerivatives().size() == 0){
+//          getRepo().getEventBaseService().delete(derivationEvent);
+//      }
     }
 
     /**
@@ -258,11 +268,25 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      * {@inheritDoc}
      */
     @Override
-    public void delete(SpecimenTypeDesignationWorkingSetDTO bean) {
-        for(stdDTOs : bean.getSpecimenTypeDesignationDTOs()){
+    @Transactional(readOnly=false)
+    public void delete(SpecimenTypeDesignationWorkingSetDTO bean, boolean deleteFieldUnit) {
 
-                }
+        @SuppressWarnings("unchecked")
+        List<SpecimenTypeDesignationDTO> specimenTypeDesignationDTOs = bean.getSpecimenTypeDesignationDTOs();
+        for(SpecimenTypeDesignationDTO stdDTO : specimenTypeDesignationDTOs){
+          SpecimenTypeDesignation std =  stdDTO.asSpecimenTypeDesignation();
+          deleteSpecimenTypeDesignation(bean, std);
+          if(bean.getOwner() instanceof Registration){
+              ((Registration)bean.getOwner()).getTypeDesignations().remove(std);
+          }
+        }
 
+        if(deleteFieldUnit){
+            FieldUnit fu = bean.getFieldUnit();
+            // delete the fieldunit and all derivatives
+            DeleteResult result = repo.getOccurrenceService().delete(fu.getUuid(), specimenDeleteConfigurer);
+            String msg = result.toString();
+        }
     }
 
 }

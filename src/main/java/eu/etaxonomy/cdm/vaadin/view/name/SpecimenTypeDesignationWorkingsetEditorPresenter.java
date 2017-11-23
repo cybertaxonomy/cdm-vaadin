@@ -201,7 +201,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     @Override
     protected void deleteBean(SpecimenTypeDesignationWorkingSetDTO bean) {
-        specimenTypeDesignationWorkingSetService.delete(bean);
+        specimenTypeDesignationWorkingSetService.delete(bean, true);
     }
 
     /**

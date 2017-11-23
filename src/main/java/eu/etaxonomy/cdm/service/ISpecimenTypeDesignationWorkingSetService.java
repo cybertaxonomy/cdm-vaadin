@@ -43,8 +43,10 @@ public interface ISpecimenTypeDesignationWorkingSetService {
     void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto);
 
     /**
-     * @param bean
+     * @param bean The SpecimenTypeDesignationWorkingSetDTO  to be deleted
+     * @param deleteFieldUnit The fieldunit and all derivatives which is the base entity of the workingset will
+     * also be deleted once this is set to <code>true</code>.
      */
-    public void delete(SpecimenTypeDesignationWorkingSetDTO bean);
+    public void delete(SpecimenTypeDesignationWorkingSetDTO bean, boolean deleteFieldUnit);
 
 }
