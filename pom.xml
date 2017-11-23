@@ -471,6 +471,11 @@
       <artifactId>v-leaflet</artifactId>
       <version>1.0.3</version>
     </dependency>
+    <dependency>
+        <groupId>org.vaadin.addons.lazyquerycontainer</groupId>
+        <artifactId>vaadin-lazyquerycontainer</artifactId>
+        <version>7.6.1.3</version>
+    </dependency>
     <!-- 
     <dependency>
         <groupId>org.vaadin.spring.extensions</groupId>
