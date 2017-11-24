@@ -8,6 +8,7 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.runner.RunWith;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
@@ -25,8 +26,10 @@ import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
+import unitils.AlternativeUnitilsJUnit4TestClassRunner;
 
 @Ignore
+@RunWith(AlternativeUnitilsJUnit4TestClassRunner.class)
 @Transactional(TransactionMode.DISABLED)
 public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 

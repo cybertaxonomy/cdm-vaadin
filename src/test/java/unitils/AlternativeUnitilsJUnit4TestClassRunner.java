@@ -12,6 +12,8 @@ import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.UnitilsJUnit4TestClassRunner;
 
+import eu.etaxonomy.cdm.addon.config.CdmVaadinConfiguration;
+
 /**
  * A runner which causes the {@link org.unitils.core.ConfigurationLoader} to load <code>unitils-alternativeRunner.properties</code>
  * instead of <code>unitils.properties</code>.
@@ -35,6 +37,7 @@ public class AlternativeUnitilsJUnit4TestClassRunner extends UnitilsJUnit4TestCl
      */
     @Override
     public void run(RunNotifier notifier) {
+        System.setProperty(CdmVaadinConfiguration.CDM_VAADIN_UI_ACTIVATED, "concept,distribution,editstatus,registration");
         System.setProperty("unitils.configuration.customFileName", "unitils-alternativeRunner.properties");
         super.run(notifier);
     }

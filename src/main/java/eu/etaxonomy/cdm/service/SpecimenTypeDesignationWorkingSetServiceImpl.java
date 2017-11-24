@@ -60,6 +60,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
         specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
         specimenDeleteConfigurer.setDeleteMolecularData(true);
+        specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
     }
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
@@ -179,6 +180,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             for(SpecimenTypeDesignation std : dto.deletedSpecimenTypeDesignations()){
                 deleteSpecimenTypeDesignation(dto, std);
             }
+            session.flush();
 
         }
 
@@ -196,6 +198,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         du.removeSpecimenTypeDesignation(std);
         DerivationEvent derivationEvent = du.getDerivedFrom();
         derivationEvent.removeDerivative(du);
+        std.setTypeSpecimen(null);
         repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
         repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
 //        if(derivationEvent.getDerivatives().size() == 0){

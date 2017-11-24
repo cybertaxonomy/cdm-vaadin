@@ -38,8 +38,6 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
 
     VersionableEntity baseEntity;
 
-    List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>();
-
     /**
      * List of all SpecimenTypeDesignation that have been loaded into the
      * DTO. By comparing this list with <code>specimenTypeDesignations</code>
@@ -80,8 +78,8 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
             }
         }
         if(specimenTypeDesignations != null){
-            this.specimenTypeDesignations = specimenTypeDesignations;
-            this.specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
+            specimenTypeDesignationsLoaded = specimenTypeDesignations;
+            specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
         }
     }
 
@@ -114,9 +112,13 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
     }
 
     /**
-     * @return the derivedUnits
+     * @return the typeDesignation entities managed in this workingset
      */
     protected List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
+        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList(specimenTypeDesignationsDTOs.size());
+        for(SpecimenTypeDesignationDTO dto : specimenTypeDesignationsDTOs){
+            specimenTypeDesignations.add(dto.asSpecimenTypeDesignation());
+        }
         return specimenTypeDesignations;
     }
 
@@ -329,7 +331,7 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      */
     public Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations() {
         Set<SpecimenTypeDesignation> deletedEntities = new HashSet<>(specimenTypeDesignationsLoaded);
-        deletedEntities.removeAll(specimenTypeDesignations);
+        deletedEntities.removeAll(getSpecimenTypeDesignations());
         return deletedEntities;
     }
 
