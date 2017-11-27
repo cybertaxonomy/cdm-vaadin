@@ -98,7 +98,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
 
        service.save(workingset);
 
-       printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+       //printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
 
        workingset = service.loadDtoByIds(registrationId, 0);
 
@@ -157,7 +157,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
 
         service.save(workingset);
 
-        printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+        //printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
 
         workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());

@@ -24,7 +24,7 @@ import unitils.AlternativeUnitilsJUnit4TestClassRunner;
  *
  */
 @RunWith(AlternativeUnitilsJUnit4TestClassRunner.class)
-@SpringApplicationContext("file:./src/test/resources/webapp/WEB-INF/applicationContext.xml")
+@SpringApplicationContext("file:./src/test/resources/webapp/WEB-INF/applicationContext-alternative.xml")
 @Transactional(TransactionMode.DISABLED)
 public abstract class CdmVaadinIntegrationTest extends CdmIntegrationTest {
 

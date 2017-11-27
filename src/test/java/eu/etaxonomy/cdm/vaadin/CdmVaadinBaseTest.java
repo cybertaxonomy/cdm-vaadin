@@ -1,18 +1,23 @@
 package eu.etaxonomy.cdm.vaadin;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 
 import org.easymock.EasyMock;
+import org.h2.tools.Server;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.ContextLoaderListener;
-import org.unitils.UnitilsJUnit4;
+import org.unitils.UnitilsJUnit4TestClassRunner;
 import org.unitils.database.DatabaseUnitils;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
@@ -26,12 +31,11 @@ import com.vaadin.server.VaadinServletService;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
-import unitils.AlternativeUnitilsJUnit4TestClassRunner;
 
-@Ignore
-@RunWith(AlternativeUnitilsJUnit4TestClassRunner.class)
+
+@RunWith(UnitilsJUnit4TestClassRunner.class)
 @Transactional(TransactionMode.DISABLED)
-public class CdmVaadinBaseTest extends UnitilsJUnit4 {
+public abstract class CdmVaadinBaseTest {
 
     private static MockServletContext servletContext;
     private static VaadinServlet vaadinServlet;
@@ -39,6 +43,7 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
     private static VaadinSession vaadinSession;
     private static boolean isVaadinServletEnvCreated = false;
 
+    private static final String PROPERTY_H2_SERVER = "h2Server";
 
     @BeforeClass
     public static void setup() {
@@ -60,6 +65,26 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
         Assert.assertNotNull(vaadinService);
         Assert.assertEquals(vaadinService, VaadinService.getCurrent());
+    }
+
+    @Before
+    public void startH2Server() throws Exception {
+
+        if(System.getProperty(PROPERTY_H2_SERVER) != null){
+            try {
+                List<String> args = new ArrayList<String>();
+                try {
+                    Integer port = Integer.parseInt(System.getProperty(PROPERTY_H2_SERVER));
+                    args.add("-webPort");
+                    args.add(port.toString());
+                } catch (Exception e) {
+                    // will start at port 8082 by default
+                }
+                Server.createWebServer(args.toArray(new String[]{})).start();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
