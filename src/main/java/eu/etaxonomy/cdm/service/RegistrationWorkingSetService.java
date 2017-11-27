@@ -199,6 +199,9 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                     Set<SpecimenOrObservationBase> nextSobs = null;
                     for(@SuppressWarnings("rawtypes") SpecimenOrObservationBase sob : sobs){
                         sob = HibernateProxyHelper.deproxy(sob);
+                        if(sob == null){
+                            continue;
+                        }
                         if(DerivedUnit.class.isAssignableFrom(sob.getClass())) {
                             defaultBeanInitializer.initialize(sob, DERIVEDUNIT_INIT_STRATEGY);
                             nextSobs = ((DerivedUnit)sob).getOriginals();
