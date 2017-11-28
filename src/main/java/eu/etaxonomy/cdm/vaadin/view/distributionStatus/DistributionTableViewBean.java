@@ -37,6 +37,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.location.NamedArea;
@@ -64,7 +65,7 @@ public class DistributionTableViewBean
             implements IDistributionTableView, AccessRestrictedView {
 
 	private static final long serialVersionUID = 1L;
-    public static final String NAME = "distGrid";
+    public static final String NAME = "distGrid"; //$NON-NLS-1$
 
     @Autowired
     private DistributionToolbar toolbar;
@@ -85,14 +86,14 @@ public class DistributionTableViewBean
 	private AbsoluteLayout initLayout() {
 		AbsoluteLayout mainLayout = new AbsoluteLayout();
 		mainLayout.setImmediate(false);
-		mainLayout.setWidth("100%");
-		mainLayout.setHeight("100%");
+		mainLayout.setWidth("100%"); //$NON-NLS-1$
+		mainLayout.setHeight("100%"); //$NON-NLS-1$
 
-		setWidth("100.0%");
-		setHeight("100.0%");
+		setWidth("100.0%"); //$NON-NLS-1$
+		setHeight("100.0%"); //$NON-NLS-1$
 
 		//Horizontal Toolbar
-		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;");
+		mainLayout.addComponent(toolbar, "top:0.0px;right:0.0px;"); //$NON-NLS-1$
 
 //		// table + formatting
 //		table = new Table(){
@@ -186,7 +187,7 @@ public class DistributionTableViewBean
 		grid.setSizeFull();
 		grid.setEditorEnabled(true);
         grid.setFooterVisible(true);
-		mainLayout.addComponent(grid, "top:75px;right:10.0px;left:10.0px;");
+		mainLayout.addComponent(grid, "top:75px;right:10.0px;left:10.0px;"); //$NON-NLS-1$
 
 		return mainLayout;
 	}
@@ -266,7 +267,7 @@ public class DistributionTableViewBean
         uuidColumn.setHidden(true);
         Column taxonColumn = grid.getColumn(DistributionStatusQuery.TAXON_COLUMN);
         taxonColumn.setEditable(false);
-        taxonColumn.setHeaderCaption("Taxon");
+        taxonColumn.setHeaderCaption(Messages.DistributionTableViewBean_TAXON);
         taxonColumn.setLastFrozenColumn();
 
         Converter<String, UUID> displayConverter = new PresenceAbsenceTermUuidTitleStringConverter();
@@ -283,7 +284,7 @@ public class DistributionTableViewBean
                 termSelect.setSizeFull();
                 termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
                 termSelect.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-                termSelect.setItemCaptionPropertyId("titleCache");
+                termSelect.setItemCaptionPropertyId("titleCache"); //$NON-NLS-1$
                 termSelect.setConverter(editorConverter);
                 termSelect.setImmediate(true);
                 c.setEditorField(termSelect);
@@ -314,13 +315,13 @@ public class DistributionTableViewBean
         }else {
             footerCell = footerRow.getCell(cells[0]);
         }
-        footerCell.setText("Total amount of Taxa displayed: " + gridcontainer.size());
+        footerCell.setText(String.format(Messages.DistributionTableViewBean_TOTAL_TAXA, gridcontainer.size()));
 	}
 
 	private void createEditClickListener(){
 		//details
 	    Button detailButton = toolbar.getDetailButton();
-		detailButton.setCaption("Taxon Details");
+		detailButton.setCaption(Messages.DistributionTableViewBean_TAXON_DETAILS);
 		detailButton.addClickListener(event -> {
 //				Object selectedItemId = DistributionTableViewBean.this.table.getValue();
 				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
@@ -336,7 +337,7 @@ public class DistributionTableViewBean
 					getUI().addWindow(window);
 				}
 				else{
-					Notification.show("Please select a taxon", Type.HUMANIZED_MESSAGE);
+					Notification.show(Messages.DistributionTableViewBean_SELECT_TAXON, Type.HUMANIZED_MESSAGE);
 				}
 			}
 		);
@@ -358,9 +359,9 @@ public class DistributionTableViewBean
         if(distributionStatusConfigWindow==null){
             distributionStatusConfigWindow = new DistributionStatusSettingsConfigWindow(this);
         }
-        Window window  = distributionStatusConfigWindow.createWindow("Status");
-        window.setWidth("25%");
-        window.setHeight("60%");
+        Window window  = distributionStatusConfigWindow.createWindow(Messages.DistributionTableViewBean_STATUS);
+        window.setWidth("25%"); //$NON-NLS-1$
+        window.setHeight("60%"); //$NON-NLS-1$
         UI.getCurrent().addWindow(window);
 	}
 
@@ -372,7 +373,7 @@ public class DistributionTableViewBean
 		if(areaAndTaxonConfigWindow==null){
 			areaAndTaxonConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
 		}
-        Window window  = areaAndTaxonConfigWindow.createWindow("Areas and Taxa");
+        Window window  = areaAndTaxonConfigWindow.createWindow(Messages.DistributionTableViewBean_AREAS_AND_TAXA);
         UI.getCurrent().addWindow(window);
 	}
 

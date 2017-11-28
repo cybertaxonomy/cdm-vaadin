@@ -18,6 +18,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.service.CdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -45,21 +46,21 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
     @Autowired
     private CdmUserHelper userHelper;
 
-    private final Button loginButton = new Button("Login");
+    private final Button loginButton = new Button(Messages.DistributionToolbar_LOGIN);
 
-    private final Button logoutButton = new Button("Logout");
+    private final Button logoutButton = new Button(Messages.DistributionToolbar_LOGOUT);
 
     private final Button userButton = new Button(FontAwesome.USER);
 
-	private final Button editButton = new Button("Edit");
+	private final Button editButton = new Button(Messages.DistributionToolbar_EDIT);
 
-	private final Button saveButton = new Button("Save");
+	private final Button saveButton = new Button(Messages.DistributionToolbar_SAVE);
 
-	private final Button detailButton = new Button("Detail");
+	private final Button detailButton = new Button(Messages.DistributionToolbar_DETAIL);
 
-	private final Button distributionSettingsButton =  new Button("Areas and Taxa");
+	private final Button distributionSettingsButton =  new Button(Messages.DistributionToolbar_AREAS_AND_TAXA);
 
-	private final Button settingsButton =  new Button("Status");
+	private final Button settingsButton =  new Button(Messages.DistributionToolbar_STATUS);
 
 //	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
@@ -68,19 +69,19 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
     public void init() {
 		setMargin(true);
 		setSpacing(true);
-		setStyleName("toolbar");
-		setWidth("100%");
-		setHeight("75px");
+		setStyleName("toolbar"); //$NON-NLS-1$
+		setWidth("100%"); //$NON-NLS-1$
+		setHeight("75px"); //$NON-NLS-1$
 
 //		exporter.setCaption("Export");
 //		exporter.setIcon(new ThemeResource("icons/32/document-xsl.png"));
 		loginButton.addClickListener(e -> performLogin());
 		logoutButton.addClickListener(e -> performLogout());
-		saveButton.setIcon(new ThemeResource("icons/32/document-save.png"));
-		editButton.setIcon(new ThemeResource("icons/32/document-edit.png"));
-		detailButton.setIcon(new ThemeResource("icons/32/document-txt.png"));
-		settingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
-		distributionSettingsButton.setIcon(new ThemeResource("icons/32/settings_1.png"));
+		saveButton.setIcon(new ThemeResource("icons/32/document-save.png")); //$NON-NLS-1$
+		editButton.setIcon(new ThemeResource("icons/32/document-edit.png")); //$NON-NLS-1$
+		detailButton.setIcon(new ThemeResource("icons/32/document-txt.png")); //$NON-NLS-1$
+		settingsButton.setIcon(new ThemeResource("icons/32/settings_1.png")); //$NON-NLS-1$
+		distributionSettingsButton.setIcon(new ThemeResource("icons/32/settings_1.png")); //$NON-NLS-1$
 
         HorizontalLayout leftLayout = new HorizontalLayout();
         leftLayout.addComponent(detailButton);
@@ -142,7 +143,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
      * @return
      */
     private void performLogin() {
-        eventBus.publishEvent(new NavigationEvent("login", navigationManager.getCurrentViewName()));
+        eventBus.publishEvent(new NavigationEvent("login", navigationManager.getCurrentViewName())); //$NON-NLS-1$
     }
 
 

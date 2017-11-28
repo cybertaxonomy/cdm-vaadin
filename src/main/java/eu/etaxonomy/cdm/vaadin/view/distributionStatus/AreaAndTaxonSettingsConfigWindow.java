@@ -40,6 +40,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.common.CdmUtils;
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
@@ -88,8 +89,8 @@ public class AreaAndTaxonSettingsConfigWindow
         //init classification
         Classification classification = presenter.getChosenClassification();
         try {
-            CdmSQLContainer classificationContainer = new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification"));
-            classificationContainer.sort(new Object[] {"titleCache"}, new boolean[] {true});
+            CdmSQLContainer classificationContainer = new CdmSQLContainer(CdmQueryFactory.generateTableQuery("Classification")); //$NON-NLS-1$
+            classificationContainer.sort(new Object[] {"titleCache"}, new boolean[] {true}); //$NON-NLS-1$
             classificationBox.setContainerDataSource(classificationContainer);
         } catch (SQLException e) {
             DistributionEditorUtil.showSqlError(e);
@@ -156,38 +157,38 @@ public class AreaAndTaxonSettingsConfigWindow
         rightContainer.setSizeFull();
 
         //classification
-        classificationBox = new ComboBox("Classification");
+        classificationBox = new ComboBox(Messages.AreaAndTaxonSettingsConfigWindow_CLASSIFICATION);
         classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        classificationBox.setInputPrompt("Please select a classification...");
+        classificationBox.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION);
         classificationBox.setImmediate(true);
         classificationBox.setNewItemsAllowed(false);
         classificationBox.setNullSelectionAllowed(false);
         classificationBox.setSizeFull();
-        classificationBox.setWidth("100%");
+        classificationBox.setWidth("100%"); //$NON-NLS-1$
 
         //taxonFilter
-        taxonFilter = new TextField("Filter");
-        taxonFilter.setInputPrompt("Filter taxa by name...");
+        taxonFilter = new TextField(Messages.AreaAndTaxonSettingsConfigWindow_FILTER);
+        taxonFilter.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_FILTER_TAXA_BY_NAME);
         taxonFilter.setSizeFull();
         taxonFilter.setImmediate(true);
 
         //distribution area box
-        distAreaBox = new ComboBox("Distribution Area:");
-        distAreaBox.setInputPrompt("Please select a distribution area...");
+        distAreaBox = new ComboBox(Messages.AreaAndTaxonSettingsConfigWindow_DISTRIBUTION_AREA);
+        distAreaBox.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_DISTRIBUTION_AREA);
         distAreaBox.setImmediate(true);
         distAreaBox.setNullSelectionAllowed(false);
         distAreaBox.setNewItemsAllowed(false);
         distAreaBox.setSizeFull();
-        distAreaBox.setWidth("100%");
+        distAreaBox.setWidth("100%"); //$NON-NLS-1$
 
         // named areas
         namedAreaList = new ListSelect();
-        namedAreaList.setCaption("Areas");
+        namedAreaList.setCaption(Messages.AreaAndTaxonSettingsConfigWindow_AREAS);
         namedAreaList.setSizeFull();
         namedAreaList.setMultiSelect(true);
 
         //taxonomy
-        taxonTree = new TreeTable("Taxonomy");
+        taxonTree = new TreeTable(Messages.AreaAndTaxonSettingsConfigWindow_TAXONOMY);
         taxonTree.setSelectable(true);
         taxonTree.setSizeFull();
         taxonTree.setImmediate(true);
@@ -232,9 +233,9 @@ public class AreaAndTaxonSettingsConfigWindow
         }
         else if(property==taxonFilter){
             String filterText = taxonFilter.getValue();
-            Property<?> uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid");
+            Property<?> uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid"); //$NON-NLS-1$
             if(uuidProperty==null){
-            	Notification.show("Please select a classification");
+            	Notification.show(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION);
             }
             else{
             	if(CdmUtils.isNotBlank(filterText)){
@@ -246,7 +247,7 @@ public class AreaAndTaxonSettingsConfigWindow
             			container.addItem(taxon);
             			taxonTree.setChildrenAllowed(taxon, false);
             		}
-            		taxonTree.setVisibleColumns("titleCache");
+            		taxonTree.setVisibleColumns("titleCache"); //$NON-NLS-1$
             	}
             	else{
             		UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
@@ -273,7 +274,7 @@ public class AreaAndTaxonSettingsConfigWindow
         if(source==okButton){
             List<UUID> taxonNodes = new ArrayList<>();
             TermVocabulary<NamedArea> areaVoc = null;
-            String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue();
+            String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue(); //$NON-NLS-1$
             UUID classificationUuid = UUID.fromString(uuidString);
             Set<UuidAndTitleCache<TaxonNode>> treeSelection = (Set<UuidAndTitleCache<TaxonNode>>) taxonTree.getValue();
 			if(!treeSelection.isEmpty()){
@@ -308,25 +309,25 @@ public class AreaAndTaxonSettingsConfigWindow
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
         taxonTree.removeAllItems();
-        Notification.show("Loading taxa...");
+        Notification.show(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_TAXA);
 
         new TreeUpdater(children).start();
     }
 
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
-        String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue();
+        String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue(); //$NON-NLS-1$
         Property<Integer> rootNodeContainerProperty = null;
 
         Collection<?> ids = classificationBox.getContainerPropertyIds();
         //use for loop here because the case of the root node id columns differs between some DBs
         for (Object id : ids) {
-			if(id instanceof String && ((String) id).toLowerCase().equals("rootnode_id")){
+			if(id instanceof String && ((String) id).toLowerCase().equals("rootnode_id")){ //$NON-NLS-1$
 				rootNodeContainerProperty = classificationBox.getContainerProperty(classificationSelection, id);
 				break;
 			}
 		}
 		int id = rootNodeContainerProperty.getValue();
-        String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue();
+        String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue(); //$NON-NLS-1$
         UUID uuid = UUID.fromString(uuidString);
         UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
         return parent;
@@ -357,11 +358,11 @@ public class AreaAndTaxonSettingsConfigWindow
 				public void run() {
 					taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
 
-			        Notification notification = new Notification("Loading complete");
+			        Notification notification = new Notification(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_COMPLETE);
 			        notification.setDelayMsec(500);
 			        notification.show(Page.getCurrent());
 			        taxonTree.setEnabled(true);
-			        taxonTree.setSortContainerPropertyId("titleCache");
+			        taxonTree.setSortContainerPropertyId("titleCache"); //$NON-NLS-1$
 			        taxonTree.sort();
 
 			        //disable polling when all taxa are loaded

@@ -10,6 +10,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.description.CategoricalData;
@@ -38,12 +39,12 @@ public class DetailWindow extends CustomComponent{
 	public Window createWindow(){
 		Window window = new Window();
 		window.setHeightUndefined();
-		window.setHeight("600px");
-		window.setWidth("400px");
+		window.setHeight("600px"); //$NON-NLS-1$
+		window.setWidth("400px"); //$NON-NLS-1$
 		window.setCaption(taxon.getName().getTitleCache());
 		window.setCloseShortcut(KeyCode.W, ModifierKey.CTRL);
 		if(listDescriptions.isEmpty()){
-			window.setContent(new Label("No descriptive data found"));
+			window.setContent(new Label(Messages.DetailWindow_NO_DESCRIPTIVE_DATA_FOUND));
 		}
 		else{
 			window.setContent(constructDescriptionTree(taxon));
@@ -54,7 +55,7 @@ public class DetailWindow extends CustomComponent{
 	private Tree constructDescriptionTree(Taxon taxon){
 		Tree tree = new Tree();
 		tree.setSizeUndefined();
-		String parent = "Descriptive Data";
+		String parent = "Descriptive Data"; //$NON-NLS-1$
 		tree.setValue(parent);
 		initDescriptionTree(tree, listDescriptions, parent);
 		return tree;

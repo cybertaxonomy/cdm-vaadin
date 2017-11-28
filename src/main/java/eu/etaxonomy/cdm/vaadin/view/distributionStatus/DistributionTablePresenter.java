@@ -33,6 +33,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -103,7 +104,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	        }
 	    }
 	    if(namedArea==null){
-	    	Notification.show("Error during update of distribution term!");
+	    	Notification.show(Messages.DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM);
 	    	repo.commitTransaction(tx);
 	    	return -1;
 	    }
@@ -153,7 +154,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 //		getConversationHolder().getSession();
-		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
+		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 //		voc = CdmBase.deproxy(voc);
 		return voc.getTerms();
 	}
@@ -183,7 +184,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	private List<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
-	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
+	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT()).stream().collect(Collectors.toCollection(ArrayList::new));
 	}
@@ -278,27 +279,27 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
-            "$",
-            "elements.*",
-            "elements.sources.citation.authorship.$",
-            "elements.sources.nameUsedInSource.originalNameString",
-            "elements.area.level",
-            "elements.modifyingText",
-            "elements.states.*",
-            "elements.media",
-            "elements.multilanguageText",
-            "multilanguageText",
-            "stateData.$",
-            "annotations",
-            "markers",
-            "sources.citation.authorship",
-            "sources.nameUsedInSource",
-            "multilanguageText",
-            "media",
-            "name.$",
-            "name.rank",
-            "name.status.type",
-            "taxon2.name",
+            "$", //$NON-NLS-1$
+            "elements.*", //$NON-NLS-1$
+            "elements.sources.citation.authorship.$", //$NON-NLS-1$
+            "elements.sources.nameUsedInSource.originalNameString", //$NON-NLS-1$
+            "elements.area.level", //$NON-NLS-1$
+            "elements.modifyingText", //$NON-NLS-1$
+            "elements.states.*", //$NON-NLS-1$
+            "elements.media", //$NON-NLS-1$
+            "elements.multilanguageText", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "stateData.$", //$NON-NLS-1$
+            "annotations", //$NON-NLS-1$
+            "markers", //$NON-NLS-1$
+            "sources.citation.authorship", //$NON-NLS-1$
+            "sources.nameUsedInSource", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "media", //$NON-NLS-1$
+            "name.$", //$NON-NLS-1$
+            "name.rank", //$NON-NLS-1$
+            "name.status.type", //$NON-NLS-1$
+            "taxon2.name", //$NON-NLS-1$
     });
 
 	/**Helper Methods*/
