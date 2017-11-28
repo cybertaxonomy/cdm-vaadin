@@ -87,8 +87,8 @@ public class DistributionStatusQuery implements Query{
         for(int i=startIndex; i<startIndex+count; i++) {
             if(i<this.size()) {
                 UUID nodeUuid = this.nodeUuids.get(i);
-                final TaxonNode taxonNode = CdmSpringContextHelper.getTaxonNodeService().load(nodeUuid, Arrays.asList("taxon"));
-                final Taxon taxon = taxonNode.getTaxon();
+                TaxonNode taxonNode = CdmSpringContextHelper.getTaxonNodeService().load(nodeUuid, Arrays.asList("taxon"));
+                Taxon taxon = taxonNode.getTaxon();
                 Item item = new PropertysetItem();
                 item.addItemProperty(UUID_COLUMN, new ObjectProperty<>(taxon.getUuid(), UUID.class));
                 item.addItemProperty(TAXON_COLUMN, new ObjectProperty<>(taxon.getTitleCache(), String.class));
@@ -98,7 +98,7 @@ public class DistributionStatusQuery implements Query{
                     UUID distributionStatusUuid = (distributionStatus != null) ? distributionStatus.getUuid() : null;
                     item.addItemProperty(namedArea.getUuid(), new ObjectProperty<>(distributionStatusUuid, UUID.class));
                 }
-                if(definition.getFilters().parallelStream().allMatch(f -> f.passesFilter(nodeUuid, item))) {
+                if(definition.getFilters().parallelStream().allMatch(f -> f.passesFilter(taxon.getUuid(), item))) {
                     items.add(item);
                 }
             }
