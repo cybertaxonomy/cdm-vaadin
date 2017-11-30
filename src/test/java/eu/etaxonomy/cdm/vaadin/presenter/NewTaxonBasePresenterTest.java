@@ -17,7 +17,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
 
@@ -37,7 +36,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 2 Apr 2015
  *
  */
-@Ignore
 @DataSet
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 

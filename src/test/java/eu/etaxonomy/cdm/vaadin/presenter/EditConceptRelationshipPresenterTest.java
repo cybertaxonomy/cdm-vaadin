@@ -17,7 +17,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
 
@@ -35,7 +34,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 13 Apr 2015
  *
  */
-@Ignore
 @DataSet
 public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
@@ -54,7 +52,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testLoadTaxonRelationshipTypeContainer() throws SQLException {
         CdmSQLContainer container = ecrp.loadTaxonRelationshipTypeContainer();
-        Assert.assertEquals(30, container.size());
+        Assert.assertEquals(27, container.size());
     }
 
 
@@ -75,8 +73,10 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testUpdateRelationship() {
         UUID fromTaxonUuid = UUID.fromString("666b484f-dc1e-4578-b404-86bc6d2e47fa");
+        // RelType "Not Congruent to" id=864 before: (935)
         UUID taxonRelUuid = UUID.fromString("9634d870-bab1-4fdc-8845-c7e71aa8dc6b");
         UUID newToTaxonUuid = UUID.fromString("5004a8e7-b907-4744-b67e-44ccb057ab3b");
+        // RelType "Contradiction"
         UUID newRelTypeUuid = UUID.fromString("a8f03491-2ad6-4fae-a04c-2a4c117a2e9b");
 
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(fromTaxonUuid,FROM_TAXON_INIT_STRATEGY),Taxon.class);
@@ -127,6 +127,8 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testDeleteRelationship() {
         UUID fromTaxonUuid = UUID.fromString("5f713f69-e03e-4a11-8a55-700fbbf44805");
+
+        // RelType "Not Included in" id=865 before (924)
         UUID taxonRelUuid = UUID.fromString("cac9fa65-9b15-445f-80e4-56f77952f7ec");
 
         ecrp.deleteRelationship(fromTaxonUuid, taxonRelUuid);
@@ -137,6 +139,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         Assert.assertNull(tr);
 
         fromTaxonUuid = UUID.fromString("666b484f-dc1e-4578-b404-86bc6d2e47fa");
+        // Reltype "Includes or Overlaps or Excludes" id = 866 (before: 934)
         taxonRelUuid = UUID.fromString("9634d870-bab1-4fdc-8845-c7e71aa8dc6b");
 
         ecrp.deleteRelationship(fromTaxonUuid, taxonRelUuid);
@@ -152,7 +155,7 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         Map<String, IdUuidName> map = ecrp.getRelTypeToTaxonIunMap(fromTaxonUuid, taxonRelUuid);
 
         IdUuidName relTypeIun = map.get(EditConceptRelationshipPresenter.REL_TYPE_KEY);
-        Assert.assertEquals(924, relTypeIun.getId());
+        Assert.assertEquals(865, relTypeIun.getId());
 
         IdUuidName toTaxonIun = map.get(EditConceptRelationshipPresenter.TO_TAXON_KEY);
         Assert.assertEquals(20, toTaxonIun.getId());

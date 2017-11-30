@@ -16,7 +16,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
@@ -35,8 +34,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 9 Apr 2015
  *
  */
-@Ignore
-@DataSet
+@DataSet // (loadStrategy=CleanSweepInsertLoadStrategy.class) // user admin id 5000 is missing in this set!!!
 public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(ConceptRelationshipPresenterTest.class);
@@ -76,13 +74,15 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     public void testAbbreviatedNameGeneration() {
-        TransactionStatus tx = app.startTransaction();
+
+        // TransactionStatus tx = app.startTransaction();
         UUID nameUuid = UUID.fromString("7ebe3f1f-c383-4611-95da-4ee633a12d3a");
-        TaxonName name = CdmBase.deproxy(nameService.load(nameUuid));
+        TaxonName name = nameService.load(nameUuid);
+        name = CdmBase.deproxy(name);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
         Assert.assertEquals("T. × withverylongspecificepithet subsp.", abbreviatedName);
-        app.commitTransaction(tx);
+        // app.commitTransaction(tx);
 
     }
 
