@@ -35,6 +35,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 9 Apr 2015
  *
  */
+@Ignore
 @DataSet
 public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 

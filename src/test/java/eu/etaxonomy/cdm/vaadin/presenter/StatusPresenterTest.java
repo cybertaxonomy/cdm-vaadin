@@ -19,6 +19,7 @@ import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
@@ -32,6 +33,7 @@ import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
  * @author cmathew
  * @date 10 Mar 2015
  */
+@Ignore
 @DataSet
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
@@ -42,9 +44,8 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @BeforeClass
     public static void init() {
         sp = new StatusPresenter();
+        // Logger.getLogger("org.dbunit").setLevel(Level.DEBUG);
     }
-
-
 
     @Test
     public void testLoadTaxa() throws SQLException {
@@ -82,14 +83,18 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    @DataSet
     public void updatePublishFlag() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
         RowId taxonId = new RowId(10);
-        boolean pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        Item item = container.getItem(taxonId);
+        Property itemProperty = item.getItemProperty(LeafNodeTaxonContainer.PB_ID);
+        boolean pb = (Boolean) itemProperty.getValue();
         Assert.assertTrue(pb);
         sp.updatePublished(false, taxonId);
         container.refresh();
-        pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        pb = (Boolean) itemProperty.getValue();
         Assert.assertFalse(pb);
     }
 

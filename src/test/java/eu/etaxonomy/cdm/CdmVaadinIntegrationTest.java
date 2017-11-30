@@ -19,12 +19,16 @@ import eu.etaxonomy.cdm.test.integration.CdmIntegrationTest;
 import unitils.AlternativeUnitilsJUnit4TestClassRunner;
 
 /**
+ * Base test class for pure service layer tests.
+ *
+ * The application context will not contain any Webservice application context!
+ *
  * @author a.kohlbecker
  * @since Nov 24, 2017
  *
  */
 @RunWith(AlternativeUnitilsJUnit4TestClassRunner.class)
-@SpringApplicationContext("file:./src/test/resources/webapp/WEB-INF/applicationContext-alternative.xml")
+@SpringApplicationContext("file:./src/test/resources/eu/etaxonomy/cdm/applicationContext-service-integration.xml")
 @Transactional(TransactionMode.DISABLED)
 public abstract class CdmVaadinIntegrationTest extends CdmIntegrationTest {
 

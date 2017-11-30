@@ -28,7 +28,12 @@
     <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/>
 
     <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
-        <property name="omit" value="false"/>
+        <property name="omit" value="true"/>
+    </bean>
+    
+    <bean id="termInitializer" class="eu.etaxonomy.cdm.database.TestingTermInitializer">
+        <property name="termsDataSet" value="classpath:/eu/etaxonomy/cdm/database/TermsDataSet-ui-registration-with_auditing_info.xml"/> 
+        <property name="termsDtd" value="classpath:/eu/etaxonomy/cdm/database/schema/dataset.dtd"/>
     </bean>
 
     <bean id="hibernateProperties"

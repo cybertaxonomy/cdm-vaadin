@@ -32,7 +32,7 @@
    </bean>
    <context:component-scan base-package="eu/etaxonomy/cdm/ext" />
 
-  <import resource="classpath:/eu/etaxonomy/cdm/remote.xml"/>
+  <!--   <import resource="classpath:/eu/etaxonomy/cdm/remote.xml"/> -->
   <!--   <context:component-scan base-package="eu/etaxonomy/cdm/io">
         <context:exclude-filter type="regex" expression="eu\.etaxonomy\.cdm\.io\.pesi.*" />
         <context:exclude-filter type="regex" expression="eu\.etaxonomy\.cdm\.io\.faunaEuropaea.*" />

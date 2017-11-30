@@ -71,7 +71,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
 
 
     @Test
-    @DataSet
+    @DataSet("SpecimenTypeDesignationWorkingsetEditorPresenterTest.xml")
     public void createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
        //printDataSetWithNull(System.err, debugTables);

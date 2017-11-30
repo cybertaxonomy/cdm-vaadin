@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.util.converter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -22,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -36,7 +38,6 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
-import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
@@ -47,7 +48,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  * @since Mar 10, 2017
  *
  */
-public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
+public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
 
 
     private NameTypeDesignation ntd;
@@ -182,6 +183,15 @@ public class TypeDesignationSetManagerTest extends CdmVaadinBaseTest{
                 "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA); NameType: Prionus L. Species Plantarum"
                 , typeDesignationManager.buildString().print()
                 );
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createTestDataSet() throws FileNotFoundException {
+        // TODO Auto-generated method stub
 
     }
 }
