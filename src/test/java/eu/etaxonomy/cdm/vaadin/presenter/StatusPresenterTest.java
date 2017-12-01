@@ -48,7 +48,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @BeforeClass
     public static void init() {
         sp = new StatusPresenter();
-        // Logger.getLogger("org.dbunit").setLevel(Level.DEBUG);
     }
 
     @Test
@@ -91,7 +90,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
-    @DataSet
     @Ignore
     public void updatePublishFlag() throws SQLException {
 
@@ -116,7 +114,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         Assert.assertNull(classificationId);
     }
 
-    @Ignore
     @Test
     public void testLoadClassifications() throws SQLException {
         CdmSQLContainer container = sp.loadClassifications();
