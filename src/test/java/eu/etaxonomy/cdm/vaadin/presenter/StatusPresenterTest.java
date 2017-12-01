@@ -33,7 +33,6 @@ import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
  * @author cmathew
  * @date 10 Mar 2015
  */
-@Ignore
 @DataSet
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
@@ -48,7 +47,9 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    @Ignore
     public void testLoadTaxa() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
 
         Collection<?> itemIds = container.rootItemIds();
@@ -70,7 +71,9 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    @Ignore
     public void testSynonyms() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
 
         RowId taxonId10 = new RowId(10);
@@ -84,6 +87,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     @DataSet
+    @Ignore
     public void updatePublishFlag() throws SQLException {
 
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
