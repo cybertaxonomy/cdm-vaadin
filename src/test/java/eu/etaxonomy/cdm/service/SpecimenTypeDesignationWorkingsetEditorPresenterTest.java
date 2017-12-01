@@ -74,6 +74,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
     @DataSet("SpecimenTypeDesignationWorkingsetEditorPresenterTest.xml")
     public void createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
+//        printDataSetWithNull(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
+//                , "PERMISSIONGROUP", "PERMISSIONGROUP_GRANTEDAUTHORITYIMPL", "GRANTEDAUTHORITYIMPL"});
+
        //printDataSetWithNull(System.err, debugTables);
 //        writeDbUnitDataSetFile(new String[]{"AUDITEVENT", "DEFINEDTERMBASE", "DEFINEDTERMBASE_AUD", "DEFINEDTERMBASE_REPRESENTATION", "DEFINEDTERMBASE_REPRESENTATION_AUD",
 //                "REPRESENTATION", "REPRESENTATION_AUD", "HIBERNATE_SEQUENCES"},

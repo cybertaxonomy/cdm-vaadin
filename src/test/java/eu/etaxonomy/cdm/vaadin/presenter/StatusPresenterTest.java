@@ -17,11 +17,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.sqlcontainer.RowId;
 
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.IStatusComposite;
 import eu.etaxonomy.cdm.vaadin.component.taxon.StatusPresenter;
@@ -33,7 +35,10 @@ import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
  * @author cmathew
  * @date 10 Mar 2015
  */
-@DataSet
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);

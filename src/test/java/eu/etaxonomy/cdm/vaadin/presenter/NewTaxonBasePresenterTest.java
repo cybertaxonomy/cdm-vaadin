@@ -19,12 +19,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.INewTaxonBaseComponentListener;
 import eu.etaxonomy.cdm.vaadin.component.taxon.INewTaxonBaseComposite;
@@ -36,7 +38,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 2 Apr 2015
  *
  */
-@DataSet
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
 
     @SuppressWarnings("unused")

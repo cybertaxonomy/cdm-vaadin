@@ -17,11 +17,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
@@ -34,7 +36,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 9 Apr 2015
  *
  */
-@DataSet // (loadStrategy=CleanSweepInsertLoadStrategy.class) // user admin id 5000 is missing in this set!!!
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(ConceptRelationshipPresenterTest.class);

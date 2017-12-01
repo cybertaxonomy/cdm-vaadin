@@ -19,10 +19,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonRelationship;
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.EditConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -34,7 +36,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 13 Apr 2015
  *
  */
-@DataSet
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(EditConceptRelationshipPresenterTest.class);
