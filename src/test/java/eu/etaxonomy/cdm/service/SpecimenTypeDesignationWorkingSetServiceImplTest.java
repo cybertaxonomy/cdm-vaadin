@@ -13,8 +13,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.unitils.database.annotations.Transactional;
+import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
@@ -46,6 +47,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  * @since Nov 17, 2017
  *
  */
+@Transactional(TransactionMode.ROLLBACK)
 public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinIntegrationTest{
 
     @SpringBeanByName
@@ -138,7 +140,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    @Ignore
+    //@Ignore
     public void deleteTypeDesignationTest() {
 
         // printDataSetWithNull(System.err, includeTableNames_delete);
