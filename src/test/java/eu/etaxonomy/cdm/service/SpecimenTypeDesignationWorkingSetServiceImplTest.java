@@ -32,6 +32,7 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -45,7 +46,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  * @since Nov 17, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaadinIntegrationTest{
+public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinIntegrationTest{
 
     @SpringBeanByName
     private CdmRepository cdmRepository;
@@ -66,12 +67,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
             "DERIVATIONEVENT", "GATHERINGEVENT", "LANGUAGESTRING", "SPECIMENOROBSERVATIONBASE", "TYPEDESIGNATIONBASE",
             "REGISTRATION_TYPEDESIGNATIONBASE", "TAXONNAME_TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT",
             "MEDIA", "MEDIA_REPRESENTATION", "MEDIAREPRESENTATION", "MEDIAREPRESENTATIONPART",
+            "AUDITEVENT",
             "HIBERNATE_SEQUENCES"
             };
 
 
     @Test
-    @DataSet("SpecimenTypeDesignationWorkingsetEditorPresenterTest.xml")
+    @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
     public void createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
 //        printDataSetWithNull(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
@@ -135,7 +137,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
     }
 
     @Test
-    @DataSet("SpecimenTypeDesignationWorkingsetEditorPresenterTest-deleteTest.xml")
+    @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     @Ignore
     public void deleteTypeDesignationTest() {
 
@@ -168,14 +170,29 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenterTest extends CdmVaa
     }
 
     @Test
-    @DataSet("SpecimenTypeDesignationWorkingsetEditorPresenterTest-deleteTest.xml")
-    @Ignore
+    @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     public void deleteWorkingsetTest() {
 
+        printDataSetWithNull(System.err, includeTableNames_delete);
+
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
-        //TODO implement ...
+        service.delete(workingset, true);
+
+//        UUID gatheringEventUUID = UUID.fromString("23d40440-38bb-46c1-af11-6e25dcfa0145");
+//        UUID fieldUnitUUID = UUID.fromString("22be718a-6f21-4b74-aae3-bb7d7d659e1c");
+//        UUID mediaSpecimenUUID = UUID.fromString("10eceb2c-9b51-458e-8dcd-2cb92cc558a9");
+//        UUID specimenUUID = UUID.fromString("2e384f8e-fbb0-44eb-9d5f-1b7235493932");
+//        UUID typeDesignation1UUID = UUID.fromString("a1896ae2-4396-4243-988e-3d74058b44ab");
+//        UUID typeDesignation2UUID = UUID.fromString("a1896ae2-4396-4243-988e-3d74058b44ab");
 
 
+        Assert.assertEquals("All TypeDesignations should have been deleted", 0, cdmRepository.getNameService().getAllTypeDesignations(10, 0).size());
+        Assert.assertEquals("All derived units should have been deleted", 0, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
+        Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
+        // FIXME Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
+        // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
+
+        printDataSetWithNull(System.err, includeTableNames_delete);
     }
 
     // ---------------------- TestData -------------------------------------------

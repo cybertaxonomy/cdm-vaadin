@@ -60,7 +60,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
         specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
         specimenDeleteConfigurer.setDeleteMolecularData(true);
-        specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
     }
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
@@ -194,13 +193,21 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
 
+        if(dto.getOwner() instanceof Registration){
+            Registration registration = (Registration) dto.getOwner();
+            registration.getTypeDesignations().clear();
+            repo.getRegistrationService().save(registration);
+        } else {
+            throw new RuntimeException("Unimplemented owner type");
+        }
         DerivedUnit du = std.getTypeSpecimen();
-        du.removeSpecimenTypeDesignation(std);
         DerivationEvent derivationEvent = du.getDerivedFrom();
+
+        du.removeSpecimenTypeDesignation(std);
         derivationEvent.removeDerivative(du);
         std.setTypeSpecimen(null);
-        repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
         repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
+        repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
 //        if(derivationEvent.getDerivatives().size() == 0){
 //          getRepo().getEventBaseService().delete(derivationEvent);
 //      }
