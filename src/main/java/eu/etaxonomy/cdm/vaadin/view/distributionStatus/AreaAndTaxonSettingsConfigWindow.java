@@ -288,7 +288,7 @@ public class AreaAndTaxonSettingsConfigWindow
                 }
 			}
             areaVoc = (TermVocabulary<NamedArea>) distAreaBox.getValue();
-            Set<NamedArea> selectedAreas = (Set<NamedArea>) namedAreaList.getValue();
+            List<NamedArea> selectedAreas = new ArrayList<>((Set<NamedArea>)namedAreaList.getValue()); //getValue is LinkedHashSet and therefore sorted
             DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, areaVoc, selectedAreas, classificationUuid);
             window.close();
         }

@@ -2,7 +2,6 @@ package eu.etaxonomy.cdm.vaadin.util;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
@@ -31,7 +30,8 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
-    public static void updateDistributionView(IDistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc, Set<NamedArea> selectedAreas, UUID classificationUuid) {
+    public static void updateDistributionView(IDistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc,
+            List<NamedArea> selectedAreas, UUID classificationUuid) {
 	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, taxonNodes);
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREA_VOCABULARY_UUID, areaVoc.getUuid());
 	    VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREAS, selectedAreas);

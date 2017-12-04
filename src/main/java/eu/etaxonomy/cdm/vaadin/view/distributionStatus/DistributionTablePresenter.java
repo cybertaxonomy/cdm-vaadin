@@ -37,6 +37,7 @@ import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.OrderedTermVocabulary;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.description.DescriptionBase;
@@ -171,14 +172,11 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	public List<NamedArea> getNamedAreas(){
-	    Set<NamedArea> namedAreas = (Set<NamedArea>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
+	    List<NamedArea> namedAreas = (List<NamedArea>)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
 	    if(namedAreas!=null && namedAreas.isEmpty()){
 	        return getTermSet();
 	    }
-	    if(namedAreas != null) {
-	        return namedAreas.stream().collect(Collectors.toCollection(ArrayList::new));
-	    }
-	    return null;
+	    return namedAreas;
 	}
 
 	private List<NamedArea> getTermSet(){
@@ -186,7 +184,14 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
-	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT()).stream().collect(Collectors.toCollection(ArrayList::new));
+	    if (vocabulary instanceof OrderedTermVocabulary) {
+	        List<NamedArea> list = new ArrayList<> (((OrderedTermVocabulary)vocabulary).getOrderedTerms());
+	        Collections.reverse(list);
+	        return list;
+	    }else {
+	        return vocabulary.getTermsOrderedByLabels(Language.DEFAULT()).stream().collect(Collectors.toCollection(ArrayList::new));
+	    }
+
 	}
 
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {

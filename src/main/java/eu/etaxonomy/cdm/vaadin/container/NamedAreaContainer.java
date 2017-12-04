@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.vaadin.data.util.BeanItemContainer;
 
+import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.OrderedTermVocabulary;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.vaadin.util.TermCacher;
@@ -18,8 +20,16 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 	public NamedAreaContainer(TermVocabulary<NamedArea> vocabulary)
 	        throws IllegalArgumentException {
 	    super(NamedArea.class);
-	    List<NamedArea> namedAreas = new ArrayList<>(vocabulary.getTerms());
-	    Collections.sort(namedAreas, new AlphabeticallyAscendingNamedAreaComparator());
+	    List<NamedArea> namedAreas;
+	    if (vocabulary.isInstanceOf(OrderedTermVocabulary.class)) {
+	        OrderedTermVocabulary orderedVoc = CdmBase.deproxy(vocabulary, OrderedTermVocabulary.class);
+	        namedAreas = new ArrayList<>(orderedVoc.getOrderedTerms());
+	        Collections.reverse(namedAreas);
+	    }else {
+	        namedAreas = new ArrayList<>(vocabulary.getTerms());
+	        Collections.sort(namedAreas, new AlphabeticallyAscendingNamedAreaComparator());
+	    }
+
 	    TermCacher termCacher = TermCacher.getInstance();
 	    for (NamedArea namedArea: namedAreas) {
 	        termCacher.addNamedArea(namedArea);
