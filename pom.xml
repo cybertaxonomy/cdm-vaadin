@@ -167,6 +167,14 @@
         <!-- all main resources without filtering -->
         <directory>src/main/resources</directory>
       </resource>
+      <resource>
+        <!-- i10n resources -->
+        <directory>src/main/java/eu/etaxonomy/cdm/i10n</directory>
+        <targetPath>../classes/eu/etaxonomy/cdm/i10n</targetPath>
+        <excludes>
+            <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
     </resources>
     <plugins>
         <plugin>
