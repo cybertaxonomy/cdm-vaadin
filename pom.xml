@@ -11,7 +11,7 @@
     <vaadin.version>7.7.10</vaadin.version>
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.12.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>4.13.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
@@ -172,16 +172,16 @@
         <directory>src/main/java/eu/etaxonomy/cdm/i10n</directory>
         <targetPath>../classes/eu/etaxonomy/cdm/i10n</targetPath>
         <excludes>
-            <exclude>**/*.java</exclude>
+          <exclude>**/*.java</exclude>
         </excludes>
       </resource>
     </resources>
     <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.0.1</version>
-        </plugin>    
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.1</version>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -485,9 +485,9 @@
       <version>1.0.3</version>
     </dependency>
     <dependency>
-        <groupId>org.vaadin.addons.lazyquerycontainer</groupId>
-        <artifactId>vaadin-lazyquerycontainer</artifactId>
-        <version>7.6.1.3</version>
+      <groupId>org.vaadin.addons.lazyquerycontainer</groupId>
+      <artifactId>vaadin-lazyquerycontainer</artifactId>
+      <version>7.6.1.3</version>
     </dependency>
     <!-- 
     <dependency>
