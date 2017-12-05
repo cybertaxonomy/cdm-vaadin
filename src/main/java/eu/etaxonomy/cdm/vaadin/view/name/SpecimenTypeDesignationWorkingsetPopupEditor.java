@@ -24,6 +24,7 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
@@ -42,7 +43,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
-
     /**
      * @param layout
      * @param dtoType
@@ -53,8 +53,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         grid.setMargin(true);
         grid.setSpacing(true);
     }
-
-
 
     private static final long serialVersionUID = 5418275817834009509L;
 
@@ -155,6 +153,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
+                //getPresenter().specimenTypeDesignationDTOInstantiator(getBean());
                 SpecimenTypeDesignationDTORow.class
                 );
         typeDesignationsCollectionField.withCaption("Types");
@@ -162,6 +161,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         typeDesignationsCollectionField.getLayout().setColumns(3);
 
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
+        typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
 
@@ -248,6 +248,34 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     public void grantToCurrentUser(EnumSet<CRUD> crud) {
         getPresenter().setGrantsForCurrentUser(crud);
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void afterItemDataSourceSet() {
+        super.afterItemDataSourceSet();
+        GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
+        for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){ // first row is header
+            Component item = gridLayout.getComponent(0, rowIndex);
+            ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
+        }
+        updateAllowDelete();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateAllowDelete(){
+        // disable the delete button if there is only one typeDesignation
+        // if this typeDesignation is deleted the fieldUnit would become orphan in the
+        // TypeDesignationWorkingSet
+        GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
+        if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
+            gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);
+        }
     }
 
 

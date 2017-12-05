@@ -18,6 +18,7 @@ import com.vaadin.data.util.filter.Compare.Equal;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.model.taxon.TaxonBase;
 import eu.etaxonomy.cdm.vaadin.component.taxon.IStatusComposite.StatusComponentListener;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
@@ -156,7 +157,8 @@ public class StatusPresenter implements StatusComponentListener {
     @Override
     public void updatePublished(boolean pb, Object itemId) {
         UUID uuid = UUID.fromString((String)leafNodeTaxonContainer.getItem(itemId).getItemProperty(CdmQueryFactory.UUID_ID).getValue());
-        Taxon taxon = CdmBase.deproxy(taxonService.load(uuid), Taxon.class);
+        TaxonBase taxonBase  = taxonService.load(uuid);
+        Taxon taxon = CdmBase.deproxy(taxonBase, Taxon.class);
         boolean currentPb = taxon.isPublish();
         if(currentPb != pb) {
             taxon.setPublish(pb);

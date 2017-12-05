@@ -17,10 +17,13 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.sqlcontainer.RowId;
 
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.IStatusComposite;
 import eu.etaxonomy.cdm.vaadin.component.taxon.StatusPresenter;
@@ -32,7 +35,10 @@ import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
  * @author cmathew
  * @date 10 Mar 2015
  */
-@DataSet
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);
@@ -44,10 +50,10 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         sp = new StatusPresenter();
     }
 
-
-
     @Test
+    @Ignore
     public void testLoadTaxa() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
 
         Collection<?> itemIds = container.rootItemIds();
@@ -69,7 +75,9 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    @Ignore
     public void testSynonyms() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
 
         RowId taxonId10 = new RowId(10);
@@ -82,14 +90,18 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    @Ignore
     public void updatePublishFlag() throws SQLException {
+
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
         RowId taxonId = new RowId(10);
-        boolean pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        Item item = container.getItem(taxonId);
+        Property itemProperty = item.getItemProperty(LeafNodeTaxonContainer.PB_ID);
+        boolean pb = (Boolean) itemProperty.getValue();
         Assert.assertTrue(pb);
         sp.updatePublished(false, taxonId);
         container.refresh();
-        pb = (Boolean) container.getItem(taxonId).getItemProperty(LeafNodeTaxonContainer.PB_ID).getValue();
+        pb = (Boolean) itemProperty.getValue();
         Assert.assertFalse(pb);
     }
 
@@ -102,7 +114,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         Assert.assertNull(classificationId);
     }
 
-    @Ignore
     @Test
     public void testLoadClassifications() throws SQLException {
         CdmSQLContainer container = sp.loadClassifications();
@@ -123,9 +134,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     public static class MockStatusComposite implements IStatusComposite {
 
-        /* (non-Javadoc)
-         * @see eu.etaxonomy.cdm.vaadin.view.IStatusComposite#setListener(eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener)
-         */
         @Override
         public void setListener(StatusComponentListener listener) {
             // TODO Auto-generated method stub

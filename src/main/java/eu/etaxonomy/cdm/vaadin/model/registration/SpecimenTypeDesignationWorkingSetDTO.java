@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -21,25 +22,36 @@ import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.location.Point;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
+import eu.etaxonomy.cdm.model.reference.Reference;
 
 /**
  * @author a.kohlbecker
  * @since Jun 16, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingSetDTO {
+public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntity> {
 
     FieldUnit fieldUnit;
 
     VersionableEntity baseEntity;
 
-    List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>();
+    /**
+     * List of all SpecimenTypeDesignation that have been loaded into the
+     * DTO. By comparing this list with <code>specimenTypeDesignations</code>
+     * it is possible to find those that have been deleted.
+     */
+    List<SpecimenTypeDesignation> specimenTypeDesignationsLoaded = new ArrayList<>();
 
     List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
 
-    VersionableEntity owner;
+    OWNER owner;
+
+    private Reference citation;
+
+    private TaxonName typifiedName;
 
     /**
      *
@@ -47,10 +59,18 @@ public class SpecimenTypeDesignationWorkingSetDTO {
      * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationWorkingSetDTO(VersionableEntity owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations) {
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, Reference citation, TaxonName typifiedName) {
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
+        if(citation == null){
+            throw new NullPointerException("citation must not be null");
+        }
+        if(typifiedName == null){
+            throw new NullPointerException("typifiedName must not be null");
+        }
+        this.citation = citation;
+        this.typifiedName = typifiedName;
         if(baseEntity instanceof FieldUnit){
             this.fieldUnit = (FieldUnit) baseEntity;
             if(fieldUnit.getGatheringEvent() == null){
@@ -58,9 +78,19 @@ public class SpecimenTypeDesignationWorkingSetDTO {
             }
         }
         if(specimenTypeDesignations != null){
-            this.specimenTypeDesignations = specimenTypeDesignations;
-            this.specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
+            specimenTypeDesignationsLoaded = specimenTypeDesignations;
+            specimenTypeDesignations.forEach(std -> specimenTypeDesignationsDTOs.add(new SpecimenTypeDesignationDTO(std)));
         }
+    }
+
+    /**
+     * @param reg
+     * @param newfieldUnit
+     * @param citationEntityID
+     * @param typifiedNameEntityID
+     */
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, Reference citation, TaxonName typifiedName) {
+        this(reg, newfieldUnit, null, citation, typifiedName);
     }
 
     /**
@@ -82,9 +112,13 @@ public class SpecimenTypeDesignationWorkingSetDTO {
     }
 
     /**
-     * @return the derivedUnits
+     * @return the typeDesignation entities managed in this workingset
      */
     protected List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
+        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList(specimenTypeDesignationsDTOs.size());
+        for(SpecimenTypeDesignationDTO dto : specimenTypeDesignationsDTOs){
+            specimenTypeDesignations.add(dto.asSpecimenTypeDesignation());
+        }
         return specimenTypeDesignations;
     }
 
@@ -93,12 +127,12 @@ public class SpecimenTypeDesignationWorkingSetDTO {
     }
 
     /**
-     * The IdentifiableEntity which contains the DerivedUnit in this working set.
-     *
+     * The {@link VersionableEntity} which contains the DerivedUnit in this working set.
+     * This can be for example a {@link Registration} entity
      *
      * @return
      */
-    public VersionableEntity getOwner() {
+    public OWNER getOwner() {
         return owner;
     }
 
@@ -261,6 +295,44 @@ public class SpecimenTypeDesignationWorkingSetDTO {
 
     public void getGatheringDate(Partial gatheringDate){
         fieldUnit.getGatheringEvent().setGatheringDate(gatheringDate);
+    }
+
+    /**
+     * @return the citation
+     */
+    public Reference getCitation() {
+        return citation;
+    }
+
+    /**
+     * @param citation the citation to set
+     */
+    public void setCitation(Reference citation) {
+        this.citation = citation;
+    }
+
+    /**
+     * @return the typifiedName
+     */
+    public TaxonName getTypifiedName() {
+        return typifiedName;
+    }
+
+    /**
+     * @param typifiedName the typifiedName to set
+     */
+    public void setTypifiedName(TaxonName typifiedName) {
+        this.typifiedName = typifiedName;
+    }
+
+    /**
+     *
+     * @return the set of SpecimenTypeDesignation that haven been deleted from the <code>SpecimenTypeDesignationWorkingSetDTO</code>.
+     */
+    public Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations() {
+        Set<SpecimenTypeDesignation> deletedEntities = new HashSet<>(specimenTypeDesignationsLoaded);
+        deletedEntities.removeAll(getSpecimenTypeDesignations());
+        return deletedEntities;
     }
 
 }

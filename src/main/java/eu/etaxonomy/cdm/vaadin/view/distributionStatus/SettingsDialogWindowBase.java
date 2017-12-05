@@ -7,6 +7,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.SettingsPresenterBase;
 
 @SuppressWarnings("serial")
@@ -34,16 +35,16 @@ public abstract class SettingsDialogWindowBase<P extends SettingsPresenterBase> 
 		HorizontalLayout buttonToolBar = new HorizontalLayout();
 	    // cancelButton
 	    cancelButton = new Button();
-	    cancelButton.setCaption("Cancel");
+	    cancelButton.setCaption(Messages.SettingsDialogWindowBase_CANCEL);
 	    cancelButton.setImmediate(true);
-	    cancelButton.addStyleName("dialogButton");
+	    cancelButton.addStyleName("dialogButton"); //$NON-NLS-1$
 	    buttonToolBar.addComponent(cancelButton);
 
 	    // okButton
 	    okButton = new Button();
-	    okButton.setCaption("OK");
+	    okButton.setCaption(Messages.SettingsDialogWindowBase_OK);
 	    okButton.setImmediate(true);
-	    okButton.addStyleName("dialogButton");
+	    okButton.addStyleName("dialogButton"); //$NON-NLS-1$
 	    buttonToolBar.addComponent(okButton);
 		return buttonToolBar;
 	}
@@ -51,8 +52,8 @@ public abstract class SettingsDialogWindowBase<P extends SettingsPresenterBase> 
 	public Window createWindow(String caption) {
 	    window = new Window();
 	    window.setModal(true);
-	    window.setWidth("60%");
-	    window.setHeight("80%");
+	    window.setWidth("60%"); //$NON-NLS-1$
+	    window.setHeight("80%"); //$NON-NLS-1$
 	    window.setCaption(caption);
 	    window.setContent(mainLayout);
 	    return window;

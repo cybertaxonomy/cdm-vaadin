@@ -27,6 +27,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -55,6 +56,17 @@ import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
 
 /**
+ *
+ * Can create missing registrations for names which have Extensions of the Type <code>IAPTRegdata.json</code>.
+ * See https://dev.e-taxonomy.eu/redmine/issues/6621 for further details.
+ * This feature can be activated by by supplying one of the following jvm command line arguments:
+ * <ul>
+ * <li><code>-DregistrationCreate=iapt</code>: create all iapt Registrations if missing</li>
+ * <li><code>-DregistrationWipeout=iapt</code>: remove all iapt Registrations</li>
+ * <li><code>-DregistrationWipeout=all</code>: remove all Registrations</li>
+ * </ul>
+ * The <code>-DregistrationWipeout</code> commands are executed before the <code>-DregistrationCreate</code> and will not change the name and type designations.
+ *
  * @author a.kohlbecker
  * @since May 9, 2017
  *
@@ -114,7 +126,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     /**
      *
      */
+    @Transactional
     private void insertRequiredData() {
+
+        TransactionStatus txStatus = repo.startTransaction(false);
 
         Role roleCuration = RolesAndPermissions.ROLE_CURATION;
         if(repo.getGrantedAuthorityService().find(roleCuration.getUuid()) == null){
@@ -169,8 +184,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             }
         }
         // --------------------------------------------------------------------------------------
-
-        repo.getSession().flush();
+        txStatus.flush();
+        repo.commitTransaction(txStatus);
 
     }
 
@@ -359,7 +374,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
                 }
                 repo.getRegistrationService().save(newRegs);
-                repo.getRegistrationService().getSession().flush();
+                tx.flush();
                 logger.debug("Registrations saved");
                 pageIndex++;
             }

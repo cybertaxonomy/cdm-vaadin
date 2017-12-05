@@ -8,10 +8,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
 
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 
 
-@DataSet
+@DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class, value="CdmSQLContainerTest.xml")
 public class CdmSQLContainerTest extends CdmVaadinBaseTest {
 
 	@SuppressWarnings("unused")
@@ -19,12 +20,13 @@ public class CdmSQLContainerTest extends CdmVaadinBaseTest {
 
 
 	@Test
+	@DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class, value="CdmSQLContainerTest.xml")
 	public void testTaxonContainer() throws SQLException {
 
 		CdmSQLContainer csc = CdmSQLContainer.newInstance("TaxonBase");
 		Collection<?> propIds = csc.getContainerPropertyIds();
 		Collection<?> itemIds = csc.getItemIds();
-		Assert.assertEquals(itemIds.size(),38);
+		Assert.assertEquals(38, itemIds.size());
 	}
 
 

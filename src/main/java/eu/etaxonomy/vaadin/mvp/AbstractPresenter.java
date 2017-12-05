@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -82,7 +81,13 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
      */
     protected Session getSession() {
         Session session = getRepo().getSession();
-        logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
+        if(logger.isTraceEnabled()){
+            if(session.isOpen()){
+                logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
+            }  else {
+                logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +"  is closed ");
+            }
+        }
         return session;
     }
 

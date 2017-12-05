@@ -16,13 +16,14 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.transaction.TransactionStatus;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.DataSets;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipPresenter;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
@@ -35,7 +36,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
  * @date 9 Apr 2015
  *
  */
-@DataSet
+@DataSets({
+    @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
+    @DataSet("/eu/etaxonomy/cdm/database/FirstData_UsersAndPermissions.xml")
+})
 public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(ConceptRelationshipPresenterTest.class);
@@ -75,13 +79,15 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     public void testAbbreviatedNameGeneration() {
-        TransactionStatus tx = app.startTransaction();
+
+        // TransactionStatus tx = app.startTransaction();
         UUID nameUuid = UUID.fromString("7ebe3f1f-c383-4611-95da-4ee633a12d3a");
-        TaxonName name = CdmBase.deproxy(nameService.load(nameUuid));
+        TaxonName name = nameService.load(nameUuid);
+        name = CdmBase.deproxy(name);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
         Assert.assertEquals("T. × withverylongspecificepithet subsp.", abbreviatedName);
-        app.commitTransaction(tx);
+        // app.commitTransaction(tx);
 
     }
 

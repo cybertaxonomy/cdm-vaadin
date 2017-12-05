@@ -85,6 +85,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private GridLayout _gridLayoutCache;
 
+    private boolean isBeanLoaded;
+
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
         mainLayout = new VerticalLayout();
@@ -535,6 +537,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         DTO beanToEdit = getPresenter().loadBeanById(identifier);
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
+        isBeanLoaded = true;
     }
 
     /**
@@ -544,6 +547,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      */
     public DTO getBean() {
         return fieldGroup.getItemDataSource().getBean();
+    }
+
+    /**
+     * @return true once the bean has been loaded indicating that all fields have
+     *   been setup configured so that the editor is ready for use.
+     */
+    public boolean isBeanLoaded() {
+        return isBeanLoaded;
     }
 
     /**

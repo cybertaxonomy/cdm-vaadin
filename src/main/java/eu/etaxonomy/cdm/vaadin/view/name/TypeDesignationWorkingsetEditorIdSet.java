@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 public class TypeDesignationWorkingsetEditorIdSet {
+
     Integer registrationId;
     Integer workingsetId;
     Integer publicationId;

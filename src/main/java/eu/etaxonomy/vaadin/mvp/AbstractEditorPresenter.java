@@ -55,24 +55,29 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
-        getSession().setFlushMode(FlushMode.AUTO);
+//        getSession().setFlushMode(FlushMode.AUTO);
 
     }
 
-    /**
-     * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
-     *
-     * @param saveEvent
-     */
     @EventListener
     public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
         if(!isFromOwnView(saveEvent)){
             return;
         }
         DTO bean = saveEvent.getBean();
-        saveBean(bean);
-        getSession().setFlushMode(previousPreSaveEvenFlushMode);
-        previousPreSaveEvenFlushMode = null;
+        try {
+            saveBean(bean);
+        } catch(Exception e){
+//            if(getSession().isOpen()){
+//                getSession().clear();
+//            }
+            throw e; // re-throw after cleaning up the session
+        } finally {
+//            if(getSession().isOpen()){
+//                getSession().setFlushMode(previousPreSaveEvenFlushMode);
+//            }
+//            previousPreSaveEvenFlushMode = null;
+        }
     }
 
     /**

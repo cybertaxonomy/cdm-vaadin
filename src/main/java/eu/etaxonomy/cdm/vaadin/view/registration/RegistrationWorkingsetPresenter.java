@@ -320,16 +320,16 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             TypeDesignationWorkingsetEditorIdSet identifierSet;
             Integer typifiedNameId;
             if(newRegistrationDTOWithExistingName != null){
-                typifiedNameId = newRegistrationDTOWithExistingName.getTypifiedName().getId();
+                typifiedNameId = newRegistrationDTOWithExistingName.getTypifiedNameRef().getId();
             } else {
                 RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationId()).get();
-                EntityReference typifiedNameRef = registrationDTO.getTypifiedName();
+                EntityReference typifiedNameRef = registrationDTO.getTypifiedNameRef();
                 if(typifiedNameRef != null){
                     // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
                     typifiedNameId = typifiedNameRef.getId();
                 } else {
                     // case of registrations with a name in the nomenclatural act.
-                    typifiedNameId = registrationDTO.getName().getId();
+                    typifiedNameId = registrationDTO.getNameRef().getId();
                 }
             }
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
@@ -414,8 +414,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else
         if(TaxonName.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
-                reg.getTypifiedName() != null
-                && reg.getTypifiedName().getId() == event.getEntityId())){
+                reg.getTypifiedNameRef() != null
+                && reg.getTypifiedNameRef().getId() == event.getEntityId())){
                     refreshView(true);
             }
         } else

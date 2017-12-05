@@ -28,4 +28,11 @@ public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends Applic
     ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField();
 
     void applyDefaultComponentStyle(Component ... components);
+
+    /**
+     *  Disable the delete button if there is only one typeDesignation
+     *  if this typeDesignation is deleted the fieldUnit would become orphan in the
+     *  TypeDesignationWorkingSet
+     */
+    public void updateAllowDelete();
 }

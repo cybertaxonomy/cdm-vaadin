@@ -180,7 +180,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     }
 
     @Override
-    protected final void saveBean(DTO bean){
+    protected
+    final void saveBean(DTO bean){
         // blank implementation, since this is not needed in this or any sub class
         // see onEditorSaveEvent() instead
     }

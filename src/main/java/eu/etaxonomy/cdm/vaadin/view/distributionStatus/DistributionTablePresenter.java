@@ -18,10 +18,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.TransactionStatus;
+import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
+import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
+import org.vaadin.addons.lazyquerycontainer.QueryFactory;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -29,9 +33,11 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.i10n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.common.OrderedTermVocabulary;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.description.DescriptionBase;
@@ -50,6 +56,8 @@ import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.util.DistributionStatusQueryDefinition;
+import eu.etaxonomy.cdm.vaadin.util.DistributionStatusQueryFactory;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -69,7 +77,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
-
 
 	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
@@ -98,7 +105,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	        }
 	    }
 	    if(namedArea==null){
-	    	Notification.show("Error during update of distribution term!");
+	    	Notification.show(Messages.DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM);
 	    	repo.commitTransaction(tx);
 	    	return -1;
 	    }
@@ -148,13 +155,13 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		VaadinSession session = VaadinSession.getCurrent();
 		UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 //		getConversationHolder().getSession();
-		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
+		TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 //		voc = CdmBase.deproxy(voc);
 		return voc.getTerms();
 	}
 
 	public List<String> getAbbreviatedTermList() {
-		Set<NamedArea> terms = getTermSet();
+		List<NamedArea> terms = getTermSet();
 		List<String> list = new ArrayList<>();
 		for(DefinedTermBase<?> dtb: terms){
 		    for(Representation r : dtb.getRepresentations()){
@@ -164,20 +171,27 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		return list;
 	}
 
-	public Set<NamedArea> getNamedAreas(){
-	    Set<NamedArea> namedAreas = (Set<NamedArea>) VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
+	public List<NamedArea> getNamedAreas(){
+	    List<NamedArea> namedAreas = (List<NamedArea>)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
 	    if(namedAreas!=null && namedAreas.isEmpty()){
 	        return getTermSet();
 	    }
-        return namedAreas;
+	    return namedAreas;
 	}
 
-	private Set<NamedArea> getTermSet(){
+	private List<NamedArea> getTermSet(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
-	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms"));
+	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
-	    return vocabulary.getTermsOrderedByLabels(Language.DEFAULT());
+	    if (vocabulary instanceof OrderedTermVocabulary) {
+	        List<NamedArea> list = new ArrayList<> (((OrderedTermVocabulary)vocabulary).getOrderedTerms());
+	        Collections.reverse(list);
+	        return list;
+	    }else {
+	        return vocabulary.getTermsOrderedByLabels(Language.DEFAULT()).stream().collect(Collectors.toCollection(ArrayList::new));
+	    }
+
 	}
 
 	public HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
@@ -242,12 +256,23 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 		return Collections.emptyList();
 	}
 
+   public LazyQueryContainer getAreaDistributionStatusContainer() {
+        List<UUID> nodeUuids = getAllNodes().stream().map(n -> n.getUuid()).collect(Collectors.toCollection(ArrayList::new));
+        List<NamedArea> namedAreas = getNamedAreas();
+        if(namedAreas!=null){
+            QueryFactory factory = new DistributionStatusQueryFactory(this.repo, nodeUuids, namedAreas);
+            QueryDefinition defintion = new DistributionStatusQueryDefinition(namedAreas, true, 50);
+            return new LazyQueryContainer(defintion, factory);
+        }
+        return null;
+    }
+
 	public CdmSQLContainer getSQLContainer() throws SQLException{
 		List<Integer> nodeIds = new ArrayList<>();
 		for (TaxonNode taxonNode : getAllNodes()) {
 			nodeIds.add(taxonNode.getId());
 		}
-		Set<NamedArea> namedAreas = getNamedAreas();
+		List<NamedArea> namedAreas = getNamedAreas();
 		if(namedAreas!=null){
 			return new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namedAreas));
 		}
@@ -259,27 +284,27 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
-            "$",
-            "elements.*",
-            "elements.sources.citation.authorship.$",
-            "elements.sources.nameUsedInSource.originalNameString",
-            "elements.area.level",
-            "elements.modifyingText",
-            "elements.states.*",
-            "elements.media",
-            "elements.multilanguageText",
-            "multilanguageText",
-            "stateData.$",
-            "annotations",
-            "markers",
-            "sources.citation.authorship",
-            "sources.nameUsedInSource",
-            "multilanguageText",
-            "media",
-            "name.$",
-            "name.rank",
-            "name.status.type",
-            "taxon2.name",
+            "$", //$NON-NLS-1$
+            "elements.*", //$NON-NLS-1$
+            "elements.sources.citation.authorship.$", //$NON-NLS-1$
+            "elements.sources.nameUsedInSource.originalNameString", //$NON-NLS-1$
+            "elements.area.level", //$NON-NLS-1$
+            "elements.modifyingText", //$NON-NLS-1$
+            "elements.states.*", //$NON-NLS-1$
+            "elements.media", //$NON-NLS-1$
+            "elements.multilanguageText", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "stateData.$", //$NON-NLS-1$
+            "annotations", //$NON-NLS-1$
+            "markers", //$NON-NLS-1$
+            "sources.citation.authorship", //$NON-NLS-1$
+            "sources.nameUsedInSource", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "media", //$NON-NLS-1$
+            "name.$", //$NON-NLS-1$
+            "name.rank", //$NON-NLS-1$
+            "name.status.type", //$NON-NLS-1$
+            "taxon2.name", //$NON-NLS-1$
     });
 
 	/**Helper Methods*/

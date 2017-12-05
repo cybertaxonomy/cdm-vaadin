@@ -176,7 +176,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      *
      * @param bean
-
+     * 
      * @return the merged bean, this bean is <b>not reloaded</b> from the
      *         persistent storage.
      */
@@ -203,7 +203,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         // merge the changes into the session, ...
 
         T mergedBean = mergedBean(bean);
-        //T mergedBean = bean;
+
         // NOTE: saveOrUpdate is really needed here even if we to a merge before
         repo.getCommonService().saveOrUpdate(mergedBean);
         session.flush();

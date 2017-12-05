@@ -29,7 +29,6 @@ import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
-import eu.etaxonomy.cdm.model.reference.IReference;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
@@ -45,7 +44,7 @@ public class RegistrationDTO{
 
     private RegistrationType registrationType;
 
-    private IReference citation = null;
+    private Reference citation = null;
 
     private String citationDetail = null;
 
@@ -78,7 +77,7 @@ public class RegistrationDTO{
          }
 
         if(hasName(reg)){
-            citation = reg.getName().getNomenclaturalReference();
+            citation = (Reference) reg.getName().getNomenclaturalReference();
             citationDetail = reg.getName().getNomenclaturalMicroReference();
             name = new EntityReference(reg.getName().getId(), reg.getName().getTitleCache());
         }
@@ -234,11 +233,11 @@ public class RegistrationDTO{
         return reg.getCreated();
     }
 
-    public IReference getCitation() {
+    public Reference getCitation() {
         return citation;
     }
 
-    public void setCitation(IReference citation) throws Exception {
+    public void setCitation(Reference citation) throws Exception {
         if(this.citation == null){
             this.citation = citation;
         } else {
@@ -253,11 +252,15 @@ public class RegistrationDTO{
         return citation == null ? null : citation.getId();
     }
 
-    public EntityReference getTypifiedName() {
+    public EntityReference getTypifiedNameRef() {
+        return typeDesignationManager != null ? typeDesignationManager.getTypifiedNameRef() : null;
+    }
+
+    public TaxonName getTypifiedName() {
         return typeDesignationManager != null ? typeDesignationManager.getTypifiedName() : null;
     }
 
-    public EntityReference getName() {
+    public EntityReference getNameRef() {
         return name;
     }
 
@@ -285,12 +288,14 @@ public class RegistrationDTO{
         return typeDesignations;
     }
 
-    public SpecimenTypeDesignationWorkingSetDTO getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
         Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
         IdentifiableEntity<?> baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
-        SpecimenTypeDesignationWorkingSetDTO dto = new SpecimenTypeDesignationWorkingSetDTO(reg, baseEntity, specimenTypeDesignations);
+
+        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg,
+                baseEntity, specimenTypeDesignations, getCitation(), getTypifiedName());
         return dto;
     }
 

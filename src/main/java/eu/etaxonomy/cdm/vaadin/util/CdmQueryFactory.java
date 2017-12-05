@@ -157,7 +157,7 @@ public class CdmQueryFactory {
             	labels.put(label, count+1);
             	label += "("+count+")";
             }
-            SELECT_QUERY += "MAX( IF(area.uuid = '"+ namedArea.getUuid() +"', statusTerm.titleCache, NULL) ) as '"+ label +"'," ;
+            SELECT_QUERY += "MAX( IF(area.uuid = '"+ namedArea.getUuid() +"', statusTerm.uuid, NULL) ) as '"+ label +"'," ;
         }
         SELECT_QUERY = StringUtils.stripEnd(SELECT_QUERY, ",")+" ";
         SELECT_QUERY= SELECT_QUERY + FROM_QUERY + GROUP_BY + ORDER_BY;
