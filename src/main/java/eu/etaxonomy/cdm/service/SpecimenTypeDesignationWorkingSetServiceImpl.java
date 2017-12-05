@@ -203,8 +203,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         DerivedUnit du = std.getTypeSpecimen();
         DerivationEvent derivationEvent = du.getDerivedFrom();
 
-        du.removeSpecimenTypeDesignation(std);
-        derivationEvent.removeDerivative(du);
+        //du.removeSpecimenTypeDesignation(std);
+        //derivationEvent.removeDerivative(du);
         std.setTypeSpecimen(null);
         repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
         repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);

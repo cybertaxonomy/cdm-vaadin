@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
@@ -56,16 +58,21 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     @SpringBeanByType
     private ISpecimenTypeDesignationWorkingSetService service;
 
+    @BeforeClass
+    public static void setupLoggers()  {
+       // Logger.getLogger("org.dbunit").setLevel(Level.DEBUG);
+    }
+
     int registrationId = 5000;
 
     private Integer publicationId = 5000;
 
     private Integer typifiedNameId = 5000;
 
-    String[] includeTableNames_create = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
+    private final String[] includeTableNames_create = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
             "HIBERNATE_SEQUENCES"};
 
-    String[] includeTableNames_delete = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
+    private final String[] includeTableNames_delete = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
             "DERIVATIONEVENT", "GATHERINGEVENT", "LANGUAGESTRING", "SPECIMENOROBSERVATIONBASE", "TYPEDESIGNATIONBASE",
             "REGISTRATION_TYPEDESIGNATIONBASE", "TAXONNAME_TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT",
             "MEDIA", "MEDIA_REPRESENTATION", "MEDIAREPRESENTATION", "MEDIAREPRESENTATIONPART",
@@ -140,10 +147,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    //@Ignore
+    @Ignore
     public void deleteTypeDesignationTest() {
 
-        // printDataSetWithNull(System.err, includeTableNames_delete);
+        printDataSetWithNull(System.err,  includeTableNames_delete); // new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION"});
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
@@ -162,22 +169,26 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         SpecimenTypeDesignation std = deleteDTO.asSpecimenTypeDesignation();
         reg.getTypeDesignations().remove(std);
 
+
+        printDataSetWithNull(System.err, includeTableNames_delete);
+
         service.save(workingset);
 
-        //printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+        printDataSetWithNull(System.err, includeTableNames_delete);
 
         workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());
-
     }
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     public void deleteWorkingsetTest() {
 
-        printDataSetWithNull(System.err, includeTableNames_delete);
+        //printDataSetWithNull(System.err, includeTableNames_delete);
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
+        Assert.assertNotNull(workingset.getOwner());
+        Assert.assertEquals(2, workingset.getSpecimenTypeDesignationDTOs().size());
         service.delete(workingset, true);
 
 //        UUID gatheringEventUUID = UUID.fromString("23d40440-38bb-46c1-af11-6e25dcfa0145");
@@ -194,7 +205,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         // FIXME Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
         // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
 
-        printDataSetWithNull(System.err, includeTableNames_delete);
+        // printDataSetWithNull(System.err, includeTableNames_delete);
     }
 
     // ---------------------- TestData -------------------------------------------
