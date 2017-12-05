@@ -134,9 +134,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     public static class MockStatusComposite implements IStatusComposite {
 
-        /* (non-Javadoc)
-         * @see eu.etaxonomy.cdm.vaadin.view.IStatusComposite#setListener(eu.etaxonomy.cdm.vaadin.view.IStatusComposite.StatusComponentListener)
-         */
         @Override
         public void setListener(StatusComponentListener listener) {
             // TODO Auto-generated method stub
