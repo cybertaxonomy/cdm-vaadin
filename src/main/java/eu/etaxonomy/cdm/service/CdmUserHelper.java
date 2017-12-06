@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.RunAsAuthenticator;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
@@ -56,16 +57,19 @@ public class CdmUserHelper extends VaadinUserHelper {
     @Qualifier("cdmRepository")
     private CdmRepository repo;
 
+    AuthenticationProvider runAsAuthenticationProvider;
+
     @Autowired
     @Qualifier("runAsAuthenticationProvider")
-    AuthenticationProvider runAsAuthenticationProvider;
+    public void setRunAsAuthenticationProvider(AuthenticationProvider runAsAuthenticationProvider){
+        this.runAsAuthenticationProvider = runAsAuthenticationProvider;
+        runAsAutheticator.setRunAsAuthenticationProvider(runAsAuthenticationProvider);
+    }
 
     RunAsAuthenticator runAsAutheticator = new RunAsAuthenticator();
 
     public CdmUserHelper(){
         super();
-        runAsAutheticator.setRunAsAuthenticationProvider(runAsAuthenticationProvider);
-
     }
 
     @Override
@@ -205,7 +209,11 @@ public class CdmUserHelper extends VaadinUserHelper {
             User user = (User)userDetails;
             authority = new CdmAuthority(cdmEntity, property, crud);
             try {
-                newAuthorityAdded = user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
+                GrantedAuthorityImpl grantedAuthority = repo.getGrantedAuthorityService().findAuthorityString(authority.toString());
+                if(grantedAuthority == null){
+                    grantedAuthority = authority.asNewGrantedAuthority();
+                }
+                newAuthorityAdded = user.getGrantedAuthorities().add(grantedAuthority);
             } catch (CdmAuthorityParsingException e) {
                 throw new RuntimeException(e);
             }
