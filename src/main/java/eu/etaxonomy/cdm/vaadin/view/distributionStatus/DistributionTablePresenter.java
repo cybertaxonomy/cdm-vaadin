@@ -33,7 +33,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -105,7 +105,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	        }
 	    }
 	    if(namedArea==null){
-	    	Notification.show(Messages.DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM);
+	    	Notification.show(Messages.getLocalizedString(Messages.DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM));
 	    	repo.commitTransaction(tx);
 	    	return -1;
 	    }

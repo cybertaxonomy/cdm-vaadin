@@ -21,7 +21,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.VerticalLayout;
 
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStatusSettingsPresenter;
 
@@ -74,14 +74,14 @@ public class DistributionStatusSettingsConfigWindow
         mainLayout.setSpacing(true);
 
         //distribution status
-        distStatusSelect = new ListSelect(Messages.DistributionStatusSettingsConfigWindow_DISTRIBUTION_STATUS);
+        distStatusSelect = new ListSelect(Messages.getLocalizedString(Messages.DistributionStatusSettingsConfigWindow_DISTRIBUTION_STATUS));
         distStatusSelect.setImmediate(false);
         distStatusSelect.setMultiSelect(true);
         distStatusSelect.setSizeFull();
         distStatusSelect.setWidth("100%"); //$NON-NLS-1$
 
         //toggle abbreviated labels
-        boxToggleAbbreviatedLabels = new CheckBox(Messages.DistributionStatusSettingsConfigWindow_SHOW_ABBREVIATED_LABELS, DistributionEditorUtil.isAbbreviatedLabels());
+        boxToggleAbbreviatedLabels = new CheckBox(Messages.getLocalizedString(Messages.DistributionStatusSettingsConfigWindow_SHOW_ABBREVIATED_LABELS), DistributionEditorUtil.isAbbreviatedLabels());
         boxToggleAbbreviatedLabels.setImmediate(true);
 
         mainLayout.addComponent(boxToggleAbbreviatedLabels);

@@ -18,7 +18,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.service.CdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -46,21 +46,21 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
     @Autowired
     private CdmUserHelper userHelper;
 
-    private final Button loginButton = new Button(Messages.DistributionToolbar_LOGIN);
+    private final Button loginButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_LOGIN));
 
-    private final Button logoutButton = new Button(Messages.DistributionToolbar_LOGOUT);
+    private final Button logoutButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_LOGOUT));
 
     private final Button userButton = new Button(FontAwesome.USER);
 
-	private final Button editButton = new Button(Messages.DistributionToolbar_EDIT);
+	private final Button editButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_EDIT));
 
-	private final Button saveButton = new Button(Messages.DistributionToolbar_SAVE);
+	private final Button saveButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_SAVE));
 
-	private final Button detailButton = new Button(Messages.DistributionToolbar_DETAIL);
+	private final Button detailButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_DETAIL));
 
-	private final Button distributionSettingsButton =  new Button(Messages.DistributionToolbar_AREAS_AND_TAXA);
+	private final Button distributionSettingsButton =  new Button(Messages.getLocalizedString(Messages.DistributionToolbar_AREAS_AND_TAXA));
 
-	private final Button settingsButton =  new Button(Messages.DistributionToolbar_STATUS);
+	private final Button settingsButton =  new Button(Messages.getLocalizedString(Messages.DistributionToolbar_STATUS));
 
 //	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
