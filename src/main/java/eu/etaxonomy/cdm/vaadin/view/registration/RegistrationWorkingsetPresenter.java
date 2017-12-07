@@ -260,7 +260,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     loadWorkingSet(workingset.getCitationId());
                     workingset.add(reg);
                 }
-                refreshView(false);
+                refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){
                 if(newTaxonNameForRegistration != null){
                     // clean up

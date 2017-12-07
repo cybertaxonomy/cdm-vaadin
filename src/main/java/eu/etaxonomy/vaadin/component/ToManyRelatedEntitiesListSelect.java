@@ -10,28 +10,26 @@ package eu.etaxonomy.vaadin.component;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
-
 /**
  * Manages the a collection of items internally as LinkedList<V>. If the Collection to operate on is a Set a Converter must be
- * set. THe internally used fields are used in un-buffered mode.
+ * set. Internally used fields are used in un-buffered mode.
  *
  * @author a.kohlbecker
  * @since May 11, 2017
@@ -57,14 +55,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     protected boolean addEmptyRowOnInitContent = true;
 
-    //NOTE: Managing the item
-    //      IDs makes BeanContainer more complex to use, but it is necessary in some cases where the
-    //      equals() or hashCode() methods have been re-implemented in the bean.
-    //      TODO CdmBase has a re-implemented equals method, do we need to use the BeanContainer instead?
-    private BeanItemContainer<V> beans;
-
-   //private LinkedList<V> itemList = new LinkedList<>();
-
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
@@ -73,8 +63,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         this.fieldType = fieldType;
         this.itemType = itemType;
         setCaption(caption);
-        beans = new BeanItemContainer<V>(itemType);
-
     }
 
     /**
@@ -102,6 +90,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         grid.insertRow(row + 1);
 
+        // setting null as value for new rows
+        // see newFieldInstance() !!!
         addNewRow(row + 1, null);
         updateValue();
 
@@ -115,6 +105,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         Integer row = findRow(field);
         grid.removeRow(row);
+        // TODO remove from nested fields
         updateValue();
         updateButtonStates();
 
@@ -158,11 +149,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      *
      */
     protected void updateValue() {
-        try {
-            setValue(getValueFromNestedFields());
-        } catch (ReadOnlyException e){
-            logger.debug("datasource is readonly, only internal value was updated");
-        }
+        List<V> nestedValues = getValueFromNestedFields();
+        List<V> beanList = getValue();
+        beanList.clear();
+        beanList.addAll(nestedValues);
+        setInternalValue(beanList);
     }
 
     /**
@@ -220,24 +211,14 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
          grid.setRows(1);
 
         if(newValue != null){
-            // FIMXE is it really needed to backup as linked list?
-            LinkedList<V> linkedList;
-            if(newValue instanceof LinkedList){
-                linkedList = (LinkedList<V>) newValue;
-            } else {
-                linkedList = new LinkedList<>(newValue);
-            }
-            super.setInternalValue(linkedList);
+            super.setInternalValue(newValue);
 
             // newValue is already converted, need to use the original value from the data source
             isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
 
-            //FIXME is beans really used?
-            beans.addAll(linkedList);
-
             int row = 0;
             if(newValue.size() > 0){
-                for(V val : linkedList){
+                for(V val : newValue){
                     row = addNewRow(row, val);
                 }
             }
@@ -257,6 +238,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            Property ds = getPropertyDataSource();
+            if(ds != null){
+                Object parentVal = ds.getValue();
+            }
             addStyledComponent(field);
 
             // important! all fields must be un-buffered
@@ -369,6 +354,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         F field = fieldType.newInstance();
         field.setWidth(100, Unit.PERCENTAGE);
         field.setValue(val);
+        // TODO
+        // when passing null as value the field must take care of creating a new
+        // instance by overriding setValue() in future we could improve this by passing a
+        // NewInstanceFactory to this class
         return field;
     }
 
@@ -420,7 +409,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        getNestedFields().forEach(f -> f.commit());
+
+        List<F> nestedFields = getNestedFields();
+        for(F f : nestedFields){
+            f.commit();
+
+        }
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
     }
@@ -437,15 +431,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     public List<V> getValueFromNestedFields() {
         List<V> nestedValues = new ArrayList<>();
-        getNestedFields().forEach(f -> {
-                logger.trace(String.format("getValueFromNestedFields() - %s:%s",
+        for(F f : getNestedFields()) {
+            logger.trace(
+                    String.format("getValueFromNestedFields() - %s:%s",
                        f != null ? f.getClass().getSimpleName() : "null",
-                       f != null ? f.getValue() : "null"
-                ));
-                if(f != null){
-                    nestedValues.add(f.getValue());
-                }
-            });
+                       f != null && f.getValue() != null ? f.getValue() : "null"
+            ));
+            V value = f.getValue();
+            if(f != null && value != null){
+                nestedValues.add(f.getValue());
+            }
+         }
         return nestedValues;
     }
 
@@ -477,5 +473,23 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNullContent() {
+
+        for(Field f : getNestedFields()){
+            if(f instanceof CompositeCustomField){
+                if(!((CompositeCustomField)f).hasNullContent()){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
 
 }

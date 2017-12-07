@@ -8,6 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.EnumSet;
+import java.util.List;
+
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
@@ -16,12 +20,14 @@ import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
@@ -162,9 +168,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
             titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
             nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
+            fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
             fieldGroup.bind(personsListEditor, "teamMembers");
 
-            fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
             personsListEditor.registerParentFieldGroup(fieldGroup);
 
 
@@ -173,7 +179,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
 
         updateToolBarButtonStates();
-        checkUserPermissions(newValue);
     }
 
     private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
@@ -202,6 +207,69 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return new Component[]{titleField, nomenclaturalTitleField};
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
 
+        //need to commit the subfields propagation through the fielGroups is not enough
+        personField.commit();
+        personsListEditor.commit();
+        super.commit();
+
+        TeamOrPersonBase<?> bean = getValue();
+        if(bean != null && bean instanceof Team){
+
+            boolean isUnsaved = bean.getId() == 0;
+            if(isUnsaved){
+                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            }
+        }
+
+        if(hasNullContent()){
+            getPropertyDataSource().setValue(null);
+            setValue(null);
+
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Field> nullValueCheckIgnoreFields() {
+        List<Field> ignoreFields =  super.nullValueCheckIgnoreFields();
+        ignoreFields.add(personField);
+        ignoreFields.add(nomenclaturalTitleField.getUnlockSwitch());
+        if(nomenclaturalTitleField.getUnlockSwitch().getValue().booleanValue() == false){
+            ignoreFields.add(nomenclaturalTitleField.getTextField());
+        }
+        ignoreFields.add(titleField.getUnlockSwitch());
+        if(titleField.getUnlockSwitch().getValue().booleanValue() == false){
+            ignoreFields.add(titleField.getTextField());
+        }
+        return ignoreFields;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNullContent() {
+
+        TeamOrPersonBase<?> bean = getValue();
+        if(bean == null) {
+            return true;
+        }
+        if(bean instanceof Team){
+            // --- Team
+            return super.hasNullContent();
+        } else {
+            // --- Person
+            return personField.hasNullContent();
+        }
+    }
 
 }

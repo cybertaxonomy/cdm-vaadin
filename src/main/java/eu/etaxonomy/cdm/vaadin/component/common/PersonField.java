@@ -8,16 +8,22 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.EnumSet;
+import java.util.List;
+
 import org.vaadin.teemu.switchui.Switch;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
@@ -32,6 +38,12 @@ public class PersonField extends CompositeCustomField<Person> {
     private static final long serialVersionUID = 8346575511284469356L;
 
     private static final String PRIMARY_STYLE = "v-person-field";
+
+    /**
+     * do not allow entities which are having only <code>null</code> values in all fields
+     * {@link #getValue()} would return <code>null</code> in this case.
+     */
+    boolean allowNewEmptyEntity = false;
 
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
 
@@ -88,7 +100,8 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     private void checkUserPermissions(Person newValue) {
         boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        setEnabled(userCanEdit);
+        boolean isUnsavedEnitity = newValue.getId() == 0;
+        setEnabled(isUnsavedEnitity || userCanEdit);
     }
 
     private void setMode(Mode mode){
@@ -188,6 +201,9 @@ public class PersonField extends CompositeCustomField<Person> {
 
     @Override
     public void setValue(Person person){
+        if(person == null){
+            person = Person.NewInstance();
+        }
         super.setValue(person);
     }
 
@@ -215,4 +231,57 @@ public class PersonField extends CompositeCustomField<Person> {
     public FieldGroup getFieldGroup() {
         return fieldGroup;
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Field> nullValueCheckIgnoreFields() {
+
+        List<Field>ignoreFields = super.nullValueCheckIgnoreFields();
+        ignoreFields.add(unlockSwitch);
+        if(unlockSwitch.getValue().booleanValue() == false){
+            ignoreFields.add(cacheField);
+            cacheField.setValue(null);
+        }
+        return ignoreFields;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+
+        super.commit();
+
+        Person bean =  getValue();
+        if(bean != null){
+            boolean isUnsaved = bean.getId() == 0;
+            if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
+                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return returns <code>null</code> in case the edited entity is unsaved and if
+     * it only has null values.
+     */
+    @Override
+    public Person getValue() {
+        Person bean = super.getValue();
+        if(bean == null){
+            return null;
+        }
+        boolean isUnsaved = bean.getId() == 0;
+        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
+            return null;
+        }
+        return bean;
+    }
+
 }

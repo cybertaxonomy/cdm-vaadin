@@ -122,7 +122,4 @@ public class SwitchableTextField extends CompositeCustomField<String> {
         unlockSwitch.setVisible(visible);
     }
 
-
-
-
 }
