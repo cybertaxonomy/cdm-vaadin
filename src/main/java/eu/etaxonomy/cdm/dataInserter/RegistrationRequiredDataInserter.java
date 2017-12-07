@@ -254,7 +254,9 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                 }
             }
             repo.commitTransaction(tx);
-            repo.getRegistrationService().delete(deleteCandidates);
+            if(!deleteCandidates.isEmpty()){
+                repo.getRegistrationService().delete(deleteCandidates);
+            }
         }
 
         // ============ CREATE
