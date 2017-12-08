@@ -166,6 +166,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         save.setVisible(!readOnly);
+        delete.setVisible(!readOnly);
         cancel.setCaption(readOnly ? "Close" : "Cancel");
     }
 
@@ -591,4 +592,5 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public P presenter() {
         return getPresenter();
     }
+
 }

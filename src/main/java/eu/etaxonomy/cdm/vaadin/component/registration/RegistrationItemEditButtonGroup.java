@@ -76,7 +76,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
             boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
-            nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
+            nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getId(),
@@ -95,7 +95,8 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
+                boolean userHasPermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE);
+                tdButton.setReadOnly(isRegistrationLocked || !userHasPermission);
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,

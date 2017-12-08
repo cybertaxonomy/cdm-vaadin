@@ -17,9 +17,11 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.Layout;
 
 /**
  * TODO implement height methods for full component size support
@@ -202,5 +204,31 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
             }}
        );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, getContent());
+    }
+
+    /**
+     * @param readOnly
+     */
+    protected void setDeepReadOnly(boolean readOnly, Component component) {
+
+        component.setReadOnly(readOnly);
+        if(Button.class.isAssignableFrom(component.getClass())){
+            component.setEnabled(false);
+        }
+        if(Layout.class.isAssignableFrom(component.getClass())){
+            for(Component nestedComponent : ((Layout)component)){
+                setDeepReadOnly(readOnly, nestedComponent);
+            }
+        }
+    }
+
 
 }

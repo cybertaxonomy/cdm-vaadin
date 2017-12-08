@@ -272,7 +272,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 getEventBus().publishEvent(new TaxonNameEditorAction(
                     AbstractEditorAction.Action.EDIT,
                     nameId,
-                    null, //e.getButton(), the listener method expects this to be null
+                    e.getButton(),
                     this
                     )
                 );
@@ -289,7 +289,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                         typeDesignationWorkingsetId,
                         workingsetType,
                         registrationEntityID,
-                        null, //e.getButton(), the listener method expects this to be null
+                        e.getButton(),
                         this
                         )
                     );

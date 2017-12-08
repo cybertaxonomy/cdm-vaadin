@@ -209,8 +209,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
 
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.withDeleteButton(true);
@@ -218,7 +222,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // the in the registration application inReferences should only edited centrally
         popup.getNomReferenceCombobox().setEnabled(false);
         popup.loadInEditor(event.getEntityId());
+        if(event.getSourceComponent() != null){
+            popup.setReadOnly(event.getSourceComponent().isReadOnly());
+        }
     }
+
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
@@ -299,17 +307,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
     public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
 
-            if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
-                SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
-                popup.withDeleteButton(true);
-                popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
-            } else {
-                // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
-                // FIXME implement NameTypeDesignationWorkingsetPopupEditor
+        if(!checkFromOwnView(event)){
+            return;
+        }
+
+        if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
+            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+            popup.withDeleteButton(true);
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
+            if(event.getSourceComponent() != null){
+                popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
+        } else {
+            // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
+            // FIXME implement NameTypeDesignationWorkingsetPopupEditor
+        }
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")

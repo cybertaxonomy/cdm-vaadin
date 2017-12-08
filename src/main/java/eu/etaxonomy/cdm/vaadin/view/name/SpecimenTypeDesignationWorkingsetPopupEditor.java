@@ -278,6 +278,16 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        getFieldLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
+        typeDesignationsCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
+
+    }
 
 
 
