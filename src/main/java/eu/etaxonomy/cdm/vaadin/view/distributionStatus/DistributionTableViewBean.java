@@ -166,13 +166,13 @@ public class DistributionTableViewBean
                     }
                 }
                 //popup window
-                final Window popup = new Window("Choose distribution status");
+                final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
                 termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
                 termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
                 if(presenceAbsenceTerm != null){
-                	termSelect.setNullSelectionItemId("[no status]");
+                	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
                 }else{
                     logger.debug("No distribution status exists yet for area");
                 }
@@ -258,7 +258,7 @@ public class DistributionTableViewBean
 
 		table.setVisibleColumns(columnList.toArray());
 		table.setColumnHeaders(columnList.toArray(string));
-		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, String.format(Messages.getLocalizedString(Messages.DistributionTableViewBean_TOTAL_TAXA), gridcontainer.size()));
+		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, String.format(Messages.getLocalizedString(Messages.DistributionTableViewBean_TOTAL_TAXA), container.size()));
 
 //        gridcontainer = getPresenter().getAreaDistributionStatusContainer();
 //        if(gridcontainer==null){

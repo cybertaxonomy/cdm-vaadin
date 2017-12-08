@@ -36,6 +36,8 @@ public class Messages implements Serializable {
     public static String DistributionStatusSettingsConfigWindow_SHOW_ABBREVIATED_LABELS = "DistributionStatusSettingsConfigWindow_SHOW_ABBREVIATED_LABELS";
     public static String DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM = "DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM";
     public static String DistributionTableViewBean_AREAS_AND_TAXA = "DistributionTableViewBean_AREAS_AND_TAXA";
+    public static String DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS = "DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS";
+    public static String DistributionTableViewBean_NO_STATUS_SELECT = "DistributionTableViewBean_NO_STATUS_SELECT";
     public static String DistributionTableViewBean_SELECT_TAXON = "DistributionTableViewBean_SELECT_TAXON";
     public static String DistributionTableViewBean_STATUS = "DistributionTableViewBean_STATUS";
     public static String DistributionTableViewBean_TAXON = "DistributionTableViewBean_TAXON";
