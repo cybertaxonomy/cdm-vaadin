@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.api.service.pager.impl.DefaultPagerImpl;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -127,23 +128,29 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
 
     @Override
-    public Collection<RegistrationDTO> listDTOs() {
+    public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex) {
 
-        List<Registration> regs = repo.getRegistrationService().list(null, PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
-
-        List<RegistrationDTO> dtos = makeDTOs(regs);
-        return dtos;
+        return pageDTOs(null, null, null, null, pageSize, pageIndex);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus) {
+    public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
+            String identifierFilterPattern, String taxonNameFilterPattern,
+            Integer pageSize, Integer pageIndex) {
 
-        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
+        if(pageSize == null){
+            pageSize = PAGE_SIZE;
+        }
+
+        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus,
+                identifierFilterPattern, taxonNameFilterPattern,
+                PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
         List<Registration> registrations = pager.getRecords();
-        return makeDTOs(registrations);
+        Pager<RegistrationDTO> dtoPager = new DefaultPagerImpl(pager.getCurrentIndex(), pager.getCount(), pager.getPageSize(), makeDTOs(registrations));
+        return dtoPager;
     }
 
     /**

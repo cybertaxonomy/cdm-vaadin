@@ -8,9 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
-import java.util.Collection;
 import java.util.EnumSet;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
@@ -18,13 +18,15 @@ import org.springframework.security.core.Authentication;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -57,7 +59,20 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
     @Override
     public void handleViewEntered() {
-        getView().populate(listRegistrations());
+
+        if(getNavigationManager().getCurrentViewParameters().get(0).equals(ListView.Mode.inProgress.name())){
+            getView().setViewMode(ListViewBean.Mode.inProgress);
+            getView().getStatusFilter().setVisible(false);
+        } else {
+            getView().setViewMode(ListViewBean.Mode.all);
+        }
+
+        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
+
+        getView().getSubmitterFilter().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
+        getView().getSubmitterFilter().setItemCaptionPropertyId("username");
+
+        getView().populate(pageRegistrations());
     }
 
     /**
@@ -65,27 +80,40 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      *
      * @return
      */
-    private Collection<RegistrationDTO> listRegistrations() {
+    private Pager<RegistrationDTO> pageRegistrations() {
 
         // list all if the authenticated user is having the role CURATION of if it is an admin
         Authentication authentication = currentSecurityContext().getAuthentication();
+
+        // prepare the filters
+        String identifierFilter = getView().getIdentifierFilter().getValue();
+        String nameFilter = getView().getTaxonNameFilter().getValue();
         User submitter = null;
-        if(!(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin())) {
+        if(getView().getSubmitterFilter() != null){
+            Object o = getView().getSubmitterFilter().getValue();
+            if(o != null){
+                submitter = (User)o;
+            }
+        } else {
             submitter = (User) authentication.getPrincipal();
         }
-
-        // determine whether to show all or only registrations in progress
-        EnumSet<RegistrationStatus> includeStatus = null;
-        try {
-            if(getNavigationManager().getCurrentViewParameters().get(0).equals(ListViewBean.OPTION_IN_PROGRESS)){
-                includeStatus = inProgressStatus;
+        EnumSet<RegistrationStatus> includeStatus = inProgressStatus;
+        if(getView().getViewMode().equals(ListView.Mode.all)){
+            includeStatus = null;
+            Object o = getView().getStatusFilter().getValue();
+            if(o != null){
+                includeStatus = EnumSet.of((RegistrationStatus)o);
             }
-        } catch (IndexOutOfBoundsException e){
-            // no parameter provided:  IGNORE
         }
 
-        Collection<RegistrationDTO> dtos = getWorkingSetService().listDTOs(submitter, includeStatus);
-        return dtos;
+        Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
+                submitter,
+                includeStatus,
+                StringUtils.trimToNull(identifierFilter),
+                StringUtils.trimToNull(nameFilter),
+                null,
+                null);
+        return dtoPager;
     }
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
@@ -103,7 +131,11 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         if(event.getEntityType().isAssignableFrom(Reference.class)){
             // TODO update component showing the according reference, is there a Vaadin event supporting this?
         }
+    }
 
+    @EventListener
+    public void onUpdateResultsEvent(UpdateResultsEvent event){
+        getView().populate(pageRegistrations());
     }
 
 }

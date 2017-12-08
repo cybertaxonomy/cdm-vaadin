@@ -34,13 +34,11 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-
     TextField identifierField;
+
     TextField specificIdentifierField;
 
-
     private ListSelect submitterField;
-
 
     private ListSelect institutionField;
 

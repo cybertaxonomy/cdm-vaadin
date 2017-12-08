@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.service;
 
 import java.util.Collection;
 
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
@@ -29,10 +30,11 @@ public interface IRegistrationWorkingSetService {
      */
     public RegistrationDTO loadDtoById(Integer id);
 
+    public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex);
 
-    public Collection<RegistrationDTO> listDTOs();
-
-    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus);
+    public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
+            String identifierFilterPattern, String taxonNameFilterPattern,
+            Integer pageSize, Integer pageIndex);
 
     /**
      * @param referenceID

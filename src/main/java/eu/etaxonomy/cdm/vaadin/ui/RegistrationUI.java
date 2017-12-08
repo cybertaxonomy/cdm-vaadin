@@ -33,6 +33,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
+import eu.etaxonomy.cdm.vaadin.view.registration.ListView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -125,8 +126,8 @@ public class RegistrationUI extends UI {
         mainMenu.addMenuComponent(phycoBankLogo);
 
         mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationViewBean.NAME );
-        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
-        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListView.Mode.inProgress.name());
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListView.Mode.all.name());
 
         if(ToolbarDisplay.class.isAssignableFrom(viewDisplay.getClass())){
             ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
