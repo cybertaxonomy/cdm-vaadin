@@ -22,7 +22,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -46,10 +45,8 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButton
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
-import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -355,35 +352,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 ));
     }
 
-
-    /**
-    *
-    */
-   private void addBulletWorkflowName() {
-       WorkflowSteps steps = new WorkflowSteps();
-       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-               e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
-       steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
-               e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
-       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
-       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
-       getWorkflow().addComponent(steps);
-   }
-
-   /**
-   *
-   */
-  private void addBulletWorkflowTypification() {
-      WorkflowSteps steps = new WorkflowSteps();
-      steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-              e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
-      steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
-              e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
-      steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
-      steps.appendNewWorkflowItem(4, "Awaiting publication", null);
-      getWorkflow().addComponent(steps);
-  }
-
     /**
      * {@inheritDoc}
      */
@@ -442,14 +410,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     protected String getSubHeaderText() {
         return subheaderText;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AbstractLayout getWorkflow() {
-        return getLayout();
     }
 
     /**
