@@ -13,11 +13,9 @@ import java.util.UUID;
 
 import org.vaadin.viritin.fields.LazyComboBox;
 
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Button;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -31,10 +29,6 @@ public interface RegistrationWorkingsetView extends ApplicationView{
     public static final String ACTION_NEW = "new";
 
     public static final String ACTION_EDIT = "edit";
-
-
-    AbstractLayout getWorkflow();
-
 
     /**
      * Open a popup editor for an existing TaxonName if the nameUuid is
