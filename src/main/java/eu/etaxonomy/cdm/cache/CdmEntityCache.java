@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.AbstractPersistentCollection;
@@ -125,7 +124,7 @@ public class CdmEntityCache implements EntityCache {
                 }
 
                 String propertyPathSuffix = "." + prop.getName();
-                logger.debug("\t\tnext property:" + propertyPathSuffix);
+                logger.debug("\t\tproperty:" + propertyPathSuffix);
 
                 if(Hibernate.isInitialized(propertyValue)) {
 
@@ -296,7 +295,6 @@ public class CdmEntityCache implements EntityCache {
     @Override
     public <CDM extends CdmBase> void add(CDM value) {
         entities.add(value);
-        logger.setLevel(Level.DEBUG);
         analyzeEntity(value, "");
     }
 
