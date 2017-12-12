@@ -162,7 +162,7 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
                 .filter(
                         f -> !nullValueCheckIgnore.contains(f)
                 )
-                .peek( f -> System.out.println("###> " + f.getCaption() + ": " + f.getValue()))
+                //.peek( f -> System.out.println("###> " + f.getCaption() + ": " + f.getValue()))
                 .allMatch(
                         f -> {
                             if(f instanceof CompositeCustomField){
@@ -211,7 +211,7 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        // setDeepReadOnly(readOnly, getContent());
     }
 
     /**
@@ -230,5 +230,10 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
         }
     }
 
+    @Override
+    public String toString(){
+        return this.getClass().getSimpleName() + ": " +
+                ( getValue() != null ? getValue() : "null");
+    }
 
 }

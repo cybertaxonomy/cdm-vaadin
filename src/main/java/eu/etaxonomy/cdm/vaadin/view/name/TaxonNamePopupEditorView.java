@@ -12,6 +12,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -34,5 +35,25 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox();
 
     public ListSelect getRankSelect();
+
+    /**
+     * @return the exBasionymAuthorshipField
+     */
+    public TeamOrPersonField getExBasionymAuthorshipField();
+
+    /**
+     * @return the basionymAuthorshipField
+     */
+    public TeamOrPersonField getBasionymAuthorshipField();
+
+    /**
+     * @return the combinationAuthorshipField
+     */
+    public TeamOrPersonField getCombinationAuthorshipField();
+
+    /**
+     * @return the exCombinationAuthorshipField
+     */
+    public TeamOrPersonField getExCombinationAuthorshipField();
 
 }

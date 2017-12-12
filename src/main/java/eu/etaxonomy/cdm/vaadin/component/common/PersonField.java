@@ -12,10 +12,12 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.vaadin.teemu.switchui.Switch;
+import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
@@ -45,6 +47,11 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     boolean allowNewEmptyEntity = false;
 
+    private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
+
+    private Button personSelectConfirmButton = new Button("OK");
+    private Button newPersonButton = new Button("New");
+
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
 
     enum Mode {
@@ -60,6 +67,8 @@ public class PersonField extends CompositeCustomField<Person> {
     private float baseWidth = 100 / 8;
 
     private CssLayout root = new CssLayout();
+    private CssLayout selectOrNewContainer = new CssLayout();
+
     private TextField cacheField = new TextField();
     private CssLayout detailsContainer = new CssLayout();
     private TextField firstNameField = new TextField();
@@ -84,6 +93,23 @@ public class PersonField extends CompositeCustomField<Person> {
 
         root.setPrimaryStyleName(PRIMARY_STYLE);
 
+        // select existing or create new person
+        addStyledComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        personSelect.addValueChangeListener(e -> {
+            if(personSelect.getValue() != null){
+                personSelectConfirmButton.setEnabled(true);
+            }
+        });
+        personSelectConfirmButton.setEnabled(false);
+        personSelectConfirmButton.addClickListener(e -> {
+            setValue(personSelect.getValue());
+        });
+        selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        newPersonButton.addClickListener(e -> {
+            setValue(Person.NewInstance());
+        });
+
+        // edit person
         addStyledComponent(cacheField);
         addStyledComponent(firstNameField);
         addStyledComponent(lastNameField);
@@ -92,7 +118,6 @@ public class PersonField extends CompositeCustomField<Person> {
         addStyledComponent(unlockSwitch);
 
         addSizedComponent(root);
-
     }
 
     /**
@@ -124,8 +149,12 @@ public class PersonField extends CompositeCustomField<Person> {
     @Override
     protected Component initContent() {
 
+        selectOrNewContainer.setWidth(100, Unit.PERCENTAGE);
+        personSelect.setWidthUndefined();
+
         root.addComponent(cacheField);
         root.addComponent(unlockSwitch);
+        root.addComponent(selectOrNewContainer);
 
         cacheField.setWidth(100, Unit.PERCENTAGE);
 
@@ -178,6 +207,8 @@ public class PersonField extends CompositeCustomField<Person> {
         fieldGroup.bind(unlockSwitch, "protectedTitleCache");
         fieldGroup.setBuffered(false);
 
+        updateVisibilities(getValue());
+
         return root;
     }
 
@@ -201,9 +232,9 @@ public class PersonField extends CompositeCustomField<Person> {
 
     @Override
     public void setValue(Person person){
-        if(person == null){
-            person = Person.NewInstance();
-        }
+//        if(person == null){
+//            person = Person.NewInstance();
+//        }
         super.setValue(person);
     }
 
@@ -212,9 +243,24 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     @Override
     protected void setInternalValue(Person newValue) {
+
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(newValue);
         checkUserPermissions(newValue);
+        updateVisibilities(newValue);
+    }
+
+    /**
+     *
+     */
+    private void updateVisibilities(Person person) {
+
+        selectOrNewContainer.setVisible(person == null);
+
+        detailsContainer.setVisible(person != null);
+        unlockSwitch.setVisible(person != null);
+        cacheField.setVisible(person != null);
+
     }
 
     @Override
@@ -283,5 +329,35 @@ public class PersonField extends CompositeCustomField<Person> {
         }
         return bean;
     }
+
+    /**
+     * @return the personSelect
+     */
+    public LazyComboBox<Person> getPersonSelect() {
+        return personSelect;
+    }
+
+    /**
+     * @param personSelect the personSelect to set
+     */
+    public void setPersonSelect(LazyComboBox<Person> personSelect) {
+        this.personSelect = personSelect;
+    }
+
+    /**
+     * @return the allowNewEmptyEntity
+     */
+    public boolean isAllowNewEmptyEntity() {
+        return allowNewEmptyEntity;
+    }
+
+    /**
+     * @param allowNewEmptyEntity the allowNewEmptyEntity to set
+     */
+    public void setAllowNewEmptyEntity(boolean allowNewEmptyEntity) {
+        this.allowNewEmptyEntity = allowNewEmptyEntity;
+    }
+
+
 
 }

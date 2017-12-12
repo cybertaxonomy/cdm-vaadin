@@ -160,7 +160,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         loadWorkingSet(getView().getCitationID());
         getView().setWorkingset(workingset);
 
-        CdmFilterablePagingProvider<TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName>(
+        CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 getRepo().getNameService());
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenrator);

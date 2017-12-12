@@ -15,12 +15,15 @@ import org.hibernate.HibernateException;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.cache.CdmEntityCache;
+import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 
@@ -31,7 +34,8 @@ import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V> {
+public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V>
+    implements CachingPresenter {
 
     private static final long serialVersionUID = 2218185546277084261L;
 
@@ -43,6 +47,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      */
     protected EnumSet<CRUD> crud = null;
 
+
+    private CdmEntityCache cache = null;
 
     public AbstractCdmEditorPresenter() {
         super();
@@ -63,20 +69,23 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     protected DTO loadBeanById(Object identifier) {
 
+        DTO cdmEntitiy;
         if(identifier != null) {
             Integer integerID = (Integer)identifier;
             // CdmAuthority is needed before the bean is loaded into the session.
             // otherwise adding the authority to the user would cause a flush
             guaranteePerEntityCRUDPermissions(integerID);
-            return loadCdmEntityById(integerID);
+            cdmEntitiy = loadCdmEntityById(integerID);
         } else {
-            DTO cdmEntitiy = loadCdmEntityById(null);
+            cdmEntitiy = loadCdmEntityById(null);
             if(cdmEntitiy != null){
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
-            return cdmEntitiy;
         }
 
+        cache = new CdmEntityCache(cdmEntitiy);
+
+        return cdmEntitiy;
     }
 
 
@@ -201,6 +210,18 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public EntityCache getCache() {
+        if(((AbstractPopupEditor)getView()).isBeanLoaded()){
+            return cache;
+        } else {
+            return null;
+        }
     }
 
 

@@ -47,6 +47,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private FieldGroup parentFieldGroup = null;
 
+    Boolean valueInitiallyWasNull = null;
+
     protected boolean isOrderedCollection = false;
 
     private boolean withEditButton = false;
@@ -58,6 +60,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
+
+    private EntityFieldInstantiator<F> entityFieldInstantiator;
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
@@ -85,6 +89,14 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * @return
      */
     private void addRowAfter(F field) {
+
+        List<V> nestedValues = getValueFromNestedFields();
+
+        if(isOrderedCollection){
+
+        } else {
+
+        }
 
         Integer row = findRow(field);
 
@@ -146,14 +158,14 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
-     *
+     * update Value is only called in turn of UI changes like adding, removing, swapping rows
      */
-    protected void updateValue() {
+    private void updateValue() {
         List<V> nestedValues = getValueFromNestedFields();
         List<V> beanList = getValue();
         beanList.clear();
         beanList.addAll(nestedValues);
-        setInternalValue(beanList);
+        setInternalValue(beanList, false);
     }
 
     /**
@@ -207,27 +219,70 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     protected void setInternalValue(List<V> newValue) {
 
-         grid.removeAllComponents();
-         grid.setRows(1);
+        setInternalValue(newValue, true);
+
+    }
+
+    protected void setInternalValue(List<V> newValue, boolean doUpdateFields) {
+
+        super.setInternalValue(newValue);
+
+        if(valueInitiallyWasNull == null){
+            valueInitiallyWasNull = newValue == null;
+        }
 
         if(newValue != null){
-            super.setInternalValue(newValue);
 
             // newValue is already converted, need to use the original value from the data source
             isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
 
+        }
+
+        createFieldsForData();
+
+    }
+
+    private void createFieldsForData(){
+
+        grid.removeAllComponents();
+        grid.setRows(1);
+
+        List<V> data = getValue();
+        if(data == null || data.isEmpty()){
+            addNewRow(0, null);
+        } else {
             int row = 0;
-            if(newValue.size() > 0){
-                for(V val : newValue){
-                    row = addNewRow(row, val);
-                }
+            for(V val : data){
+                row = addNewRow(row, val);
             }
         }
 
-        if(newValue == null || newValue.isEmpty()) {
-            // add an empty row
-            addNewRow(0, null);
-        }
+    }
+
+    /**
+     * Obtains the List of values directly from the nested fields and ignores the
+     * value of the <code>propertyDataSource</code>. This is useful when the ToManyRelatedEntitiesListSelect
+     * is operating on a transient field, in which case the property is considered being read only by vaadin
+     * so that the commit is doing nothing.
+     *
+     * See also {@link AbstractCdmEditorPresenter#handleTransientProperties(DTO bean)}
+     *
+     * @return
+     */
+    public List<V> getValueFromNestedFields() {
+        List<V> nestedValues = new ArrayList<>();
+        for(F f : getNestedFields()) {
+            logger.trace(
+                    String.format("getValueFromNestedFields() - %s:%s",
+                       f != null ? f.getClass().getSimpleName() : "null",
+                       f != null && f.getValue() != null ? f.getValue() : "null"
+            ));
+            V value = f.getValue();
+            if(f != null /*&& value != null*/){
+                nestedValues.add(f.getValue());
+            }
+         }
+        return nestedValues;
     }
 
     /**
@@ -238,6 +293,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            field.addValueChangeListener(e -> {
+                updateValue();
+            });
             Property ds = getPropertyDataSource();
             if(ds != null){
                 Object parentVal = ds.getValue();
@@ -331,6 +389,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
 
     protected List<F> getNestedFields(){
+
         List<F> nestedFields = new ArrayList<>(grid.getRows());
         for(int r = 0; r < grid.getRows(); r++){
             F f = (F) grid.getComponent(GRID_X_FIELD, r);
@@ -351,9 +410,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * @throws IllegalAccessException
      */
     protected F newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
-        F field = fieldType.newInstance();
+
+        F field;
+        if(entityFieldInstantiator != null){
+            field = entityFieldInstantiator.createNewInstance();
+        } else {
+            field = fieldType.newInstance();
+        }
+
         field.setWidth(100, Unit.PERCENTAGE);
         field.setValue(val);
+
         // TODO
         // when passing null as value the field must take care of creating a new
         // instance by overriding setValue() in future we could improve this by passing a
@@ -415,34 +482,27 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             f.commit();
 
         }
+        /*
+        List<V> list = (List<V>) getPropertyDataSource().getValue();
+
+        Person p = Person.NewInstance();
+        p.setTitleCache("Hacky", true);
+        list.add((V) p);
+
+        List<V> clonedList = new ArrayList<>(list);
+        list.clear();
+        for(V value : clonedList){
+            if(value != null){
+                list.add(value);
+            }
+        }
+        //
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
-    }
-
-    /**
-     * Obtains the List of values directly from the nested fields and ignores the
-     * value of the <code>propertyDataSource</code>. This is useful when the ToManyRelatedEntitiesListSelect
-     * is operating on a transient field, in which case the property is considered being read only by vaadin
-     * so that the commit is doing nothing.
-     *
-     * See also {@link AbstractCdmEditorPresenter#handleTransientProperties(DTO bean)}
-     *
-     * @return
-     */
-    public List<V> getValueFromNestedFields() {
-        List<V> nestedValues = new ArrayList<>();
-        for(F f : getNestedFields()) {
-            logger.trace(
-                    String.format("getValueFromNestedFields() - %s:%s",
-                       f != null ? f.getClass().getSimpleName() : "null",
-                       f != null && f.getValue() != null ? f.getValue() : "null"
-            ));
-            V value = f.getValue();
-            if(f != null && value != null){
-                nestedValues.add(f.getValue());
-            }
-         }
-        return nestedValues;
+        if(getValue().isEmpty() && valueInitiallyWasNull){
+            setPropertyDataSource(null);
+        }
+         */
     }
 
     /**
@@ -490,6 +550,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return true;
     }
 
+    /**
+     * @return the enityFieldInstantiator
+     */
+    public EntityFieldInstantiator<F> getEntityFieldInstantiator() {
+        return entityFieldInstantiator;
+    }
+
+    /**
+     * @param enityFieldInstantiator the enityFieldInstantiator to set
+     */
+    public void setEntityFieldInstantiator(EntityFieldInstantiator<F> entityFieldInstantiator) {
+        this.entityFieldInstantiator = entityFieldInstantiator;
+    }
 
 
 }

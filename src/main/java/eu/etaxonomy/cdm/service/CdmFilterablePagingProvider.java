@@ -25,11 +25,13 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @since Jun 7, 2017
  *
  */
-public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implements FilterablePagingProvider<T>, FilterableCountProvider {
+public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
     private int pageSize = 20;
 
     private IIdentifiableEntityService<T> service;
+
+    private Class<V> type = null;
 
     private MatchMode matchMode = MatchMode.ANYWHERE;
 
@@ -67,20 +69,29 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      *
-     * @param service
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
-        super();
-        this.service = service;
+        this(service, null);
     }
 
     /**
-     * @param service
-     * @param matchMode
-     * @param orderHints
+     * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
+     *
      */
-    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type) {
         super();
+        this.type = type;
+        this.service = service;
+    }
+
+
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
+        this(service, null, matchMode, orderHints);
+    }
+
+    public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {
+        super();
+        this.type = type;
         this.service = service;
         this.matchMode = matchMode;
         this.orderHints = orderHints;
@@ -90,10 +101,10 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
      * {@inheritDoc}
      */
     @Override
-    public List<T> findEntities(int firstRow, String filter) {
+    public List<V> findEntities(int firstRow, String filter) {
 
-        Pager<T> page = service.findByTitle(
-                null,
+        Pager<V> page = (Pager<V>) service.findByTitle(
+                type,
                 filter,
                 matchMode,
                 null,
@@ -111,8 +122,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     @Override
     public int size(String filter) {
 
-        Pager<T> page = service.findByTitle(
-                null,
+        Pager<V> page = (Pager<V>) service.findByTitle(
+                type,
                 filter,
                 matchMode,
                 null,

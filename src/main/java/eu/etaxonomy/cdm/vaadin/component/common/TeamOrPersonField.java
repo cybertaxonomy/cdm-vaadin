@@ -11,6 +11,8 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.vaadin.viritin.fields.LazyComboBox;
+
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -24,13 +26,19 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
+import eu.etaxonomy.vaadin.component.EntityFieldInstantiator;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 
@@ -49,6 +57,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private CssLayout toolBar= new CssLayout();
     private CssLayout compositeWrapper = new CssLayout();
 
+    private LazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new LazyComboBox<TeamOrPersonBase>(TeamOrPersonBase.class);
+
+    private Button selectConfirmButton = new Button("OK");
     private Button removeButton = new Button(FontAwesome.REMOVE);
     private Button personButton = new Button(FontAwesome.USER);
     private Button teamButton = new Button(FontAwesome.USERS);
@@ -63,15 +74,21 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 
+    private CdmFilterablePagingProvider<AgentBase, Person> pagingProviderPerson;
+
     public TeamOrPersonField(String caption){
 
         setCaption(caption);
 
+        teamOrPersonSelect.setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TeamOrPersonBase>());
+
+
+        addStyledComponent(teamOrPersonSelect);
         addStyledComponent(personField);
         addStyledComponent(titleField);
         addStyledComponent(nomenclaturalTitleField);
         addStyledComponent(personsListEditor);
-        addStyledComponents(removeButton, personButton, teamButton);
+        addStyledComponents(selectConfirmButton, removeButton, personButton, teamButton);
 
 
         addSizedComponent(root);
@@ -92,6 +109,16 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     @Override
     protected Component initContent() {
 
+        teamOrPersonSelect.addValueChangeListener(e -> {
+            selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
+        });
+        teamOrPersonSelect.setWidthUndefined();
+
+        selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
+        selectConfirmButton.addClickListener(e -> {
+            setValue(teamOrPersonSelect.getValue());
+            updateToolBarButtonStates();
+        });
         removeButton.addClickListener(e -> {
             setValue(null);
             updateToolBarButtonStates();
@@ -110,7 +137,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         teamButton.setDescription("Add team");
 
         toolBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP + " toolbar");
-        toolBar.addComponents(removeButton, personButton, teamButton);
+        toolBar.addComponents(teamOrPersonSelect, selectConfirmButton,  removeButton, personButton, teamButton);
 
         compositeWrapper.setStyleName("margin-wrapper");
         compositeWrapper.addComponent(toolBar);
@@ -131,7 +158,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private void updateToolBarButtonStates(){
         TeamOrPersonBase<?> val = getInternalValue();
         boolean userCanCreate = UserHelper.fromSession().userHasPermission(Person.class, "CREATE");
-        removeButton.setEnabled(val != null);
+
+        teamOrPersonSelect.setVisible(val == null);
+        selectConfirmButton.setVisible(val == null);
+        removeButton.setVisible(val != null);
         personButton.setEnabled(userCanCreate && val == null);
         teamButton.setEnabled(userCanCreate && val == null);
     }
@@ -149,33 +179,33 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         compositeWrapper.removeAllComponents();
         compositeWrapper.addComponent(toolBar);
 
-        if(newValue == null) {
-            return;
-        }
+        if(newValue != null) {
 
-        if(Person.class.isAssignableFrom(newValue.getClass())){
-            // value is a Person:
-            compositeWrapper.addComponent(personField);
+            if(Person.class.isAssignableFrom(newValue.getClass())){
+                // value is a Person:
+                compositeWrapper.addComponent(personField);
 
-            personField.setValue((Person) newValue);
-            personField.registerParentFieldGroup(fieldGroup);
+                personField.setValue((Person) newValue);
+                personField.registerParentFieldGroup(fieldGroup);
 
-        }
-        else if(Team.class.isAssignableFrom(newValue.getClass())){
-            // otherwise it a Team
+            }
+            else if(Team.class.isAssignableFrom(newValue.getClass())){
+                // otherwise it a Team
 
-            compositeWrapper.addComponents(titleField, nomenclaturalTitleField, personsListEditor);
+                compositeWrapper.addComponents(titleField, nomenclaturalTitleField, personsListEditor);
 
-            titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
-            nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
-            fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
-            fieldGroup.bind(personsListEditor, "teamMembers");
+                titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
+                nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
+                fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+                fieldGroup.bind(personsListEditor, "teamMembers"); // here personField is set readonly since setTeamMembers does not exist
+                personsListEditor.setReadOnly(false); // fixing the readonly state
 
-            personsListEditor.registerParentFieldGroup(fieldGroup);
+                personsListEditor.registerParentFieldGroup(fieldGroup);
 
+            } else {
+                setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
+            }
 
-        } else {
-            setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
         }
 
         updateToolBarButtonStates();
@@ -205,6 +235,13 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     public Component[] getCachFields(){
         return new Component[]{titleField, nomenclaturalTitleField};
+    }
+
+    /**
+     * @return the teamOrPersonSelect
+     */
+    public LazyComboBox<TeamOrPersonBase> getTeamOrPersonSelect() {
+        return teamOrPersonSelect;
     }
 
     /**
@@ -270,6 +307,30 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             // --- Person
             return personField.hasNullContent();
         }
+    }
+
+    public void setFilterableTeamPagingProvider(CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> pagingProvider, CachingPresenter cachingPresenter){
+        teamOrPersonSelect.loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+        ToOneRelatedEntityReloader<TeamOrPersonBase> teamOrPersonReloader = new ToOneRelatedEntityReloader<TeamOrPersonBase>(teamOrPersonSelect, cachingPresenter);
+        teamOrPersonSelect.addValueChangeListener(teamOrPersonReloader );
+    }
+
+    public void setFilterablePersonPagingProvider(CdmFilterablePagingProvider<AgentBase, Person> pagingProvider, CachingPresenter cachingPresenter){
+
+        teamOrPersonSelect.addValueChangeListener(new ToOneRelatedEntityReloader<TeamOrPersonBase>(teamOrPersonSelect, cachingPresenter));
+
+        personsListEditor.setEntityFieldInstantiator(new EntityFieldInstantiator<PersonField>() {
+
+            @Override
+            public PersonField createNewInstance() {
+                PersonField f = new PersonField();
+                f.setAllowNewEmptyEntity(true); // otherwise new entities can not be added to the personsListEditor
+                f.getPersonSelect().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+                f.getPersonSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Person>());
+                f.getPersonSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Person>(f.getPersonSelect(), cachingPresenter));
+                return f;
+            }
+        });
     }
 
 }

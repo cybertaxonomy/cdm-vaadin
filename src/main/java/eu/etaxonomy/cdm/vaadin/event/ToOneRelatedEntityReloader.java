@@ -8,10 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
-import org.vaadin.viritin.fields.LazyComboBox;
-
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
@@ -28,11 +27,11 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
 
     private static final long serialVersionUID = -1141764783149024788L;
 
-    LazyComboBox<CDM>  toOneRelatedEntityField;
+    Field<CDM>  toOneRelatedEntityField;
 
     CachingPresenter cachingPresenter;
 
-    public ToOneRelatedEntityReloader( LazyComboBox<CDM> toOneRelatedEntityField, CachingPresenter entityCache){
+    public ToOneRelatedEntityReloader( Field<CDM> toOneRelatedEntityField, CachingPresenter entityCache){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
         this.cachingPresenter = entityCache;
     }
@@ -56,7 +55,9 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
             CDM cachedEntity = cache.find(value);
             if(cachedEntity == null){
                 cache.add(value);
-            } else if(cachedEntity != value){
+            } else if(
+                    // pure object comparison is not reliable since the entity may have been changed
+                    cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()){
                 toOneRelatedEntityField.removeValueChangeListener(this);
                 toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
                 toOneRelatedEntityField.setValue(cachedEntity);

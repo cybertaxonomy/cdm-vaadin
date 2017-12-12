@@ -93,6 +93,16 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         return "Name editor";
     }
 
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getWindowPixelWidth() {
+        return 700;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -117,6 +127,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     protected void initContent() {
 
         GridLayout grid = (GridLayout)getFieldLayout();
+        grid.setSizeFull();
         grid.setSpacing(true);
         grid.setColumnExpandRatio(0, 0.3f);
         grid.setColumnExpandRatio(1, 0.3f);
@@ -359,6 +370,40 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     public ListSelect getRankSelect() {
         return rankSelect;
     }
+
+    /**
+     * @return the exBasionymAuthorshipField
+     */
+    @Override
+    public TeamOrPersonField getExBasionymAuthorshipField() {
+        return exBasionymAuthorshipField;
+    }
+
+    /**
+     * @return the basionymAuthorshipField
+     */
+    @Override
+    public TeamOrPersonField getBasionymAuthorshipField() {
+        return basionymAuthorshipField;
+    }
+
+    /**
+     * @return the combinationAuthorshipField
+     */
+    @Override
+    public TeamOrPersonField getCombinationAuthorshipField() {
+        return combinationAuthorshipField;
+    }
+
+    /**
+     * @return the exCombinationAuthorshipField
+     */
+    @Override
+    public TeamOrPersonField getExCombinationAuthorshipField() {
+        return exCombinationAuthorshipField;
+    }
+
+
 
 
 }
