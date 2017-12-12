@@ -103,6 +103,7 @@ public class PersonField extends CompositeCustomField<Person> {
         personSelectConfirmButton.setEnabled(false);
         personSelectConfirmButton.addClickListener(e -> {
             setValue(personSelect.getValue());
+            personSelect.clear();
         });
         selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
         newPersonButton.addClickListener(e -> {
@@ -288,8 +289,11 @@ public class PersonField extends CompositeCustomField<Person> {
         List<Field>ignoreFields = super.nullValueCheckIgnoreFields();
         ignoreFields.add(unlockSwitch);
         if(unlockSwitch.getValue().booleanValue() == false){
-            ignoreFields.add(cacheField);
-            cacheField.setValue(null);
+            if(getValue().getId() == 0){
+                // only it the entity is unsaved!
+                ignoreFields.add(cacheField);
+                cacheField.setValue(null);
+            }
         }
         return ignoreFields;
     }

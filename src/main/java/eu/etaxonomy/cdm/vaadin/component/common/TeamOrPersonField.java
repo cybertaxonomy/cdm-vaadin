@@ -117,6 +117,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
         selectConfirmButton.addClickListener(e -> {
             setValue(teamOrPersonSelect.getValue());
+            teamOrPersonSelect.clear();
             updateToolBarButtonStates();
         });
         removeButton.addClickListener(e -> {
@@ -277,6 +278,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      */
     @Override
     protected List<Field> nullValueCheckIgnoreFields() {
+
         List<Field> ignoreFields =  super.nullValueCheckIgnoreFields();
         ignoreFields.add(personField);
         ignoreFields.add(nomenclaturalTitleField.getUnlockSwitch());
