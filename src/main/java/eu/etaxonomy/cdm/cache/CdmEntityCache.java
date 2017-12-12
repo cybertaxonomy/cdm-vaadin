@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.AbstractPersistentCollection;
@@ -30,6 +31,7 @@ import org.hibernate.envers.internal.entities.mapper.relation.lazy.proxy.SortedM
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.persistence.dao.initializer.AbstractBeanInitializer;
 
 /**
@@ -123,10 +125,13 @@ public class CdmEntityCache implements EntityCache {
                 }
 
                 String propertyPathSuffix = "." + prop.getName();
+                logger.debug("\t\tnext property:" + propertyPathSuffix);
 
                 if(Hibernate.isInitialized(propertyValue)) {
 
-                    if(CdmBase.class.isAssignableFrom(prop.getPropertyType())){
+                    if(CdmBase.class.isAssignableFrom(prop.getPropertyType())
+                            || INomenclaturalReference.class.isAssignableFrom(prop.getPropertyType())
+                            ){
                         analyzeEntity(HibernateProxyHelper.deproxy(propertyValue, CdmBase.class), propertyPath + propertyPathSuffix);
                         continue;
                     }
@@ -291,6 +296,7 @@ public class CdmEntityCache implements EntityCache {
     @Override
     public <CDM extends CdmBase> void add(CDM value) {
         entities.add(value);
+        logger.setLevel(Level.DEBUG);
         analyzeEntity(value, "");
     }
 
