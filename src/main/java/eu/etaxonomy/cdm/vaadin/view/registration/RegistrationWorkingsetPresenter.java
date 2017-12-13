@@ -26,6 +26,8 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.api.service.idminter.IdentifierMinter.Identifier;
+import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -72,6 +74,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
+
+    @Autowired
+    private RegistrationIdentifierMinter minter;
 
     /**
      * @return the workingSetService
@@ -122,9 +127,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // move into RegistrationWorkflowStateMachine
         TransactionStatus txStatus = getRepo().startTransaction();
         long identifier = System.currentTimeMillis();
+
+        Identifier<String> identifiers = minter.mint();
+        if(identifiers.getIdentifier() == null){
+            throw new RuntimeException("RegistrationIdentifierMinter configuration incomplete.");
+        }
         Registration reg = Registration.NewInstance(
-                "http://phycobank.org/" + identifier,
-                "" + identifier,
+                identifiers.getIdentifier(),
+                identifiers.getLocalId(),
                 taxonNameId != null ? getRepo().getNameService().find(taxonNameId) : null,
                 null);
         Authentication authentication = currentSecurityContext().getAuthentication();
