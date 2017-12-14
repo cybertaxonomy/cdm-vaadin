@@ -15,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
+import eu.etaxonomy.cdm.api.utility.DerivedUnitConverterFactory;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
@@ -107,7 +108,7 @@ public class SpecimenTypeDesignationDTO {
 
             SpecimenOrObservationType convertToType = specimenOrObservationTypeFor(kindOfUnit);
             if(requiredSpecimenType.equals(MediaSpecimen.class)){
-                DerivedUnitConverter<MediaSpecimen> converter = new DerivedUnitConverter<MediaSpecimen> (typeSpecimen);
+                DerivedUnitConverter<MediaSpecimen> converter = DerivedUnitConverterFactory.createDerivedUnitConverter(typeSpecimen, MediaSpecimen.class);
                 convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, convertToType);
             } else {
                  if(currentType == MediaSpecimen.class){
@@ -115,7 +116,7 @@ public class SpecimenTypeDesignationDTO {
                      // set null to allow conversion
                      mediaSpecimen.setMediaSpecimen(null);
                  }
-                DerivedUnitConverter<DerivedUnit> converter = new DerivedUnitConverter<DerivedUnit> (typeSpecimen);
+                DerivedUnitConverter<DerivedUnit> converter = DerivedUnitConverterFactory.createDerivedUnitConverter(typeSpecimen, DerivedUnit.class);
                 convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, convertToType);
             }
 
