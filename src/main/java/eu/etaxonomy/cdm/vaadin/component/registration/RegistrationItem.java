@@ -260,7 +260,9 @@ public class RegistrationItem extends GridLayout {
 
             stateLabel.setVisible(true);
             stateLabel.update(regDto.getStatus());
-            getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            if(regDto.getIdentifier() != null){
+                getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            }
             getIdentifierLink().setCaption(regDto.getIdentifier());
             //TODO make responsive and use specificIdentifier in case the space gets too narrow
             getIdentifierLink().setVisible(true);
