@@ -1791,7 +1791,6 @@
 		<xsd:attribute name="SUBGENUSAUTHORSHIP" use="optional" />
 		<xsd:attribute name="SPECIFICEPITHET" use="optional" />
 		<xsd:attribute name="RANK_ID" use="optional" />
-		<xsd:attribute name="DTYPE" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
 		<xsd:attribute name="UUID" use="optional" />
 		<xsd:attribute name="BREED" use="optional" />
@@ -2442,7 +2441,6 @@
 		<xsd:attribute name="SERIESPART" use="optional" />
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
 		<xsd:attribute name="PARSINGPROBLEM" use="optional" />
-		<xsd:attribute name="DTYPE" use="optional" />
 		<xsd:attribute name="ID" use="optional" />
 		<xsd:attribute name="UUID" use="optional" />
 		<xsd:attribute name="EDITION" use="optional" />

@@ -14,7 +14,6 @@ import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
@@ -49,7 +48,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  * @since Nov 17, 2017
  *
  */
-@Transactional(TransactionMode.ROLLBACK)
+@Transactional(TransactionMode.DISABLED)
 public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinIntegrationTest{
 
     @SpringBeanByName
@@ -142,12 +141,23 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
        // printDataSetWithNull(System.err, includeTableNames_delete);
         writeDbUnitDataSetFile(includeTableNames_delete, "deleteTest");
         */
+       /* The following audit table fix needs also to be added to the test data:
+           <!-- Test data is being used by more than one test - need to reset a couple of *_AUD tables -->
+          <AUDITEVENT />
+          <TAXONNAME_AUD />
+          <DERIVATIONEVENT_AUD />
+          <TYPEDESIGNATIONBASE_AUD />
+          <SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT_AUD />
+          <REGISTRATION_AUD />
+          <SPECIMENOROBSERVATIONBASE_AUD />
+          <TAXONNAME_TYPEDESIGNATIONBASE_AUD />
+        */
 
     }
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    @Ignore
+    // @Ignore
     public void deleteTypeDesignationTest() {
 
         printDataSetWithNull(System.err,  includeTableNames_delete); // new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION"});
@@ -170,7 +180,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         reg.getTypeDesignations().remove(std);
 
 
-        printDataSetWithNull(System.err, includeTableNames_delete);
+        //printDataSetWithNull(System.err, includeTableNames_delete);
 
         service.save(workingset);
 
@@ -178,6 +188,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
         workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());
+        reg = workingset.getOwner();
+        Assert.assertEquals(1, reg.getTypeDesignations().size());
     }
 
     @Test

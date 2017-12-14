@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
+import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -168,9 +169,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             Session session = repo.getSession();
 
-//            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
-//            regAnalyzer.printEntityGraph(System.out);
-//            regAnalyzer.printCopyEntities(System.out);
+            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
+            regAnalyzer.printEntityGraph(System.out);
+            regAnalyzer.printCopyEntities(System.out);
 
             session.merge(dto.getOwner());
             session.flush();
@@ -180,7 +181,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
                 deleteSpecimenTypeDesignation(dto, std);
             }
             session.flush();
-
         }
 
 
@@ -193,15 +193,15 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
 
-        if(dto.getOwner() instanceof Registration){
-            Registration registration = (Registration) dto.getOwner();
-            registration.getTypeDesignations().clear();
-            repo.getRegistrationService().save(registration);
-        } else {
-            throw new RuntimeException("Unimplemented owner type");
-        }
+//        if(dto.getOwner() instanceof Registration){
+//            Registration registration = (Registration) dto.getOwner();
+//            registration.getTypeDesignations().clear();
+//            repo.getRegistrationService().save(registration);
+//        } else {
+//            throw new RuntimeException("Unimplemented owner type");
+//        }
         DerivedUnit du = std.getTypeSpecimen();
-        DerivationEvent derivationEvent = du.getDerivedFrom();
+//        DerivationEvent derivationEvent = du.getDerivedFrom();
 
         //du.removeSpecimenTypeDesignation(std);
         //derivationEvent.removeDerivative(du);
