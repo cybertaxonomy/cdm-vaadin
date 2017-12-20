@@ -252,7 +252,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         registrationId = reg.getId();
 
 
-        printDataSetWithNull(System.err, includeTableNames_create);
+        //printDataSetWithNull(System.err, includeTableNames_create);
 
         writeDbUnitDataSetFile(includeTableNames_create);
     }
