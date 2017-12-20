@@ -14,7 +14,9 @@ import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
@@ -51,6 +53,8 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  *
  */
 @Transactional(TransactionMode.DISABLED)
+// IMPORTANT: test03_deleteTypeDesignationTest executed not as last would cause the other tests to fail due to changes in the db
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinIntegrationTest{
 
     @SpringBeanByName
@@ -84,7 +88,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
-    public void createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
+    public void test01_createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
 //        printDataSetWithNull(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
 //                , "PERMISSIONGROUP", "PERMISSIONGROUP_GRANTEDAUTHORITYIMPL", "GRANTEDAUTHORITYIMPL"});
@@ -160,7 +164,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     @ExpectedDataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.deleteTypeDesignationTest-result.xml")
-    public void deleteTypeDesignationTest() {
+    public void test03_deleteTypeDesignationTest() {
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
@@ -191,10 +195,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    public void deleteWorkingsetTest() {
+    public void test02_deleteWorkingset() {
 
-        //printDataSetWithNull(System.err, includeTableNames_delete);
+        printDataSetWithNull(System.err, includeTableNames_delete);
 
+        try {
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
         Assert.assertNotNull(workingset.getOwner());
         Assert.assertEquals(2, workingset.getSpecimenTypeDesignationDTOs().size());
@@ -213,7 +218,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
         Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
         // FIXME  Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
-
+        } catch (Exception e){
+            e.printStackTrace(System.err);
+        }
         // printDataSetWithNull(System.err, includeTableNames_delete);
     }
 
