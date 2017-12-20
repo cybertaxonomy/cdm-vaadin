@@ -73,7 +73,12 @@ public class PersistentContextAnalyzer {
 
     private boolean showHashCodes = false;
 
-
+    /**
+     * TODO the PersistentContextAnalyzer should be a subclass od the CdmEntityCache!!!
+     *
+     * @param entity
+     * @param session
+     */
     public PersistentContextAnalyzer(CdmBase entity, Session session){
         this.session = session;
         this.entity = entity;
