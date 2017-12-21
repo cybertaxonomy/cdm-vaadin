@@ -362,7 +362,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     getView().getCitationID(),
                     typifiedNameId
                     );
-            popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE));
+            popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.loadInEditor(identifierSet);
             popup.withDeleteButton(true);
         } else {

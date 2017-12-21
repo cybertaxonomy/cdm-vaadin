@@ -45,7 +45,7 @@ public class PersonField extends CompositeCustomField<Person> {
      * do not allow entities which are having only <code>null</code> values in all fields
      * {@link #getValue()} would return <code>null</code> in this case.
      */
-    boolean allowNewEmptyEntity = false;
+    boolean allowNewEmptyEntity = true;
 
     private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
 
@@ -76,6 +76,9 @@ public class PersonField extends CompositeCustomField<Person> {
     private TextField prefixField = new TextField();
     private TextField suffixField = new TextField();
     private SwitchButton unlockSwitch = new SwitchButton();
+
+    private boolean onCommit = false;
+
 
     /**
      * @param caption
@@ -288,6 +291,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
         List<Field>ignoreFields = super.nullValueCheckIgnoreFields();
         ignoreFields.add(unlockSwitch);
+
         if(unlockSwitch.getValue().booleanValue() == false){
             if(getValue().getId() == 0){
                 // only it the entity is unsaved!
@@ -327,10 +331,10 @@ public class PersonField extends CompositeCustomField<Person> {
         if(bean == null){
             return null;
         }
-        boolean isUnsaved = bean.getId() == 0;
-        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
-            return null;
-        }
+       // boolean isUnsaved = bean.getId() == 0;
+//        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
+//            return null;
+//        }
         return bean;
     }
 

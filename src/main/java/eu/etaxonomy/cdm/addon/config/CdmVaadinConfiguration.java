@@ -16,6 +16,10 @@ import java.util.Properties;
 import javax.servlet.annotation.WebServlet;
 
 import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -41,6 +45,7 @@ import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
+import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
@@ -85,6 +90,11 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @Autowired
     Environment env;
 
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    private boolean registrationUiHibernateEventListenersDone = false;
+
     /*
      * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
      * @WebServlets is mapped to the root path. It is sufficient to configure one of the
@@ -114,6 +124,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
                         }
 
                     });
+                    ).getServiceRegistry().getService
 
                 }});
 
@@ -139,9 +150,25 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @UIScope
     public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
+            registerRegistrationUiHibernateEventListeners();
+
             return new RegistrationUI();
         }
         return null;
+    }
+
+    /**
+     * this is only a quick implementation for testing,
+     * TODO see also the NOTE on CdmListenerIntegrator class declaration for a prospective better solution
+     */
+    protected void registerRegistrationUiHibernateEventListeners() {
+        if(!registrationUiHibernateEventListenersDone){
+            EventListenerRegistry listenerRegistry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry().getService(
+                    EventListenerRegistry.class);
+            GrantedAuthorityRevokingRegistrationUpdateLister listener = new GrantedAuthorityRevokingRegistrationUpdateLister();
+            listenerRegistry.appendListeners(EventType.POST_UPDATE, listener);
+            registrationUiHibernateEventListenersDone = true;
+        }
     }
 
     @Bean
