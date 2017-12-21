@@ -22,6 +22,7 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 
+import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.Team;
@@ -121,6 +122,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(name == null){
             return;
         }
+        name = HibernateProxyHelper.deproxy(name);
         deleteCandidates.add(new CdmAuthority(name, UPDATE_DELETE));
         addDeleteCandidates(deleteCandidates, (Reference)name.getNomenclaturalReference());
         addDeleteCandidates(deleteCandidates, name.getCombinationAuthorship());
@@ -138,6 +140,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(td == null){
             return;
         }
+        td = HibernateProxyHelper.deproxy(td);
         deleteCandidates.add(new CdmAuthority(td, UPDATE_DELETE));
         addDeleteCandidates(deleteCandidates, td.getCitation());
         if(td instanceof SpecimenTypeDesignation){
@@ -154,6 +157,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(deriveUnit == null){
             return;
         }
+
+        deriveUnit = HibernateProxyHelper.deproxy(deriveUnit);
         if(deriveUnit.getCollection() != null){
             deleteCandidates.add(new CdmAuthority(deriveUnit.getCollection(), UPDATE_DELETE));
         }
@@ -174,6 +179,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(fieldUnit == null){
             return;
         }
+        fieldUnit = HibernateProxyHelper.deproxy(fieldUnit);
         if(fieldUnit.getGatheringEvent() != null){
             addDeleteCandidates(deleteCandidates, fieldUnit.getGatheringEvent().getActor());
         }
@@ -187,6 +193,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(reference == null){
             return;
         }
+        reference = HibernateProxyHelper.deproxy(reference);
         deleteCandidates.add(new CdmAuthority(reference, UPDATE_DELETE));
         addDeleteCandidates(deleteCandidates, reference.getAuthorship());
         addDeleteCandidates(deleteCandidates, reference.getInReference());
@@ -196,6 +203,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(agent == null){
             return;
         }
+        agent = HibernateProxyHelper.deproxy(agent);
         deleteCandidates.add(new CdmAuthority(agent, UPDATE_DELETE));
         if(agent instanceof TeamOrPersonBase){
             if(agent instanceof Team){
