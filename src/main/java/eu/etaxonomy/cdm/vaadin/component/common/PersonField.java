@@ -26,6 +26,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
@@ -69,12 +70,12 @@ public class PersonField extends CompositeCustomField<Person> {
     private CssLayout root = new CssLayout();
     private CssLayout selectOrNewContainer = new CssLayout();
 
-    private TextField cacheField = new TextField();
+    private TextField cacheField = new TextFieldNFix();
     private CssLayout detailsContainer = new CssLayout();
-    private TextField firstNameField = new TextField();
-    private TextField lastNameField = new TextField();
-    private TextField prefixField = new TextField();
-    private TextField suffixField = new TextField();
+    private TextField firstNameField = new TextFieldNFix();
+    private TextField lastNameField = new TextFieldNFix();
+    private TextField prefixField = new TextFieldNFix();
+    private TextField suffixField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
 
     private boolean onCommit = false;

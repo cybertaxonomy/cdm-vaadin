@@ -32,6 +32,7 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -63,11 +64,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private ListSelect submitterFilter = null; // must be null, the presenter relies on this
 
-    private TextField identifierFilter = new TextField("Identifier");
+    private TextField identifierFilter = new TextFieldNFix("Identifier");
 
-    private TextField taxonNameFilter = new TextField("Name");
+    private TextField taxonNameFilter = new TextFieldNFix("Name");
 
-    private TextField referenceFilter = new TextField("Publication");
+    private TextField referenceFilter = new TextFieldNFix("Publication");
 
     public ListViewBean() {
         super();

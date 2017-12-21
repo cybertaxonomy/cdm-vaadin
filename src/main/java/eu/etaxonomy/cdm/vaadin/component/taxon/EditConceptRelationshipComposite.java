@@ -44,6 +44,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.component.CdmProgressComponent;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.jscomponent.D3ConceptRelationshipTree.Direction;
@@ -260,12 +261,12 @@ public class EditConceptRelationshipComposite extends CustomComponent {
     private void initTaxonComponents() {
         // init left taxon layout
         leftTaxonLabel = new Label();
-        leftTaxonTextField = new TextField();
+        leftTaxonTextField = new TextFieldNFix();
         leftTaxonComponent = buildTaxonVLayout(leftTaxonLabel, leftTaxonTextField);
 
         // init right taxon layout
         rightTaxonLabel = new Label();
-        rightTaxonTextField = new TextField();
+        rightTaxonTextField = new TextFieldNFix();
         rightTaxonComponent = buildTaxonVLayout(rightTaxonLabel, rightTaxonTextField);
     }
 

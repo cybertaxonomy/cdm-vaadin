@@ -25,6 +25,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 
 /**
@@ -43,11 +44,11 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     Point parsedPoint = Point.NewInstance();
 
-    private TextField longitudeField = new TextField("Long.");
-    TextField latitudeField = new TextField("Lat.");
+    private TextField longitudeField = new TextFieldNFix("Long.");
+    TextField latitudeField = new TextFieldNFix("Lat.");
     Label longLatParsed = new Label();
-    TextField errorRadiusField = new TextField("Error radius (m)");
-    TextField referenceSystemField = new TextField("ReferenceSystem");
+    TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
+    TextField referenceSystemField = new TextFieldNFix("ReferenceSystem");
 
     private LMap map = new LMap();
     private LMarker mapMarker = new LMarker();

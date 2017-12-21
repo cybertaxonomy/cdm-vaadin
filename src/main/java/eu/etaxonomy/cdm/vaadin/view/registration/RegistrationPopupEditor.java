@@ -20,6 +20,7 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -56,10 +57,10 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         form.setSpacing(true);
         form.setMargin(true);
 
-        identifierField = new TextField("Identifier");
+        identifierField = new TextFieldNFix("Identifier");
         addField(identifierField, "identifier");
 
-        specificIdentifierField = new TextField("Specific Identifier");
+        specificIdentifierField = new TextFieldNFix("Specific Identifier");
         addField(specificIdentifierField, "specificIdentifier");
 
         ListSelect statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));

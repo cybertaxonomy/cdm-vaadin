@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+
 /**
  * @author a.kohlbecker
  * @since Jun 22, 2017
@@ -27,7 +29,7 @@ public class MinMaxTextField extends HorizontalLayout {
 
     private static final long serialVersionUID = -6690659776664579698L;
 
-    TextField minField, textField;
+    TextFieldNFix minField, textField;
     MaxTextField maxField;
 
     String unitOfMeasure;
@@ -47,9 +49,9 @@ public class MinMaxTextField extends HorizontalLayout {
      * @param unitOfMeasure
      */
     protected void initFields(String unitOfMeasure) {
-        textField = new TextField("free text");
+        textField = new TextFieldNFix("free text");
         maxField = new MaxTextField(String.format("min (%s)", unitOfMeasure));
-        minField = new TextField(String.format("min (%s)", unitOfMeasure)) {
+        minField = new TextFieldNFix(String.format("min (%s)", unitOfMeasure)) {
 
             private static final long serialVersionUID = -536012841624056585L;
 

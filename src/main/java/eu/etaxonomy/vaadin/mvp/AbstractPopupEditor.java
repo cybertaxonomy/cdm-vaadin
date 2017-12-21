@@ -44,6 +44,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
@@ -319,18 +320,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
 
     protected TextField addTextField(String caption, String propertyId) {
-        return addField(new TextField(caption), propertyId);
+        return addField(new TextFieldNFix(caption), propertyId);
     }
 
     protected TextField addTextField(String caption, String propertyId, int column1, int row1,
             int column2, int row2)
             throws OverlapsException, OutOfBoundsException {
-        return addField(new TextField(caption), propertyId, column1, row1, column2, row2);
+        return addField(new TextFieldNFix(caption), propertyId, column1, row1, column2, row2);
     }
 
     protected TextField addTextField(String caption, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
-        return addField(new TextField(caption), propertyId, column, row);
+        return addField(new TextFieldNFix(caption), propertyId, column, row);
     }
 
     protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column1, int row1,

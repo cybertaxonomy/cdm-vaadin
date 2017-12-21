@@ -56,6 +56,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
@@ -842,7 +843,7 @@ public class StatusComposite extends CustomComponent implements View, IStatusCom
         searchHorizontalLayout.setSpacing(true);
 
         // searchTextField
-        searchTextField = new TextField();
+        searchTextField = new TextFieldNFix();
         searchTextField.setImmediate(false);
         searchTextField.setWidth("100.0%");
         searchTextField.setHeight("-1px");
