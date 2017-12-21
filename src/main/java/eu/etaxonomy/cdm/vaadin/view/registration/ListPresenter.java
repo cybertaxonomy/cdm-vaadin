@@ -69,8 +69,10 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
         CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
 
-        getView().getSubmitterFilter().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
-        getView().getSubmitterFilter().setItemCaptionPropertyId("username");
+        if(getView().getSubmitterFilter() != null){
+            getView().getSubmitterFilter().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
+            getView().getSubmitterFilter().setItemCaptionPropertyId("username");
+        }
 
         getView().populate(pageRegistrations());
     }
