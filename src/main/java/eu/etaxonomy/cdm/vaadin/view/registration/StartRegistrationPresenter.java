@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.EnumSet;
+
 import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.LazyComboBox;
 
@@ -18,6 +20,7 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
@@ -84,6 +87,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
         newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
 
+        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
         newReferencePopup.loadInEditor(null);
     }

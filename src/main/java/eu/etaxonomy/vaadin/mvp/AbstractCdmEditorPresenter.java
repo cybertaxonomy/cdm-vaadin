@@ -42,7 +42,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     private static final Logger logger = Logger.getLogger(AbstractCdmEditorPresenter.class);
 
     /**
-     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.
      */
     protected EnumSet<CRUD> crud = null;
