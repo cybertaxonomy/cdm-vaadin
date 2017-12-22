@@ -55,6 +55,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private static final long serialVersionUID = 4255636253714476918L;
 
+    private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
+
     CdmStore<Registration, IRegistrationService> store;
 
 
@@ -275,7 +277,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         collectionPopuEditorSourceRow = rowItemCollection;
         collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(null);
     }
@@ -285,7 +287,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         collectionPopuEditorSourceRow = rowItemCollection;
         collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(collectionId);
     }

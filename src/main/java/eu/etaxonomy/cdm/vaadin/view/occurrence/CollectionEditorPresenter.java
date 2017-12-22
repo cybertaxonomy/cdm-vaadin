@@ -9,17 +9,16 @@
 package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
@@ -62,7 +61,9 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
      */
     @Override
     protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
-        // TODO Auto-generated method stub
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
+        }
 
     }
 
@@ -71,7 +72,9 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
      */
     @Override
     protected void guaranteePerEntityCRUDPermissions(Collection bean) {
-        // TODO Auto-generated method stub
+        if(crud != null){
+            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+        }
 
     }
 
@@ -109,7 +112,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
         collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(null);
     }
@@ -123,7 +126,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
         collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(event.getEntityId());
     }
