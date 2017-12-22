@@ -57,9 +57,15 @@ public class CdmEntityCache implements EntityCache {
 
     private Set<Object> objectsSeen = new HashSet<>();
 
+    /**
+     * @param entity the first entity to be cached. can be <code>null</code>.
+     *      Further entities can be added to the cache with {@link CdmEntityCache#add(CdmBase)}
+     */
     public CdmEntityCache(CdmBase entity){
-        this.entities.add(entity);
-        update();
+        if(entity != null){
+            this.entities.add(entity);
+            update();
+        }
     }
 
     @Override
