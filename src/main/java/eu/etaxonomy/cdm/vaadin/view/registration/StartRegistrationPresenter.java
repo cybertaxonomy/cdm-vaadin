@@ -82,7 +82,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
-        if(getView().getNewPublicationButton() != event.getSourceComponent()){
+        if(getView() == null || getView().getNewPublicationButton() != event.getSourceComponent()){
             return;
         }
         newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
