@@ -50,7 +50,7 @@ public class MinMaxTextField extends HorizontalLayout {
      */
     protected void initFields(String unitOfMeasure) {
         textField = new TextFieldNFix("free text");
-        maxField = new MaxTextField(String.format("min (%s)", unitOfMeasure));
+        maxField = new MaxTextField(String.format("max (%s)", unitOfMeasure));
         minField = new TextFieldNFix(String.format("min (%s)", unitOfMeasure)) {
 
             private static final long serialVersionUID = -536012841624056585L;
@@ -128,7 +128,7 @@ public class MinMaxTextField extends HorizontalLayout {
         super.setEnabled(enabled);
     }
 
-    class MaxTextField extends TextField {
+    class MaxTextField extends TextFieldNFix {
 
         private static final long serialVersionUID = -536012841624056585L;
 
