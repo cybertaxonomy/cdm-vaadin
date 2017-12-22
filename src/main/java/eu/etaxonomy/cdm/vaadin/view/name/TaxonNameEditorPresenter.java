@@ -9,10 +9,12 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -23,12 +25,17 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -40,6 +47,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     private static final long serialVersionUID = -3538980627079389221L;
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
+
+    ReferencePopupEditor newReferencePopup = null;
 
     /**
      * {@inheritDoc}
@@ -171,6 +180,36 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     @Override
     protected INameService getService() {
         return getRepo().getNameService();
+    }
+
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+
+        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        newReferencePopup.withDeleteButton(true);
+        newReferencePopup.loadInEditor(null);
+    }
+
+    @EventListener
+    public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+        if(event.getPopup() == newReferencePopup){
+            if(event.getReason() == Reason.SAVE){
+
+                Reference newReference = newReferencePopup.getBean();
+
+                // TODO the bean contained in the popup editor is not yet updated at this point.
+                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                newReference = getRepo().getReferenceService().find(newReference.getUuid());
+                getView().getNomReferenceCombobox().setValue(newReference);
+            }
+
+            newReferencePopup = null;
+        }
     }
 
 

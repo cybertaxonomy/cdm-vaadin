@@ -18,6 +18,9 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 
 /**
+ * The <code>ToOneRelatedEntityReloader</code> helps avoiding <i>java.lang.IllegalStateException: Multiple representations of the same entity</i>
+ * in Hibernate sessions.
+ *
  *
  * @author a.kohlbecker
  * @since 19.10.2017
@@ -31,6 +34,8 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
 
     CachingPresenter cachingPresenter;
 
+    boolean onSettingReloadedEntity;
+
     public ToOneRelatedEntityReloader( Field<CDM> toOneRelatedEntityField, CachingPresenter entityCache){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
         this.cachingPresenter = entityCache;
@@ -42,6 +47,11 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
     @Override
     public void valueChange(ValueChangeEvent event) {
 
+
+        if(onSettingReloadedEntity){
+            // avoid potential loops caused by setValue() below
+            return;
+        }
 
         CDM value = (CDM)event.getProperty().getValue();
         if(value == null) {
@@ -56,13 +66,15 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
             if(cachedEntity == null){
                 cache.add(value);
             } else if(
-                    // pure object comparison is not reliable since the entity may have been changed
-                    cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()){
-                toOneRelatedEntityField.removeValueChangeListener(this);
-                toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
-                toOneRelatedEntityField.setValue(cachedEntity);
-                toOneRelatedEntityField.addValueChangeListener(this);
-
+                // pure object comparison is not reliable since the entity may have been changed
+                cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
+                ){
+                    onSettingReloadedEntity = true;
+                    toOneRelatedEntityField.removeValueChangeListener(this);
+                    toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
+                    toOneRelatedEntityField.setValue(cachedEntity);
+                    toOneRelatedEntityField.addValueChangeListener(this);
+                    onSettingReloadedEntity = false;
             }
         }
     }

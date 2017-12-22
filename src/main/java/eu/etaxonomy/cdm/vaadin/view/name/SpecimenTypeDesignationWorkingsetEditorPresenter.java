@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.EnumSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
@@ -26,6 +27,7 @@ import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
@@ -33,8 +35,12 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -68,6 +74,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private CdmEntityCache cache = null;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
+
+    private CollectionPopupEditor collectionPopuEditor;
+
+    private CollectionRowItemCollection collectionPopuEditorSourceRow;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -130,6 +140,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
+
+
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
@@ -161,6 +173,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                row.collection.addClickListenerAddEntity( e -> doCollectionEditorAdd(row));
+                row.collection.addClickListenerEditEntity(e -> {
+                        if(row.collection.getValue() != null){
+                            doCollectionEditorEdit(row, row.collection.getValue().getId());
+                        }
+                    });
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
@@ -251,5 +269,47 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             return null;
         }
     }
+
+    public void doCollectionEditorAdd(CollectionRowItemCollection rowItemCollection) {
+
+        collectionPopuEditorSourceRow = rowItemCollection;
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+
+        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.withDeleteButton(true);
+        collectionPopuEditor.loadInEditor(null);
+    }
+
+    public void doCollectionEditorEdit(CollectionRowItemCollection rowItemCollection, int collectionId) {
+
+        collectionPopuEditorSourceRow = rowItemCollection;
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+
+        collectionPopuEditor.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        collectionPopuEditor.withDeleteButton(true);
+        collectionPopuEditor.loadInEditor(collectionId);
+    }
+
+    @EventListener
+    public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+
+        if(event.getPopup() == collectionPopuEditor){
+            if(event.getReason() == Reason.SAVE){
+
+                Collection newCollection = collectionPopuEditor.getBean();
+
+                // TODO the bean contained in the popup editor is not yet updated at this point.
+                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                newCollection = getRepo().getCollectionService().find(newCollection.getUuid());
+                ToOneRelatedEntityCombobox<Collection> combobox = collectionPopuEditorSourceRow.getComponent(ToOneRelatedEntityCombobox.class, 2);
+                combobox.setValue(newCollection);
+            }
+
+            collectionPopuEditor = null;
+            collectionPopuEditorSourceRow = null;
+        }
+    }
+
+
 
 }

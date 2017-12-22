@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Arrays;
+
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ListSelect;
@@ -16,6 +18,7 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRow;
+import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
@@ -31,7 +34,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
  * @since Jun 22, 2017
  *
  */
-public class SpecimenTypeDesignationDTORow implements CollectionRow {
+public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection implements CollectionRow {
 
     /* CONVENTION!
      *
@@ -57,7 +60,7 @@ public class SpecimenTypeDesignationDTORow implements CollectionRow {
         accessionNumber.setWidth(100, Unit.PIXELS);
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
-        collection.setWidth(150, Unit.PIXELS);
+        collection.setWidth(200, Unit.PIXELS);
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
@@ -73,13 +76,15 @@ public class SpecimenTypeDesignationDTORow implements CollectionRow {
      * @return
      */
     public Component[] components() {
-        return new Component[]{
-                kindOfUnit, typeStatus,
-                collection, accessionNumber,
-                preferredStableUri,
-                mediaUri, mediaSpecimenReference,
-                mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail
-                };
+        Component[] components = new Component[]{
+            kindOfUnit, typeStatus,
+            collection, accessionNumber,
+            preferredStableUri,
+            mediaUri, mediaSpecimenReference,
+            mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail
+            };
+        addAll(Arrays.asList(components));
+        return components;
     }
 
     @Override
