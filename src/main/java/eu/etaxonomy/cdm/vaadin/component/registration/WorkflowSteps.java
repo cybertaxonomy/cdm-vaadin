@@ -17,6 +17,7 @@ import eu.etaxonomy.cdm.vaadin.design.registration.WorkflowStepsDesign;
  * @since Mar 10, 2017
  *
  */
+@Deprecated // FIXME delete also all css styles if any
 public class WorkflowSteps extends WorkflowStepsDesign {
 
     private static final long serialVersionUID = 7224620045791102584L;

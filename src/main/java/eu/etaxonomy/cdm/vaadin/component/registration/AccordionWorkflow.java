@@ -16,6 +16,7 @@ import com.vaadin.ui.Component;
  * @since Mar 27, 2017
  *
  */
+@Deprecated // FIXME delete also all css styles if any
 public class AccordionWorkflow extends Accordion {
 
     private static final long serialVersionUID = -3279853764419918649L;
