@@ -11,9 +11,12 @@ package eu.etaxonomy.cdm.vaadin.security;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.annotation.Profile;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
@@ -38,6 +41,9 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
  * @since Oct 11, 2017
  *
  */
+@SpringComponent
+@UIScope
+@Profile("debug")
 public class PermissionDebugUtils {
 
 
