@@ -20,6 +20,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferenceEditorPresenter;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditorView;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -73,6 +74,14 @@ public class CdmEditorPresenterTest {
          */
         @Override
         public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public TeamOrPersonField getAuthorshipField() {
             return null;
         }
 

@@ -62,7 +62,7 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
         EntityCache cache = cachingPresenter.getCache();
         if(cache != null){
             cache.update();
-            CDM cachedEntity = cache.find(value);
+            CDM cachedEntity = cache.findAndUpdate(value);
             if(cachedEntity == null){
                 cache.add(value);
             } else if(

@@ -65,6 +65,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "name.nomenclaturalReference.authorship",
             "name.nomenclaturalReference.inReference",
             "name.rank",
+            "name.homotypicalGroup.typifiedNames",
             "name.status.type",
             "name.typeDesignations", // important !!"
             // institution

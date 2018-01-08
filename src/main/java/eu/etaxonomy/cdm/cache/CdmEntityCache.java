@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -30,6 +32,7 @@ import org.hibernate.envers.internal.entities.mapper.relation.lazy.proxy.SortedM
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.persistence.dao.initializer.AbstractBeanInitializer;
 
@@ -88,11 +91,15 @@ public class CdmEntityCache implements EntityCache {
      */
     protected void analyzeEntity(CdmBase bean, String propertyPath) {
 
+        CdmBase proxyBean = bean;
+
+        bean = HibernateProxyHelper.deproxy(proxyBean, CdmBase.class);
+
         EntityKey entityKey = new EntityKey(bean);
 
         propertyPath += "[" + entityKey;
         String flags = "";
-        CdmBase mappedEntity = entityyMap.put(entityKey, bean);
+        CdmBase mappedEntity = entityyMap.put(entityKey, proxyBean);
 
         if(mappedEntity != null && mappedEntity != bean) {
             copyEntitiyKeys.add(entityKey);
@@ -154,6 +161,7 @@ public class CdmEntityCache implements EntityCache {
                                 || propertyValue instanceof MapProxy<?, ?>
                                 || propertyValue instanceof SortedMapProxy<?, ?>){
                             //hibernate envers collections
+                            // FIXME this won't work!!!!
                             collection = (Collection<CdmBase>)propertyValue;
                     }
 
@@ -276,9 +284,23 @@ public class CdmEntityCache implements EntityCache {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * In case the cached bean is a HibernateProxy it will be unproxied
+     * before returning it.
      */
     @Override
     public <CDM extends CdmBase> CDM find(CDM value) {
+        if(value != null){
+            EntityKey entityKey = new EntityKey(HibernateProxyHelper.deproxy(value));
+            CDM cachedBean = (CDM) entityyMap.get(entityKey);
+            if(cachedBean != null){
+                return (CDM) HibernateProxyHelper.deproxy(cachedBean, CdmBase.class);
+            }
+        }
+        return null;
+    }
+
+    private <CDM extends CdmBase> CDM findProxy(CDM value) {
         if(value != null){
             EntityKey entityKey = new EntityKey(HibernateProxyHelper.deproxy(value));
             return (CDM) entityyMap.get(entityKey);
@@ -288,11 +310,107 @@ public class CdmEntityCache implements EntityCache {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * In case the cached bean is a HibernateProxy it will be unproxied
+     * before returning it.
      */
     @Override
     public <CDM extends CdmBase> CDM find(Class<CDM> type, int id) {
         EntityKey entityKey = new EntityKey(type, id);
-        return (CDM) entityyMap.get(entityKey);
+        CDM cachedBean = (CDM) entityyMap.get(entityKey);
+        if(cachedBean != null){
+            return (CDM) HibernateProxyHelper.deproxy(cachedBean, CdmBase.class);
+        }
+        return null;
+    }
+
+    @Override
+    public <CDM extends CdmBase> CDM findAndUpdate(CDM value){
+        CDM cachedBean = findProxy(value);
+        if(cachedBean != null && VersionableEntity.class.isAssignableFrom(cachedBean.getClass())){
+            updatedCachedIfEarlier((VersionableEntity)cachedBean, (VersionableEntity)value);
+        }
+        if(cachedBean != null){
+            return (CDM) HibernateProxyHelper.deproxy(cachedBean, CdmBase.class);
+        }
+        return null;
+
+    }
+
+    /**
+     * @param cachedValue
+     * @param value
+     */
+    private <CDM extends VersionableEntity> void updatedCachedIfEarlier(CDM cachedValue, CDM value) {
+       if(cachedValue != null && value != null && value.getUpdated() != null){
+           if(cachedValue.getUpdated() == null || value.getUpdated().isAfter(cachedValue.getUpdated())){
+               try {
+                copyProperties(cachedValue, value);
+            } catch (IllegalAccessException e) {
+                /* should never happen */
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                /* critical! re-throw as runtime exception, which is ok in the context of a vaadin app */
+                throw new RuntimeException(e);
+            }
+           }
+       }
+
+    }
+
+    /**
+     * partially copy of {@link BeanUtilsBean#copyProperties(Object, Object)}
+     */
+    private <CDM extends VersionableEntity> void copyProperties(CDM dest, CDM orig) throws IllegalAccessException, InvocationTargetException {
+
+        PropertyUtilsBean propertyUtils = BeanUtilsBean.getInstance().getPropertyUtils();
+        PropertyDescriptor[] origDescriptors =
+                propertyUtils.getPropertyDescriptors(orig);
+            for (int i = 0; i < origDescriptors.length; i++) {
+                String name = origDescriptors[i].getName();
+                if ("class".equals(name)) {
+                    continue; // No point in trying to set an object's class
+                }
+                if (propertyUtils.isReadable(orig, name) &&
+                        propertyUtils.isWriteable(dest, name)) {
+                    try {
+                        if(CdmBase.class.isAssignableFrom(propertyUtils.getPropertyType(dest, name))){
+                            CdmBase origValue = (CdmBase)propertyUtils.getSimpleProperty(orig, name);
+                            if(!Hibernate.isInitialized(origValue)){
+                                // ignore uninitialized entities
+                                continue;
+                            }
+                            // only copy entities if origValue either is a completely different entity (A)
+                            // or if origValue is updated (B).
+                            CdmBase destValue = (CdmBase)propertyUtils.getSimpleProperty(dest, name);
+                            if(destValue == null && origValue == null){
+                                continue;
+                            }
+                            if(
+                                    origValue != null && destValue == null ||
+                                    origValue == null && destValue != null ||
+
+                                    origValue.getId() != destValue.getId() ||
+                                    origValue.getClass() != destValue.getClass() ||
+                                    origValue.getUuid() != destValue.getUuid()){
+                                // (A)
+                                BeanUtilsBean.getInstance().copyProperty(dest, name, origValue);
+
+                            } else {
+                                // (B) recurse into findAndUpdate
+                                findAndUpdate(origValue);
+                            }
+                        } else {
+                                Object value = propertyUtils.getSimpleProperty(orig, name);
+                                BeanUtilsBean.getInstance().copyProperty(dest, name, value);
+                        }
+
+                    } catch (NoSuchMethodException e) {
+                        // Should not happen
+                    }
+                }
+            }
+
     }
 
     /**

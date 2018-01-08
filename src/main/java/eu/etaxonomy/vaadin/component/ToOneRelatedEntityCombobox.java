@@ -106,6 +106,15 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     }
 
     /**
+     * reload the selected entity from the persistent storage
+     */
+    public void reload() {
+        getSelect().refresh();
+        getSelect().discard(); // reload from data source
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -164,8 +173,8 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
      */
     @Override
     public void setValue(V newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
-        lazySelect.setValue(newFieldValue);
         lazySelect.refresh();
+        lazySelect.setValue(newFieldValue);
     }
 
     @Override
