@@ -20,6 +20,9 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
 import eu.etaxonomy.cdm.cache.EntityCache;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -141,6 +144,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
+        getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));

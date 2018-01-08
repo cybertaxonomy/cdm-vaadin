@@ -62,6 +62,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     private EnumSet<CRUD> crud;
 
+    private TeamOrPersonField collectorField;
+
     /**
      * @return the countrySelectField
      */
@@ -139,7 +141,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToGroundMinMax.getTextField(), "distanceToGroundText");
 
         row++;
-        TeamOrPersonField collectorField = new TeamOrPersonField("Collector");
+        collectorField = new TeamOrPersonField("Collector");
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
@@ -287,6 +289,14 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         getFieldLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
         typeDesignationsCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
 
+    }
+
+    /**
+     * @return the collectorField
+     */
+    @Override
+    public TeamOrPersonField getCollectorField() {
+        return collectorField;
     }
 
 
