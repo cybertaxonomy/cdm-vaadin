@@ -14,15 +14,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.CaptionGenerator;
-import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
-import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
-import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
@@ -63,40 +61,13 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
             }
 
         });
-        getView().getInReferenceCombobox().loadFrom(new FilterablePagingProvider<Reference>(){
 
-            @Override
-            public List<Reference> findEntities(int firstRow, String filter) {
-                Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                        null,
-                        filter,
-                        MatchMode.ANYWHERE,
-                        null,
-                        20,
-                        firstRow,
-                        OrderHint.ORDER_BY_TITLE_CACHE.asList(),
-                        Arrays.asList("$")
-                      );
-                return page.getRecords();
-            }},
-            new FilterableCountProvider(){
-                @Override
-                public int size(String filter) {
-                    Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                            null,
-                            filter,
-                            MatchMode.ANYWHERE,
-                            null,
-                            1,
-                            0,
-                            null,
-                            null
-                          );
-                    return page.getCount().intValue();
-                }}
-            , 20);
-
+        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
+
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService());
+        getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
     }
 
     /**
