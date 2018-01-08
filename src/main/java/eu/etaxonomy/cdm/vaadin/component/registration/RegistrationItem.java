@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -37,6 +38,7 @@ import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
@@ -191,6 +193,7 @@ public class RegistrationItem extends GridLayout {
             if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(Action.EDIT, workingSet.getCitationId());
             }
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
             if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE)){
                 referenceEditorAction = new ReferenceEditorAction(Action.ADD);
