@@ -48,6 +48,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
+    private TeamOrPersonField authorshipField;
+
     /**
      * @param layout
      * @param dtoType
@@ -107,7 +109,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         row++;
         addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        TeamOrPersonField authorshipField = new TeamOrPersonField("Author(s)");
+        authorshipField = new TeamOrPersonField("Author(s)");
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, 3, row);
         row++;
@@ -235,5 +237,14 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
         return inReferenceCombobox;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TeamOrPersonField getAuthorshipField() {
+        return authorshipField;
+    }
+
 
 }
