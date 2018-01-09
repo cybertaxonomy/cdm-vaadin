@@ -110,9 +110,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 "basionymAuthorship",
                 "exBasionymAuthorship",
 
-                "basionyms.rank",
-                "basionyms.nomenclaturalReference.authorship",
-                "basionyms.nomenclaturalReference.inReference",
+                // basionyms: relationsToThisName.fromName
+                "relationsToThisName.type",
+                "relationsToThisName.fromName.rank",
+                "relationsToThisName.fromName.nomenclaturalReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference",
+                "relationsToThisName.fromName.relationsToThisName",
+                "relationsToThisName.fromName.relationsFromThisName",
+
+                "relationsFromThisName",
+                //"relationsToThisName",
+                "homotypicalGroup.typifiedNames"
 
                 }
         );
@@ -149,24 +157,27 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
     @Override
     protected TaxonName handleTransientProperties(TaxonName bean) {
+
         logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
         List<TaxonName> newBasionymNames = getView().getBasionymCombobox().getValueFromNestedFields();
         Set<TaxonName> oldBasionyms = bean.getBasionyms();
         boolean updateBasionyms = false;
-        for(TaxonName newB : newBasionymNames){
 
+        for(TaxonName newB : newBasionymNames){
             updateBasionyms = updateBasionyms || !oldBasionyms.contains(newB);
         }
+
         for(TaxonName oldB : oldBasionyms){
             updateBasionyms = updateBasionyms || !newBasionymNames.contains(oldB);
         }
+
         if(updateBasionyms){
             bean.removeBasionyms();
             for(TaxonName basionymName :newBasionymNames){
                 if(basionymName != null){
                     if(basionymName .getUuid() != null){
                         // reload
-                        basionymName = getRepo().getNameService().load(basionymName.getUuid());
+                        basionymName = getRepo().getNameService().load(basionymName.getUuid(), Arrays.asList("$", "relationsFromThisName", "homotypicalGroup.typifiedNames"));
                     }
                     bean.addBasionym(basionymName);
                 }
