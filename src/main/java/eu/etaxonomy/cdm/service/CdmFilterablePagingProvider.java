@@ -27,6 +27,11 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  */
 public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
+    /**
+     *
+     */
+    private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
+
     private int pageSize = 20;
 
     private IIdentifiableEntityService<T> service;
@@ -36,6 +41,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     private MatchMode matchMode = MatchMode.ANYWHERE;
 
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
+
+    List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
 
     /**
@@ -111,7 +118,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                 pageSize,
                 firstRow,
                 orderHints,
-                Arrays.asList("$")
+                initStrategy
               );
         return page.getRecords();
     }
@@ -147,6 +154,20 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    /**
+     * @return the initStrategy
+     */
+    public List<String> getInitStrategy() {
+        return initStrategy;
+    }
+
+    /**
+     * @param initStrategy the initStrategy to set
+     */
+    public void setInitStrategy(List<String> initStrategy) {
+        this.initStrategy = initStrategy;
     }
 
 }
