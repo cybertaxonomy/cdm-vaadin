@@ -55,6 +55,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -228,14 +229,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.withDeleteButton(true);
+        configureTaxonNameEditor(popup);
         popup.loadInEditor(event.getEntityId());
         if(event.getSourceComponent() != null){
             popup.setReadOnly(event.getSourceComponent().isReadOnly());
         }
-        // disable NomReferenceCombobox:
-        // the in the registration application inReferences should only edited centrally
-        // setEnabled must be set at last otherwise it will not be effective
-        popup.getNomReferenceCombobox().setEnabled(false);
+
     }
 
 
@@ -249,11 +248,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         popup.withDeleteButton(true);
+        configureTaxonNameEditor(popup);
         popup.loadInEditor(newTaxonNameForRegistration.getId());
         // disable NomReferenceCombobox:
         // the in the registration application inReferences should only edited centrally
         // setEnabled must be set at last otherwise it will not be effective
         popup.getNomReferenceCombobox().setEnabled(false);
+    }
+
+    /**
+     * TODO consider putting this into a Configurer Bean per UIScope.
+     * In the configurator bean this methods popup papamerter should be of the type
+     * AbstractPopupEditor
+     *
+     * @param popup
+     */
+    protected void configureTaxonNameEditor(TaxonNamePopupEditor popup) {
+        popup.enableMode(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData);
+
     }
 
     /**

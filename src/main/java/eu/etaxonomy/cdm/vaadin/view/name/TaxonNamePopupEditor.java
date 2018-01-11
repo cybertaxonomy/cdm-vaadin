@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -76,6 +77,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     private TeamOrPersonField exCombinationAuthorshipField;
 
+    private EnumSet<TaxonNamePopupEditorMode> modesActive = EnumSet.noneOf(TaxonNamePopupEditorMode.class);
 
     /**
      * @param layout
@@ -306,6 +308,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymAuthorshipField.setVisible(enable);
         exBasionymAuthorshipField.setVisible(enable);
         basionymCombobox.setVisible(enable);
+        if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
+            TaxonName taxonName = getBean();
+            basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
+        }
     }
 
     /**
@@ -328,6 +334,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 || taxonName.getBasionymAuthorship() != null
                 || taxonName.getExBasionymAuthorship() != null;
         basionymToggle.setValue(showBasionymSection);
+
+        if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
+            combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
+        }
 
     }
 
@@ -403,7 +413,15 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         return exCombinationAuthorshipField;
     }
 
+    @Override
+    public void enableMode(TaxonNamePopupEditorMode mode){
+        modesActive.add(mode);
+    }
 
+    @Override
+    public void disableMode(TaxonNamePopupEditorMode mode){
+        modesActive.remove(mode);
+    }
 
 
 }

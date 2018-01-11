@@ -56,4 +56,13 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     public TeamOrPersonField getExCombinationAuthorshipField();
 
+    void disableMode(TaxonNamePopupEditorMode mode);
+
+    /**
+     * Modes must be enabled before calling {@link AbstractPopupEditor#loadInEditor(Object identifier)}.
+     *
+     * @param mode
+     */
+    void enableMode(TaxonNamePopupEditorMode mode);
+
 }
