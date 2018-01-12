@@ -8,8 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -49,6 +49,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     private TeamOrPersonField authorshipField;
+
+    private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
 
     /**
      * @param layout
@@ -91,7 +93,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         "inReference"
          */
         int row = 0;
-        typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
+        typeSelect = new ListSelect("Reference type");
+        typeSelect.addItems(referenceTypes);
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
         typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
@@ -107,7 +110,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Nomenclatural title", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
         authorshipField = new TeamOrPersonField("Author(s)");
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
@@ -244,6 +247,14 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public TeamOrPersonField getAuthorshipField() {
         return authorshipField;
+    }
+
+    public void withReferenceTypes(EnumSet<ReferenceType> types){
+        this.referenceTypes = types;
+        if(typeSelect != null){
+            typeSelect.removeAllItems();
+            typeSelect.addItems(referenceTypes);
+        }
     }
 
 

@@ -20,10 +20,12 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
@@ -86,7 +88,9 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             return;
         }
         newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
-
+        EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.REFERENCE_TYPES.clone();
+        refTypes.remove(ReferenceType.Section);
+        newReferencePopup.withReferenceTypes(refTypes);
         newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
         newReferencePopup.loadInEditor(null);

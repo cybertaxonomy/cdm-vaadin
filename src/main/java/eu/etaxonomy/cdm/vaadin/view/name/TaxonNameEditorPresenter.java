@@ -255,6 +255,26 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         }
     }
 
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
+    public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+
+        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        newReferencePopup.withDeleteButton(true);
+        newReferencePopup.setBeanInstantiator(newReferenceInstantiator);
+        newReferencePopup.loadInEditor(event.getEntityId());
+        if(newReferenceInstantiator != null){
+            // this is a bit clumsy, we actually need to inject something like a view configurer
+            // which can enable, disable fields
+            newReferencePopup.getInReferenceCombobox().setEnabled(false);
+            newReferencePopup.getTypeSelect().setEnabled(false);
+        }
+    }
+
     @EventListener
     public void onDoneWithPopupEvent(DoneWithPopupEvent event){
         if(event.getPopup() == newReferencePopup){
