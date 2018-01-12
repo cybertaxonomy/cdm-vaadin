@@ -335,7 +335,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 || taxonName.getExBasionymAuthorship() != null;
         basionymToggle.setValue(showBasionymSection);
 
-        if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
+        if(isModeEnabled(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
             combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
         }
 
@@ -416,6 +416,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public void enableMode(TaxonNamePopupEditorMode mode){
         modesActive.add(mode);
+    }
+
+    @Override
+    public boolean isModeEnabled(TaxonNamePopupEditorMode mode){
+        return modesActive.contains(mode);
     }
 
     @Override

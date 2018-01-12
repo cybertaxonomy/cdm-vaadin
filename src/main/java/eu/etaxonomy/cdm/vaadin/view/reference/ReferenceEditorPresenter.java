@@ -81,8 +81,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         List<String> initStrategy = Arrays.asList(new String []{
 
-                "$",
-
+                "$"
                 }
         );
 
@@ -90,9 +89,21 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         if(identifier != null){
             reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
-            reference = ReferenceFactory.newGeneric();
+            reference = createNewReference();
         }
         return reference;
+    }
+
+    /**
+     * TODO this should better go into {@link AbstractCdmEditorPresenter}
+     *
+     * @return
+     */
+    protected Reference createNewReference() {
+        if(this.beanInstantiator != null){
+            return beanInstantiator.createNewBean();
+        }
+        return ReferenceFactory.newGeneric();
     }
 
     /**

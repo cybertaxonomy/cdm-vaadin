@@ -250,10 +250,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
         popup.loadInEditor(newTaxonNameForRegistration.getId());
-        // disable NomReferenceCombobox:
-        // the in the registration application inReferences should only edited centrally
-        // setEnabled must be set at last otherwise it will not be effective
-        popup.getNomReferenceCombobox().setEnabled(false);
     }
 
     /**
@@ -265,7 +261,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     protected void configureTaxonNameEditor(TaxonNamePopupEditor popup) {
         popup.enableMode(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData);
-
+        popup.enableMode(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly);
     }
 
     /**

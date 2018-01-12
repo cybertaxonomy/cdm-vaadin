@@ -542,6 +542,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         isBeanLoaded = true;
     }
 
+    public final void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
+        getPresenter().setBeanInstantiator(beanInstantiator);
+    }
+
     /**
      * Returns the bean contained in the itemDatasource of the fieldGroup.
      *

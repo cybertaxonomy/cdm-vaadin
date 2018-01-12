@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -25,6 +26,8 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -34,6 +37,7 @@ import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -49,6 +53,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
 
     ReferencePopupEditor newReferencePopup = null;
+
+    private CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider;
+
+    private Reference publishedUnit;
+
+    private BeanInstantiator<Reference> newReferenceInstantiator;
 
     /**
      * {@inheritDoc}
@@ -78,10 +88,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getExBasionymAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
-
 
         getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         CdmFilterablePagingProvider<TaxonName, TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
@@ -125,13 +134,45 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 }
         );
 
-        TaxonName bean;
+        TaxonName taxonName;
         if(identifier != null){
-            bean = getRepo().getNameService().load(identifier, initStrategy);
+            taxonName = getRepo().getNameService().load(identifier, initStrategy);
         } else {
-            bean = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
+            taxonName = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         }
-        return bean;
+
+        if(getView().isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly)){
+            if(taxonName.getNomenclaturalReference() != null){
+                Reference nomRef = (Reference)taxonName.getNomenclaturalReference();
+                //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
+                publishedUnit = nomRef;
+                while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
+                    publishedUnit = nomRef.getInReference();
+                }
+                // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
+                // referencePagingProvider
+                referencePagingProvider.getCriteria().add(Restrictions.or(
+                        Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
+                        Restrictions.idEq(publishedUnit.getId())
+                        )
+                );
+                // and remove the empty option
+                getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
+
+                // new Reference only a sub sections of the publishedUnit
+                newReferenceInstantiator = new BeanInstantiator<Reference>() {
+                    @Override
+                    public Reference createNewBean() {
+                        Reference newRef = ReferenceFactory.newSection();
+                        newRef.setInReference(publishedUnit);
+                        return newRef;
+                    }
+                };
+
+            }
+        }
+
+        return taxonName;
     }
 
     /**
@@ -204,7 +245,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
         newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
+        newReferencePopup.setBeanInstantiator(newReferenceInstantiator);
         newReferencePopup.loadInEditor(null);
+        if(newReferenceInstantiator != null){
+            // this is a bit clumsy, we actually need to inject something like a view configurer
+            // which can enable, disable fields
+            newReferencePopup.getInReferenceCombobox().setEnabled(false);
+            newReferencePopup.getTypeSelect().setEnabled(false);
+        }
     }
 
     @EventListener
@@ -216,7 +264,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 // TODO the bean contained in the popup editor is not yet updated at this point.
                 //      so re reload it using the uuid since new beans will not have an Id at this point.
-                newReference = getRepo().getReferenceService().find(newReference.getUuid());
+                newReference = getRepo().getReferenceService().load(newReference.getUuid(), Arrays.asList("inReference"));
                 getView().getNomReferenceCombobox().setValue(newReference);
             }
 

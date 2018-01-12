@@ -224,5 +224,4 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         }
     }
 
-
 }

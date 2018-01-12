@@ -65,4 +65,10 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     void enableMode(TaxonNamePopupEditorMode mode);
 
+    /**
+     * @param mode
+     * @return
+     */
+    boolean isModeEnabled(TaxonNamePopupEditorMode mode);
+
 }

@@ -8,9 +8,11 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -43,6 +45,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
 
     List<String> initStrategy = DEFAULT_INIT_STRATEGY;
+
+    private List<Criterion> criteria = new ArrayList<>();
 
 
     /**
@@ -114,7 +118,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                 type,
                 filter,
                 matchMode,
-                null,
+                criteria,
                 pageSize,
                 firstRow,
                 orderHints,
@@ -133,7 +137,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                 type,
                 filter,
                 matchMode,
-                null,
+                criteria,
                 1,
                 0,
                 null,
@@ -170,4 +174,12 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         this.initStrategy = initStrategy;
     }
 
+    /**
+     * The list of criteria is initially empty.
+     *
+     * @return the criteria
+     */
+    public List<Criterion> getCriteria() {
+        return criteria;
+    }
 }
