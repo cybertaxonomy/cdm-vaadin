@@ -41,8 +41,10 @@ import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -82,9 +84,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
-    private CollectionPopupEditor collectionPopuEditor;
+    private CollectionPopupEditor collectionPopupEditor;
 
     private Set<CollectionRowItemCollection> collectionPopuEditorSourceRows = new HashSet<>();
+
+    private ReferencePopupEditor referencePopupEditor;
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -186,7 +190,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
-                row.collection.addClickListenerAddEntity( e -> doCollectionEditorAdd());
+                row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd());
                 row.collection.addClickListenerEditEntity(e -> {
                         if(row.collection.getValue() != null){
                             doCollectionEditorEdit(row.collection.getValue().getId());
@@ -203,6 +207,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd());
+                row.mediaSpecimenReference.addClickListenerEditEntity(e -> {
+                    if(row.mediaSpecimenReference.getValue() != null){
+                        doReferenceEditorEdit(row.mediaSpecimenReference.getValue().getId());
+                    }
+                });
 
                 getView().applyDefaultComponentStyle(row.components());
 
@@ -287,20 +297,20 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorAdd() {
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
-        collectionPopuEditor.withDeleteButton(true);
-        collectionPopuEditor.loadInEditor(null);
+        collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+        collectionPopupEditor.withDeleteButton(true);
+        collectionPopupEditor.loadInEditor(null);
     }
 
     public void doCollectionEditorEdit(int collectionId) {
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
 
-        collectionPopuEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
-        collectionPopuEditor.withDeleteButton(true);
-        collectionPopuEditor.loadInEditor(collectionId);
+        collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+        collectionPopupEditor.withDeleteButton(true);
+        collectionPopupEditor.loadInEditor(collectionId);
     }
 
     @EventListener(condition = "#event.entityType == T(eu.etaxonomy.cdm.model.occurrence.Collection)")
@@ -311,6 +321,37 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
             ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 2);
+            combobox.reload();
+        }
+    }
+
+    public void doReferenceEditorAdd() {
+
+        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+
+        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+        referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+        referencePopupEditor.withDeleteButton(true);
+        referencePopupEditor.loadInEditor(null);
+    }
+
+    public void doReferenceEditorEdit(int referenceId) {
+
+        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+        referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+        referencePopupEditor.withDeleteButton(true);
+        referencePopupEditor.loadInEditor(referenceId);
+    }
+
+    @EventListener(condition = "#event.entityType == T(eu.etaxonomy.cdm.model.reference.Reference)")
+    public void onReferenceEvent(EntityChangeEvent event){
+
+        Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));
+        cache.findAndUpdate(newRef);
+
+        for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
+            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 6);
             combobox.reload();
         }
     }

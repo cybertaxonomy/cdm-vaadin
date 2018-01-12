@@ -19,7 +19,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
  */
 public class RegistrationUIDefaults {
 
-    public static final EnumSet<ReferenceType> REFERENCE_TYPES = EnumSet.of(
+    public static final EnumSet<ReferenceType> PRINTPUB_REFERENCE_TYPES = EnumSet.of(
             ReferenceType.Article,
             ReferenceType.Book,
             ReferenceType.InProceedings,
@@ -28,5 +28,22 @@ public class RegistrationUIDefaults {
             ReferenceType.Proceedings,
             ReferenceType.Section,
             ReferenceType.Thesis);
+
+    public static final EnumSet<ReferenceType> MEDIA_REFERENCE_TYPES = EnumSet.of(
+            // same as for print
+            ReferenceType.Article,
+            ReferenceType.Book,
+            ReferenceType.InProceedings,
+            ReferenceType.Journal,
+            ReferenceType.PrintSeries,
+            ReferenceType.Proceedings,
+            ReferenceType.Section,
+            ReferenceType.Thesis,
+            // additional
+            ReferenceType.WebPage,
+            ReferenceType.Database,
+            ReferenceType.CdDvd,
+            ReferenceType.Report
+            );
 
 }
