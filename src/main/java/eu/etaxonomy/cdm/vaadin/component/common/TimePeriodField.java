@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
@@ -269,6 +270,21 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     public Class<? extends TimePeriod> getType() {
         return TimePeriod.class;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+        super.commit();
+        try {
+            fieldGroup.commit();
+        } catch (CommitException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
 
 
