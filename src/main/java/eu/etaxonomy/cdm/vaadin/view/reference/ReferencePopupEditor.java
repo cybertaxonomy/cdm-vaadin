@@ -20,11 +20,14 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -148,8 +151,12 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         row++;
         addTextField("ISSN", "issn", 0, row);
         addTextField("ISBN", "isbn", 1, row);
-        addTextField("DOI", "doi", 2, row);
-        addTextField("Uri", "uri", 3, row);
+        TextFieldNFix doiField = new TextFieldNFix("DOI");
+        doiField.setConverter(new DoiConverter());
+        addField(doiField, "doi", 2, row);
+        TextFieldNFix uriField = new TextFieldNFix("Uri");
+        uriField.setConverter(new UriConverter());
+        addField(uriField, "uri", 3, row);
 
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
