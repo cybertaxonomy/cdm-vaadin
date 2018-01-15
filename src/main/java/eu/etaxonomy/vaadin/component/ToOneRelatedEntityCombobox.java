@@ -190,6 +190,14 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         return lazySelect.getPropertyDataSource();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, getContent());
+    }
 
 
 }
