@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.security;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -44,8 +45,9 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 @SpringComponent
 @UIScope
 @Profile("debug")
-public class PermissionDebugUtils {
+public class PermissionDebugUtils implements Serializable {
 
+    private static final long serialVersionUID = -210079304170235459L;
 
     private final static Logger logger = Logger.getLogger(PermissionDebugUtils.class);
 

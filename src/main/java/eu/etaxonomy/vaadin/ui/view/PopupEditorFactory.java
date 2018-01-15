@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.vaadin.ui.view;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,8 +43,10 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @UIScope
-public class PopupEditorFactory {
+public class PopupEditorFactory implements Serializable {
 
+
+    private static final long serialVersionUID = -3371003970671610677L;
 
     @Autowired
     protected ApplicationEventPublisher eventBus;
