@@ -564,5 +564,13 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         this.entityFieldInstantiator = entityFieldInstantiator;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, getContent());
+    }
 
 }

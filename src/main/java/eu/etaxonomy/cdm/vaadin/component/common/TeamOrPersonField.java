@@ -335,4 +335,15 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, getContent());
+    }
+
+
+
 }
