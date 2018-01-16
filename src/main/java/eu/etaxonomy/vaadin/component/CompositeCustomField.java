@@ -221,7 +221,7 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
 
         component.setReadOnly(readOnly);
         if(Button.class.isAssignableFrom(component.getClass())){
-            component.setEnabled(false);
+            component.setEnabled(!readOnly);
         }
         if(Layout.class.isAssignableFrom(component.getClass())){
             for(Component nestedComponent : ((Layout)component)){

@@ -111,6 +111,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         teamOrPersonSelect.addValueChangeListener(e -> {
             selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
+            selectConfirmButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
         });
         teamOrPersonSelect.setWidthUndefined();
 
