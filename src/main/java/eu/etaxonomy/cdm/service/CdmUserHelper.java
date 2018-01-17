@@ -207,21 +207,25 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
         UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
         boolean newAuthorityAdded = false;
         CdmAuthority authority = null;
+        User user = (User)userDetails;
         if(userDetails != null){
-            runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
-            User user = (User)userDetails;
-            authority = new CdmAuthority(cdmEntity, property, crud);
-            try {
-                GrantedAuthorityImpl grantedAuthority = repo.getGrantedAuthorityService().findAuthorityString(authority.toString());
-                if(grantedAuthority == null){
-                    grantedAuthority = authority.asNewGrantedAuthority();
+            try{
+                runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
+                authority = new CdmAuthority(cdmEntity, property, crud);
+                try {
+                    GrantedAuthorityImpl grantedAuthority = repo.getGrantedAuthorityService().findAuthorityString(authority.toString());
+                    if(grantedAuthority == null){
+                        grantedAuthority = authority.asNewGrantedAuthority();
+                    }
+                    newAuthorityAdded = user.getGrantedAuthorities().add(grantedAuthority);
+                } catch (CdmAuthorityParsingException e) {
+                    throw new RuntimeException(e);
                 }
-                newAuthorityAdded = user.getGrantedAuthorities().add(grantedAuthority);
-            } catch (CdmAuthorityParsingException e) {
-                throw new RuntimeException(e);
+                repo.getSession().flush();
+            } finally {
+                // in any case restore the previous authentication
+                runAsAutheticator.restoreAuthentication();
             }
-            repo.getSession().flush();
-            runAsAutheticator.restoreAuthentication();
             logger.debug("new authority for " + username + ": " + authority.toString());
             Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
