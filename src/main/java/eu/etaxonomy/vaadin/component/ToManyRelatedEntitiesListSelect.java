@@ -239,7 +239,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
 
         createFieldsForData();
-
     }
 
     private void createFieldsForData(){
@@ -256,7 +255,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 row = addNewRow(row, val);
             }
         }
-
     }
 
     /**
@@ -372,17 +370,24 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             boolean isFirst = row == 0;
             boolean isLast = row == fieldsCount - 1;
 
+            F field = (F) grid.getComponent(GRID_X_FIELD, row);
             CssLayout buttonGroup = (CssLayout) grid.getComponent(GRID_X_FIELD + 1, row);
 
+            int addButtonIndex = 0;
+            if(withEditButton){
+                addButtonIndex++;
+                // edit
+                buttonGroup.getComponent(0).setEnabled(field.getValue() != null);
+            }
             // add
-            buttonGroup.getComponent(0).setEnabled(isLast || isOrderedCollection);
+            buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
             // remove
-            buttonGroup.getComponent(1).setEnabled(!isFirst);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(!isFirst);
             // up
-            if(buttonGroup.getComponentCount() > 2){
-                buttonGroup.getComponent(2).setEnabled(!isFirst);
+            if(isOrderedCollection){
+                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
                 // down
-                buttonGroup.getComponent(3).setEnabled(!isLast);
+                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);
             }
         }
     }
@@ -571,6 +576,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         setDeepReadOnly(readOnly, getContent());
+        updateButtonStates();
     }
 
 }

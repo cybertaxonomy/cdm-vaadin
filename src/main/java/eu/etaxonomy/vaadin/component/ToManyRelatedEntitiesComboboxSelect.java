@@ -83,7 +83,6 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
      */
     @Override
     protected ClickListener newEditButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
         return super.newEditButtonClicklistener(field);
     }
 
@@ -92,7 +91,6 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
      */
     @Override
     protected ClickListener newAddButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
         return super.newAddButtonClicklistener(field);
     }
 
@@ -101,7 +99,6 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
      */
     @Override
     protected ClickListener newRemoveButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
         return super.newRemoveButtonClicklistener(field);
     }
 

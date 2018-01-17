@@ -277,6 +277,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymCombobox.setConverter(new SetToListConverter<TaxonName>());
         addField(basionymCombobox, "basionyms", 0, row, 3, row);
         basionymCombobox.setWidth(100, Unit.PERCENTAGE);
+        basionymCombobox.withEditButton(true);
         grid.setComponentAlignment(basionymCombobox, Alignment.TOP_RIGHT);
         row++;
         basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
