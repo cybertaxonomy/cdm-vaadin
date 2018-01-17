@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
@@ -29,10 +30,10 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  */
 public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
-    /**
-     *
-     */
+
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
+
+    private static final Logger logger = Logger.getLogger(CdmFilterablePagingProvider.class);
 
     private int pageSize = 20;
 
@@ -114,16 +115,20 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     @Override
     public List<V> findEntities(int firstRow, String filter) {
 
+        Integer pageIndex = firstRow / pageSize;
         Pager<V> page = (Pager<V>) service.findByTitle(
                 type,
                 filter,
                 matchMode,
                 criteria,
                 pageSize,
-                firstRow,
+                pageIndex ,
                 orderHints,
                 initStrategy
               );
+        if(logger.isTraceEnabled()){
+            logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
+        }
         return page.getRecords();
     }
 
@@ -143,6 +148,9 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                 null,
                 null
               );
+        if(logger.isTraceEnabled()){
+            logger.trace("size() -  count: " + page.getCount().intValue());
+        }
         return page.getCount().intValue();
     }
 
