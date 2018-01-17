@@ -27,6 +27,8 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.vaadin.permission.EditPermissionTester;
+
 /**
  * Manages the a collection of items internally as LinkedList<V>. If the Collection to operate on is a Set a Converter must be
  * set. Internally used fields are used in un-buffered mode.
@@ -62,6 +64,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
 
     private EntityFieldInstantiator<F> entityFieldInstantiator;
+
+    private EditPermissionTester editPermissionTester;
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
@@ -377,7 +381,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             if(withEditButton){
                 addButtonIndex++;
                 // edit
-                buttonGroup.getComponent(0).setEnabled(field.getValue() != null);
+                buttonGroup.getComponent(0).setEnabled(field.getValue() != null && testEditButtonPermission(field.getValue()));
             }
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
@@ -389,6 +393,18 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 // down
                 buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);
             }
+        }
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    protected boolean testEditButtonPermission(Object rowValue) {
+        if(editPermissionTester != null) {
+            return editPermissionTester.userHasEditPermission(rowValue);
+        } else {
+            return true;
         }
     }
 
@@ -577,6 +593,20 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         super.setReadOnly(readOnly);
         setDeepReadOnly(readOnly, getContent());
         updateButtonStates();
+    }
+
+    /**
+     * @return the editPermissionTester
+     */
+    public EditPermissionTester getEditPermissionTester() {
+        return editPermissionTester;
+    }
+
+    /**
+     * @param editPermissionTester the editPermissionTester to set
+     */
+    public void setEditPermissionTester(EditPermissionTester editPermissionTester) {
+        this.editPermissionTester = editPermissionTester;
     }
 
 }

@@ -19,18 +19,22 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
  * @author a.kohlbecker
@@ -278,6 +282,13 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         addField(basionymCombobox, "basionyms", 0, row, 3, row);
         basionymCombobox.setWidth(100, Unit.PERCENTAGE);
         basionymCombobox.withEditButton(true);
+        basionymCombobox.setEditPermissionTester(new EditPermissionTester() {
+
+            @Override
+            public boolean userHasEditPermission(Object bean) {
+                return  UserHelper.fromSession().userHasPermission((CdmBase)bean, CRUD.UPDATE, CRUD.DELETE);
+            }
+        });
         grid.setComponentAlignment(basionymCombobox, Alignment.TOP_RIGHT);
         row++;
         basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
