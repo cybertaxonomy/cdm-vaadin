@@ -91,6 +91,10 @@ public class CdmEntityCache implements EntityCache {
      */
     protected void analyzeEntity(CdmBase bean, String propertyPath) {
 
+        if(bean == null){
+            return;
+        }
+
         CdmBase proxyBean = bean;
 
         bean = HibernateProxyHelper.deproxy(proxyBean, CdmBase.class);
