@@ -46,9 +46,9 @@ public class CdmEntityCache implements EntityCache {
 
     private final static Logger logger = Logger.getLogger(CdmEntityCache.class);
 
-    private static final String COPY_ENTITY = "!";
+    protected static final String COPY_ENTITY = "!";
 
-    private Set<CdmBase> entities = new HashSet<>();
+    protected Set<CdmBase> entities = new HashSet<>();
 
     private Map<EntityKey, CdmBase> entityyMap = new HashMap<>();
 
@@ -59,6 +59,10 @@ public class CdmEntityCache implements EntityCache {
     private Set<EntityKey> copyEntitiyKeys = new HashSet<>();
 
     private Set<Object> objectsSeen = new HashSet<>();
+
+    protected CdmEntityCache(){
+
+    }
 
     /**
      * @param entity the first entity to be cached. can be <code>null</code>.
@@ -80,7 +84,7 @@ public class CdmEntityCache implements EntityCache {
         copyEntitiyKeys.clear();
 
         for(CdmBase entity : entities){
-        analyzeEntity(entity, "");
+            analyzeEntity(entity, "");
         }
 
         return copyEntitiyKeys.isEmpty();
@@ -146,7 +150,7 @@ public class CdmEntityCache implements EntityCache {
                 if(Hibernate.isInitialized(propertyValue)) {
 
                     if(CdmBase.class.isAssignableFrom(prop.getPropertyType())
-                            || INomenclaturalReference.class.isAssignableFrom(prop.getPropertyType())
+                            || INomenclaturalReference.class.equals(prop.getPropertyType())
                             ){
                         analyzeEntity(HibernateProxyHelper.deproxy(propertyValue, CdmBase.class), propertyPath + propertyPathSuffix);
                         continue;
@@ -216,6 +220,7 @@ public class CdmEntityCache implements EntityCache {
     }
 
     public void printCopyEntities(PrintStream printStream){
+        printStream.println("-------------- Copy Entities --------------");
         printLegend(printStream);
         for(EntityKey key : copyEntitiyKeys){
             for(String path : entityPathsMap.get(key)) {
@@ -284,6 +289,14 @@ public class CdmEntityCache implements EntityCache {
             return type.getSimpleName() + "#" + getId();
         }
 
+    }
+
+    /**
+     *
+     * @return the entities in this cache
+     */
+    public Set<CdmBase> getEntities(){
+        return entities;
     }
 
     /**
