@@ -41,6 +41,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -157,7 +158,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         if(identifier != null){
             taxonName = getRepo().getNameService().load(identifier, initStrategy);
         } else {
-            taxonName = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
+            taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
         }
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly)){

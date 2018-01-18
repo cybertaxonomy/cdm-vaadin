@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.EnumSet;
 
+import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 
 /**
@@ -46,4 +47,8 @@ public class RegistrationUIDefaults {
             ReferenceType.Report
             );
 
+    /**
+     *  TODO make configurable as preset and in TaxonNameEditor
+     */
+    public static final NomenclaturalCode NOMENCLATURAL_CODE = NomenclaturalCode.ICNAFP;
 }
