@@ -53,11 +53,17 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
             return;
         }
 
+        @SuppressWarnings("unchecked")
         CDM value = (CDM)event.getProperty().getValue();
         if(value == null) {
             return;
         }
         value = HibernateProxyHelper.deproxy(value);
+
+        if(!cachingPresenter.isCacheInitialized()){
+            // skips as long as the view has not completely loaded the bean
+            return;
+        }
 
         EntityCache cache = cachingPresenter.getCache();
         if(cache != null){
@@ -76,6 +82,8 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
                     toOneRelatedEntityField.addValueChangeListener(this);
                     onSettingReloadedEntity = false;
             }
+        } else {
+            throw new RuntimeException("The cache must not be null. See loadBeanById() in AbstractCdmEditorPresenter");
         }
     }
 

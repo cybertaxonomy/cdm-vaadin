@@ -23,13 +23,13 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -128,13 +128,13 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
         inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
         inReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
-                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.ADD, null, inReferenceCombobox, this)
                 ));
         inReferenceCombobox.addClickListenerEditEntity(e -> {
             if(inReferenceCombobox.getValue() != null){
                 getEventBus().publishEvent(
                     new ReferenceEditorAction(
-                            AbstractEditorAction.Action.EDIT,
+                            EditorActionType.EDIT,
                             inReferenceCombobox.getValue().getId(),
                             inReferenceCombobox,
                             this)

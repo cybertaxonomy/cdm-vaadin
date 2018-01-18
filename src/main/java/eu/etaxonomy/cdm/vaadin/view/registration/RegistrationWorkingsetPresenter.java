@@ -201,26 +201,40 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
+
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
         popup.withDeleteButton(true);
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
+
         RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class);
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -238,8 +252,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
 
         newTaxonNameForRegistration = TaxonNameFactory.NewBotanicalInstance(Rank.SPECIES());
         newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
@@ -327,7 +345,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -347,7 +365,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD && #event.sourceComponent == null")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD && #event.sourceComponent == null")
     public void onAddNewTypeDesignationWorkingset(TypeDesignationWorkingsetEditorAction event) {
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){

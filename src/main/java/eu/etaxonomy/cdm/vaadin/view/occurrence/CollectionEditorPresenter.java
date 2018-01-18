@@ -103,7 +103,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
                 );
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onCollectionEditorActionAdd(CollectionEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -117,7 +117,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         collectionPopuEditor.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onCollectionEditorActionEdit(CollectionEditorAction event) {
 
         if(!checkFromOwnView(event)){

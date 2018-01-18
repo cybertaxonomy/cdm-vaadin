@@ -81,7 +81,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.handleViewExit();
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
         if(getView() == null || getView().getNewPublicationButton() != event.getSourceComponent()){
@@ -96,7 +96,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         newReferencePopup.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).REMOVE")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).REMOVE")
     public void onReferenceEditorActionRemove(ReferenceEditorAction event) {
 
         if(getView().getRemoveNewPublicationButton() != event.getSourceComponent()){
@@ -147,7 +147,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
         if(getView().getContinueButton() != event.getSourceComponent()){

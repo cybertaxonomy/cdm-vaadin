@@ -10,30 +10,29 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
+ * Base implementation for an event which
+ * which represents the request to start an editor to enable the
+ * user to perform the <code>action</code> transported with this event.
+ *
  * @author a.kohlbecker
  * @since Mar 22, 2017
  *
  */
-public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractEditorAction.Action> {
-
-    public enum Action {
-        ADD,
-        EDIT,
-        REMOVE;
-    }
+public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorActionType> {
 
     private Component sourceComponent = null;
 
     private AbstractView sourceView = null;
 
-    public AbstractEditorAction(Action action) {
+    public AbstractEditorAction(EditorActionType action) {
         super(action, null);
     }
 
-    public AbstractEditorAction(Action action, Component source) {
+    public AbstractEditorAction(EditorActionType action, Component source) {
         this(action, null, source);
     }
 
@@ -41,31 +40,31 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<AbstractE
      * @param type
      * @param citationId
      */
-    public AbstractEditorAction(Action action, Integer entityId) {
+    public AbstractEditorAction(EditorActionType action, Integer entityId) {
         super(action, entityId);
     }
 
-    public AbstractEditorAction(Action action, Integer entityId, Component source) {
+    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source) {
         super(action, entityId);
         this.sourceComponent = source;
     }
 
-    public AbstractEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
         super(action, entityId);
         this.sourceComponent = source;
         this.sourceView = sourceView;
     }
 
     public boolean isAddAction() {
-        return type.equals(Action.ADD);
+        return type.equals(EditorActionType.ADD);
     }
 
     public boolean isEditAction() {
-        return type.equals(Action.EDIT);
+        return type.equals(EditorActionType.EDIT);
     }
 
     public boolean isRemoveAction() {
-        return type.equals(Action.REMOVE);
+        return type.equals(EditorActionType.REMOVE);
     }
 
     public Component getSourceComponent(){

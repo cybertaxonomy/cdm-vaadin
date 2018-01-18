@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
@@ -45,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -191,12 +191,12 @@ public class RegistrationItem extends GridLayout {
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationId() != null){
             if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
-                referenceEditorAction = new ReferenceEditorAction(Action.EDIT, workingSet.getCitationId());
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId());
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
             if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE)){
-                referenceEditorAction = new ReferenceEditorAction(Action.ADD);
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
             }
         }
         TimePeriod datePublished = null;
