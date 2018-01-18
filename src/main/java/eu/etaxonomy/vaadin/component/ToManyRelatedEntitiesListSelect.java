@@ -20,18 +20,22 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.vaadin.event.EditorActionType;
+import eu.etaxonomy.vaadin.event.EntityEditorActionEvent;
+import eu.etaxonomy.vaadin.event.EntityEditorActionListener;
 import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
  * Manages the a collection of items internally as LinkedList<V>. If the Collection to operate on is a Set a Converter must be
- * set. Internally used fields are used in un-buffered mode.
+ * set. Internally used fields are used in un-buffered mode. The actual instances of the field type <code>F</code> to be used to
+ * edit or select the entities is created by a implementation of the <code>EntityFieldInstantiator</code>,
+ * see {@link #setEntityFieldInstantiator(EntityFieldInstantiator).
  *
  * @author a.kohlbecker
  * @since May 11, 2017
@@ -49,23 +53,31 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private FieldGroup parentFieldGroup = null;
 
-    Boolean valueInitiallyWasNull = null;
+    private Boolean valueInitiallyWasNull = null;
 
     protected boolean isOrderedCollection = false;
 
+    /**
+     * with a button to edit existing and to add new entities
+     */
     private boolean withEditButton = false;
 
-    private static final int GRID_X_FIELD = 0;
-
     protected boolean addEmptyRowOnInitContent = true;
-
-    private int GRID_COLS = 2;
-
-    private GridLayout grid = new GridLayout(GRID_COLS, 1);
 
     private EntityFieldInstantiator<F> entityFieldInstantiator;
 
     private EditPermissionTester editPermissionTester;
+
+    private EntityEditorActionListener editActionListener;
+
+    /**
+     * X index of the data field in the grid
+     */
+    private static final int GRID_X_FIELD = 0;
+
+    private int GRID_COLS = 2;
+
+    private GridLayout grid = new GridLayout(GRID_COLS, 1);
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
@@ -170,28 +182,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         beanList.clear();
         beanList.addAll(nestedValues);
         setInternalValue(beanList, false);
-    }
-
-    /**
-     * @param field
-     * @return
-     */
-    protected ClickListener newEditButtonClicklistener(F field) {
-        return null;
-    }
-
-    /**
-     * @return
-     */
-    protected ClickListener newAddButtonClicklistener(F field) {
-        return null;
-    }
-
-    /**
-     * @return
-     */
-    protected ClickListener newRemoveButtonClicklistener(F field) {
-        return null;
     }
 
     /**
@@ -334,10 +324,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         if(withEditButton){
             Button edit = new Button(FontAwesome.EDIT);
-            ClickListener editClickListerner = newEditButtonClicklistener(field);
-            if(editClickListerner != null){
-                edit.addClickListener(editClickListerner);
-            }
+            edit.addClickListener(e -> editOrCreate(field));
             buttonGroup.addComponent(edit);
             addStyledComponents(edit);
         }
@@ -366,6 +353,26 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return buttonGroup;
     }
 
+    /**
+     * @param e
+     * @return
+     */
+    private void editOrCreate(F field) {
+
+        if(editActionListener == null){
+            throw new RuntimeException("editActionListener missing");
+        }
+
+        if(field.getValue() == null){
+            // create
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.ADD, null, field));
+        } else {
+            // edit
+            V value = field.getValue();
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
+        }
+    }
+
     private void updateButtonStates(){
 
         int fieldsCount = getNestedFields().size();
@@ -381,12 +388,14 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             if(withEditButton){
                 addButtonIndex++;
                 // edit
-                buttonGroup.getComponent(0).setEnabled(field.getValue() != null && testEditButtonPermission(field.getValue()));
+                ((Button)buttonGroup.getComponent(0)).setDescription(field.getValue() == null ? "New" : "Edit");
+                buttonGroup.getComponent(0).setEnabled(field.getValue() == null
+                        || field.getValue() != null && testEditButtonPermission(field.getValue()));
             }
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
             // remove
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(!isFirst);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(field.getValue() != null);
             // up
             if(isOrderedCollection){
                 buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
@@ -551,6 +560,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // no default styles
     }
 
+
+    /**
+     * with a button edit existing and to add new entities
+     */
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
     }
@@ -608,5 +621,20 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void setEditPermissionTester(EditPermissionTester editPermissionTester) {
         this.editPermissionTester = editPermissionTester;
     }
+
+    /**
+     * @return the editActionListener
+     */
+    public EntityEditorActionListener getEditActionListener() {
+        return editActionListener;
+    }
+
+    /**
+     * @param editActionListener the editActionListener to set
+     */
+    public void setEditActionListener(EntityEditorActionListener editActionListener) {
+        this.editActionListener = editActionListener;
+    }
+
 
 }
