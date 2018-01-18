@@ -191,11 +191,11 @@ public class RegistrationItem extends GridLayout {
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationId() != null){
             if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
-                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId());
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId(), null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
-            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE)){
+            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
             }
         }

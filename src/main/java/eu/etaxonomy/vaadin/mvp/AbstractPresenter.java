@@ -178,7 +178,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     }
 
     protected boolean checkFromOwnView(AbstractEditorAction event) {
-        return getView() == event.getSourceView();
+        return getView() != null && getView() == event.getSourceView();
     }
 
 }
