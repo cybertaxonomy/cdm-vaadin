@@ -17,6 +17,7 @@ import org.springframework.context.event.EventListener;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
 import eu.etaxonomy.cdm.cache.EntityCache;
+import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
@@ -136,7 +137,18 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         // the bean is now updated with the changes made by the user
         DTO bean = (DTO) saveEvent.getBean();
 
+        if(logger.isTraceEnabled()){
+            PersistentContextAnalyzer pca = new PersistentContextAnalyzer(bean);
+            pca.printEntityGraph(System.err);
+            pca.printCopyEntities(System.err);
+        }
         bean = handleTransientProperties(bean);
+
+        if(logger.isTraceEnabled()){
+            PersistentContextAnalyzer pca = new PersistentContextAnalyzer(bean);
+            pca.printEntityGraph(System.err);
+            pca.printCopyEntities(System.err);
+        }
         try {
             EntityChangeEvent changeEvent = getStore().saveBean(bean);
 
