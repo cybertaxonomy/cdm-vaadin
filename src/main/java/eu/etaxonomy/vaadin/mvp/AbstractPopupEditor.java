@@ -542,6 +542,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         isBeanLoaded = true;
     }
 
+    /**
+     * Passes the beanInstantiator to the presenter method {@link AbstractEditorPresenter#setBeanInstantiator(BeanInstantiator)}
+     *
+     * @param beanInstantiator
+     */
     public final void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
         getPresenter().setBeanInstantiator(beanInstantiator);
     }

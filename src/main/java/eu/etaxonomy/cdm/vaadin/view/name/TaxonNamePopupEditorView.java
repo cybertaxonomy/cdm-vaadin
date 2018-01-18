@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -32,7 +33,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
     /**
      * @return
      */
-    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox();
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect();
 
     public ListSelect getRankSelect();
 
@@ -70,5 +71,10 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     boolean isModeEnabled(TaxonNamePopupEditorMode mode);
+
+    /**
+     * @return
+     */
+    CheckBox getBasionymToggle();
 
 }

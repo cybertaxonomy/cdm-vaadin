@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,11 +18,16 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.event.EventListener;
 
+import com.vaadin.ui.AbstractField;
+
 import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.cache.CdmEntityCache;
+import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.TermType;
+import eu.etaxonomy.cdm.model.name.NameRelationship;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
@@ -32,6 +38,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -48,17 +55,28 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonName, TaxonNamePopupEditorView> {
 
+    /**
+     *
+     */
+    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList("$", "relationsFromThisName", "homotypicalGroup.typifiedNames");
+
     private static final long serialVersionUID = -3538980627079389221L;
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
 
-    ReferencePopupEditor newReferencePopup = null;
+    private ReferencePopupEditor referenceEditorPopup = null;
+
+    private TaxonNamePopupEditor basionymNamePopup = null;
 
     private CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider;
 
     private Reference publishedUnit;
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
+
+    private BeanInstantiator<TaxonName> newBasionymNameInstantiator;
+
+    private AbstractField<TaxonName> basionymSourceField;
 
     /**
      * {@inheritDoc}
@@ -92,10 +110,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
 
-        getView().getBasionymCombobox().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        CdmFilterablePagingProvider<TaxonName, TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
+        getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
 
-        getView().getBasionymCombobox().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
+        CdmFilterablePagingProvider<TaxonName, TaxonName> basionymPagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
+        basionymPagingProvider.setInitStrategy(BASIONYM_INIT_STRATEGY);
+        getView().getBasionymComboboxSelect().setPagingProviders(basionymPagingProvider, basionymPagingProvider, basionymPagingProvider.getPageSize(), this);
     }
 
     /**
@@ -200,29 +219,65 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     protected TaxonName handleTransientProperties(TaxonName bean) {
 
         logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
-        List<TaxonName> newBasionymNames = getView().getBasionymCombobox().getValueFromNestedFields();
+
+
+        List<TaxonName> newBasionymNames = getView().getBasionymComboboxSelect().getValueFromNestedFields();
         Set<TaxonName> oldBasionyms = bean.getBasionyms();
-        boolean updateBasionyms = false;
+        Set<TaxonName> updateBasionyms = new HashSet<>();
+        Set<TaxonName> removeBasionyms = new HashSet<>();
 
         for(TaxonName newB : newBasionymNames){
-            updateBasionyms = updateBasionyms || !oldBasionyms.contains(newB);
+            if(!oldBasionyms.contains(newB)){
+                updateBasionyms.add(newB);
+            }
         }
 
         for(TaxonName oldB : oldBasionyms){
-            updateBasionyms = updateBasionyms || !newBasionymNames.contains(oldB);
+            if(!newBasionymNames.contains(oldB)){
+                removeBasionyms.add(oldB);
+            }
         }
-
-        if(updateBasionyms){
-            bean.removeBasionyms();
-            for(TaxonName basionymName :newBasionymNames){
-                if(basionymName != null){
-                    if(basionymName .getUuid() != null){
-                        // reload
-                        basionymName = getRepo().getNameService().load(basionymName.getUuid(), Arrays.asList("$", "relationsFromThisName", "homotypicalGroup.typifiedNames"));
-                    }
-                    bean.addBasionym(basionymName);
+        for(TaxonName removeBasionym :removeBasionyms){
+            Set<NameRelationship> removeRelations = new HashSet<NameRelationship>();
+            for (NameRelationship nameRelation : bean.getRelationsToThisName()){
+                if (nameRelation.getType().isBasionymRelation() && nameRelation.getFromName().equals(removeBasionym)){
+                    removeRelations.add(nameRelation);
                 }
             }
+            for (NameRelationship relation : removeRelations){
+                bean.removeNameRelationship(relation);
+            }
+        }
+        // updateBasionyms.clear(); // DEBUGGING #########################
+        getRepo().getSession().clear();
+        for(TaxonName addBasionymName :updateBasionyms){
+            // if(addBasionymName != null){
+                // if(addBasionymName.getUuid() != null){
+                    // reload
+
+                    System.err.println("====== Cache ======");
+                    addBasionymName = getRepo().getNameService().load(addBasionymName.getUuid(), BASIONYM_INIT_STRATEGY);
+                    PersistentContextAnalyzer pca = new PersistentContextAnalyzer((CdmEntityCache)getCache(), getRepo().getSession());
+                    pca.setShowHashCodes(true);
+                    pca.printEntityGraph(System.err);
+                    pca.printCopyEntities(System.err);
+
+                    System.err.println("====== Basionym ======");
+                    PersistentContextAnalyzer basiopca = new PersistentContextAnalyzer(addBasionymName, getRepo().getSession());
+                    basiopca.setShowHashCodes(true);
+                    basiopca.printEntityGraph(System.err);
+
+                    TaxonName cachedName = getCache().find(addBasionymName);
+                    if(cachedName != null){
+                        System.err.println("====== Cached Basionym ======");
+                        PersistentContextAnalyzer cahedbasiopca = new PersistentContextAnalyzer(addBasionymName, getRepo().getSession());
+                        cahedbasiopca.setShowHashCodes(true);
+                        cahedbasiopca.printEntityGraph(System.err);
+                        addBasionymName = cachedName;
+                    }
+                // }
+                bean.addBasionym(addBasionymName);
+            //}
         }
         return bean;
     }
@@ -235,63 +290,112 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         return getRepo().getNameService();
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
 
-        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-        newReferencePopup.withDeleteButton(true);
-        newReferencePopup.setBeanInstantiator(newReferenceInstantiator);
-        newReferencePopup.loadInEditor(null);
+        referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        referenceEditorPopup.withDeleteButton(true);
+        referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        referenceEditorPopup.loadInEditor(null);
         if(newReferenceInstantiator != null){
             // this is a bit clumsy, we actually need to inject something like a view configurer
             // which can enable, disable fields
-            newReferencePopup.getInReferenceCombobox().setEnabled(false);
-            newReferencePopup.getTypeSelect().setEnabled(false);
+            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+            referenceEditorPopup.getTypeSelect().setEnabled(false);
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).EDIT")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
 
-        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-        newReferencePopup.withDeleteButton(true);
-        newReferencePopup.setBeanInstantiator(newReferenceInstantiator);
-        newReferencePopup.loadInEditor(event.getEntityId());
+        referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        referenceEditorPopup.withDeleteButton(true);
+        referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        referenceEditorPopup.loadInEditor(event.getEntityId());
         if(newReferenceInstantiator != null){
             // this is a bit clumsy, we actually need to inject something like a view configurer
             // which can enable, disable fields
-            newReferencePopup.getInReferenceCombobox().setEnabled(false);
-            newReferencePopup.getTypeSelect().setEnabled(false);
+            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+            referenceEditorPopup.getTypeSelect().setEnabled(false);
         }
     }
 
     @EventListener
     public void onDoneWithPopupEvent(DoneWithPopupEvent event){
-        if(event.getPopup() == newReferencePopup){
+
+        if(event.getPopup() == referenceEditorPopup){
             if(event.getReason() == Reason.SAVE){
 
-                Reference newReference = newReferencePopup.getBean();
+                Reference modifiedReference = referenceEditorPopup.getBean();
 
                 // TODO the bean contained in the popup editor is not yet updated at this point.
                 //      so re reload it using the uuid since new beans will not have an Id at this point.
-                newReference = getRepo().getReferenceService().load(newReference.getUuid(), Arrays.asList("inReference"));
-                getView().getNomReferenceCombobox().setValue(newReference);
+                modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
+                getView().getNomReferenceCombobox().setValue(modifiedReference);
             }
 
-            newReferencePopup = null;
+            referenceEditorPopup = null;
+        }
+        if(event.getPopup() == basionymNamePopup){
+            if(event.getReason() == Reason.SAVE){
+                TaxonName modifiedTaxonName = basionymNamePopup.getBean();
+
+                // TODO the bean contained in the popup editor is not yet updated at this point.
+                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid()); //, BASIONYM_INIT_STRATEGY);
+                basionymSourceField.setValue(modifiedTaxonName);
+
+                // TODO create blocking registration
+            }
+            if(event.getReason() == Reason.DELETE){
+                basionymSourceField.setValue(null);
+            }
+
+            basionymNamePopup = null;
+            basionymSourceField = null;
         }
     }
 
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+        basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
+
+        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        basionymNamePopup.withDeleteButton(true);
+        basionymNamePopup.loadInEditor(event.getEntityId());
+        basionymNamePopup.getBasionymToggle().setVisible(false);
+
+    }
+
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    public void onReferenceEditorActionAdd(TaxonNameEditorAction event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+        basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
+
+        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        basionymNamePopup.withDeleteButton(true);
+        basionymNamePopup.loadInEditor(null);
+        basionymNamePopup.getBasionymToggle().setVisible(false);
+    }
 
 
 }

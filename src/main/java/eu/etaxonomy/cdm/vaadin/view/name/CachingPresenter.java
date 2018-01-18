@@ -19,4 +19,6 @@ public interface CachingPresenter {
 
     public EntityCache getCache();
 
+    public boolean isCacheInitialized();
+
 }

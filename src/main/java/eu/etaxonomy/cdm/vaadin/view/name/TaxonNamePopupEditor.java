@@ -25,14 +25,15 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
@@ -71,7 +72,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     private TeamOrPersonField basionymAuthorshipField;
 
-    private ToManyRelatedEntitiesComboboxSelect<TaxonName> basionymCombobox;
+    private ToManyRelatedEntitiesComboboxSelect<TaxonName> basionymsComboboxSelect;
 
     private CheckBox basionymToggle;
 
@@ -240,13 +241,13 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
         nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
-                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, nomReferenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
                 ));
         nomReferenceCombobox.addClickListenerEditEntity(e -> {
             if(nomReferenceCombobox.getValue() != null){
                 getEventBus().publishEvent(
                     new ReferenceEditorAction(
-                            AbstractEditorAction.Action.EDIT,
+                            EditorActionType.EDIT,
                             nomReferenceCombobox.getValue().getId(),
                             nomReferenceCombobox,
                             this)
@@ -261,35 +262,29 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         // Basionym
         row++;
-        basionymCombobox = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Basionym");
-        /**
-        basionymCombobox.newAdd(e -> getEventBus().publishEvent(
-                new TaxonNameEditorAction(AbstractEditorAction.Action.ADD, null, basionymCombobox, this)
-                ));
-        basionymCombobox.addClickListenerEditEntity(e -> {
-            if(basionymCombobox.getValue() != null){
-                getEventBus().publishEvent(
-                    new TaxonNameEditorAction(
-                            AbstractEditorAction.Action.EDIT,
-                            basionymCombobox.getValue().getId(),
-                            basionymCombobox,
-                            this)
-                );
-            }
-            });
-         **/
-        basionymCombobox.setConverter(new SetToListConverter<TaxonName>());
-        addField(basionymCombobox, "basionyms", 0, row, 3, row);
-        basionymCombobox.setWidth(100, Unit.PERCENTAGE);
-        basionymCombobox.withEditButton(true);
-        basionymCombobox.setEditPermissionTester(new EditPermissionTester() {
+        basionymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Basionym");
+        basionymsComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        addField(basionymsComboboxSelect, "basionyms", 0, row, 3, row);
+        basionymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
+        basionymsComboboxSelect.withEditButton(true);
+        basionymsComboboxSelect.setEditPermissionTester(new EditPermissionTester() {
 
             @Override
             public boolean userHasEditPermission(Object bean) {
                 return  UserHelper.fromSession().userHasPermission((CdmBase)bean, CRUD.UPDATE, CRUD.DELETE);
             }
         });
-        grid.setComponentAlignment(basionymCombobox, Alignment.TOP_RIGHT);
+        basionymsComboboxSelect.setEditActionListener(e -> {
+
+            Object fieldValue = e.getSource().getValue();
+            Integer beanId = null;
+            if(fieldValue != null){
+                beanId = ((CdmBase)fieldValue).getId();
+
+            }
+            eventBus.publishEvent(new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
+        });
+        grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;
         basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
         basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
@@ -319,7 +314,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     private void enableBasionymFields(boolean enable) {
         basionymAuthorshipField.setVisible(enable);
         exBasionymAuthorshipField.setVisible(enable);
-        basionymCombobox.setVisible(enable);
+        basionymsComboboxSelect.setVisible(enable);
         if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
             TaxonName taxonName = getBean();
             basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
@@ -381,8 +376,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      * {@inheritDoc}
      */
     @Override
-    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox() {
-        return basionymCombobox;
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect() {
+        return basionymsComboboxSelect;
     }
 
     /**
@@ -438,6 +433,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public void disableMode(TaxonNamePopupEditorMode mode){
         modesActive.remove(mode);
+    }
+
+    @Override
+    public CheckBox getBasionymToggle() {
+        return basionymToggle;
     }
 
 
