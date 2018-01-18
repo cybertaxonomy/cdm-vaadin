@@ -229,11 +229,21 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      */
     @Override
     public EntityCache getCache() {
-        if(((AbstractPopupEditor)getView()).isBeanLoaded()){
-            return cache;
-        } else {
-            return null;
-        }
+        return cache;
+//        if(((AbstractPopupEditor)getView()).isBeanLoaded()){
+//        } else {
+//            return null;
+//        }
+    }
+
+    /**
+     * Returns true only after the view method {@link AbstractPopupEditor#loadInEditor()}
+     * has completed.
+     *
+     */
+    @Override
+    public boolean isCacheInitialized() {
+        return ((AbstractPopupEditor)getView()).isBeanLoaded();
     }
 
 }
