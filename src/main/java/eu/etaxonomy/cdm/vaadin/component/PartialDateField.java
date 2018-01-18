@@ -27,7 +27,7 @@ public class PartialDateField extends TextField {
 
     private static final long serialVersionUID = -347319052346135100L;
 
-    JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.DAY_MONTH_YEAR_DOT;
+    JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.ISO8601;
 
     /**
      *
