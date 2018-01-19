@@ -254,7 +254,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 );
             }
             });
-        nomReferenceCombobox.setWidth(300, Unit.PIXELS);
+        // nomReferenceCombobox.setWidth(300, Unit.PIXELS);
+        nomReferenceCombobox.setWidth("100%");
         addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 2, row);
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 3, row, 3, row);
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
