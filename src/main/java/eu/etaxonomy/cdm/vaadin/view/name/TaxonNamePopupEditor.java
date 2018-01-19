@@ -346,6 +346,9 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         if(isModeEnabled(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
             combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
         }
+        if(isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly) && getBean().getNomenclaturalReference() != null) {
+            nomReferenceCombobox.setCaption("Nomenclatural reference (sections of " + getBean().getNomenclaturalReference().getTitle() + " only)");
+        }
 
     }
 
