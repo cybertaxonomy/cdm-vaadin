@@ -252,7 +252,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         // updateBasionyms.clear(); // DEBUGGING #########################
         getRepo().getSession().clear();
         for(TaxonName addBasionymName :updateBasionyms){
-            // if(addBasionymName != null){
+            if(addBasionymName != null){
                 // if(addBasionymName.getUuid() != null){
                     // reload
 
@@ -278,7 +278,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                     }
                 // }
                 bean.addBasionym(addBasionymName);
-            //}
+            }
         }
         return bean;
     }
