@@ -16,6 +16,12 @@ import com.vaadin.ui.TextField;
  * default  TextField implementation in vaadin 7. TODO: this might no longer be
  * required in vaadin 8 since it is supposed to have a mechanism to configure
  * the null representations.
+ * <p>
+ * Additional features:
+ * <ul>
+ *    <li>entered text is trimmed</li>
+ * </ul>
+ *
  *
  * @author a.kohlbecker
  * @since Dec 21, 2017
@@ -80,6 +86,21 @@ public class TextFieldNFix extends TextField {
     public String getNullRepresentation() {
         return "";
     }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setInternalValue(String newValue) {
+        if(newValue != null){
+            newValue = newValue.trim();
+        }
+        super.setInternalValue(newValue);
+    }
+
+
 
 
 
