@@ -191,8 +191,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
             }
         }
+        throw new RuntimeException("Error handler test");
 
-        return taxonName;
+        // return taxonName;
     }
 
     /**

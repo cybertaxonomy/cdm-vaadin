@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
+import com.flowingcode.vaadin.addons.errorwindow.WindowErrorHandler;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
@@ -112,6 +113,10 @@ public class RegistrationUI extends UI {
 
     @Override
     protected void init(VaadinRequest request) {
+
+        setErrorHandler(new WindowErrorHandler(this, "Please contact the editsupport@bgbm.org for more information.</br></br>"
+                + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
+                + "You also might want to add a sreenshot of the browser page in error.</i>"));
 
         navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();
