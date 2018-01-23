@@ -21,8 +21,6 @@ import org.springframework.context.event.EventListener;
 import com.vaadin.ui.AbstractField;
 
 import eu.etaxonomy.cdm.api.service.INameService;
-import eu.etaxonomy.cdm.cache.CdmEntityCache;
-import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
@@ -248,34 +246,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 bean.removeNameRelationship(relation);
             }
         }
-        // updateBasionyms.clear(); // DEBUGGING #########################
         getRepo().getSession().clear();
         for(TaxonName addBasionymName :updateBasionyms){
             if(addBasionymName != null){
-                // if(addBasionymName.getUuid() != null){
-                    // reload
-
-                    System.err.println("====== Cache ======");
-                    addBasionymName = getRepo().getNameService().load(addBasionymName.getUuid(), BASIONYM_INIT_STRATEGY);
-                    PersistentContextAnalyzer pca = new PersistentContextAnalyzer((CdmEntityCache)getCache(), getRepo().getSession());
-                    pca.setShowHashCodes(true);
-                    pca.printEntityGraph(System.err);
-                    pca.printCopyEntities(System.err);
-
-                    System.err.println("====== Basionym ======");
-                    PersistentContextAnalyzer basiopca = new PersistentContextAnalyzer(addBasionymName, getRepo().getSession());
-                    basiopca.setShowHashCodes(true);
-                    basiopca.printEntityGraph(System.err);
-
-                    TaxonName cachedName = (TaxonName) getCache().getFromCache(addBasionymName);
-                    if(cachedName != null){
-                        System.err.println("====== Cached Basionym ======");
-                        PersistentContextAnalyzer cahedbasiopca = new PersistentContextAnalyzer(addBasionymName, getRepo().getSession());
-                        cahedbasiopca.setShowHashCodes(true);
-                        cahedbasiopca.printEntityGraph(System.err);
-                        addBasionymName = cachedName;
-                    }
-                // }
                 bean.addBasionym(addBasionymName);
             }
         }
