@@ -91,8 +91,8 @@ public class EntityCacheDebugger implements ViewChangeListener {
         window.setModal(false);
         content.setSizeFull();
         window.setContent(content);
-        window.setWidth("500px");
-        window.setHeight("500px");
+        window.setWidth("800px");
+        window.setHeight("600px");
         UI.getCurrent().addWindow(window);
 
     }

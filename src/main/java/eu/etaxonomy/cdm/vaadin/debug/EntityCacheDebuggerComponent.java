@@ -53,26 +53,13 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
     private void initContent() {
 
 
-//        VerticalLayout filterTree = new VerticalLayout();
-//        filterTree.setSizeFull();
-
         TextField filterField = new TextFieldNFix();
         filterField.setInputPrompt("Enter filter text");
         filterField.addTextChangeListener(e -> filterTree(e.getText()));
         filterField.setWidth("100%");
 
-//        filterTree.addComponent(filterField);
-
-        // Panel treePanel = new Panel();
         entityTree = new Tree("Cache Content");
         buildTree(entityTree, debugResults.getRootElements());
-
-//        treePanel.setContent(entityTree);
-//        treePanel.setWidth("100%");
-//        filterTree.addComponents(filterField, treePanel);
-        //treePanel.setHeight("200px");
-//        filterTree.addComponent(treePanel);
-        // filterTree.setExpandRatio(treePanel, 1.0f);
 
         TextArea debugInformation = new TextArea("Debug Information");
         debugInformation.setValue(debugResults.toString());
@@ -107,6 +94,7 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
         if(!text.isEmpty()){
             SimpleStringFilter filter = new SimpleStringFilter("label", text, true, false);
             indexedContainer.addContainerFilter(filter);
+            ((HierarchicalContainer)entityTree.getContainerDataSource()).rootItemIds().forEach(rid -> entityTree.expandItemsRecursively(rid));
         }
     }
 
@@ -123,6 +111,8 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
         buildTree(container, childElements, null);
 
         tree.setContainerDataSource(container);
+
+        container.setItemSorter(new CdmEntityInfoSorter());
 
     }
 
