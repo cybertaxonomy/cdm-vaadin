@@ -41,7 +41,9 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
+import eu.etaxonomy.cdm.api.cache.CdmCacher;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
@@ -92,6 +94,11 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    @Autowired
+    private void  setTermCacher(CdmCacher termCacher){
+        CdmTransientEntityCacher.setDefaultCacher(termCacher);
+    }
 
     private boolean registrationUiHibernateEventListenersDone = false;
 

@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -15,9 +17,9 @@ import org.hibernate.HibernateException;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.cache.CdmEntityCache;
-import eu.etaxonomy.cdm.cache.EntityCache;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
+import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
@@ -49,7 +51,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     protected EnumSet<CRUD> crud = null;
 
 
-    private CdmEntityCache cache = null;
+    private ICdmCacher cache = new CdmTransientEntityCacher(this);
+
+    private java.util.Collection<CdmBase> rootEntities = new ArrayList<>();
 
     public AbstractCdmEditorPresenter() {
         super();
@@ -84,7 +88,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             }
         }
 
-        cache = new CdmEntityCache(cdmEntitiy);
+        cache.put(cdmEntitiy);
+        rootEntities.add(cdmEntitiy);
 
         return cdmEntitiy;
     }
@@ -228,12 +233,18 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      * {@inheritDoc}
      */
     @Override
-    public EntityCache getCache() {
+    public ICdmCacher getCache() {
         return cache;
-//        if(((AbstractPopupEditor)getView()).isBeanLoaded()){
-//        } else {
-//            return null;
-//        }
+    }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<CdmBase> getRootEntities() {
+        return rootEntities;
     }
 
     /**

@@ -11,7 +11,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
-@SpringComponent
+@SpringComponent("viewChangeListenerBean")
 @UIScope
 class ViewChangeListenerBean implements ViewChangeListener {
 	private static final long serialVersionUID = 1913421359807383L;

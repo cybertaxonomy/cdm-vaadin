@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -18,11 +19,12 @@ import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
-import eu.etaxonomy.cdm.cache.CdmEntityCache;
-import eu.etaxonomy.cdm.cache.EntityCache;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -80,7 +82,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     private EnumSet<CRUD> crud = null;
 
-    private CdmEntityCache cache = null;
+    private ICdmCacher cache = new CdmTransientEntityCacher(this);
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
@@ -89,6 +91,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private Set<CollectionRowItemCollection> collectionPopuEditorSourceRows = new HashSet<>();
 
     private ReferencePopupEditor referencePopupEditor;
+
+    private java.util.Collection<CdmBase> rootEntities = new ArrayList<>();
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -124,11 +128,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         //       This method must go again into the presenter !!!!
                         logger.info("Basing all typeDesignations on a new fieldUnit");
                 }
-                cache = new CdmEntityCache(workingSetDto.getOwner());
+                cache.put(workingSetDto.getOwner());
+                rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationId, idset.publicationId, idset.typifiedNameId);
-                cache = new CdmEntityCache(workingSetDto.getOwner());
+                cache.put(workingSetDto.getOwner());
+                rootEntities.add(workingSetDto.getOwner());
             }
 
         } else {
@@ -287,12 +293,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * {@inheritDoc}
      */
     @Override
-    public EntityCache getCache() {
+    public ICdmCacher getCache() {
         return cache;
-//        if(((AbstractPopupEditor)getView()).isBeanLoaded()){
-//        } else {
-//            return null;
-//        }
     }
 
     /**
@@ -328,7 +330,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onCollectionEvent(EntityChangeEvent event){
 
         Collection newCollection = getRepo().getCollectionService().load(event.getEntityId(), Arrays.asList(new String[]{"$.institute"}));
-        cache.findAndUpdate(newCollection);
+        cache.getFromCache(newCollection);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
             ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 2);
@@ -359,12 +361,21 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onReferenceEvent(EntityChangeEvent event){
 
         Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));
-        cache.findAndUpdate(newRef);
+        cache.getFromCache(newRef);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
             ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 6);
             combobox.reload();
         }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public java.util.Collection<CdmBase> getRootEntities() {
+        return rootEntities ;
     }
 
 

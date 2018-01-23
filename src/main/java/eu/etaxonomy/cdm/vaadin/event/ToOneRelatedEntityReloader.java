@@ -12,8 +12,8 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Field;
 
-import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 
@@ -65,13 +65,10 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
             return;
         }
 
-        EntityCache cache = cachingPresenter.getCache();
+        ICdmCacher cache = cachingPresenter.getCache();
         if(cache != null){
-            cache.update();
-            CDM cachedEntity = cache.findAndUpdate(value);
-            if(cachedEntity == null){
-                cache.add(value);
-            } else if(
+            CDM cachedEntity = (CDM) cache.load(value);
+            if(cachedEntity != null &&
                 // pure object comparison is not reliable since the entity may have been changed
                 cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
                 ){

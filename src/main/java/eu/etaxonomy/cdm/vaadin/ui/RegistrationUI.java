@@ -31,6 +31,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.debug.EntityCacheDebugger;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
@@ -68,6 +69,9 @@ public class RegistrationUI extends UI {
 
     @Autowired
     NavigationManagerBean navigator;
+
+    @Autowired(required = false)
+    EntityCacheDebugger entityCacheDebugger = null;
 
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
@@ -138,6 +142,7 @@ public class RegistrationUI extends UI {
             ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
         }
 
+
         eventBus.publishEvent(new UIInitializedEvent());
 
         String brand = "phycobank";
@@ -152,6 +157,9 @@ public class RegistrationUI extends UI {
 
         navigator.setDefaultViewName(INITIAL_VIEW);
 
+        if(entityCacheDebugger != null){
+            addShortcutListener(entityCacheDebugger.getShortcutListener());
+        }
         //navigate to initial view
 //        String state = pageFragmentAsState();
 

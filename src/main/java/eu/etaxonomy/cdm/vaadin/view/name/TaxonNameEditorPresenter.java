@@ -59,7 +59,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     /**
      *
      */
-    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList("$", "relationsFromThisName", "homotypicalGroup.typifiedNames");
+    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList("$", "relationsFromThisName", "relationsToThisName.type", "homotypicalGroup.typifiedNames");
 
     private static final long serialVersionUID = -3538980627079389221L;
 
@@ -148,7 +148,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 "relationsToThisName.fromName.relationsFromThisName",
 
                 "relationsFromThisName",
-                //"relationsToThisName",
                 "homotypicalGroup.typifiedNames"
 
                 }
@@ -268,7 +267,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                     basiopca.setShowHashCodes(true);
                     basiopca.printEntityGraph(System.err);
 
-                    TaxonName cachedName = getCache().find(addBasionymName);
+                    TaxonName cachedName = (TaxonName) getCache().getFromCache(addBasionymName);
                     if(cachedName != null){
                         System.err.println("====== Cached Basionym ======");
                         PersistentContextAnalyzer cahedbasiopca = new PersistentContextAnalyzer(addBasionymName, getRepo().getSession());
@@ -353,7 +352,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 // TODO the bean contained in the popup editor is not yet updated at this point.
                 //      so re reload it using the uuid since new beans will not have an Id at this point.
-                modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid()); //, BASIONYM_INIT_STRATEGY);
+                modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
                 basionymSourceField.setValue(modifiedTaxonName);
 
                 // TODO create blocking registration

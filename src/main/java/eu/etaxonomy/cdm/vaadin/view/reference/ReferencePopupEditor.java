@@ -184,6 +184,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
         getField("pages").setVisible(value.isSection());
 
+        EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
+        EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
+        getField("abbrevTitle").setVisible(!hideNomTitle.contains(value));
+        getField("title").setVisible(!hideTitle.contains(value));
+
         return null;
     }
 

@@ -210,6 +210,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        popup.withReferenceTypes(RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES);
         popup.loadInEditor(null);
     }
 
@@ -220,6 +221,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        popup.withReferenceTypes(RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES);
         popup.withDeleteButton(true);
         popup.loadInEditor(event.getEntityId());
     }
