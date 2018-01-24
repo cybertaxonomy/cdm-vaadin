@@ -9,6 +9,7 @@
 package eu.etaxonomy.vaadin.component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -78,6 +79,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
+
+    private boolean creatingFields;
 
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
@@ -226,29 +229,56 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
 
         if(newValue != null){
-
             // newValue is already converted, need to use the original value from the data source
-            isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
-
+            boolean isListType = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+            if(valueInitiallyWasNull && isOrderedCollection != isListType){
+                // need to reset the grid in this case, so that the button groups are created correctly
+                grid.setRows(1);
+                grid.removeAllComponents();
+            }
+            isOrderedCollection = isListType;
         }
 
-        createFieldsForData();
+        if(!creatingFields){
+            createFieldsForData();
+        }
     }
 
     private void createFieldsForData(){
 
-        grid.removeAllComponents();
-        grid.setRows(1);
 
+//        for(int r = 0; r < grid.getRows(); r++){
+//            grid.getComponent(GRID_X_FIELD, r);
+//        }
+        // grid.removeAllComponents();
+        // grid.setRows(1);
+
+        creatingFields = true;
         List<V> data = getValue();
         if(data == null || data.isEmpty()){
-            addNewRow(0, null);
-        } else {
-            int row = 0;
-            for(V val : data){
-                row = addNewRow(row, val);
-            }
+//            addNewRow(0, null);
+            data = Arrays.asList((V)null);
         }
+        //else {
+            for(int row = 0; row < data.size(); row++){
+                boolean newRowNeeded = true;
+                if(grid.getRows() > row){
+                    Component fieldComponent = grid.getComponent(GRID_X_FIELD, row);
+                    if(fieldComponent != null){
+                        newRowNeeded = false;
+                        Field field = (Field)fieldComponent;
+                        if(data.get(row) != null && field.getValue() != data.get(row)){
+                            field.setValue(data.get(row));
+                        }
+                    }
+
+                }
+                if(newRowNeeded){
+                    row = addNewRow(row, data.get(row));
+                }
+//            }
+        }
+        creatingFields = false;
     }
 
     /**
@@ -278,7 +308,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
-     * @param row
+     * @param row the row index, starting from 0.
      * @param val
      * @return
      */
@@ -397,7 +427,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             // remove
             buttonGroup.getComponent(addButtonIndex + 1).setEnabled(field.getValue() != null);
             // up
-            if(isOrderedCollection){
+            if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
                 buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
                 // down
                 buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);

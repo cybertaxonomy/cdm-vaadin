@@ -13,8 +13,9 @@ import java.util.List;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.TextArea;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.VerticalLayout;
@@ -61,15 +62,17 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
         entityTree = new Tree("Cache Content");
         buildTree(entityTree, debugResults.getRootElements());
 
-        TextArea debugInformation = new TextArea("Debug Information");
+        Label debugInformation = new Label(); // );
+        debugInformation.setCaption("Debug Information");
         debugInformation.setValue(debugResults.toString());
+        debugInformation.setContentMode(ContentMode.PREFORMATTED);
 
         setCompositionRoot(layout);
 
         entityTree.setSizeUndefined();
         debugInformation.setSizeUndefined();
         debugInformation.setWidth("100%");
-        debugInformation.setRows(100);
+        // debugInformation.setRows(100);
         debugInformation.setReadOnly(true);
         splitPanel.setFirstComponent(entityTree);
         splitPanel.setSecondComponent(debugInformation);
