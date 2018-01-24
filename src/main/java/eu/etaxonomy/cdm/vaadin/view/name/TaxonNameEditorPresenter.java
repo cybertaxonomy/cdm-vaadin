@@ -59,6 +59,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      */
     private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList("$", "relationsFromThisName", "relationsToThisName.type", "homotypicalGroup.typifiedNames");
 
+    private static final List<String> REFERENCE_INIT_STRATEGY = Arrays.asList("authorship", "inReference.authorship", "inReference.inReference.authorship", "inReference.inReference.inReference.authorship");
+
     private static final long serialVersionUID = -3538980627079389221L;
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
@@ -106,6 +108,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        referencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
 
@@ -128,7 +131,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalReference.authorship",
-                "nomenclaturalReference.inReference",
+                "nomenclaturalReference.inReference.authorship",
+                "nomenclaturalReference.inReference.inReference.authorship",
+                "nomenclaturalReference.inReference.inReference.inReference.authorship",
 
                 "status.type",
 
@@ -141,7 +146,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 "relationsToThisName.type",
                 "relationsToThisName.fromName.rank",
                 "relationsToThisName.fromName.nomenclaturalReference.authorship",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
 
