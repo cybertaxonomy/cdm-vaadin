@@ -90,7 +90,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
 
         cache = new CdmTransientEntityCacher(this);
-        cache.put(cdmEntitiy);
+        // need to use load but put see #7214
+        cdmEntitiy = cache.load(cdmEntitiy);
         rootEntities.add(cdmEntitiy);
 
         return cdmEntitiy;

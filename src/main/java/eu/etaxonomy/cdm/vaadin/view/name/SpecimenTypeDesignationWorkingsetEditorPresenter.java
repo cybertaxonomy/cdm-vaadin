@@ -127,12 +127,14 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         //       This method must go again into the presenter !!!!
                         logger.info("Basing all typeDesignations on a new fieldUnit");
                 }
-                cache.put(workingSetDto.getOwner());
+                // need to use load but put see #7214
+                cache.load(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationId, idset.publicationId, idset.typifiedNameId);
-                cache.put(workingSetDto.getOwner());
+                // need to use load but put see #7214
+                cache.load(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getOwner());
             }
 
@@ -318,7 +320,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onCollectionEvent(EntityChangeEvent event){
 
         Collection newCollection = getRepo().getCollectionService().load(event.getEntityId(), Arrays.asList(new String[]{"$.institute"}));
-        cache.getFromCache(newCollection);
+        cache.load(newCollection);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
             ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 2);
@@ -349,7 +351,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onReferenceEvent(EntityChangeEvent event){
 
         Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));
-        cache.getFromCache(newRef);
+        cache.load(newRef);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
             ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 6);
