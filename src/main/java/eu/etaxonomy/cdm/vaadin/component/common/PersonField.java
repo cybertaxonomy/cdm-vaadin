@@ -237,10 +237,8 @@ public class PersonField extends CompositeCustomField<Person> {
 
     @Override
     public void setValue(Person person){
-//        if(person == null){
-//            person = Person.NewInstance();
-//        }
         super.setValue(person);
+        personSelect.setValue(person);
     }
 
     /**
