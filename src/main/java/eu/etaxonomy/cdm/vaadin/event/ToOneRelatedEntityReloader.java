@@ -47,6 +47,14 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
     @Override
     public void valueChange(ValueChangeEvent event) {
 
+        // TODO during the view intitialization this method is called twice with the same value.
+        // for faster view initialization it might make sense to reduce this to only one call.
+        // only one call should be sufficient since the same value object is use in both calls
+        // whereas i observed that it is a hibnerate proxy during the first call,
+        // the second time it is the de-proxied entity which was during the first call inside the proxy.
+        // Since both cdm enties are the same object
+        // a reduction to one call should not break anything, but at least one call during the initialization
+        // is required!
 
         if(onSettingReloadedEntity){
             // avoid potential loops caused by setValue() below
@@ -60,16 +68,11 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
         }
         value = HibernateProxyHelper.deproxy(value);
 
-        if(!cachingPresenter.isCacheInitialized()){
-            // skips as long as the view has not completely loaded the bean
-            return;
-        }
-
         ICdmCacher cache = cachingPresenter.getCache();
         if(cache != null){
             CDM cachedEntity = (CDM) cache.load(value);
-            if(cachedEntity != null &&
-                // pure object comparison is not reliable since the entity may have been changed
+            // cachingPresenter.addRootEntity(cachedEntity);
+            if(// pure object comparison is not reliable since the entity may have been changed
                 cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
                 ){
                     onSettingReloadedEntity = true;

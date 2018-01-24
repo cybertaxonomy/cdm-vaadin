@@ -22,8 +22,8 @@ public interface CachingPresenter {
 
     public ICdmCacher getCache();
 
-    public boolean isCacheInitialized();
-
     public Collection<CdmBase> getRootEntities();
+
+    public void addRootEntity(CdmBase entity);
 
 }

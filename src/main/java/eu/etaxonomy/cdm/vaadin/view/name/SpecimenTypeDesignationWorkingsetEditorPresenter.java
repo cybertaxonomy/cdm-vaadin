@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -49,7 +48,6 @@ import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
-import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -82,7 +80,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     private EnumSet<CRUD> crud = null;
 
-    private ICdmCacher cache = new CdmTransientEntityCacher(this);
+    private ICdmCacher cache;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
@@ -92,7 +90,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private ReferencePopupEditor referencePopupEditor;
 
-    private java.util.Collection<CdmBase> rootEntities = new ArrayList<>();
+    private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
     protected CdmStore<Registration, IRegistrationService> getStore() {
         if(store == null){
@@ -116,6 +114,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> loadBeanById(Object identifier) {
 
+        cache = new CdmTransientEntityCacher(this);
         if(identifier != null){
 
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
@@ -297,17 +296,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         return cache;
     }
 
-    /**
-     * Returns true only after the view method {@link AbstractPopupEditor#loadInEditor()}
-     * has completed.
-     *
-     */
-    @Override
-    public boolean isCacheInitialized() {
-        return ((AbstractPopupEditor)getView()).isBeanLoaded();
-    }
-
-
     public void doCollectionEditorAdd() {
 
         collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
@@ -369,6 +357,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRootEntity(CdmBase entity) {
+        rootEntities.add(entity);
+    }
 
     /**
      * {@inheritDoc}

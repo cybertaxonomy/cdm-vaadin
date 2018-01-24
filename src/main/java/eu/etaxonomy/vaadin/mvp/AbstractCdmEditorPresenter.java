@@ -8,9 +8,9 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -51,9 +51,9 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     protected EnumSet<CRUD> crud = null;
 
 
-    private ICdmCacher cache = new CdmTransientEntityCacher(this);
+    private ICdmCacher cache;
 
-    private java.util.Collection<CdmBase> rootEntities = new ArrayList<>();
+    private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
     public AbstractCdmEditorPresenter() {
         super();
@@ -88,6 +88,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             }
         }
 
+
+        cache = new CdmTransientEntityCacher(this);
         cache.put(cdmEntitiy);
         rootEntities.add(cdmEntitiy);
 
@@ -237,6 +239,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return cache;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRootEntity(CdmBase entity) {
+        rootEntities.add(entity);
+    }
 
 
     /**
@@ -247,14 +256,5 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         return rootEntities;
     }
 
-    /**
-     * Returns true only after the view method {@link AbstractPopupEditor#loadInEditor()}
-     * has completed.
-     *
-     */
-    @Override
-    public boolean isCacheInitialized() {
-        return ((AbstractPopupEditor)getView()).isBeanLoaded();
-    }
 
 }
