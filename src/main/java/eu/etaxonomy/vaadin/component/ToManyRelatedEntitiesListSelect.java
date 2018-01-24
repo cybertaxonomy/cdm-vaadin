@@ -246,37 +246,26 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private void createFieldsForData(){
 
-
-//        for(int r = 0; r < grid.getRows(); r++){
-//            grid.getComponent(GRID_X_FIELD, r);
-//        }
-        // grid.removeAllComponents();
-        // grid.setRows(1);
-
         creatingFields = true;
         List<V> data = getValue();
         if(data == null || data.isEmpty()){
-//            addNewRow(0, null);
             data = Arrays.asList((V)null);
         }
-        //else {
-            for(int row = 0; row < data.size(); row++){
-                boolean newRowNeeded = true;
-                if(grid.getRows() > row){
-                    Component fieldComponent = grid.getComponent(GRID_X_FIELD, row);
-                    if(fieldComponent != null){
-                        newRowNeeded = false;
-                        Field field = (Field)fieldComponent;
-                        if(data.get(row) != null && field.getValue() != data.get(row)){
-                            field.setValue(data.get(row));
-                        }
+        for(int row = 0; row < data.size(); row++){
+            boolean newRowNeeded = true;
+            if(grid.getRows() > row){
+                Component fieldComponent = grid.getComponent(GRID_X_FIELD, row);
+                if(fieldComponent != null){
+                    newRowNeeded = false;
+                    F field = (F)fieldComponent;
+                    if(data.get(row) != null && field.getValue() != data.get(row)){
+                        field.setValue(data.get(row));
                     }
-
                 }
-                if(newRowNeeded){
-                    row = addNewRow(row, data.get(row));
-                }
-//            }
+            }
+            if(newRowNeeded){
+                addNewRow(row, data.get(row));
+            }
         }
         creatingFields = false;
     }
