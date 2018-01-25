@@ -57,7 +57,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "typeDesignations.typeStatus",
             "typeDesignations.typifiedNames.typeDesignations", // important !!
             "typeDesignations.typeSpecimen",
-            "typeDesignations.typeName",
+            "typeDesignations.typeName.$",
             "typeDesignations.citation",
             "typeDesignations.citation.authorship.$",
             // name
@@ -79,7 +79,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
    private  List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
            "*", // initialize all related entities to allow DerivedUnit conversion, see DerivedUnitConverter.copyPropertiesTo()
            "derivedFrom.$",
-           "derivedFrom.type",
+           "derivedFrom.type", // TODO remove?
            "derivedFrom.originals.derivationEvents", // important!!
            "specimenTypeDesignations.typifiedNames.typeDesignations", // important!!
            "mediaSpecimen.sources"
@@ -122,7 +122,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
     @Override
     public RegistrationDTO loadDtoById(Integer id) {
-        Registration reg = repo.getRegistrationService().find(id);
+        Registration reg = repo.getRegistrationService().load(id, REGISTRATION_INIT_STRATEGY);
         inititializeSpecimen(reg);
         return new RegistrationDTO(reg);
     }
@@ -200,7 +200,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                 DerivedUnit derivedUnit = ((SpecimenTypeDesignation) td).getTypeSpecimen();
                 @SuppressWarnings("rawtypes")
                 Set<SpecimenOrObservationBase> sobs = new HashSet<>();
-                sobs.add(derivedUnit);
+                sobs.add(HibernateProxyHelper.deproxy(derivedUnit));
 
                 while(sobs != null && !sobs.isEmpty()){
                     @SuppressWarnings("rawtypes")
