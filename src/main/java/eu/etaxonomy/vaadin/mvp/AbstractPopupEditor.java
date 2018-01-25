@@ -557,7 +557,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @return
      */
     public DTO getBean() {
-        return fieldGroup.getItemDataSource().getBean();
+        if(fieldGroup.getItemDataSource() != null){
+            return fieldGroup.getItemDataSource().getBean();
+
+        }
+        return null;
     }
 
     /**
