@@ -50,7 +50,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 12;
+    private final static int GRID_ROWS = 13;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -77,6 +77,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     private ToManyRelatedEntitiesComboboxSelect<TaxonName> basionymsComboboxSelect;
 
     private CheckBox basionymToggle;
+
+    private CheckBox validationToggle;
 
     private ListSelect rankSelect;
 
@@ -213,6 +215,16 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymToggle.setStyleName(getDefaultComponentStyles());
         grid.addComponent(basionymToggle, 2, row, 3, row);
         grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
+
+        row++;
+        validationToggle = new CheckBox("With validation");
+        validationToggle.addValueChangeListener(e -> {
+                boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+                exCombinationAuthorshipField.setVisible(enable);
+            });
+        grid.addComponent(validationToggle, 2, row, 3, row);
+        grid.setComponentAlignment(validationToggle, Alignment.BOTTOM_LEFT);
+
         row++;
         // fullTitleCache
         fullTitleCacheFiled = addSwitchableTextField("Full title cache", "fullTitleCache", "protectedFullTitleCache", 0, row, GRID_COLS-1, row);
@@ -328,6 +340,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         if(taxonName != null){
             if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
                 basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
+                exBasionymAuthorshipField.setVisible(taxonName.getExBasionymAuthorship() != null);
             }
             updateFieldVisibility(taxonName.getRank());
         }
@@ -354,6 +367,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 || taxonName.getBasionymAuthorship() != null
                 || taxonName.getExBasionymAuthorship() != null;
         basionymToggle.setValue(showBasionymSection);
+        basionymToggle.setReadOnly(showBasionymSection);
+
+        boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
+        validationToggle.setValue(showExAuthors);
+        validationToggle.setReadOnly(showExAuthors);
 
         if(isModeEnabled(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
             combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
@@ -460,6 +478,25 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     public CheckBox getBasionymToggle() {
         return basionymToggle;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        boolean basionymToggleReadonly = basionymToggle.isReadOnly();
+        boolean validationToggleReadonly = validationToggle.isReadOnly();
+        super.setReadOnly(readOnly);
+        // preserve old readonly states if they were true
+        if(basionymToggleReadonly){
+            basionymToggle.setReadOnly(true);
+        }
+        if(validationToggleReadonly){
+            validationToggle.setReadOnly(true);
+        }
+    }
+
+
 
 
 }
