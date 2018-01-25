@@ -13,9 +13,11 @@ import java.util.EnumSet;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
@@ -232,11 +234,9 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
-        row++;
-        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
-        exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
-        addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
+        row++;
+        grid.addComponent(new Label("Hint: <i>Nomenclatural authors can be edited in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
         // nomenclaturalReference
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
@@ -260,6 +260,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 3, row, 3, row);
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
 
+        row++;
+        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
+        exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
+        addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
         // Basionym
         row++;
@@ -313,12 +317,18 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      * @return
      */
     private void enableBasionymFields(boolean enable) {
+
+
         basionymAuthorshipField.setVisible(enable);
         exBasionymAuthorshipField.setVisible(enable);
         basionymsComboboxSelect.setVisible(enable);
-        if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
-            TaxonName taxonName = getBean();
-            basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
+        TaxonName taxonName = getBean();
+
+        if(taxonName != null){
+            if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
+                basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
+            }
+            updateFieldVisibility(taxonName.getRank());
         }
     }
 
@@ -333,6 +343,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
+        exCombinationAuthorshipField.setVisible(isSpeciesOrBelow);
     }
 
     @Override

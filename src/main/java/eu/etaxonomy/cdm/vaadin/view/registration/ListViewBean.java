@@ -86,7 +86,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
             submitterFilter = new ListSelect("Submitter");
             submitterFilter.setRows(1);
-            submitterFilter.addValueChangeListener(e -> updateResults());
+            submitterFilter.addValueChangeListener(e -> updateResults(null, null));
             toolBar.addComponent(submitterFilter);
         }
 
@@ -94,13 +94,16 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             statusFilter = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
             statusFilter.setNullSelectionAllowed(true);
             statusFilter.setRows(1);
-            statusFilter.addValueChangeListener(e -> updateResults());
+            statusFilter.addValueChangeListener(e -> updateResults(null, null));
             toolBar.addComponent(statusFilter);
         }
 
         toolBar.addComponents(identifierFilter, taxonNameFilter);
-        identifierFilter.addValueChangeListener(e -> updateResults());
-        taxonNameFilter.addValueChangeListener(e -> updateResults());
+        int textChangeTimeOut = 200;
+        identifierFilter.addTextChangeListener(e -> updateResults(identifierFilter, e.getText()));
+        identifierFilter.setTextChangeTimeout(textChangeTimeOut);
+        taxonNameFilter.addTextChangeListener(e -> updateResults(taxonNameFilter, e.getText()));
+        identifierFilter.setTextChangeTimeout(textChangeTimeOut);
 
         toolBar.setSpacing(true);
         addContentComponent(toolBar, null);
@@ -115,8 +118,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     /**
      * @return
      */
-    private void updateResults() {
-        eventBus.publishEvent(new UpdateResultsEvent(this));
+    private void updateResults(TextField field, String newText) {
+        eventBus.publishEvent(new UpdateResultsEvent(field, newText, this));
     }
 
     @Override

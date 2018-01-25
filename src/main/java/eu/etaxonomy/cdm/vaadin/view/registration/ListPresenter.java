@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
@@ -74,7 +75,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             getView().getSubmitterFilter().setItemCaptionPropertyId("username");
         }
 
-        getView().populate(pageRegistrations());
+        getView().populate(pageRegistrations(null, null));
     }
 
     /**
@@ -82,14 +83,24 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      *
      * @return
      */
-    private Pager<RegistrationDTO> pageRegistrations() {
+    private Pager<RegistrationDTO> pageRegistrations(TextField textFieldOverride, String alternativeText) {
 
         // list all if the authenticated user is having the role CURATION of if it is an admin
         Authentication authentication = currentSecurityContext().getAuthentication();
 
         // prepare the filters
-        String identifierFilter = getView().getIdentifierFilter().getValue();
-        String nameFilter = getView().getTaxonNameFilter().getValue();
+        String identifierFilter;
+        if(textFieldOverride != null && textFieldOverride == getView().getIdentifierFilter()){
+            identifierFilter = alternativeText;
+        } else {
+            identifierFilter = getView().getIdentifierFilter().getValue();
+        }
+        String nameFilter;
+        if(textFieldOverride != null && textFieldOverride == getView().getTaxonNameFilter()){
+            nameFilter = alternativeText;
+        } else {
+            nameFilter = getView().getTaxonNameFilter().getValue();
+        }
         User submitter = null;
         if(getView().getSubmitterFilter() != null){
             Object o = getView().getSubmitterFilter().getValue();
@@ -137,7 +148,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
     @EventListener
     public void onUpdateResultsEvent(UpdateResultsEvent event){
-        getView().populate(pageRegistrations());
+        getView().populate(pageRegistrations(event.getField(), event.getNewText()));
     }
 
 }

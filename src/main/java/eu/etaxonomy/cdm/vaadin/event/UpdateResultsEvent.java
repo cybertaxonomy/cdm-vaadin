@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import com.vaadin.ui.TextField;
+
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -18,14 +20,18 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 public class UpdateResultsEvent {
 
     private AbstractView sourceView = null;
+    TextField field;
+    String newText;
 
 
     /**
      * @param sourceView
      */
-    public UpdateResultsEvent(AbstractView sourceView) {
+    public UpdateResultsEvent(TextField field, String newText, AbstractView sourceView) {
         super();
         this.sourceView = sourceView;
+        this.field = field;
+        this.newText = newText;
     }
 
     /**
@@ -40,6 +46,20 @@ public class UpdateResultsEvent {
      */
     public void setSourceView(AbstractView sourceView) {
         this.sourceView = sourceView;
+    }
+
+    /**
+     * @return the field
+     */
+    public TextField getField() {
+        return field;
+    }
+
+    /**
+     * @return the newText
+     */
+    public String getNewText() {
+        return newText;
     }
 
 
