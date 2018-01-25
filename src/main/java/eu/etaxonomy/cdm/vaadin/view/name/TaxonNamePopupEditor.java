@@ -230,14 +230,15 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         specificEpithetField.setWidth(200, Unit.PIXELS);
         infraSpecificEpithetField = addTextField("Infraspecific epithet", "infraSpecificEpithet", 2, row, 3, row);
         infraSpecificEpithetField.setWidth(200, Unit.PIXELS);
+
+        row++;
+        grid.addComponent(new Label("Hint: <i>Edit nomenclatural authors in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
+
         row++;
         combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
 
-        row++;
-        grid.addComponent(new Label("Hint: <i>Nomenclatural authors can be edited in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
-        // nomenclaturalReference
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
         nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
@@ -358,7 +359,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
             combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly) && getBean().getNomenclaturalReference() != null) {
-            nomReferenceCombobox.setCaption("Nomenclatural reference (sections of " + getBean().getNomenclaturalReference().getTitle() + " only)");
+            nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
         }
 
     }
@@ -437,7 +438,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     @Override
     public void enableMode(TaxonNamePopupEditorMode mode){
-        modesActive.add(mode);
+            modesActive.add(mode);
     }
 
     @Override
@@ -448,6 +449,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public void disableMode(TaxonNamePopupEditorMode mode){
         modesActive.remove(mode);
+    }
+
+    @Override
+    public EnumSet<TaxonNamePopupEditorMode> getModesActive(){
+        return modesActive;
     }
 
     @Override

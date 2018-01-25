@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.EnumSet;
+
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ListSelect;
 
@@ -71,6 +73,8 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     boolean isModeEnabled(TaxonNamePopupEditorMode mode);
+
+    public EnumSet<TaxonNamePopupEditorMode> getModesActive();
 
     /**
      * @return

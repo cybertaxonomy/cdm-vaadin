@@ -358,6 +358,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
+        getView().getModesActive().forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(event.getEntityId());
         basionymNamePopup.getBasionymToggle().setVisible(false);
 
