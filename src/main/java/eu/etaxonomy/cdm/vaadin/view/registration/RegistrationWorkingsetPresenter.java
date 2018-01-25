@@ -226,6 +226,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityId());
     }
 
+    @EventListener
+    public void onDoneWithReferencePopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
+        if(event.getPopup() instanceof ReferencePopupEditor){
+            if(event.getReason().equals(Reason.SAVE)){
+                refreshView(true);
+            }
+        }
+    }
+
+    @EventListener
+    public void onDoneWithSpecimenTypeDesignationWorkingsetPopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
+        if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
+            if(event.getReason().equals(Reason.SAVE)){
+                refreshView(true);
+            }
+        }
+    }
+
     @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
 
