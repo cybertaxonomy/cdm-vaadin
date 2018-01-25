@@ -96,11 +96,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
         getView().getSuperCollectionCombobox().getSelect().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
-
-        getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(
-                new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(),
-                this)
-                );
+        getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(),this));
     }
 
     @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
