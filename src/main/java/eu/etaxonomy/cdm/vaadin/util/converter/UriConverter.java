@@ -47,11 +47,14 @@ public final class UriConverter implements Converter<String, URI> {
     public URI convertToModel(String value, Class<? extends URI> targetType, Locale locale)
             throws com.vaadin.data.util.converter.Converter.ConversionException {
         if(value != null){
-            try{
-                URI uri = new URI(value);
-                return uri;
-            } catch (Exception e){
-                throw new com.vaadin.data.util.converter.Converter.ConversionException(e);
+            value = value.trim();
+            if(!value.isEmpty()){
+                try{
+                    URI uri = new URI(value.trim());
+                    return uri;
+                } catch (Exception e){
+                    throw new com.vaadin.data.util.converter.Converter.ConversionException(e);
+                }
             }
         }
         return null;
