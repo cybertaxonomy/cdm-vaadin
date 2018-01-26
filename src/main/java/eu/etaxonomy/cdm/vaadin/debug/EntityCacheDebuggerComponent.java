@@ -71,8 +71,6 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
 
         entityTree.setSizeUndefined();
         debugInformation.setSizeUndefined();
-        debugInformation.setWidth("100%");
-        // debugInformation.setRows(100);
         debugInformation.setReadOnly(true);
         splitPanel.setFirstComponent(entityTree);
         splitPanel.setSecondComponent(debugInformation);
