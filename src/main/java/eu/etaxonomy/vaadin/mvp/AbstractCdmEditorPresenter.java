@@ -167,6 +167,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             if(newAuthorityCreated != null){
                 UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
             }
+            throw e;
         }
     }
 
