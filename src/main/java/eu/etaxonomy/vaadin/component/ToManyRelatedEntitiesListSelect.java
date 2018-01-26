@@ -414,7 +414,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
             // remove
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(field.getValue() != null);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(fieldsCount > 1);
             // up
             if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
                 buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
