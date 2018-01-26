@@ -154,6 +154,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     protected void refreshView(boolean doReload) {
+        if(workingset == null){
+            return; // nothing to do
+        }
         if(doReload){
             loadWorkingSet(workingset.getCitationId());
         }
