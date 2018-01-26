@@ -217,7 +217,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
 
         row++;
-        validationToggle = new CheckBox("With validation");
+        validationToggle = new CheckBox("Validation");
         validationToggle.addValueChangeListener(e -> {
                 boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
                 exCombinationAuthorshipField.setVisible(enable);
