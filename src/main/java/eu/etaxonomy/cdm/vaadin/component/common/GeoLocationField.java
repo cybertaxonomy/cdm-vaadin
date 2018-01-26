@@ -44,8 +44,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     Point parsedPoint = Point.NewInstance();
 
-    private TextField longitudeField = new TextFieldNFix("Long.");
-    TextField latitudeField = new TextFieldNFix("Lat.");
+    private TextField longitudeField = new TextFieldNFix("Longitude");
+    TextField latitudeField = new TextFieldNFix("Latitude");
     Label longLatParsed = new Label();
     TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
     TextField referenceSystemField = new TextFieldNFix("ReferenceSystem");
@@ -78,8 +78,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.setRows(2);
         root.setColumns(3);
         root.setStyleName("wrapper");
-        root.addComponent(longitudeField, 0, 0);
-        root.addComponent(latitudeField, 1, 0);
+        root.addComponent(latitudeField, 0, 0);
+        root.addComponent(longitudeField, 1, 0);
         root.addComponent(errorRadiusField, 0, 1);
         root.addComponent(referenceSystemField, 1, 1);
 
@@ -140,7 +140,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
      *
      */
     protected void updateMap() {
-        longLatParsed.setValue(parsedPoint.getLongitudeSexagesimal() + "/" + parsedPoint.getLatitudeSexagesimal());
+        longLatParsed.setValue(parsedPoint.getLatitudeSexagesimal() + "/" + parsedPoint.getLongitudeSexagesimal());
         map.removeComponent(mapMarker);
         if(parsedPoint.getLongitude() != null && parsedPoint.getLatitude() != null){
             map.setZoomLevel(10);
