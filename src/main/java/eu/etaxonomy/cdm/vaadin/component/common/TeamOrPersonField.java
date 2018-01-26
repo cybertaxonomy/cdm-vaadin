@@ -70,7 +70,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     // Fields for case when value is a Team
     private SwitchableTextField titleField = new SwitchableTextField("Team (bibliographic)");
     private SwitchableTextField nomenclaturalTitleField = new SwitchableTextField("Team (nomenclatural)");
-    private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<Person, PersonField>(Person.class, PersonField.class, "Teammembers");
+    private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<Person, PersonField>(Person.class, PersonField.class, "Team members");
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 
