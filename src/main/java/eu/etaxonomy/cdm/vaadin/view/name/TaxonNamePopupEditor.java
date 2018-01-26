@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.Collection;
 import java.util.EnumSet;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.shared.ui.label.ContentMode;
@@ -111,7 +112,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      */
     @Override
     public int getWindowPixelWidth() {
-        return 700;
+        return 800;
     }
 
     /**
@@ -202,15 +203,14 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setRows(1);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
-        rankSelect.addValueChangeListener(e -> updateFieldVisibility((Rank)e.getProperty().getValue()));
+        rankSelect.addValueChangeListener(e -> updateFieldVisibility());
         addField(rankSelect, "rank", 0, row, 1, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
 
         basionymToggle = new CheckBox("With basionym");
         basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
         basionymToggle.addValueChangeListener(e -> {
-                boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
-                enableBasionymFields(enable);
+                updateFieldVisibility();
             });
         basionymToggle.setStyleName(getDefaultComponentStyles());
         grid.addComponent(basionymToggle, 2, row, 3, row);
@@ -315,7 +315,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
 
         setAdvancedModeEnabled(true);
-        enableBasionymFields(HAS_BASIONYM_DEFAULT);
         registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
         registerAdvancedModeComponents(basionymAuthorshipField.getCachFields());
         registerAdvancedModeComponents(exBasionymAuthorshipField.getCachFields());
@@ -326,38 +325,36 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     }
 
     /**
-     * @param value
+     * @param rank
      * @return
      */
-    private void enableBasionymFields(boolean enable) {
+    private void updateFieldVisibility() {
 
+        // TODO use getField() instead and remove field references
 
-        basionymAuthorshipField.setVisible(enable);
-        exBasionymAuthorshipField.setVisible(enable);
-        basionymsComboboxSelect.setVisible(enable);
         TaxonName taxonName = getBean();
+        Rank rank = taxonName.getRank();
+
+        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
+        Boolean withBasionym = BooleanUtils.isTrue(basionymToggle.getValue());
+        Boolean withValidation = BooleanUtils.isTrue(validationToggle.getValue());
+
+        basionymAuthorshipField.setVisible(withBasionym != null && withBasionym);
+        exBasionymAuthorshipField.setVisible(withBasionym);
+        basionymsComboboxSelect.setVisible(withBasionym);
 
         if(taxonName != null){
             if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
                 basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
                 exBasionymAuthorshipField.setVisible(taxonName.getExBasionymAuthorship() != null);
             }
-            updateFieldVisibility(taxonName.getRank());
         }
-    }
 
-    /**
-     * @param rank
-     * @return
-     */
-    private void updateFieldVisibility(Rank rank) {
-        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
-        // TODO use getField() instead and remove field references
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
-        exCombinationAuthorshipField.setVisible(isSpeciesOrBelow);
+        exCombinationAuthorshipField.setVisible(isSpeciesOrBelow && withValidation);
     }
 
     @Override
@@ -372,6 +369,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
         validationToggle.setValue(showExAuthors);
         validationToggle.setReadOnly(showExAuthors);
+        exCombinationAuthorshipField.setVisible(showExAuthors);
 
         if(isModeEnabled(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
             combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
