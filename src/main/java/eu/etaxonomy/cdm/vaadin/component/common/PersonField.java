@@ -65,13 +65,14 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private Mode currentMode = null;
 
-    private float baseWidth = 100 / 8;
+    private float baseWidth = 100 / 9;
 
     private CssLayout root = new CssLayout();
     private CssLayout selectOrNewContainer = new CssLayout();
 
     private TextField cacheField = new TextFieldNFix();
     private CssLayout detailsContainer = new CssLayout();
+    private TextField initialsField = new TextFieldNFix();
     private TextField firstNameField = new TextFieldNFix();
     private TextField lastNameField = new TextFieldNFix();
     private TextField prefixField = new TextFieldNFix();
@@ -116,6 +117,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
         // edit person
         addStyledComponent(cacheField);
+        addStyledComponents(initialsField);
         addStyledComponent(firstNameField);
         addStyledComponent(lastNameField);
         addStyledComponent(prefixField);
@@ -166,6 +168,9 @@ public class PersonField extends CompositeCustomField<Person> {
         prefixField.setWidth(baseWidth, Unit.PERCENTAGE);
         prefixField.setInputPrompt("Prefix");
 
+        initialsField.setWidth(baseWidth, Unit.PERCENTAGE);
+        initialsField.setInputPrompt("Initials");
+
         firstNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
         firstNameField.setInputPrompt("First Name");
 
@@ -177,6 +182,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
         detailsContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         detailsContainer.addComponent(prefixField);
+        detailsContainer.addComponent(initialsField);
         detailsContainer.addComponent(firstNameField);
         detailsContainer.addComponent(lastNameField);
         detailsContainer.addComponent(suffixField);
@@ -206,6 +212,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
         fieldGroup.bind(cacheField, "titleCache");
         fieldGroup.bind(prefixField, "prefix");
+        fieldGroup.bind(initialsField, "initials");
         fieldGroup.bind(firstNameField, "firstname");
         fieldGroup.bind(lastNameField, "lastname");
         fieldGroup.bind(suffixField, "suffix");
