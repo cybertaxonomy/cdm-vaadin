@@ -22,6 +22,7 @@ import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -47,6 +48,7 @@ import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.mvp.event.EditorCancelEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -139,6 +141,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
+
+        updateToolBarVisibility();
     }
 
     protected VerticalLayout getMainLayout() {
@@ -210,7 +214,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      */
     private void updateToolBarVisibility() {
+        boolean showToolbar = toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1;
         toolBar.setVisible(toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1);
+        if(!showToolbar){
+            mainLayout.setMargin(new MarginInfo(true, false, false, false));
+        } else {
+            mainLayout.setMargin(false);
+        }
 
     }
 
@@ -269,6 +279,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Override
     public void cancel() {
         fieldGroup.discard();
+        eventBus.publishEvent(new EditorCancelEvent<DTO>(this, getBean()));
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
@@ -359,6 +370,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected CheckBox addCheckBox(String caption, String propertyId) {
         return addField(new CheckBox(caption), propertyId);
+    }
+
+    protected CheckBox addCheckBox(String caption, String propertyId, int column, int row){
+        return addField(new CheckBox(caption), propertyId, column, row);
     }
 
     protected <T extends Field> T addField(T field, String propertyId) {

@@ -9,8 +9,10 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -54,6 +56,7 @@ import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
@@ -92,6 +95,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     private TaxonName newTaxonNameForRegistration = null;
 
     private RegistrationDTO newRegistrationDTOWithExistingName;
+
+    private RegistrationDTO newNameTypeDesignationTarget;
 
 
     /**
@@ -381,11 +386,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
             if(event.getSourceComponent() != null){
+                // TODO document this !!!!!!!!!!!
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
         } else {
-            // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
-            // FIXME implement NameTypeDesignationWorkingsetPopupEditor
+            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
+            popup.withDeleteButton(true);
+            popup.loadInEditor(event.getEntityId());
+            if(event.getSourceComponent() != null){
+                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+            }
+            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
         }
     }
 
@@ -418,8 +429,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.loadInEditor(identifierSet);
             popup.withDeleteButton(true);
         } else {
-            // TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET
-            // FIXME implement NameTypeDesignationWorkingsetPopupEditor
+            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
+            popup.withDeleteButton(true);
+            popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            popup.loadInEditor(null);
+            if(event.getSourceComponent() != null){
+                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+            }
+            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
         }
     }
 
@@ -449,7 +466,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
             // set newRegistrationDTOWithExistingName NULL in any case
             newRegistrationDTOWithExistingName = null;
+        } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
+            if(event.getReason().equals(Reason.SAVE)){
+                UUID uuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
+                TypeDesignationBase<?> nameTypeDesignation = getRepo().getNameService().loadTypeDesignation(uuid, null);
+                Registration registration = getRepo().getRegistrationService().load(newNameTypeDesignationTarget.getId(), Arrays.asList("$", "typeDesignations"));
+                registration.getTypeDesignations().add(nameTypeDesignation);
+                getRepo().getRegistrationService().saveOrUpdate(registration);
+                newNameTypeDesignationTarget = null;
+                refreshView(true);
+            } else if(event.getReason().equals(Reason.CANCEL)){
+                // noting to do
+            }
         }
+        // ignore other editors
     }
 
 
@@ -498,7 +528,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(
-                    reg -> reg.getTypeDesignations().stream().anyMatch(
+                    reg -> reg.getTypeDesignations() != null && reg.getTypeDesignations().stream().anyMatch(
                             td -> td.getId() == event.getEntityId()
                             )
                         )
