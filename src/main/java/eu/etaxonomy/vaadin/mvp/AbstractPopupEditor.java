@@ -48,7 +48,6 @@ import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
-import eu.etaxonomy.vaadin.mvp.event.EditorCancelEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -279,7 +278,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Override
     public void cancel() {
         fieldGroup.discard();
-        eventBus.publishEvent(new EditorCancelEvent<DTO>(this, getBean()));
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
@@ -287,7 +285,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @return
      */
     private void delete() {
-        eventBus.publishEvent(new EditorDeleteEvent(this, fieldGroup.getItemDataSource().getBean()));
+        eventBus.publishEvent(new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
     }
 

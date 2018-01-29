@@ -14,6 +14,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
@@ -31,6 +33,7 @@ import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.api.service.idminter.IdentifierMinter.Identifier;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -63,6 +66,7 @@ import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -386,14 +390,19 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
             if(event.getSourceComponent() != null){
-                // TODO document this !!!!!!!!!!!
+                // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
             popup.withDeleteButton(true);
             popup.loadInEditor(event.getEntityId());
+
+            popup.getCitationCombobox().setEnabled(false);
+            popup.getTypifiedNamesComboboxSelect().setEnabled(false);
+
             if(event.getSourceComponent() != null){
+                // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
             newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
@@ -428,15 +437,32 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.loadInEditor(identifierSet);
             popup.withDeleteButton(true);
+            if(event.getSourceComponent() != null){
+                // propagate readonly state from source component to popup
+                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+            }
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+            popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
+
+                @Override
+                public NameTypeDesignation createNewBean() {
+                    NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
+                    nameTypeDesignation.setCitation(newNameTypeDesignationTarget.getCitation());
+                    nameTypeDesignation.getTypifiedNames().add(newNameTypeDesignationTarget.getTypifiedName());
+                    return nameTypeDesignation;
+                }
+            });
             popup.loadInEditor(null);
+            popup.getCitationCombobox().setEnabled(false);
+            popup.getTypifiedNamesComboboxSelect().setEnabled(false);
             if(event.getSourceComponent() != null){
+                // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
-            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
         }
     }
 
@@ -469,10 +495,18 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
                 UUID uuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
-                TypeDesignationBase<?> nameTypeDesignation = getRepo().getNameService().loadTypeDesignation(uuid, null);
-                Registration registration = getRepo().getRegistrationService().load(newNameTypeDesignationTarget.getId(), Arrays.asList("$", "typeDesignations"));
+
+                Session session = getRepo().getSessionFactory().openSession();
+                Transaction txstate = session.beginTransaction();
+                TypeDesignationBase<?> nameTypeDesignation = getRepo().getNameService().loadTypeDesignation(uuid, Arrays.asList(""));
+                // only load the typeDesignations with the registration so that the typified name can  not be twice in the session
+                // otherwise multiple representation problems might occur
+                Registration registration = getRepo().getRegistrationService().load(newNameTypeDesignationTarget.getUuid(), Arrays.asList("typeDesignations"));
                 registration.getTypeDesignations().add(nameTypeDesignation);
-                getRepo().getRegistrationService().saveOrUpdate(registration);
+                session.merge(registration);
+                txstate.commit();
+                session.close();
+
                 newNameTypeDesignationTarget = null;
                 refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){

@@ -132,6 +132,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
         typifiedNamesComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
+        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help
 
         row++;
         citationCombobox = new ToOneRelatedEntityCombobox<Reference>("Citation", Reference.class);

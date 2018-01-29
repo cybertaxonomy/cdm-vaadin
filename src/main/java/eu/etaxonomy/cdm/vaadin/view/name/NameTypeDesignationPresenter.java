@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import eu.etaxonomy.cdm.api.service.IService;
@@ -21,6 +22,7 @@ import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -30,6 +32,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  */
 public class NameTypeDesignationPresenter
         extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
+
+    HashSet<TaxonName> typifiedNamesAsLoaded;
 
     /**
      * {@inheritDoc}
@@ -54,6 +58,9 @@ public class NameTypeDesignationPresenter
                 typeDesignation = NameTypeDesignation.NewInstance();
             }
         }
+
+        typifiedNamesAsLoaded = new HashSet<>(typeDesignation.getTypifiedNames());
+
         return typeDesignation;
     }
 
@@ -69,6 +76,7 @@ public class NameTypeDesignationPresenter
         CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getTypeStatusSelect().setContainerDataSource(selectFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
 
+        getView().getCitationCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
         getView().getCitationCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
@@ -111,5 +119,35 @@ public class NameTypeDesignationPresenter
         // TODO Auto-generated method stub
         return null;
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NameTypeDesignation handleTransientProperties(NameTypeDesignation bean) {
+
+        // the typifiedNames can only be set on the name side, so we need to
+        // handle changes explicitly here
+        HashSet<TaxonName> typifiedNames = new HashSet<>(bean.getTypifiedNames());
+
+        // handle adds
+        for(TaxonName name : typifiedNames){
+            if(!name.getTypeDesignations().contains(bean)){
+                name.addTypeDesignation(bean, false);
+            }
+        }
+        // handle removed
+        for(TaxonName name : typifiedNamesAsLoaded){
+            if(!typifiedNames.contains(name)){
+                name.removeTypeDesignation(bean);
+            }
+            // FIXME do we need to save the names here or is the delete cascaded from the typedesignation to the name?
+        }
+
+        return bean;
+    }
+
+
 
 }
