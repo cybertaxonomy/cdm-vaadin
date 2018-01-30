@@ -10,6 +10,8 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -25,6 +27,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
 
     private int registrationId;
 
+    private TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
+
     /**
      *
      * @param action
@@ -34,9 +38,10 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      * @param source
      * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(EditorActionType action, Integer typeDesignationWorkingsetId, TypeDesignationWorkingSetType workingSetType, int registrationId,
+    public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef, TypeDesignationWorkingSetType workingSetType, int registrationId,
             Component source, AbstractView sourceView) {
-        super(action, typeDesignationWorkingsetId, source, sourceView);
+        super(action, null, source, sourceView);
+        this.baseEntityRef = baseEntityRef;
         this.registrationId = registrationId;
         this.workingSetType = workingSetType;
     }
@@ -75,8 +80,12 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
         return getEntityId();
     }
 
-
-
+    /**
+     * @return the baseEntityRef
+     */
+    public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityRef() {
+        return baseEntityRef;
+    }
 
 
 }

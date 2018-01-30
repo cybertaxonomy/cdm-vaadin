@@ -50,6 +50,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
@@ -280,12 +281,12 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
-                Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 Integer registrationEntityID = dto.getId();
                 getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
                         EditorActionType.EDIT,
-                        typeDesignationWorkingsetId,
+                        baseEntityRef,
                         workingsetType,
                         registrationEntityID,
                         e.getButton(),

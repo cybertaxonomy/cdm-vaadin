@@ -55,12 +55,14 @@ public class NameTypeDesignationPresenter
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
             // find the working set
-            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
-            int nameTypeDesignationId = typeDesignationWorkingSet.getBaseEntityReference().getId();
+            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
+
             // NameTypeDesignation bameTypeDesignation = regDTO.getNameTypeDesignation(typeDesignationWorkingSet.getBaseEntityReference());
-            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
+            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(TaxonName.class)){
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
             }
+            // TypeDesignationWorkingSet for NameTyped only contain one item!!!
+            int nameTypeDesignationId = typeDesignationWorkingSet.getTypeDesignations().get(0).getId();
             return super.loadBeanById(nameTypeDesignationId);
         }
     }

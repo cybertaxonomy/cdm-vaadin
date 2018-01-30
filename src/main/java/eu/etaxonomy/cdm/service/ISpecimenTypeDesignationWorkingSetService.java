@@ -8,8 +8,10 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 
 /**
@@ -25,7 +27,7 @@ public interface ISpecimenTypeDesignationWorkingSetService {
      * @param id the CDM Entity id
      * @return
      */
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, int workingsetId);
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef);
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO<Registration> bean);
 

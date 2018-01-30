@@ -315,22 +315,6 @@ public class RegistrationDTO{
     }
 
     /**
-     *
-     * @param workingSetId
-     * @return the TypeDesignationWorkingSet in this DTO with the matching workingSetId or NULL
-     */
-    public TypeDesignationWorkingSet getTypeDesignationWorkingSet(int workingSetId) {
-        for(TypeDesignationWorkingSet workingSet : getOrderdTypeDesignationWorkingSets().values()){
-            logger.debug("WorkingSet:" + workingSet.getWorkingsetType() + "#" + workingSet.getWorkingSetId());
-            if(workingSet.getWorkingSetId() == workingSetId){
-                return workingSet;
-            }
-        }
-        return null;
-
-    }
-
-    /**
      * @param ref
      * @return
      */

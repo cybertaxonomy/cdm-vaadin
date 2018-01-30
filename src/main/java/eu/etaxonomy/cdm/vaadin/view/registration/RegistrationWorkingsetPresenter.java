@@ -388,7 +388,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
             if(event.getSourceComponent() != null){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
@@ -396,7 +396,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
 
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);

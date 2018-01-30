@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
+import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -98,10 +99,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     @Override
     @Transactional
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, int workingsetId) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(registrationId);
         // find the working set
-        TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(workingsetId);
+        TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
         return workingSetDto;
     }

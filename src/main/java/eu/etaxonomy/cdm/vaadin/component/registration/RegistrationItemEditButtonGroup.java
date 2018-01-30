@@ -93,7 +93,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
-                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + "#" + typeDesignationWorkingSet.getWorkingSetId());
+                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
@@ -106,7 +106,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
-                        typeDesignationWorkingSet.getWorkingSetId(),
+                        typeDesignationWorkingSet.getBaseEntityReference(),
                         tdButton)
                         );
                 String labelText = typeDesignationWorkingSet.getRepresentation();
@@ -163,21 +163,22 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
     }
 
     public class TypeDesignationWorkingSetButton {
-        private Integer id;
+
+        private TypedEntityReference baseEntityRef;
         private TypeDesignationWorkingSetType type;
         private Button button;
 
-        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, Integer id, Button button){
+        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, TypedEntityReference baseEntityRef, Button button){
             this.type = type;
-            this.id = id;
+            this.baseEntityRef = baseEntityRef;
             this.button = button;
         }
 
         /**
          * @return the id
          */
-        public Integer getId() {
-            return id;
+        public TypedEntityReference getBaseEntity() {
+            return baseEntityRef;
         }
 
         /**
