@@ -111,6 +111,13 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
                         );
                 String labelText = typeDesignationWorkingSet.getRepresentation();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
+                if(typeDesignationWorkingSet.getWorkingsetType().equals(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET)){
+                    // remove the citation from the label which looks very redundant in the registration working set editor
+                    // TODO when use in other contexts. it might be required to make this configurable.
+
+                    String citationString = regDto.getCitation().getCitation();
+                    labelText = labelText.replaceFirst(citationString, "");
+                }
                 Label label = new Label(labelText);
 
                 label.setWidthUndefined();
