@@ -12,17 +12,22 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -33,7 +38,33 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 public class NameTypeDesignationPresenter
         extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
 
+    @Autowired
+    private IRegistrationWorkingSetService registrationWorkingSetService;
+
     HashSet<TaxonName> typifiedNamesAsLoaded;
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NameTypeDesignation loadBeanById(Object identifier) {
+        if(identifier instanceof Integer || identifier == null){
+            return super.loadBeanById(identifier);
+        } else {
+            TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
+            RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
+            // find the working set
+            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.workingsetId);
+            int nameTypeDesignationId = typeDesignationWorkingSet.getBaseEntityReference().getId();
+            // NameTypeDesignation bameTypeDesignation = regDTO.getNameTypeDesignation(typeDesignationWorkingSet.getBaseEntityReference());
+            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
+                throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
+            }
+            return super.loadBeanById(nameTypeDesignationId);
+        }
+    }
+
 
     /**
      * {@inheritDoc}

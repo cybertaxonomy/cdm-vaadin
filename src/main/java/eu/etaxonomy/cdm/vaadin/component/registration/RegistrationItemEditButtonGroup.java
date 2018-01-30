@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
@@ -39,10 +41,9 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  */
 public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
+    private final static Logger logger = Logger.getLogger(RegistrationItemEditButtonGroup.class);
 
-    /**
-     *
-     */
+
     private static final String DEFAULT_BUTTON_STYLES = "";
 
     private static final long serialVersionUID = -5059163772392864050L;
@@ -92,6 +93,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
+                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + "#" + typeDesignationWorkingSet.getWorkingSetId());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");

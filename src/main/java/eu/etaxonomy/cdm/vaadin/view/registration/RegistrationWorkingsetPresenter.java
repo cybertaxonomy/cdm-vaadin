@@ -82,16 +82,16 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     private static final long serialVersionUID = 1L;
 
     @Autowired
-    private IRegistrationWorkingSetService workingSetService;
+    private IRegistrationWorkingSetService regWorkingSetService;
 
     @Autowired
     private RegistrationIdentifierMinter minter;
 
     /**
-     * @return the workingSetService
+     * @return the regWorkingSetService
      */
     public IRegistrationWorkingSetService getWorkingSetService() {
-        return workingSetService;
+        return regWorkingSetService;
     }
 
     private RegistrationWorkingSet workingset;
@@ -396,7 +396,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
             popup.withDeleteButton(true);
-            popup.loadInEditor(event.getEntityId());
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getEntityId()));
 
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
@@ -530,7 +530,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
     public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
-        RegistrationDTO regDto = workingSetService.loadDtoById((Integer)event.getIdentifier());
+        RegistrationDTO regDto = regWorkingSetService.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
             if(getView() != null){
                 getView().openDetailsPopup("Messages", regDto.getMessages());
