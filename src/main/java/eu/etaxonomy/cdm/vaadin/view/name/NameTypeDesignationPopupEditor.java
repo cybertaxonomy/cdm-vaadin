@@ -47,6 +47,8 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private TextField citationDetailField;
 
+    private boolean showTypeFlags = false;
+
 
     /**
      * @param layout
@@ -69,7 +71,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
      */
     @Override
     public void focusFirst() {
-        // TODO Auto-generated method stub
+        // none
     }
 
     /**
@@ -110,23 +112,23 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
         int row = 0;
 
-        conservedTypeField = addCheckBox("Conserved type", "conservedType", 0, row);
+        if(showTypeFlags){
+            conservedTypeField = addCheckBox("Conserved type", "conservedType", 0, row);
+            rejectedTypeField = addCheckBox("Rejected type", "rejectedType", 1, row);
+            notDesignatedField = addCheckBox("Not designated", "notDesignated", 2, row);
+            row++;
+        }
 
-        rejectedTypeField = addCheckBox("Rejected type", "rejectedType", 1, row);
-
-        notDesignatedField = addCheckBox("Not designated", "notDesignated", 2, row);
-
-        row++;
-        typeNameField = new ToOneRelatedEntityCombobox<TaxonName>("Type name", TaxonName.class);
-        addField(typeNameField, "typeName", 0, row, 3, row);
-
-        row++;
         typeStatusSelect = new ListSelect("Type status");
         typeStatusSelect.setNullSelectionAllowed(false);
         typeStatusSelect.setRows(1);
         typeStatusSelect.setWidth(100, Unit.PERCENTAGE);
         addField(typeStatusSelect, "typeStatus", 0, row, 1, row);
         grid.setComponentAlignment(typeStatusSelect, Alignment.TOP_RIGHT);
+
+        row++;
+        typeNameField = new ToOneRelatedEntityCombobox<TaxonName>("Type name", TaxonName.class);
+        addField(typeNameField, "typeName", 0, row, 3, row);
 
         row++;
         typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
@@ -137,6 +139,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         citationCombobox = new ToOneRelatedEntityCombobox<Reference>("Citation", Reference.class);
         addField(citationCombobox, "citation", 0, row, 2, row);
+        citationCombobox.setWidth(400, Unit.PIXELS);
         citationDetailField = addTextField("Citation detail", "citationMicroReference", 3, row);
     }
 
@@ -170,6 +173,23 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     @Override
     public ToOneRelatedEntityCombobox<Reference> getCitationCombobox() {
         return citationCombobox;
+    }
+
+
+    /**
+     * @return the showTypeFlags
+     */
+    @Override
+    public boolean isShowTypeFlags() {
+        return showTypeFlags;
+    }
+
+    /**
+     * @param showTypeFlags the showTypeFlags to set
+     */
+    @Override
+    public void setShowTypeFlags(boolean showTypeFlags) {
+        this.showTypeFlags = showTypeFlags;
     }
 
 

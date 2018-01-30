@@ -108,6 +108,7 @@ public class NameTypeDesignationPresenter
 
         CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getTypeStatusSelect().setContainerDataSource(selectFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
+        getView().getTypeStatusSelect().setItemCaptionPropertyId("description");
 
         getView().getCitationCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());

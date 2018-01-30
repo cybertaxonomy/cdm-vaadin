@@ -31,4 +31,8 @@ public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeD
 
     ToOneRelatedEntityCombobox<TaxonName> getTypeNameField();
 
+    void setShowTypeFlags(boolean showTypeFlags);
+
+    boolean isShowTypeFlags();
+
 }
