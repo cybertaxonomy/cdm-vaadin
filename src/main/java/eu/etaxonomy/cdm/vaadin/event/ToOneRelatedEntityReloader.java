@@ -8,17 +8,19 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
-import org.vaadin.viritin.fields.LazyComboBox;
-
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.ui.Field;
 
-import eu.etaxonomy.cdm.cache.EntityCache;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
+import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 
 /**
+ * The <code>ToOneRelatedEntityReloader</code> helps avoiding <i>java.lang.IllegalStateException: Multiple representations of the same entity</i>
+ * in Hibernate sessions.
+ *
  *
  * @author a.kohlbecker
  * @since 19.10.2017
@@ -28,11 +30,13 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
 
     private static final long serialVersionUID = -1141764783149024788L;
 
-    LazyComboBox<CDM>  toOneRelatedEntityField;
+    Field<CDM>  toOneRelatedEntityField;
 
     CachingPresenter cachingPresenter;
 
-    public ToOneRelatedEntityReloader( LazyComboBox<CDM> toOneRelatedEntityField, CachingPresenter entityCache){
+    boolean onSettingReloadedEntity;
+
+    public ToOneRelatedEntityReloader( Field<CDM> toOneRelatedEntityField, CachingPresenter entityCache){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
         this.cachingPresenter = entityCache;
     }
@@ -43,26 +47,43 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
     @Override
     public void valueChange(ValueChangeEvent event) {
 
+        // TODO during the view intitialization this method is called twice with the same value.
+        // for faster view initialization it might make sense to reduce this to only one call.
+        // only one call should be sufficient since the same value object is use in both calls
+        // whereas i observed that it is a hibnerate proxy during the first call,
+        // the second time it is the de-proxied entity which was during the first call inside the proxy.
+        // Since both cdm enties are the same object
+        // a reduction to one call should not break anything, but at least one call during the initialization
+        // is required!
 
+        if(onSettingReloadedEntity){
+            // avoid potential loops caused by setValue() below
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
         CDM value = (CDM)event.getProperty().getValue();
         if(value == null) {
             return;
         }
         value = HibernateProxyHelper.deproxy(value);
 
-        EntityCache cache = cachingPresenter.getCache();
+        ICdmCacher cache = cachingPresenter.getCache();
         if(cache != null){
-            cache.update();
-            CDM cachedEntity = cache.find(value);
-            if(cachedEntity == null){
-                cache.add(value);
-            } else if(cachedEntity != value){
-                toOneRelatedEntityField.removeValueChangeListener(this);
-                toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
-                toOneRelatedEntityField.setValue(cachedEntity);
-                toOneRelatedEntityField.addValueChangeListener(this);
-
+            CDM cachedEntity = (CDM) cache.load(value);
+            // cachingPresenter.addRootEntity(cachedEntity);
+            if(// pure object comparison is not reliable since the entity may have been changed
+                cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
+                ){
+                    onSettingReloadedEntity = true;
+                    toOneRelatedEntityField.removeValueChangeListener(this);
+                    toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
+                    toOneRelatedEntityField.setValue(cachedEntity);
+                    toOneRelatedEntityField.addValueChangeListener(this);
+                    onSettingReloadedEntity = false;
             }
+        } else {
+            throw new RuntimeException("The cache must not be null. See loadBeanById() in AbstractCdmEditorPresenter");
         }
     }
 

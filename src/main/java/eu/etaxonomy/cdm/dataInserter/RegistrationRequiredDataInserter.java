@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.Partial;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -154,6 +155,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TAXONNAME, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TEAMORPERSONBASE, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REFERENCE, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
@@ -236,7 +238,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         if(wipeoutCmd != null && wipeoutCmd.matches("iapt|all")){
 
             boolean onlyIapt = wipeoutCmd.equals("iapt");
-            List<UUID> deleteCandidates = new ArrayList<UUID>();
+            Set<UUID> deleteCandidates = new HashSet<UUID>();
 
             TransactionStatus tx = repo.startTransaction(true);
             List<Registration> allRegs = repo.getRegistrationService().list(null, null, null, null, null);
@@ -245,16 +247,27 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                     try {
                         @SuppressWarnings("unchecked")
                         Set<String> extensions = reg.getName().getExtensions(getExtensionTypeIAPTRegData());
-                        deleteCandidates.add(reg.getUuid());
+                        if(reg.getUuid() != null){
+                            deleteCandidates.add(reg.getUuid());
+                        }
                     } catch(NullPointerException e){
                         // IGNORE
                     }
                 } else {
-                    deleteCandidates.add(reg.getUuid());
+                    if(reg.getUuid() != null){
+                        deleteCandidates.add(reg.getUuid());
+                    }
                 }
             }
             repo.commitTransaction(tx);
-            repo.getRegistrationService().delete(deleteCandidates);
+            if(!deleteCandidates.isEmpty()){
+                try {
+                    repo.getRegistrationService().delete(deleteCandidates);
+                } catch (Exception e) {
+                    // MySQLIntegrityConstraintViolationException happens here every second run !!!
+                    logger.error(e);
+                }
+            }
         }
 
         // ============ CREATE
@@ -273,12 +286,17 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                 List<Registration> newRegs = new ArrayList<>(pager.getRecords().size());
                 for(TaxonName name : pager.getRecords()){
 
+
+
                     Set<String> extensionValues = name.getExtensions(getExtensionTypeIAPTRegData());
 
                     // there is for sure only one
                     if(extensionValues.isEmpty()){
                         continue;
                     }
+
+                    logger.debug("IAPT Registration for " + name.getTitleCache() + " ...");
+
                     String iaptJson = extensionValues.iterator().next();
                     try {
 
@@ -311,7 +329,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         reg.setSpecificIdentifier(iaptData.getRegId().toString());
                         reg.setInstitution(getInstitution(iaptData.getOffice()));
 
-                        boolean isPhycobankID = false; // Integer.valueOf(reg.getSpecificIdentifier()) >= 100000;
+                        boolean isPhycobankID = Integer.valueOf(reg.getSpecificIdentifier()) >= 100000;
 
                         Partial youngestDate = null;
                         Reference youngestPub = null;
@@ -331,10 +349,12 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                                         continue;
                                     }
                                     Partial pubdate = partial(td.getCitation().getDatePublished());
-                                        if(youngestDate.compareTo(pubdate) < 0){
+                                    if(pubdate != null){
+                                        if(youngestDate== null || comparePartials(youngestDate, pubdate)){
                                             youngestDate = pubdate;
                                             youngestPub = td.getCitation();
                                         }
+                                    }
                                 }
                             }
                         }
@@ -361,7 +381,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                             reg.setTypeDesignations(typeDesignations);
                         }
                         reg.setRegistrationDate(regDate);
-                        logger.debug("IAPT Registration for " + name.getTitleCache());
                         newRegs.add(reg);
 
                     } catch (JsonParseException e) {
@@ -380,6 +399,28 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             }
             repo.commitTransaction(tx);
         }
+    }
+
+
+    /**
+     * @param youngestDate
+     * @param pubdate
+     * @return
+     */
+    protected boolean comparePartials(Partial youngestDate, Partial pubdate) {
+
+        if(youngestDate.size() == pubdate.size()) {
+            return youngestDate.compareTo(pubdate) < 0;
+        }
+        youngestDate = youngestDate.without(DateTimeFieldType.dayOfMonth());
+        pubdate = pubdate.without(DateTimeFieldType.dayOfMonth());
+        if(youngestDate.size() == pubdate.size()) {
+            return youngestDate.compareTo(pubdate) < 0;
+        }
+        youngestDate = youngestDate.without(DateTimeFieldType.monthOfYear());
+        pubdate = pubdate.without(DateTimeFieldType.monthOfYear());
+        return youngestDate.compareTo(pubdate) < 0;
+
     }
 
 

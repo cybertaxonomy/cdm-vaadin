@@ -98,4 +98,17 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
         getPresenter().setGrantsForCurrentUser(crud);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        getFieldLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
+    }
+
+
+
+
+
 }

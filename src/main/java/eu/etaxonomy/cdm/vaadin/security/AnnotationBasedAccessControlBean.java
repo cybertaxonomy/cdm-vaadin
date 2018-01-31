@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.security;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,8 +27,9 @@ import com.vaadin.ui.UI;
  *
  * FIMXE consider renaming this class and its interface, since it is no longer annotation based!!!!
  */
-public class AnnotationBasedAccessControlBean implements ViewInstanceAccessControl {
+public class AnnotationBasedAccessControlBean implements ViewInstanceAccessControl, Serializable {
 
+    private static final long serialVersionUID = -4232241572782673248L;
 
     private final static Logger logger = Logger.getLogger(AnnotationBasedAccessControlBean.class);
 

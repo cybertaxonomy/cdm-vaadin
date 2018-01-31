@@ -25,11 +25,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 
 /**
  * @author a.kohlbecker
@@ -89,7 +89,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
 
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> eventBus.publishEvent(
-                new ReferenceEditorAction(Action.ADD, newPublicationButton)
+                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton)
                 ));
         newPublicationButton.setCaption("New");
         newPublicationButton.setWidth(ELEMENT_WIDTH);
@@ -101,7 +101,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> eventBus.publishEvent(
-                new ReferenceEditorAction(Action.REMOVE, removeNewPublicationButton)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton)
                 ));
 
         removeNewPublicationButton.setVisible(false);
@@ -134,7 +134,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
                 refId = referenceCombobox.getValue().getId();
             }
             eventBus.publishEvent(
-                new RegistrationEditorAction(Action.ADD,
+                new RegistrationEditorAction(EditorActionType.ADD,
                         // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
                         refId,
                         continueButton,

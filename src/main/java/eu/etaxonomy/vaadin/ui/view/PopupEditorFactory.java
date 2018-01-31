@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.vaadin.ui.view;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,7 +28,9 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -42,8 +45,10 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @UIScope
-public class PopupEditorFactory {
+public class PopupEditorFactory implements Serializable {
 
+
+    private static final long serialVersionUID = -3371003970671610677L;
 
     @Autowired
     protected ApplicationEventPublisher eventBus;
@@ -65,6 +70,9 @@ public class PopupEditorFactory {
     private ISpecimenTypeDesignationWorkingSetService specimenTypeDesignationWorkingSetService;
 
     @Autowired
+    private IRegistrationWorkingSetService registrationWorkingSetService;
+
+    @Autowired
     @Lazy
     private NavigationManager navigationManager;
 
@@ -75,6 +83,8 @@ public class PopupEditorFactory {
     private Field viewEventBusField;
     private Field specimenTypeDesignationWorkingSetServiceField;
     private Method viewInjectPresenterMethod;
+
+    private Field Field;
 
     private Method viewInitMethod;
 
@@ -109,6 +119,9 @@ public class PopupEditorFactory {
 
             specimenTypeDesignationWorkingSetServiceField = SpecimenTypeDesignationWorkingsetEditorPresenter.class.getDeclaredField("specimenTypeDesignationWorkingSetService");
             specimenTypeDesignationWorkingSetServiceField.setAccessible(true);
+
+            Field = NameTypeDesignationPresenter.class.getDeclaredField("registrationWorkingSetService");
+            Field.setAccessible(true);
 
         } catch (NoSuchFieldException | SecurityException | NoSuchMethodException  e) {
             throw new RuntimeException("Severe error during initialization. Please check the classes AbstractPresenter, AbstractEditorPresenter, AbstractView for modificactions.", e);
@@ -163,6 +176,9 @@ public class PopupEditorFactory {
         }
         if(SpecimenTypeDesignationWorkingsetEditorPresenter.class.equals(presenterClass)){
             specimenTypeDesignationWorkingSetServiceField.set(presenter, specimenTypeDesignationWorkingSetService);
+        }
+        if(NameTypeDesignationPresenter.class.equals(presenterClass)){
+            Field.set(presenter, registrationWorkingSetService);
         }
     }
 

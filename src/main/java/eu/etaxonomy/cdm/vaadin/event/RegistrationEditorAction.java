@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -21,7 +22,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
     /**
      * @param eventType
      */
-    public RegistrationEditorAction(Action type) {
+    public RegistrationEditorAction(EditorActionType type) {
         super(type);
     }
 
@@ -29,7 +30,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param edit
      * @param citationId
      */
-    public RegistrationEditorAction(Action type, Integer enitityId) {
+    public RegistrationEditorAction(EditorActionType type, Integer enitityId) {
         super(type, enitityId);
     }
 
@@ -37,7 +38,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param action
      * @param source
      */
-    public RegistrationEditorAction(Action action, Component source) {
+    public RegistrationEditorAction(EditorActionType action, Component source) {
         super(action, source);
     }
 
@@ -47,7 +48,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public RegistrationEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+    public RegistrationEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
         super(action, entityId, source, sourceView);
     }
 
@@ -56,7 +57,7 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param entityId
      * @param source
      */
-    public RegistrationEditorAction(Action action, Integer entityId, Component source) {
+    public RegistrationEditorAction(EditorActionType action, Integer entityId, Component source) {
         super(action, entityId, source);
     }
 

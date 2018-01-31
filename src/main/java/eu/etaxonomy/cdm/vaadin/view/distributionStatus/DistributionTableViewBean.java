@@ -37,7 +37,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
@@ -166,13 +166,13 @@ public class DistributionTableViewBean
                     }
                 }
                 //popup window
-                final Window popup = new Window("Choose distribution status");
+                final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
                 termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
                 termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
                 if(presenceAbsenceTerm != null){
-                	termSelect.setNullSelectionItemId("[no status]");
+                	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
                 }else{
                     logger.debug("No distribution status exists yet for area");
                 }
@@ -258,7 +258,7 @@ public class DistributionTableViewBean
 
 		table.setVisibleColumns(columnList.toArray());
 		table.setColumnHeaders(columnList.toArray(string));
-		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, "Total amount of Taxa displayed: " + container.size());
+		table.setColumnFooter(CdmQueryFactory.TAXON_COLUMN, String.format(Messages.getLocalizedString(Messages.DistributionTableViewBean_TOTAL_TAXA), container.size()));
 
 //        gridcontainer = getPresenter().getAreaDistributionStatusContainer();
 //        if(gridcontainer==null){
@@ -331,7 +331,7 @@ public class DistributionTableViewBean
 	private void createEditClickListener(){
 		//details
 	    Button detailButton = toolbar.getDetailButton();
-		detailButton.setCaption(Messages.DistributionTableViewBean_TAXON_DETAILS);
+		detailButton.setCaption(Messages.getLocalizedString(Messages.DistributionTableViewBean_TAXON_DETAILS));
 		detailButton.addClickListener(event -> {
 				Object selectedItemId = DistributionTableViewBean.this.table.getValue();
 //				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
@@ -347,7 +347,7 @@ public class DistributionTableViewBean
 					getUI().addWindow(window);
 				}
 				else{
-					Notification.show(Messages.DistributionTableViewBean_SELECT_TAXON, Type.HUMANIZED_MESSAGE);
+					Notification.show(Messages.getLocalizedString(Messages.DistributionTableViewBean_SELECT_TAXON), Type.HUMANIZED_MESSAGE);
 				}
 			}
 		);
@@ -369,7 +369,7 @@ public class DistributionTableViewBean
         if(distributionStatusConfigWindow==null){
             distributionStatusConfigWindow = new DistributionStatusSettingsConfigWindow(this);
         }
-        Window window  = distributionStatusConfigWindow.createWindow(Messages.DistributionTableViewBean_STATUS);
+        Window window  = distributionStatusConfigWindow.createWindow(Messages.getLocalizedString(Messages.DistributionTableViewBean_STATUS));
         window.setWidth("25%"); //$NON-NLS-1$
         window.setHeight("60%"); //$NON-NLS-1$
         UI.getCurrent().addWindow(window);
@@ -383,7 +383,7 @@ public class DistributionTableViewBean
 		if(areaAndTaxonConfigWindow==null){
 			areaAndTaxonConfigWindow = new AreaAndTaxonSettingsConfigWindow(this);
 		}
-        Window window  = areaAndTaxonConfigWindow.createWindow(Messages.DistributionTableViewBean_AREAS_AND_TAXA);
+        Window window  = areaAndTaxonConfigWindow.createWindow(Messages.getLocalizedString(Messages.DistributionTableViewBean_AREAS_AND_TAXA));
         UI.getCurrent().addWindow(window);
 	}
 

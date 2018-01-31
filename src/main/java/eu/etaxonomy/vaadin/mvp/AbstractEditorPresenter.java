@@ -35,6 +35,8 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     @Autowired
     protected ApplicationEventPublisher eventBus;
 
+    protected BeanInstantiator<DTO> beanInstantiator = null;
+
     /**
      * Load the bean to be edited in the editor freshly from the persistent storage.
      * Ore create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
@@ -44,6 +46,12 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      */
     protected abstract DTO loadBeanById(Object identifier);
 
+    /**
+     * @param beanInstantiator the beanInstantiator to set
+     */
+    public void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
+        this.beanInstantiator = beanInstantiator;
+    }
 
     /**
      * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}

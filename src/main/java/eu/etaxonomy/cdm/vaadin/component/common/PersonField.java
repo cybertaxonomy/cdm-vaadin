@@ -8,16 +8,25 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
-import org.vaadin.teemu.switchui.Switch;
+import java.util.EnumSet;
+import java.util.List;
 
+import org.vaadin.teemu.switchui.Switch;
+import org.vaadin.viritin.fields.LazyComboBox;
+
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
@@ -33,6 +42,17 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private static final String PRIMARY_STYLE = "v-person-field";
 
+    /**
+     * do not allow entities which are having only <code>null</code> values in all fields
+     * {@link #getValue()} would return <code>null</code> in this case.
+     */
+    boolean allowNewEmptyEntity = true;
+
+    private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
+
+    private Button personSelectConfirmButton = new Button("OK");
+    private Button newPersonButton = new Button("New");
+
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
 
     enum Mode {
@@ -45,16 +65,22 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private Mode currentMode = null;
 
-    private float baseWidth = 100 / 8;
+    private float baseWidth = 100 / 9;
 
     private CssLayout root = new CssLayout();
-    private TextField cacheField = new TextField();
+    private CssLayout selectOrNewContainer = new CssLayout();
+
+    private TextField cacheField = new TextFieldNFix();
     private CssLayout detailsContainer = new CssLayout();
-    private TextField firstNameField = new TextField();
-    private TextField lastNameField = new TextField();
-    private TextField prefixField = new TextField();
-    private TextField suffixField = new TextField();
+    private TextField initialsField = new TextFieldNFix();
+    private TextField firstNameField = new TextFieldNFix();
+    private TextField lastNameField = new TextFieldNFix();
+    private TextField prefixField = new TextFieldNFix();
+    private TextField suffixField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
+
+    private boolean onCommit = false;
+
 
     /**
      * @param caption
@@ -72,7 +98,26 @@ public class PersonField extends CompositeCustomField<Person> {
 
         root.setPrimaryStyleName(PRIMARY_STYLE);
 
+        // select existing or create new person
+        addStyledComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        personSelect.addValueChangeListener(e -> {
+            if(personSelect.getValue() != null){
+                personSelectConfirmButton.setEnabled(true);
+            }
+        });
+        personSelectConfirmButton.setEnabled(false);
+        personSelectConfirmButton.addClickListener(e -> {
+            setValue(personSelect.getValue());
+            personSelect.clear();
+        });
+        selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        newPersonButton.addClickListener(e -> {
+            setValue(Person.NewInstance());
+        });
+
+        // edit person
         addStyledComponent(cacheField);
+        addStyledComponents(initialsField);
         addStyledComponent(firstNameField);
         addStyledComponent(lastNameField);
         addStyledComponent(prefixField);
@@ -80,7 +125,6 @@ public class PersonField extends CompositeCustomField<Person> {
         addStyledComponent(unlockSwitch);
 
         addSizedComponent(root);
-
     }
 
     /**
@@ -88,7 +132,8 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     private void checkUserPermissions(Person newValue) {
         boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        setEnabled(userCanEdit);
+        boolean isUnsavedEnitity = newValue.getId() == 0;
+        setEnabled(isUnsavedEnitity || userCanEdit);
     }
 
     private void setMode(Mode mode){
@@ -111,13 +156,20 @@ public class PersonField extends CompositeCustomField<Person> {
     @Override
     protected Component initContent() {
 
+        selectOrNewContainer.setWidth(100, Unit.PERCENTAGE);
+        personSelect.setWidthUndefined();
+
         root.addComponent(cacheField);
         root.addComponent(unlockSwitch);
+        root.addComponent(selectOrNewContainer);
 
         cacheField.setWidth(100, Unit.PERCENTAGE);
 
         prefixField.setWidth(baseWidth, Unit.PERCENTAGE);
         prefixField.setInputPrompt("Prefix");
+
+        initialsField.setWidth(baseWidth, Unit.PERCENTAGE);
+        initialsField.setInputPrompt("Initials");
 
         firstNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
         firstNameField.setInputPrompt("First Name");
@@ -130,6 +182,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
         detailsContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         detailsContainer.addComponent(prefixField);
+        detailsContainer.addComponent(initialsField);
         detailsContainer.addComponent(firstNameField);
         detailsContainer.addComponent(lastNameField);
         detailsContainer.addComponent(suffixField);
@@ -159,11 +212,14 @@ public class PersonField extends CompositeCustomField<Person> {
 
         fieldGroup.bind(cacheField, "titleCache");
         fieldGroup.bind(prefixField, "prefix");
+        fieldGroup.bind(initialsField, "initials");
         fieldGroup.bind(firstNameField, "firstname");
         fieldGroup.bind(lastNameField, "lastname");
         fieldGroup.bind(suffixField, "suffix");
         fieldGroup.bind(unlockSwitch, "protectedTitleCache");
         fieldGroup.setBuffered(false);
+
+        updateVisibilities(getValue());
 
         return root;
     }
@@ -189,6 +245,7 @@ public class PersonField extends CompositeCustomField<Person> {
     @Override
     public void setValue(Person person){
         super.setValue(person);
+        personSelect.setValue(person);
     }
 
     /**
@@ -196,9 +253,24 @@ public class PersonField extends CompositeCustomField<Person> {
      */
     @Override
     protected void setInternalValue(Person newValue) {
+
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(newValue);
         checkUserPermissions(newValue);
+        updateVisibilities(newValue);
+    }
+
+    /**
+     *
+     */
+    private void updateVisibilities(Person person) {
+
+        selectOrNewContainer.setVisible(person == null);
+
+        detailsContainer.setVisible(person != null);
+        unlockSwitch.setVisible(person != null);
+        cacheField.setVisible(person != null);
+
     }
 
     @Override
@@ -215,4 +287,91 @@ public class PersonField extends CompositeCustomField<Person> {
     public FieldGroup getFieldGroup() {
         return fieldGroup;
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<Field> nullValueCheckIgnoreFields() {
+
+        List<Field>ignoreFields = super.nullValueCheckIgnoreFields();
+        ignoreFields.add(unlockSwitch);
+
+        if(unlockSwitch.getValue().booleanValue() == false){
+            if(getValue().getId() == 0){
+                // only it the entity is unsaved!
+                ignoreFields.add(cacheField);
+                cacheField.setValue(null);
+            }
+        }
+        return ignoreFields;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+
+        super.commit();
+
+        Person bean =  getValue();
+        if(bean != null){
+            boolean isUnsaved = bean.getId() == 0;
+            if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
+                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return returns <code>null</code> in case the edited entity is unsaved and if
+     * it only has null values.
+     */
+    @Override
+    public Person getValue() {
+        Person bean = super.getValue();
+        if(bean == null){
+            return null;
+        }
+       // boolean isUnsaved = bean.getId() == 0;
+//        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
+//            return null;
+//        }
+        return bean;
+    }
+
+    /**
+     * @return the personSelect
+     */
+    public LazyComboBox<Person> getPersonSelect() {
+        return personSelect;
+    }
+
+    /**
+     * @param personSelect the personSelect to set
+     */
+    public void setPersonSelect(LazyComboBox<Person> personSelect) {
+        this.personSelect = personSelect;
+    }
+
+    /**
+     * @return the allowNewEmptyEntity
+     */
+    public boolean isAllowNewEmptyEntity() {
+        return allowNewEmptyEntity;
+    }
+
+    /**
+     * @param allowNewEmptyEntity the allowNewEmptyEntity to set
+     */
+    public void setAllowNewEmptyEntity(boolean allowNewEmptyEntity) {
+        this.allowNewEmptyEntity = allowNewEmptyEntity;
+    }
+
+
+
 }

@@ -17,6 +17,7 @@ import eu.etaxonomy.cdm.vaadin.design.registration.WorkflowItemDesign;
  * @since Mar 10, 2017
  *
  */
+@Deprecated // FIXME delete also all css styles if any
 public class WorkflowBulletItem extends WorkflowItemDesign {
 
     private static final long serialVersionUID = -6825656185698773467L;

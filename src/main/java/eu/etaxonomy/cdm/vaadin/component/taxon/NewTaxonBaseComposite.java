@@ -32,6 +32,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.component.CdmProgressComponent;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent.Action;
@@ -317,7 +318,7 @@ public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonB
         gridLayout.setComponentAlignment(nameLabel, new Alignment(34));
 
         // nameTextField
-        nameTextField = new TextField();
+        nameTextField = new TextFieldNFix();
         nameTextField.setImmediate(false);
         nameTextField.setWidth("190px");
         nameTextField.setHeight("-1px");

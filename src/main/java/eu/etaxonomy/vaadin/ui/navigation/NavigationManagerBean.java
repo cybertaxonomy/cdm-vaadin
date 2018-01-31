@@ -29,6 +29,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
@@ -50,7 +51,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	private SpringViewProvider viewProvider;
 
 	@Autowired
-	private ViewChangeListener viewChangeListener;
+	private List<ViewChangeListener> viewChangeListeners;
 
 	@Autowired
 	private PojoEventListenerManager eventListenerManager;
@@ -114,7 +115,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	@EventListener
 	protected void onUIInitialized(UIInitializedEvent e) {
 		init(UI.getCurrent(), uriFragmentManager, viewDisplay);
-		addViewChangeListener(viewChangeListener);
+		viewChangeListeners.forEach(vcl -> addViewChangeListener(vcl));
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
@@ -172,6 +173,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		UI.getCurrent().addWindow(window);
 		popupView.viewEntered();
 		popupView.focusFirst();
+		eventBus.publishEvent(new PopEditorOpenedEvent(this, popupView));
 
 		popupMap.put(popupView, window);
 

@@ -10,7 +10,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Tree;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.description.CategoricalData;
@@ -44,7 +44,7 @@ public class DetailWindow extends CustomComponent{
 		window.setCaption(taxon.getName().getTitleCache());
 		window.setCloseShortcut(KeyCode.W, ModifierKey.CTRL);
 		if(listDescriptions.isEmpty()){
-			window.setContent(new Label(Messages.DetailWindow_NO_DESCRIPTIVE_DATA_FOUND));
+			window.setContent(new Label(Messages.getLocalizedString(Messages.DetailWindow_NO_DESCRIPTIVE_DATA_FOUND)));
 		}
 		else{
 			window.setContent(constructDescriptionTree(taxon));

@@ -8,8 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -20,13 +20,16 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -47,6 +50,10 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private ListSelect typeSelect;
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
+
+    private TeamOrPersonField authorshipField;
+
+    private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
 
     /**
      * @param layout
@@ -89,7 +96,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         "inReference"
          */
         int row = 0;
-        typeSelect = new ListSelect("Reference type", Arrays.asList(ReferenceType.values()));
+        typeSelect = new ListSelect("Reference type");
+        typeSelect.addItems(referenceTypes);
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
         typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
@@ -105,9 +113,9 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        addTextField("NomenclaturalTitle", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Nomenclatural title", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        TeamOrPersonField authorshipField = new TeamOrPersonField("Author(s)");
+        authorshipField = new TeamOrPersonField("Author(s)");
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, 3, row);
         row++;
@@ -120,13 +128,13 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
         inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
         inReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
-                new ReferenceEditorAction(AbstractEditorAction.Action.ADD, null, inReferenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.ADD, null, inReferenceCombobox, this)
                 ));
         inReferenceCombobox.addClickListenerEditEntity(e -> {
             if(inReferenceCombobox.getValue() != null){
                 getEventBus().publishEvent(
                     new ReferenceEditorAction(
-                            AbstractEditorAction.Action.EDIT,
+                            EditorActionType.EDIT,
                             inReferenceCombobox.getValue().getId(),
                             inReferenceCombobox,
                             this)
@@ -143,8 +151,12 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         row++;
         addTextField("ISSN", "issn", 0, row);
         addTextField("ISBN", "isbn", 1, row);
-        addTextField("DOI", "doi", 2, row);
-        addTextField("Uri", "uri", 3, row);
+        TextFieldNFix doiField = new TextFieldNFix("DOI");
+        doiField.setConverter(new DoiConverter());
+        addField(doiField, "doi", 2, row);
+        TextFieldNFix uriField = new TextFieldNFix("Uri");
+        uriField.setConverter(new UriConverter());
+        addField(uriField, "uri", 3, row);
 
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
@@ -171,6 +183,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
         getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
         getField("pages").setVisible(value.isSection());
+
+        EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
+        EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
+        getField("abbrevTitle").setVisible(!hideNomTitle.contains(value));
+        getField("title").setVisible(!hideTitle.contains(value));
 
         return null;
     }
@@ -235,5 +252,22 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
         return inReferenceCombobox;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TeamOrPersonField getAuthorshipField() {
+        return authorshipField;
+    }
+
+    public void withReferenceTypes(EnumSet<ReferenceType> types){
+        this.referenceTypes = types;
+        if(typeSelect != null){
+            typeSelect.removeAllItems();
+            typeSelect.addItems(referenceTypes);
+        }
+    }
+
 
 }

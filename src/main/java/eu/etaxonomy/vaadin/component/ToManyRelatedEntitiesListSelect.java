@@ -9,29 +9,34 @@
 package eu.etaxonomy.vaadin.component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.event.EditorActionType;
+import eu.etaxonomy.vaadin.event.EntityEditorActionEvent;
+import eu.etaxonomy.vaadin.event.EntityEditorActionListener;
+import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
  * Manages the a collection of items internally as LinkedList<V>. If the Collection to operate on is a Set a Converter must be
- * set. THe internally used fields are used in un-buffered mode.
+ * set. Internally used fields are used in un-buffered mode. The actual instances of the field type <code>F</code> to be used to
+ * edit or select the entities is created by a implementation of the <code>EntityFieldInstantiator</code>,
+ * see {@link #setEntityFieldInstantiator(EntityFieldInstantiator).
  *
  * @author a.kohlbecker
  * @since May 11, 2017
@@ -49,32 +54,38 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private FieldGroup parentFieldGroup = null;
 
+    private Boolean valueInitiallyWasNull = null;
+
     protected boolean isOrderedCollection = false;
 
+    /**
+     * with a button to edit existing and to add new entities
+     */
     private boolean withEditButton = false;
-
-    private static final int GRID_X_FIELD = 0;
 
     protected boolean addEmptyRowOnInitContent = true;
 
-    //NOTE: Managing the item
-    //      IDs makes BeanContainer more complex to use, but it is necessary in some cases where the
-    //      equals() or hashCode() methods have been re-implemented in the bean.
-    //      TODO CdmBase has a re-implemented equals method, do we need to use the BeanContainer instead?
-    private BeanItemContainer<V> beans;
+    private EntityFieldInstantiator<F> entityFieldInstantiator;
 
-   //private LinkedList<V> itemList = new LinkedList<>();
+    private EditPermissionTester editPermissionTester;
+
+    private EntityEditorActionListener editActionListener;
+
+    /**
+     * X index of the data field in the grid
+     */
+    private static final int GRID_X_FIELD = 0;
 
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
 
+    private boolean creatingFields;
+
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
         this.itemType = itemType;
         setCaption(caption);
-        beans = new BeanItemContainer<V>(itemType);
-
     }
 
     /**
@@ -98,10 +109,20 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     private void addRowAfter(F field) {
 
+        List<V> nestedValues = getValueFromNestedFields();
+
+        if(isOrderedCollection){
+
+        } else {
+
+        }
+
         Integer row = findRow(field);
 
         grid.insertRow(row + 1);
 
+        // setting null as value for new rows
+        // see newFieldInstance() !!!
         addNewRow(row + 1, null);
         updateValue();
 
@@ -115,6 +136,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         Integer row = findRow(field);
         grid.removeRow(row);
+        // TODO remove from nested fields
         updateValue();
         updateButtonStates();
 
@@ -155,36 +177,14 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
-     *
+     * update Value is only called in turn of UI changes like adding, removing, swapping rows
      */
-    protected void updateValue() {
-        try {
-            setValue(getValueFromNestedFields());
-        } catch (ReadOnlyException e){
-            logger.debug("datasource is readonly, only internal value was updated");
-        }
-    }
-
-    /**
-     * @param field
-     * @return
-     */
-    protected ClickListener newEditButtonClicklistener(F field) {
-        return null;
-    }
-
-    /**
-     * @return
-     */
-    protected ClickListener newAddButtonClicklistener(F field) {
-        return null;
-    }
-
-    /**
-     * @return
-     */
-    protected ClickListener newRemoveButtonClicklistener(F field) {
-        return null;
+    private void updateValue() {
+        List<V> nestedValues = getValueFromNestedFields();
+        List<V> beanList = getValue();
+        beanList.clear();
+        beanList.addAll(nestedValues);
+        setInternalValue(beanList, false);
     }
 
     /**
@@ -216,47 +216,101 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     protected void setInternalValue(List<V> newValue) {
 
-         grid.removeAllComponents();
-         grid.setRows(1);
+        setInternalValue(newValue, true);
 
-        if(newValue != null){
-            // FIMXE is it really needed to backup as linked list?
-            LinkedList<V> linkedList;
-            if(newValue instanceof LinkedList){
-                linkedList = (LinkedList<V>) newValue;
-            } else {
-                linkedList = new LinkedList<>(newValue);
-            }
-            super.setInternalValue(linkedList);
+    }
 
-            // newValue is already converted, need to use the original value from the data source
-            isOrderedCollection = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+    protected void setInternalValue(List<V> newValue, boolean doUpdateFields) {
 
-            //FIXME is beans really used?
-            beans.addAll(linkedList);
+        super.setInternalValue(newValue);
 
-            int row = 0;
-            if(newValue.size() > 0){
-                for(V val : linkedList){
-                    row = addNewRow(row, val);
-                }
-            }
+        if(valueInitiallyWasNull == null){
+            valueInitiallyWasNull = newValue == null;
         }
 
-        if(newValue == null || newValue.isEmpty()) {
-            // add an empty row
-            addNewRow(0, null);
+        if(newValue != null){
+            // newValue is already converted, need to use the original value from the data source
+            boolean isListType = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+            if(valueInitiallyWasNull && isOrderedCollection != isListType){
+                // need to reset the grid in this case, so that the button groups are created correctly
+                grid.setRows(1);
+                grid.removeAllComponents();
+            }
+            isOrderedCollection = isListType;
+        }
+
+        if(!creatingFields){
+            createFieldsForData();
         }
     }
 
+    private void createFieldsForData(){
+
+        creatingFields = true;
+        List<V> data = getValue();
+        if(data == null || data.isEmpty()){
+            data = Arrays.asList((V)null);
+        }
+        for(int row = 0; row < data.size(); row++){
+            boolean newRowNeeded = true;
+            if(grid.getRows() > row){
+                Component fieldComponent = grid.getComponent(GRID_X_FIELD, row);
+                if(fieldComponent != null){
+                    newRowNeeded = false;
+                    F field = (F)fieldComponent;
+                    if(data.get(row) != null && field.getValue() != data.get(row)){
+                        field.setValue(data.get(row));
+                    }
+                }
+            }
+            if(newRowNeeded){
+                addNewRow(row, data.get(row));
+            }
+        }
+        creatingFields = false;
+    }
+
     /**
-     * @param row
+     * Obtains the List of values directly from the nested fields and ignores the
+     * value of the <code>propertyDataSource</code>. This is useful when the ToManyRelatedEntitiesListSelect
+     * is operating on a transient field, in which case the property is considered being read only by vaadin
+     * so that the commit is doing nothing.
+     *
+     * See also {@link AbstractCdmEditorPresenter#handleTransientProperties(DTO bean)}
+     *
+     * @return
+     */
+    public List<V> getValueFromNestedFields() {
+        List<V> nestedValues = new ArrayList<>();
+        for(F f : getNestedFields()) {
+            logger.trace(
+                    String.format("getValueFromNestedFields() - %s:%s",
+                       f != null ? f.getClass().getSimpleName() : "null",
+                       f != null && f.getValue() != null ? f.getValue() : "null"
+            ));
+            V value = f.getValue();
+            if(f != null /*&& value != null*/){
+                nestedValues.add(f.getValue());
+            }
+         }
+        return nestedValues;
+    }
+
+    /**
+     * @param row the row index, starting from 0.
      * @param val
      * @return
      */
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            field.addValueChangeListener(e -> {
+                updateValue();
+            });
+            Property ds = getPropertyDataSource();
+            if(ds != null){
+                Object parentVal = ds.getValue();
+            }
             addStyledComponent(field);
 
             // important! all fields must be un-buffered
@@ -289,10 +343,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         if(withEditButton){
             Button edit = new Button(FontAwesome.EDIT);
-            ClickListener editClickListerner = newEditButtonClicklistener(field);
-            if(editClickListerner != null){
-                edit.addClickListener(editClickListerner);
-            }
+            edit.addClickListener(e -> editOrCreate(field));
             buttonGroup.addComponent(edit);
             addStyledComponents(edit);
         }
@@ -321,6 +372,26 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return buttonGroup;
     }
 
+    /**
+     * @param e
+     * @return
+     */
+    private void editOrCreate(F field) {
+
+        if(editActionListener == null){
+            throw new RuntimeException("editActionListener missing");
+        }
+
+        if(field.getValue() == null){
+            // create
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.ADD, null, field));
+        } else {
+            // edit
+            V value = field.getValue();
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
+        }
+    }
+
     private void updateButtonStates(){
 
         int fieldsCount = getNestedFields().size();
@@ -329,23 +400,45 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             boolean isFirst = row == 0;
             boolean isLast = row == fieldsCount - 1;
 
+            F field = (F) grid.getComponent(GRID_X_FIELD, row);
             CssLayout buttonGroup = (CssLayout) grid.getComponent(GRID_X_FIELD + 1, row);
 
-            // add
-            buttonGroup.getComponent(0).setEnabled(isLast || isOrderedCollection);
-            // remove
-            buttonGroup.getComponent(1).setEnabled(!isFirst);
-            // up
-            if(buttonGroup.getComponentCount() > 2){
-                buttonGroup.getComponent(2).setEnabled(!isFirst);
-                // down
-                buttonGroup.getComponent(3).setEnabled(!isLast);
+            int addButtonIndex = 0;
+            if(withEditButton){
+                addButtonIndex++;
+                // edit
+                ((Button)buttonGroup.getComponent(0)).setDescription(field.getValue() == null ? "New" : "Edit");
+                buttonGroup.getComponent(0).setEnabled(field.getValue() == null
+                        || field.getValue() != null && testEditButtonPermission(field.getValue()));
             }
+            // add
+            buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
+            // remove
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(fieldsCount > 1);
+            // up
+            if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
+                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
+                // down
+                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);
+            }
+        }
+    }
+
+    /**
+     * @param field
+     * @return
+     */
+    protected boolean testEditButtonPermission(Object rowValue) {
+        if(editPermissionTester != null) {
+            return editPermissionTester.userHasEditPermission(rowValue);
+        } else {
+            return true;
         }
     }
 
 
     protected List<F> getNestedFields(){
+
         List<F> nestedFields = new ArrayList<>(grid.getRows());
         for(int r = 0; r < grid.getRows(); r++){
             F f = (F) grid.getComponent(GRID_X_FIELD, r);
@@ -366,9 +459,21 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * @throws IllegalAccessException
      */
     protected F newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
-        F field = fieldType.newInstance();
+
+        F field;
+        if(entityFieldInstantiator != null){
+            field = entityFieldInstantiator.createNewInstance();
+        } else {
+            field = fieldType.newInstance();
+        }
+
         field.setWidth(100, Unit.PERCENTAGE);
         field.setValue(val);
+
+        // TODO
+        // when passing null as value the field must take care of creating a new
+        // instance by overriding setValue() in future we could improve this by passing a
+        // NewInstanceFactory to this class
         return field;
     }
 
@@ -420,33 +525,33 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     @Override
     public void commit() throws SourceException, InvalidValueException {
-        getNestedFields().forEach(f -> f.commit());
+
+        List<F> nestedFields = getNestedFields();
+        for(F f : nestedFields){
+            f.commit();
+
+        }
+        /*
+        List<V> list = (List<V>) getPropertyDataSource().getValue();
+
+        Person p = Person.NewInstance();
+        p.setTitleCache("Hacky", true);
+        list.add((V) p);
+
+        List<V> clonedList = new ArrayList<>(list);
+        list.clear();
+        for(V value : clonedList){
+            if(value != null){
+                list.add(value);
+            }
+        }
+        //
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
-    }
-
-    /**
-     * Obtains the List of values directly from the nested fields and ignores the
-     * value of the <code>propertyDataSource</code>. This is useful when the ToManyRelatedEntitiesListSelect
-     * is operating on a transient field, in which case the property is considered being read only by vaadin
-     * so that the commit is doing nothing.
-     *
-     * See also {@link AbstractCdmEditorPresenter#handleTransientProperties(DTO bean)}
-     *
-     * @return
-     */
-    public List<V> getValueFromNestedFields() {
-        List<V> nestedValues = new ArrayList<>();
-        getNestedFields().forEach(f -> {
-                logger.trace(String.format("getValueFromNestedFields() - %s:%s",
-                       f != null ? f.getClass().getSimpleName() : "null",
-                       f != null ? f.getValue() : "null"
-                ));
-                if(f != null){
-                    nestedValues.add(f.getValue());
-                }
-            });
-        return nestedValues;
+        if(getValue().isEmpty() && valueInitiallyWasNull){
+            setPropertyDataSource(null);
+        }
+         */
     }
 
     /**
@@ -474,8 +579,81 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // no default styles
     }
 
+
+    /**
+     * with a button edit existing and to add new entities
+     */
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNullContent() {
+
+        for(Field f : getNestedFields()){
+            if(f instanceof CompositeCustomField){
+                if(!((CompositeCustomField)f).hasNullContent()){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @return the enityFieldInstantiator
+     */
+    public EntityFieldInstantiator<F> getEntityFieldInstantiator() {
+        return entityFieldInstantiator;
+    }
+
+    /**
+     * @param enityFieldInstantiator the enityFieldInstantiator to set
+     */
+    public void setEntityFieldInstantiator(EntityFieldInstantiator<F> entityFieldInstantiator) {
+        this.entityFieldInstantiator = entityFieldInstantiator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, getContent());
+        updateButtonStates();
+    }
+
+    /**
+     * @return the editPermissionTester
+     */
+    public EditPermissionTester getEditPermissionTester() {
+        return editPermissionTester;
+    }
+
+    /**
+     * @param editPermissionTester the editPermissionTester to set
+     */
+    public void setEditPermissionTester(EditPermissionTester editPermissionTester) {
+        this.editPermissionTester = editPermissionTester;
+    }
+
+    /**
+     * @return the editActionListener
+     */
+    public EntityEditorActionListener getEditActionListener() {
+        return editActionListener;
+    }
+
+    /**
+     * @param editActionListener the editActionListener to set
+     */
+    public void setEditActionListener(EntityEditorActionListener editActionListener) {
+        this.editActionListener = editActionListener;
+    }
+
 
 }

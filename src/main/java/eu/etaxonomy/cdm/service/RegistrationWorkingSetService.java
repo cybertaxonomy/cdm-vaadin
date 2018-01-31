@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.api.service.pager.impl.DefaultPagerImpl;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -56,7 +57,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "typeDesignations.typeStatus",
             "typeDesignations.typifiedNames.typeDesignations", // important !!
             "typeDesignations.typeSpecimen",
-            "typeDesignations.typeName",
+            "typeDesignations.typeName.$",
             "typeDesignations.citation",
             "typeDesignations.citation.authorship.$",
             // name
@@ -64,6 +65,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "name.nomenclaturalReference.authorship",
             "name.nomenclaturalReference.inReference",
             "name.rank",
+            "name.homotypicalGroup.typifiedNames",
             "name.status.type",
             "name.typeDesignations", // important !!"
             // institution
@@ -77,7 +79,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
    private  List<String> DERIVEDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
            "*", // initialize all related entities to allow DerivedUnit conversion, see DerivedUnitConverter.copyPropertiesTo()
            "derivedFrom.$",
-           "derivedFrom.type",
+           "derivedFrom.type", // TODO remove?
            "derivedFrom.originals.derivationEvents", // important!!
            "specimenTypeDesignations.typifiedNames.typeDesignations", // important!!
            "mediaSpecimen.sources"
@@ -91,7 +93,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
           "gatheringEvent.$",
           "gatheringEvent.country",
           "gatheringEvent.collectingAreas",
-          "gatheringEvent.actor",
+          "gatheringEvent.actor.teamMembers",
           "derivationEvents.derivatives" // important, otherwise the DerivedUnits are not included into the graph of initialized entities!!!
   });
 
@@ -120,30 +122,36 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
     @Override
     public RegistrationDTO loadDtoById(Integer id) {
-        Registration reg = repo.getRegistrationService().find(id);
+        Registration reg = repo.getRegistrationService().load(id, REGISTRATION_INIT_STRATEGY);
         inititializeSpecimen(reg);
         return new RegistrationDTO(reg);
     }
 
 
     @Override
-    public Collection<RegistrationDTO> listDTOs() {
+    public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex) {
 
-        List<Registration> regs = repo.getRegistrationService().list(null, PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
-
-        List<RegistrationDTO> dtos = makeDTOs(regs);
-        return dtos;
+        return pageDTOs(null, null, null, null, pageSize, pageIndex);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Collection<RegistrationDTO> listDTOs(User submitter, Collection<RegistrationStatus> includedStatus) {
+    public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
+            String identifierFilterPattern, String taxonNameFilterPattern,
+            Integer pageSize, Integer pageIndex) {
 
-        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
+        if(pageSize == null){
+            pageSize = PAGE_SIZE;
+        }
+
+        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus,
+                identifierFilterPattern, taxonNameFilterPattern,
+                PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
         List<Registration> registrations = pager.getRecords();
-        return makeDTOs(registrations);
+        Pager<RegistrationDTO> dtoPager = new DefaultPagerImpl(pager.getCurrentIndex(), pager.getCount(), pager.getPageSize(), makeDTOs(registrations));
+        return dtoPager;
     }
 
     /**
@@ -192,7 +200,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                 DerivedUnit derivedUnit = ((SpecimenTypeDesignation) td).getTypeSpecimen();
                 @SuppressWarnings("rawtypes")
                 Set<SpecimenOrObservationBase> sobs = new HashSet<>();
-                sobs.add(derivedUnit);
+                sobs.add(HibernateProxyHelper.deproxy(derivedUnit));
 
                 while(sobs != null && !sobs.isEmpty()){
                     @SuppressWarnings("rawtypes")

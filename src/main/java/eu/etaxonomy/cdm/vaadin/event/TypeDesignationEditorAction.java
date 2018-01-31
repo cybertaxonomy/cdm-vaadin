@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import eu.etaxonomy.vaadin.event.EditorActionType;
+
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -15,7 +17,7 @@ package eu.etaxonomy.cdm.vaadin.event;
 public class TypeDesignationEditorAction extends AbstractEditorAction {
 
 
-    public TypeDesignationEditorAction(Action eventType) {
+    public TypeDesignationEditorAction(EditorActionType eventType) {
         super(eventType);
     }
 
@@ -23,7 +25,7 @@ public class TypeDesignationEditorAction extends AbstractEditorAction {
      * @param type
      * @param entityId
      */
-    public TypeDesignationEditorAction(Action type, Integer entityId) {
+    public TypeDesignationEditorAction(EditorActionType type, Integer entityId) {
         super(type, entityId);
     }
 

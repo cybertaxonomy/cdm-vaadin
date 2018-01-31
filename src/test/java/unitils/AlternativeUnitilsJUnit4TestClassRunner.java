@@ -8,11 +8,12 @@
 */
 package unitils;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.internal.runners.InitializationError;
 import org.junit.runner.notification.RunNotifier;
 import org.unitils.UnitilsJUnit4TestClassRunner;
-
-import eu.etaxonomy.cdm.addon.config.CdmVaadinConfiguration;
 
 /**
  * A runner which enables all vaadin UIs for the tests
@@ -36,8 +37,23 @@ public class AlternativeUnitilsJUnit4TestClassRunner extends UnitilsJUnit4TestCl
      */
     @Override
     public void run(RunNotifier notifier) {
-        System.setProperty(CdmVaadinConfiguration.CDM_VAADIN_UI_ACTIVATED, "concept,distribution,editstatus,registration");
+
+        loadSystemPropertiesFrom("spring-environment.mock.properties");
         super.run(notifier);
+    }
+
+    /**
+     * @param propFile
+     */
+    protected void loadSystemPropertiesFrom(String propFile) {
+        InputStream inStream = this.getClass().getClassLoader().getResourceAsStream(propFile);
+        //Properties props = new Properties();
+        try {
+            // props.load(inStream);
+            System.getProperties().load(inStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

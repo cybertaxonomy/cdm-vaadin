@@ -13,9 +13,12 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
-import com.vaadin.ui.Button.ClickListener;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 
 /**
+ * A ToManyRelatedEntitiesListSelect which uses a {@link LazyComboBox} as data field.
+ *
  * @author a.kohlbecker
  * @since Jun 7, 2017
  *
@@ -29,6 +32,8 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
     private Integer pageLength = null;
 
     private CaptionGenerator<V> captionGenerator;
+
+    private CachingPresenter cachingPresenter;
 
     /**
      * @param itemType
@@ -49,7 +54,11 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
      */
     @Override
     protected LazyComboBox<V> newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
+
+        // TODO use the setEntityFieldInstantiator(EntityFieldInstantiator) instead to inject as instantiator?
         LazyComboBox<V> field = new LazyComboBox<V>(itemType);
+        // FIXME using the ToOneRelatedEntityReloader created a dependency to the cdm packages, this should be relaxed!!!
+        field.addValueChangeListener(new ToOneRelatedEntityReloader(field, cachingPresenter));
 
         if(filterablePagingProvider == null || filterableCountProvider == null ||  pageLength == null) {
             throw new RuntimeException("The filterablePagingProvider, filterableCountProvider and pageLength must be set, use setPagingProviders().");
@@ -63,10 +72,12 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         return field;
     }
 
-    public void setPagingProviders(FilterablePagingProvider<V> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength){
+    public void setPagingProviders(FilterablePagingProvider<V> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength,
+            CachingPresenter cachingPresenter){
         this.filterablePagingProvider = filterablePagingProvider;
         this.filterableCountProvider = filterableCountProvider;
         this.pageLength = pageLength;
+        this.cachingPresenter = cachingPresenter;
         setInternalValue(null);
     }
 
@@ -76,35 +87,5 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
     public void setCaptionGenerator(CaptionGenerator<V> captionGenerator) {
         this.captionGenerator = captionGenerator;
     }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ClickListener newEditButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
-        return super.newEditButtonClicklistener(field);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ClickListener newAddButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
-        return super.newAddButtonClicklistener(field);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ClickListener newRemoveButtonClicklistener(LazyComboBox<V> field) {
-        // TODO Auto-generated method stub
-        return super.newRemoveButtonClicklistener(field);
-    }
-
-
 
 }

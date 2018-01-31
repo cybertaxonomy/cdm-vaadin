@@ -26,6 +26,15 @@
    <import resource="classpath:/eu/etaxonomy/cdm/defaultApplicationContext.xml"/>
    
    <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/>
+   <bean id="dataSourceConfigurer-mock" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="order" value="-999" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="properties">
+          <props>
+              <prop key="cdm.dataSource.id">cdm</prop>
+          </props>
+        </property>
+    </bean>
    
    <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
        <property name="omit" value="true" />

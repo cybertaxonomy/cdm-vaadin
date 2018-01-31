@@ -50,7 +50,7 @@ public class TypedEntityReference<T> extends EntityReference {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-                .appendSuper(super.hashCode())
+                .append(id)
                 .appendSuper(type.hashCode())
                 .hashCode();
     }
@@ -68,6 +68,12 @@ public class TypedEntityReference<T> extends EntityReference {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @Override
+    public String toString(){
+        return type.getSimpleName() + "#" + id;
+
     }
 
 }

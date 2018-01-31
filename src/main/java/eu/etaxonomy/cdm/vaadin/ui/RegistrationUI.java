@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 
+import com.flowingcode.vaadin.addons.errorwindow.WindowErrorHandler;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
@@ -30,9 +31,11 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.debug.EntityCacheDebugger;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
+import eu.etaxonomy.cdm.vaadin.view.registration.ListView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
 import eu.etaxonomy.vaadin.ui.MainMenu;
@@ -66,6 +69,9 @@ public class RegistrationUI extends UI {
 
     @Autowired
     NavigationManagerBean navigator;
+
+    @Autowired(required = false)
+    EntityCacheDebugger entityCacheDebugger = null;
 
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
@@ -112,6 +118,10 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
+        setErrorHandler(new WindowErrorHandler(this, "Please contact the editsupport@bgbm.org for more information.</br></br>"
+                + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
+                + "You also might want to add a sreenshot of the browser page in error.</i>"));
+
         navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();
 
@@ -125,12 +135,13 @@ public class RegistrationUI extends UI {
         mainMenu.addMenuComponent(phycoBankLogo);
 
         mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationViewBean.NAME );
-        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListViewBean.OPTION_IN_PROGRESS);
-        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListViewBean.OPTION_ALL);
+        mainMenu.addMenuItem("Continue", FontAwesome.ARROW_RIGHT, ListViewBean.NAME + "/" + ListView.Mode.inProgress.name());
+        mainMenu.addMenuItem("List", FontAwesome.TASKS, ListViewBean.NAME + "/" + ListView.Mode.all.name());
 
         if(ToolbarDisplay.class.isAssignableFrom(viewDisplay.getClass())){
             ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
         }
+
 
         eventBus.publishEvent(new UIInitializedEvent());
 
@@ -146,6 +157,9 @@ public class RegistrationUI extends UI {
 
         navigator.setDefaultViewName(INITIAL_VIEW);
 
+        if(entityCacheDebugger != null){
+            addShortcutListener(entityCacheDebugger.getShortcutListener());
+        }
         //navigate to initial view
 //        String state = pageFragmentAsState();
 

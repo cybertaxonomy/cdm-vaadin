@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.cache;
 
 
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ import eu.etaxonomy.cdm.model.occurrence.Collection;
 public class EntityCacheTest {
 
     @Test
-    public void EntityKeyTest() {
+    public void entityKeyTest() {
 
         Collection collection1 = Collection.NewInstance();
         Collection collection2 = Collection.NewInstance();
@@ -41,6 +42,34 @@ public class EntityCacheTest {
         Assert.assertEquals(key1.hashCode(), key2.hashCode());
 
         Assert.assertNotNull(cache.find(collection1));
+    }
+
+    @Test
+    public void testFindOrUpdate() {
+
+        Collection collection = Collection.NewInstance();
+        collection.setId(10);
+        collection.setCode("A");
+
+        CdmEntityCache cache = new CdmEntityCache(collection);
+
+        Assert.assertEquals(collection, cache.find(Collection.class, 10));
+        Assert.assertEquals("A", cache.find(Collection.class, 10).getCode());
+
+        Collection copyCollection = collection.clone();
+        copyCollection.setId(collection.getId()); // clone does not copy the id!
+        copyCollection.setUuid(collection.getUuid());
+        copyCollection.setCode("B");
+        copyCollection.setUpdated(new DateTime(2017, 12, 1, 0, 0));
+        Assert.assertEquals("B", cache.findAndUpdate(copyCollection).getCode());
+
+        copyCollection = collection.clone();
+        copyCollection.setId(10); // clone does not copy the id!
+        copyCollection.setUuid(collection.getUuid());
+        copyCollection.setCode("C");
+        copyCollection.setUpdated(new DateTime(2018, 1, 1, 0, 0));
+        Assert.assertEquals("C", cache.findAndUpdate(copyCollection).getCode());
+
     }
 
 }

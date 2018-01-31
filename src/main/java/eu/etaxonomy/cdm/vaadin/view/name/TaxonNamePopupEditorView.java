@@ -8,10 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.EnumSet;
+
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -31,8 +35,50 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
     /**
      * @return
      */
-    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymCombobox();
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect();
 
     public ListSelect getRankSelect();
+
+    /**
+     * @return the exBasionymAuthorshipField
+     */
+    public TeamOrPersonField getExBasionymAuthorshipField();
+
+    /**
+     * @return the basionymAuthorshipField
+     */
+    public TeamOrPersonField getBasionymAuthorshipField();
+
+    /**
+     * @return the combinationAuthorshipField
+     */
+    public TeamOrPersonField getCombinationAuthorshipField();
+
+    /**
+     * @return the exCombinationAuthorshipField
+     */
+    public TeamOrPersonField getExCombinationAuthorshipField();
+
+    void disableMode(TaxonNamePopupEditorMode mode);
+
+    /**
+     * Modes must be enabled before calling {@link AbstractPopupEditor#loadInEditor(Object identifier)}.
+     *
+     * @param mode
+     */
+    void enableMode(TaxonNamePopupEditorMode mode);
+
+    /**
+     * @param mode
+     * @return
+     */
+    boolean isModeEnabled(TaxonNamePopupEditorMode mode);
+
+    public EnumSet<TaxonNamePopupEditorMode> getModesActive();
+
+    /**
+     * @return
+     */
+    CheckBox getBasionymToggle();
 
 }

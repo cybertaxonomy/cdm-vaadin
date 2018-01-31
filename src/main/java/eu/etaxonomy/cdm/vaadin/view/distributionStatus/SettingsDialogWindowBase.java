@@ -7,7 +7,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.SettingsPresenterBase;
 
 @SuppressWarnings("serial")
@@ -35,14 +35,14 @@ public abstract class SettingsDialogWindowBase<P extends SettingsPresenterBase> 
 		HorizontalLayout buttonToolBar = new HorizontalLayout();
 	    // cancelButton
 	    cancelButton = new Button();
-	    cancelButton.setCaption(Messages.SettingsDialogWindowBase_CANCEL);
+	    cancelButton.setCaption(Messages.getLocalizedString(Messages.SettingsDialogWindowBase_CANCEL));
 	    cancelButton.setImmediate(true);
 	    cancelButton.addStyleName("dialogButton"); //$NON-NLS-1$
 	    buttonToolBar.addComponent(cancelButton);
 
 	    // okButton
 	    okButton = new Button();
-	    okButton.setCaption(Messages.SettingsDialogWindowBase_OK);
+	    okButton.setCaption(Messages.getLocalizedString(Messages.SettingsDialogWindowBase_OK));
 	    okButton.setImmediate(true);
 	    okButton.addStyleName("dialogButton"); //$NON-NLS-1$
 	    buttonToolBar.addComponent(okButton);

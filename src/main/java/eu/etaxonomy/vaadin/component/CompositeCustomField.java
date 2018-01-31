@@ -10,14 +10,18 @@ package eu.etaxonomy.vaadin.component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.Layout;
 
 /**
  * TODO implement height methods for full component size support
@@ -148,6 +152,40 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     @Override
     public abstract FieldGroup getFieldGroup();
 
+    /**
+     * @return true if all fields having the value <code>null</code>
+     */
+    @SuppressWarnings("rawtypes")
+    public boolean hasNullContent() {
+        Collection<Field> nullValueCheckIgnore = nullValueCheckIgnoreFields();
+        return getFieldGroup().getFields().stream()
+                .filter(
+                        f -> !nullValueCheckIgnore.contains(f)
+                )
+                //.peek( f -> System.out.println("###> " + f.getCaption() + ": " + f.getValue()))
+                .allMatch(
+                        f -> {
+                            if(f instanceof CompositeCustomField){
+                                return ((CompositeCustomField)f).hasNullContent();
+                            } else {
+                                if(f.getValue() == null) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        }
+                );
+    }
+
+    /**
+     * @return
+     */
+    protected List<Field> nullValueCheckIgnoreFields() {
+        // TODO Auto-generated method stub
+        return new ArrayList<Field>(0);
+    }
+
     @Override
     public void registerParentFieldGroup(FieldGroup parent) {
         parent.addCommitHandler(new CommitHandler() {
@@ -165,6 +203,37 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
                 // noting to do
             }}
        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        // setDeepReadOnly(readOnly, getContent());
+    }
+
+    /**
+     * @param readOnly
+     */
+    protected void setDeepReadOnly(boolean readOnly, Component component) {
+
+        component.setReadOnly(readOnly);
+        if(Button.class.isAssignableFrom(component.getClass())){
+            component.setEnabled(!readOnly);
+        }
+        if(Layout.class.isAssignableFrom(component.getClass())){
+            for(Component nestedComponent : ((Layout)component)){
+                setDeepReadOnly(readOnly, nestedComponent);
+            }
+        }
+    }
+
+    @Override
+    public String toString(){
+        return this.getClass().getSimpleName() + ": " +
+                ( getValue() != null ? getValue() : "null");
     }
 
 }

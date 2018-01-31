@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.ui.Component;
 
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -20,7 +21,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 public class TaxonNameEditorAction extends AbstractEditorAction {
 
 
-    public TaxonNameEditorAction(Action eventType) {
+    public TaxonNameEditorAction(EditorActionType eventType) {
         super(eventType);
     }
 
@@ -28,7 +29,7 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param type
      * @param entityId
      */
-    public TaxonNameEditorAction(Action type, Integer entityId) {
+    public TaxonNameEditorAction(EditorActionType type, Integer entityId) {
         super(type, entityId);
     }
 
@@ -37,7 +38,7 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param entityId
      * @param source
      */
-    public TaxonNameEditorAction(Action type, Integer entityId, Component source) {
+    public TaxonNameEditorAction(EditorActionType type, Integer entityId, Component source) {
         super(type, entityId, source);
     }
 
@@ -45,7 +46,7 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param action
      * @param source
      */
-    public TaxonNameEditorAction(Action action, Component source) {
+    public TaxonNameEditorAction(EditorActionType action, Component source) {
         super(action, source);
         // TODO Auto-generated constructor stub
     }
@@ -56,7 +57,7 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public TaxonNameEditorAction(Action action, Integer entityId, Component source, AbstractView sourceView) {
+    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
         super(action, entityId, source, sourceView);
         // TODO Auto-generated constructor stub
     }

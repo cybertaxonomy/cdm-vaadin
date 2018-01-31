@@ -8,19 +8,25 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
+import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 
@@ -31,18 +37,23 @@ import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V> {
+public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V>
+    implements CachingPresenter {
 
     private static final long serialVersionUID = 2218185546277084261L;
 
     private static final Logger logger = Logger.getLogger(AbstractCdmEditorPresenter.class);
 
     /**
-     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.
      */
     protected EnumSet<CRUD> crud = null;
 
+
+    private ICdmCacher cache;
+
+    private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
     public AbstractCdmEditorPresenter() {
         super();
@@ -63,20 +74,27 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     @Override
     protected DTO loadBeanById(Object identifier) {
 
+        DTO cdmEntitiy;
         if(identifier != null) {
             Integer integerID = (Integer)identifier;
             // CdmAuthority is needed before the bean is loaded into the session.
             // otherwise adding the authority to the user would cause a flush
             guaranteePerEntityCRUDPermissions(integerID);
-            return loadCdmEntityById(integerID);
+            cdmEntitiy = loadCdmEntityById(integerID);
         } else {
-            DTO cdmEntitiy = loadCdmEntityById(null);
+            cdmEntitiy = loadCdmEntityById(null);
             if(cdmEntitiy != null){
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
-            return cdmEntitiy;
         }
 
+
+        cache = new CdmTransientEntityCacher(this);
+        // need to use load but put see #7214
+        cdmEntitiy = cache.load(cdmEntitiy);
+        addRootEntity(cdmEntitiy);
+
+        return cdmEntitiy;
     }
 
 
@@ -127,7 +145,18 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
         // the bean is now updated with the changes made by the user
         DTO bean = (DTO) saveEvent.getBean();
 
+        if(logger.isTraceEnabled()){
+            PersistentContextAnalyzer pca = new PersistentContextAnalyzer(bean);
+            pca.printEntityGraph(System.err);
+            pca.printCopyEntities(System.err);
+        }
         bean = handleTransientProperties(bean);
+
+        if(logger.isTraceEnabled()){
+            PersistentContextAnalyzer pca = new PersistentContextAnalyzer(bean);
+            pca.printEntityGraph(System.err);
+            pca.printCopyEntities(System.err);
+        }
         try {
             EntityChangeEvent changeEvent = getStore().saveBean(bean);
 
@@ -138,6 +167,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             if(newAuthorityCreated != null){
                 UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
             }
+            throw e;
         }
     }
 
@@ -201,6 +231,31 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ICdmCacher getCache() {
+        return cache;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRootEntity(CdmBase entity) {
+        rootEntities.add(entity);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<CdmBase> getRootEntities() {
+        return rootEntities;
     }
 
 

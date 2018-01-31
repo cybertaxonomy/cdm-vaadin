@@ -22,6 +22,7 @@ import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -44,6 +45,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
@@ -138,6 +140,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
+
+        updateToolBarVisibility();
     }
 
     protected VerticalLayout getMainLayout() {
@@ -166,6 +170,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         save.setVisible(!readOnly);
+        delete.setVisible(!readOnly);
         cancel.setCaption(readOnly ? "Close" : "Cancel");
     }
 
@@ -208,7 +213,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      */
     private void updateToolBarVisibility() {
+        boolean showToolbar = toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1;
         toolBar.setVisible(toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1);
+        if(!showToolbar){
+            mainLayout.setMargin(new MarginInfo(true, false, false, false));
+        } else {
+            mainLayout.setMargin(false);
+        }
 
     }
 
@@ -274,7 +285,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @return
      */
     private void delete() {
-        eventBus.publishEvent(new EditorDeleteEvent(this, fieldGroup.getItemDataSource().getBean()));
+        eventBus.publishEvent(new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
         eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
     }
 
@@ -293,10 +304,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             } else if(e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof PermissionDeniedException){
                 PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
                 Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
-            }
-            else {
-                Logger.getLogger(this.getClass()).error("Error saving", e);
-                Notification.show("Error saving", Type.ERROR_MESSAGE);
+            } else {
+//                Logger.getLogger(this.getClass()).error("Error saving", e);
+//                Notification.show("Error saving", Type.ERROR_MESSAGE);
+                throw new RuntimeException("Error saving", e);
             }
         }
     }
@@ -318,18 +329,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
 
     protected TextField addTextField(String caption, String propertyId) {
-        return addField(new TextField(caption), propertyId);
+        return addField(new TextFieldNFix(caption), propertyId);
     }
 
     protected TextField addTextField(String caption, String propertyId, int column1, int row1,
             int column2, int row2)
             throws OverlapsException, OutOfBoundsException {
-        return addField(new TextField(caption), propertyId, column1, row1, column2, row2);
+        return addField(new TextFieldNFix(caption), propertyId, column1, row1, column2, row2);
     }
 
     protected TextField addTextField(String caption, String propertyId, int column, int row)
             throws OverlapsException, OutOfBoundsException {
-        return addField(new TextField(caption), propertyId, column, row);
+        return addField(new TextFieldNFix(caption), propertyId, column, row);
     }
 
     protected SwitchableTextField addSwitchableTextField(String caption, String textPropertyId, String switchPropertyId, int column1, int row1,
@@ -357,6 +368,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected CheckBox addCheckBox(String caption, String propertyId) {
         return addField(new CheckBox(caption), propertyId);
+    }
+
+    protected CheckBox addCheckBox(String caption, String propertyId, int column, int row){
+        return addField(new CheckBox(caption), propertyId, column, row);
     }
 
     protected <T extends Field> T addField(T field, String propertyId) {
@@ -541,12 +556,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     /**
+     * Passes the beanInstantiator to the presenter method {@link AbstractEditorPresenter#setBeanInstantiator(BeanInstantiator)}
+     *
+     * @param beanInstantiator
+     */
+    public final void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
+        getPresenter().setBeanInstantiator(beanInstantiator);
+    }
+
+    /**
      * Returns the bean contained in the itemDatasource of the fieldGroup.
      *
      * @return
      */
     public DTO getBean() {
-        return fieldGroup.getItemDataSource().getBean();
+        if(fieldGroup.getItemDataSource() != null){
+            return fieldGroup.getItemDataSource().getBean();
+
+        }
+        return null;
     }
 
     /**
@@ -591,4 +619,5 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public P presenter() {
         return getPresenter();
     }
+
 }

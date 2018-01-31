@@ -19,8 +19,8 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
@@ -37,14 +37,14 @@ public class RegistrationWorkingSet {
 
     private DateTime created = null;
 
-    private String citation = null;
+    private String citationString = null;
 
     /**
      * Creates an empty working set
      */
     public RegistrationWorkingSet(Reference citation) {
         citationId = citation.getId();
-        this.citation= citation.getTitleCache();
+        this.citationString= citation.getTitleCache();
 
     }
 
@@ -66,7 +66,9 @@ public class RegistrationWorkingSet {
     /**
      * Validate and add all Registrations to the working set which are referring to the same publication
      * which is either the citation of the nomenclatural reference of the {@link TaxonName} or the
-     * citation of the {@link TypeDesignations}. Registration with a differing publication are not added to
+     * citation of the {@link TypeDesignations}. In case the citation is a section and this section is
+     * having an in-reference the in-reference will be used instead.
+     * Registration with a differing publication are not added to
      * the working set, instead a {@link RegistrationValidationException} is thrown which is a container for
      * all validation problems.
      *
@@ -80,12 +82,13 @@ public class RegistrationWorkingSet {
             problems = new ArrayList<>();
         }
         for(RegistrationDTO regDto : candidates){
+                Reference citation = publicationUnit(regDto);
                 if(citationId == null){
-                    citationId = regDto.getCitationID();
-                    citation = regDto.getCitation().getTitleCache();
+                    citationId = citation.getId();
+                    citationString = citation.getTitleCache();
                 } else {
-                    if(!regDto.getCitationID().equals(citationId)){
-                        problems.add("Removing Registration " + regDto.getSummary() + " from set since this refers to a different citation.");
+                    if(citation.getId() != citationId.intValue()){
+                        problems.add("Removing Registration " + regDto.getSummary() + " from set since this refers to a different citationString.");
                         continue;
                     }
                 }
@@ -99,6 +102,21 @@ public class RegistrationWorkingSet {
             throw new RegistrationValidationException("", problems);
         }
 
+    }
+
+    /**
+     * @param regDto
+     * @return
+     */
+    protected Reference publicationUnit(RegistrationDTO regDto) {
+        Reference ref = regDto.getCitation();
+        while(ref.isOfType(ReferenceType.Section)&& ref.getInReference() != null){
+            ref = ref.getInReference();
+            if(!ref.isOfType(ReferenceType.Section)){
+                break;
+            }
+        }
+        return ref;
     }
 
     /**
@@ -174,10 +192,10 @@ public class RegistrationWorkingSet {
     }
 
     /**
-     * @return the citation
+     * @return the citationString
      */
     public String getCitation() {
-        return citation;
+        return citationString;
     }
 
     public DateTime getRegistrationDate() {

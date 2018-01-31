@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
 import java.util.Collection;
+import java.util.EnumSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -33,16 +34,17 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -189,11 +191,12 @@ public class RegistrationItem extends GridLayout {
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationId() != null){
             if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
-                referenceEditorAction = new ReferenceEditorAction(Action.EDIT, workingSet.getCitationId());
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId(), null, parentView);
             }
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
-            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE)){
-                referenceEditorAction = new ReferenceEditorAction(Action.ADD);
+            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
             }
         }
         TimePeriod datePublished = null;
@@ -260,7 +263,9 @@ public class RegistrationItem extends GridLayout {
 
             stateLabel.setVisible(true);
             stateLabel.update(regDto.getStatus());
-            getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            if(regDto.getIdentifier() != null){
+                getIdentifierLink().setResource(new ExternalResource(regDto.getIdentifier()));
+            }
             getIdentifierLink().setCaption(regDto.getIdentifier());
             //TODO make responsive and use specificIdentifier in case the space gets too narrow
             getIdentifierLink().setVisible(true);

@@ -8,9 +8,12 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -25,15 +28,26 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @since Jun 7, 2017
  *
  */
-public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implements FilterablePagingProvider<T>, FilterableCountProvider {
+public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
+
+
+    private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
+
+    private static final Logger logger = Logger.getLogger(CdmFilterablePagingProvider.class);
 
     private int pageSize = 20;
 
     private IIdentifiableEntityService<T> service;
 
+    private Class<V> type = null;
+
     private MatchMode matchMode = MatchMode.ANYWHERE;
 
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
+
+    List<String> initStrategy = DEFAULT_INIT_STRATEGY;
+
+    private List<Criterion> criteria = new ArrayList<>();
 
 
     /**
@@ -67,20 +81,29 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      *
-     * @param service
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
-        super();
-        this.service = service;
+        this(service, null);
     }
 
     /**
-     * @param service
-     * @param matchMode
-     * @param orderHints
+     * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
+     *
      */
-    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type) {
         super();
+        this.type = type;
+        this.service = service;
+    }
+
+
+    public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
+        this(service, null, matchMode, orderHints);
+    }
+
+    public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {
+        super();
+        this.type = type;
         this.service = service;
         this.matchMode = matchMode;
         this.orderHints = orderHints;
@@ -90,18 +113,22 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
      * {@inheritDoc}
      */
     @Override
-    public List<T> findEntities(int firstRow, String filter) {
+    public List<V> findEntities(int firstRow, String filter) {
 
-        Pager<T> page = service.findByTitle(
-                null,
+        Integer pageIndex = firstRow / pageSize;
+        Pager<V> page = (Pager<V>) service.findByTitle(
+                type,
                 filter,
                 matchMode,
-                null,
+                criteria,
                 pageSize,
-                firstRow,
+                pageIndex ,
                 orderHints,
-                Arrays.asList("$")
+                initStrategy
               );
+        if(logger.isTraceEnabled()){
+            logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
+        }
         return page.getRecords();
     }
 
@@ -111,16 +138,19 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
     @Override
     public int size(String filter) {
 
-        Pager<T> page = service.findByTitle(
-                null,
+        Pager<V> page = (Pager<V>) service.findByTitle(
+                type,
                 filter,
                 matchMode,
-                null,
+                criteria,
                 1,
                 0,
                 null,
                 null
               );
+        if(logger.isTraceEnabled()){
+            logger.trace("size() -  count: " + page.getCount().intValue());
+        }
         return page.getCount().intValue();
     }
 
@@ -138,4 +168,26 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity> implement
         this.pageSize = pageSize;
     }
 
+    /**
+     * @return the initStrategy
+     */
+    public List<String> getInitStrategy() {
+        return initStrategy;
+    }
+
+    /**
+     * @param initStrategy the initStrategy to set
+     */
+    public void setInitStrategy(List<String> initStrategy) {
+        this.initStrategy = initStrategy;
+    }
+
+    /**
+     * The list of criteria is initially empty.
+     *
+     * @return the criteria
+     */
+    public List<Criterion> getCriteria() {
+        return criteria;
+    }
 }

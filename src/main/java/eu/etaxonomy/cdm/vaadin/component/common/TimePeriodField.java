@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.util.BeanItem;
@@ -29,6 +30,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.strategy.parser.TimePeriodParser;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
@@ -60,7 +62,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     GridLayout buttonTextField = new GridLayout(2, 1);
     GridLayout simpleView = new GridLayout(2, 1);
 
-    TextField cacheField = new TextField();
+    TextField cacheField = new TextFieldNFix();
 
     Set<Component> styledComponents = new HashSet<>();
 
@@ -126,7 +128,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
      */
     private void initDetailsView() {
 
-        parseField = new TextField();
+        parseField = new TextFieldNFix();
         // parseField.setWidth(100, Unit.PERCENTAGE);
         parseField.setInputPrompt("This field will parse the entered time period");
         parseField.addTextChangeListener(e -> parseInput(e));
@@ -154,7 +156,7 @@ public class TimePeriodField extends CustomField<TimePeriod> {
         startDate.setInputPrompt("dd.mm.yyyy");
         PartialDateField endDate = new PartialDateField("End");
         endDate.setInputPrompt("dd.mm.yyyy");
-        freeText = new TextField("FreeText");
+        freeText = new TextFieldNFix("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 
         fieldGroup.bind(startDate, "start");
@@ -268,6 +270,21 @@ public class TimePeriodField extends CustomField<TimePeriod> {
     public Class<? extends TimePeriod> getType() {
         return TimePeriod.class;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+        super.commit();
+        try {
+            fieldGroup.commit();
+        } catch (CommitException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 
 
 

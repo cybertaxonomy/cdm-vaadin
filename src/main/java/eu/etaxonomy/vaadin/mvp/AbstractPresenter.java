@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
 /**
@@ -174,6 +175,10 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
      */
     protected void setNavigationManager(NavigationManager navigationManager) {
         this.navigationManager = navigationManager;
+    }
+
+    protected boolean checkFromOwnView(AbstractEditorAction event) {
+        return getView() != null && getView() == event.getSourceView();
     }
 
 }

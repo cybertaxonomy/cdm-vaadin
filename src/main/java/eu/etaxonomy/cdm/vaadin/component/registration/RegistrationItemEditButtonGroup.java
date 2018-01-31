@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
@@ -39,10 +41,9 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  */
 public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
+    private final static Logger logger = Logger.getLogger(RegistrationItemEditButtonGroup.class);
 
-    /**
-     *
-     */
+
     private static final String DEFAULT_BUTTON_STYLES = "";
 
     private static final long serialVersionUID = -5059163772392864050L;
@@ -76,7 +77,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
             boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
-            nameButton.setEnabled(!isRegistrationLocked && userHasPermission);
+            nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getId(),
@@ -92,10 +93,12 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
+                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                tdButton.setEnabled(!isRegistrationLocked && UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE));
+                boolean userHasPermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE);
+                tdButton.setReadOnly(isRegistrationLocked || !userHasPermission);
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
@@ -103,11 +106,18 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
-                        typeDesignationWorkingSet.getWorkingSetId(),
+                        typeDesignationWorkingSet.getBaseEntityReference(),
                         tdButton)
                         );
                 String labelText = typeDesignationWorkingSet.getRepresentation();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
+                if(typeDesignationWorkingSet.getWorkingsetType().equals(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET)){
+                    // remove the citation from the label which looks very redundant in the registration working set editor
+                    // TODO when use in other contexts. it might be required to make this configurable.
+
+                    String citationString = regDto.getCitation().getCitation();
+                    labelText = labelText.replaceFirst(citationString, "");
+                }
                 Label label = new Label(labelText);
 
                 label.setWidthUndefined();
@@ -160,21 +170,22 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
     }
 
     public class TypeDesignationWorkingSetButton {
-        private Integer id;
+
+        private TypedEntityReference baseEntityRef;
         private TypeDesignationWorkingSetType type;
         private Button button;
 
-        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, Integer id, Button button){
+        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, TypedEntityReference baseEntityRef, Button button){
             this.type = type;
-            this.id = id;
+            this.baseEntityRef = baseEntityRef;
             this.button = button;
         }
 
         /**
          * @return the id
          */
-        public Integer getId() {
-            return id;
+        public TypedEntityReference getBaseEntity() {
+            return baseEntityRef;
         }
 
         /**

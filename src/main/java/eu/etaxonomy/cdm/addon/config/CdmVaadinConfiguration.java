@@ -16,6 +16,10 @@ import java.util.Properties;
 import javax.servlet.annotation.WebServlet;
 
 import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.hibernate.event.service.spi.EventListenerRegistry;
+import org.hibernate.event.spi.EventType;
+import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +29,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 
@@ -38,9 +41,13 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
+import eu.etaxonomy.cdm.api.cache.CdmCacher;
+import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
+import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
@@ -73,9 +80,12 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
 
-    public static final String CDM_DATA_SOURCE_ID = "cdm.dataSource.id";
+    public static final String CDM_DATA_SOURCE_ID = DataSourceConfigurer.CDM_DATA_SOURCE_ID;
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
+    public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";
+    public static final String CDM_SERVICE_MINTER_REGSTRATION_MAXID = "cdm.service.minter.registration.maxLocalId";
+    public static final String CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT = "cdm.service.minter.registration.identifierFormatString";
 
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
@@ -83,10 +93,14 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     Environment env;
 
     @Autowired
-    @Lazy
-    //FIXME consider to set the instanceName (instanceID) in the spring environment to avoid a bean reference here
-    // key CDM_DATA_SOURCE_ID is already declared here
-    private DataSourceConfigurer dataSourceConfigurer;
+    private SessionFactory sessionFactory;
+
+    @Autowired
+    private void  setTermCacher(CdmCacher termCacher){
+        CdmTransientEntityCacher.setDefaultCacher(termCacher);
+    }
+
+    private boolean registrationUiHibernateEventListenersDone = false;
 
     /*
      * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
@@ -117,6 +131,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
                         }
 
                     });
+                    ).getServiceRegistry().getService
 
                 }});
 
@@ -142,9 +157,25 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @UIScope
     public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
+            registerRegistrationUiHibernateEventListeners();
+
             return new RegistrationUI();
         }
         return null;
+    }
+
+    /**
+     * this is only a quick implementation for testing,
+     * TODO see also the NOTE on CdmListenerIntegrator class declaration for a prospective better solution
+     */
+    protected void registerRegistrationUiHibernateEventListeners() {
+        if(!registrationUiHibernateEventListenersDone){
+            EventListenerRegistry listenerRegistry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry().getService(
+                    EventListenerRegistry.class);
+            GrantedAuthorityRevokingRegistrationUpdateLister listener = new GrantedAuthorityRevokingRegistrationUpdateLister();
+            listenerRegistry.appendListeners(EventType.POST_UPDATE, listener);
+            registrationUiHibernateEventListenersDone = true;
+        }
     }
 
     @Bean
@@ -160,6 +191,16 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             // therefore we return a empty dummy implementation.
             return new DummyDataInserter();
         }
+    }
+
+    @Bean
+    public RegistrationIdentifierMinter registrationIdentifierMinter() throws IOException {
+        RegistrationIdentifierMinter minter = new RegistrationIdentifierMinter();
+        ensureVaadinAppPropertiesLoaded();
+        minter.setMinLocalId(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_MINID));
+        minter.setMaxLocalId(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_MAXID));
+        minter.setIdentifierFormatString(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
+        return minter;
     }
 
     @Bean
@@ -180,7 +221,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         return null;
     }
 
-    static final String PROPERTIES_NAME = "vaadin-apps";
+
+
+
+    static final String PROPERTIES_FILE_NAME = "vaadin-apps";
 
     private Properties appProps = null;
 
@@ -208,6 +252,8 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     /**
      * Checks if the ui class supplied is activated by listing it in the properties by its {@link SpringUI#path()} value.
      *
+     * TODO see https://dev.e-taxonomy.eu/redmine/issues/7139 (consider using spring profiles to enable vaadin UI contexts)
+     *
      * @param type
      * @return
      */
@@ -217,22 +263,16 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
         if(activeUIpaths == null){
             try {
-                String currentDataSourceId = env.getProperty(CDM_DATA_SOURCE_ID);
+
                 String activatedVaadinUIs = env.getProperty(CDM_VAADIN_UI_ACTIVATED);
                 if(activatedVaadinUIs == null){
                     // not in environment? Read it from the config file!
-                    if(appProps == null){
-                        if(currentDataSourceId == null){
-                            currentDataSourceId = dataSourceConfigurer.dataSourceProperties().getCurrentDataSourceId();
-                        }
-                        appProps = new ConfigFileUtil()
-                                .setDefaultContent(APP_FILE_CONTENT)
-                                .getProperties(currentDataSourceId, PROPERTIES_NAME);
-                    }
+                    ensureVaadinAppPropertiesLoaded();
                     if(appProps.get(CDM_VAADIN_UI_ACTIVATED) != null){
                         activatedVaadinUIs = appProps.get(CDM_VAADIN_UI_ACTIVATED).toString();
                     }
                 }
+
                 if(activatedVaadinUIs != null) {
                     String[] uiPaths = activatedVaadinUIs.split("\\s*,\\s*");
                     this.activeUIpaths = Arrays.asList(uiPaths);
@@ -247,6 +287,20 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         }
         return false;
 
+    }
+
+    /**
+     * @param currentDataSourceId
+     * @throws IOException
+     */
+    protected void ensureVaadinAppPropertiesLoaded() throws IOException {
+
+        String currentDataSourceId = env.getProperty(CDM_DATA_SOURCE_ID);
+        if(appProps == null){
+            appProps = new ConfigFileUtil()
+                    .setDefaultContent(APP_FILE_CONTENT)
+                    .getProperties(currentDataSourceId, PROPERTIES_FILE_NAME);
+        }
     }
 
     /**

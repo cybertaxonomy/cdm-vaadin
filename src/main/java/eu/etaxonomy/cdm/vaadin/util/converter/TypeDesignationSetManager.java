@@ -69,8 +69,6 @@ public class TypeDesignationSetManager {
 
     private Collection<TypeDesignationBase> typeDesignations;
 
-    private int workingSetIdAutoIncrement = 0;
-
     /**
      * Groups the EntityReferences for each of the TypeDesignations by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys are already ordered by the term order defined in the vocabulary.
@@ -260,7 +258,6 @@ public class TypeDesignationSetManager {
             TypeDesignationWorkingSet orderedStringsByOrderedTypes = new TypeDesignationWorkingSet(
                     typeDesignationWorkingSet.getBaseEntity(),
                     baseEntityRef);
-            orderedStringsByOrderedTypes.setWorkingSetId(typeDesignationWorkingSet.workingSetId); // preserve original workingSetId
             keyList.forEach(key -> orderedStringsByOrderedTypes.put(key, typeDesignationWorkingSet.get(key)));
             stringsOrderedbyBaseEntityOrderdByType.put(baseEntityRef, orderedStringsByOrderedTypes);
        }
@@ -598,11 +595,7 @@ public class TypeDesignationSetManager {
      * The EntityReferences for TypeDesignations are grouped by the according TypeDesignationStatus.
      * The TypeDesignationStatusBase keys can be ordered by the term order defined in the vocabulary.
      *
-     * A workingset can be referenced by the <code>workingSetId</code>, this is a autoincrement
-     * value which is created during the process of determining the workingsets in a collection of
-     * TypeDesignations.
-     *
-     * TODO: consider using a concatenation of baseEntity.getClass() + baseEntity.getId() as workingset identifier
+     * A workingset can be referenced by the <code>baseEntityReference</code>.
      */
     public class TypeDesignationWorkingSet extends LinkedHashMap<TypeDesignationStatusBase<?>, Collection<EntityReference>> {
 
@@ -615,8 +608,6 @@ public class TypeDesignationSetManager {
         IdentifiableEntity<?> baseEntity;
 
         List<DerivedUnit> derivedUnits = null;
-
-        int workingSetId = workingSetIdAutoIncrement++;
 
         /**
          * @param baseEntityReference
@@ -654,19 +645,6 @@ public class TypeDesignationSetManager {
             get(status).add(typeDesignationEntityReference);
         }
 
-        /**
-         * @return the workingSetId
-         */
-        public int getWorkingSetId() {
-            return workingSetId;
-        }
-
-        /**
-         * @param workingSetId the workingSetId to set
-         */
-        public void setWorkingSetId(int workingSetId) {
-            this.workingSetId = workingSetId;
-        }
 
         public String getRepresentation() {
             return workingSetRepresentation;
@@ -683,7 +661,7 @@ public class TypeDesignationSetManager {
          *
          * @return the baseEntityReference
          */
-        public TypedEntityReference getBaseEntityReference() {
+        public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityReference() {
             return baseEntityReference;
         }
 

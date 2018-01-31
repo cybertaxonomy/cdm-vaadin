@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.EnumSet;
+
 import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.LazyComboBox;
 
@@ -18,9 +20,12 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
@@ -57,7 +62,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
         super.onPresenterReady();
 
-        CdmFilterablePagingProvider<Reference> pagingProvider = new CdmFilterablePagingProvider<Reference>(
+        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
                 getRepo().getReferenceService());
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
@@ -76,19 +81,22 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.handleViewExit();
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
-        if(getView().getNewPublicationButton() != event.getSourceComponent()){
+        if(getView() == null || getView().getNewPublicationButton() != event.getSourceComponent()){
             return;
         }
         newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
-
+        EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
+        refTypes.remove(ReferenceType.Section);
+        newReferencePopup.withReferenceTypes(refTypes);
+        newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
         newReferencePopup.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).REMOVE")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).REMOVE")
     public void onReferenceEditorActionRemove(ReferenceEditorAction event) {
 
         if(getView().getRemoveNewPublicationButton() != event.getSourceComponent()){
@@ -139,7 +147,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action).ADD")
+    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
         if(getView().getContinueButton() != event.getSourceComponent()){

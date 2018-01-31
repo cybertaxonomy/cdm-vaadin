@@ -40,7 +40,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.common.CdmUtils;
-import eu.etaxonomy.cdm.i10n.Messages;
+import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
@@ -157,9 +157,9 @@ public class AreaAndTaxonSettingsConfigWindow
         rightContainer.setSizeFull();
 
         //classification
-        classificationBox = new ComboBox(Messages.AreaAndTaxonSettingsConfigWindow_CLASSIFICATION);
+        classificationBox = new ComboBox(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_CLASSIFICATION));
         classificationBox.setItemCaptionPropertyId(TaxonNodeContainer.LABEL);
-        classificationBox.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION);
+        classificationBox.setInputPrompt(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION));
         classificationBox.setImmediate(true);
         classificationBox.setNewItemsAllowed(false);
         classificationBox.setNullSelectionAllowed(false);
@@ -167,14 +167,14 @@ public class AreaAndTaxonSettingsConfigWindow
         classificationBox.setWidth("100%"); //$NON-NLS-1$
 
         //taxonFilter
-        taxonFilter = new TextField(Messages.AreaAndTaxonSettingsConfigWindow_FILTER);
-        taxonFilter.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_FILTER_TAXA_BY_NAME);
+        taxonFilter = new TextField(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_FILTER));
+        taxonFilter.setInputPrompt(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_FILTER_TAXA_BY_NAME));
         taxonFilter.setSizeFull();
         taxonFilter.setImmediate(true);
 
         //distribution area box
-        distAreaBox = new ComboBox(Messages.AreaAndTaxonSettingsConfigWindow_DISTRIBUTION_AREA);
-        distAreaBox.setInputPrompt(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_DISTRIBUTION_AREA);
+        distAreaBox = new ComboBox(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_DISTRIBUTION_AREA));
+        distAreaBox.setInputPrompt(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_DISTRIBUTION_AREA));
         distAreaBox.setImmediate(true);
         distAreaBox.setNullSelectionAllowed(false);
         distAreaBox.setNewItemsAllowed(false);
@@ -183,12 +183,12 @@ public class AreaAndTaxonSettingsConfigWindow
 
         // named areas
         namedAreaList = new ListSelect();
-        namedAreaList.setCaption(Messages.AreaAndTaxonSettingsConfigWindow_AREAS);
+        namedAreaList.setCaption(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_AREAS));
         namedAreaList.setSizeFull();
         namedAreaList.setMultiSelect(true);
 
         //taxonomy
-        taxonTree = new TreeTable(Messages.AreaAndTaxonSettingsConfigWindow_TAXONOMY);
+        taxonTree = new TreeTable(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_TAXONOMY));
         taxonTree.setSelectable(true);
         taxonTree.setSizeFull();
         taxonTree.setImmediate(true);
@@ -235,7 +235,7 @@ public class AreaAndTaxonSettingsConfigWindow
             String filterText = taxonFilter.getValue();
             Property<?> uuidProperty = classificationBox.getContainerProperty(classificationBox.getValue(),"uuid"); //$NON-NLS-1$
             if(uuidProperty==null){
-            	Notification.show(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION);
+            	Notification.show(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_SELECT_CLASSIFICATION));
             }
             else{
             	if(CdmUtils.isNotBlank(filterText)){
@@ -309,7 +309,7 @@ public class AreaAndTaxonSettingsConfigWindow
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
         taxonTree.removeAllItems();
-        Notification.show(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_TAXA);
+        Notification.show(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_TAXA));
 
         new TreeUpdater(children).start();
     }
@@ -358,7 +358,7 @@ public class AreaAndTaxonSettingsConfigWindow
 				public void run() {
 					taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
 
-			        Notification notification = new Notification(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_COMPLETE);
+			        Notification notification = new Notification(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_COMPLETE));
 			        notification.setDelayMsec(500);
 			        notification.show(Page.getCurrent());
 			        taxonTree.setEnabled(true);

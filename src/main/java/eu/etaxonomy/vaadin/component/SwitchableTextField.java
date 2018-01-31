@@ -15,6 +15,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+
 
 /**
  * @author a.kohlbecker
@@ -28,7 +30,7 @@ public class SwitchableTextField extends CompositeCustomField<String> {
     private static final String PRIMARY_STYLE = "v-switchable-textfield";
 
     CssLayout root = new CssLayout();
-    private TextField textField = new TextField();
+    private TextField textField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
 
     /**
@@ -121,8 +123,5 @@ public class SwitchableTextField extends CompositeCustomField<String> {
         // the unlockSwitch needs to be handled explicitly, for the textField this is not needed.
         unlockSwitch.setVisible(visible);
     }
-
-
-
 
 }

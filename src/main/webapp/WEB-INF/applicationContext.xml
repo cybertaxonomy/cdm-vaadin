@@ -74,5 +74,7 @@
         <property name="cacheManager" ref="cacheManager" />
         <property name="serializableFactory" ref="serializableFactory"/>
     </bean>
-
+    
+    <!--  for cdmTermCacher see CdmVaadinConfiguration.setTermCacher() -->
+    <bean id="cdmTermCacher" class="eu.etaxonomy.cdm.api.cache.CdmTermCacher" />
 </beans>

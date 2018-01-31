@@ -14,3 +14,4 @@ src/test/resources/eu/etaxonomy/cdm/database/schema/*.xsd
 .vaadin-designer
 .idea
 *.iml
+.directory

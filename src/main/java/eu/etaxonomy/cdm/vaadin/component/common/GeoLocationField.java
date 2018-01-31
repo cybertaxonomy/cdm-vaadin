@@ -25,6 +25,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 
 /**
@@ -43,11 +44,11 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     Point parsedPoint = Point.NewInstance();
 
-    private TextField longitudeField = new TextField("Long.");
-    TextField latitudeField = new TextField("Lat.");
+    private TextField longitudeField = new TextFieldNFix("Longitude");
+    TextField latitudeField = new TextFieldNFix("Latitude");
     Label longLatParsed = new Label();
-    TextField errorRadiusField = new TextField("Error radius (m)");
-    TextField referenceSystemField = new TextField("ReferenceSystem");
+    TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
+    TextField referenceSystemField = new TextFieldNFix("ReferenceSystem");
 
     private LMap map = new LMap();
     private LMarker mapMarker = new LMarker();
@@ -77,8 +78,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.setRows(2);
         root.setColumns(3);
         root.setStyleName("wrapper");
-        root.addComponent(longitudeField, 0, 0);
-        root.addComponent(latitudeField, 1, 0);
+        root.addComponent(latitudeField, 0, 0);
+        root.addComponent(longitudeField, 1, 0);
         root.addComponent(errorRadiusField, 0, 1);
         root.addComponent(referenceSystemField, 1, 1);
 
@@ -139,7 +140,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
      *
      */
     protected void updateMap() {
-        longLatParsed.setValue(parsedPoint.getLongitudeSexagesimal() + "/" + parsedPoint.getLatitudeSexagesimal());
+        longLatParsed.setValue(parsedPoint.getLatitudeSexagesimal() + "/" + parsedPoint.getLongitudeSexagesimal());
         map.removeComponent(mapMarker);
         if(parsedPoint.getLongitude() != null && parsedPoint.getLatitude() != null){
             map.setZoomLevel(10);

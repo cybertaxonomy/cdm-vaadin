@@ -8,9 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
-import java.util.Collection;
 import java.util.List;
 
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.TextField;
+
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -20,15 +23,55 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface ListView extends ApplicationView<ListPresenter>{
 
+    enum Mode {
+        all,
+        inProgress
+    }
+
     /**
      * @param page
      */
-    void populate(Collection<RegistrationDTO> registrations);
+    void populate(Pager<RegistrationDTO> registrations);
 
     /**
      * @param messages
      */
     void openDetailsPopup(String caption, List<String> messages);
+
+    /**
+     * @return the identifierFilter
+     */
+    public TextField getIdentifierFilter();
+
+    /**
+     * @return the taxonNameFilter
+     */
+    public TextField getTaxonNameFilter();
+
+    /**
+     * @return the referenceFilter
+     */
+    public TextField getReferenceFilter();
+
+    /**
+     * @return the statusFilter
+     */
+    public ListSelect getStatusFilter();
+
+    /**
+     * @return the submitterFilter
+     */
+    public ListSelect getSubmitterFilter();
+
+    /**
+     * @param optionInProgress
+     */
+    void setViewMode(Mode mode);
+
+    /**
+     * @return
+     */
+    Mode getViewMode();
 
 
 }

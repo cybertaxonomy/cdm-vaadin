@@ -22,7 +22,6 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -46,21 +45,19 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButton
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.component.registration.WorkflowSteps;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.Action;
-import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 
 /**
  * @author a.kohlbecker
@@ -187,7 +184,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.ADD, addNewNameRegistrationButton))
+                e -> eventBus.publishEvent(new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this))
                 );
 
         addExistingNameButton = new Button("existing name:");
@@ -254,7 +251,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");
             editRegistrationButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
-                AbstractEditorAction.Action.EDIT,
+                EditorActionType.EDIT,
                 dto.getId(),
                 null,
                 this
@@ -273,9 +270,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             editButtonGroup.getNameButton().getButton().addClickListener(e -> {
                 Integer nameId = editButtonGroup.getNameButton().getId();
                 getEventBus().publishEvent(new TaxonNameEditorAction(
-                    AbstractEditorAction.Action.EDIT,
+                    EditorActionType.EDIT,
                     nameId,
-                    null, //e.getButton(), the listener method expects this to be null
+                    e.getButton(),
                     this
                     )
                 );
@@ -284,15 +281,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         for(TypeDesignationWorkingSetButton workingsetButton : editButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
-                Integer typeDesignationWorkingsetId = workingsetButton.getId();
+                TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 Integer registrationEntityID = dto.getId();
                 getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
-                        AbstractEditorAction.Action.EDIT,
-                        typeDesignationWorkingsetId,
+                        EditorActionType.EDIT,
+                        baseEntityRef,
                         workingsetType,
                         registrationEntityID,
-                        null, //e.getButton(), the listener method expects this to be null
+                        e.getButton(),
                         this
                         )
                     );
@@ -329,7 +326,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
                 e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
-        newNameTypeDesignationButton.setEnabled(false);
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
         layout.setMargin(true);
@@ -347,42 +343,13 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
-                AbstractEditorAction.Action.ADD,
+                EditorActionType.ADD,
                 newWorkingsetType,
                 registrationEntityId,
                 null,
                 this
                 ));
     }
-
-
-    /**
-    *
-    */
-   private void addBulletWorkflowName() {
-       WorkflowSteps steps = new WorkflowSteps();
-       steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-               e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
-       steps.appendNewWorkflowItem(2, "One or multiple published scientific new names.",
-               e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
-       steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
-       steps.appendNewWorkflowItem(4, "Awaiting publication", null);
-       getWorkflow().addComponent(steps);
-   }
-
-   /**
-   *
-   */
-  private void addBulletWorkflowTypification() {
-      WorkflowSteps steps = new WorkflowSteps();
-      steps.appendNewWorkflowItem(1, "Publication details including the publisher.",
-              e -> eventBus.publishEvent(new ReferenceEditorAction(Action.EDIT)));
-      steps.appendNewWorkflowItem(2, "One or multiple published typifications.",
-              e -> eventBus.publishEvent(new TaxonNameEditorAction(Action.EDIT)));
-      steps.appendNewWorkflowItem(3, "Request for data curation and await approval.", null);
-      steps.appendNewWorkflowItem(4, "Awaiting publication", null);
-      getWorkflow().addComponent(steps);
-  }
 
     /**
      * {@inheritDoc}
@@ -442,14 +409,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     protected String getSubHeaderText() {
         return subheaderText;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AbstractLayout getWorkflow() {
-        return getLayout();
     }
 
     /**

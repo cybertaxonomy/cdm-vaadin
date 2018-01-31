@@ -22,6 +22,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.ui.AbstractAuthenticatedUI;
 
 @SpringView
@@ -148,7 +149,7 @@ public class AuthenticationView extends CustomComponent implements IAuthenticati
 		loginPanelLayout.setSpacing(true);
 
 		// userNameTF
-		userNameTF = new TextField();
+		userNameTF = new TextFieldNFix();
 		userNameTF.setCaption("User Name");
 		userNameTF.setImmediate(false);
 		userNameTF.setWidth("-1px");

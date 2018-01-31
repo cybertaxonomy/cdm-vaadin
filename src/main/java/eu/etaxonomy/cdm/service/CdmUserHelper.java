@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import java.io.Serializable;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -29,6 +30,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.RunAsAuthenticator;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
@@ -45,7 +47,9 @@ import eu.etaxonomy.cdm.vaadin.security.VaadinUserHelper;
  */
 @SpringComponent
 @UIScope
-public class CdmUserHelper extends VaadinUserHelper {
+public class CdmUserHelper extends VaadinUserHelper implements Serializable {
+
+    private static final long serialVersionUID = -2521474709047255979L;
 
     public static final Logger logger = Logger.getLogger(CdmUserHelper.class);
 
@@ -56,16 +60,19 @@ public class CdmUserHelper extends VaadinUserHelper {
     @Qualifier("cdmRepository")
     private CdmRepository repo;
 
+    AuthenticationProvider runAsAuthenticationProvider;
+
     @Autowired
     @Qualifier("runAsAuthenticationProvider")
-    AuthenticationProvider runAsAuthenticationProvider;
+    public void setRunAsAuthenticationProvider(AuthenticationProvider runAsAuthenticationProvider){
+        this.runAsAuthenticationProvider = runAsAuthenticationProvider;
+        runAsAutheticator.setRunAsAuthenticationProvider(runAsAuthenticationProvider);
+    }
 
     RunAsAuthenticator runAsAutheticator = new RunAsAuthenticator();
 
     public CdmUserHelper(){
         super();
-        runAsAutheticator.setRunAsAuthenticationProvider(runAsAuthenticationProvider);
-
     }
 
     @Override
@@ -200,17 +207,25 @@ public class CdmUserHelper extends VaadinUserHelper {
         UserDetails userDetails = repo.getUserService().loadUserByUsername(username);
         boolean newAuthorityAdded = false;
         CdmAuthority authority = null;
+        User user = (User)userDetails;
         if(userDetails != null){
-            runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
-            User user = (User)userDetails;
-            authority = new CdmAuthority(cdmEntity, property, crud);
-            try {
-                newAuthorityAdded = user.getGrantedAuthorities().add(authority.asNewGrantedAuthority());
-            } catch (CdmAuthorityParsingException e) {
-                throw new RuntimeException(e);
+            try{
+                runAsAutheticator.runAsAuthentication(Role.ROLE_USER_MANAGER);
+                authority = new CdmAuthority(cdmEntity, property, crud);
+                try {
+                    GrantedAuthorityImpl grantedAuthority = repo.getGrantedAuthorityService().findAuthorityString(authority.toString());
+                    if(grantedAuthority == null){
+                        grantedAuthority = authority.asNewGrantedAuthority();
+                    }
+                    newAuthorityAdded = user.getGrantedAuthorities().add(grantedAuthority);
+                } catch (CdmAuthorityParsingException e) {
+                    throw new RuntimeException(e);
+                }
+                repo.getSession().flush();
+            } finally {
+                // in any case restore the previous authentication
+                runAsAutheticator.restoreAuthentication();
             }
-            repo.getSession().flush();
-            runAsAutheticator.restoreAuthentication();
             logger.debug("new authority for " + username + ": " + authority.toString());
             Authentication authentication = new PreAuthenticatedAuthenticationToken(user, user.getPassword(), user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

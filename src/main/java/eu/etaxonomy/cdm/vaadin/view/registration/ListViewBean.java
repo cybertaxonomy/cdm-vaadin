@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,9 +24,17 @@ import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
@@ -38,17 +47,28 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 @SpringView(name=ListViewBean.NAME)
 public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View, AccessRestrictedView {
 
+
     private static final long serialVersionUID = 3543300933072824713L;
 
     public static final String NAME = "list";
 
-    public static final String OPTION_ALL = "all";
-
-    public static final String OPTION_IN_PROGRESS = "inprogress";
+    Mode viewMode = Mode.all;
 
     private CssLayout listContainer;
 
-    private CssLayout toolBar;
+    private HorizontalLayout toolBar;
+
+    private Label filterInstructionLabel = new Label("Filter the registrations by");
+
+    private ListSelect statusFilter = null;
+
+    private ListSelect submitterFilter = null; // must be null, the presenter relies on this
+
+    private TextField identifierFilter = new TextFieldNFix("Identifier");
+
+    private TextField taxonNameFilter = new TextFieldNFix("Name");
+
+    private TextField referenceFilter = new TextFieldNFix("Publication");
 
     public ListViewBean() {
         super();
@@ -56,9 +76,36 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     @Override
     protected void initContent() {
+
         getLayout().setId(NAME);
-        toolBar = new CssLayout();
-        toolBar.setWidth(100, Unit.PERCENTAGE);
+        toolBar = new HorizontalLayout();
+
+        toolBar.addComponent(filterInstructionLabel);
+
+        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
+
+            submitterFilter = new ListSelect("Submitter");
+            submitterFilter.setRows(1);
+            submitterFilter.addValueChangeListener(e -> updateResults(null, null));
+            toolBar.addComponent(submitterFilter);
+        }
+
+        if(viewMode.equals(Mode.all)){
+            statusFilter = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
+            statusFilter.setNullSelectionAllowed(true);
+            statusFilter.setRows(1);
+            statusFilter.addValueChangeListener(e -> updateResults(null, null));
+            toolBar.addComponent(statusFilter);
+        }
+
+        toolBar.addComponents(identifierFilter, taxonNameFilter);
+        int textChangeTimeOut = 200;
+        identifierFilter.addTextChangeListener(e -> updateResults(identifierFilter, e.getText()));
+        identifierFilter.setTextChangeTimeout(textChangeTimeOut);
+        taxonNameFilter.addTextChangeListener(e -> updateResults(taxonNameFilter, e.getText()));
+        identifierFilter.setTextChangeTimeout(textChangeTimeOut);
+
+        toolBar.setSpacing(true);
         addContentComponent(toolBar, null);
 
         listContainer = new CssLayout();
@@ -66,6 +113,13 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer.setWidth(100, Unit.PERCENTAGE);
         addContentComponent(listContainer, 1f);
 
+    }
+
+    /**
+     * @return
+     */
+    private void updateResults(TextField field, String newText) {
+        eventBus.publishEvent(new UpdateResultsEvent(field, newText, this));
     }
 
     @Override
@@ -88,15 +142,16 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     }
 
     @Override
-    public void populate(Collection<RegistrationDTO> registrations) {
+    public void populate(Pager<RegistrationDTO> regDtoPager) {
 
-        registrations = new ArrayList<RegistrationDTO>(registrations);
+        ArrayList<RegistrationDTO> regDtos = new ArrayList<RegistrationDTO>(regDtoPager.getRecords());
 
-        populateList(registrations);
+        populateList(regDtos);
     }
 
     public void populateList(Collection<RegistrationDTO> registrations) {
 
+        listContainer.removeAllComponents();
         boolean isCurator = UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this);
@@ -155,6 +210,64 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
     }
+
+    /**
+     * @return the identifierFilter
+     */
+    @Override
+    public TextField getIdentifierFilter() {
+        return identifierFilter;
+    }
+
+    /**
+     * @return the taxonNameFilter
+     */
+    @Override
+    public TextField getTaxonNameFilter() {
+        return taxonNameFilter;
+    }
+
+    /**
+     * @return the referenceFilter
+     */
+    @Override
+    public TextField getReferenceFilter() {
+        return referenceFilter;
+    }
+
+    /**
+     * @return the statusFilter
+     */
+    @Override
+    public ListSelect getStatusFilter() {
+        return statusFilter;
+    }
+
+    /**
+     * @return the submitterFilter
+     */
+    @Override
+    public ListSelect getSubmitterFilter() {
+        return submitterFilter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setViewMode(Mode mode) {
+        viewMode = mode;
+    }
+
+
+    @Override
+    public Mode getViewMode() {
+        return viewMode;
+    }
+
+
+
+
 
 
 

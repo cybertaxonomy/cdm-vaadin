@@ -14,11 +14,13 @@ import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.dbunit.annotation.DataSet;
+import org.unitils.dbunit.annotation.ExpectedDataSet;
 import org.unitils.spring.annotation.SpringBeanByName;
 import org.unitils.spring.annotation.SpringBeanByType;
 
@@ -37,9 +39,12 @@ import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
+import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
+import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -49,7 +54,9 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  * @since Nov 17, 2017
  *
  */
-@Transactional(TransactionMode.ROLLBACK)
+@Transactional(TransactionMode.DISABLED)
+// IMPORTANT: test03_deleteTypeDesignationTest executed not as last would cause the other tests to fail due to changes in the db
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinIntegrationTest{
 
     @SpringBeanByName
@@ -83,7 +90,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
-    public void createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
+    public void test01_createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
 //        printDataSetWithNull(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
 //                , "PERMISSIONGROUP", "PERMISSIONGROUP_GRANTEDAUTHORITYIMPL", "GRANTEDAUTHORITYIMPL"});
@@ -99,6 +106,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
        Assert.assertEquals(Registration.class, workingset.getOwner().getClass());
 
        workingset.getFieldUnit().setFieldNotes("FieldNotes");
+       int baseEntityID = workingset.getFieldUnit().getId();
        workingset.getFieldUnit().setFieldNumber("FieldNumber");
        workingset.getFieldUnit().getGatheringEvent().setLocality(LanguageString.NewInstance("Somewhere", Language.ENGLISH()));
 
@@ -112,9 +120,14 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        service.save(workingset);
 
-       //printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+       SpecimenOrObservationBase baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
 
-       workingset = service.loadDtoByIds(registrationId, 0);
+
+       printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+
+       TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, baseEntity.getId(), baseEntity.getTitleCache());
+
+       workingset = service.loadDtoByIds(registrationId, baseEntityRef);
 
        Assert.assertNotNull(specimenTypeDesignationDTO.asSpecimenTypeDesignation().getTypeSpecimen());
        Assert.assertEquals(MediaSpecimen.class, specimenTypeDesignationDTO.asSpecimenTypeDesignation().getTypeSpecimen().getClass());
@@ -131,7 +144,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        service.save(workingset);
 
-       workingset = service.loadDtoByIds(registrationId, 0);
+       workingset = service.loadDtoByIds(registrationId, baseEntityRef);
        Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 
 
@@ -142,17 +155,28 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
        // printDataSetWithNull(System.err, includeTableNames_delete);
         writeDbUnitDataSetFile(includeTableNames_delete, "deleteTest");
         */
+       /* The following audit table fix needs also to be added to the test data:
+           <!-- Test data is being used by more than one test - need to reset a couple of *_AUD tables -->
+          <AUDITEVENT />
+          <TAXONNAME_AUD />
+          <DERIVATIONEVENT_AUD />
+          <TYPEDESIGNATIONBASE_AUD />
+          <SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT_AUD />
+          <REGISTRATION_AUD />
+          <SPECIMENOROBSERVATIONBASE_AUD />
+          <TAXONNAME_TYPEDESIGNATIONBASE_AUD />
+        */
 
     }
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    @Ignore
-    public void deleteTypeDesignationTest() {
+    @ExpectedDataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.deleteTypeDesignationTest-result.xml")
+    public void test03_deleteTypeDesignationTest() {
 
-        printDataSetWithNull(System.err,  includeTableNames_delete); // new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION"});
-
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
+        // FieldUnit" ID="5001
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, 5001, "Somewhere, FieldNumber.");
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, baseEntityRef);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 
         SpecimenTypeDesignationDTO deleteDTO = null;
@@ -169,24 +193,27 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         SpecimenTypeDesignation std = deleteDTO.asSpecimenTypeDesignation();
         reg.getTypeDesignations().remove(std);
 
-
-        printDataSetWithNull(System.err, includeTableNames_delete);
-
         service.save(workingset);
 
-        printDataSetWithNull(System.err, includeTableNames_delete);
+        //printDataSetWithNull(System.err, includeTableNames_delete);
 
-        workingset = service.loadDtoByIds(registrationId, 0);
+        workingset = service.loadDtoByIds(registrationId, baseEntityRef);
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());
+        reg = workingset.getOwner();
+        Assert.assertEquals(1, reg.getTypeDesignations().size());
     }
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
-    public void deleteWorkingsetTest() {
+    public void test02_deleteWorkingset() {
 
-        //printDataSetWithNull(System.err, includeTableNames_delete);
+        // printDataSetWithNull(System.err, includeTableNames_delete);
 
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, 0);
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, 5001, null);
+
+        try {
+
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, baseEntityRef);
         Assert.assertNotNull(workingset.getOwner());
         Assert.assertEquals(2, workingset.getSpecimenTypeDesignationDTOs().size());
         service.delete(workingset, true);
@@ -202,9 +229,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         Assert.assertEquals("All TypeDesignations should have been deleted", 0, cdmRepository.getNameService().getAllTypeDesignations(10, 0).size());
         Assert.assertEquals("All derived units should have been deleted", 0, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
         Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
-        // FIXME Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
-        // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
-
+        Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
+        // FIXME  Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
+        } catch (Exception e){
+            e.printStackTrace(System.err);
+        }
         // printDataSetWithNull(System.err, includeTableNames_delete);
     }
 
@@ -236,7 +265,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         registrationId = reg.getId();
 
 
-        printDataSetWithNull(System.err, includeTableNames_create);
+        //printDataSetWithNull(System.err, includeTableNames_create);
 
         writeDbUnitDataSetFile(includeTableNames_create);
     }

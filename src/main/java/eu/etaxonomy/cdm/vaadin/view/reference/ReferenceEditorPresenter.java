@@ -14,17 +14,17 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.context.event.EventListener;
 import org.vaadin.viritin.fields.CaptionGenerator;
-import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
-import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
-import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -63,40 +63,16 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
             }
 
         });
-        getView().getInReferenceCombobox().loadFrom(new FilterablePagingProvider<Reference>(){
 
-            @Override
-            public List<Reference> findEntities(int firstRow, String filter) {
-                Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                        null,
-                        filter,
-                        MatchMode.ANYWHERE,
-                        null,
-                        20,
-                        firstRow,
-                        OrderHint.ORDER_BY_TITLE_CACHE.asList(),
-                        Arrays.asList("$")
-                      );
-                return page.getRecords();
-            }},
-            new FilterableCountProvider(){
-                @Override
-                public int size(String filter) {
-                    Pager<Reference> page = getRepo().getReferenceService().findByTitle(
-                            null,
-                            filter,
-                            MatchMode.ANYWHERE,
-                            null,
-                            1,
-                            0,
-                            null,
-                            null
-                          );
-                    return page.getCount().intValue();
-                }}
-            , 20);
-
+        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
+        getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(getView().getInReferenceCombobox(),this));
+
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService());
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
+        getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
     }
 
     /**
@@ -107,8 +83,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         List<String> initStrategy = Arrays.asList(new String []{
 
-                "$",
-
+                "$"
                 }
         );
 
@@ -116,9 +91,21 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         if(identifier != null){
             reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
-            reference = ReferenceFactory.newGeneric();
+            reference = createNewReference();
         }
         return reference;
+    }
+
+    /**
+     * TODO this should better go into {@link AbstractCdmEditorPresenter}
+     *
+     * @return
+     */
+    protected Reference createNewReference() {
+        if(this.beanInstantiator != null){
+            return beanInstantiator.createNewBean();
+        }
+        return ReferenceFactory.newGeneric();
     }
 
     /**

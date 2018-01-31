@@ -13,7 +13,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,6 +22,7 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
+import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -299,18 +299,19 @@ public class RegistrationDTO{
         return dto;
     }
 
-    /**
-     *
-     * @param workingSetId
-     * @return the TypeDesignationWorkingSet in this DTO with the matching workingSetId or NULL
-     */
-    public TypeDesignationWorkingSet getTypeDesignationWorkingSet(int workingSetId) {
-        Optional<TypeDesignationWorkingSet> workingSetOptional = getOrderdTypeDesignationWorkingSets().values().stream().filter(workingSet -> workingSet.getWorkingSetId() == workingSetId).findFirst();
-        if(workingSetOptional.isPresent()){
-            return workingSetOptional.get();
+    public NameTypeDesignation getNameTypeDesignation(TypedEntityReference baseEntityReference) {
+        Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
+        if(typeDesignations.size() == 1){
+            TypeDesignationBase item = typeDesignations.iterator().next();
+            return (NameTypeDesignation)item ;
+        }
+        if(typeDesignations.size() == 0){
+            return null;
+        }
+        if(typeDesignations.size() > 1){
+            throw new RuntimeException("Workingsets of NameTypeDesignations must contain exactly one item.");
         }
         return null;
-
     }
 
     /**
