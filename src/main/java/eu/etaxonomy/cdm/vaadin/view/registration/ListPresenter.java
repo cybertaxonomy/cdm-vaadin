@@ -12,8 +12,8 @@ import java.util.EnumSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -57,6 +57,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     public IRegistrationWorkingSetService getWorkingSetService() {
         return workingSetService;
     }
+
 
     @Override
     public void handleViewEntered() {
@@ -129,24 +130,27 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         return dtoPager;
     }
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
-    public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
-        RegistrationDTO regDto = getWorkingSetService().loadDtoById((Integer)event.getIdentifier());
-        if(event.getProperty().equals("messages")){
-            if(getView() != null){
-                getView().openDetailsPopup("Messages", regDto.getMessages());
+    @EventBusListenerMethod
+    public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) {
+
+        if(event.getEntityType().equals(RegistrationDTO.class)){
+            RegistrationDTO regDto = getWorkingSetService().loadDtoById((Integer)event.getIdentifier());
+            if(event.getProperty().equals("messages")){
+                if(getView() != null){
+                    getView().openDetailsPopup("Messages", regDto.getMessages());
+                }
             }
         }
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent event){
         if(event.getEntityType().isAssignableFrom(Reference.class)){
             // TODO update component showing the according reference, is there a Vaadin event supporting this?
         }
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onUpdateResultsEvent(UpdateResultsEvent event){
         getView().populate(pageRegistrations(event.getField(), event.getNewText()));
     }

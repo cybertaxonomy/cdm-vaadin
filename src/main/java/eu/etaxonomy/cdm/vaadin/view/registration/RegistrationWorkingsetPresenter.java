@@ -17,9 +17,9 @@ import java.util.UUID;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.TransactionStatus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -46,10 +46,12 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
+import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
@@ -108,7 +110,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     public RegistrationWorkingsetPresenter() {
     }
-
 
     /**
      * Always create a new Store
@@ -214,7 +215,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -226,7 +228,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -238,7 +240,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventListener
+    @EventBusListenerMethod    
     public void onDoneWithReferencePopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof ReferencePopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
@@ -247,7 +249,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onDoneWithSpecimenTypeDesignationWorkingsetPopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
@@ -256,7 +258,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -267,7 +269,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -285,7 +287,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -326,7 +328,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param event
      * @throws RegistrationValidationException
      */
-    @EventListener
+    @EventBusListenerMethod
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
             TransactionStatus txStatus = getRepo().startTransaction();
@@ -358,8 +360,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param event
      * @throws RegistrationValidationException
      */
-    @EventListener(condition = "#event.action == T(eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction.Action).start")
+    @EventBusListenerMethod
     public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws RegistrationValidationException {
+
+        if(!event.isStart()){
+            return;
+        }
 
         getView().getAddExistingNameCombobox().commit();
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
@@ -378,7 +384,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
 
         if(!checkFromOwnView(event)){
@@ -409,8 +416,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD && #event.sourceComponent == null")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onAddNewTypeDesignationWorkingset(TypeDesignationWorkingsetEditorAction event) {
+
+        if(event.getSourceComponent() != null){
+            return;
+        }
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
@@ -479,7 +490,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param event
      * @throws RegistrationValidationException
      */
-    @EventListener
+    @EventBusListenerMethod
     public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
@@ -517,8 +528,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet)")
-    public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
+    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationWorkingSet.class)
+    public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) {
         List<String> messages = new ArrayList<>();
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
             dto.getMessages().forEach(m -> messages.add(dto.getSummary() + ": " + m));
@@ -528,8 +539,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener(classes=ShowDetailsEvent.class, condition = "#event.type == T(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO)")
-    public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) { // WARNING don't use more specific generic type arguments
+
+    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
+    public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) {
         RegistrationDTO regDto = regWorkingSetService.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
             if(getView() != null){
@@ -538,7 +550,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent event){
         if(workingset == null){
             return;

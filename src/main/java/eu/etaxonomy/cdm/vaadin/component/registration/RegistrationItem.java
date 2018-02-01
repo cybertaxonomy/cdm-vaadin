@@ -15,6 +15,7 @@ import java.util.EnumSet;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -296,7 +297,11 @@ public class RegistrationItem extends GridLayout {
 
 
     private void publishEvent(Object event) {
-        parentView.getEventBus().publishEvent(event);
+        if(event instanceof NavigationEvent){
+            parentView.getViewEventBus().publish(EventScope.UI, this, event);
+        } else {
+            parentView.getViewEventBus().publish(this, event);
+        }
     }
 
     /* ====== RegistrationItemDesign Getters ====== */

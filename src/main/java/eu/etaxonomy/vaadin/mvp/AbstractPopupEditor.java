@@ -11,6 +11,7 @@ package eu.etaxonomy.vaadin.mvp;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -244,7 +245,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         public void preCommit(CommitEvent commitEvent) throws CommitException {
             logger.debug("preCommit(), publishing EditorPreSaveEvent");
             // notify the presenter to start a transaction
-            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+            viewEventBus.publish(this, new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
         }
 
         @Override
@@ -254,12 +255,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                     logger.trace("postCommit() publishing EditorSaveEvent for " + getBean().toString());
                 }
                 // notify the presenter to persist the bean and to commit the transaction
-                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+                viewEventBus.publish(this, new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
                 if(logger.isTraceEnabled()){
                     logger.trace("postCommit() publishing DoneWithPopupEvent");
                 }
                 // notify the NavigationManagerBean to close the window and to dispose the view
-                eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
+                viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
             } catch (Exception e) {
                 logger.error(e);
                 throw new CommitException("Failed to store data to backend", e);
@@ -278,15 +279,15 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Override
     public void cancel() {
         fieldGroup.discard();
-        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
+        viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
     /**
      * @return
      */
     private void delete() {
-        eventBus.publishEvent(new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
-        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
+        viewEventBus.publish(this, new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
+        viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.DELETE));
     }
 
     /**

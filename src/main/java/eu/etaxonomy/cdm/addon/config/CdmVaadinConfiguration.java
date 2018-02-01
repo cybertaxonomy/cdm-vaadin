@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.vaadin.spring.events.annotation.EnableEventBus;
 
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
@@ -77,6 +78,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadin   // this imports VaadinConfiguration
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
+@EnableEventBus // enable the vaadin spring event bus
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
 

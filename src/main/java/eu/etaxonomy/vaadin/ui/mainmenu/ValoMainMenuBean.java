@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
@@ -41,7 +41,12 @@ class ValoMainMenuBean extends CssLayout implements MainMenu {
 	private Button menuToggle;
 
 	@Autowired
-    ApplicationEventPublisher eventBus;
+    protected EventBus.UIEventBus uiEventBus;
+
+	protected void setUIEventBus(EventBus.UIEventBus uiEventBus){
+	    this.uiEventBus = uiEventBus;
+	    uiEventBus.subscribe(this);
+	}
 
 	public ValoMainMenuBean() {
 		setPrimaryStyleName(ValoTheme.MENU_ROOT);
@@ -82,10 +87,10 @@ class ValoMainMenuBean extends CssLayout implements MainMenu {
 	}
 
 	private void onMenuItemClicked(String navigationResource) {
-	    eventBus.publishEvent(new NavigationEvent(navigationResource));
+	    uiEventBus.publish(this, new NavigationEvent(navigationResource));
 	}
 
-	@EventListener
+	@EventBusListenerMethod
 	protected void onNavigationEvent(NavigationEvent e) {
 		List<MainMenuItemBean> menuItems = StreamSupport.stream(menuArea.spliterator(), false)
 				.filter(component -> MainMenuItemBean.class.isAssignableFrom(component.getClass()))
@@ -99,8 +104,8 @@ class ValoMainMenuBean extends CssLayout implements MainMenu {
 		}
 	}
 
-	@EventListener
-	protected void afterViewChange(AfterViewChangeEvent event) {
+	@EventBusListenerMethod
+	protected void afterViewChange(org.vaadin.spring.events.Event<AfterViewChangeEvent> event) {
 		removeStyleName(MENU_VISIBLE);
 	}
 

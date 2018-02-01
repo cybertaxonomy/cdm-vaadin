@@ -16,8 +16,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -35,6 +37,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
@@ -53,6 +56,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  * @since May 22, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonName, TaxonNamePopupEditorView> {
 
     /**
@@ -271,12 +276,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         return getRepo().getNameService();
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
+
         referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
@@ -291,8 +297,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
+
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
@@ -311,7 +318,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         }
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onDoneWithPopupEvent(DoneWithPopupEvent event){
 
         if(event.getPopup() == referenceEditorPopup){
@@ -347,12 +354,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
+
         basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
 
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
@@ -364,12 +372,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(TaxonNameEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
+
         basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
 
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);

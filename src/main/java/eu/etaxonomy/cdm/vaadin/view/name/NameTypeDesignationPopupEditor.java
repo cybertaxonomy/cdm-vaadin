@@ -8,6 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import org.springframework.context.annotation.Scope;
+
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
@@ -27,6 +30,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since Jan 26, 2018
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameTypeDesignation, NameTypeDesignationPresenter>
     implements NameTypeDesignationEditorView {
 

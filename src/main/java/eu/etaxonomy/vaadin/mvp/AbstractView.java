@@ -7,7 +7,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.spring.events.EventBus;
 
 import com.vaadin.ui.CustomComponent;
 
@@ -36,7 +36,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	private ApplicationContext applicationContext;
 
     @Autowired
-    protected ApplicationEventPublisher eventBus;
+    EventBus.ViewEventBus viewEventBus;
 
 	@SuppressWarnings("unchecked")
     @PostConstruct
@@ -91,8 +91,8 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 		this.applicationContext = applicationContext;
 	}
 
-	public ApplicationEventPublisher getEventBus(){
-	    return eventBus;
+	public EventBus.ViewEventBus getViewEventBus(){
+	    return viewEventBus;
 	}
 
    @Override

@@ -3,8 +3,8 @@ package eu.etaxonomy.vaadin.ui.navigation;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -24,7 +24,7 @@ class ViewChangeListenerBean implements ViewChangeListener {
 	private NavigationManager navigationManager;
 
 	@Autowired
-    ApplicationEventPublisher eventBus;
+    UIEventBus uiEventBus;
 
 	@Override
 	public boolean beforeViewChange(ViewChangeEvent event) {
@@ -43,7 +43,7 @@ class ViewChangeListenerBean implements ViewChangeListener {
 
 	@Override
 	public void afterViewChange(ViewChangeEvent event) {
-	    eventBus.publishEvent(new AfterViewChangeEvent());
+	    uiEventBus.publish(this, new AfterViewChangeEvent());
 	}
 
 }

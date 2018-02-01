@@ -119,7 +119,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
      * @return
      */
     private void updateResults(TextField field, String newText) {
-        eventBus.publishEvent(new UpdateResultsEvent(field, newText, this));
+        getViewEventBus().publish(this, new UpdateResultsEvent(field, newText, this));
     }
 
     @Override

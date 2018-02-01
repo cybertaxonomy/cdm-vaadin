@@ -14,8 +14,11 @@ import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.vaadin.spring.events.Event;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBus.ViewEventBus;
+import org.vaadin.spring.events.EventBusListener;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
@@ -29,6 +32,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -37,9 +41,17 @@ import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
  */
 @Component
 @Profile("debug")
-public class EntityCacheDebugger implements ViewChangeListener {
+public class EntityCacheDebugger implements ViewChangeListener, EventBusListener<PopEditorOpenedEvent> {
 
     Logger logger = Logger.getLogger(EntityCacheDebugger.class);
+    private ViewEventBus viewEventBus;
+
+
+    // @Autowired // FIXME autowiring fails, need to put in UI Scope?
+    protected final void setViewEventBus(EventBus.ViewEventBus viewEventBus){
+        this.viewEventBus = viewEventBus;
+        viewEventBus.subscribe(this);
+    }
 
     EntityCacheDebuggerShortcutListener shortcutListener;
 
@@ -119,10 +131,11 @@ public class EntityCacheDebugger implements ViewChangeListener {
         }
     }
 
-    @EventListener
-    public void onPopEditorOpenedEvent(PopEditorOpenedEvent event){
-        if(event.getPopupView() != null && event.getPopupView() instanceof AbstractCdmPopupEditor){
-            findWindow(((AbstractCdmPopupEditor)event.getPopupView())).addShortcutListener(shortcutListener);
+    @Override
+    public void onEvent(Event<PopEditorOpenedEvent> event){
+        PopupView popupView = event.getPayload().getPopupView();
+        if(popupView != null && popupView instanceof AbstractCdmPopupEditor){
+            findWindow(((AbstractCdmPopupEditor)popupView)).addShortcutListener(shortcutListener);
         }
 
     }

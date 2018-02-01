@@ -11,10 +11,10 @@ package eu.etaxonomy.vaadin.mvp;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationEventPublisher;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByType;
+import org.vaadin.spring.events.EventBus.ViewEventBus;
 
 import com.vaadin.ui.ListSelect;
 
@@ -24,7 +24,6 @@ import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferenceEditorPresenter;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditorView;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
-import eu.etaxonomy.vaadin.ui.view.PopupEditorFactory;
 
 /**
  * @author a.kohlbecker
@@ -39,20 +38,18 @@ public class CdmEditorPresenterTest {
     private static final Logger logger = Logger.getLogger(CdmEditorPresenterTest.class);
 
     @SpringBeanByType
-    protected ApplicationEventPublisher eventBus;
+    protected ViewEventBus viewEventBus;
+
+    @SpringBeanByType
+    private ReferenceEditorPresenter referencePresenter;
 
     @SpringBean("cdmRepository")
     private CdmRepository repo;
-
-    @SpringBeanByType
-    protected PopupEditorFactory factory;
 
     @DataSet
     // @Test test setup not jet working :(
     public void testSaveReference() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-        ReferenceEditorPresenter referencePresenter = new ReferenceEditorPresenter();
-        factory.injectPresenterBeans(ReferenceEditorPresenter.class, referencePresenter);
 
         TestReferenceEditorView testView = new TestReferenceEditorView();
         referencePresenter.init(testView);

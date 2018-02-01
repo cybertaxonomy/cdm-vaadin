@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.vaadin.spring.events.EventBus;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
@@ -34,7 +35,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
 	private V view;
 
-
 	protected V getView() {
 	    if(view == null){
             Logger.getLogger(this.getClass()).warn("CDM-VAADIN#6562: presenter " + toString() + " without view.");
@@ -48,6 +48,27 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
 	@Autowired
 	private NavigationManager navigationManager;
+
+    protected EventBus.ViewEventBus viewEventBus;
+
+    @Autowired
+    protected void setViewEventBus(EventBus.ViewEventBus viewEventBus){
+        this.viewEventBus = viewEventBus;
+        eventViewBusSubscription(viewEventBus);
+    }
+
+    /**
+     * Override if needed, e.g. to skip subscription
+     *
+     * @param viewEventBus
+     */
+    protected void eventViewBusSubscription(EventBus.ViewEventBus viewEventBus){
+            viewEventBus.subscribe(this);
+    }
+
+    public void unsubscribeFromEventBuses(){
+        viewEventBus.unsubscribe(this);
+    }
 
 
 	//	protected DefaultTransactionDefinition definition = null;

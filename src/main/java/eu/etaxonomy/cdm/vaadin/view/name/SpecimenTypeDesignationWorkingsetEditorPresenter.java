@@ -14,8 +14,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
+
+import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
@@ -36,6 +39,7 @@ import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEventFilter;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
@@ -56,6 +60,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
  * @since Jun 13, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class SpecimenTypeDesignationWorkingsetEditorPresenter
     extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView>
     implements CachingPresenter {
@@ -98,7 +104,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         }
         return store;
     }
-
 
     /**
      * Loads an existing working set from the database. This process actually involves
@@ -316,10 +321,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         collectionPopupEditor.loadInEditor(collectionId);
     }
 
-    @EventListener(condition = "#event.entityType == T(eu.etaxonomy.cdm.model.occurrence.Collection)")
+
+    @EventBusListenerMethod(filter = EntityChangeEventFilter.OccurrenceCollectionFilter.class)
     public void onCollectionEvent(EntityChangeEvent event){
 
-        Collection newCollection = getRepo().getCollectionService().load(event.getEntityId(), Arrays.asList(new String[]{"$.institute"}));
+        Collection newCollection = getRepo().getCollectionService().load(
+                event.getEntityId(), Arrays.asList(new String[]{"$.institute"})
+                );
         cache.load(newCollection);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
@@ -347,7 +355,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         referencePopupEditor.loadInEditor(referenceId);
     }
 
-    @EventListener(condition = "#event.entityType == T(eu.etaxonomy.cdm.model.reference.Reference)")
+    @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
     public void onReferenceEvent(EntityChangeEvent event){
 
         Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));

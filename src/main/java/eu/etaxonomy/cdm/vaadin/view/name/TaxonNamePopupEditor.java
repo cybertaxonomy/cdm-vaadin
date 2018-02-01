@@ -12,9 +12,11 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
@@ -45,6 +47,8 @@ import eu.etaxonomy.vaadin.permission.EditPermissionTester;
  * @since May 22, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
@@ -253,12 +257,12 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
-        nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+        nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
                 ));
         nomReferenceCombobox.addClickListenerEditEntity(e -> {
             if(nomReferenceCombobox.getValue() != null){
-                getEventBus().publishEvent(
+                getViewEventBus().publish(this,
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
                             nomReferenceCombobox.getValue().getId(),
@@ -300,7 +304,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 beanId = ((CdmBase)fieldValue).getId();
 
             }
-            eventBus.publishEvent(new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;

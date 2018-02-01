@@ -184,14 +184,14 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> eventBus.publishEvent(new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this))
+                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this))
                 );
 
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
-                e -> eventBus.publishEvent(new RegistrationWorkingsetAction(citationID, RegistrationWorkingsetAction.Action.start))
+                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(citationID, RegistrationWorkingsetAction.Action.start))
                 );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
@@ -229,7 +229,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         if(dto.getMessages().isEmpty()){
             messageButton.setEnabled(false);
         } else {
-            messageButton.addClickListener(e -> eventBus.publishEvent(
+            messageButton.addClickListener(e -> getViewEventBus().publish(this,
                     new ShowDetailsEvent<RegistrationDTO, Integer>(
                         e,
                         RegistrationDTO.class,
@@ -250,7 +250,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");
-            editRegistrationButton.addClickListener(e -> getEventBus().publishEvent(new RegistrationEditorAction(
+            editRegistrationButton.addClickListener(e -> getViewEventBus().publish(this, new RegistrationEditorAction(
                 EditorActionType.EDIT,
                 dto.getId(),
                 null,
@@ -269,7 +269,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         if(editButtonGroup.getNameButton() != null){
             editButtonGroup.getNameButton().getButton().addClickListener(e -> {
                 Integer nameId = editButtonGroup.getNameButton().getId();
-                getEventBus().publishEvent(new TaxonNameEditorAction(
+                getViewEventBus().publish(this, new TaxonNameEditorAction(
                     EditorActionType.EDIT,
                     nameId,
                     e.getButton(),
@@ -284,7 +284,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 Integer registrationEntityID = dto.getId();
-                getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+                getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                         EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
@@ -342,7 +342,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      */
     protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
-        getEventBus().publishEvent(new TypeDesignationWorkingsetEditorAction(
+        getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                 EditorActionType.ADD,
                 newWorkingsetType,
                 registrationEntityId,

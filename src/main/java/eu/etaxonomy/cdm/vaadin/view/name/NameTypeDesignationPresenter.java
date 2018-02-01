@@ -13,6 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+
+import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -35,6 +38,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
  * @since Jan 26, 2018
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class NameTypeDesignationPresenter
         extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
 
