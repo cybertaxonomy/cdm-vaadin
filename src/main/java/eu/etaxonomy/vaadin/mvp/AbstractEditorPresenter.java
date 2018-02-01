@@ -60,17 +60,12 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     }
 
    /**
-    * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
-    *
     * @param saveEvent
     */
    @EventBusListenerMethod
    public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
 
-       FlushMode previousFlushMode = getSession().getFlushMode();
-       getSession().setFlushMode(FlushMode.AUTO);
        deleteBean(deleteEvent.getBean());
-       getSession().setFlushMode(previousFlushMode);
    }
 
     /**
