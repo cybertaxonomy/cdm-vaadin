@@ -245,6 +245,11 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().setCaptionAsHtml(true);
         }
 
+        if(regDto != null && regDto.getBlockedBy() != null && regDto.getBlockedBy().size() > 0){
+            getBlockedByButton().setEnabled(true);
+            getBlockedByButton().addStyleName("blocked");
+        }
+
         labelMarkup.append(citationString);
 
         if(openButtonEvent != null){

@@ -58,7 +58,7 @@ public class RegistrationDTO{
 
     private List<String> messages = new ArrayList<>();
 
-    private Set<eu.etaxonomy.cdm.model.name.Registration> blockedBy = new HashSet<>();
+    // private Set<eu.etaxonomy.cdm.model.name.Registration> blockedBy = new HashSet<>();
 
 
     /**
@@ -363,7 +363,7 @@ public class RegistrationDTO{
      * @return the blockedBy
      */
     public Set<Registration> getBlockedBy() {
-        return blockedBy;
+        return reg.getBlockedBy();
     }
 
     /**

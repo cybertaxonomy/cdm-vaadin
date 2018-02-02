@@ -53,6 +53,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
 public class RegistrationWorkingSetService implements IRegistrationWorkingSetService {
 
     public static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(new String []{
+            "blockedBy",
             // typeDesignation
             "typeDesignations.typeStatus",
             "typeDesignations.typifiedNames.typeDesignations", // important !!

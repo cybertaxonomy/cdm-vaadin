@@ -242,6 +242,15 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         }
     }
     
+    
+   // --------------------------------------------------- //
+   
+   .registration-list-item {
+        .blocked {
+            color: $v-focus-color;
+        }
+   }
+   
    // --------------------------------------------------- //
 
     #workingset {
