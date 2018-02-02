@@ -64,7 +64,7 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
      * @param e
      */
     private void handleLoginClick(ClickEvent e) {
-        getViewEventBus().publish(this, new AuthenticationAttemptEvent(e, loginDialog.getUserName().getValue()));
+        getViewEventBus().publish(EventScope.UI, this, new AuthenticationAttemptEvent(e, loginDialog.getUserName().getValue()));
     }
 
     @Override
