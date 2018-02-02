@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since May 10, 2017
@@ -27,8 +29,8 @@ public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Typ
      * @param type
      * @param entityId
      */
-    public EntityChangeEvent(Class<?> entityType, Integer entityId, Type type) {
-        super(type, entityId);
+    public EntityChangeEvent(Class<?> entityType, Integer entityId, Type type, AbstractView sourceView) {
+        super(type, entityId, sourceView);
         this.entityType = entityType;
     }
 

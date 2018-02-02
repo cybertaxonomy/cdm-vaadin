@@ -89,7 +89,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
 
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton)
+                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, this)
                 ));
         newPublicationButton.setCaption("New");
         newPublicationButton.setWidth(ELEMENT_WIDTH);
@@ -101,7 +101,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, this)
                 ));
 
         removeNewPublicationButton.setVisible(false);

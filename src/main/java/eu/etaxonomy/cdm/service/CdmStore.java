@@ -24,6 +24,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
+import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
  * @author a.kohlbecker
@@ -176,11 +177,11 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      *
      * @param bean
-     * 
+     *
      * @return the merged bean, this bean is <b>not reloaded</b> from the
      *         persistent storage.
      */
-    public EntityChangeEvent saveBean(T bean) {
+    public EntityChangeEvent saveBean(T bean, AbstractView view) {
 
         Type changeEventType;
         if(bean.getId() > 1){
@@ -209,7 +210,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         session.flush();
         commitTransction();
 
-        return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType);
+        return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType, view);
     }
 
     /**
@@ -217,7 +218,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @param bean
      * @return a EntityChangeEvent in case the deletion was successful otherwise <code>null</code>.
      */
-    public final EntityChangeEvent deleteBean(T bean) {
+    public final EntityChangeEvent deleteBean(T bean, AbstractView view) {
 
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
 
@@ -229,7 +230,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             getSession().flush();
             commitTransction();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
-            return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED);
+            return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED, view);
         } else {
             String notificationTitle;
             StringBuffer messageBody = new StringBuffer();

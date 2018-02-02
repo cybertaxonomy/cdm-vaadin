@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Stack;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -45,6 +46,7 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButton
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -265,6 +267,12 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         Component regItem;
 
         RegistrationItemEditButtonGroup editButtonGroup = new RegistrationItemEditButtonGroup(dto);
+        Integer registrationEntityID = dto.getId();
+        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        context.push(new EditorActionContext(
+                    new TypedEntityReference<>(Registration.class, registrationEntityID),
+                    this)
+                    );
 
         if(editButtonGroup.getNameButton() != null){
             editButtonGroup.getNameButton().getButton().addClickListener(e -> {
@@ -273,7 +281,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     EditorActionType.EDIT,
                     nameId,
                     e.getButton(),
-                    this
+                    this,
+                    context
                     )
                 );
             });
@@ -283,14 +292,14 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             workingsetButton.getButton().addClickListener(e -> {
                 TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
-                Integer registrationEntityID = dto.getId();
                 getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                         EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
                         registrationEntityID,
                         e.getButton(),
-                        this
+                        this,
+                        context
                         )
                     );
             });

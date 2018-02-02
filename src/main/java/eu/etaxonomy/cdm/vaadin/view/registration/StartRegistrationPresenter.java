@@ -92,7 +92,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             return;
         }
 
-        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
         refTypes.remove(ReferenceType.Section);
         newReferencePopup.withReferenceTypes(refTypes);

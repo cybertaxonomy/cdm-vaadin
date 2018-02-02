@@ -21,12 +21,5 @@ public class TypeDesignationEditorAction extends AbstractEditorAction {
         super(eventType);
     }
 
-    /**
-     * @param type
-     * @param entityId
-     */
-    public TypeDesignationEditorAction(EditorActionType type, Integer entityId) {
-        super(type, entityId);
-    }
 
 }

@@ -6,13 +6,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.event.PojoEventListenerManager;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
@@ -26,10 +26,12 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.mvp.ApplicationView;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
@@ -57,9 +59,6 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Autowired
 	protected ApplicationContext applicationContext;
-
-	@Autowired
-	private PojoEventListenerManager eventListenerManager;
 
 	protected EventBus.UIEventBus uiEventBus;
 
@@ -166,14 +165,18 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	@Override
-	public <T extends PopupView> T showInPopup(Class<T> popupType) {
+	public <T extends PopupView> T showInPopup(Class<T> popupType, ApplicationView parentView) {
 
 	    PopupView popupView =  findPopupView(popupType);
 
 	    if(AbstractPopupEditor.class.isAssignableFrom(popupView.getClass())){
-	        AbstractEditorPresenter presenter = ((AbstractPopupEditor)popupView).presenter();
-	        eventListenerManager.addEventListeners(presenter);
+	        if(parentView instanceof AbstractPopupEditor){
+	            // retain the chain of EditorActionContexts when starting a new pupupEditor
+	            Stack<EditorActionContext> parentEditorActionContext = ((AbstractPopupEditor)parentView).getEditorActionContext();
+	            ((AbstractPopupEditor)popupView).setParentEditorActionContext(parentEditorActionContext);
+	        }
 	    }
+
 
 		Window window = new Window();
 		window.setCaption(popupView.getWindowCaption());

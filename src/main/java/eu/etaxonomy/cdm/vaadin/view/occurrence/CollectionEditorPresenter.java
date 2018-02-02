@@ -113,7 +113,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
@@ -127,7 +127,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);

@@ -305,7 +305,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorAdd() {
 
-        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -314,7 +314,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorEdit(int collectionId) {
 
-        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -338,7 +338,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorAdd() {
 
-        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
 
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
@@ -348,7 +348,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorEdit(int referenceId) {
 
-        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);

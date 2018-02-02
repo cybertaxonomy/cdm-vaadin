@@ -26,6 +26,11 @@ public class TypedEntityReference<T> extends EntityReference {
         this.type = type;
     }
 
+    public TypedEntityReference(Class<T> type, int id) {
+        super(id, null);
+        this.type = type;
+    }
+
     /**
      * @return the type
      */

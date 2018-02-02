@@ -283,7 +283,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             return;
         }
 
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
@@ -304,7 +304,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
@@ -363,7 +363,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
         basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
 
-        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
         getView().getModesActive().forEach(m -> basionymNamePopup.enableMode(m));
@@ -381,7 +381,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
         basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
 
-        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
         basionymNamePopup.loadInEditor(null);

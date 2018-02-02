@@ -8,15 +8,17 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.Stack;
+
 import com.vaadin.ui.Component;
 
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
- * Base implementation for an event which
- * which represents the request to start an editor to enable the
- * user to perform the <code>action</code> transported with this event.
+ * Base implementation for an event which which represents the request to start
+ * an editor to enable the user to perform the <code>action</code> transported
+ * with this event.
  *
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -26,33 +28,43 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
 
     private Component sourceComponent = null;
 
-    private AbstractView sourceView = null;
+    protected Stack<EditorActionContext> context;
 
     public AbstractEditorAction(EditorActionType action) {
-        super(action, null);
+        this(action, null, null);
     }
 
-    public AbstractEditorAction(EditorActionType action, Component source) {
-        this(action, null, source);
-    }
-
-    /**
-     * @param type
-     * @param citationId
-     */
-    public AbstractEditorAction(EditorActionType action, Integer entityId) {
-        super(action, entityId);
-    }
-
-    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source) {
-        super(action, entityId);
-        this.sourceComponent = source;
+    public AbstractEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
+        this(action, null, source, sourceView);
+        if (!action.equals(EditorActionType.ADD)) {
+            throw new RuntimeException("This constructor must only be used for EditorActionType.ADD");
+        }
     }
 
     public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId);
+        this(action, entityId, source, sourceView, null);
+    }
+
+    /**
+     *
+     * @param action
+     *            the action being requested
+     * @param entityId
+     *            the id of the entity to which the action
+     * @param source
+     *            The vaadin ui component from which the action was triggered
+     * @param sourceView
+     *            The view from which the action is send
+     * @param context
+     *            Editor actions can hold a stack of entities to represent the chain of
+     *            Editor actions from previous views and editors that lead to the point
+     *            from where this action is spawned.
+     */
+    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+            Stack<EditorActionContext> context) {
+        super(action, entityId, sourceView);
         this.sourceComponent = source;
-        this.sourceView = sourceView;
+        this.context = context;
     }
 
     public boolean isAddAction() {
@@ -67,7 +79,7 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
         return type.equals(EditorActionType.REMOVE);
     }
 
-    public Component getSourceComponent(){
+    public Component getSourceComponent() {
         return sourceComponent;
     }
 
@@ -76,11 +88,44 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
     }
 
     /**
-     * @return the sourceView
+     * @return the context
      */
-    public AbstractView getSourceView() {
-        return sourceView;
+    public Stack<EditorActionContext> getContext() {
+        return context;
     }
 
+    public static class EditorActionContext {
+
+        Object parentEntity;
+
+        AbstractView parentView;
+
+        /**
+         * @param parentEntity
+         * @param parentView
+         */
+        public EditorActionContext(Object parentEntity, AbstractView parentView) {
+            super();
+            this.parentEntity = parentEntity;
+            this.parentView = parentView;
+        }
+
+        /**
+         * @return the parentEntity
+         */
+        public Object getParentEntity() {
+            return parentEntity;
+        }
+
+        /**
+         * @return the parentView
+         */
+        public AbstractView getParentView() {
+            return parentView;
+        }
+
+
+
+    }
 
 }

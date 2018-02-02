@@ -9,6 +9,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.vaadin.spring.events.EventScope;
@@ -47,6 +48,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
@@ -89,6 +92,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private GridLayout _gridLayoutCache;
 
     private boolean isBeanLoaded;
+
+    private Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+
+    private boolean isContextUpdated;
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
@@ -619,6 +626,33 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Deprecated
     public P presenter() {
         return getPresenter();
+    }
+
+    /**
+     * Returns the context of editor actions for this editor.
+     * The context submitted with {@link #setParentContext(Stack)} will be updated
+     * to represent the current context.
+     *
+     * @return the context
+     */
+    public Stack<EditorActionContext> getEditorActionContext() {
+        if(!isContextUpdated){
+            if(getBean() == null){
+                throw new RuntimeException("getContext() is only possible after the bean is loaded");
+            }
+            context.push(new AbstractEditorAction.EditorActionContext(getBean(), this));
+            isContextUpdated = true;
+        }
+        return context;
+    }
+
+    /**
+     * Set the context of editor actions parent to this editor
+     *
+     * @param context the context to set
+     */
+    public void setParentEditorActionContext(Stack<EditorActionContext> context) {
+        this.context.addAll(context);
     }
 
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Stack;
 import java.util.UUID;
 
 import org.hibernate.Session;
@@ -46,6 +47,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -56,6 +58,7 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.model.EntityReference;
+import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
@@ -67,7 +70,9 @@ import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
@@ -151,7 +156,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 null);
         Authentication authentication = currentSecurityContext().getAuthentication();
         reg.setSubmitter((User)authentication.getPrincipal());
-        EntityChangeEvent event = getRegistrationStore().saveBean(reg);
+        EntityChangeEvent event = getRegistrationStore().saveBean(reg, (AbstractView) getView());
         UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityId(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
         getRepo().commitTransaction(txStatus);
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,7 +228,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         popup.withReferenceTypes(RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES);
         popup.loadInEditor(null);
     }
@@ -234,13 +239,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(!checkFromOwnView(event)){
             return;
         }
-        ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+        ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         popup.withReferenceTypes(RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES);
         popup.withDeleteButton(true);
         popup.loadInEditor(event.getEntityId());
     }
 
-    @EventBusListenerMethod    
+    @EventBusListenerMethod
     public void onDoneWithReferencePopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof ReferencePopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
@@ -265,7 +270,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class);
+        RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class, getView());
         popup.loadInEditor(event.getEntityId());
     }
 
@@ -276,7 +281,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        popup.setParentEditorActionContext(event.getContext());
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
         popup.loadInEditor(event.getEntityId());
@@ -296,9 +302,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         newTaxonNameForRegistration = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
         newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
-        EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration);
+        EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration, (AbstractView) getView());
         newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityId());
-        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class);
+        TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        popup.setParentEditorActionContext(event.getContext());
         popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
@@ -345,7 +352,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             } else if(event.getReason().equals(Reason.CANCEL)){
                 if(newTaxonNameForRegistration != null){
                     // clean up
-                    getTaxonNameStore().deleteBean(newTaxonNameForRegistration);
+                    getTaxonNameStore().deleteBean(newTaxonNameForRegistration, (AbstractView) getView());
                 }
             }
             getRepo().commitTransaction(txStatus);
@@ -393,7 +400,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
-            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class, getView());
+            popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
             if(event.getSourceComponent() != null){
@@ -401,7 +409,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
         } else {
-            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
+            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class, getView());
+            popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
 
@@ -424,7 +433,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
-            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class);
+            SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class, getView());
+            popup.setParentEditorActionContext(event.getContext());
             TypeDesignationWorkingsetEditorIdSet identifierSet;
             Integer typifiedNameId;
             if(newRegistrationDTOWithExistingName != null){
@@ -453,7 +463,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
         } else {
-            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class);
+            NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class, getView());
+            popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
@@ -498,7 +509,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // clean up
                 if(newRegistrationDTOWithExistingName != null){
-                    getRegistrationStore().deleteBean(newRegistrationDTOWithExistingName.registration());
+                    getRegistrationStore().deleteBean(newRegistrationDTOWithExistingName.registration(), (AbstractView) getView());
                 }
             }
             // set newRegistrationDTOWithExistingName NULL in any case
@@ -566,6 +577,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         } else
         if(TaxonName.class.isAssignableFrom(event.getEntityType())){
+            if(event.getType().equals(EntityChangeEvent.Type.CREATED)){
+                // new name! create a blocking registration
+                Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
+                EditorActionContext rootContext = context.get(0);
+                if(rootContext.getParentView().equals(getView())){
+                    TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
+                    TaxonName newName = getRepo().getNameService().load(event.getEntityId(), Arrays.asList("$", "registrations"));
+                    Registration blockingRegistration = Registration.NewInstance();
+                    blockingRegistration = getRepo().getRegistrationService().save(blockingRegistration);
+                    blockingRegistration.setName(newName);
+                    Registration registration = getRepo().getRegistrationService().load(regReference.getId(), Arrays.asList("$", "blockedBy"));
+                    registration.getBlockedBy().add(blockingRegistration);
+                    getRepo().getRegistrationService().saveOrUpdate(registration);
+                    logger.debug("Blocking registration created");
+                } else {
+                    throw new RuntimeException("huuu?");
+                }
+            }
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
                 reg.getTypifiedNameRef() != null
                 && reg.getTypifiedNameRef().getId() == event.getEntityId())){

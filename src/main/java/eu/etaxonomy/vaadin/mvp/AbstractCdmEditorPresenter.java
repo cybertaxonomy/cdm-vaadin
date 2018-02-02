@@ -14,7 +14,6 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
@@ -120,10 +119,10 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      * @return
      */
     protected abstract IService<DTO> getService();
-    
+
     @SuppressWarnings("unchecked")
     @Override
-    @EventBusListenerMethod
+    // @EventBusListenerMethod // already annotated at super class
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
 
         if(!isFromOwnView(preSaveEvent)){
@@ -134,13 +133,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     @SuppressWarnings("unchecked")
     @Override
-    @EventBusListenerMethod
+    // @EventBusListenerMethod // already annotated at super class
     public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
 
         if(!isFromOwnView(saveEvent)){
             return;
         }
-        
+
         // the bean is now updated with the changes made by the user
         DTO bean = saveEvent.getBean();
 
@@ -157,7 +156,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             pca.printCopyEntities(System.err);
         }
         try {
-            EntityChangeEvent changeEvent = getStore().saveBean(bean);
+            EntityChangeEvent changeEvent = getStore().saveBean(bean, (AbstractView) getView());
 
             if(changeEvent != null){
                 viewEventBus.publish(this, changeEvent);
@@ -217,7 +216,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     @Override
     protected final void deleteBean(DTO bean){
-        EntityChangeEvent changeEvent = getStore().deleteBean(bean);
+        EntityChangeEvent changeEvent = getStore().deleteBean(bean, (AbstractView) getView());
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }
