@@ -172,10 +172,10 @@ public class PersonField extends CompositeCustomField<Person> {
         initialsField.setInputPrompt("Initials");
 
         firstNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        firstNameField.setInputPrompt("First Name");
+        firstNameField.setInputPrompt("Family name");
 
         lastNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        lastNameField.setInputPrompt("Last Name");
+        lastNameField.setInputPrompt("Other/given names");
 
         suffixField.setWidth(baseWidth, Unit.PERCENTAGE);
         suffixField.setInputPrompt("Suffix");
