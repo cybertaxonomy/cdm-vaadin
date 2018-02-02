@@ -50,11 +50,16 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     @EventBusListenerMethod
     public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
+        if(!isFromOwnView(preSaveEvent)){
+            return;
+        }
     }
 
     @EventBusListenerMethod
     public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
-
+        if(!isFromOwnView(saveEvent)){
+            return;
+        }
         DTO bean = saveEvent.getBean();
         saveBean(bean);
     }
@@ -64,7 +69,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     */
    @EventBusListenerMethod
    public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
-
+       if(!isFromOwnView(deleteEvent)){
+           return;
+       }
        deleteBean(deleteEvent.getBean());
    }
 
