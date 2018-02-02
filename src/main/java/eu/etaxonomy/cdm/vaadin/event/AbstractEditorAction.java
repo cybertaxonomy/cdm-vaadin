@@ -36,9 +36,6 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
 
     public AbstractEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
         this(action, null, source, sourceView);
-        if (!action.equals(EditorActionType.ADD)) {
-            throw new RuntimeException("This constructor must only be used for EditorActionType.ADD");
-        }
     }
 
     public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
