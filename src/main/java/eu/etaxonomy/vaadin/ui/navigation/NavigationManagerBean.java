@@ -194,7 +194,10 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		// see #6843
 		window.setHeight("100%");
 		window.setContent(popupView.asComponent());
-		window.addCloseListener(e -> popupView.cancel());
+		// TODO need to disallow pressing the close [x] button:
+		// since window.addCloseListener(e -> popupView.cancel()); will
+		// cause sending cancel events even if save has been clicked
+		window.setClosable(false);
 		UI.getCurrent().addWindow(window);
 		popupView.viewEntered();
 		popupView.focusFirst();
