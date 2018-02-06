@@ -157,6 +157,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             RegistrationItem item = new RegistrationItem(regDto, this);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
+            item.getBlockedByButton().addClickListener(e -> item.setShowBlockingRelations(true));
             listContainer.addComponent(item);
         }
     }

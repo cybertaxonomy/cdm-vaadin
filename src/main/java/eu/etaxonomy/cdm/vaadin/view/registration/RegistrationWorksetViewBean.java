@@ -186,8 +186,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this))
-                );
+                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this)));
 
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");

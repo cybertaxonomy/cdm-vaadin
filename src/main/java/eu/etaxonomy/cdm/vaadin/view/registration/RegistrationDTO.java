@@ -58,7 +58,7 @@ public class RegistrationDTO{
 
     private List<String> messages = new ArrayList<>();
 
-    // private Set<eu.etaxonomy.cdm.model.name.Registration> blockedBy = new HashSet<>();
+    private Set<RegistrationDTO> blockedBy;
 
 
     /**
@@ -362,8 +362,17 @@ public class RegistrationDTO{
     /**
      * @return the blockedBy
      */
-    public Set<Registration> getBlockedBy() {
-        return reg.getBlockedBy();
+    public Set<RegistrationDTO> getBlockedBy() {
+
+        if(blockedBy == null){
+            blockedBy = new HashSet<>();
+            if(reg.getBlockedBy() != null){
+                for(Registration blockReg : reg.getBlockedBy()){
+                    blockedBy.add(new RegistrationDTO(blockReg));
+                }
+            }
+        }
+        return blockedBy;
     }
 
     /**

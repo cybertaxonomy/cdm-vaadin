@@ -28,7 +28,9 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
@@ -73,6 +75,10 @@ public class RegistrationItem extends GridLayout {
 
     private AbstractView<?> parentView;
 
+    private RegistrationDTO regDto;
+
+    private boolean showBlockingRelations = false;
+
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
     // --------------------------------------------------
@@ -87,6 +93,8 @@ public class RegistrationItem extends GridLayout {
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
     private Label releasedLabel = new Label();
+
+    private Panel blockingRelationsPanel;
 
     /**
      *
@@ -170,7 +178,10 @@ public class RegistrationItem extends GridLayout {
     }
 
     public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
+
         this.parentView = parentView;
+
+        this.regDto = regDto;
 
         NavigationEvent navigationEvent = null;
         if(regDto.getCitationID() != null) {
@@ -180,6 +191,10 @@ public class RegistrationItem extends GridLayout {
                     );
         } else {
             setComponentError(new UserError("Citation is missing"));
+        }
+
+        if(showBlockingRelations){
+            createBlockingRelationsContent();
         }
 
         updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
@@ -208,6 +223,23 @@ public class RegistrationItem extends GridLayout {
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
+    }
+
+    private void createBlockingRelationsContent(){
+
+        if(blockingRelationsPanel == null && !regDto.getBlockedBy().isEmpty()){
+            blockingRelationsPanel = new Panel("blocked by");
+            Layout blockingRelations = new CssLayout();
+            blockingRelations.setWidth(100, Unit.PERCENTAGE);
+            blockingRelationsPanel.setContent(blockingRelations);
+            for(RegistrationDTO blockRegDto : regDto.getBlockedBy()){
+                RegistrationItem blockRegItem = new RegistrationItem(blockRegDto, parentView);
+                blockingRelations.addComponent(blockRegItem);
+            }
+            blockingRelationsPanel.setWidth(100, Unit.PERCENTAGE);
+            addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
+        }
+
     }
 
     /**
@@ -245,7 +277,7 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().setCaptionAsHtml(true);
         }
 
-        if(regDto != null && regDto.getBlockedBy() != null && regDto.getBlockedBy().size() > 0){
+        if(regDto != null && !regDto.getBlockedBy().isEmpty()){
             getBlockedByButton().setEnabled(true);
             getBlockedByButton().addStyleName("blocked");
         }
@@ -380,6 +412,24 @@ public class RegistrationItem extends GridLayout {
     public Label getSubmitterLabel() {
         return submitterLabel;
     }
+
+    /**
+     * @return the showBlockingRelations
+     */
+    public boolean isShowBlockingRelations() {
+        return showBlockingRelations;
+    }
+
+    /**
+     * @param showBlockingRelations the showBlockingRelations to set
+     */
+    public void setShowBlockingRelations(boolean showBlockingRelations) {
+        if(showBlockingRelations && !this.showBlockingRelations){
+            createBlockingRelationsContent();
+        }
+        this.showBlockingRelations = showBlockingRelations;
+    }
+
 
 
    /* --------------------------------------- */

@@ -143,7 +143,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // move into RegistrationWorkflowStateMachine
         TransactionStatus txStatus = getRepo().startTransaction();
-        long identifier = System.currentTimeMillis();
 
         Identifier<String> identifiers = minter.mint();
         if(identifiers.getIdentifier() == null){
@@ -322,6 +321,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     protected void configureTaxonNameEditor(TaxonNamePopupEditor popup) {
         popup.enableMode(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData);
         popup.enableMode(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly);
+        popup.enableMode(TaxonNamePopupEditorMode.requireNomenclaturalReference);
     }
 
     /**
@@ -582,17 +582,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
                 EditorActionContext rootContext = context.get(0);
                 if(rootContext.getParentView().equals(getView())){
+                    Registration blockingRegistration = createNewRegistrationForName(event.getEntityId());
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    TaxonName newName = getRepo().getNameService().load(event.getEntityId(), Arrays.asList("$", "registrations"));
-                    Registration blockingRegistration = Registration.NewInstance();
-                    blockingRegistration = getRepo().getRegistrationService().save(blockingRegistration);
-                    blockingRegistration.setName(newName);
                     Registration registration = getRepo().getRegistrationService().load(regReference.getId(), Arrays.asList("$", "blockedBy"));
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
                 } else {
-                    throw new RuntimeException("huuu?");
+                    logger.debug("Nn blocking registration, since a new name for a new registration has been created");
                 }
             }
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->

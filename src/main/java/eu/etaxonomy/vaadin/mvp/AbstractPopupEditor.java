@@ -652,7 +652,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @param context the context to set
      */
     public void setParentEditorActionContext(Stack<EditorActionContext> context) {
-        this.context.addAll(context);
+        if(context != null){
+            this.context.addAll(context);
+        }
     }
 
 }
