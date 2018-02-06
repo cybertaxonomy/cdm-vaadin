@@ -366,14 +366,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
-        getView().getModesActive().forEach(m -> basionymNamePopup.enableMode(m));
+        getView().getModesActive().stream()
+                .filter(
+                        m -> !TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly.equals(m))
+                .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(event.getEntityId());
         basionymNamePopup.getBasionymToggle().setVisible(false);
 
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
-    public void onReferenceEditorActionAdd(TaxonNameEditorAction event) {
+    public void oTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
@@ -384,6 +387,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
+        getView().getModesActive().stream()
+                .filter(
+                        m -> !TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly.equals(m))
+                .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(null);
         basionymNamePopup.getBasionymToggle().setVisible(false);
     }
