@@ -251,6 +251,16 @@ public class TypeDesignationSetManager {
                 @Override
                 public int compare(TypeDesignationStatusBase o1, TypeDesignationStatusBase o2) {
                     // fix inverted order of cdm terms by -1*
+                    if(o1 == null && o2 == null || o1 instanceof NullTypeDesignationStatus && o2 instanceof NullTypeDesignationStatus){
+                        return 0;
+                    }
+                    if(o1 == null || o1 instanceof NullTypeDesignationStatus){
+                        return -1;
+                    }
+
+                    if(o2 == null || o2 instanceof NullTypeDesignationStatus){
+                        return 1;
+                    }
                     return -1 * o1.compareTo(o2);
                 }
             });
