@@ -507,12 +507,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
                 refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){
-                // clean up
-                if(newRegistrationDTOWithExistingName != null){
-                    getRegistrationStore().deleteBean(newRegistrationDTOWithExistingName.registration(), (AbstractView) getView());
-                }
+                // noting to do
             }
-            // set newRegistrationDTOWithExistingName NULL in any case
             newRegistrationDTOWithExistingName = null;
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
@@ -529,11 +525,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 txstate.commit();
                 session.close();
 
-                newNameTypeDesignationTarget = null;
                 refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // noting to do
             }
+            newNameTypeDesignationTarget = null;
         }
         // ignore other editors
     }
