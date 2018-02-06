@@ -226,44 +226,50 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
         DeleteResult result = service.delete(bean);
         if (result.isOk()) {
-
             getSession().flush();
             commitTransction();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
             return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED, view);
         } else {
-            String notificationTitle;
-            StringBuffer messageBody = new StringBuffer();
-            if (result.isAbort()) {
-                notificationTitle = "The delete operation as abborded by the system.";
-            } else {
-                notificationTitle = "An error occured during the delete operation.";
-            }
-            if (!result.getExceptions().isEmpty()) {
-                messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
-                result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
-                messageBody.append("</ul>");
-            }
-            if (!result.getRelatedObjects().isEmpty()) {
-                messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
-                result.getRelatedObjects().forEach(e -> {
-                    messageBody.append("<li>");
-                    if (IdentifiableEntity.class.isAssignableFrom(e.getClass())) {
-                        messageBody.append(((IdentifiableEntity) e).getTitleCache());
-                    } else {
-                        messageBody.append(e.toString());
-                    }
-                    messageBody.append("</li>");
-                });
-
-                messageBody.append("</ul>");
-            }
-            Notification notification = new Notification(notificationTitle, messageBody.toString(),
-                    com.vaadin.ui.Notification.Type.ERROR_MESSAGE, true);
-            notification.show(UI.getCurrent().getPage());
+            handleDeleteresultInError(result);
             txStatus = null;
         }
         return null;
+    }
+
+    /**
+     * @param result
+     */
+    public static void handleDeleteresultInError(DeleteResult result) {
+        String notificationTitle;
+        StringBuffer messageBody = new StringBuffer();
+        if (result.isAbort()) {
+            notificationTitle = "The delete operation as abborded by the system.";
+        } else {
+            notificationTitle = "An error occured during the delete operation.";
+        }
+        if (!result.getExceptions().isEmpty()) {
+            messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
+            result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
+            messageBody.append("</ul>");
+        }
+        if (!result.getRelatedObjects().isEmpty()) {
+            messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
+            result.getRelatedObjects().forEach(e -> {
+                messageBody.append("<li>");
+                if (IdentifiableEntity.class.isAssignableFrom(e.getClass())) {
+                    messageBody.append(((IdentifiableEntity) e).getTitleCache());
+                } else {
+                    messageBody.append(e.toString());
+                }
+                messageBody.append("</li>");
+            });
+
+            messageBody.append("</ul>");
+        }
+        Notification notification = new Notification(notificationTitle, messageBody.toString(),
+                com.vaadin.ui.Notification.Type.ERROR_MESSAGE, true);
+        notification.show(UI.getCurrent().getPage());
     }
 
 

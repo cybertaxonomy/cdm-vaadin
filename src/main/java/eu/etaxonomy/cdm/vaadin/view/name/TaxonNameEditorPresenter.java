@@ -326,8 +326,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 Reference modifiedReference = referenceEditorPopup.getBean();
 
-                // TODO the bean contained in the popup editor is not yet updated at this point.
-                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                // the bean contained in the popup editor is not yet updated at this point.
+                // so re reload it using the uuid since new beans might not have an Id at this point.
                 modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
                 getView().getNomReferenceCombobox().setValue(modifiedReference);
             }
@@ -338,12 +338,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             if(event.getReason() == Reason.SAVE){
                 TaxonName modifiedTaxonName = basionymNamePopup.getBean();
 
-                // TODO the bean contained in the popup editor is not yet updated at this point.
-                //      so re reload it using the uuid since new beans will not have an Id at this point.
+                // the bean contained in the popup editor is not yet updated at this point.
+                // so re reload it using the uuid since new beans might not have an Id at this point.
                 modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
                 basionymSourceField.setValue(modifiedTaxonName);
 
-                // TODO create blocking registration
             }
             if(event.getReason() == Reason.DELETE){
                 basionymSourceField.setValue(null);
@@ -394,6 +393,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup.loadInEditor(null);
         basionymNamePopup.getBasionymToggle().setVisible(false);
     }
+
+
 
 
 }

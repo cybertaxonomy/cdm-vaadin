@@ -47,7 +47,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
         this.baseEntityRef = baseEntityRef;
         this.registrationId = registrationId;
         this.workingSetType = workingSetType;
-        this.context.addAll(context);
+        this.context = context;
+
     }
 
     /**
@@ -63,6 +64,7 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
         super(action, null, source, sourceView);
         this.workingSetType = workingSetType;
         this.registrationId = registrationId;
+        this.context = new Stack<>();
         this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationId), sourceView));
     }
 

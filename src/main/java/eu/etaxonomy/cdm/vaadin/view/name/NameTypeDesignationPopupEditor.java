@@ -20,9 +20,11 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
 /**
@@ -134,6 +136,21 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         typeNameField = new ToOneRelatedEntityCombobox<TaxonName>("Type name", TaxonName.class);
         addField(typeNameField, "typeName", 0, row, 3, row);
+        typeNameField.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                this,
+                new TaxonNameEditorAction(EditorActionType.ADD, null, typeNameField, this))
+        );
+        typeNameField.addClickListenerEditEntity(e -> {
+            if(typeNameField.getValue() != null){
+                getViewEventBus().publish(this,
+                    new TaxonNameEditorAction(
+                            EditorActionType.EDIT,
+                            typeNameField.getValue().getId(),
+                            typeNameField,
+                            this)
+                );
+            }
+        });
 
         row++;
         typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
@@ -196,7 +213,4 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     public void setShowTypeFlags(boolean showTypeFlags) {
         this.showTypeFlags = showTypeFlags;
     }
-
-
-
 }

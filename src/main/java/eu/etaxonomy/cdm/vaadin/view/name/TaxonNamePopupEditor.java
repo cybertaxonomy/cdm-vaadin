@@ -258,7 +258,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
-        nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
+        nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
                 ));
         nomReferenceCombobox.addClickListenerEditEntity(e -> {

@@ -215,7 +215,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     }
 
     @Override
-    protected final void deleteBean(DTO bean){
+    protected void deleteBean(DTO bean){
         EntityChangeEvent changeEvent = getStore().deleteBean(bean, (AbstractView) getView());
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);

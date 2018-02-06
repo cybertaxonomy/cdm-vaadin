@@ -175,6 +175,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     public void setValue(V newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         lazySelect.refresh();
         lazySelect.setValue(newFieldValue);
+        lazySelect.markAsDirty();
     }
 
     @Override
