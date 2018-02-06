@@ -144,6 +144,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         GridLayout grid = (GridLayout)getFieldLayout();
         // grid.setSizeFull();
+        grid.setHideEmptyRowsAndColumns(true);
         grid.setSpacing(true);
         grid.setColumnExpandRatio(0, 0.3f);
         grid.setColumnExpandRatio(1, 0.3f);
@@ -380,6 +381,17 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly) && getBean().getNomenclaturalReference() != null) {
             nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
+        }
+        if(isModeEnabled(TaxonNamePopupEditorMode.requireNomenclaturalReference)) {
+            if(combinationAuthorshipField.getValue() == null){
+                nomReferenceCombobox.setRequired(true);
+            } else {
+                combinationAuthorshipField.addValueChangeListener(e -> {
+                    if(e.getProperty().getValue() == null){
+                        nomReferenceCombobox.setRequired(true);
+                    }
+                });
+            }
         }
 
     }
