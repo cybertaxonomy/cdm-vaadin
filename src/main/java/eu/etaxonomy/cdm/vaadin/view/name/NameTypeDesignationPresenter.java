@@ -80,7 +80,7 @@ public class NameTypeDesignationPresenter
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
 
             // NameTypeDesignation bameTypeDesignation = regDTO.getNameTypeDesignation(typeDesignationWorkingSet.getBaseEntityReference());
-            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(TaxonName.class)){
+            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
             }
             // TypeDesignationWorkingSet for NameTyped only contain one item!!!
