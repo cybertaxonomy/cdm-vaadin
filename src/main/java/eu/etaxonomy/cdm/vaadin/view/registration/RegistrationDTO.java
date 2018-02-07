@@ -359,6 +359,10 @@ public class RegistrationDTO{
         }
     }
 
+    public boolean isBlocked() {
+        return reg.getBlockedBy() != null && !reg.getBlockedBy().isEmpty();
+    }
+
     /**
      * @return the blockedBy
      */

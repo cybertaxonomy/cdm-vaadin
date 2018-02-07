@@ -28,7 +28,6 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
@@ -111,6 +110,7 @@ public class RegistrationItem extends GridLayout {
    public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView) {
        super(GRID_COLS, GRID_ROWS);
        init();
+       blockedByButton.setVisible(false);
        setWorkingSet(workingSet, parentView);
    }
 
@@ -228,15 +228,7 @@ public class RegistrationItem extends GridLayout {
     private void createBlockingRelationsContent(){
 
         if(blockingRelationsPanel == null && !regDto.getBlockedBy().isEmpty()){
-            blockingRelationsPanel = new Panel("blocked by");
-            Layout blockingRelations = new CssLayout();
-            blockingRelations.setWidth(100, Unit.PERCENTAGE);
-            blockingRelationsPanel.setContent(blockingRelations);
-            for(RegistrationDTO blockRegDto : regDto.getBlockedBy()){
-                RegistrationItem blockRegItem = new RegistrationItem(blockRegDto, parentView);
-                blockingRelations.addComponent(blockRegItem);
-            }
-            blockingRelationsPanel.setWidth(100, Unit.PERCENTAGE);
+            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", regDto.getBlockedBy());
             addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
         }
 
@@ -277,7 +269,7 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().setCaptionAsHtml(true);
         }
 
-        if(regDto != null && !regDto.getBlockedBy().isEmpty()){
+        if(regDto != null && !regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
             getBlockedByButton().addStyleName("blocked");
         }
