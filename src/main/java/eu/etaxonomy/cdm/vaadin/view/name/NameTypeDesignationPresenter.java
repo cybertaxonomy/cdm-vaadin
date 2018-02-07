@@ -72,6 +72,9 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadBeanById(Object identifier) {
         if(identifier instanceof Integer || identifier == null){
             return super.loadBeanById(identifier);
+//        } else if(identifier instanceof TypedEntityReference && ((TypedEntityReference)identifier).getType().equals(TaxonName.class)) {
+//            typifiedNameInContext = getRepo().getNameService().find(((TypedEntityReference)identifier).getId());
+//            bean = super.loadBeanById(null);
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);

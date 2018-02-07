@@ -427,7 +427,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
-    public void onAddNewTypeDesignationWorkingset(TypeDesignationWorkingsetEditorAction event) {
+    public void onTypeDesignationWorkingsetAdd(TypeDesignationWorkingsetEditorAction event) {
 
         if(event.getSourceComponent() != null){
             return;
@@ -469,13 +469,19 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
                 @Override
                 public NameTypeDesignation createNewBean() {
+                    TaxonName typifiedName = newNameTypeDesignationTarget.getTypifiedName();
+                    if(typifiedName == null){
+                        // this will be the first type designation, so the nomenclatural act must contain a name
+                        typifiedName = newNameTypeDesignationTarget.registration().getName();
+                    }
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
                     nameTypeDesignation.setCitation(newNameTypeDesignationTarget.getCitation());
-                    nameTypeDesignation.getTypifiedNames().add(newNameTypeDesignationTarget.getTypifiedName());
+                    nameTypeDesignation.getTypifiedNames().add(typifiedName);
                     return nameTypeDesignation;
                 }
             });
