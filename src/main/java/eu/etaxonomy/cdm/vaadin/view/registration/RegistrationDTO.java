@@ -58,7 +58,7 @@ public class RegistrationDTO{
 
     private List<String> messages = new ArrayList<>();
 
-    private Set<RegistrationDTO> blockedBy;
+    private Set<TypedEntityReference<Registration>> blockedBy;
 
 
     /**
@@ -366,13 +366,13 @@ public class RegistrationDTO{
     /**
      * @return the blockedBy
      */
-    public Set<RegistrationDTO> getBlockedBy() {
+    public Set<TypedEntityReference<Registration>> getBlockedBy() {
 
         if(blockedBy == null){
             blockedBy = new HashSet<>();
             if(reg.getBlockedBy() != null){
                 for(Registration blockReg : reg.getBlockedBy()){
-                    blockedBy.add(new RegistrationDTO(blockReg));
+                    blockedBy.add(new TypedEntityReference<Registration>(Registration.class, blockReg.getId(), blockReg.getIdentifier()));
                 }
             }
         }

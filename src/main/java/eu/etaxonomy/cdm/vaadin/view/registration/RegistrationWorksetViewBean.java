@@ -11,7 +11,11 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -25,8 +29,6 @@ import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -72,6 +74,34 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
     implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
+    private class RegistrationDetailsItem {
+
+        RegistrationItemEditButtonGroup registrationItemEditButtonGroup;
+        CssLayout itemFooter;
+
+        public RegistrationDetailsItem(RegistrationItemEditButtonGroup registrationItemEditButtonGroup, CssLayout itemFooter){
+            this.registrationItemEditButtonGroup = registrationItemEditButtonGroup;
+            this.itemFooter = itemFooter;
+        }
+
+
+    }
+
+    /**
+     *
+     */
+    private static final int COL_INDEX_STATE_LABEL = 0;
+
+    /**
+     *
+     */
+    private static final int COL_INDEX_REG_ITEM = 1;
+
+    /**
+     *
+     */
+    private static final int COL_INDEX_BUTTON_GROUP = 2;
+
     public static final String DOM_ID_WORKINGSET = "workingset";
 
     private static final long serialVersionUID = -213040114015958970L;
@@ -98,6 +128,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     private RegistrationItem workingsetHeader;
 
     private Panel registrationListPanel;
+
+    private Map<Integer, RegistrationDetailsItem> registrationItemMap = new HashMap<>();
 
     public RegistrationWorksetViewBean() {
         super();
@@ -151,10 +183,28 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     }
 
+    @Override
+    public void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs) {
+
+        RegistrationDetailsItem regItem = registrationItemMap.get(registrationId);
+
+        boolean blockingRegAdded = false;
+        for(Iterator it = regItem.itemFooter.iterator(); it.hasNext(); ){
+            if(it.next() instanceof RegistrationItemsPanel){
+                blockingRegAdded = true;
+                break;
+            }
+        }
+        if(!blockingRegAdded){
+            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs));
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
+    @Deprecated // no longer needed
     public void addBlockingRegistration(RegistrationDTO blocking) {
         if(registrations == null) {
             throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
@@ -177,9 +227,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         //registrationsGrid.setColumnExpandRatio(0, 0.1f);
         registrationsGrid.setColumnExpandRatio(1, 1f);
 
+        registrationItemMap.clear();
+        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 2);
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
-            putRegistrationListComponent(registrationsGrid, row++, dto);
+            row = putRegistrationListComponent(row, dto);
         }
 
         Label addRegistrationLabel_1 = new Label("Add a new registration for a");
@@ -207,7 +259,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 //        buttonContainer.setWidth(100, Unit.PERCENTAGE);
         buttonContainer.setComponentAlignment(addRegistrationLabel_1, Alignment.MIDDLE_LEFT);
         buttonContainer.setComponentAlignment(addRegistrationLabel_2, Alignment.MIDDLE_LEFT);
-        registrationsGrid.addComponent(buttonContainer, 0, row, 2, row);
+
+        row++;
+        registrationsGrid.addComponent(buttonContainer, 0, row, COL_INDEX_BUTTON_GROUP, row);
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
@@ -215,17 +269,16 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     }
 
 
-    /**
-     * @param grid
-     * @param row If null, the new row will be inserted as last registration item, that is before the button row.
-     * @param dto
-     */
-    protected void putRegistrationListComponent(GridLayout grid, int row, RegistrationDTO dto) {
 
-        grid.setRows(grid.getRows() + 1);
+    protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
         RegistrationItemEditButtonGroup regItemButtonGroup = new RegistrationItemEditButtonGroup(dto);
         Integer registrationEntityID = dto.getId();
+        CssLayout footer = new CssLayout();
+        footer.setWidth(100, Unit.PERCENTAGE);
+        footer.setStyleName("item-footer");
+        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, footer);
+        registrationItemMap.put(registrationEntityID, regDetailsItem);
         Stack<EditorActionContext> context = new Stack<EditorActionContext>();
         context.push(new EditorActionContext(
                     new TypedEntityReference<>(Registration.class, registrationEntityID),
@@ -276,18 +329,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         if(!dto.isBlocked()){
             blockingRegistrationButton.setEnabled(false);
         } else {
-            blockingRegistrationButton.addClickListener(new ClickListener() {
-
-                private static final long serialVersionUID = 2846082434479085292L;
-                RegistrationItemsPanel blockedByPanel = null;
-                @Override
-                public void buttonClick(ClickEvent event) {
-                    if(blockedByPanel == null){
-                        blockedByPanel = new RegistrationItemsPanel(RegistrationWorksetViewBean.this, "Blocked by", dto.getBlockedBy());
-                        regItemButtonGroup.addComponent(blockedByPanel);
-                    }
-                }
-            });
+            blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
+                    this,
+                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                            e,
+                            RegistrationDTO.class,
+                            dto.getId(),
+                            "blockedBy"
+                            )
+                    ));
         }
         buttonGroup.addComponent(blockingRegistrationButton);
 
@@ -329,11 +379,17 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         PermissionDebugUtils.addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
                 EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
-        grid.addComponent(stateLabel, 0, row);
-        grid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
-        grid.addComponent(regItemButtonGroup, 1, row);
-        grid.addComponent(buttonGroup, 2, row);
-        grid.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+        row++;
+        registrationsGrid.addComponent(stateLabel, COL_INDEX_STATE_LABEL, row);
+        registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
+        registrationsGrid.addComponent(regItemButtonGroup, COL_INDEX_REG_ITEM, row);
+        registrationsGrid.addComponent(buttonGroup, COL_INDEX_BUTTON_GROUP, row);
+        registrationsGrid.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+
+        row++;
+        registrationsGrid.addComponent(footer, 0, row, COL_INDEX_BUTTON_GROUP, row);
+
+        return row;
     }
 
     /**

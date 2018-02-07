@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.service;
 
 import java.util.Collection;
+import java.util.Set;
 
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
@@ -41,5 +42,7 @@ public interface IRegistrationWorkingSetService {
      * @return
      */
     public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException;
+
+    public Set<RegistrationDTO> loadBlockingRegistrations(Integer blockedRegistrationId);
 
 }

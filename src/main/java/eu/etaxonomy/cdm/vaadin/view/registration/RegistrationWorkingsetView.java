@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -61,6 +62,7 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      */
     void setWorkingset(RegistrationWorkingSet workingset);
 
+    @Deprecated // no longer needed
     void addBlockingRegistration(RegistrationDTO blocking);
 
     /**
@@ -86,6 +88,12 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      * @param registrationEntityId
      */
     void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId);
+
+    /**
+     * @param registrationId
+     * @param blockingRegDTOs
+     */
+    void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs);
 
 
 

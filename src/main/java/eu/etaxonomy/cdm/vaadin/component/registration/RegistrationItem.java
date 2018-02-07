@@ -12,6 +12,7 @@ import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -75,8 +76,6 @@ public class RegistrationItem extends GridLayout {
     private AbstractView<?> parentView;
 
     private RegistrationDTO regDto;
-
-    private boolean showBlockingRelations = false;
 
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
@@ -193,10 +192,6 @@ public class RegistrationItem extends GridLayout {
             setComponentError(new UserError("Citation is missing"));
         }
 
-        if(showBlockingRelations){
-            createBlockingRelationsContent();
-        }
-
         updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
@@ -225,14 +220,6 @@ public class RegistrationItem extends GridLayout {
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
     }
 
-    private void createBlockingRelationsContent(){
-
-        if(blockingRelationsPanel == null && !regDto.getBlockedBy().isEmpty()){
-            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", regDto.getBlockedBy());
-            addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
-        }
-
-    }
 
     /**
      * @param submitterUserName TODO
@@ -269,7 +256,7 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().setCaptionAsHtml(true);
         }
 
-        if(regDto != null && !regDto.isBlocked()){
+        if(regDto != null && regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
             getBlockedByButton().addStyleName("blocked");
         }
@@ -331,6 +318,30 @@ public class RegistrationItem extends GridLayout {
         } else {
             parentView.getViewEventBus().publish(this, event);
         }
+    }
+
+    public int getRegistrationId(){
+        return regDto.getId();
+    }
+
+    /**
+     * @param showBlockingRelations the showBlockingRelations to set
+     */
+    public void showBlockingRegistrations(Set<RegistrationDTO> blockingRegDTOs) {
+
+        if(blockingRelationsPanel == null) {
+
+            if(regDto.isBlocked() && blockingRegDTOs.isEmpty()){
+                throw new RuntimeException("Registration is blocked but tet of blocking registrations is empty");
+            }
+            if(!regDto.isBlocked() && !blockingRegDTOs.isEmpty()){
+                throw new RuntimeException("No point showing blocking registrations for an unblocked registration");
+            }
+
+            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs);
+            addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
+        }
+
     }
 
     /* ====== RegistrationItemDesign Getters ====== */
@@ -409,19 +420,8 @@ public class RegistrationItem extends GridLayout {
      * @return the showBlockingRelations
      */
     public boolean isShowBlockingRelations() {
-        return showBlockingRelations;
+        return blockingRelationsPanel != null;
     }
-
-    /**
-     * @param showBlockingRelations the showBlockingRelations to set
-     */
-    public void setShowBlockingRelations(boolean showBlockingRelations) {
-        if(showBlockingRelations && !this.showBlockingRelations){
-            createBlockingRelationsContent();
-        }
-        this.showBlockingRelations = showBlockingRelations;
-    }
-
 
 
    /* --------------------------------------- */

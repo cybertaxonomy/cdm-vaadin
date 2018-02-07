@@ -53,7 +53,7 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
 public class RegistrationWorkingSetService implements IRegistrationWorkingSetService {
 
     public static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(new String []{
-            "blockedBy.typeDesignations",
+            "blockedBy",
             // typeDesignation
             "typeDesignations.typeStatus",
             "typeDesignations.typifiedNames.typeDesignations", // important !!
@@ -97,6 +97,29 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
           "gatheringEvent.actor.teamMembers",
           "derivationEvents.derivatives" // important, otherwise the DerivedUnits are not included into the graph of initialized entities!!!
   });
+
+  public static final List<String> BLOCKING_REGISTRATION_INIT_STRATEGY = Arrays.asList(new String []{
+
+          "blockedBy.blockedBy",
+          // typeDesignation
+          "blockedBy.typeDesignations.typeStatus",
+//          "typeDesignations.typifiedNames.typeDesignations", // important !!
+//          "typeDesignations.typeSpecimen",
+//          "typeDesignations.typeName.$",
+//          "typeDesignations.citation",
+//          "typeDesignations.citation.authorship.$",
+          // name
+//          "blockedBy.name.$",
+          "blockedBy.name.nomenclaturalReference.authorship",
+          "blockedBy.name.nomenclaturalReference.inReference",
+          "blockedBy.name.rank",
+//          "name.homotypicalGroup.typifiedNames",
+//          "name.status.type",
+//          "name.typeDesignations",
+          // institution
+          "blockedBy.institution",
+          }
+  );
 
     /**
      *
@@ -167,6 +190,19 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
+    @Override
+    public Set<RegistrationDTO> loadBlockingRegistrations(Integer blockedRegistrationId){
+
+        Registration registration = repo.getRegistrationService().load(blockedRegistrationId, BLOCKING_REGISTRATION_INIT_STRATEGY);
+        Set<Registration> registrations = registration.getBlockedBy();
+
+        Set<RegistrationDTO> blockingSet = new HashSet<>();
+        for(Registration reg : registrations){
+            blockingSet.add(new RegistrationDTO(reg));
+        }
+        return blockingSet;
+    }
+
     /**
      * @param regs
      * @return
@@ -177,6 +213,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         regs.forEach(reg -> {dtos.add(new RegistrationDTO(reg));});
         return dtos;
     }
+
 
 
     /**

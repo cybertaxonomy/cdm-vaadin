@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
@@ -603,6 +604,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     ){
                 refreshView(true);
             }
+        }
+    }
+
+    @EventBusListenerMethod
+    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, Integer> event) {
+
+        // FIXME check from own view!!!
+        if(getView() == null){
+            return;
+        }
+
+        Integer registrationId = event.getIdentifier();
+
+        RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
+        if(event.getProperty().equals("blockedBy")){
+
+            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationId);
+            getView().setBlockingRegistrations(registrationId, blockingRegs);
         }
 
     }

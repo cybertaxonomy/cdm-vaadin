@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
@@ -131,16 +133,27 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     }
 
     @EventBusListenerMethod
-    public void onShowDetailsEvent(ShowDetailsEvent<?,?> event) {
+    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, Integer> event) {
 
-        if(event.getEntityType().equals(RegistrationDTO.class)){
-            RegistrationDTO regDto = getWorkingSetService().loadDtoById((Integer)event.getIdentifier());
-            if(event.getProperty().equals("messages")){
-                if(getView() != null){
-                    getView().openDetailsPopup("Messages", regDto.getMessages());
-                }
-            }
+        // FIXME check from own view!!!
+        if(getView() == null){
+            return;
         }
+
+        Integer registrationId = event.getIdentifier();
+
+        RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
+        if(event.getProperty().equals("messages")){
+
+            getView().openDetailsPopup("Messages", regDto.getMessages());
+
+        } else if(event.getProperty().equals("blockedBy")){
+
+            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationId);
+            RegistrationItem regItem = getView().getRegistrationItem(registrationId);
+            regItem.showBlockingRegistrations(blockingRegs);
+        }
+
     }
 
     @EventBusListenerMethod
