@@ -232,7 +232,7 @@ public class TypeDesignationSetManager {
                     return type1.equals(FieldUnit.class) ? -1 : 1;
                 } else {
                     // name types last (in case of missing FieldUnit we expect the base type to be DerivedUnit which comes into the middle)
-                    return type2.equals(TaxonName.class) ? -1 : 1;
+                    return type2.equals(TaxonName.class) || type2.equals(NameTypeDesignation.class) ? -1 : 1;
                 }
             } else {
                 return o1.getLabel().compareTo(o2.getLabel());
