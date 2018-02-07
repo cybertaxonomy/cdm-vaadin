@@ -59,6 +59,11 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 public class RegistrationItem extends GridLayout {
 
 
+    /**
+     *
+     */
+    public static final String STYLE_NAME_BLOCKED = "blocked";
+
     private static final String LABEL_CAPTION_CREATED = "Created";
 
     private static final String LABEL_CAPTION_PUBLISHED = "Published";
@@ -258,7 +263,7 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null && regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
-            getBlockedByButton().addStyleName("blocked");
+            getBlockedByButton().addStyleName(STYLE_NAME_BLOCKED);
         }
 
         labelMarkup.append(citationString);

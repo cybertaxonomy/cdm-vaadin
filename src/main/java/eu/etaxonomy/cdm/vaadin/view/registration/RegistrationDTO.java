@@ -20,8 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
-import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -292,7 +292,7 @@ public class RegistrationDTO{
         Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
-        IdentifiableEntity<?> baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
+        VersionableEntity baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg,
                 baseEntity, specimenTypeDesignations, getCitation(), getTypifiedName());

@@ -25,8 +25,8 @@ import org.hibernate.search.hcore.util.impl.HibernateHelper;
 
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -144,8 +144,8 @@ public class TypeDesignationSetManager {
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
 
         try {
-            final IdentifiableEntity<?> baseEntity = baseEntity(td);
-            final TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = makeEntityReference(baseEntity);
+            final VersionableEntity baseEntity = baseEntity(td);
+            final TypedEntityReference<VersionableEntity> baseEntityReference = makeEntityReference(baseEntity);
 
             EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
 
@@ -166,9 +166,9 @@ public class TypeDesignationSetManager {
      * @return
      * @throws DataIntegrityException
      */
-    protected IdentifiableEntity<?> baseEntity(TypeDesignationBase<?> td) throws DataIntegrityException {
+    protected VersionableEntity baseEntity(TypeDesignationBase<?> td) throws DataIntegrityException {
 
-        IdentifiableEntity<?> baseEntity = null;
+        VersionableEntity baseEntity = null;
         if(td  instanceof SpecimenTypeDesignation){
             SpecimenTypeDesignation std = (SpecimenTypeDesignation) td;
             FieldUnit fu = findFieldUnit(std);
@@ -179,6 +179,7 @@ public class TypeDesignationSetManager {
             }
         } else if(td instanceof NameTypeDesignation){
             baseEntity = ((NameTypeDesignation)td).getTypeName();
+            baseEntity = td;
         }
         if(baseEntity == null) {
             throw new DataIntegrityException("Incomplete TypeDesignation, no type missin in " + td.toString());
@@ -190,15 +191,15 @@ public class TypeDesignationSetManager {
      * @param td
      * @return
      */
-    protected TypedEntityReference<IdentifiableEntity<?>> makeEntityReference(IdentifiableEntity<?> baseEntity) {
+    protected TypedEntityReference<VersionableEntity> makeEntityReference(VersionableEntity baseEntity) {
 
-        baseEntity = (IdentifiableEntity<?>) HibernateHelper.unproxy(baseEntity);
+        baseEntity = (VersionableEntity) HibernateHelper.unproxy(baseEntity);
         String label = "";
         if(baseEntity  instanceof FieldUnit){
                 label = ((FieldUnit)baseEntity).getTitleCache();
         }
 
-        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
+        TypedEntityReference<VersionableEntity> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
 
         return baseEntityReference;
     }
@@ -613,16 +614,16 @@ public class TypeDesignationSetManager {
 
         String workingSetRepresentation = null;
 
-        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference;
+        TypedEntityReference<VersionableEntity> baseEntityReference;
 
-        IdentifiableEntity<?> baseEntity;
+        VersionableEntity baseEntity;
 
         List<DerivedUnit> derivedUnits = null;
 
         /**
          * @param baseEntityReference
          */
-        public TypeDesignationWorkingSet(IdentifiableEntity<?> baseEntity, TypedEntityReference<IdentifiableEntity<?>> baseEntityReference) {
+        public TypeDesignationWorkingSet(VersionableEntity baseEntity, TypedEntityReference<VersionableEntity> baseEntityReference) {
             this.baseEntity = baseEntity;
             this.baseEntityReference = baseEntityReference;
         }
@@ -630,7 +631,7 @@ public class TypeDesignationSetManager {
         /**
          * @return
          */
-        public IdentifiableEntity<?> getBaseEntity() {
+        public VersionableEntity getBaseEntity() {
             return baseEntity;
         }
 
@@ -671,7 +672,7 @@ public class TypeDesignationSetManager {
          *
          * @return the baseEntityReference
          */
-        public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityReference() {
+        public TypedEntityReference<VersionableEntity> getBaseEntityReference() {
             return baseEntityReference;
         }
 
