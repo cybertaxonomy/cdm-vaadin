@@ -60,6 +60,12 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  */
 public class TypeDesignationSetManager {
 
+    enum NameTypeBaseEntityType{
+
+        NAME_TYPE_DESIGNATION,
+        TYPE_NAME;
+
+    }
 
     private static final String TYPE_STATUS_SEPARATOR = "; ";
 
@@ -68,6 +74,8 @@ public class TypeDesignationSetManager {
     private static final String TYPE_DESIGNATION_SEPARATOR = ", ";
 
     private Collection<TypeDesignationBase> typeDesignations;
+
+    private NameTypeBaseEntityType nameTypeBaseEntityType = NameTypeBaseEntityType.NAME_TYPE_DESIGNATION;
 
     /**
      * Groups the EntityReferences for each of the TypeDesignations by the according TypeDesignationStatus.
@@ -178,8 +186,12 @@ public class TypeDesignationSetManager {
                 baseEntity = ((SpecimenTypeDesignation) td).getTypeSpecimen();
             }
         } else if(td instanceof NameTypeDesignation){
-            baseEntity = ((NameTypeDesignation)td).getTypeName();
-            baseEntity = td;
+            if(nameTypeBaseEntityType == NameTypeBaseEntityType.NAME_TYPE_DESIGNATION){
+                baseEntity = td;
+            } else {
+                // only other option is TaxonName
+                baseEntity = ((NameTypeDesignation)td).getTypeName();
+            }
         }
         if(baseEntity == null) {
             throw new DataIntegrityException("Incomplete TypeDesignation, no type missin in " + td.toString());
@@ -596,6 +608,14 @@ public class TypeDesignationSetManager {
      */
     public TaxonName getTypifiedName() {
         return typifiedName;
+    }
+
+    public void setNameTypeBaseEntityType(NameTypeBaseEntityType nameTypeBaseEntityType){
+        this.nameTypeBaseEntityType = nameTypeBaseEntityType;
+    }
+
+    public NameTypeBaseEntityType getNameTypeBaseEntityType(){
+        return nameTypeBaseEntityType;
     }
 
     /**
