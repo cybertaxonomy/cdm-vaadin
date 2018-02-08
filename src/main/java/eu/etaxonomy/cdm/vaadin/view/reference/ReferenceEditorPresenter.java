@@ -153,9 +153,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                inReferencePopup.loadInEditor(null);
            }
            if(editorAction.isEditAction()){
-               ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
-               popup.withDeleteButton(true);
-               popup.loadInEditor(editorAction.getEntityId());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup.withDeleteButton(true);
+               inReferencePopup.loadInEditor(editorAction.getEntityId());
            }
        }
    }
