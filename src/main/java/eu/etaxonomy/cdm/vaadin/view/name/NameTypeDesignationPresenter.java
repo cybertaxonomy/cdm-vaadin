@@ -257,13 +257,7 @@ public class NameTypeDesignationPresenter
 
         if(event.getPopup() == typeNamePopup){
             if(event.getReason() == Reason.SAVE){
-
-                TaxonName typeName = typeNamePopup.getBean();
-
-                // the bean contained in the popup editor is not yet updated at this point.
-                // so we re reload it using the uuid since new beans might not have an Id at this point.
-                typeName = getRepo().getNameService().load(typeName.getUuid(), Arrays.asList("$"));
-                getView().getTypeNameField().selectNewItem(typeName);
+                getView().getTypeNameField().reload();
             }
             if(event.getReason() == Reason.DELETE){
                 getView().getTypeNameField().selectNewItem(null);

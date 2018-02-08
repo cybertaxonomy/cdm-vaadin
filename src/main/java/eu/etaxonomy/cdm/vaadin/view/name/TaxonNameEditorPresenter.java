@@ -46,6 +46,7 @@ import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.vaadin.component.ReloadableSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
@@ -328,20 +329,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 // the bean contained in the popup editor is not yet updated at this point.
                 // so re reload it using the uuid since new beans might not have an Id at this point.
-                modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
-                getView().getNomReferenceCombobox().setValue(modifiedReference);
+                // modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
+                getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
             }
 
             referenceEditorPopup = null;
         }
         if(event.getPopup() == basionymNamePopup){
             if(event.getReason() == Reason.SAVE){
-                TaxonName modifiedTaxonName = basionymNamePopup.getBean();
-
-                // the bean contained in the popup editor is not yet updated at this point.
-                // so re reload it using the uuid since new beans might not have an Id at this point.
-                modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
-                basionymSourceField.setValue(modifiedTaxonName);
+                // TaxonName modifiedTaxonName = basionymNamePopup.getBean();
+                // modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
+                ((ReloadableSelect)basionymSourceField).reload();
 
             }
             if(event.getReason() == Reason.DELETE){

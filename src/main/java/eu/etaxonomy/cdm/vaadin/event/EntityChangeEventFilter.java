@@ -62,7 +62,7 @@ public class EntityChangeEventFilter implements EventBusListenerMethodFilter {
 
     public static class OccurrenceCollectionFilter extends EntityChangeEventFilter{
 
-        OccurrenceCollectionFilter(){
+        public OccurrenceCollectionFilter(){
             super(eu.etaxonomy.cdm.model.occurrence.Collection.class);
         }
     }

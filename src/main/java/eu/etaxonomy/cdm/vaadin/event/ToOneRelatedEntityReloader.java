@@ -16,6 +16,7 @@ import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.ICdmCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
+import eu.etaxonomy.vaadin.component.EntitySupport;
 
 /**
  * The <code>ToOneRelatedEntityReloader</code> helps avoiding <i>java.lang.IllegalStateException: Multiple representations of the same entity</i>
@@ -70,16 +71,20 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
 
         ICdmCacher cache = cachingPresenter.getCache();
         if(cache != null){
-            CDM cachedEntity = (CDM) cache.load(value);
+            CDM cachedEntity = cache.load(value);
             // cachingPresenter.addRootEntity(cachedEntity);
             if(// pure object comparison is not reliable since the entity may have been changed
                 cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
                 ){
                     onSettingReloadedEntity = true;
-                    toOneRelatedEntityField.removeValueChangeListener(this);
-                    toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
-                    toOneRelatedEntityField.setValue(cachedEntity);
-                    toOneRelatedEntityField.addValueChangeListener(this);
+                    if(EntitySupport.class.isAssignableFrom(toOneRelatedEntityField.getClass())){
+                        ((EntitySupport)toOneRelatedEntityField).replaceEntityValue(cachedEntity);
+                    } else {
+                        toOneRelatedEntityField.removeValueChangeListener(this);
+                        toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
+                        toOneRelatedEntityField.setValue(cachedEntity);
+                        toOneRelatedEntityField.addValueChangeListener(this);
+                    }
                     onSettingReloadedEntity = false;
             }
         } else {

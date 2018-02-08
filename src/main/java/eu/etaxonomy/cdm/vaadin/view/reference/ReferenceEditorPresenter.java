@@ -166,7 +166,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();
-               getView().getInReferenceCombobox().selectNewItem(bean);
+               getView().getInReferenceCombobox().reload(); //refreshSelectedValue(bean);
            }
            if(event.getReason().equals(Reason.DELETE)){
                getView().getInReferenceCombobox().selectNewItem(null);
