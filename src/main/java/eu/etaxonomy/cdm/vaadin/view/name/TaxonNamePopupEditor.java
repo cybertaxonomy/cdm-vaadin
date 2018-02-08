@@ -143,7 +143,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     protected void initContent() {
 
         GridLayout grid = (GridLayout)getFieldLayout();
-        // grid.setSizeFull();
+        grid.setSizeFull();
         grid.setHideEmptyRowsAndColumns(true);
         grid.setSpacing(true);
         grid.setColumnExpandRatio(0, 0.3f);
