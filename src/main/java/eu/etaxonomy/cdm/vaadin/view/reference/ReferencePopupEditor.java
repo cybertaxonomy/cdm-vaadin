@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
@@ -119,7 +120,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         row++;
         addTextField("Nomenclatural title", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
-        authorshipField = new TeamOrPersonField("Author(s)");
+        authorshipField = new TeamOrPersonField("Author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.BIBLIOGRAPHIC_TITLE);
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, 3, row);
         row++;

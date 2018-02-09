@@ -34,6 +34,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -252,7 +253,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         grid.addComponent(new Label("Hint: <i>Edit nomenclatural authors in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
 
         row++;
-        combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
+        combinationAuthorshipField = new TeamOrPersonField("combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -280,7 +281,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
 
         row++;
-        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
+        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -310,11 +311,11 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;
-        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
+        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(basionymAuthorshipField, "basionymAuthorship", 0, row, GRID_COLS-1, row);
         row++;
-        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)");
+        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
 

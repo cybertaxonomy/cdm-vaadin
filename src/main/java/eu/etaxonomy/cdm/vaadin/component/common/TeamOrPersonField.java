@@ -34,11 +34,12 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.EntityFieldInstantiator;
+import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 
@@ -57,7 +58,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private CssLayout toolBar= new CssLayout();
     private CssLayout compositeWrapper = new CssLayout();
 
-    private LazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new LazyComboBox<TeamOrPersonBase>(TeamOrPersonBase.class);
+    private ReloadableLazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new ReloadableLazyComboBox<TeamOrPersonBase>(TeamOrPersonBase.class);
 
     private Button selectConfirmButton = new Button("OK");
     private Button removeButton = new Button(FontAwesome.REMOVE);
@@ -76,11 +77,14 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private CdmFilterablePagingProvider<AgentBase, Person> pagingProviderPerson;
 
-    public TeamOrPersonField(String caption){
+    private TeamOrPersonBaseCaptionGenerator.CacheType cacheType;
+
+    public TeamOrPersonField(String caption, TeamOrPersonBaseCaptionGenerator.CacheType cacheType){
 
         setCaption(caption);
 
-        teamOrPersonSelect.setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TeamOrPersonBase>());
+        this.cacheType = cacheType;
+        teamOrPersonSelect.setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<TeamOrPersonBase>(cacheType));
 
 
         addStyledComponent(teamOrPersonSelect);
@@ -329,7 +333,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 PersonField f = new PersonField();
                 f.setAllowNewEmptyEntity(true); // otherwise new entities can not be added to the personsListEditor
                 f.getPersonSelect().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
-                f.getPersonSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Person>());
+                f.getPersonSelect().setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<Person>(cacheType));
                 f.getPersonSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Person>(f.getPersonSelect(), cachingPresenter));
                 return f;
             }

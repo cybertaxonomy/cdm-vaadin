@@ -33,6 +33,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
@@ -144,7 +145,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToGroundMinMax.getTextField(), "distanceToGroundText");
 
         row++;
-        collectorField = new TeamOrPersonField("Collector");
+        collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
