@@ -22,8 +22,6 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
 
     private static final long serialVersionUID = -4833661351090992884L;
 
-//    boolean originalScrollToSelect;
-
     static Field lazySelectInternalValueField;
     static Field internalSelectField;
     static {

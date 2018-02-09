@@ -17,7 +17,7 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
  * @since Jun 7, 2017
  *
  */
-public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase<?>> implements CaptionGenerator<T> {
+public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> implements CaptionGenerator<T> {
 
     public enum CacheType {
         NOMENCLATURAL_TITLE,
