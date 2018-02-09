@@ -17,10 +17,12 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 
-public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements ReloadableSelect, EntitySupport<T>{
+public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements ReloadableSelect, EntitySupport<T> {
 
 
     private static final long serialVersionUID = -4833661351090992884L;
+
+//    boolean originalScrollToSelect;
 
     static Field lazySelectInternalValueField;
     static Field internalSelectField;
@@ -44,10 +46,6 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
      */
     public ReloadableLazyComboBox(Class<T> itemType) {
         super(itemType);
-        // in the LazyComboBox.initList() scrollToSelectedItem is set to false for better performance
-        // but this breaks the refresh, so we need to set it true
-        // (temporarily setting it true in reload() does not work)
-        ((ComboBox)getSelect()).setScrollToSelectedItem(true);
     }
 
     /**
@@ -55,9 +53,15 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
      */
     @Override
     public void reload() {
+        // in the LazyComboBox.initList() scrollToSelectedItem is set to false for better performance
+        // but this breaks the refresh, so we need to set it now so that it can
+        // affect the next component repaint which is triggered in refresh()
+        ComboBox comboBox = (ComboBox)getSelect();
+        comboBox.setScrollToSelectedItem(true);
         refresh(); // reload from persistence
-        discard(); // reload from data source
+        discard(); // reload from property data source
     }
+
 
     /**
      * This method allows updating the value even if the equals check done
@@ -117,5 +121,6 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
             throw new RuntimeException(e);
         }
     }
+
 
 }
