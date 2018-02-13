@@ -125,7 +125,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
             String uuid = (String)item.getItemProperty("UUID").getValue();
             Assert.assertEquals(uuids[count], uuid);
-            String titleCache = (String)item.getItemProperty("BIBLIOGRAPHIC_TITLE").getValue();
+            String titleCache = (String)item.getItemProperty("TITLECACHE").getValue();
             logger.info("titleCache : " + titleCache);
             count++;
 
