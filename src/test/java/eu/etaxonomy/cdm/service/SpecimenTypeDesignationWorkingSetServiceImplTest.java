@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.model.common.LanguageString;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
@@ -188,16 +187,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         }
         workingset.getSpecimenTypeDesignationDTOs().remove(deleteDTO);
 
-        // TODO once https://dev.e-taxonomy.eu/redmine/issues/7077 is fixed dissociating from the Registration could be removed here
-        Registration reg = workingset.getOwner();
-        SpecimenTypeDesignation std = deleteDTO.asSpecimenTypeDesignation();
-        reg.getTypeDesignations().remove(std);
-
         service.save(workingset);
 
-        //printDataSetWithNull(System.err, includeTableNames_delete);
+        // printDataSetWithNull(System.err, includeTableNames_delete);
 
         workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+        Registration reg = workingset.getOwner();
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());
         reg = workingset.getOwner();
         Assert.assertEquals(1, reg.getTypeDesignations().size());
