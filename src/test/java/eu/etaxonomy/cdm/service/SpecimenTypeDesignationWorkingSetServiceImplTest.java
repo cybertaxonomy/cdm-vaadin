@@ -207,11 +207,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     public void test02_deleteWorkingset() {
 
-        // printDataSetWithNull(System.err, includeTableNames_delete);
+//        printDataSetWithNull(System.err, includeTableNames_delete);
 
         TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, 5001, null);
-
-        try {
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, baseEntityRef);
         Assert.assertNotNull(workingset.getOwner());
@@ -230,10 +228,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         Assert.assertEquals("All derived units should have been deleted", 0, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
         Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
         Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
-        // FIXME  Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
-        } catch (Exception e){
-            e.printStackTrace(System.err);
-        }
+        // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
+
         // printDataSetWithNull(System.err, includeTableNames_delete);
     }
 

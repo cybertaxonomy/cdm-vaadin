@@ -68,7 +68,7 @@ public class TypedEntityReference<T> extends EntityReference {
     public boolean equals(Object obj) {
         try {
             TypedEntityReference other = (TypedEntityReference) obj;
-            return id == other.id && label.equals(other.label) && type.equals(other.type);
+            return id == other.id && type.equals(other.type);
 
         } catch (Exception e) {
             return false;
