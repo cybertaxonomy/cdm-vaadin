@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+
 /**
  * @author a.kohlbecker
  * @since May 10, 2017
@@ -19,9 +21,12 @@ public abstract class AbstractEntityEvent<T extends Enum> {
 
     protected T type;
 
-    public AbstractEntityEvent(T type, Integer entityId) {
+    private AbstractView sourceView = null;
+
+    public AbstractEntityEvent(T type, Integer entityId, AbstractView sourceView) {
         this.entityId = entityId;
         this.type = type;
+        this.sourceView = sourceView;
         if(type == null){
             throw new NullPointerException();
         }
@@ -36,6 +41,13 @@ public abstract class AbstractEntityEvent<T extends Enum> {
 
     public T getType() {
         return type;
+    }
+
+    /**
+     * @return the sourceView
+     */
+    public AbstractView getSourceView() {
+        return sourceView;
     }
 
 }

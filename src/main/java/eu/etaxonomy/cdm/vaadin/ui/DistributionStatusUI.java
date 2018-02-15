@@ -2,7 +2,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -66,7 +66,7 @@ public class DistributionStatusUI extends UI{
 //    private Toolbar toolbar;
 
     @Autowired
-    ApplicationEventPublisher eventBus;
+    UIEventBus uiEventBus;
 
     public DistributionStatusUI() {
 
@@ -97,7 +97,7 @@ public class DistributionStatusUI extends UI{
 //            ((ToolbarDisplay)viewDisplay).setToolbar(toolbar);
 //        }
 
-        eventBus.publishEvent(new UIInitializedEvent());
+        uiEventBus.publish(this, new UIInitializedEvent());
 
         navigator.setDefaultViewName(INITIAL_VIEW);
 

@@ -10,8 +10,9 @@ package eu.etaxonomy.cdm.vaadin.toolbar;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBus.UIEventBus;
+import org.vaadin.spring.events.EventBusListener;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -36,16 +37,21 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent("registrationToolbar")
 @UIScope
-public class RegistrationToolbar extends HorizontalLayout implements Toolbar {
+public class RegistrationToolbar extends HorizontalLayout implements Toolbar, EventBusListener<AuthenticationSuccessEvent> {
 
     private static final long serialVersionUID = 2594781255088231474L;
 
     @Autowired
-    protected ApplicationEventPublisher eventBus;
-
-    @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
+
+    private UIEventBus uiEventBus;
+
+    @Autowired
+    protected final void setUIEventBus(EventBus.UIEventBus uiEventBus){
+        this.uiEventBus = uiEventBus;
+        uiEventBus.subscribe(this);
+    }
 
     @Autowired
     protected NavigationManager navigationManager;
@@ -85,15 +91,9 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar {
     }
 
 
-    @EventListener
-    public void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event){
-        boolean isInitialized = userButton != null;
-        // The RegistrationToolbar is being initialize even if not needed only because it is a EventListener
-        // which causes Spring to initialize it.
-        // TODO After switching to an other event bus this check can be removed
-        if(isInitialized){
-            updateAuthenticationButtons();
-        }
+    @Override
+    public void onEvent(org.vaadin.spring.events.Event<AuthenticationSuccessEvent> event) {
+        updateAuthenticationButtons();
     }
 
     /**
@@ -121,7 +121,7 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar {
      * @return
      */
     private void performLogin() {
-        eventBus.publishEvent(new NavigationEvent("login", navigationManager.getCurrentViewName()));
+        uiEventBus.publish(this, new NavigationEvent("login", navigationManager.getCurrentViewName()));
     }
 
 

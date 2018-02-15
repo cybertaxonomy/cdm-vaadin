@@ -23,7 +23,7 @@ import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
  * @since Jun 7, 2017
  *
  */
-public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToManyRelatedEntitiesListSelect<V, LazyComboBox<V>> {
+public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToManyRelatedEntitiesListSelect<V, ReloadableLazyComboBox<V>> {
 
     private static final long serialVersionUID = -4496067980953939548L;
 
@@ -44,7 +44,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         super(itemType, null, caption);
         // TODO this.fieldTyp = LazyComboBox.class does not work
         LazyComboBox<V> field = new LazyComboBox<V>(itemType);
-        this.fieldType = (Class<LazyComboBox<V>>) field.getClass();
+        this.fieldType = (Class<ReloadableLazyComboBox<V>>) field.getClass();
         // addEmptyRowOnInitContent is false in this class since adding row is only possible after setting the PagingProviders
         addEmptyRowOnInitContent = false;
     }
@@ -53,10 +53,10 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
      * {@inheritDoc}
      */
     @Override
-    protected LazyComboBox<V> newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
+    protected ReloadableLazyComboBox<V> newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
 
         // TODO use the setEntityFieldInstantiator(EntityFieldInstantiator) instead to inject as instantiator?
-        LazyComboBox<V> field = new LazyComboBox<V>(itemType);
+        ReloadableLazyComboBox<V> field = new ReloadableLazyComboBox<V>(itemType);
         // FIXME using the ToOneRelatedEntityReloader created a dependency to the cdm packages, this should be relaxed!!!
         field.addValueChangeListener(new ToOneRelatedEntityReloader(field, cachingPresenter));
 

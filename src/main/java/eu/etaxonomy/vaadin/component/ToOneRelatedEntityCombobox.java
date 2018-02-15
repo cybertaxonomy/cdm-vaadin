@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.vaadin.component;
 
-import org.vaadin.viritin.fields.LazyComboBox;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -27,7 +26,8 @@ import com.vaadin.ui.themes.ValoTheme;
  * @since May 24, 2017
  *
  */
-public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField<V> {
+public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V>
+    implements ToOneRelatedEntityField<V>, ReloadableSelect, EntitySupport<V> {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
@@ -37,7 +37,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     private CssLayout container = new CssLayout();
 
-    private LazyComboBox<V> lazySelect;
+    private ReloadableLazyComboBox<V> lazySelect;
 
     private Button addButton = new Button(FontAwesome.PLUS);
     private Button editButton  = new Button(FontAwesome.EDIT);
@@ -45,7 +45,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     public ToOneRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;
         setCaption(caption);
-        lazySelect = new LazyComboBox<V>(type);
+        lazySelect = new ReloadableLazyComboBox<V>(type);
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
         lazySelect.addValueChangeListener(e -> {
@@ -93,7 +93,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     /**
      * @return the select
      */
-    public LazyComboBox<V> getSelect() {
+    public ReloadableLazyComboBox<V> getSelect() {
         return lazySelect;
     }
 
@@ -108,10 +108,9 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     /**
      * reload the selected entity from the persistent storage
      */
+    @Override
     public void reload() {
-        getSelect().refresh();
-        getSelect().discard(); // reload from data source
-
+        getSelect().reload();
     }
 
     /**
@@ -148,13 +147,16 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         editButton.addClickListener(listener);
     }
 
+
     @Override
-    public void selectNewItem(V bean){
-        lazySelect.refresh();
-        lazySelect.setValue(bean);
-        lazySelect.markAsDirty();
+    public void replaceEntityValue(V bean){
+        lazySelect.replaceEntityValue(bean);
     }
 
+    @Override
+    public void selectNewItem(V bean){
+        setValue(bean);
+    }
 
     /**
      * Returns always currently selected item by
@@ -175,6 +177,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     public void setValue(V newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         lazySelect.refresh();
         lazySelect.setValue(newFieldValue);
+        lazySelect.markAsDirty();
     }
 
     @Override

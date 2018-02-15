@@ -12,9 +12,11 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
@@ -32,6 +34,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -45,6 +48,8 @@ import eu.etaxonomy.vaadin.permission.EditPermissionTester;
  * @since May 22, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
@@ -139,7 +144,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     protected void initContent() {
 
         GridLayout grid = (GridLayout)getFieldLayout();
-        // grid.setSizeFull();
+        grid.setSizeFull();
+        grid.setHideEmptyRowsAndColumns(true);
         grid.setSpacing(true);
         grid.setColumnExpandRatio(0, 0.3f);
         grid.setColumnExpandRatio(1, 0.3f);
@@ -247,18 +253,19 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         grid.addComponent(new Label("Hint: <i>Edit nomenclatural authors in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
 
         row++;
-        combinationAuthorshipField = new TeamOrPersonField("combination author(s)");
+        combinationAuthorshipField = new TeamOrPersonField("combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
 
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
-        nomReferenceCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+        nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
                 ));
         nomReferenceCombobox.addClickListenerEditEntity(e -> {
             if(nomReferenceCombobox.getValue() != null){
-                getEventBus().publishEvent(
+                getViewEventBus().publish(this,
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
                             nomReferenceCombobox.getValue().getId(),
@@ -274,7 +281,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
 
         row++;
-        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)");
+        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -300,15 +307,15 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 beanId = ((CdmBase)fieldValue).getId();
 
             }
-            eventBus.publishEvent(new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;
-        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)");
+        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(basionymAuthorshipField, "basionymAuthorship", 0, row, GRID_COLS-1, row);
         row++;
-        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)");
+        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -376,6 +383,17 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly) && getBean().getNomenclaturalReference() != null) {
             nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
+        }
+        if(isModeEnabled(TaxonNamePopupEditorMode.requireNomenclaturalReference)) {
+            if(combinationAuthorshipField.getValue() == null){
+                nomReferenceCombobox.setRequired(true);
+            } else {
+                combinationAuthorshipField.addValueChangeListener(e -> {
+                    if(e.getProperty().getValue() == null){
+                        nomReferenceCombobox.setRequired(true);
+                    }
+                });
+            }
         }
 
     }

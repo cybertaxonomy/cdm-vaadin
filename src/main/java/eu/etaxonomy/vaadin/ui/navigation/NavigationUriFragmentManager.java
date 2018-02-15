@@ -1,7 +1,7 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 
 import com.vaadin.navigator.Navigator.UriFragmentManager;
 import com.vaadin.server.Page;
@@ -16,7 +16,7 @@ public class NavigationUriFragmentManager extends UriFragmentManager {
     private static final long serialVersionUID = -2033745435437337863L;
 
     @Autowired
-    ApplicationEventPublisher eventBus;
+    UIEventBus uiEventBus;
 
 	public NavigationUriFragmentManager() {
 		super(Page.getCurrent());
@@ -24,6 +24,6 @@ public class NavigationUriFragmentManager extends UriFragmentManager {
 
 	@Override
 	public void uriFragmentChanged(UriFragmentChangedEvent event) {
-	    eventBus.publishEvent(new NavigationEvent(getState()));
+	    uiEventBus.publish(this, new NavigationEvent(getState()));
 	}
 }

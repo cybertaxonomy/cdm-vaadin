@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 
 import com.flowingcode.vaadin.addons.errorwindow.WindowErrorHandler;
 import com.vaadin.annotations.Theme;
@@ -73,6 +73,32 @@ public class RegistrationUI extends UI {
     @Autowired(required = false)
     EntityCacheDebugger entityCacheDebugger = null;
 
+    @Autowired
+    UIEventBus uiEventBus;
+
+    /*
+         * this HACKY solution forces the bean to be instantiated, TODO do it properly
+         */
+    //    @Autowired
+    //    MenuBeanDiscoveryBean bean;
+    
+        @Autowired
+        private MainMenu mainMenu;
+
+    /*
+             * this HACKY solution forces the bean to be instantiated, TODO do it properly
+             */
+        //    @Autowired
+        //    MenuBeanDiscoveryBean bean;
+        
+            @Autowired
+            @Qualifier("registrationToolbar")
+            private Toolbar toolbar;
+
+    //---------------------------------------------
+            
+            public static final String INITIAL_VIEW =  DashBoardView.NAME;
+
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
     }
@@ -92,7 +118,7 @@ public class RegistrationUI extends UI {
 
     //---------------------------------------------
 
-    public static final String INITIAL_VIEW =  DashBoardView.NAME;
+    
 
 
     /*
@@ -100,16 +126,6 @@ public class RegistrationUI extends UI {
      */
 //    @Autowired
 //    MenuBeanDiscoveryBean bean;
-
-    @Autowired
-    private MainMenu mainMenu;
-
-    @Autowired
-    @Qualifier("registrationToolbar")
-    private Toolbar toolbar;
-
-    @Autowired
-    ApplicationEventPublisher eventBus;
 
     public RegistrationUI() {
 
@@ -143,7 +159,7 @@ public class RegistrationUI extends UI {
         }
 
 
-        eventBus.publishEvent(new UIInitializedEvent());
+        uiEventBus.publish(this, new UIInitializedEvent());
 
         String brand = "phycobank";
         //TODO create annotation:

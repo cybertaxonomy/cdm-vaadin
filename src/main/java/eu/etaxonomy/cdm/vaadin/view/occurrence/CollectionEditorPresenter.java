@@ -11,12 +11,16 @@ package eu.etaxonomy.cdm.vaadin.view.occurrence;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+
+import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -28,10 +32,13 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  * @since Dec 21, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collection, CollectionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
     private CollectionPopupEditor collectionPopuEditor;
+
 
     /**
      * {@inheritDoc}
@@ -99,34 +106,35 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(),this));
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onCollectionEditorActionAdd(CollectionEditorAction event) {
 
         if(!checkFromOwnView(event)){
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).EDIT")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onCollectionEditorActionEdit(CollectionEditorAction event) {
 
         if(!checkFromOwnView(event)){
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class);
+        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
         collectionPopuEditor.loadInEditor(event.getEntityId());
     }
 
+    @EventBusListenerMethod()
     public void onDoneWithPopupEvent(DoneWithPopupEvent event){
         if(event.getPopup() == collectionPopuEditor){
             if(event.getReason() == Reason.SAVE){

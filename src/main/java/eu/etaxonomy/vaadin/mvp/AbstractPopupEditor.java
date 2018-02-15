@@ -9,8 +9,10 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -46,6 +48,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
@@ -88,6 +92,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private GridLayout _gridLayoutCache;
 
     private boolean isBeanLoaded;
+
+    private Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+
+    private boolean isContextUpdated;
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
@@ -244,7 +252,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         public void preCommit(CommitEvent commitEvent) throws CommitException {
             logger.debug("preCommit(), publishing EditorPreSaveEvent");
             // notify the presenter to start a transaction
-            eventBus.publishEvent(new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+            viewEventBus.publish(this, new EditorPreSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
         }
 
         @Override
@@ -254,12 +262,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                     logger.trace("postCommit() publishing EditorSaveEvent for " + getBean().toString());
                 }
                 // notify the presenter to persist the bean and to commit the transaction
-                eventBus.publishEvent(new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+                viewEventBus.publish(this, new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
                 if(logger.isTraceEnabled()){
                     logger.trace("postCommit() publishing DoneWithPopupEvent");
                 }
                 // notify the NavigationManagerBean to close the window and to dispose the view
-                eventBus.publishEvent(new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
+                viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(AbstractPopupEditor.this, Reason.SAVE));
             } catch (Exception e) {
                 logger.error(e);
                 throw new CommitException("Failed to store data to backend", e);
@@ -278,15 +286,15 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Override
     public void cancel() {
         fieldGroup.discard();
-        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.CANCEL));
+        viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
     /**
      * @return
      */
     private void delete() {
-        eventBus.publishEvent(new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
-        eventBus.publishEvent(new DoneWithPopupEvent(this, Reason.DELETE));
+        viewEventBus.publish(this, new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
+        viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.DELETE));
     }
 
     /**
@@ -618,6 +626,35 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     @Deprecated
     public P presenter() {
         return getPresenter();
+    }
+
+    /**
+     * Returns the context of editor actions for this editor.
+     * The context submitted with {@link #setParentContext(Stack)} will be updated
+     * to represent the current context.
+     *
+     * @return the context
+     */
+    public Stack<EditorActionContext> getEditorActionContext() {
+        if(!isContextUpdated){
+            if(getBean() == null){
+                throw new RuntimeException("getContext() is only possible after the bean is loaded");
+            }
+            context.push(new AbstractEditorAction.EditorActionContext(getBean(), this));
+            isContextUpdated = true;
+        }
+        return context;
+    }
+
+    /**
+     * Set the context of editor actions parent to this editor
+     *
+     * @param context the context to set
+     */
+    public void setParentEditorActionContext(Stack<EditorActionContext> context) {
+        if(context != null){
+            this.context.addAll(context);
+        }
     }
 
 }

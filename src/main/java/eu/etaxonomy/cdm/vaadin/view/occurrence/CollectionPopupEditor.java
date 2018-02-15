@@ -8,8 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
@@ -27,6 +29,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since Dec 21, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, CollectionEditorPresenter> implements CollectionPopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = 2019724189877425882L;
@@ -133,12 +137,12 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         row++;
 
         superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("Super-collection", Collection.class);
-        superCollectionCombobox.addClickListenerAddEntity(e -> getEventBus().publishEvent(
+        superCollectionCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
                 new CollectionEditorAction(EditorActionType.ADD, null, superCollectionCombobox, this)
                 ));
         superCollectionCombobox.addClickListenerEditEntity(e -> {
             if(superCollectionCombobox.getValue() != null){
-                getEventBus().publishEvent(
+                getViewEventBus().publish(this,
                     new CollectionEditorAction(
                             EditorActionType.EDIT,
                             superCollectionCombobox.getValue().getId(),
@@ -157,7 +161,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                 new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox)
                 );
 
-        superCollectionCombobox.addClickListenerAddEntity( e -> getEventBus().publishEvent(
+        superCollectionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new CollectionEditorAction(
                         EditorActionType.ADD,
                         null,
@@ -166,7 +170,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                 ));
         superCollectionCombobox.addClickListenerEditEntity(e -> {
                 if(superCollectionCombobox.getValue() != null){
-                    getEventBus().publishEvent(
+                    getViewEventBus().publish(this,
                             new CollectionEditorAction(
                                 EditorActionType.EDIT,
                                 superCollectionCombobox.getValue().getId(),

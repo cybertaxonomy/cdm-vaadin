@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.Stack;
+
 import com.vaadin.ui.Component;
 
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -26,29 +28,11 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
     }
 
     /**
-     * @param type
-     * @param entityId
-     */
-    public TaxonNameEditorAction(EditorActionType type, Integer entityId) {
-        super(type, entityId);
-    }
-
-    /**
-     * @param type
-     * @param entityId
-     * @param source
-     */
-    public TaxonNameEditorAction(EditorActionType type, Integer entityId, Component source) {
-        super(type, entityId, source);
-    }
-
-    /**
      * @param action
      * @param source
      */
-    public TaxonNameEditorAction(EditorActionType action, Component source) {
-        super(action, source);
-        // TODO Auto-generated constructor stub
+    public TaxonNameEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
+        super(action, source, sourceView);
     }
 
     /**
@@ -59,7 +43,18 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      */
     public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
         super(action, entityId, source, sourceView);
-        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param action
+     * @param entityId
+     * @param source
+     * @param sourceView
+     * @param context
+     */
+    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+            Stack<EditorActionContext> context) {
+        super(action, entityId, source, sourceView, context);
     }
 
 

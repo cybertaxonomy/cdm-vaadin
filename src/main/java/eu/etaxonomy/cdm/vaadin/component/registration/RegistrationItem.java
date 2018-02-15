@@ -12,9 +12,11 @@ import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -28,6 +30,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
@@ -56,6 +59,11 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 public class RegistrationItem extends GridLayout {
 
 
+    /**
+     *
+     */
+    public static final String STYLE_NAME_BLOCKED = "blocked";
+
     private static final String LABEL_CAPTION_CREATED = "Created";
 
     private static final String LABEL_CAPTION_PUBLISHED = "Published";
@@ -72,6 +80,8 @@ public class RegistrationItem extends GridLayout {
 
     private AbstractView<?> parentView;
 
+    private RegistrationDTO regDto;
+
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
     // --------------------------------------------------
@@ -86,6 +96,8 @@ public class RegistrationItem extends GridLayout {
     private Label createdLabel = new Label();
     private Label publishedLabel = new Label();
     private Label releasedLabel = new Label();
+
+    private Panel blockingRelationsPanel;
 
     /**
      *
@@ -102,6 +114,7 @@ public class RegistrationItem extends GridLayout {
    public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView) {
        super(GRID_COLS, GRID_ROWS);
        init();
+       blockedByButton.setVisible(false);
        setWorkingSet(workingSet, parentView);
    }
 
@@ -169,7 +182,10 @@ public class RegistrationItem extends GridLayout {
     }
 
     public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
+
         this.parentView = parentView;
+
+        this.regDto = regDto;
 
         NavigationEvent navigationEvent = null;
         if(regDto.getCitationID() != null) {
@@ -209,6 +225,7 @@ public class RegistrationItem extends GridLayout {
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
     }
 
+
     /**
      * @param submitterUserName TODO
      *
@@ -242,6 +259,11 @@ public class RegistrationItem extends GridLayout {
             );
             getMessageButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + messagesCount + "</span>");
             getMessageButton().setCaptionAsHtml(true);
+        }
+
+        if(regDto != null && regDto.isBlocked()){
+            getBlockedByButton().setEnabled(true);
+            getBlockedByButton().addStyleName(STYLE_NAME_BLOCKED);
         }
 
         labelMarkup.append(citationString);
@@ -296,7 +318,35 @@ public class RegistrationItem extends GridLayout {
 
 
     private void publishEvent(Object event) {
-        parentView.getEventBus().publishEvent(event);
+        if(event instanceof NavigationEvent){
+            parentView.getViewEventBus().publish(EventScope.UI, this, event);
+        } else {
+            parentView.getViewEventBus().publish(this, event);
+        }
+    }
+
+    public int getRegistrationId(){
+        return regDto.getId();
+    }
+
+    /**
+     * @param showBlockingRelations the showBlockingRelations to set
+     */
+    public void showBlockingRegistrations(Set<RegistrationDTO> blockingRegDTOs) {
+
+        if(blockingRelationsPanel == null) {
+
+            if(regDto.isBlocked() && blockingRegDTOs.isEmpty()){
+                throw new RuntimeException("Registration is blocked but tet of blocking registrations is empty");
+            }
+            if(!regDto.isBlocked() && !blockingRegDTOs.isEmpty()){
+                throw new RuntimeException("No point showing blocking registrations for an unblocked registration");
+            }
+
+            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs);
+            addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
+        }
+
     }
 
     /* ====== RegistrationItemDesign Getters ====== */
@@ -369,6 +419,13 @@ public class RegistrationItem extends GridLayout {
      */
     public Label getSubmitterLabel() {
         return submitterLabel;
+    }
+
+    /**
+     * @return the showBlockingRelations
+     */
+    public boolean isShowBlockingRelations() {
+        return blockingRelationsPanel != null;
     }
 
 

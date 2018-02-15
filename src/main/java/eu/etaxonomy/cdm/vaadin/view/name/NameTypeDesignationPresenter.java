@@ -9,19 +9,31 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.spring.annotation.SpringComponent;
+
+import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
@@ -29,12 +41,17 @@ import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
  * @since Jan 26, 2018
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class NameTypeDesignationPresenter
         extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
 
@@ -42,6 +59,10 @@ public class NameTypeDesignationPresenter
     private IRegistrationWorkingSetService registrationWorkingSetService;
 
     HashSet<TaxonName> typifiedNamesAsLoaded;
+
+    private TaxonNamePopupEditor typeNamePopup;
+
+    private TaxonName typifiedNameInContext;
 
 
     /**
@@ -51,14 +72,18 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadBeanById(Object identifier) {
         if(identifier instanceof Integer || identifier == null){
             return super.loadBeanById(identifier);
+//        } else if(identifier instanceof TypedEntityReference && ((TypedEntityReference)identifier).getType().equals(TaxonName.class)) {
+//            typifiedNameInContext = getRepo().getNameService().find(((TypedEntityReference)identifier).getId());
+//            bean = super.loadBeanById(null);
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
+            typifiedNameInContext = regDTO.getTypifiedName();
             // find the working set
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
 
             // NameTypeDesignation bameTypeDesignation = regDTO.getNameTypeDesignation(typeDesignationWorkingSet.getBaseEntityReference());
-            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(TaxonName.class)){
+            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
             }
             // TypeDesignationWorkingSet for NameTyped only contain one item!!!
@@ -150,8 +175,19 @@ public class NameTypeDesignationPresenter
      */
     @Override
     protected IService<NameTypeDesignation> getService() {
-        // TODO Auto-generated method stub
+        // No TypeDesignationService :( so I need override the generic save and delete methods
         return null;
+    }
+
+    @Override
+    protected void deleteBean(NameTypeDesignation bean){
+        DeleteResult deletResult = getRepo().getNameService().deleteTypeDesignation(typifiedNameInContext, bean);
+        if(deletResult.isOk()){
+            EntityChangeEvent changeEvent = new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED, (AbstractView) getView());
+            viewEventBus.publish(this, changeEvent);
+        } else {
+            CdmStore.handleDeleteresultInError(deletResult);
+        }
     }
 
 
@@ -183,5 +219,53 @@ public class NameTypeDesignationPresenter
     }
 
 
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+    public void onTaxonNameEditorActionAdd(TaxonNameEditorAction action){
+
+        if(!isFromOwnView(action)){
+            return;
+        }
+
+        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        typeNamePopup.withDeleteButton(true);
+        // TODO configure Modes???
+        typeNamePopup.loadInEditor(null);
+
+    }
+
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+    public void onTaxonNameEditorActionEdit(TaxonNameEditorAction action){
+
+        if(!isFromOwnView(action)){
+            return;
+        }
+
+        //  basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
+
+        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        typeNamePopup.withDeleteButton(true);
+        // TODO configure Modes???
+        typeNamePopup.loadInEditor(action.getEntityId());
+
+    }
+
+    @EventBusListenerMethod
+    public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+
+        if(event.getPopup() == typeNamePopup){
+            if(event.getReason() == Reason.SAVE){
+                getView().getTypeNameField().reload();
+            }
+            if(event.getReason() == Reason.DELETE){
+                getView().getTypeNameField().selectNewItem(null);
+            }
+            typeNamePopup = null;
+
+        }
+    }
 
 }

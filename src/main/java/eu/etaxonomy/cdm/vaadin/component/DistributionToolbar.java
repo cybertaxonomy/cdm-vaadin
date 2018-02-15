@@ -6,8 +6,8 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
@@ -33,8 +33,13 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 	 */
 	private static final long serialVersionUID = 5344340511582993289L;
 
+    private EventBus.UIEventBus uiEventBus;
+
     @Autowired
-    protected ApplicationEventPublisher eventBus;
+    private final void setViewEventBus(EventBus.UIEventBus viewEventBus){
+        this.uiEventBus = viewEventBus;
+        viewEventBus.subscribe(AuthenticationSuccessEvent.class);
+    }
 
     @Autowired
     @Qualifier("cdmRepository")
@@ -101,8 +106,8 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 		updateAuthenticationButtons();
     }
 
-    @EventListener
-    public void onAuthenticationSuccessEvent(AuthenticationSuccessEvent event){
+	@EventBusListenerMethod
+    public void onAuthenticationSuccessEvent(org.vaadin.spring.events.Event<AuthenticationSuccessEvent> event){
         boolean isInitialized = userButton != null;
         // The RegistrationToolbar is being initialize even if not needed only because it is a EventListener
         // which causes Spring to initialize it.
@@ -143,7 +148,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
      * @return
      */
     private void performLogin() {
-        eventBus.publishEvent(new NavigationEvent("login", navigationManager.getCurrentViewName())); //$NON-NLS-1$
+        uiEventBus.publish(this, new NavigationEvent("login", navigationManager.getCurrentViewName())); //$NON-NLS-1$
     }
 
 
@@ -172,4 +177,5 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 	public Button getDetailButton() {
 		return detailButton;
 	}
+
 }

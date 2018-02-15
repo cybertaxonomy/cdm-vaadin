@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import org.vaadin.spring.events.EventScope;
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
@@ -51,18 +53,18 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         setCompositionRoot(root);
 
         loginDialog.getLoginButton().addClickListener(e -> handleLoginClick(e));
-        loginDialog.getRegisterButton().addClickListener(e -> eventBus.publishEvent(new RegisterNewUserEvent(e)));
-        loginDialog.getSendOnetimeLogin().addClickListener(e -> eventBus.publishEvent(new PasswordRevoveryEvent(e)));
+        loginDialog.getRegisterButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new RegisterNewUserEvent(e)));
+        loginDialog.getSendOnetimeLogin().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new PasswordRevoveryEvent(e)));
         // NOTE: null viewName will be replaced by the default view name in NavigationManagerBean
-        loginDialog.getCancelLoginButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(null)));
-        loginDialog.getCancelRegistrationButton().addClickListener(e -> eventBus.publishEvent(new NavigationEvent(null)));
+        loginDialog.getCancelLoginButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new NavigationEvent(null)));
+        loginDialog.getCancelRegistrationButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new NavigationEvent(null)));
     }
 
     /**
      * @param e
      */
     private void handleLoginClick(ClickEvent e) {
-        eventBus.publishEvent(new AuthenticationAttemptEvent(e, loginDialog.getUserName().getValue()));
+        getViewEventBus().publish(EventScope.UI, this, new AuthenticationAttemptEvent(e, loginDialog.getUserName().getValue()));
     }
 
     @Override

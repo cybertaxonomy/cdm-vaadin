@@ -26,6 +26,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.QueryDefinition;
 import org.vaadin.addons.lazyquerycontainer.QueryFactory;
+import org.vaadin.spring.events.EventBus.ViewEventBus;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -76,9 +77,17 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 
     @Autowired
     @Qualifier("cdmRepository")
-    private CdmRepository repo;
+    private CdmRepository repo; // TODO remove, since this is already in the super class
 
-	public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
+	/**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
+        // no point subscribing
+    }
+
+    public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
 	    taxon = (Taxon)repo.getTaxonService().find(taxon.getUuid());
 	    Set<DefinedTermBase> chosenTerms = getChosenTerms();

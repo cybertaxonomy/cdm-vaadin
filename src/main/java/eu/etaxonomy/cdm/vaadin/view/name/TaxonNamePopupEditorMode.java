@@ -29,6 +29,13 @@ public enum TaxonNamePopupEditorMode {
      * section can be edited via a ReferencePopupEditor.
      *
      */
-    nomenclaturalReferenceSectionEditingOnly
+    nomenclaturalReferenceSectionEditingOnly,
+
+    /**
+     * setting the nomenclatural reference is required with the exception
+     * that existing data is considered complete if the combination
+     * authors are set.
+     */
+    requireNomenclaturalReference
 
 }

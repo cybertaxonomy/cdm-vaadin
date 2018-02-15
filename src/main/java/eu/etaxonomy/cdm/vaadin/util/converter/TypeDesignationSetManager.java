@@ -25,8 +25,8 @@ import org.hibernate.search.hcore.util.impl.HibernateHelper;
 
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -60,6 +60,12 @@ import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException
  */
 public class TypeDesignationSetManager {
 
+    enum NameTypeBaseEntityType{
+
+        NAME_TYPE_DESIGNATION,
+        TYPE_NAME;
+
+    }
 
     private static final String TYPE_STATUS_SEPARATOR = "; ";
 
@@ -68,6 +74,8 @@ public class TypeDesignationSetManager {
     private static final String TYPE_DESIGNATION_SEPARATOR = ", ";
 
     private Collection<TypeDesignationBase> typeDesignations;
+
+    private NameTypeBaseEntityType nameTypeBaseEntityType = NameTypeBaseEntityType.NAME_TYPE_DESIGNATION;
 
     /**
      * Groups the EntityReferences for each of the TypeDesignations by the according TypeDesignationStatus.
@@ -144,8 +152,8 @@ public class TypeDesignationSetManager {
         TypeDesignationStatusBase<?> status = td.getTypeStatus();
 
         try {
-            final IdentifiableEntity<?> baseEntity = baseEntity(td);
-            final TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = makeEntityReference(baseEntity);
+            final VersionableEntity baseEntity = baseEntity(td);
+            final TypedEntityReference<VersionableEntity> baseEntityReference = makeEntityReference(baseEntity);
 
             EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
 
@@ -166,9 +174,9 @@ public class TypeDesignationSetManager {
      * @return
      * @throws DataIntegrityException
      */
-    protected IdentifiableEntity<?> baseEntity(TypeDesignationBase<?> td) throws DataIntegrityException {
+    protected VersionableEntity baseEntity(TypeDesignationBase<?> td) throws DataIntegrityException {
 
-        IdentifiableEntity<?> baseEntity = null;
+        VersionableEntity baseEntity = null;
         if(td  instanceof SpecimenTypeDesignation){
             SpecimenTypeDesignation std = (SpecimenTypeDesignation) td;
             FieldUnit fu = findFieldUnit(std);
@@ -178,7 +186,12 @@ public class TypeDesignationSetManager {
                 baseEntity = ((SpecimenTypeDesignation) td).getTypeSpecimen();
             }
         } else if(td instanceof NameTypeDesignation){
-            baseEntity = ((NameTypeDesignation)td).getTypeName();
+            if(nameTypeBaseEntityType == NameTypeBaseEntityType.NAME_TYPE_DESIGNATION){
+                baseEntity = td;
+            } else {
+                // only other option is TaxonName
+                baseEntity = ((NameTypeDesignation)td).getTypeName();
+            }
         }
         if(baseEntity == null) {
             throw new DataIntegrityException("Incomplete TypeDesignation, no type missin in " + td.toString());
@@ -190,15 +203,15 @@ public class TypeDesignationSetManager {
      * @param td
      * @return
      */
-    protected TypedEntityReference<IdentifiableEntity<?>> makeEntityReference(IdentifiableEntity<?> baseEntity) {
+    protected TypedEntityReference<VersionableEntity> makeEntityReference(VersionableEntity baseEntity) {
 
-        baseEntity = (IdentifiableEntity<?>) HibernateHelper.unproxy(baseEntity);
+        baseEntity = (VersionableEntity) HibernateHelper.unproxy(baseEntity);
         String label = "";
         if(baseEntity  instanceof FieldUnit){
                 label = ((FieldUnit)baseEntity).getTitleCache();
         }
 
-        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
+        TypedEntityReference<VersionableEntity> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
 
         return baseEntityReference;
     }
@@ -231,7 +244,7 @@ public class TypeDesignationSetManager {
                     return type1.equals(FieldUnit.class) ? -1 : 1;
                 } else {
                     // name types last (in case of missing FieldUnit we expect the base type to be DerivedUnit which comes into the middle)
-                    return type2.equals(TaxonName.class) ? -1 : 1;
+                    return type2.equals(TaxonName.class) || type2.equals(NameTypeDesignation.class) ? -1 : 1;
                 }
             } else {
                 return o1.getLabel().compareTo(o2.getLabel());
@@ -251,6 +264,16 @@ public class TypeDesignationSetManager {
                 @Override
                 public int compare(TypeDesignationStatusBase o1, TypeDesignationStatusBase o2) {
                     // fix inverted order of cdm terms by -1*
+                    if(o1 == null && o2 == null || o1 instanceof NullTypeDesignationStatus && o2 instanceof NullTypeDesignationStatus){
+                        return 0;
+                    }
+                    if(o1 == null || o1 instanceof NullTypeDesignationStatus){
+                        return -1;
+                    }
+
+                    if(o2 == null || o2 instanceof NullTypeDesignationStatus){
+                        return 1;
+                    }
                     return -1 * o1.compareTo(o2);
                 }
             });
@@ -587,6 +610,14 @@ public class TypeDesignationSetManager {
         return typifiedName;
     }
 
+    public void setNameTypeBaseEntityType(NameTypeBaseEntityType nameTypeBaseEntityType){
+        this.nameTypeBaseEntityType = nameTypeBaseEntityType;
+    }
+
+    public NameTypeBaseEntityType getNameTypeBaseEntityType(){
+        return nameTypeBaseEntityType;
+    }
+
     /**
      * TypeDesignations which refer to the same FieldUnit (SpecimenTypeDesignation) or TaxonName
      * (NameTypeDesignation) form a working set. The <code>TypeDesignationWorkingSet</code> internally
@@ -603,16 +634,16 @@ public class TypeDesignationSetManager {
 
         String workingSetRepresentation = null;
 
-        TypedEntityReference<IdentifiableEntity<?>> baseEntityReference;
+        TypedEntityReference<VersionableEntity> baseEntityReference;
 
-        IdentifiableEntity<?> baseEntity;
+        VersionableEntity baseEntity;
 
         List<DerivedUnit> derivedUnits = null;
 
         /**
          * @param baseEntityReference
          */
-        public TypeDesignationWorkingSet(IdentifiableEntity<?> baseEntity, TypedEntityReference<IdentifiableEntity<?>> baseEntityReference) {
+        public TypeDesignationWorkingSet(VersionableEntity baseEntity, TypedEntityReference<VersionableEntity> baseEntityReference) {
             this.baseEntity = baseEntity;
             this.baseEntityReference = baseEntityReference;
         }
@@ -620,7 +651,7 @@ public class TypeDesignationSetManager {
         /**
          * @return
          */
-        public IdentifiableEntity<?> getBaseEntity() {
+        public VersionableEntity getBaseEntity() {
             return baseEntity;
         }
 
@@ -661,7 +692,7 @@ public class TypeDesignationSetManager {
          *
          * @return the baseEntityReference
          */
-        public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityReference() {
+        public TypedEntityReference<VersionableEntity> getBaseEntityReference() {
             return baseEntityReference;
         }
 

@@ -85,7 +85,8 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
 
     /**
      * @return the select
-     * @deprecated list specific method should not be in the interface
+     * @deprecated list specific method should not be in
+     * the interface
      */
     @Deprecated
     public ListSelect getSelect() {

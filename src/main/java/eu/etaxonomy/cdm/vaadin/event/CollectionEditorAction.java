@@ -27,28 +27,11 @@ public class CollectionEditorAction extends AbstractEditorAction {
     }
 
     /**
-     * @param edit
-     * @param citationId
-     */
-    public CollectionEditorAction(EditorActionType type, Integer citationId) {
-        super(type, citationId);
-    }
-
-    /**
-     * @param type
-     * @param entityId
-     * @param source
-     */
-    public CollectionEditorAction(EditorActionType type, Integer entityId, Component source) {
-        super(type, entityId, source);
-    }
-
-    /**
      * @param action
      * @param source
      */
-    public CollectionEditorAction(EditorActionType action, Component source) {
-        super(action, source);
+    public CollectionEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
+        super(action, source, sourceView);
     }
 
     /**

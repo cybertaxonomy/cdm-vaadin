@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.EnumSet;
 
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.EventScope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.server.SystemError;
@@ -23,6 +24,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
@@ -54,6 +56,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super();
     }
 
+
     /**
      * {@inheritDoc}
      */
@@ -81,13 +84,15 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.handleViewExit();
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
         if(getView() == null || getView().getNewPublicationButton() != event.getSourceComponent()){
             return;
         }
-        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+
+        newReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
         refTypes.remove(ReferenceType.Section);
         newReferencePopup.withReferenceTypes(refTypes);
@@ -96,7 +101,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         newReferencePopup.loadInEditor(null);
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).REMOVE")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Remove.class)
     public void onReferenceEditorActionRemove(ReferenceEditorAction event) {
 
         if(getView().getRemoveNewPublicationButton() != event.getSourceComponent()){
@@ -120,8 +125,9 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         getView().getNewPublicationLabel().setVisible(false);
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+
         if(event.getPopup() == newReferencePopup){
             if(event.getReason() == Reason.SAVE){
 
@@ -147,12 +153,13 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
     }
 
-    @EventListener(condition = "#event.type == T(eu.etaxonomy.vaadin.event.EditorActionType).ADD")
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
         if(getView().getContinueButton() != event.getSourceComponent()){
             return;
         }
+
         Integer referenceId = null;
         LazyComboBox<Reference> referenceCombobox = getView().getReferenceCombobox();
         referenceCombobox.commit();
@@ -167,7 +174,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        eventBus.publishEvent(new NavigationEvent(RegistrationWorksetViewBean.NAME, Integer.toString(referenceId)));
+        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorksetViewBean.NAME, Integer.toString(referenceId)));
 
     }
 

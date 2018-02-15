@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.EventBus.UIEventBus;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
@@ -31,8 +31,13 @@ public class MenuBeanDiscoveryBean {
 	@Autowired
 	private ApplicationContext beanManager;
 
+    private UIEventBus uiEventBus;
+
     @Autowired
-    private ApplicationEventPublisher eventBus;
+    private void setUiEventBus(UIEventBus uiEventBus){
+        this.uiEventBus = uiEventBus;
+        uiEventBus.subscribe(this);
+    }
 
 	private MainMenu mainMenuLookup = null;
 
@@ -48,7 +53,7 @@ public class MenuBeanDiscoveryBean {
 	    this.mainMenuLookup = mainMenu;
 	}
 
-	@EventListener
+	@EventBusListenerMethod
 	protected void doMenuItemLookup(UIInitializedEvent event) {
 
 		if (mainMenuLookup == null) {

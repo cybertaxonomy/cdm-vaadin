@@ -26,20 +26,13 @@ public class RegistrationEditorAction extends AbstractEditorAction {
         super(type);
     }
 
-    /**
-     * @param edit
-     * @param citationId
-     */
-    public RegistrationEditorAction(EditorActionType type, Integer enitityId) {
-        super(type, enitityId);
-    }
 
     /**
      * @param action
      * @param source
      */
-    public RegistrationEditorAction(EditorActionType action, Component source) {
-        super(action, source);
+    public RegistrationEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
+        super(action, source, sourceView);
     }
 
     /**
@@ -52,14 +45,6 @@ public class RegistrationEditorAction extends AbstractEditorAction {
         super(action, entityId, source, sourceView);
     }
 
-    /**
-     * @param action
-     * @param entityId
-     * @param source
-     */
-    public RegistrationEditorAction(EditorActionType action, Integer entityId, Component source) {
-        super(action, entityId, source);
-    }
 
 
 

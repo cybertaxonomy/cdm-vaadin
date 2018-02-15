@@ -10,8 +10,8 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.EventBus;
 
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
@@ -49,7 +49,7 @@ public class RedirectToLoginView extends VerticalLayout implements View {
     NavigationManager navigationManager;
 
     @Autowired
-    protected ApplicationEventPublisher eventBus;
+    protected EventBus.UIEventBus uiEventBus;
 
     public RedirectToLoginView() {
 
@@ -70,7 +70,7 @@ public class RedirectToLoginView extends VerticalLayout implements View {
 
         String currentState = ((Navigator)navigationManager).getState();
         // redirect to the login view and pass over the current state
-        eventBus.publishEvent(new NavigationEvent(LoginViewBean.NAME, currentState));
+        uiEventBus.publish(this, new NavigationEvent(LoginViewBean.NAME, currentState));
     }
 
 }

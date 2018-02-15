@@ -4,14 +4,15 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>4.13.0</version>
+  <version>4.14.0</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vaadin.version>7.7.10</vaadin.version>
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
-    <cdmlib.version>4.13.0</cdmlib.version>
+    <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
+    <cdmlib.version>4.14.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
@@ -96,9 +97,9 @@
   <distributionManagement>
     <repository>
       <uniqueVersion>false</uniqueVersion>
-      <id>wp5.e-taxonomy.eu</id>
+      <id>cybertaxonomy.eu</id>
       <name>Edit Maven Repository</name>
-      <url>scpexe://wp5.e-taxonomy.eu/var/www/wp5.e-taxonomy.eu/mavenrepo/</url>
+      <url>scpexe://cybertaxonomy.eu/var/www/wp5.e-taxonomy.eu/mavenrepo/</url>
       <layout>default</layout>
     </repository>
   </distributionManagement>
@@ -409,6 +410,11 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring</artifactId>
       <version>${vaadin-spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.spring.addons</groupId>
+      <artifactId>vaadin-spring-addon-eventbus</artifactId>
+      <version>${vaadin-spring-addon-eventbus.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>

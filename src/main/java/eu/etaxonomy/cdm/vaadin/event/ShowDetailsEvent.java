@@ -31,12 +31,12 @@ public class ShowDetailsEvent<T extends Object, I extends Object> {
 
     /**
      *
-     * @param e
+     * @param sourceEvent
      * @param identifier
      * @param property
      */
-    public ShowDetailsEvent(Event e, Class<T> entityType , I identifier, String property) {
-        this.source = e;
+    public ShowDetailsEvent(Event sourceEvent, Class<T> entityType , I identifier, String property) {
+        this.source = sourceEvent;
         this.entityType = entityType;
         this.identifier = identifier;
         this.property = property;

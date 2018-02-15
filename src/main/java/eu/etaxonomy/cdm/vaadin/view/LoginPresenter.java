@@ -13,12 +13,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.vaadin.spring.events.Event;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBus.ViewEventBus;
+import org.vaadin.spring.events.EventBusListener;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -47,7 +49,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @ViewScope
-public class LoginPresenter extends AbstractPresenter<LoginView> {
+public class LoginPresenter extends AbstractPresenter<LoginView> implements EventBusListener<AuthenticationAttemptEvent> {
 
     private static final long serialVersionUID = 4020699735656994791L;
 
@@ -57,10 +59,23 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
 
     private final static String PROPNAME_PASSWORD = "cdm-vaadin.login.pwd";
 
-    @Autowired
-    protected ApplicationEventPublisher eventBus;
-
     private String redirectToState;
+
+    protected EventBus.UIEventBus uiEventBus;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
+        // not listening to view scope events
+    }
+
+    @Autowired
+    protected void setUIEventBus(EventBus.UIEventBus uiEventBus){
+        this.uiEventBus = uiEventBus;
+        uiEventBus.subscribe(this);
+    }
 
     public boolean authenticate(String userName, String password) {
 
@@ -74,9 +89,9 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
                 log.debug("user '" + userName + "' authenticated");
                 currentSecurityContext().setAuthentication(authentication);
                 if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
-                    eventBus.publishEvent(new AuthenticationSuccessEvent(userName));
+                    uiEventBus.publish(this, new AuthenticationSuccessEvent(userName));
                     log.debug("redirecting to " + redirectToState);
-                    eventBus.publishEvent(new NavigationEvent(redirectToState));
+                    uiEventBus.publish(this, new NavigationEvent(redirectToState));
                 }
             }
         } catch (AuthenticationException e){
@@ -113,11 +128,10 @@ public class LoginPresenter extends AbstractPresenter<LoginView> {
         }
     }
 
-    @EventListener
-    protected void onLoginEvent(AuthenticationAttemptEvent e){
-        authenticate(e.getUserName(), getView().getLoginDialog().getPassword().getValue());
+    @Override
+    public void onEvent(Event<AuthenticationAttemptEvent> event) {
+        authenticate(event.getPayload().getUserName(), getView().getLoginDialog().getPassword().getValue());
     }
-
 
 
 }

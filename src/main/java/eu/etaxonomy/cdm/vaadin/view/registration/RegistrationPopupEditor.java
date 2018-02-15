@@ -11,8 +11,10 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.ListSelect;
@@ -30,6 +32,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  * @since May 15, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter>
     implements RegistrationPopEditorView, AccessRestrictedView {
 

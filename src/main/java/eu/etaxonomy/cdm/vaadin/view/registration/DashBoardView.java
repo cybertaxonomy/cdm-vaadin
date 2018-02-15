@@ -9,7 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.vaadin.spring.events.EventBus;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -32,13 +32,13 @@ public class DashBoardView extends DashBoardDesign implements View {
     private static final long serialVersionUID = -6172448806905158782L;
 
     @Autowired
-    ApplicationEventPublisher eventBus;
+    protected EventBus.UIEventBus uiEventBus;
 
     public DashBoardView() {
         Responsive.makeResponsive(dashboard);
-        buttonNew.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(StartRegistrationViewBean.NAME)));
-        buttonContinue.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME + "/" + ListView.Mode.inProgress.name())));
-        buttonList.addClickListener(e -> eventBus.publishEvent(new NavigationEvent(ListViewBean.NAME + "/" + ListViewBean.Mode.all.name())));
+        buttonNew.addClickListener(e -> uiEventBus.publish(this, new NavigationEvent(StartRegistrationViewBean.NAME)));
+        buttonContinue.addClickListener(e -> uiEventBus.publish(this, new NavigationEvent(ListViewBean.NAME + "/" + ListView.Mode.inProgress.name())));
+        buttonList.addClickListener(e -> uiEventBus.publish(this, new NavigationEvent(ListViewBean.NAME + "/" + ListViewBean.Mode.all.name())));
     }
 
     /**

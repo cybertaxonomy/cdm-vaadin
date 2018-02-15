@@ -11,10 +11,12 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.Collection;
 import java.util.EnumSet;
 
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.data.validator.DoubleRangeValidator;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
@@ -31,6 +33,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
@@ -39,6 +42,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  * @since May 15, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
@@ -140,7 +145,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToGroundMinMax.getTextField(), "distanceToGroundText");
 
         row++;
-        collectorField = new TeamOrPersonField("Collector");
+        collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;

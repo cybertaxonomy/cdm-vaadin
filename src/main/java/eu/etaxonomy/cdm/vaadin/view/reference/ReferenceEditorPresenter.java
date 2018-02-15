@@ -12,8 +12,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Scope;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.CaptionGenerator;
+
+import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -36,6 +39,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  * @since Apr 5, 2017
  *
  */
+@SpringComponent
+@Scope("prototype")
 public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Reference, ReferencePopupEditorView> {
 
     private static final long serialVersionUID = -7926116447719010837L;
@@ -47,6 +52,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     public ReferenceEditorPresenter() {
 
     }
+
 
     /**
      * {@inheritDoc}
@@ -134,31 +140,33 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     * @param editorAction
      * @throws EditorEntityBeanException
     */
-   @EventListener(condition = "#editorAction.sourceComponent != null")
+   @EventBusListenerMethod
    public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
-       if(!isFromOwnView(editorAction)){
+
+       if(!isFromOwnView(editorAction) || editorAction.getSourceComponent() == null){
            return;
        }
+
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
            if(editorAction.isAddAction()){
-               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
                inReferencePopup.loadInEditor(null);
            }
            if(editorAction.isEditAction()){
-               ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class);
-               popup.withDeleteButton(true);
-               popup.loadInEditor(editorAction.getEntityId());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup.withDeleteButton(true);
+               inReferencePopup.loadInEditor(editorAction.getEntityId());
            }
        }
    }
 
-   @EventListener
+   @EventBusListenerMethod
    public void doDoneWithPopupEvent(DoneWithPopupEvent event){
 
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
                Reference bean = inReferencePopup.getBean();
-               getView().getInReferenceCombobox().selectNewItem(bean);
+               getView().getInReferenceCombobox().reload(); //refreshSelectedValue(bean);
            }
            if(event.getReason().equals(Reason.DELETE)){
                getView().getInReferenceCombobox().selectNewItem(null);

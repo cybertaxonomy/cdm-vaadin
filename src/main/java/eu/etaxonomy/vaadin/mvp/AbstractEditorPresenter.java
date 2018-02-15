@@ -9,9 +9,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import org.hibernate.FlushMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
@@ -32,9 +30,6 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     FlushMode previousPreSaveEvenFlushMode = null;
 
-    @Autowired
-    protected ApplicationEventPublisher eventBus;
-
     protected BeanInstantiator<DTO> beanInstantiator = null;
 
     /**
@@ -53,55 +48,31 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         this.beanInstantiator = beanInstantiator;
     }
 
-    /**
-     * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
-     *
-     * @param preSaveEvent
-     */
-    @EventListener
+    @EventBusListenerMethod
     public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
-//        getSession().setFlushMode(FlushMode.AUTO);
-
     }
 
-    @EventListener
+    @EventBusListenerMethod
     public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
         if(!isFromOwnView(saveEvent)){
             return;
         }
         DTO bean = saveEvent.getBean();
-        try {
-            saveBean(bean);
-        } catch(Exception e){
-//            if(getSession().isOpen()){
-//                getSession().clear();
-//            }
-            throw e; // re-throw after cleaning up the session
-        } finally {
-//            if(getSession().isOpen()){
-//                getSession().setFlushMode(previousPreSaveEvenFlushMode);
-//            }
-//            previousPreSaveEvenFlushMode = null;
-        }
+        saveBean(bean);
     }
 
-    /**
-    * Regarding changing the Flush mode see see also {@link ViewScopeConversationHolder}
-    *
+   /**
     * @param saveEvent
     */
-   @EventListener
+   @EventBusListenerMethod
    public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
        if(!isFromOwnView(deleteEvent)){
            return;
        }
-       FlushMode previousFlushMode = getSession().getFlushMode();
-       getSession().setFlushMode(FlushMode.AUTO);
        deleteBean(deleteEvent.getBean());
-       getSession().setFlushMode(previousFlushMode);
    }
 
     /**

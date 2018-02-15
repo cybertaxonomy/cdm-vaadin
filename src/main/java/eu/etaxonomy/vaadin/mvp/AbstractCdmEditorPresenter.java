@@ -14,7 +14,6 @@ import java.util.HashSet;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
-import org.springframework.context.event.EventListener;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
@@ -123,7 +122,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     @SuppressWarnings("unchecked")
     @Override
-    @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
+    // @EventBusListenerMethod // already annotated at super class
     public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
 
         if(!isFromOwnView(preSaveEvent)){
@@ -134,16 +133,15 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
     @SuppressWarnings("unchecked")
     @Override
-    @EventListener // the generic type parameter <DTO> must not be used here otherwise events will not be received
-    public void onEditorSaveEvent(EditorSaveEvent saveEvent){
+    // @EventBusListenerMethod // already annotated at super class
+    public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
 
         if(!isFromOwnView(saveEvent)){
             return;
         }
 
-
         // the bean is now updated with the changes made by the user
-        DTO bean = (DTO) saveEvent.getBean();
+        DTO bean = saveEvent.getBean();
 
         if(logger.isTraceEnabled()){
             PersistentContextAnalyzer pca = new PersistentContextAnalyzer(bean);
@@ -158,10 +156,10 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             pca.printCopyEntities(System.err);
         }
         try {
-            EntityChangeEvent changeEvent = getStore().saveBean(bean);
+            EntityChangeEvent changeEvent = getStore().saveBean(bean, (AbstractView) getView());
 
             if(changeEvent != null){
-                eventBus.publishEvent(changeEvent);
+                viewEventBus.publish(this, changeEvent);
             }
         } catch (HibernateException e){
             if(newAuthorityCreated != null){
@@ -172,7 +170,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     }
 
     /**
-     * EditorPresneters for beans with transient properties should overwrite this method to
+     * EditorPresenters for beans with transient properties should overwrite this method to
      * update the beanItem with the changes made to the transient properties.
      * <p>
      * This is necessary because Vaadin MethodProperties are readonly when no setter is
@@ -217,10 +215,10 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     }
 
     @Override
-    protected final void deleteBean(DTO bean){
-        EntityChangeEvent changeEvent = getStore().deleteBean(bean);
+    protected void deleteBean(DTO bean){
+        EntityChangeEvent changeEvent = getStore().deleteBean(bean, (AbstractView) getView());
         if(changeEvent != null){
-            eventBus.publishEvent(changeEvent);
+            viewEventBus.publish(this, changeEvent);
         }
 
     }
