@@ -2,10 +2,12 @@ package eu.etaxonomy.cdm.vaadin.container;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinSession;
@@ -24,6 +26,14 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 	private static PresenceAbsenceTermContainer instance;
 
 	private static Collection<PresenceAbsenceTerm> defaultDistributionStatus;
+
+    static class PresenceAbsenceTermComparator implements Comparator<PresenceAbsenceTerm> {
+        @Override
+        public int compare(PresenceAbsenceTerm pa1, PresenceAbsenceTerm pa2) {
+            return pa1.compareTo(pa2);
+        }
+
+    }
 
 	private PresenceAbsenceTermContainer()
 			throws IllegalArgumentException {
@@ -56,11 +66,16 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
     public static List<PresenceAbsenceTerm> getDistributionStatusList(List<String> propertyPath){
         CdmPreference statusPref = CdmSpringContextHelper.getPreferenceService().findVaadin(PreferencePredicate.AvailableDistributionStatus);
+        List<PresenceAbsenceTerm> paList;
         if (statusPref != null){
             List<UUID> uuidList = statusPref.getValueUuidList();
-            return (List)CdmSpringContextHelper.getTermService().load(uuidList, propertyPath);
+            paList = CdmSpringContextHelper.getTermService().load(uuidList, propertyPath).stream().map(db -> (PresenceAbsenceTerm)db).collect(Collectors.toList());
+            paList.sort(new PresenceAbsenceTermComparator());
+            return paList;
         }else{
-            return TermCacher.getInstance().getDistributionStatusTermList();
+            paList = TermCacher.getInstance().getDistributionStatusTermList();
+            paList.sort(new PresenceAbsenceTermComparator());
+            return paList;
         }
     }
 
@@ -68,5 +83,4 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
             "$",
             "representations",
     });
-
 }
