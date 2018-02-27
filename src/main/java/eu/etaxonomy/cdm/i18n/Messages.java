@@ -50,6 +50,7 @@ public class Messages implements Serializable {
     public static String DistributionToolbar_LOGOUT = "DistributionToolbar_LOGOUT";
     public static String DistributionToolbar_SAVE = "DistributionToolbar_SAVE";
     public static String DistributionToolbar_STATUS = "DistributionToolbar_STATUS";
+    public static String PermissionDeniedErrorHandler_ERROR_MSG = "PermissionDeniedErrorHandler_ERROR_MSG";
     public static String SettingsDialogWindowBase_CANCEL = "SettingsDialogWindowBase_CANCEL";
     public static String SettingsDialogWindowBase_OK = "SettingsDialogWindowBase_OK";
 

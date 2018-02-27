@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.hibernate5.HibernateSystemException;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
@@ -47,6 +48,8 @@ import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
+import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.HibernateSystemErrorHandler;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
@@ -167,6 +170,9 @@ public class DistributionTableViewBean
                 }
                 //popup window
                 final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
+                DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
+                errorHandler.registerHandler(HibernateSystemException.class, new HibernateSystemErrorHandler());
+                popup.setErrorHandler(errorHandler);
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
                 termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
