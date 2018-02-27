@@ -39,9 +39,9 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  * @since May 19, 2017
  *
  */
-public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
+public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
-    private final static Logger logger = Logger.getLogger(RegistrationItemEditButtonGroup.class);
+    private final static Logger logger = Logger.getLogger(RegistrationItemNameAndTypeButtons.class);
 
 
     private static final String DEFAULT_BUTTON_STYLES = "";
@@ -62,7 +62,7 @@ public class RegistrationItemEditButtonGroup extends CompositeStyledComponent {
 
     private Link identifierLink;
 
-    public RegistrationItemEditButtonGroup(RegistrationDTO regDto) {
+    public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto) {
 
         boolean isRegistrationLocked = EnumSet.of(
                 RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)

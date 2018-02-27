@@ -45,8 +45,8 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
@@ -76,10 +76,10 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private class RegistrationDetailsItem {
 
-        RegistrationItemEditButtonGroup registrationItemEditButtonGroup;
+        RegistrationItemNameAndTypeButtons registrationItemEditButtonGroup;
         CssLayout itemFooter;
 
-        public RegistrationDetailsItem(RegistrationItemEditButtonGroup registrationItemEditButtonGroup, CssLayout itemFooter){
+        public RegistrationDetailsItem(RegistrationItemNameAndTypeButtons registrationItemEditButtonGroup, CssLayout itemFooter){
             this.registrationItemEditButtonGroup = registrationItemEditButtonGroup;
             this.itemFooter = itemFooter;
         }
@@ -272,7 +272,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
-        RegistrationItemEditButtonGroup regItemButtonGroup = new RegistrationItemEditButtonGroup(dto);
+        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
         Integer registrationEntityID = dto.getId();
         CssLayout footer = new CssLayout();
         footer.setWidth(100, Unit.PERCENTAGE);
