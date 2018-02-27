@@ -197,7 +197,7 @@ public class RegistrationItem extends GridLayout {
             setComponentError(new UserError("Citation is missing"));
         }
 
-        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getValidationProblems().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 

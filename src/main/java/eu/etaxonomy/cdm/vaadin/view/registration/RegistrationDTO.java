@@ -56,7 +56,7 @@ public class RegistrationDTO{
 
     private Registration reg;
 
-    private List<String> messages = new ArrayList<>();
+    private List<String> validationProblems = new ArrayList<>();
 
     private Set<TypedEntityReference<Registration>> blockedBy;
 
@@ -105,7 +105,7 @@ public class RegistrationDTO{
                 typeDesignationManager = new TypeDesignationSetManager(reg.getTypeDesignations());
                 summary = typeDesignationManager.buildString().print();
             } catch (RegistrationValidationException e) {
-                messages.add("Validation errors: " + e.getMessage());
+                validationProblems.add("Validation errors: " + e.getMessage());
             }
             break;
         }
@@ -382,8 +382,8 @@ public class RegistrationDTO{
     /**
      * @return
      */
-    public List<String> getMessages() {
-        return messages;
+    public List<String> getValidationProblems() {
+        return validationProblems;
     }
 
 }

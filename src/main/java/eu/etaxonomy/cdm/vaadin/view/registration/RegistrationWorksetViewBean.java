@@ -344,7 +344,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         Button messageButton = new Button(FontAwesome.COMMENT);
         messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-        if(dto.getMessages().isEmpty()){
+
+        if(dto.getValidationProblems().isEmpty()){
             messageButton.setEnabled(false);
         } else {
             messageButton.addClickListener(e -> getViewEventBus().publish(this,
@@ -357,7 +358,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     )
                 );
         }
-        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
+        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
         messageButton.setCaptionAsHtml(true);
         buttonGroup.addComponent(messageButton);
 

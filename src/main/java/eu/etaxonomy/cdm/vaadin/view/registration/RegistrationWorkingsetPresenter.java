@@ -546,7 +546,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) {
         List<String> messages = new ArrayList<>();
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
-            dto.getMessages().forEach(m -> messages.add(dto.getSummary() + ": " + m));
+            dto.getValidationProblems().forEach(m -> messages.add(dto.getSummary() + ": " + m));
         }
         if(event.getProperty().equals("messages")){
             getView().openDetailsPopup("Messages", messages);
@@ -559,7 +559,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         RegistrationDTO regDto = regWorkingSetService.loadDtoById((Integer)event.getIdentifier());
         if(event.getProperty().equals("messages")){
             if(getView() != null){
-                getView().openDetailsPopup("Messages", regDto.getMessages());
+                getView().openDetailsPopup("Messages", regDto.getValidationProblems());
             }
         }
     }

@@ -145,7 +145,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
         if(event.getProperty().equals("messages")){
 
-            getView().openDetailsPopup("Messages", regDto.getMessages());
+            getView().openDetailsPopup("Messages", regDto.getValidationProblems());
 
         } else if(event.getProperty().equals("blockedBy")){
 

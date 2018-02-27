@@ -151,7 +151,7 @@ public class RegistrationWorkingSet {
     public int messagesCount() {
         int messagesCount = 0;
         for(RegistrationDTO dto : getRegistrationDTOs()) {
-            messagesCount = messagesCount + dto.getMessages().size();
+            messagesCount = messagesCount + dto.getValidationProblems().size();
         }
         return messagesCount;
     }
