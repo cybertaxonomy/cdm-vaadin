@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
+package eu.etaxonomy.cdm.vaadin.component.distributionStatus;
 
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;

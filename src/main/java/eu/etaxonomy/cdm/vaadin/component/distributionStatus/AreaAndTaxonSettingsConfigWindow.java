@@ -6,7 +6,7 @@
  * The contents of this file are subject to the Mozilla Public License Version 1.1
  * See LICENSE.TXT at the top of this package for the full license terms.
  */
-package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
+package eu.etaxonomy.cdm.vaadin.component.distributionStatus;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -52,6 +52,7 @@ import eu.etaxonomy.cdm.vaadin.container.TaxonNodeContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.AreaAndTaxonSettingsPresenter;
 
 /**

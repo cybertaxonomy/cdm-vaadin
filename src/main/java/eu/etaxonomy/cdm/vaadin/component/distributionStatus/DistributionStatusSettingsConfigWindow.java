@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
+package eu.etaxonomy.cdm.vaadin.component.distributionStatus;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -23,6 +23,7 @@ import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStatusSettingsPresenter;
 
 /**

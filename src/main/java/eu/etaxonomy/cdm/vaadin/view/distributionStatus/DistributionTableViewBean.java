@@ -45,8 +45,11 @@ import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
-import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
-import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.AreaAndTaxonSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DetailWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionStatusSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionToolbar;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.HelpWindow;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
 import eu.etaxonomy.cdm.vaadin.event.error.HibernateSystemErrorHandler;
@@ -81,6 +84,7 @@ public class DistributionTableViewBean
     private LazyQueryContainer gridcontainer;
 	private AreaAndTaxonSettingsConfigWindow areaAndTaxonConfigWindow;;
 	private DistributionStatusSettingsConfigWindow distributionStatusConfigWindow;
+	private HelpWindow helpWindow;
 
 	public DistributionTableViewBean() {
 		super();
@@ -365,6 +369,10 @@ public class DistributionTableViewBean
 		//distr status
 		Button distrStatusButton = toolbar.getSettingsButton();
 		distrStatusButton.addClickListener(event -> openStatusSettings());
+
+	    //help
+        Button helpButton = toolbar.getHelpButton();
+        helpButton.addClickListener(event -> openHelpWindow());
 	}
 
     /**
@@ -391,6 +399,14 @@ public class DistributionTableViewBean
 		}
         Window window  = areaAndTaxonConfigWindow.createWindow(Messages.getLocalizedString(Messages.DistributionTableViewBean_AREAS_AND_TAXA));
         UI.getCurrent().addWindow(window);
+	}
+
+	public void openHelpWindow() {
+	       if(helpWindow==null){
+	           helpWindow = new HelpWindow(this);
+	        }
+	        Window window  = helpWindow.createWindow(Messages.getLocalizedString(Messages.DistributionToolbar_HELP));
+	        UI.getCurrent().addWindow(window);
 	}
 
     /**

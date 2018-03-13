@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.component;
+package eu.etaxonomy.cdm.vaadin.component.distributionStatus;
 import java.util.Collection;
 
 import org.springframework.context.annotation.Scope;

@@ -1,4 +1,4 @@
-package eu.etaxonomy.cdm.vaadin.component;
+package eu.etaxonomy.cdm.vaadin.component.distributionStatus;
 
 import java.io.Serializable;
 
@@ -67,6 +67,8 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 
 	private final Button settingsButton =  new Button(Messages.getLocalizedString(Messages.DistributionToolbar_STATUS));
 
+	private final Button helpButton =  new Button(Messages.getLocalizedString(Messages.DistributionToolbar_HELP));
+
 //	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
 
@@ -94,6 +96,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
         leftLayout.addComponent(distributionSettingsButton);
 
 		HorizontalLayout rightLayout = new HorizontalLayout();
+		rightLayout.addComponent(helpButton);
 		rightLayout.addComponent(loginButton);
 		rightLayout.addComponent(logoutButton);
         rightLayout.addComponent(userButton);
@@ -178,4 +181,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 		return detailButton;
 	}
 
+   public Button getHelpButton() {
+        return helpButton;
+    }
 }
