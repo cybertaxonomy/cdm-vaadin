@@ -91,9 +91,9 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 		distributionSettingsButton.setIcon(new ThemeResource("icons/32/settings_1.png")); //$NON-NLS-1$
 
         HorizontalLayout leftLayout = new HorizontalLayout();
-        leftLayout.addComponent(detailButton);
-        leftLayout.addComponent(settingsButton);
         leftLayout.addComponent(distributionSettingsButton);
+        leftLayout.addComponent(settingsButton);
+        leftLayout.addComponent(detailButton);
 
 		HorizontalLayout rightLayout = new HorizontalLayout();
 		rightLayout.addComponent(helpButton);
