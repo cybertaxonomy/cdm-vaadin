@@ -99,6 +99,8 @@ public class AreaAndTaxonSettingsConfigWindow
         RowId classificationRow = null;
         if(classification!=null){
             classificationRow = new RowId(classification.getId());
+            TaxonNode root = CdmSpringContextHelper.getClassificationService().getRootNode(classification.getUuid());
+            showClassificationTaxa(root);
         }
         else if(classificationBox.getItemIds().size()==1){
             //only one classification exists
@@ -106,7 +108,6 @@ public class AreaAndTaxonSettingsConfigWindow
         }
         if(classificationRow!=null){
             classificationBox.setValue(classificationRow);
-            showClassificationTaxa(getUuidAndTitleCacheFromRowId(classificationRow));
         }
 
         classificationBox.addValueChangeListener(this);
@@ -230,7 +231,8 @@ public class AreaAndTaxonSettingsConfigWindow
         Property<?> property = event.getProperty();
         if(property==classificationBox){
         	UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
-            showClassificationTaxa(parent);
+        	TaxonNode root = CdmSpringContextHelper.getClassificationService().getRootNode(parent.getUuid());
+        	showClassificationTaxa(root);
         }
         else if(property==taxonFilter){
             String filterText = taxonFilter.getValue();
@@ -252,7 +254,8 @@ public class AreaAndTaxonSettingsConfigWindow
             	}
             	else{
             		UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
-            		showClassificationTaxa(parent);
+            		TaxonNode root = CdmSpringContextHelper.getClassificationService().getRootNode(parent.getUuid());
+            		showClassificationTaxa(root);
             	}
             }
         }
@@ -304,7 +307,7 @@ public class AreaAndTaxonSettingsConfigWindow
         ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
-    private void showClassificationTaxa(UuidAndTitleCache<TaxonNode> rootNode) {
+    private void showClassificationTaxa(TaxonNode rootNode) {
         final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(rootNode);
         // Enable polling and set frequency to 0.5 seconds
         UI.getCurrent().setPollInterval(500);
