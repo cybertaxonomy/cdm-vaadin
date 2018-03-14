@@ -18,7 +18,8 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 
 import eu.etaxonomy.cdm.i18n.Messages;
@@ -36,7 +37,7 @@ public class DistributionStatusSettingsConfigWindow
             implements ValueChangeListener, ClickListener{
 
 	private static final long serialVersionUID = -8220442386869594032L;
-    private ListSelect distStatusSelect;
+    private OptionGroup distStatusSelect;
     private CheckBox boxToggleAbbreviatedLabels;
     private IDistributionTableView distributionTableView;
 
@@ -75,19 +76,21 @@ public class DistributionStatusSettingsConfigWindow
         mainLayout.setSpacing(true);
 
         //distribution status
-        distStatusSelect = new ListSelect(Messages.getLocalizedString(Messages.DistributionStatusSettingsConfigWindow_DISTRIBUTION_STATUS));
+        distStatusSelect = new OptionGroup();
         distStatusSelect.setImmediate(false);
         distStatusSelect.setMultiSelect(true);
         distStatusSelect.setSizeFull();
-        distStatusSelect.setWidth("100%"); //$NON-NLS-1$
+        Panel distStatusPanel = new Panel(Messages.getLocalizedString(Messages.DistributionStatusSettingsConfigWindow_DISTRIBUTION_STATUS));
+        distStatusPanel.setContent(new VerticalLayout(distStatusSelect));
+        distStatusPanel.setSizeFull();
 
         //toggle abbreviated labels
         boxToggleAbbreviatedLabels = new CheckBox(Messages.getLocalizedString(Messages.DistributionStatusSettingsConfigWindow_SHOW_ABBREVIATED_LABELS), DistributionEditorUtil.isAbbreviatedLabels());
         boxToggleAbbreviatedLabels.setImmediate(true);
 
         mainLayout.addComponent(boxToggleAbbreviatedLabels);
-        mainLayout.addComponent(distStatusSelect);
-        mainLayout.setExpandRatio(distStatusSelect, 1);
+        mainLayout.addComponent(distStatusPanel);
+        mainLayout.setExpandRatio(distStatusPanel, 1);
         mainLayout.setSizeFull();
 
         //button toolbar

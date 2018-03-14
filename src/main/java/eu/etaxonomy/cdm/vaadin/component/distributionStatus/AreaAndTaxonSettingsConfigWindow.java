@@ -29,8 +29,9 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.Tree.ExpandEvent;
@@ -68,7 +69,7 @@ public class AreaAndTaxonSettingsConfigWindow
     private ComboBox classificationBox;
     private TextField taxonFilter;
     private ComboBox distAreaBox;
-    private ListSelect namedAreaList;
+    private OptionGroup namedAreaList;
     private TreeTable taxonTree;
     private IDistributionTableView distributionTableView;
 
@@ -184,10 +185,13 @@ public class AreaAndTaxonSettingsConfigWindow
         distAreaBox.setWidth("100%"); //$NON-NLS-1$
 
         // named areas
-        namedAreaList = new ListSelect();
-        namedAreaList.setCaption(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_AREAS));
-        namedAreaList.setSizeFull();
+        namedAreaList = new OptionGroup();
         namedAreaList.setMultiSelect(true);
+        namedAreaList.setSizeFull();
+        Panel namedAreaPanel = new Panel(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_AREAS));
+        namedAreaPanel.setContent(new VerticalLayout(namedAreaList));
+        namedAreaPanel.setSizeFull();
+
 
         //taxonomy
         taxonTree = new TreeTable(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_TAXONOMY));
@@ -199,9 +203,9 @@ public class AreaAndTaxonSettingsConfigWindow
         taxonTree.setMultiSelect(true);
 
         leftContainer.addComponent(distAreaBox);
-        leftContainer.addComponent(namedAreaList);
+        leftContainer.addComponent(namedAreaPanel);
         leftContainer.setExpandRatio(distAreaBox, 0.1f);
-        leftContainer.setExpandRatio(namedAreaList, 0.9f);
+        leftContainer.setExpandRatio(namedAreaPanel, 0.9f);
         leftContainer.setSizeFull();
 
         rightContainer.addComponent(classificationBox);
