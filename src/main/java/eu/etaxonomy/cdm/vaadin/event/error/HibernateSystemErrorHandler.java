@@ -23,6 +23,8 @@ import eu.etaxonomy.cdm.i18n.Messages;
  */
 public class HibernateSystemErrorHandler extends ErrorTypeHandler<HibernateSystemException>{
 
+    private static final long serialVersionUID = -5703485298578474572L;
+
     /* (non-Javadoc)
      * @see eu.etaxonomy.cdm.vaadin.util.errorhandler.ErrorTypeHandler#handleError(com.vaadin.server.ErrorEvent)
      */

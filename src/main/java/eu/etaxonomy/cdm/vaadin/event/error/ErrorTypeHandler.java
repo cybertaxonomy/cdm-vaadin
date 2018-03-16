@@ -13,11 +13,15 @@ import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
 
 /**
+ * see {@link DelegatingErrorHandler}
+ *
  * @author freimeier
  * @date 26.02.2018
  *
  */
 public abstract class ErrorTypeHandler<E extends Exception> implements ErrorHandler {
+
+    private static final long serialVersionUID = 1782060185842059311L;
 
     /* (non-Javadoc)
      * @see com.vaadin.server.ErrorHandler#error(com.vaadin.server.ErrorEvent)
