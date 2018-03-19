@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
@@ -73,19 +75,6 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 @SpringView(name=RegistrationWorksetViewBean.NAME)
 public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
     implements RegistrationWorkingsetView, View, AccessRestrictedView {
-
-    private class RegistrationDetailsItem {
-
-        RegistrationItemNameAndTypeButtons registrationItemEditButtonGroup;
-        CssLayout itemFooter;
-
-        public RegistrationDetailsItem(RegistrationItemNameAndTypeButtons registrationItemEditButtonGroup, CssLayout itemFooter){
-            this.registrationItemEditButtonGroup = registrationItemEditButtonGroup;
-            this.itemFooter = itemFooter;
-        }
-
-
-    }
 
     /**
      *
@@ -129,6 +118,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private Panel registrationListPanel;
 
+    /**
+     * uses the registrationId as key
+     */
     private Map<Integer, RegistrationDetailsItem> registrationItemMap = new HashMap<>();
 
     public RegistrationWorksetViewBean() {
@@ -274,11 +266,16 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
         Integer registrationEntityID = dto.getId();
+
+        RegistrationItemButtons regItemButtons = new RegistrationItemButtons();
+
         CssLayout footer = new CssLayout();
         footer.setWidth(100, Unit.PERCENTAGE);
         footer.setStyleName("item-footer");
-        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, footer);
+
+        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, regItemButtons, footer);
         registrationItemMap.put(registrationEntityID, regDetailsItem);
+
         Stack<EditorActionContext> context = new Stack<EditorActionContext>();
         context.push(new EditorActionContext(
                     new TypedEntityReference<>(Registration.class, registrationEntityID),
@@ -321,14 +318,10 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 );
 
 
-        CssLayout buttonGroup = new CssLayout();
-        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-
-        Button blockingRegistrationButton = new Button(FontAwesome.WARNING);
+        Button blockingRegistrationButton = regItemButtons.getBlockingRegistrationButton();
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
-        if(!dto.isBlocked()){
-            blockingRegistrationButton.setEnabled(false);
-        } else {
+        if(dto.isBlocked()){
+           blockingRegistrationButton.setEnabled(true);
             blockingRegistrationButton.addStyleName(RegistrationItem.STYLE_NAME_BLOCKED);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
@@ -336,31 +329,40 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                             e,
                             RegistrationDTO.class,
                             dto.getId(),
-                            "blockedBy"
+                            RegistrationItem.BLOCKED_BY
                             )
                     ));
         }
-        buttonGroup.addComponent(blockingRegistrationButton);
 
-        Button messageButton = new Button(FontAwesome.COMMENT);
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
+        Button validationProblemsButton = regItemButtons.getValidationProblemsButton();
+        validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
 
-        if(dto.getValidationProblems().isEmpty()){
-            messageButton.setEnabled(false);
-        } else {
-            messageButton.addClickListener(e -> getViewEventBus().publish(this,
+        if(!dto.getValidationProblems().isEmpty()){
+            validationProblemsButton.setEnabled(true);
+            validationProblemsButton.addClickListener(e -> getViewEventBus().publish(this,
                     new ShowDetailsEvent<RegistrationDTO, Integer>(
                         e,
                         RegistrationDTO.class,
                         dto.getId(),
-                        "messages"
+                        RegistrationItem.VALIDATION_PROBLEMS
                         )
                     )
                 );
         }
-        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
-        messageButton.setCaptionAsHtml(true);
-        buttonGroup.addComponent(messageButton);
+        validationProblemsButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
+        validationProblemsButton.setCaptionAsHtml(true);
+
+        Button messageButton = regItemButtons.getMessagesButton();
+        messageButton.addClickListener(e -> getViewEventBus().publish(this,
+                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                        e,
+                        RegistrationDTO.class,
+                        dto.getId(),
+                        RegistrationItem.MESSAGES
+                        )
+                    )
+                );
+        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
         RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
 
@@ -375,18 +377,18 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 null,
                 this
                 )));
-            buttonGroup.addComponent(editRegistrationButton);
+            regItemButtons.addComponent(editRegistrationButton);
         }
 
-        PermissionDebugUtils.addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
+        PermissionDebugUtils.addGainPerEntityPermissionButton(regItemButtons, Registration.class, dto.getId(),
                 EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
         row++;
         registrationsGrid.addComponent(stateLabel, COL_INDEX_STATE_LABEL, row);
         registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
         registrationsGrid.addComponent(regItemButtonGroup, COL_INDEX_REG_ITEM, row);
-        registrationsGrid.addComponent(buttonGroup, COL_INDEX_BUTTON_GROUP, row);
-        registrationsGrid.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+        registrationsGrid.addComponent(regItemButtons, COL_INDEX_BUTTON_GROUP, row);
+        registrationsGrid.setComponentAlignment(regItemButtons, Alignment.TOP_LEFT);
 
         row++;
         registrationsGrid.addComponent(footer, 0, row, COL_INDEX_BUTTON_GROUP, row);
@@ -548,6 +550,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     public Integer getCitationID() {
         return citationID;
+    }
+
+    @Override
+    public Map<Integer, RegistrationDetailsItem> getRegistrationItemMap(){
+        return Collections.unmodifiableMap(registrationItemMap);
     }
 
 

@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -94,6 +95,13 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      * @param blockingRegDTOs
      */
     void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs);
+
+    /**
+     * Returns the registrationItemMap as unmodifiableMap.
+     *
+     * @return
+     */
+    Map<Integer, RegistrationDetailsItem> getRegistrationItemMap();
 
 
 

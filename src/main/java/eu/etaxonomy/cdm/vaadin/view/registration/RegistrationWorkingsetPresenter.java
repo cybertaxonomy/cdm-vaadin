@@ -23,8 +23,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.transaction.TransactionStatus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -34,6 +36,8 @@ import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.api.service.idminter.IdentifierMinter.Identifier;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
+import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -48,6 +52,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
@@ -94,6 +99,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private RegistrationIdentifierMinter minter;
+
+    @Autowired
+    private IRegistrationMessageService messageService;
 
     /**
      * @return the regWorkingSetService
@@ -190,11 +198,27 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         loadWorkingSet(getView().getCitationID());
         getView().setWorkingset(workingset);
 
+        // PagingProviders and CacheGenerator for the existingNameCombobox
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 getRepo().getNameService());
-        CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<TaxonName>();
-        getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenrator);
+        CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
+        getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+
+        // update the messages
+        User user = UserHelper.fromSession().user();
+        for (Integer registrationId : getView().getRegistrationItemMap().keySet()) {
+            Button messageButton = getView().getRegistrationItemMap().get(registrationId).regItemButtons.getMessagesButton();
+
+            RegistrationDTO regDto = workingset.getRegistrationDTO(registrationId).get();
+            try {
+                int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
+                messageButton.setEnabled(UserHelper.fromSession().userIsRegistrationCurator() || messageCount > 0);
+            } catch (ExternalServiceException e) {
+                messageButton.setComponentError(new SystemError(e.getMessage(), e));
+            }
+        }
+
     }
 
 
@@ -543,24 +567,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationWorkingSet.class)
-    public void onShowRegistrationWorkingSetMessages(ShowDetailsEvent<?,?> event) {
-        List<String> messages = new ArrayList<>();
-        for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
-            dto.getValidationProblems().forEach(m -> messages.add(dto.getSummary() + ": " + m));
-        }
-        if(event.getProperty().equals("messages")){
-            getView().openDetailsPopup("Messages", messages);
-        }
-    }
+    public void onShowDetailsEventForRegistrationWorkingSet(ShowDetailsEvent<RegistrationWorkingSet,?> event) {
 
-
-    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
-    public void onShowRegistrationMessages(ShowDetailsEvent<?,?> event) {
-        RegistrationDTO regDto = regWorkingSetService.loadDtoById((Integer)event.getIdentifier());
-        if(event.getProperty().equals("messages")){
-            if(getView() != null){
-                getView().openDetailsPopup("Messages", regDto.getValidationProblems());
+        if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
+            List<String> messages = new ArrayList<>();
+            for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
+                dto.getValidationProblems().forEach(m -> messages.add(dto.getSummary() + ": " + m));
             }
+            getView().openDetailsPopup("Validation Problems", messages);
         }
     }
 
@@ -613,8 +627,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventBusListenerMethod
-    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, Integer> event) {
+
+    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
+    public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, Integer> event) {
 
         // FIXME check from own view!!!
         if(getView() == null){
@@ -624,11 +639,19 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         Integer registrationId = event.getIdentifier();
 
         RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
-        if(event.getProperty().equals("blockedBy")){
+        if(event.getProperty().equals(RegistrationItem.BLOCKED_BY)){
 
             Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationId);
             getView().setBlockingRegistrations(registrationId, blockingRegs);
+        } else if(event.getProperty().equals(RegistrationItem.MESSAGES)){
+
+            RegistrationMessagesPopup popup = getNavigationManager().showInPopup(RegistrationMessagesPopup.class, getView());
+            popup.loadMessagesFor(regDto.getId());
+
+        } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
+            getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
         }
+
 
     }
 

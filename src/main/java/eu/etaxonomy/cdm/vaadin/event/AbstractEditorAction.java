@@ -16,7 +16,7 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
- * Base implementation for an event which which represents the request to start
+ * Base implementation for an event which represents the request to start
  * an editor to enable the user to perform the <code>action</code> transported
  * with this event.
  *

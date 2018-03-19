@@ -59,6 +59,13 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 public class RegistrationItem extends GridLayout {
 
 
+
+    public static final String VALIDATION_PROBLEMS = "validationProblems";
+
+    public static final String MESSAGES = "messages";
+
+    public static final String BLOCKED_BY = "blockedBy";
+
     /**
      *
      */
@@ -246,13 +253,13 @@ public class RegistrationItem extends GridLayout {
                             e,
                             RegistrationDTO.class,
                             regDto.getId(),
-                            "messages");
+                            VALIDATION_PROBLEMS);
                 } else {
                     detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, Integer>(
                             e,
                             RegistrationWorkingSet.class,
                             null,
-                            "messages");
+                            VALIDATION_PROBLEMS);
                 }
                 publishEvent(detailsEvent);
                 }
@@ -379,7 +386,7 @@ public class RegistrationItem extends GridLayout {
     }
 
     /**
-     * @return the messageButton
+     * @return the validationProblemsButton
      */
     public Button getMessageButton() {
         return messageButton;
