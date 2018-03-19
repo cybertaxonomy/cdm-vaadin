@@ -62,7 +62,7 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
         }
         try {
             List<Message> messages = messageService.listMessages(registration);
-            getView().showMessages(messages);
+            getView().showMessages("On Registration " + registration.getIdentifier(), messages);
         } catch (ExternalServiceException e) {
             throw new RuntimeException(e);
         }

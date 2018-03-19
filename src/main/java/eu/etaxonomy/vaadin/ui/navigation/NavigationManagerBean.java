@@ -18,7 +18,6 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.navigator.ViewDisplay;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
@@ -186,18 +185,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		//window.setModal(popupView.isModal());
 		window.setModal(true);
 		window.setCaptionAsHtml(popupView.isWindowCaptionAsHtml());
-		window.setWidth(popupView.getWindowPixelWidth(), Unit.PIXELS);
-		// setting 100% as default height. If the height
-		// would be undefined the window, will fit the size of
-		// the content and will sometimes exceed the height of the
-		// main window and will not get a scroll bar in this situation.
-		// see #6843
-		window.setHeight("100%");
+		window.setWidth(popupView.getWindowWidth(), popupView.getWindowWidthUnit());
+		window.setHeight(popupView.getWindowHeight(), popupView.getWindowHeightUnit());
 		window.setContent(popupView.asComponent());
 		// TODO need to disallow pressing the close [x] button:
 		// since window.addCloseListener(e -> popupView.cancel()); will
 		// cause sending cancel events even if save has been clicked
-		window.setClosable(false);
+		window.setClosable(popupView.isClosable());
 		UI.getCurrent().addWindow(window);
 		popupView.viewEntered();
 		popupView.focusFirst();

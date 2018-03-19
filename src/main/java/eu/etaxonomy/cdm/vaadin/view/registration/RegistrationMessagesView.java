@@ -24,7 +24,7 @@ public interface RegistrationMessagesView extends ApplicationView<RegistrationMe
     /**
      * @param messages
      */
-    void showMessages(List<Message> messages);
+    void showMessages(String registrationLabel, List<Message> messages);
 
     DelegatingErrorHandler getErrrorHandler();
 

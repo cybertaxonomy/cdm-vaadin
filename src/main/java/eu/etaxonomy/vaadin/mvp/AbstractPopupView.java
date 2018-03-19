@@ -28,13 +28,51 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
         return false;
     }
 
+    @Override
+    public boolean isClosable(){
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getWindowPixelWidth() {
+    public int getWindowWidth() {
         return -1;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Unit getWindowWidthUnit() {
+        return Unit.PIXELS;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     *  <p>
+     *  <b>NOTE:</b> setting 100% as default height. If the height
+     *  would be undefined the window, will fit the size of
+     *  the content and will sometimes exceed the height of the
+     *  main window and will not get a scroll bar in this situation.
+     *  see #6843
+     *  </p>
+     */
+    @Override
+    public int getWindowHeight() {
+        return 100;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Unit getWindowHeightUnit() {
+        return Unit.PERCENTAGE;
+    }
+
 
     /**
      * {@inheritDoc}

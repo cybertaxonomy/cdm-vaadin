@@ -116,7 +116,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      * {@inheritDoc}
      */
     @Override
-    public int getWindowPixelWidth() {
+    public int getWindowWidth() {
         return 800;
     }
 

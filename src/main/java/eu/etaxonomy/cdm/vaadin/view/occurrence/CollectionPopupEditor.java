@@ -67,7 +67,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
      * {@inheritDoc}
      */
     @Override
-    public int getWindowPixelWidth() {
+    public int getWindowWidth() {
         return 500;
     }
 
