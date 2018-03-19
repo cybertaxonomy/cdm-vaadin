@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2018 EDIT
 * European Distributed Institute of Taxonomy
@@ -16,23 +15,23 @@ import com.vaadin.server.ErrorHandler;
  * see {@link DelegatingErrorHandler}
  *
  * @author freimeier
- * @date 26.02.2018
  *
  */
-public abstract class ErrorTypeHandler<E extends Exception> implements ErrorHandler {
+public abstract class ErrorTypeHandler<E extends Throwable> implements ErrorHandler {
 
-    private static final long serialVersionUID = 1782060185842059311L;
+    private  static final long serialVersionUID = 1782060185842059311L;
 
-    /* (non-Javadoc)
-     * @see com.vaadin.server.ErrorHandler#error(com.vaadin.server.ErrorEvent)
-     */
-    @Override
-    public final void error(ErrorEvent event) {
-        handleError((E) event.getThrowable().getCause());
+    public abstract Class<E> supports();
 
+    public final void handleError(ErrorEvent event, E throwable){
+        error(event);
+        exception(throwable);
     }
 
-    public abstract void handleError(E exception);
+    /**
+     * @param exception
+     */
+    public abstract void exception(E throwable);
 }
 
 

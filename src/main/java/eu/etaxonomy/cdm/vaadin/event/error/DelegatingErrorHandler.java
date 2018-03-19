@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2018 EDIT
 * European Distributed Institute of Taxonomy
@@ -9,8 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.error;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -26,17 +25,28 @@ import com.vaadin.ui.Notification;
  * see https://dev.e-taxonomy.eu/redmine/issues/7241
  *
  * @author freimeier
- * @date 26.02.2018
  *
  */
 public class DelegatingErrorHandler implements ErrorHandler{
 
     private static final long serialVersionUID = 3378605204517477112L;
 
-    Map<Class<? extends Exception>, ErrorTypeHandler<? extends Exception>> handlerMap = new HashMap<>();
+    Set<ErrorTypeHandler<? extends Throwable>> handlers = new HashSet<>();
 
-    public <E extends Exception> void  registerHandler(Class<E> type, ErrorTypeHandler<E> handler) {
-        handlerMap.put(type, handler);
+    public <E extends Throwable> void  registerHandler(ErrorTypeHandler<E> handler) {
+        assert findHandler(handler.supports()) == null;
+        handlers.add(handler);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E extends Throwable> ErrorTypeHandler<E> findHandler(Class<E> errorClass){
+        for(ErrorTypeHandler<?> h : handlers){
+            if(h.supports().equals(errorClass)){
+                return (ErrorTypeHandler<E>) h;
+            }
+        }
+        return null;
+
     }
 
     /* (non-Javadoc)
@@ -45,12 +55,27 @@ public class DelegatingErrorHandler implements ErrorHandler{
     @Override
     public void error(ErrorEvent event) {
 
-        Class<? extends Throwable> errorClass = event.getThrowable().getCause().getClass();
-        Logger.getLogger(this.getClass()).debug(errorClass);
-        if(handlerMap.get(errorClass) != null){
-            handlerMap.get(errorClass).error(event);
-          } else {
+        boolean handlerFound = true;
+        Throwable throwable = event.getThrowable();
+        while(throwable != null){
+            if(delegate(event, throwable)){
+                break;
+            }
+            throwable = throwable.getCause();
+        }
+        if(!handlerFound){
             Notification.show(event.getThrowable().getMessage());
           }
+    }
+
+    private <E extends Throwable> boolean delegate(ErrorEvent event, E throwable){
+        Class<E> errorClass = (Class<E>) throwable.getClass();
+        Logger.getLogger(this.getClass()).debug(errorClass);
+        ErrorTypeHandler<E> handler = findHandler(errorClass);
+        if(handler != null){
+            handler.handleError(event, throwable);
+            return true;
+        }
+        return false;
     }
 }

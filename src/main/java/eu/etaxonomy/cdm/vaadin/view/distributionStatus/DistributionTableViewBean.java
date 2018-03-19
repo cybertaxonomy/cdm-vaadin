@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate5.HibernateSystemException;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 
@@ -175,7 +174,7 @@ public class DistributionTableViewBean
                 //popup window
                 final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
                 DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
-                errorHandler.registerHandler(HibernateSystemException.class, new HibernateSystemErrorHandler());
+                errorHandler.registerHandler(new HibernateSystemErrorHandler());
                 popup.setErrorHandler(errorHandler);
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
