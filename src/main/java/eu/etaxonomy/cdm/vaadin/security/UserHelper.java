@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 
@@ -47,6 +48,8 @@ public interface UserHelper {
     boolean userIsRegistrationCurator();
 
     boolean userIsAdmin();
+
+    User user();
 
     String userName();
 

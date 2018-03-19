@@ -94,6 +94,15 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     }
 
     @Override
+    public User user() {
+        Authentication authentication = getAuthentication();
+        if(authentication != null && authentication.getPrincipal() != null) {
+            return (User) authentication.getPrincipal();
+        }
+        return null;
+    }
+
+    @Override
     public String userName() {
         Authentication authentication = getAuthentication();
         if(authentication != null) {
