@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2017 EDIT
 * European Distributed Institute of Taxonomy
@@ -16,10 +15,12 @@ import com.vaadin.server.VaadinSession;
 
 /**
  * @author freimeier
- * @date 07.12.2017
  *
  */
 public class Messages implements Serializable {
+
+    private static final long serialVersionUID = 863200898445493048L;
+
     public static final String BUNDLE_NAME = "eu.etaxonomy.cdm.i18n.messages";
     public static String AreaAndTaxonSettingsConfigWindow_AREAS = "AreaAndTaxonSettingsConfigWindow_AREAS";
     public static String AreaAndTaxonSettingsConfigWindow_CLASSIFICATION = "AreaAndTaxonSettingsConfigWindow_CLASSIFICATION";
