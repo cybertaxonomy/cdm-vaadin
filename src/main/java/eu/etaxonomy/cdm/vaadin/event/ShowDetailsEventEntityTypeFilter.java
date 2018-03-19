@@ -41,14 +41,14 @@ public class ShowDetailsEventEntityTypeFilter implements EventBusListenerMethodF
     public static class RegistrationWorkingSet extends ShowDetailsEventEntityTypeFilter{
 
         public RegistrationWorkingSet(){
-            super(RegistrationWorkingSet.class);
+            super(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet.class);
         }
     }
 
     public static class RegistrationDTO extends ShowDetailsEventEntityTypeFilter{
 
         public RegistrationDTO(){
-            super(RegistrationDTO.class);
+            super(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO.class);
         }
     }
 }
