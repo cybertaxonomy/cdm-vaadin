@@ -81,7 +81,7 @@ public class RegistrationUI extends UI {
          */
     //    @Autowired
     //    MenuBeanDiscoveryBean bean;
-    
+
         @Autowired
         private MainMenu mainMenu;
 
@@ -90,13 +90,13 @@ public class RegistrationUI extends UI {
              */
         //    @Autowired
         //    MenuBeanDiscoveryBean bean;
-        
+
             @Autowired
             @Qualifier("registrationToolbar")
             private Toolbar toolbar;
 
     //---------------------------------------------
-            
+
             public static final String INITIAL_VIEW =  DashBoardView.NAME;
 
     protected void configureAccessDeniedView() {
@@ -118,7 +118,7 @@ public class RegistrationUI extends UI {
 
     //---------------------------------------------
 
-    
+
 
 
     /*
@@ -134,7 +134,7 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        setErrorHandler(new WindowErrorHandler(this, "Please contact the editsupport@bgbm.org for more information.</br></br>"
+        setErrorHandler(new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
                 + "You also might want to add a sreenshot of the browser page in error.</i>"));
 
