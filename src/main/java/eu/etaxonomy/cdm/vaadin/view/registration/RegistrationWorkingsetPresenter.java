@@ -214,9 +214,23 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             RegistrationDTO regDto = workingset.getRegistrationDTO(registrationId).get();
             try {
                 int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
-                messageButton.setEnabled(UserHelper.fromSession().userIsRegistrationCurator() || messageCount > 0);
-                if(messageCount > 0){
+
+                boolean activeMessages = messageCount > 0;
+                boolean currentUserIsSubmitter = regDto.getSubmitterUserName().equals(UserHelper.fromSession().userName());
+                boolean currentUserIsCurator = UserHelper.fromSession().userIsRegistrationCurator();
+                messageButton.setEnabled(false);
+                if(currentUserIsCurator){
+                    if(currentUserIsSubmitter){
+                        messageButton.setDescription("No point sending messages to your self.");
+                    } else {
+                        messageButton.setEnabled(true);
+                        messageButton.setDescription("Open the messages dialog");
+                    }
+                }
+                if(activeMessages){
+                    messageButton.setEnabled(true);
                     messageButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
+                    messageButton.setDescription("There are active messages for you!");
                 }
             } catch (ExternalServiceException e) {
                 messageButton.setComponentError(new SystemError(e.getMessage(), e));
