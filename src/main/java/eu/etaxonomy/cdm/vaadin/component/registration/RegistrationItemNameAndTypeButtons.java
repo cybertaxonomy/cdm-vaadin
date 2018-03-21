@@ -21,6 +21,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
@@ -90,6 +91,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
+        boolean userHasAddPermission = UserHelper.fromSession().userHasPermission(Registration.class, regDto.getId(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -97,8 +99,8 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasPermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE);
-                tdButton.setReadOnly(isRegistrationLocked || !userHasPermission);
+                boolean userHasUpdatePermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE, CRUD.DELETE);
+                tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
@@ -126,8 +128,8 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         addTypeDesignationButton = new Button(FontAwesome.PLUS);
-        addTypeDesignationButton.setDescription("Add a new type designation workingset");
-        addTypeDesignationButton.setVisible(!isRegistrationLocked);
+        addTypeDesignationButton.setDescription("Add a new type designation workingset.");
+        addTypeDesignationButton.setVisible(!isRegistrationLocked && userHasAddPermission);
         addComponent(addTypeDesignationButton);
 
         //TODO make responsive and use specificIdentifier in case the space gets too narrow
