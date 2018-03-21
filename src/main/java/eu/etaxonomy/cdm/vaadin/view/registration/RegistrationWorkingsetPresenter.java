@@ -67,6 +67,7 @@ import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
@@ -214,6 +215,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             try {
                 int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
                 messageButton.setEnabled(UserHelper.fromSession().userIsRegistrationCurator() || messageCount > 0);
+                if(messageCount > 0){
+                    messageButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
+                }
             } catch (ExternalServiceException e) {
                 messageButton.setComponentError(new SystemError(e.getMessage(), e));
             }

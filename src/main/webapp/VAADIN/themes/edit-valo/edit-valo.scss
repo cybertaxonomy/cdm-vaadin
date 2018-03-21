@@ -168,6 +168,17 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
           }
       }
     }
+    
+    // ==== styles in eu.etaxonomy.cdm.vaadin.theme.EditValoTheme ==== // 
+    
+    // style for buttons highlighted as being active
+    .v-button-highlite {
+        color: $v-focus-color;
+    }
+    
+    .v-panel-padding-left .v-panel-content {
+        padding-left: round($v-unit-size / 4);
+    }
 
     // ===== workflow ==== // 
     
@@ -175,9 +186,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         .registration-list {
                 .v-gridlayout-slot {
                     border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
-                }
-                .v-panel-content {
-                    padding-left: round($v-unit-size / 4);
                 }
             }
          .v-gridlayout-registration-list-item {
@@ -242,13 +250,6 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         }
     }
     
-    
-   // --------------------------------------------------- //
-   // style for blocked by buttons
-   
-    .v-button-blocked {
-        color: $v-focus-color;
-    }
    
    // --------------------------------------------------- //
 
@@ -452,5 +453,14 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         }
     }
 
+    // ---------- ---------- //
 
+    .v-slot-message-item {
+        .date-time {
+            font-weight: lighter;
+        }
+        .user-name {
+            font-weight: bold;
+        }
+    }
 }

@@ -31,6 +31,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.ext.registration.messages.Message;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupView;
 
 @SpringComponent
@@ -66,6 +67,7 @@ public class RegistrationMessagesPopup extends AbstractPopupView<RegistrationMes
     protected void initContent() {
 
         messagesPanel = new Panel();
+        messagesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
 
         newMessageField = new TextArea();
         newMessageField.setNullRepresentation("");
@@ -180,7 +182,7 @@ public class RegistrationMessagesPopup extends AbstractPopupView<RegistrationMes
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
 
         for(Message message : messages){
-            Label item = new Label("<span class=\"date-time\">(" +  dateFormat.format(message.getCreatedOn()) + ")</span> <span class=\"user-name\"><span class=\"user-name\">" + message.getFrom().getUsername() + "</span>: "  + message.getText());
+            Label item = new Label("<span class=\"date-time\">(" +  dateFormat.format(message.getCreatedOn()) + ")</span> <span class=\"user-name\">" + message.getFrom().getUsername() + "</span>: <span class=\"message-text\">"  + message.getText() + "</span>");
             item.setStyleName("message-item");
             item.setContentMode(ContentMode.HTML);
             messagesList.addComponent(item);

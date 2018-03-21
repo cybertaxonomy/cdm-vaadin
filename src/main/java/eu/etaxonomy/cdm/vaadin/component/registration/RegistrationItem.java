@@ -42,6 +42,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
@@ -65,11 +66,6 @@ public class RegistrationItem extends GridLayout {
     public static final String MESSAGES = "messages";
 
     public static final String BLOCKED_BY = "blockedBy";
-
-    /**
-     *
-     */
-    public static final String STYLE_NAME_BLOCKED = "blocked";
 
     private static final String LABEL_CAPTION_CREATED = "Created";
 
@@ -270,7 +266,7 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null && regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
-            getBlockedByButton().addStyleName(STYLE_NAME_BLOCKED);
+            getBlockedByButton().addStyleName(EditValoTheme.BUTTON_HIGHLITE);
         }
 
         labelMarkup.append(citationString);

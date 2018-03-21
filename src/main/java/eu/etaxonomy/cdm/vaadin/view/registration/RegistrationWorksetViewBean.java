@@ -63,6 +63,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -257,6 +258,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
+        namesTypesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
         return namesTypesPanel;
     }
 
@@ -322,7 +324,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
         if(dto.isBlocked()){
            blockingRegistrationButton.setEnabled(true);
-            blockingRegistrationButton.addStyleName(RegistrationItem.STYLE_NAME_BLOCKED);
+            blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
                     new ShowDetailsEvent<RegistrationDTO, Integer>(
