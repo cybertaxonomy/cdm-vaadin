@@ -322,8 +322,10 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         Button blockingRegistrationButton = regItemButtons.getBlockingRegistrationButton();
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
+        blockingRegistrationButton.setDescription("No blocking registrations");
         if(dto.isBlocked()){
-           blockingRegistrationButton.setEnabled(true);
+            blockingRegistrationButton.setEnabled(true);
+            blockingRegistrationButton.setDescription("This registration is currently blocked by other registrations");
             blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,

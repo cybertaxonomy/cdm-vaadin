@@ -224,13 +224,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         messageButton.setDescription("No point sending messages to your self.");
                     } else {
                         messageButton.setEnabled(true);
-                        messageButton.setDescription("Open the messages dialog");
+                        messageButton.setDescription("Open the messages dialog.");
                     }
+                } else {
+                    messageButton.setDescription("Sorry, only a curator can start a conversation.");
                 }
                 if(activeMessages){
                     messageButton.setEnabled(true);
                     messageButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
-                    messageButton.setDescription("There are active messages for you!");
+                    String who = currentUserIsSubmitter ? "curator" : "submitter";
+                    messageButton.setDescription("The " + who + " is looking forward to your reply.");
+
                 }
             } catch (ExternalServiceException e) {
                 messageButton.setComponentError(new SystemError(e.getMessage(), e));
