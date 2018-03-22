@@ -268,16 +268,17 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     }
 
     // --------------------------------------------------- //
-    
+    .v-caption-submitter {
+            margin-right: round($v-unit-size / 8);
+    }
+        
     .registration-list-item {
         border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 0.7);
         padding-top: 4px; // avoid button group to overlap with border
         .v-label-registration-state {
             margin-right: round($v-unit-size / 4);
         }            
-        .v-caption-submitter {
-            margin-right: round($v-unit-size / 8);
-        }
+        
     }
 
    .registration-workflow-item {
@@ -349,22 +350,25 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         }
     }
 
-    // ----------------------------------------------- //
+    // =============================================== //
+    .registration-status {
+        display: block;
+    }
     
    // status colors --------------------------------- //
-    .status-REJECTED {
+    .registration-status-REJECTED {
         color: $status-rejected-color;
     }
-    .status-CURATION {
+    .registration-status-CURATION {
         color: $status-curation-color;
     }
-    .status-PREPARATION {
+    .registration-status-PREPARATION {
         color: $status-preparation-color;
     }
-    .status-PUBLISHED {
+    .registration-status-PUBLISHED {
         color: $status-published-color;
     }
-    .status-READY {
+    .registration-status-READY {
         color: $status-ready-color;
     }
 

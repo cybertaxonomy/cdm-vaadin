@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -163,9 +166,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             getLayout().removeComponent(registrationListPanel);
         }
         workingsetHeader = new RegistrationItem(workingset, this);
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
-            workingsetHeader.getSubmitterLabel().setVisible(true);
-        }
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
@@ -369,6 +369,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
         RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
+        Label submitterLabel = new Label(dto.getSubmitterUserName());
+        submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
+        submitterLabel.setIcon(FontAwesome.USER);
+        submitterLabel.setContentMode(ContentMode.HTML);
+        CssLayout stateAndSubmitter = new CssLayout(stateLabel, submitterLabel);
 
 
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
@@ -388,8 +393,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
         row++;
-        registrationsGrid.addComponent(stateLabel, COL_INDEX_STATE_LABEL, row);
-        registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
+        registrationsGrid.addComponent(stateAndSubmitter, COL_INDEX_STATE_LABEL, row);
+        // registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
         registrationsGrid.addComponent(regItemButtonGroup, COL_INDEX_REG_ITEM, row);
         registrationsGrid.addComponent(regItemButtons, COL_INDEX_BUTTON_GROUP, row);
         registrationsGrid.setComponentAlignment(regItemButtons, Alignment.TOP_LEFT);

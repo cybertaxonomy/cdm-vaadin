@@ -222,7 +222,7 @@ public class RegistrationItem extends GridLayout {
         String submitterName = null;
         if(workingSet.getRegistrationDTOs().size() > 0){
             datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
-            submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
+            // submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
@@ -301,6 +301,7 @@ public class RegistrationItem extends GridLayout {
 
         getCitationSummaryLabel().setValue(labelMarkup.toString());
         getSubmitterLabel().setValue(submitterUserName);
+        getSubmitterLabel().setVisible(submitterUserName != null);
         updateDateLabels(created, datePublished, registrationDate);
     }
 
