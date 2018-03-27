@@ -54,7 +54,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private TextField citationDetailField;
 
-    private boolean showTypeFlags = false;
+    private boolean showTypeFlags = true;
 
 
     /**
