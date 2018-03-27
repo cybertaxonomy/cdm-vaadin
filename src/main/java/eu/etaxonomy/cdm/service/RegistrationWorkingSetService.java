@@ -63,7 +63,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "typeDesignations.citation.authorship.$",
             // name
             "name.$",
-            "name.nomenclaturalReference.authorship",
+            "name.nomenclaturalReference.authorship.$",
             "name.nomenclaturalReference.inReference",
             "name.rank",
             "name.homotypicalGroup.typifiedNames",
@@ -186,7 +186,22 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
 
         Reference reference = repo.getReferenceService().find(referenceID);
+        repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
+
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
+
+        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331
+        for(Registration reg : pager.getRecords()){
+            if(reg.getName() != null && reg.getName().getNomenclaturalReference().getAuthorship() != null){
+                Reference ref = (Reference) reg.getName().getNomenclaturalReference();
+                if(!Hibernate.isInitialized(ref.getAuthorship())){
+                    logger.error("UNINITIALIZED");
+                }
+            } else {
+                logger.debug("NO AUTHORS");
+            }
+        }
+        */
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
