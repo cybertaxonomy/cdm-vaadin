@@ -515,16 +515,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
-
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
                 @Override
                 public NameTypeDesignation createNewBean() {
-                    TaxonName typifiedName = newNameTypeDesignationTarget.getTypifiedName();
-                    if(typifiedName == null){
-                        // this will be the first type designation, so the nomenclatural act must contain a name
-                        typifiedName = newNameTypeDesignationTarget.registration().getName();
-                    }
+
+                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameId(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
                     nameTypeDesignation.setCitation(newNameTypeDesignationTarget.getCitation());
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);

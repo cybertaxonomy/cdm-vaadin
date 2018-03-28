@@ -30,6 +30,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
 
     private int registrationId;
 
+    private int typifiedNameId;
+
     private TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
 
     /**
@@ -42,10 +44,13 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      * @param sourceView
      */
     public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
-            TypeDesignationWorkingSetType workingSetType, int registrationId, Component source, AbstractView sourceView, Stack<EditorActionContext> context) {
+            TypeDesignationWorkingSetType workingSetType,
+            int registrationId, int typifiedNameId,
+            Component source, AbstractView sourceView, Stack<EditorActionContext> context) {
         super(action, null, source, sourceView);
         this.baseEntityRef = baseEntityRef;
         this.registrationId = registrationId;
+        this.typifiedNameId = typifiedNameId;
         this.workingSetType = workingSetType;
         this.context = context;
 
@@ -59,11 +64,13 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      * @param source
      * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypeDesignationWorkingSetType workingSetType, int registrationId,
+    public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypeDesignationWorkingSetType workingSetType,
+            int registrationId, int typifiedNameId,
             Component source, AbstractView sourceView) {
         super(action, null, source, sourceView);
         this.workingSetType = workingSetType;
         this.registrationId = registrationId;
+        this.typifiedNameId = typifiedNameId;
         this.context = new Stack<>();
         this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationId), sourceView));
     }
@@ -94,6 +101,13 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      */
     public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityRef() {
         return baseEntityRef;
+    }
+
+    /**
+     * @return the typifiedNameId
+     */
+    public int getTypifiedNameId() {
+        return typifiedNameId;
     }
 
 

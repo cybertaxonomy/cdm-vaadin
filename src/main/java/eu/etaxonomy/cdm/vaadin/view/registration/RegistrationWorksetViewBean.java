@@ -61,6 +61,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.model.EntityReference;
 import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
@@ -126,6 +127,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * uses the registrationId as key
      */
     private Map<Integer, RegistrationDetailsItem> registrationItemMap = new HashMap<>();
+
+    /**
+     * uses the registrationId as key
+     */
+    private Map<Integer, EntityReference> typifiedNamesMap = new HashMap<>();
 
     public RegistrationWorksetViewBean() {
         super();
@@ -266,6 +272,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
+        typifiedNamesMap.put(dto.getId(), dto.getTypifiedNameRef());
+
         RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
         Integer registrationEntityID = dto.getId();
 
@@ -301,12 +309,14 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         for(TypeDesignationWorkingSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
                 TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
+                EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityID);
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                         EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
                         registrationEntityID,
+                        typifiedNameRef.getId(),
                         e.getButton(),
                         this,
                         context
@@ -438,10 +448,12 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      */
     protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
+        EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityId);
         getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                 EditorActionType.ADD,
                 newWorkingsetType,
                 registrationEntityId,
+                typifiedNameRef.getId(),
                 null,
                 this
                 ));

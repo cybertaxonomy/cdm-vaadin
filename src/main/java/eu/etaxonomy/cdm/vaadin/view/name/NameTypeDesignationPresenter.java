@@ -204,6 +204,9 @@ public class NameTypeDesignationPresenter
 
         // handle adds
         for(TaxonName name : typifiedNames){
+            if(name == null){
+                throw new NullPointerException("typifiedName must not be null");
+            }
             if(!name.getTypeDesignations().contains(bean)){
                 name.addTypeDesignation(bean, false);
             }
