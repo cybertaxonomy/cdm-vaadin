@@ -34,6 +34,8 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.converter.DoubleConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
@@ -122,6 +124,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(absElevationMinMax.getMaxField(), "absoluteElevationMax");
         bindField(absElevationMinMax.getTextField(), "absoluteElevationText");
 
+        absElevationMinMax.getMaxField().setConverter(new IntegerConverter());
+        absElevationMinMax.getMinField().setConverter(new IntegerConverter());
+
         row++;
         MinMaxTextField distanceToWaterSurfaceMinMax = new MinMaxTextField("Distance to water surface", "m");
         distanceToWaterSurfaceMinMax.setWidth("100%");
@@ -131,6 +136,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToWaterSurfaceMinMax.getMinField(), "distanceToWaterSurface");
         bindField(distanceToWaterSurfaceMinMax.getMaxField(), "distanceToWaterSurfaceMax");
         bindField(distanceToWaterSurfaceMinMax.getTextField(), "distanceToWaterSurfaceText");
+        distanceToWaterSurfaceMinMax.getMaxField().setConverter(new DoubleConverter());
+        distanceToWaterSurfaceMinMax.getMinField().setConverter(new DoubleConverter());
         distanceToWaterSurfaceMinMax.getMaxField().addValidator(new DoubleRangeValidator("Negative values are not allowed here.", 0.0, Double.MAX_VALUE));
         distanceToWaterSurfaceMinMax.getMinField().addValidator(new DoubleRangeValidator("Negative values are not allowed here.", 0.0, Double.MAX_VALUE));
 
@@ -143,6 +150,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToGroundMinMax.getMinField(), "distanceToGround");
         bindField(distanceToGroundMinMax.getMaxField(), "distanceToGroundMax");
         bindField(distanceToGroundMinMax.getTextField(), "distanceToGroundText");
+        distanceToGroundMinMax.getMaxField().setConverter(new DoubleConverter());
+        distanceToGroundMinMax.getMinField().setConverter(new DoubleConverter());
 
         row++;
         collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
