@@ -169,7 +169,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityId(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
         getRepo().commitTransaction(txStatus);
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        return getRepo().getRegistrationService().find(event.getEntityId());
+        return getRepo().getRegistrationService().load(event.getEntityId(), Arrays.asList(new String []{"blockedBy"}));
     }
 
 
