@@ -51,7 +51,7 @@ import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionToolbar;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.HelpWindow;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
-import eu.etaxonomy.cdm.vaadin.event.error.HibernateSystemErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.HibernateExceptionHandler;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
@@ -174,7 +174,7 @@ public class DistributionTableViewBean
                 //popup window
                 final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
                 DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
-                errorHandler.registerHandler(new HibernateSystemErrorHandler());
+                errorHandler.registerHandler(new HibernateExceptionHandler());
                 popup.setErrorHandler(errorHandler);
                 final ListSelect termSelect = new ListSelect();
                 termSelect.setSizeFull();
@@ -241,25 +241,6 @@ public class DistributionTableViewBean
 		columnHeaders.remove(CdmQueryFactory.ID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.UUID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
-//		columnHeaders.sort(new Comparator<String>() {
-//            @Override
-//            public int compare(String o1, String o2) {
-//                if(o1.equals(CdmQueryFactory.TAXON_COLUMN) || o2.equals(CdmQueryFactory.TAXON_COLUMN)) {
-//                    return o1.equals(CdmQueryFactory.TAXON_COLUMN) ? -1 : 1;
-//                }
-//                if(o1.equals(CdmQueryFactory.RANK_COLUMN) || o2.equals(CdmQueryFactory.RANK_COLUMN)) {
-//                    return o1.equals(CdmQueryFactory.RANK_COLUMN) ? -1 : 1;
-//                }
-//
-//                // TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
-//                if(o1.equals("DE") || o1.equals("Deutschland")
-//                        || o2.equals("DE") || o2.equals("Deutschland")) {
-//                    return (o1.equals("DE") || o1.equals("Deutschland")) ? -1 : 1;
-//                }
-//
-//                return o1.compareTo(o2);
-//            }
-//		});
 
 		List<String> columnList = new ArrayList<>(columnHeaders);
 

@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2018 EDIT
 * European Distributed Institute of Taxonomy
@@ -9,9 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.error;
 
-import org.springframework.orm.hibernate5.HibernateSystemException;
+import org.hibernate.HibernateException;
 
 import com.vaadin.server.ErrorEvent;
+import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.i18n.Messages;
  * @author freimeier
  *
  */
-public class HibernateSystemErrorHandler extends ErrorTypeHandler<HibernateSystemException>{
+public class HibernateExceptionHandler extends ErrorTypeHandler<HibernateException>{
 
     private static final long serialVersionUID = -5703485298578474572L;
 
@@ -29,8 +29,8 @@ public class HibernateSystemErrorHandler extends ErrorTypeHandler<HibernateSyste
      * {@inheritDoc}
      */
     @Override
-    public Class<HibernateSystemException> supports() {
-        return HibernateSystemException.class;
+    public Class<HibernateException> supports() {
+        return HibernateException.class;
     }
 
     /**
@@ -42,14 +42,17 @@ public class HibernateSystemErrorHandler extends ErrorTypeHandler<HibernateSyste
     }
 
     @Override
-    public void exception(HibernateSystemException exception) {
-
+    public void exception(HibernateException exception) {
         if(exception != null) {
-            if(exception.getCause().getClass().equals(PermissionDeniedException.class)) {
-                Notification.show(Messages.getLocalizedString(Messages.PermissionDeniedErrorHandler_ERROR_MSG));
-            }else {
-                Notification.show(exception.getCause().getMessage());
+            Notification notification = new Notification(exception.getMessage());
+            if(exception.getCause() != null) {
+                if(exception.getCause().getClass().equals(PermissionDeniedException.class)) {
+                    notification = new Notification(Messages.getLocalizedString(Messages.HibernateExceptionHandler_PERMISSION_DENIED));
+                }else {
+                    notification = new Notification(exception.getCause().getMessage());
+                }
             }
+            notification.show(Page.getCurrent());
         }
     }
 

@@ -53,7 +53,7 @@ public class Messages implements Serializable {
     public static String DistributionToolbar_STATUS = "DistributionToolbar_STATUS";
     public static String DistributionToolbar_HELP = "DistributionToolbar_HELP";
     public static String HelpWindow_RESOURCE = "HelpWindow_RESOURCE";
-    public static String PermissionDeniedErrorHandler_ERROR_MSG = "PermissionDeniedErrorHandler_ERROR_MSG";
+    public static String HibernateExceptionHandler_PERMISSION_DENIED = "HibernateExceptionHandler_PERMISSION_DENIED";
     public static String SettingsDialogWindowBase_CANCEL = "SettingsDialogWindowBase_CANCEL";
     public static String SettingsDialogWindowBase_OK = "SettingsDialogWindowBase_OK";
 
