@@ -119,6 +119,12 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
        line-height: 50px;
      }
    }
+   
+   .v-button-center-h {
+    // requires width to be defined 
+    display: block;
+    margin: 0 auto;
+   }
 
    .v-label .caption {
        font-size: $v-font-size--small;

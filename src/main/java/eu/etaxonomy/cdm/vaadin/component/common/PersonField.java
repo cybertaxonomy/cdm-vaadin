@@ -17,6 +17,7 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -70,7 +71,9 @@ public class PersonField extends CompositeCustomField<Person> {
     private CssLayout root = new CssLayout();
     private CssLayout selectOrNewContainer = new CssLayout();
 
-    private TextField cacheField = new TextFieldNFix();
+    private TextField titleCacheField = new TextFieldNFix();
+    private TextField nomenclaturalTitleField = new TextFieldNFix();
+    private Button nomenclaturalTitleButton = new Button();
     private CssLayout detailsContainer = new CssLayout();
     private TextField initialsField = new TextFieldNFix();
     private TextField firstNameField = new TextFieldNFix();
@@ -80,6 +83,7 @@ public class PersonField extends CompositeCustomField<Person> {
     private SwitchButton unlockSwitch = new SwitchButton();
 
     private boolean onCommit = false;
+
 
 
     /**
@@ -116,13 +120,15 @@ public class PersonField extends CompositeCustomField<Person> {
         });
 
         // edit person
-        addStyledComponent(cacheField);
+        addStyledComponent(titleCacheField);
         addStyledComponents(initialsField);
         addStyledComponent(firstNameField);
         addStyledComponent(lastNameField);
         addStyledComponent(prefixField);
         addStyledComponent(suffixField);
         addStyledComponent(unlockSwitch);
+        addStyledComponent(nomenclaturalTitleField);
+        addStyledComponent(nomenclaturalTitleButton);
 
         addSizedComponent(root);
     }
@@ -159,11 +165,11 @@ public class PersonField extends CompositeCustomField<Person> {
         selectOrNewContainer.setWidth(100, Unit.PERCENTAGE);
         personSelect.setWidthUndefined();
 
-        root.addComponent(cacheField);
+        root.addComponent(titleCacheField);
         root.addComponent(unlockSwitch);
         root.addComponent(selectOrNewContainer);
 
-        cacheField.setWidth(100, Unit.PERCENTAGE);
+        titleCacheField.setWidth(100, Unit.PERCENTAGE);
 
         prefixField.setWidth(baseWidth, Unit.PERCENTAGE);
         prefixField.setInputPrompt("Prefix");
@@ -172,10 +178,10 @@ public class PersonField extends CompositeCustomField<Person> {
         initialsField.setInputPrompt("Initials");
 
         firstNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        firstNameField.setInputPrompt("Family name");
+        firstNameField.setInputPrompt("Other/given names");
 
         lastNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        lastNameField.setInputPrompt("Other/given names");
+        lastNameField.setInputPrompt("Family name");
 
         suffixField.setWidth(baseWidth, Unit.PERCENTAGE);
         suffixField.setInputPrompt("Suffix");
@@ -188,11 +194,26 @@ public class PersonField extends CompositeCustomField<Person> {
         detailsContainer.addComponent(suffixField);
         root.addComponent(detailsContainer);
 
+        nomenclaturalTitleButton.setHeight(22, Unit.PIXELS);
+        nomenclaturalTitleButton.setDescription("Show the nomenclatural title cache.");
+        nomenclaturalTitleButton.addClickListener( e -> {
+            nomenclaturalTitleField.setVisible(!nomenclaturalTitleField.isVisible());
+            nomenclaturalTitleButtonChooseIcon();
+            if(nomenclaturalTitleField.isVisible()){
+                nomenclaturalTitleField.focus();
+            }
+        });
+        // nomenclaturalTitleField.setCaption("Nomenclatural title");
+        nomenclaturalTitleField.setWidth(100, Unit.PERCENTAGE);
+
+        root.addComponent(nomenclaturalTitleField);
+        root.addComponent(nomenclaturalTitleButton);
+
         unlockSwitch.addValueChangeListener(e -> {
             if(refreshMode()){
                 switch (currentMode) {
                     case CACHE_MODE:
-                        cacheField.focus();
+                        titleCacheField.focus();
                         break;
                     case DETAILS_MODE:
                         firstNameField.focus();
@@ -210,18 +231,26 @@ public class PersonField extends CompositeCustomField<Person> {
         addDefaultStyles();
         setMode(Mode.DETAILS_MODE);
 
-        fieldGroup.bind(cacheField, "titleCache");
+        fieldGroup.bind(titleCacheField, "titleCache");
         fieldGroup.bind(prefixField, "prefix");
         fieldGroup.bind(initialsField, "initials");
         fieldGroup.bind(firstNameField, "firstname");
         fieldGroup.bind(lastNameField, "lastname");
         fieldGroup.bind(suffixField, "suffix");
         fieldGroup.bind(unlockSwitch, "protectedTitleCache");
+        fieldGroup.bind(nomenclaturalTitleField, "nomenclaturalTitle");
         fieldGroup.setBuffered(false);
 
         updateVisibilities(getValue());
 
         return root;
+    }
+
+    /**
+     *
+     */
+    protected void nomenclaturalTitleButtonChooseIcon() {
+        nomenclaturalTitleButton.setIcon(nomenclaturalTitleField.isVisible() ? FontAwesome.ANGLE_UP : FontAwesome.ELLIPSIS_H);
     }
 
     /**
@@ -245,6 +274,8 @@ public class PersonField extends CompositeCustomField<Person> {
     @Override
     public void setValue(Person person){
         super.setValue(person);
+//        PersonFieldAccess personWrapper = new PersonFieldAccess(person);
+//        super.setValue(personWrapper);
         personSelect.setValue(person);
     }
 
@@ -269,15 +300,18 @@ public class PersonField extends CompositeCustomField<Person> {
 
         detailsContainer.setVisible(person != null);
         unlockSwitch.setVisible(person != null);
-        cacheField.setVisible(person != null);
+        titleCacheField.setVisible(person != null);
+        nomenclaturalTitleField.setVisible(nomenclaturalTitleField.getValue().equals(titleCacheField.getValue()));
+        nomenclaturalTitleButtonChooseIcon();
 
     }
 
     @Override
     protected void addDefaultStyles(){
-        cacheField.addStyleName("cache-field");
+        titleCacheField.addStyleName("cache-field");
         detailsContainer.addStyleName("details-fields");
         unlockSwitch.addStyleName(Switch.DOM_STYLE);
+        nomenclaturalTitleButton.addStyleName(ValoTheme.BUTTON_BORDERLESS_COLORED + " center-h");
     }
 
     /**
@@ -302,8 +336,8 @@ public class PersonField extends CompositeCustomField<Person> {
             Person value = getValue();
             if(value != null && value.getId() == 0){
                 // only if the entity is unsaved!
-                ignoreFields.add(cacheField);
-                cacheField.setValue(null);
+                ignoreFields.add(titleCacheField);
+                titleCacheField.setValue(null);
             }
         }
         return ignoreFields;
