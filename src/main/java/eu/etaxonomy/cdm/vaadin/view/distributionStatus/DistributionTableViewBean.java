@@ -43,6 +43,7 @@ import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.AreaAndTaxonSettingsConfigWindow;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DetailWindow;
@@ -154,47 +155,52 @@ public class DistributionTableViewBean
             		// TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
             		&& !(event.getPropertyId().toString().equalsIgnoreCase("DE"))
             		&& !(event.getPropertyId().toString().equalsIgnoreCase("Deutschland"))){
-                final Item item = event.getItem();
-                Property<?> itemProperty = item.getItemProperty("uuid");
-                UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-                final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
-                		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
-                final String areaID = (String)event.getPropertyId();
-                PresenceAbsenceTerm presenceAbsenceTerm = null;
-                Object statusValue = item.getItemProperty(areaID).getValue();
-                if(statusValue instanceof String){
-                    try {
-                        presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)statusValue));
-                    }catch(IllegalArgumentException|ClassCastException e) {
-                        // Not a PresenceAbsenceTerm Column
+
+                final String areaString = (String)event.getPropertyId();
+                final NamedArea area = getPresenter().getAreaFromString(areaString);
+
+                if(!getPresenter().getUneditableAreas().contains(area)) {
+                    final Item item = event.getItem();
+                    Property<?> itemProperty = item.getItemProperty("uuid");
+                    UUID uuid = UUID.fromString(itemProperty.getValue().toString());
+                    final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
+                    		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
+                    PresenceAbsenceTerm presenceAbsenceTerm = null;
+                    Object statusValue = item.getItemProperty(areaString).getValue();
+                    if(statusValue instanceof String){
+                        try {
+                            presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)statusValue));
+                        }catch(IllegalArgumentException|ClassCastException e) {
+                            // Not a PresenceAbsenceTerm Column
+                        }
                     }
+                    //popup window
+                    final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
+                    DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
+                    errorHandler.registerHandler(new HibernateExceptionHandler());
+                    popup.setErrorHandler(errorHandler);
+                    final ListSelect termSelect = new ListSelect();
+                    termSelect.setSizeFull();
+                    termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
+                    termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
+                    if(presenceAbsenceTerm != null){
+                    	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
+                    }else{
+                        logger.debug("No distribution status exists yet for area");
+                    }
+                    termSelect.setValue(presenceAbsenceTerm);
+                    termSelect.addValueChangeListener(valueChangeEvent -> {
+    						PresenceAbsenceTerm distributionStatus = (PresenceAbsenceTerm) valueChangeEvent.getProperty().getValue();
+    						getPresenter().updateDistributionField(area, distributionStatus, taxon);
+    						container.refresh();
+    						popup.close();
+    				});
+                    VerticalLayout layout = new VerticalLayout(termSelect);
+                    popup.setContent(layout);
+                    popup.setModal(true);
+                    popup.center();
+                    UI.getCurrent().addWindow(popup);
                 }
-                //popup window
-                final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
-                DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
-                errorHandler.registerHandler(new HibernateExceptionHandler());
-                popup.setErrorHandler(errorHandler);
-                final ListSelect termSelect = new ListSelect();
-                termSelect.setSizeFull();
-                termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
-                termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
-                if(presenceAbsenceTerm != null){
-                	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
-                }else{
-                    logger.debug("No distribution status exists yet for area");
-                }
-                termSelect.setValue(presenceAbsenceTerm);
-                termSelect.addValueChangeListener(valueChangeEvent -> {
-						Object distributionStatus = valueChangeEvent.getProperty().getValue();
-						getPresenter().updateDistributionField(areaID, distributionStatus, taxon);
-						container.refresh();
-						popup.close();
-				});
-                VerticalLayout layout = new VerticalLayout(termSelect);
-                popup.setContent(layout);
-                popup.setModal(true);
-                popup.center();
-                UI.getCurrent().addWindow(popup);
             }
         });
 

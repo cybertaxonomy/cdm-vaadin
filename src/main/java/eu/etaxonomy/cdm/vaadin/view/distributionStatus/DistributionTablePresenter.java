@@ -87,33 +87,10 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
         // no point subscribing
     }
 
-    public int updateDistributionField(String distributionAreaString, Object comboValue, Taxon taxon) {
+    public int updateDistributionField(NamedArea area, PresenceAbsenceTerm distributionStatus, Taxon taxon) {
 	    TransactionStatus tx = repo.startTransaction();
 	    taxon = (Taxon)repo.getTaxonService().find(taxon.getUuid());
-	    Set<DefinedTermBase> chosenTerms = getChosenTerms();
-	    NamedArea namedArea = null;
-	    for(DefinedTermBase term:chosenTerms){
-	    	Representation representation = term.getRepresentation(Language.DEFAULT());
-	    	if(representation!=null){
-	    		if(DistributionEditorUtil.isAbbreviatedLabels()){
-	    			String label = representation.getLabel();
-	    			String abbreviatedLabel = representation.getAbbreviatedLabel();
-					if(abbreviatedLabel!=null && abbreviatedLabel.equalsIgnoreCase(distributionAreaString)){
-	    				namedArea = (NamedArea) term;
-	    				break;
-	    			}
-					else if(label!=null && label.equalsIgnoreCase(distributionAreaString)){
-						namedArea = (NamedArea) term;
-						break;
-					}
-	    		}
-	    	}
-	        if(term.getTitleCache().equalsIgnoreCase(distributionAreaString)){
-	        	namedArea = (NamedArea) term;
-	        	break;
-	        }
-	    }
-	    if(namedArea==null){
+	    if(area==null){
 	    	Notification.show(Messages.getLocalizedString(Messages.DistributionTablePresenter_ERROR_UPDATE_DISTRIBUTION_TERM));
 	    	repo.commitTransaction(tx);
 	    	return -1;
@@ -121,14 +98,14 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	    List<Distribution> distributions = getDistributions(taxon);
 	    Distribution distribution = null;
 	    for(Distribution dist : distributions){
-	        if(dist.getArea()!=null && dist.getArea().equals(namedArea)){
+	        if(dist.getArea()!=null && dist.getArea().equals(area)){
 	            distribution = dist;
 	            break;
 	        }
 	    }
 	    if(distribution==null){
 	    	//create new distribution
-	    	distribution = Distribution.NewInstance(namedArea, (PresenceAbsenceTerm) comboValue);
+	    	distribution = Distribution.NewInstance(area, distributionStatus);
 			Set<TaxonDescription> descriptions = taxon.getDescriptions();
 			if (descriptions != null && !descriptions.isEmpty()) {
 			    for (TaxonDescription desc : descriptions) {
@@ -144,14 +121,14 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 			    return 0;
 			}
 	    }
-	    else if(comboValue == null){//delete descriptionElementBase
+	    else if(distributionStatus == null){//delete descriptionElementBase
 	        DescriptionBase<?> desc = distribution.getInDescription();
 	        desc.removeElement(distribution);
 	    	repo.commitTransaction(tx);
             return 1;
 	    }
 	    else{//update distribution
-           distribution.setStatus((PresenceAbsenceTerm)comboValue);
+           distribution.setStatus(distributionStatus);
            repo.getCommonService().saveOrUpdate(distribution);
            repo.commitTransaction(tx);
            return 0;
@@ -160,23 +137,12 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	    return -1;
 	}
 
-    public LazyQueryContainer getAreaDistributionStatusContainer() {
-         List<UUID> nodeUuids = getAllNodes().stream().map(n -> n.getUuid()).collect(Collectors.toCollection(ArrayList::new));
-         List<NamedArea> namedAreas = getNamedAreas();
-         if(namedAreas!=null){
-             QueryFactory factory = new DistributionStatusQueryFactory(this.repo, nodeUuids, namedAreas);
-             QueryDefinition defintion = new DistributionStatusQueryDefinition(namedAreas, true, 50);
-             return new LazyQueryContainer(defintion, factory);
-         }
-         return null;
-     }
-
     public CdmSQLContainer getSQLContainer() throws SQLException{
          List<Integer> nodeIds = new ArrayList<>();
          for (TaxonNode taxonNode : getAllNodes()) {
              nodeIds.add(taxonNode.getId());
          }
-         List<NamedArea> namedAreas = getNamedAreas();
+         List<NamedArea> namedAreas = getChosenAreas();
          if(namedAreas!=null){
              return new CdmSQLContainer(CdmQueryFactory.generateTaxonDistributionQuery(nodeIds, namedAreas));
          }
@@ -193,6 +159,38 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
         return listDescriptionElementsForTaxon;
     }
 
+    public List<NamedArea> getUneditableAreas(){
+        List<NamedArea> uneditable = new ArrayList<>();
+        return uneditable;
+    }
+
+    public NamedArea getAreaFromString(String areaString){
+        List<NamedArea> namedAreas = getChosenAreas();
+        NamedArea area = null;
+        for(NamedArea namedArea:namedAreas){
+            Representation representation = namedArea.getRepresentation(Language.DEFAULT());
+            if(representation!=null){
+                if(DistributionEditorUtil.isAbbreviatedLabels()){
+                    String label = representation.getLabel();
+                    String abbreviatedLabel = representation.getAbbreviatedLabel();
+                    if(abbreviatedLabel!=null && abbreviatedLabel.equalsIgnoreCase(areaString)){
+                        area = namedArea;
+                        break;
+                    }
+                    else if(label!=null && label.equalsIgnoreCase(areaString)){
+                        area = namedArea;
+                        break;
+                    }
+                }
+            }
+            if(namedArea.getTitleCache().equalsIgnoreCase(areaString)){
+                area = namedArea;
+                break;
+            }
+        }
+        return area;
+    }
+
     private List<Distribution> getDistributions(Taxon taxon) {
         Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
         List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
@@ -201,24 +199,15 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 
     }
 
-    private Set<DefinedTermBase> getChosenTerms() {
-        VaadinSession session = VaadinSession.getCurrent();
-        UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
-//      getConversationHolder().getSession();
-        TermVocabulary<DefinedTermBase> voc = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
-//      voc = CdmBase.deproxy(voc);
-        return voc.getTerms();
-    }
-
-	private List<NamedArea> getNamedAreas(){
+	private List<NamedArea> getChosenAreas(){
 	    List<NamedArea> namedAreas = (List<NamedArea>)VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS);
 	    if(namedAreas!=null && namedAreas.isEmpty()){
-	        return getNamedAreasFromVoc();
+	        return getChosenAreasFromVoc();
 	    }
 	    return namedAreas;
 	}
 
-	private List<NamedArea> getNamedAreasFromVoc(){
+	private List<NamedArea> getChosenAreasFromVoc(){
 	    VaadinSession session = VaadinSession.getCurrent();
 	    UUID vocUUID = (UUID) session.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID);
 	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
@@ -233,6 +222,23 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 
 	}
 
+   private List<TaxonNode> getChosenTaxonNodes() {
+        VaadinSession session = VaadinSession.getCurrent();
+        List<UUID> taxonNodeUUIDs = (List<UUID>) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
+        UUID classificationUuid = (UUID)session.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
+        if((taxonNodeUUIDs==null || taxonNodeUUIDs.isEmpty()) && classificationUuid!=null){
+            Classification classification = CdmSpringContextHelper.getClassificationService().load(classificationUuid);
+            if(classification!=null){
+                taxonNodeUUIDs = Collections.singletonList(classification.getRootNode().getUuid());
+            }
+        }
+        List<TaxonNode> loadedNodes = CdmSpringContextHelper.getTaxonNodeService().load(taxonNodeUUIDs, null);
+        if(loadedNodes!=null){
+            return loadedNodes;
+        }
+        return Collections.emptyList();
+    }
+
 	private List<TaxonNode> getAllNodes(){
 		List<TaxonNode> allNodes = new ArrayList<>();
 
@@ -244,23 +250,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 			allNodes.addAll(CdmSpringContextHelper.getTaxonNodeService().loadChildNodesOfTaxonNode(taxonNode, null, true, null));
 		}
 		return allNodes;
-	}
-
-	private List<TaxonNode> getChosenTaxonNodes() {
-		VaadinSession session = VaadinSession.getCurrent();
-		List<UUID> taxonNodeUUIDs = (List<UUID>) session.getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
-		UUID classificationUuid = (UUID)session.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION);
-		if((taxonNodeUUIDs==null || taxonNodeUUIDs.isEmpty()) && classificationUuid!=null){
-			Classification classification = CdmSpringContextHelper.getClassificationService().load(classificationUuid);
-			if(classification!=null){
-				taxonNodeUUIDs = Collections.singletonList(classification.getRootNode().getUuid());
-			}
-		}
-		List<TaxonNode> loadedNodes = CdmSpringContextHelper.getTaxonNodeService().load(taxonNodeUUIDs, null);
-		if(loadedNodes!=null){
-			return loadedNodes;
-		}
-		return Collections.emptyList();
 	}
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
@@ -328,7 +317,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	/**Unused Methods*/
 	// TODO: Currently unused. Remove?
     private List<String> getAbbreviatedNamedAreas() {
-        List<NamedArea> terms = getNamedAreasFromVoc();
+        List<NamedArea> terms = getChosenAreasFromVoc();
         List<String> list = new ArrayList<>();
         for(DefinedTermBase<?> dtb: terms){
             for(Representation r : dtb.getRepresentations()){
@@ -356,5 +345,14 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
         return map;
     }
 
-
+    public LazyQueryContainer getAreaDistributionStatusContainer() {
+        List<UUID> nodeUuids = getAllNodes().stream().map(n -> n.getUuid()).collect(Collectors.toCollection(ArrayList::new));
+        List<NamedArea> namedAreas = getChosenAreas();
+        if(namedAreas!=null){
+            QueryFactory factory = new DistributionStatusQueryFactory(this.repo, nodeUuids, namedAreas);
+            QueryDefinition defintion = new DistributionStatusQueryDefinition(namedAreas, true, 50);
+            return new LazyQueryContainer(defintion, factory);
+        }
+        return null;
+    }
 }
