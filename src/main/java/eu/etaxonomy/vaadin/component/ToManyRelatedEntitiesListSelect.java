@@ -306,6 +306,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             F field = newFieldInstance(val);
             field.addValueChangeListener(e -> {
                 updateValue();
+                fireValueChange(true);
             });
             Property ds = getPropertyDataSource();
             if(ds != null){
@@ -654,6 +655,5 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void setEditActionListener(EntityEditorActionListener editActionListener) {
         this.editActionListener = editActionListener;
     }
-
 
 }

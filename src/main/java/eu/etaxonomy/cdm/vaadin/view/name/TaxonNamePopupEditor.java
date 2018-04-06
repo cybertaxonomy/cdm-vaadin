@@ -10,11 +10,17 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.log4j.Level;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
@@ -101,6 +107,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     private Boolean isInferredBasionymAuthorship = null;
 
     private Boolean isInferredExBasionymAuthorship = null;
+
+    private Map<AbstractField, Property.ValueChangeListener> authorshipUpdateListeners = new HashMap<>();
 
     /**
      * @param layout
@@ -223,10 +231,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         basionymToggle = new CheckBox("With basionym");
         basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
-        basionymToggle.addValueChangeListener(e -> {
-                updateFieldVisibility();
-                updateAuthorshipFields();
-            });
+
         basionymToggle.setStyleName(getDefaultComponentStyles());
         grid.addComponent(basionymToggle, 2, row, 3, row);
         grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
@@ -283,6 +288,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 );
             }
             });
+        logger.setLevel(Level.DEBUG);
+        nomReferenceCombobox.getSelect().addValueChangeListener(e -> logger.debug("nomReferenceCombobox value changed #1"));
         // nomReferenceCombobox.setWidth(300, Unit.PIXELS);
         nomReferenceCombobox.setWidth("100%");
         addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 2, row);
@@ -346,9 +353,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     }
 
-    protected TeamOrPersonBase inferBasiomynAuthors(TaxonName taxonName) {
-        TaxonName basionym = taxonName.getBasionym();
-        if(basionym != null){
+    protected TeamOrPersonBase inferBasiomynAuthors() {
+        List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
+        if(!basionyms.isEmpty()){
+            TaxonName basionym = basionyms.get(0);
             if(basionym.getCombinationAuthorship() != null){
                 return basionym.getCombinationAuthorship();
             } else if(basionym.getNomenclaturalReference() != null){
@@ -358,17 +366,19 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         return null;
     }
 
-    protected TeamOrPersonBase inferExBasiomynAuthors(TaxonName taxonName) {
-        TaxonName basionym = taxonName.getBasionym();
-        if(basionym != null){
+    protected TeamOrPersonBase inferExBasiomynAuthors() {
+        List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
+        if(!basionyms.isEmpty()){
+            TaxonName basionym = basionyms.get(0);
                 return basionym.getExCombinationAuthorship();
         }
         return null;
     }
 
-    protected TeamOrPersonBase inferCombinationAuthors(TaxonName taxonName) {
-        if(taxonName.getNomenclaturalReference() != null) {
-            return taxonName.getNomenclaturalReference().getAuthorship();
+    protected TeamOrPersonBase inferCombinationAuthors() {
+        Reference nomRef = nomReferenceCombobox.getValue();
+        if(nomRef != null) {
+            return nomRef.getAuthorship();
         }
         return null;
     }
@@ -381,6 +391,10 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 || taxonName.getExBasionymAuthorship() != null;
         basionymToggle.setValue(showBasionymSection);
         basionymToggle.setReadOnly(showBasionymSection);
+        basionymToggle.addValueChangeListener(e -> {
+            updateAuthorshipFields();
+            updateFieldVisibility();
+        });
 
         boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
         validationToggle.setValue(showExAuthors);
@@ -416,9 +430,9 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         TaxonName taxonName = getBean();
 
         // ------------- CombinationAuthors
-        isInferredCombinationAuthorship = updateAuthorshipField(
+        isInferredCombinationAuthorship = updateAuthorshipFieldData(
                 taxonName.getCombinationAuthorship(),
-                inferCombinationAuthors(taxonName),
+                inferCombinationAuthors(),
                 combinationAuthorshipField,
                 nomReferenceCombobox.getSelect(),
                 isInferredCombinationAuthorship);
@@ -427,24 +441,38 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         // ------------- Basionym and ExBasionymAuthors
         if(BooleanUtils.isTrue(basionymToggle.getValue())){
 
-            isInferredBasionymAuthorship = updateAuthorshipField(
+            isInferredBasionymAuthorship = updateAuthorshipFieldData(
                     taxonName.getBasionymAuthorship(),
-                    inferBasiomynAuthors(taxonName),
+                    inferBasiomynAuthors(),
                     basionymAuthorshipField,
                     basionymsComboboxSelect,
                     isInferredBasionymAuthorship
                     );
 
-            isInferredExBasionymAuthorship = updateAuthorshipField(
+            isInferredExBasionymAuthorship = updateAuthorshipFieldData(
                     taxonName.getExBasionymAuthorship(),
-                    inferExBasiomynAuthors(taxonName),
+                    inferExBasiomynAuthors(),
                     exBasionymAuthorshipField,
-                    //no point adding the basionymsComboboxSelect again, it has bee registered already for the BasionymAuthorship above
-                    null,
+                    basionymsComboboxSelect,
                     isInferredExBasionymAuthorship
                     );
+
         }
+
+        updateFieldVisibility();
+
     }
+
+//    /**
+//     *
+//     */
+//    protected void updateAuthorshipFieldsVisibility() {
+//        combinationAuthorshipField.setVisible(!isInferredCombinationAuthorship);
+//        if(BooleanUtils.isTrue(basionymToggle.getValue())){
+//            basionymAuthorshipField.setVisible(!isInferredBasionymAuthorship);
+//            exBasionymAuthorshipField.setVisible(!isInferredExBasionymAuthorship);
+//        }
+//    }
 
     /**
      *
@@ -458,7 +486,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      * @param lastInferredAuthorshipState
      * @return
      */
-    protected Boolean updateAuthorshipField(TeamOrPersonBase<?> authorship, TeamOrPersonBase inferredAuthors,
+    protected Boolean updateAuthorshipFieldData(TeamOrPersonBase<?> authorship, TeamOrPersonBase inferredAuthors,
             TeamOrPersonField authorshipField, AbstractField updateTriggerField,
             Boolean lastInferredAuthorshipState) {
 
@@ -468,15 +496,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         } else {
             boolean authorshipMatch = authorship == inferredAuthors;
             if(lastInferredAuthorshipState == null){
-                // initialization of isInferredCombinationAuthorship in case the editor is just being initialized
+                // initialization of authorshipState, this comes only into account when the editor is just being initialized
                 lastInferredAuthorshipState = authorshipMatch;
-                if(updateTriggerField != null){
-                    // IMPORTANT!
-                    // this ChangeListener must be added at this very late point in the editor lifecycle so that it is called after
-                    // the ToOneRelatedEntityReloader which may have been added to the updateTriggerField in the presenters handleViewEntered() method.
-                    // Otherwise we risk multiple representation problems in the hibernate session
-                    updateTriggerField.addValueChangeListener(e -> updateAuthorshipFields());
-                }
             }
             if(!authorshipMatch && lastInferredAuthorshipState){
                 // update the combinationAuthorshipField to follow changes of the nomenclatural reference in case it was autofilled before
@@ -484,7 +505,22 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 lastInferredAuthorshipState = true;
             }
         }
-        authorshipField.setVisible(!lastInferredAuthorshipState);
+
+        if(updateTriggerField != null){
+            // IMPORTANT!
+            // this ChangeListener must be added at this very late point in the editor lifecycle so that it is called after
+            // the ToOneRelatedEntityReloader which may have been added to the updateTriggerField in the presenters handleViewEntered() method.
+            // Otherwise we risk multiple representation problems in the hibernate session
+            if(!authorshipUpdateListeners.containsKey(updateTriggerField)){
+                ValueChangeListener listener = e ->  {
+                    logger.debug(" value changed #2");
+                    updateAuthorshipFields();
+                };
+                updateTriggerField.addValueChangeListener(listener);
+                authorshipUpdateListeners.put(updateTriggerField, listener);
+            }
+        }
+
         return lastInferredAuthorshipState;
     }
 
@@ -507,17 +543,28 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         exBasionymAuthorshipField.setVisible(withBasionym);
         basionymsComboboxSelect.setVisible(withBasionym);
 
-        if(taxonName != null){
-            if(modesActive.contains(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
-                updateAuthorshipFields();
-            }
+        combinationAuthorshipField.setVisible(isInferredCombinationAuthorship != null && !isInferredCombinationAuthorship);
+        if(BooleanUtils.isTrue(basionymToggle.getValue())){
+            basionymAuthorshipField.setVisible(isInferredBasionymAuthorship != null && !isInferredBasionymAuthorship);
+            exBasionymAuthorshipField.setVisible(isInferredExBasionymAuthorship != null && !isInferredExBasionymAuthorship);
         }
+
+//        if(taxonName != null){
+//            if(modesActive.contains(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
+//            }
+//        }
 
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
         exCombinationAuthorshipField.setVisible(isSpeciesOrBelow && withValidation);
+    }
+
+    @Override
+    public void cancel() {
+        authorshipUpdateListeners.keySet().forEach(field -> field.removeValueChangeListener(authorshipUpdateListeners.get(field)));
+        super.cancel();
     }
 
     /**
