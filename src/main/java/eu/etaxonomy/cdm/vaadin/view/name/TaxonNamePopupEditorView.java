@@ -10,9 +10,12 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.EnumSet;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ListSelect;
 
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -80,5 +83,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     CheckBox getBasionymToggle();
+
+    void updateAuthorshipFields();
 
 }

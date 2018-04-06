@@ -64,7 +64,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     /**
      *
      */
-    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList("$", "relationsFromThisName", "relationsToThisName.type", "homotypicalGroup.typifiedNames");
+    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList(
+            "$",
+            "relationsFromThisName",
+            "relationsToThisName.type",
+            "homotypicalGroup.typifiedNames"
+            );
 
     private static final List<String> REFERENCE_INIT_STRATEGY = Arrays.asList("authorship", "inReference.authorship", "inReference.inReference.authorship", "inReference.inReference.inReference.authorship");
 
@@ -145,17 +150,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
                 "status.type",
 
-                "combinationAuthorship",
-                "exCombinationAuthorship",
-                "basionymAuthorship",
-                "exBasionymAuthorship",
+                "combinationAuthorship.teamMembers",
+                "exCombinationAuthorship.teamMembers",
+                "basionymAuthorship.teamMembers",
+                "exBasionymAuthorship.teamMembers",
 
                 // basionyms: relationsToThisName.fromName
                 "relationsToThisName.type",
                 "relationsToThisName.fromName.rank",
-                "relationsToThisName.fromName.nomenclaturalReference.authorship",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
+                "relationsToThisName.fromName.combinationAuthorship.teamMembers",
+                "relationsToThisName.fromName.exCombinationAuthorship.teamMembers",
+                "relationsToThisName.fromName.nomenclaturalReference.authorship.teamMembers",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship.teamMembers",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship.teamMembers",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
 
@@ -172,7 +179,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
         }
 
-        if(getView().isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly)){
+        if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){
             if(taxonName.getNomenclaturalReference() != null){
                 Reference nomRef = (Reference)taxonName.getNomenclaturalReference();
                 //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
@@ -331,6 +338,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 // so re reload it using the uuid since new beans might not have an Id at this point.
                 // modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
                 getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
+
             }
 
             referenceEditorPopup = null;
@@ -340,6 +348,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 // TaxonName modifiedTaxonName = basionymNamePopup.getBean();
                 // modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
                 ((ReloadableSelect)basionymSourceField).reload();
+                getView().updateAuthorshipFields();
 
             }
             if(event.getReason() == Reason.DELETE){
@@ -365,7 +374,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup.withDeleteButton(true);
         getView().getModesActive().stream()
                 .filter(
-                        m -> !TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly.equals(m))
+                        m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                 .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(event.getEntityId());
         basionymNamePopup.getBasionymToggle().setVisible(false);
@@ -386,7 +395,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         basionymNamePopup.withDeleteButton(true);
         getView().getModesActive().stream()
                 .filter(
-                        m -> !TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly.equals(m))
+                        m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                 .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(null);
         basionymNamePopup.getBasionymToggle().setVisible(false);

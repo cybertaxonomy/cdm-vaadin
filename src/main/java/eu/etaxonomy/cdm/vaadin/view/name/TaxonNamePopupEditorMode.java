@@ -19,7 +19,7 @@ public enum TaxonNamePopupEditorMode {
      * CombinationAuthorship BasionymAuthorship fields only visible if
      * not empty
      */
-    suppressReplacementAuthorshipData,
+    AUTOFILL_AUTHORSHIP_DATA,
 
     /**
      * Editing of the nomenclatural reference is limited to editing the sub section of the
@@ -29,13 +29,13 @@ public enum TaxonNamePopupEditorMode {
      * section can be edited via a ReferencePopupEditor.
      *
      */
-    nomenclaturalReferenceSectionEditingOnly,
+    NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY,
 
     /**
      * setting the nomenclatural reference is required with the exception
      * that existing data is considered complete if the combination
      * authors are set.
      */
-    requireNomenclaturalReference
+    REQUIRE_NOMENCLATURALREFERENCE
 
 }

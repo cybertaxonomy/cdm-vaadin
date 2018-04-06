@@ -75,6 +75,7 @@ import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
+import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorView;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -365,10 +366,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      * @param popup
      */
-    protected void configureTaxonNameEditor(TaxonNamePopupEditor popup) {
-        popup.enableMode(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData);
-        popup.enableMode(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly);
-        popup.enableMode(TaxonNamePopupEditorMode.requireNomenclaturalReference);
+    protected void configureTaxonNameEditor(TaxonNamePopupEditorView popup) {
+        popup.enableMode(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA);
+        popup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+        // popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
     }
 
     /**

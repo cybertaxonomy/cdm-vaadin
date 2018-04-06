@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
@@ -24,6 +25,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -93,6 +95,12 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     private TeamOrPersonField exCombinationAuthorshipField;
 
     private EnumSet<TaxonNamePopupEditorMode> modesActive = EnumSet.noneOf(TaxonNamePopupEditorMode.class);
+
+    private Boolean isInferredCombinationAuthorship = null;
+
+    private Boolean isInferredBasionymAuthorship = null;
+
+    private Boolean isInferredExBasionymAuthorship = null;
 
     /**
      * @param layout
@@ -217,6 +225,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
         basionymToggle.addValueChangeListener(e -> {
                 updateFieldVisibility();
+                updateAuthorshipFields();
             });
         basionymToggle.setStyleName(getDefaultComponentStyles());
         grid.addComponent(basionymToggle, 2, row, 3, row);
@@ -323,12 +332,160 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         setAdvancedModeEnabled(true);
         registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
-        registerAdvancedModeComponents(basionymAuthorshipField.getCachFields());
-        registerAdvancedModeComponents(exBasionymAuthorshipField.getCachFields());
+
+        registerAdvancedModeComponents(combinationAuthorshipField);
+        registerAdvancedModeComponents(basionymAuthorshipField);
+        registerAdvancedModeComponents(exBasionymAuthorshipField);
+
         registerAdvancedModeComponents(combinationAuthorshipField.getCachFields());
         registerAdvancedModeComponents(exCombinationAuthorshipField.getCachFields());
+        registerAdvancedModeComponents(basionymAuthorshipField.getCachFields());
+        registerAdvancedModeComponents(exBasionymAuthorshipField.getCachFields());
+
         setAdvancedMode(false);
 
+    }
+
+    protected TeamOrPersonBase inferBasiomynAuthors(TaxonName taxonName) {
+        TaxonName basionym = taxonName.getBasionym();
+        if(basionym != null){
+            if(basionym.getCombinationAuthorship() != null){
+                return basionym.getCombinationAuthorship();
+            } else if(basionym.getNomenclaturalReference() != null){
+                return basionym.getNomenclaturalReference().getAuthorship();
+            }
+        }
+        return null;
+    }
+
+    protected TeamOrPersonBase inferExBasiomynAuthors(TaxonName taxonName) {
+        TaxonName basionym = taxonName.getBasionym();
+        if(basionym != null){
+                return basionym.getExCombinationAuthorship();
+        }
+        return null;
+    }
+
+    protected TeamOrPersonBase inferCombinationAuthors(TaxonName taxonName) {
+        if(taxonName.getNomenclaturalReference() != null) {
+            return taxonName.getNomenclaturalReference().getAuthorship();
+        }
+        return null;
+    }
+
+    @Override
+    protected void afterItemDataSourceSet() {
+        TaxonName taxonName = getBean();
+        boolean showBasionymSection = taxonName.getBasionyms().size() > 0
+                || taxonName.getBasionymAuthorship() != null
+                || taxonName.getExBasionymAuthorship() != null;
+        basionymToggle.setValue(showBasionymSection);
+        basionymToggle.setReadOnly(showBasionymSection);
+
+        boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
+        validationToggle.setValue(showExAuthors);
+        validationToggle.setReadOnly(showExAuthors);
+        exCombinationAuthorshipField.setVisible(showExAuthors);
+
+        if(isModeEnabled(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
+            updateAuthorshipFields();
+        }
+        if(isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY) && getBean().getNomenclaturalReference() != null) {
+            nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
+        }
+        if(isModeEnabled(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE)) {
+            if(combinationAuthorshipField.getValue() == null){
+                nomReferenceCombobox.setRequired(true);
+            } else {
+                combinationAuthorshipField.addValueChangeListener(e -> {
+                    if(e.getProperty().getValue() == null){
+                        nomReferenceCombobox.setRequired(true);
+                    }
+                });
+            }
+        }
+
+    }
+
+    /**
+     * @param taxonName
+     */
+    @Override
+    public void updateAuthorshipFields() {
+
+        TaxonName taxonName = getBean();
+
+        // ------------- CombinationAuthors
+        isInferredCombinationAuthorship = updateAuthorshipField(
+                taxonName.getCombinationAuthorship(),
+                inferCombinationAuthors(taxonName),
+                combinationAuthorshipField,
+                nomReferenceCombobox.getSelect(),
+                isInferredCombinationAuthorship);
+
+
+        // ------------- Basionym and ExBasionymAuthors
+        if(BooleanUtils.isTrue(basionymToggle.getValue())){
+
+            isInferredBasionymAuthorship = updateAuthorshipField(
+                    taxonName.getBasionymAuthorship(),
+                    inferBasiomynAuthors(taxonName),
+                    basionymAuthorshipField,
+                    basionymsComboboxSelect,
+                    isInferredBasionymAuthorship
+                    );
+
+            isInferredExBasionymAuthorship = updateAuthorshipField(
+                    taxonName.getExBasionymAuthorship(),
+                    inferExBasiomynAuthors(taxonName),
+                    exBasionymAuthorshipField,
+                    //no point adding the basionymsComboboxSelect again, it has bee registered already for the BasionymAuthorship above
+                    null,
+                    isInferredExBasionymAuthorship
+                    );
+        }
+    }
+
+    /**
+     *
+     * @param authorship
+     *    the value of the taxonName authorship field
+     * @param inferredAuthors
+     *    the value inferred from other fields which may be set as authorship to the taxon name
+     * @param authorshipField
+     *    the ui element to edit the taxonName authorship field
+     * @param updateTriggerField
+     * @param lastInferredAuthorshipState
+     * @return
+     */
+    protected Boolean updateAuthorshipField(TeamOrPersonBase<?> authorship, TeamOrPersonBase inferredAuthors,
+            TeamOrPersonField authorshipField, AbstractField updateTriggerField,
+            Boolean lastInferredAuthorshipState) {
+
+        if(authorship == null){
+            authorshipField.setValue(inferredAuthors);
+            lastInferredAuthorshipState = true;
+        } else {
+            boolean authorshipMatch = authorship == inferredAuthors;
+            if(lastInferredAuthorshipState == null){
+                // initialization of isInferredCombinationAuthorship in case the editor is just being initialized
+                lastInferredAuthorshipState = authorshipMatch;
+                if(updateTriggerField != null){
+                    // IMPORTANT!
+                    // this ChangeListener must be added at this very late point in the editor lifecycle so that it is called after
+                    // the ToOneRelatedEntityReloader which may have been added to the updateTriggerField in the presenters handleViewEntered() method.
+                    // Otherwise we risk multiple representation problems in the hibernate session
+                    updateTriggerField.addValueChangeListener(e -> updateAuthorshipFields());
+                }
+            }
+            if(!authorshipMatch && lastInferredAuthorshipState){
+                // update the combinationAuthorshipField to follow changes of the nomenclatural reference in case it was autofilled before
+                authorshipField.setValue(inferredAuthors);
+                lastInferredAuthorshipState = true;
+            }
+        }
+        authorshipField.setVisible(!lastInferredAuthorshipState);
+        return lastInferredAuthorshipState;
     }
 
     /**
@@ -351,9 +508,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymsComboboxSelect.setVisible(withBasionym);
 
         if(taxonName != null){
-            if(modesActive.contains(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
-                basionymAuthorshipField.setVisible(taxonName.getBasionymAuthorship() != null);
-                exBasionymAuthorshipField.setVisible(taxonName.getExBasionymAuthorship() != null);
+            if(modesActive.contains(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
+                updateAuthorshipFields();
             }
         }
 
@@ -362,40 +518,6 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
         exCombinationAuthorshipField.setVisible(isSpeciesOrBelow && withValidation);
-    }
-
-    @Override
-    protected void afterItemDataSourceSet() {
-        TaxonName taxonName = getBean();
-        boolean showBasionymSection = taxonName.getBasionyms().size() > 0
-                || taxonName.getBasionymAuthorship() != null
-                || taxonName.getExBasionymAuthorship() != null;
-        basionymToggle.setValue(showBasionymSection);
-        basionymToggle.setReadOnly(showBasionymSection);
-
-        boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
-        validationToggle.setValue(showExAuthors);
-        validationToggle.setReadOnly(showExAuthors);
-        exCombinationAuthorshipField.setVisible(showExAuthors);
-
-        if(isModeEnabled(TaxonNamePopupEditorMode.suppressReplacementAuthorshipData)){
-            combinationAuthorshipField.setVisible(taxonName.getCombinationAuthorship() != null);
-        }
-        if(isModeEnabled(TaxonNamePopupEditorMode.nomenclaturalReferenceSectionEditingOnly) && getBean().getNomenclaturalReference() != null) {
-            nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
-        }
-        if(isModeEnabled(TaxonNamePopupEditorMode.requireNomenclaturalReference)) {
-            if(combinationAuthorshipField.getValue() == null){
-                nomReferenceCombobox.setRequired(true);
-            } else {
-                combinationAuthorshipField.addValueChangeListener(e -> {
-                    if(e.getProperty().getValue() == null){
-                        nomReferenceCombobox.setRequired(true);
-                    }
-                });
-            }
-        }
-
     }
 
     /**
