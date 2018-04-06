@@ -111,7 +111,6 @@ public class DistributionTableViewBean
 				PresenceAbsenceTerm presenceAbsenceTerm = null;
 				Object value = property.getValue();
 				if(value instanceof String){
-//					presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) value);
                     try {
                         presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)value));
                     }catch(IllegalArgumentException|ClassCastException e) {
@@ -164,7 +163,6 @@ public class DistributionTableViewBean
                 PresenceAbsenceTerm presenceAbsenceTerm = null;
                 Object statusValue = item.getItemProperty(areaID).getValue();
                 if(statusValue instanceof String){
-//                	presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) statusValue);
                     try {
                         presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)statusValue));
                     }catch(IllegalArgumentException|ClassCastException e) {
