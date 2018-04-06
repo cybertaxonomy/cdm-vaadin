@@ -73,7 +73,7 @@ public class AreaAndTaxonSettingsPresenter extends SettingsPresenterBase {
         return CdmSpringContextHelper.getVocabularyService().load(areaVocabUUID, VOCABULARY_INIT_STRATEGY);
     }
 
-
+    // TODO: Currently unused. Remove?
     public List<TaxonNode> getChosenTaxonNodes(){
         List<UUID> nodeUuids = (List<UUID>) VaadinSession.getCurrent()
                 .getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);
