@@ -140,10 +140,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
             if(event.getReason() == Reason.SAVE){
 
                 Collection newCollection = collectionPopuEditor.getBean();
-
-                // TODO the bean contained in the popup editor is not yet updated at this point.
-                //      so re reload it using the uuid since new beans will not have an Id at this point.
-                newCollection = getRepo().getCollectionService().find(newCollection.getUuid());
+                getCache().load(newCollection);
                 getView().getSuperCollectionCombobox().getSelect().setValue(newCollection);
             }
 

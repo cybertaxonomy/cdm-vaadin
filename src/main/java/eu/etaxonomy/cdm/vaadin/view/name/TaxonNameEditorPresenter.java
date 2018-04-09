@@ -332,22 +332,21 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         if(event.getPopup() == referenceEditorPopup){
             if(event.getReason() == Reason.SAVE){
 
-                Reference modifiedReference = referenceEditorPopup.getBean();
-
-                // the bean contained in the popup editor is not yet updated at this point.
-                // so re reload it using the uuid since new beans might not have an Id at this point.
-                // modifiedReference = getRepo().getReferenceService().load(modifiedReference.getUuid(), Arrays.asList("inReference"));
+                getCache().load(referenceEditorPopup.getBean());
                 getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
-
+                getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
+                getView().updateAuthorshipFields();
             }
 
             referenceEditorPopup = null;
         }
         if(event.getPopup() == basionymNamePopup){
             if(event.getReason() == Reason.SAVE){
-                // TaxonName modifiedTaxonName = basionymNamePopup.getBean();
-                // modifiedTaxonName = getRepo().getNameService().load(modifiedTaxonName.getUuid(), BASIONYM_INIT_STRATEGY);
+
+                getCache().load(basionymNamePopup.getBean());
                 ((ReloadableSelect)basionymSourceField).reload();
+                getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
+                getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
                 getView().updateAuthorshipFields();
 
             }

@@ -161,11 +161,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
    }
 
    @EventBusListenerMethod
-   public void doDoneWithPopupEvent(DoneWithPopupEvent event){
+   public void onDoneWithPopupEvent(DoneWithPopupEvent event){
 
        if(event.getPopup().equals(inReferencePopup)){
            if(event.getReason().equals(Reason.SAVE)){
-               Reference bean = inReferencePopup.getBean();
+               getCache().load(inReferencePopup.getBean());
                getView().getInReferenceCombobox().reload(); //refreshSelectedValue(bean);
            }
            if(event.getReason().equals(Reason.DELETE)){

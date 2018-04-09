@@ -262,6 +262,7 @@ public class NameTypeDesignationPresenter
 
         if(event.getPopup() == typeNamePopup){
             if(event.getReason() == Reason.SAVE){
+                getCache().load(typeNamePopup.getBean());
                 getView().getTypeNameField().reload();
             }
             if(event.getReason() == Reason.DELETE){
