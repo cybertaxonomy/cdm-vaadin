@@ -8,6 +8,9 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.EnumSet;
+
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -15,7 +18,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since May 10, 2017
  *
  */
-public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Type> {
+public class EntityChangeEvent<T extends CdmBase> extends AbstractEntityEvent<EntityChangeEvent.Type> {
 
     public enum Type {
         CREATED,
@@ -23,15 +26,16 @@ public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Typ
         REMOVED;
     }
 
-    private Class<?> entityType;
+    public static final EnumSet<Type> CREATE_OR_MODIFIED = EnumSet.of(EntityChangeEvent.Type.CREATED, EntityChangeEvent.Type.MODIFIED);
 
-    /**
-     * @param type
-     * @param entityId
-     */
-    public EntityChangeEvent(Class<?> entityType, Integer entityId, Type type, AbstractView sourceView) {
-        super(type, entityId, sourceView);
-        this.entityType = entityType;
+    private Class<T> entityType;
+
+    private T entity;
+
+    public EntityChangeEvent(T entity, Type type, AbstractView sourceView) {
+        super(type, entity.getId(), sourceView);
+        this.entityType = (Class<T>) entity.getClass();
+        this.entity = entity;
     }
 
     /**
@@ -40,5 +44,20 @@ public class EntityChangeEvent extends AbstractEntityEvent<EntityChangeEvent.Typ
     public Class<?> getEntityType() {
         return entityType;
     }
+
+    /**
+     * @return the entity
+     */
+    public T getEntity() {
+        return entity;
+    }
+
+    public boolean isCreateOrModifiedType() {
+       return CREATE_OR_MODIFIED.contains(type);
+    }
+
+    public boolean isRemovedType() {
+        return Type.REMOVED.equals(type);
+     }
 
 }

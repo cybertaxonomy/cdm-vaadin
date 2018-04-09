@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
@@ -49,8 +50,6 @@ import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ReloadableSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -327,12 +326,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     }
 
     @EventBusListenerMethod
-    public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+    public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-        if(event.getPopup() == referenceEditorPopup){
-            if(event.getReason() == Reason.SAVE){
+        if(event.getSourceView() == referenceEditorPopup){
+            if(event.isCreateOrModifiedType()){
 
-                getCache().load(referenceEditorPopup.getBean());
+                getCache().load(event.getEntity());
                 getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
                 getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
                 getView().updateAuthorshipFields();
@@ -340,18 +339,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
 
             referenceEditorPopup = null;
         }
-        if(event.getPopup() == basionymNamePopup){
-            if(event.getReason() == Reason.SAVE){
+        if(event.getSourceView()  == basionymNamePopup){
+            if(event.isCreateOrModifiedType()){
 
-                getCache().load(basionymNamePopup.getBean());
+                getCache().load(event.getEntity());
                 ((ReloadableSelect)basionymSourceField).reload();
                 getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
                 getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
                 getView().updateAuthorshipFields();
 
             }
-            if(event.getReason() == Reason.DELETE){
+            if(event.isRemovedType()){
                 basionymSourceField.setValue(null);
+                getView().updateAuthorshipFields();
             }
 
             basionymNamePopup = null;

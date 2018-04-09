@@ -25,14 +25,13 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -161,14 +160,14 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
    }
 
    @EventBusListenerMethod
-   public void onDoneWithPopupEvent(DoneWithPopupEvent event){
+   public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-       if(event.getPopup().equals(inReferencePopup)){
-           if(event.getReason().equals(Reason.SAVE)){
-               getCache().load(inReferencePopup.getBean());
-               getView().getInReferenceCombobox().reload(); //refreshSelectedValue(bean);
+       if(event.getSourceView() == inReferencePopup){
+           if(event.isCreateOrModifiedType()){
+               getCache().load(event.getEntity());
+               getView().getInReferenceCombobox().reload();
            }
-           if(event.getReason().equals(Reason.DELETE)){
+           if(event.isRemovedType()){
                getView().getInReferenceCombobox().selectNewItem(null);
            }
            inReferencePopup = null;

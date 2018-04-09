@@ -210,7 +210,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         session.flush();
         commitTransction();
 
-        return new EntityChangeEvent(mergedBean.getClass(), mergedBean.getId(), changeEventType, view);
+        return new EntityChangeEvent(mergedBean, changeEventType, view);
     }
 
     /**
@@ -229,7 +229,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             getSession().flush();
             commitTransction();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
-            return new EntityChangeEvent(bean.getClass(), bean.getId(), Type.REMOVED, view);
+            return new EntityChangeEvent(bean, Type.REMOVED, view);
         } else {
             handleDeleteresultInError(result);
             txStatus = null;

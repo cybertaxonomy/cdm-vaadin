@@ -21,11 +21,10 @@ import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -135,11 +134,11 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
     }
 
     @EventBusListenerMethod()
-    public void onDoneWithPopupEvent(DoneWithPopupEvent event){
-        if(event.getPopup() == collectionPopuEditor){
-            if(event.getReason() == Reason.SAVE){
+    public void onEntityChangeEvent(EntityChangeEvent<?> event){
+        if(event.getSourceView() == collectionPopuEditor){
+            if(event.isCreateOrModifiedType()){
 
-                Collection newCollection = collectionPopuEditor.getBean();
+                Collection newCollection = (Collection) event.getEntity();
                 getCache().load(newCollection);
                 getView().getSuperCollectionCombobox().getSelect().setValue(newCollection);
             }
