@@ -272,7 +272,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
-        typifiedNamesMap.put(dto.getId(), dto.getTypifiedNameRef());
+        EntityReference typifiedNameReference = dto.getTypifiedNameRef();
+        if(typifiedNameReference == null){
+            typifiedNameReference = dto.getNameRef();
+        }
+        typifiedNamesMap.put(dto.getId(), typifiedNameReference);
 
         RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
         Integer registrationEntityID = dto.getId();
