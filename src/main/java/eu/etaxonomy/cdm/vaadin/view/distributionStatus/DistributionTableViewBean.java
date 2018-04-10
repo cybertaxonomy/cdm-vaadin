@@ -151,17 +151,14 @@ public class DistributionTableViewBean
 
 		table.addItemClickListener(event -> {
             if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN))
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))
-            		// TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase("DE"))
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase("Deutschland"))){
+            		&& !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
 
                 final String areaString = (String)event.getPropertyId();
                 final NamedArea area = getPresenter().getAreaFromString(areaString);
 
-                if(!getPresenter().getUneditableAreas().contains(area)) {
+                if(!getPresenter().getReadOnlyAreas().contains(area)) {
                     final Item item = event.getItem();
-                    Property<?> itemProperty = item.getItemProperty("uuid");
+                    Property<?> itemProperty = item.getItemProperty(CdmQueryFactory.UUID_COLUMN);
                     UUID uuid = UUID.fromString(itemProperty.getValue().toString());
                     final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
                     		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);

@@ -159,9 +159,11 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
         return listDescriptionElementsForTaxon;
     }
 
-    public List<NamedArea> getUneditableAreas(){
-        List<NamedArea> uneditable = new ArrayList<>();
-        return uneditable;
+    public List<NamedArea> getReadOnlyAreas(){
+        List<NamedArea> readonly = new ArrayList<>();
+        // TODO: HACK FOR RL 2017: Remove as soon as possible by receiving read only areas from cdm preferences
+        readonly.add(this.getAreaFromString("Deutschland"));
+        return readonly;
     }
 
     public NamedArea getAreaFromString(String areaString){
