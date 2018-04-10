@@ -36,14 +36,14 @@ public class CdmQueryFactory {
 
 
 	public static final String DTYPE_COLUMN = "DTYPE";
-	public static final String ID_COLUMN = "id";
-	public static final String UUID_COLUMN = "uuid";
-	public static final String CLASSIFICATION_COLUMN = "classification";
-	public static final String RANK_COLUMN = "Rang";
-	public static final String TAXON_COLUMN = "Taxon";
+	public static final String ID_COLUMN = "ID";
+	public static final String UUID_COLUMN = "UUID";
+	public static final String CLASSIFICATION_COLUMN = "CLASSIFICATION";
+	public static final String RANK_COLUMN = "RANK";
+	public static final String TAXON_COLUMN = "TAXON";
 
-    public static final String ID = "id";
-    public static final String UUID_ID = "uuid";
+    public static final String ID = "ID";
+    public static final String UUID_ID = "UUID";
 
     public static QueryDelegate generateTaxonTreeQuery(String name_id, String classificationId)  {
         String FROM_QUERY = " FROM TaxonBase tb " +

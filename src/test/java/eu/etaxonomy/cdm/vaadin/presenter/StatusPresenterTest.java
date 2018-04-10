@@ -74,7 +74,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
-    @Ignore
     public void testSynonyms() throws SQLException {
 
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
