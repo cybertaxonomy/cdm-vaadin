@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.util.converter;
+package eu.etaxonomy.cdm.api.service.name;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +24,9 @@ import java.util.Set;
 import org.hibernate.search.hcore.util.impl.HibernateHelper;
 
 import eu.etaxonomy.cdm.api.facade.DerivedUnitFacadeCacheStrategy;
+import eu.etaxonomy.cdm.api.service.dto.EntityReference;
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -35,10 +38,6 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
-import eu.etaxonomy.cdm.vaadin.model.EntityReference;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
-
 /**
  * Manages a collection of {@link TypeDesignationBase TypeDesignations} for the same typified name.
  *
@@ -745,4 +744,15 @@ public class TypeDesignationSetManager {
 
     }
 
+    class DataIntegrityException extends Exception {
+
+        private static final long serialVersionUID = 1464726696296824905L;
+
+        /**
+         * @param string
+         */
+        public DataIntegrityException(String string) {
+            super(string);
+        }
+    }
 }

@@ -17,6 +17,7 @@ import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.ui.Button;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;

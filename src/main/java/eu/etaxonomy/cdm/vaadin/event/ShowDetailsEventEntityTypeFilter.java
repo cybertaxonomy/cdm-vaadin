@@ -48,7 +48,7 @@ public class ShowDetailsEventEntityTypeFilter implements EventBusListenerMethodF
     public static class RegistrationDTO extends ShowDetailsEventEntityTypeFilter{
 
         public RegistrationDTO(){
-            super(eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO.class);
+            super(eu.etaxonomy.cdm.api.service.dto.RegistrationDTO.class);
         }
     }
 }

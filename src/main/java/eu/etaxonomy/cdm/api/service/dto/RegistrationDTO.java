@@ -6,7 +6,7 @@
 * The contents of this file are subject to the Mozilla Public License Version 1.1
 * See LICENSE.TXT at the top of this package for the full license terms.
 */
-package eu.etaxonomy.cdm.vaadin.view.registration;
+package eu.etaxonomy.cdm.api.service.dto;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,21 +20,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 
+import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
-import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.model.EntityReference;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
-import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
 
 public class RegistrationDTO{
 
@@ -275,17 +271,6 @@ public class RegistrationDTO{
             typeDesignations.add(findTypeDesignation(ref));
         }
         return typeDesignations;
-    }
-
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> getSpecimenTypeDesignationWorkingSetDTO(TypedEntityReference baseEntityReference) {
-        Set<TypeDesignationBase> typeDesignations = getTypeDesignationsInWorkingSet(baseEntityReference);
-        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
-        typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
-        VersionableEntity baseEntity = getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
-
-        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg,
-                baseEntity, specimenTypeDesignations, getCitation(), getTypifiedName());
-        return dto;
     }
 
     public NameTypeDesignation getNameTypeDesignation(TypedEntityReference baseEntityReference) {

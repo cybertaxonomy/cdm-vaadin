@@ -10,8 +10,8 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.UUID;
 
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 
 public class TypeDesignationWorkingsetEditorIdSet {
 

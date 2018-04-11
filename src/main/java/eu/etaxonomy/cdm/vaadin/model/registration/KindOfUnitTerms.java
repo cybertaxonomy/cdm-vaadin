@@ -14,6 +14,11 @@ import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.TermType;
 
 /**
+ * Terms to be used as kindOfUnit for {@link SpecimenOrObservationBase#setKindOfUnit()}.
+ * These terms are specific to the phycobank project but are temporarily necessary in
+ * cdmlib-services for {@link SpecimenTypeDesignationDTO}
+ *
+ *
  * @author a.kohlbecker
  * @since Jun 20, 2017
  *

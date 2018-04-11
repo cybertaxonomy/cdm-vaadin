@@ -13,6 +13,8 @@ import java.util.Locale;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.server.FontAwesome;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
+
 /**
  * @author a.kohlbecker
  * @since Mar 7, 2017
