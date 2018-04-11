@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Scope;
@@ -166,8 +167,8 @@ public class RegistrationMessagesPopup extends AbstractPopupView<RegistrationMes
     /**
      * @param identifier
      */
-    public void loadMessagesFor(Integer registrationEntityId) {
-        getPresenter().loadMessagesFor(registrationEntityId);
+    public void loadMessagesFor(UUID registrationEntityUuid) {
+        getPresenter().loadMessagesFor(registrationEntityUuid);
 
     }
 

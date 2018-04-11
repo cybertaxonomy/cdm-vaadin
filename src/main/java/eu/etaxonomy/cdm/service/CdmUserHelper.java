@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.service;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,18 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     }
 
     @Override
+    public boolean userHasPermission(Class<? extends CdmBase> cdmType, UUID entitiyUuid, Object ... args){
+        EnumSet<CRUD> crudSet = crudSetFromArgs(args);
+        try {
+            CdmBase entity = repo.getCommonService().find(cdmType, entitiyUuid);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
+        } catch (PermissionDeniedException e){
+            //IGNORE
+        }
+        return false;
+    }
+
+    @Override
     public boolean userHasPermission(Class<? extends CdmBase> cdmType, Object ... args){
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
@@ -260,6 +273,20 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     }
 
     /**
+     * @param username
+     * @param cdmType
+     * @param entitiyUuid
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property) {
+
+        CdmBase cdmEntity = repo.getCommonService().find(cdmType, entitiyUuid);
+        return createAuthorityFor(username, cdmEntity, crud, property);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -277,6 +304,17 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     @Override
     public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
         return createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
+    }
+
+    /**
+     * @param cdmType
+     * @param entitiyUuid
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmType, entitiyUuid, crud, property);
     }
 
     /**

@@ -59,7 +59,7 @@ public class RegistrationWorkingSetTest {
         dtos.add(new RegistrationDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getId(), ws.getCitationId().intValue());
+        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
 
@@ -96,7 +96,7 @@ public class RegistrationWorkingSetTest {
         dtos.add(new RegistrationDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getId(), ws.getCitationId().intValue());
+        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
 

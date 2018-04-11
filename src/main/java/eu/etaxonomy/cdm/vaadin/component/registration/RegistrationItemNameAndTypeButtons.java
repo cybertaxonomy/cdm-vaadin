@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -74,14 +75,14 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         if(regDto.getNameRef() != null){
             Button nameButton = new Button("Name:");
             nameButton.setDescription("Edit the Name");
-            nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getId(), nameButton);
+            nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getUuid(), nameButton);
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
             boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
             nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
-            PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getId(),
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getUuid(),
                     EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             addComponent(nameLabel);
         } else {
@@ -91,7 +92,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = UserHelper.fromSession().userHasPermission(Registration.class, regDto.getId(), CRUD.UPDATE);
+        boolean userHasAddPermission = UserHelper.fromSession().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -99,12 +100,12 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getId(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
-                        baseEntityRef.getId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
+                        baseEntityRef.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
@@ -207,21 +208,21 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
     }
 
     public class IdButton<T> {
-        private Integer id;
+        private UUID uuid;
         private Class<T> entityType;
         private Button button;
 
-        public IdButton(Class<T> type, Integer id, Button button){
+        public IdButton(Class<T> type, UUID uuid, Button button){
             this.entityType = type;
-            this.id = id;
+            this.uuid = uuid;
             this.button = button;
         }
 
         /**
          * @return the id
          */
-        public Integer getId() {
-            return id;
+        public UUID getUuid() {
+            return uuid;
         }
 
         /**

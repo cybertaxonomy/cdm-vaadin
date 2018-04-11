@@ -15,8 +15,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -152,6 +154,18 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     }
 
 
+    /**
+     * @param id the Registration entity id
+     * @return
+     */
+    @Override
+    public RegistrationDTO loadDtoByUuid(UUID uuid) {
+        Registration reg = repo.getRegistrationService().load(uuid, REGISTRATION_INIT_STRATEGY);
+        inititializeSpecimen(reg);
+        return new RegistrationDTO(reg);
+    }
+
+
     @Override
     public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex) {
 
@@ -183,6 +197,23 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      * @throws RegistrationValidationException
      */
     @Override
+    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid) throws RegistrationValidationException {
+
+        Reference reference = repo.getReferenceService().find(referenceUuid);
+        repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
+
+        Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
+
+        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331 */
+        // debugIssue7331(pager);
+        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @throws RegistrationValidationException
+     */
+    @Override
     public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
 
         Reference reference = repo.getReferenceService().find(referenceID);
@@ -190,7 +221,18 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
 
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
 
-        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331
+        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331 */
+        // debugIssue7331(pager);
+
+        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
+    }
+
+
+    /**
+     * @param pager
+     */
+    @SuppressWarnings("unused")
+    private void debugIssue7331(Pager<Registration> pager) {
         for(Registration reg : pager.getRecords()){
             if(reg.getName() != null && reg.getName().getNomenclaturalReference().getAuthorship() != null){
                 Reference ref = (Reference) reg.getName().getNomenclaturalReference();
@@ -201,14 +243,12 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
                 logger.debug("NO AUTHORS");
             }
         }
-        */
-        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
     @Override
-    public Set<RegistrationDTO> loadBlockingRegistrations(Integer blockedRegistrationId){
+    public Set<RegistrationDTO> loadBlockingRegistrations(UUID blockedRegistrationUuid){
 
-        Registration registration = repo.getRegistrationService().load(blockedRegistrationId, BLOCKING_REGISTRATION_INIT_STRATEGY);
+        Registration registration = repo.getRegistrationService().load(blockedRegistrationUuid, BLOCKING_REGISTRATION_INIT_STRATEGY);
         Set<Registration> registrations = registration.getBlockedBy();
 
         Set<RegistrationDTO> blockingSet = new HashSet<>();

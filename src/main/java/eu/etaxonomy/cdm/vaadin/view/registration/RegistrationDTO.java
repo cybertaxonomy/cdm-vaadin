@@ -79,7 +79,7 @@ public class RegistrationDTO{
         if(hasName(reg)){
             citation = (Reference) reg.getName().getNomenclaturalReference();
             citationDetail = reg.getName().getNomenclaturalMicroReference();
-            name = new EntityReference(reg.getName().getId(), reg.getName().getTitleCache());
+            name = new EntityReference(reg.getName().getUuid(), reg.getName().getTitleCache());
         }
         if(hasTypifications(reg)){
             if(!reg.getTypeDesignations().isEmpty()){
@@ -192,15 +192,6 @@ public class RegistrationDTO{
     }
 
 
-    /**
-     * The entity ID of the Registration Item
-     * @return
-     */
-    public int getId() {
-        return reg.getId();
-    }
-
-
     public UUID getUuid() {
         return reg.getUuid();
     }
@@ -245,11 +236,9 @@ public class RegistrationDTO{
         }
     }
 
-    /**
-     * @return the citationID
-     */
-    public Integer getCitationID() {
-        return citation == null ? null : citation.getId();
+
+    public UUID getCitationUuid() {
+        return citation == null ? null : citation.getUuid();
     }
 
     public EntityReference getTypifiedNameRef() {
@@ -372,7 +361,7 @@ public class RegistrationDTO{
             blockedBy = new HashSet<>();
             if(reg.getBlockedBy() != null){
                 for(Registration blockReg : reg.getBlockedBy()){
-                    blockedBy.add(new TypedEntityReference<Registration>(Registration.class, blockReg.getId(), blockReg.getIdentifier()));
+                    blockedBy.add(new TypedEntityReference<Registration>(Registration.class, blockReg.getUuid(), blockReg.getIdentifier()));
                 }
             }
         }

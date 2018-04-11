@@ -150,7 +150,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param taxonNameId
      * @return
      */
-    protected Registration createNewRegistrationForName(Integer taxonNameId) {
+    protected Registration createNewRegistrationForName(UUID taxonNameUuid) {
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // move into RegistrationWorkflowStateMachine
         TransactionStatus txStatus = getRepo().startTransaction();
@@ -162,15 +162,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         Registration reg = Registration.NewInstance(
                 identifiers.getIdentifier(),
                 identifiers.getLocalId(),
-                taxonNameId != null ? getRepo().getNameService().find(taxonNameId) : null,
+                taxonNameUuid != null ? getRepo().getNameService().find(taxonNameUuid) : null,
                 null);
         Authentication authentication = currentSecurityContext().getAuthentication();
         reg.setSubmitter((User)authentication.getPrincipal());
         EntityChangeEvent event = getRegistrationStore().saveBean(reg, (AbstractView) getView());
-        UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityId(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
+        UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityUuid(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
         getRepo().commitTransaction(txStatus);
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        return getRepo().getRegistrationService().load(event.getEntityId(), Arrays.asList(new String []{"blockedBy"}));
+        return getRepo().getRegistrationService().load(event.getEntityUuid(), Arrays.asList(new String []{"blockedBy"}));
     }
 
 
@@ -183,7 +183,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return; // nothing to do
         }
         if(doReload){
-            loadWorkingSet(workingset.getCitationId());
+            loadWorkingSet(workingset.getCitationUuid());
         }
         getView().setWorkingset(workingset);
     }
@@ -197,7 +197,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         super.handleViewEntered();
 
-        loadWorkingSet(getView().getCitationID());
+        loadWorkingSet(getView().getCitationUuid());
         getView().setWorkingset(workingset);
 
         // PagingProviders and CacheGenerator for the existingNameCombobox
@@ -209,10 +209,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         // update the messages
         User user = UserHelper.fromSession().user();
-        for (Integer registrationId : getView().getRegistrationItemMap().keySet()) {
-            Button messageButton = getView().getRegistrationItemMap().get(registrationId).regItemButtons.getMessagesButton();
+        for (UUID registrationUuid : getView().getRegistrationItemMap().keySet()) {
+            Button messageButton = getView().getRegistrationItemMap().get(registrationUuid).regItemButtons.getMessagesButton();
 
-            RegistrationDTO regDto = workingset.getRegistrationDTO(registrationId).get();
+            RegistrationDTO regDto = workingset.getRegistrationDTO(registrationUuid).get();
             try {
                 int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
 
@@ -248,9 +248,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     /**
      * @param referenceID
      */
-    protected void loadWorkingSet(Integer referenceID) {
+    protected void loadWorkingSet(UUID referenceUuid) {
         try {
-            workingset = getWorkingSetService().loadWorkingSetByReferenceID(referenceID);
+            workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid);
         } catch (RegistrationValidationException error) {
             logger.error(error);
             Window errorDialog = new Window("Validation Error");
@@ -261,8 +261,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             subContent.addComponent(new Label(error.getMessage()));
             UI.getCurrent().addWindow(errorDialog);
         }
-        if(workingset == null || workingset.getCitationId() == null){
-            Reference citation = getRepo().getReferenceService().find(referenceID);
+        if(workingset == null || workingset.getCitationUuid() == null){
+            Reference citation = getRepo().getReferenceService().find(referenceUuid);
             workingset = new RegistrationWorkingSet(citation);
         }
     }
@@ -289,7 +289,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         ReferencePopupEditor popup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         popup.withReferenceTypes(RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES);
         popup.withDeleteButton(true);
-        popup.loadInEditor(event.getEntityId());
+        popup.loadInEditor(event.getEntityUuid());
     }
 
     @EventBusListenerMethod
@@ -318,7 +318,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         RegistrationPopupEditor popup = getNavigationManager().showInPopup(RegistrationPopupEditor.class, getView());
-        popup.loadInEditor(event.getEntityId());
+        popup.loadInEditor(event.getEntityUuid());
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
@@ -332,7 +332,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.setParentEditorActionContext(event.getContext());
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
-        popup.loadInEditor(event.getEntityId());
+        popup.loadInEditor(event.getEntityUuid());
         if(event.getSourceComponent() != null){
             popup.setReadOnly(event.getSourceComponent().isReadOnly());
         }
@@ -348,15 +348,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         newTaxonNameForRegistration = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
-        newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationId()));
+        newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationUuid()));
         EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration, (AbstractView) getView());
-        newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityId());
+        newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityUuid());
         TaxonNamePopupEditor popup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         popup.setParentEditorActionContext(event.getContext());
         popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
-        popup.loadInEditor(newTaxonNameForRegistration.getId());
+        popup.loadInEditor(newTaxonNameForRegistration.getUuid());
     }
 
     /**
@@ -389,11 +389,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             TransactionStatus txStatus = getRepo().startTransaction();
             if(event.getReason().equals(Reason.SAVE)){
                 if(newTaxonNameForRegistration != null){
-                    int taxonNameId = newTaxonNameForRegistration.getId();
+                    UUID taxonNameUuid = newTaxonNameForRegistration.getUuid();
                     getRepo().getSession().refresh(newTaxonNameForRegistration);
-                    Registration reg = createNewRegistrationForName(taxonNameId);
+                    Registration reg = createNewRegistrationForName(taxonNameUuid);
                     // reload workingset into current session
-                    loadWorkingSet(workingset.getCitationId());
+                    loadWorkingSet(workingset.getCitationUuid());
                     workingset.add(reg);
                 }
                 refreshView(true);
@@ -426,7 +426,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
         if(typifiedName != null){
             Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
-            Reference citation = getRepo().getReferenceService().find(workingset.getCitationId());
+            Reference citation = getRepo().getReferenceService().find(workingset.getCitationUuid());
             newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
             workingset.add(newRegistrationDTOWithExistingName);
             // tell the view to update the workingset
@@ -451,7 +451,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class, getView());
             popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
             if(event.getSourceComponent() != null){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
@@ -460,7 +460,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class, getView());
             popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationId(), event.getBaseEntityRef()));
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
 
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
@@ -469,7 +469,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSourceComponent().isReadOnly());
             }
-            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
         }
     }
 
@@ -484,24 +484,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             SpecimenTypeDesignationWorkingsetPopupEditor popup = getNavigationManager().showInPopup(SpecimenTypeDesignationWorkingsetPopupEditor.class, getView());
             popup.setParentEditorActionContext(event.getContext());
             TypeDesignationWorkingsetEditorIdSet identifierSet;
-            Integer typifiedNameId;
+            UUID typifiedNameUuid;
             if(newRegistrationDTOWithExistingName != null){
-                typifiedNameId = newRegistrationDTOWithExistingName.getTypifiedNameRef().getId();
+                typifiedNameUuid = newRegistrationDTOWithExistingName.getTypifiedNameRef().getUuid();
             } else {
-                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
                 EntityReference typifiedNameRef = registrationDTO.getTypifiedNameRef();
                 if(typifiedNameRef != null){
                     // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
-                    typifiedNameId = typifiedNameRef.getId();
+                    typifiedNameUuid = typifiedNameRef.getUuid();
                 } else {
                     // case of registrations with a name in the nomenclatural act.
-                    typifiedNameId = registrationDTO.getNameRef().getId();
+                    typifiedNameUuid = registrationDTO.getNameRef().getUuid();
                 }
             }
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
-                    event.getRegistrationId(),
-                    getView().getCitationID(),
-                    typifiedNameId
+                    event.getRegistrationUuid(),
+                    getView().getCitationUuid(),
+                    typifiedNameUuid
                     );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.loadInEditor(identifierSet);
@@ -515,13 +515,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationId()).get();
+            newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
                 @Override
                 public NameTypeDesignation createNewBean() {
 
-                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameId(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
+                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
                     nameTypeDesignation.setCitation(newNameTypeDesignationTarget.getCitation());
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);
@@ -603,12 +603,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
         if(Reference.class.isAssignableFrom(event.getEntityType())){
-            if(workingset.getCitationId().equals(event.getEntityId())){
+            if(workingset.getCitationUuid().equals(event.getEntityUuid())){
                 refreshView(true);
             }
         } else
         if(Registration.class.isAssignableFrom(event.getEntityType())){
-            if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getId() == event.getEntityId())){
+            if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getUuid() == event.getEntityUuid())){
                 refreshView(true);
             }
         } else
@@ -618,9 +618,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
                 EditorActionContext rootContext = context.get(0);
                 if(rootContext.getParentView().equals(getView())){
-                    Registration blockingRegistration = createNewRegistrationForName(event.getEntityId());
+                    Registration blockingRegistration = createNewRegistrationForName(event.getEntityUuid());
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    Registration registration = getRepo().getRegistrationService().load(regReference.getId(), Arrays.asList("$", "blockedBy"));
+                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), Arrays.asList("$", "blockedBy"));
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
@@ -630,14 +630,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
                 reg.getTypifiedNameRef() != null
-                && reg.getTypifiedNameRef().getId() == event.getEntityId())){
+                && reg.getTypifiedNameRef().getUuid().equals(event.getEntityUuid()))){
                     refreshView(true);
             }
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(
                     reg -> reg.getTypeDesignations() != null && reg.getTypeDesignations().stream().anyMatch(
-                            td -> td.getId() == event.getEntityId()
+                            td -> td.getUuid() == event.getEntityUuid()
                             )
                         )
                     ){
@@ -648,24 +648,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
-    public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, Integer> event) {
+    public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
 
         // FIXME check from own view!!!
         if(getView() == null){
             return;
         }
 
-        Integer registrationId = event.getIdentifier();
+        UUID registrationUuid = event.getIdentifier();
 
-        RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
+        RegistrationDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
         if(event.getProperty().equals(RegistrationItem.BLOCKED_BY)){
 
-            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationId);
-            getView().setBlockingRegistrations(registrationId, blockingRegs);
+            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
+            getView().setBlockingRegistrations(registrationUuid, blockingRegs);
         } else if(event.getProperty().equals(RegistrationItem.MESSAGES)){
 
             RegistrationMessagesPopup popup = getNavigationManager().showInPopup(RegistrationMessagesPopup.class, getView());
-            popup.loadMessagesFor(regDto.getId());
+            popup.loadMessagesFor(regDto.getUuid());
 
         } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
             getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());

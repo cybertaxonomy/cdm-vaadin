@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,24 +134,24 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     }
 
     @EventBusListenerMethod
-    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, Integer> event) {
+    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, UUID> event) {
 
         // FIXME check from own view!!!
         if(getView() == null){
             return;
         }
 
-        Integer registrationId = event.getIdentifier();
+        UUID registrationUuid = event.getIdentifier();
 
-        RegistrationDTO regDto = getWorkingSetService().loadDtoById(registrationId);
+        RegistrationDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
         if(event.getProperty().equals("messages")){
 
             getView().openDetailsPopup("Messages", regDto.getValidationProblems());
 
         } else if(event.getProperty().equals("blockedBy")){
 
-            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationId);
-            RegistrationItem regItem = getView().getRegistrationItem(registrationId);
+            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
+            RegistrationItem regItem = getView().getRegistrationItem(registrationUuid);
             regItem.showBlockingRegistrations(blockingRegs);
         }
 

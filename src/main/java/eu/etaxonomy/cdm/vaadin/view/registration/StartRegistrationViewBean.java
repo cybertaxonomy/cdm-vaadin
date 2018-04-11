@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -128,15 +129,15 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         continueButton.setEnabled(false);
         continueButton.addClickListener(e -> {
 
-            Integer refId = null;
+            UUID refUuid = null;
             referenceCombobox.commit();
             if(referenceCombobox.getValue() != null){
-                refId = referenceCombobox.getValue().getId();
+                refUuid = referenceCombobox.getValue().getUuid();
             }
             getViewEventBus().publish(this,
                 new RegistrationEditorAction(EditorActionType.ADD,
                         // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
-                        refId,
+                        refUuid,
                         continueButton,
                         StartRegistrationViewBean.this)
                 );

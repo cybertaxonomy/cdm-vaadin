@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
@@ -84,7 +85,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected Reference loadCdmEntityById(Integer identifier) {
+    protected Reference loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
 
@@ -117,7 +118,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Reference.class, identifier, crud, null);
         }
@@ -154,7 +155,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
            if(editorAction.isEditAction()){
                inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
                inReferencePopup.withDeleteButton(true);
-               inReferencePopup.loadInEditor(editorAction.getEntityId());
+               inReferencePopup.loadInEditor(editorAction.getEntityUuid());
            }
        }
    }

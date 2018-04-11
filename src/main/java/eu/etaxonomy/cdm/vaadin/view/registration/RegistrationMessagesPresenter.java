@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -56,9 +57,9 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
     /**
      * @param identifier
      */
-    public void loadMessagesFor(Integer id) {
+    public void loadMessagesFor(UUID uuid) {
         if(registration == null){
-            registration = registrationService.load(id, Arrays.asList("submitter"));
+            registration = registrationService.load(uuid, Arrays.asList("submitter"));
         }
         try {
             List<Message> messages = messageService.listMessages(registration);
@@ -99,7 +100,7 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
         }
         try {
             messageService.postMessage(registration, message, user, toUser);
-            loadMessagesFor(registration.getId());
+            loadMessagesFor(registration.getUuid());
         } catch (ExternalServiceException e) {
             logger.error(e);
             throw new RuntimeException(e);

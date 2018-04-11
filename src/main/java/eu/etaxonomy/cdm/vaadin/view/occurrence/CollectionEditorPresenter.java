@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -43,7 +44,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
      * {@inheritDoc}
      */
     @Override
-    protected Collection loadCdmEntityById(Integer identifier) {
+    protected Collection loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
 
@@ -66,7 +67,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
         }
@@ -130,7 +131,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
-        collectionPopuEditor.loadInEditor(event.getEntityId());
+        collectionPopuEditor.loadInEditor(event.getEntityUuid());
     }
 
     @EventBusListenerMethod()

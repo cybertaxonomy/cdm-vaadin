@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.Stack;
+import java.util.UUID;
 
 import com.vaadin.ui.Component;
 
@@ -38,8 +39,8 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
         this(action, null, source, sourceView);
     }
 
-    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        this(action, entityId, source, sourceView, null);
+    public AbstractEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView) {
+        this(action, entityUuid, source, sourceView, null);
     }
 
     /**
@@ -57,9 +58,9 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
      *            Editor actions from previous views and editors that lead to the point
      *            from where this action is spawned.
      */
-    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+    public AbstractEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView,
             Stack<EditorActionContext> context) {
-        super(action, entityId, sourceView);
+        super(action, entityUuid, sourceView);
         this.sourceComponent = source;
         this.context = context;
     }

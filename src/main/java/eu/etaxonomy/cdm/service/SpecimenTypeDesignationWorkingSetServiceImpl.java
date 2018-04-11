@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.jboss.logging.Logger;
@@ -85,11 +86,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      * {@inheritDoc}
      */
     @Override
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(int registrationId, int publicationId, int typifiedNameId) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
-        Registration reg = repo.getRegistrationService().load(registrationId, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
-        TaxonName typifiedName = repo.getNameService().load(typifiedNameId, TAXON_NAME_INIT_STRATEGY);
-        Reference citation = repo.getReferenceService().load(publicationId, Arrays.asList("$"));
+        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
+        TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
+        Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
@@ -99,8 +100,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     @Override
     @Transactional
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
-        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(registrationId);
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
+        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
         TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
@@ -114,7 +115,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
             // so that they are based on an empty FieldUnit with an associated Gathering Event
 
-            Registration reg = repo.getRegistrationService().find(bean.getOwner().getId());
+            Registration reg = repo.getRegistrationService().find(bean.getOwner().getUuid());
             RegistrationDTO regDTO = new RegistrationDTO(reg);
 
             FieldUnit fieldUnit = FieldUnit.NewInstance();
@@ -124,7 +125,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             VersionableEntity baseEntity = bean.getBaseEntity();
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
-                    new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), baseEntity.toString())
+                    new TypedEntityReference(baseEntity.getClass(), baseEntity.getUuid(), baseEntity.toString())
                     );
             for(TypeDesignationBase td : typeDesignations){
                 DerivationEvent de = DerivationEvent.NewInstance();//

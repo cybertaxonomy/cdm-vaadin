@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.log4j.Level;
@@ -282,7 +283,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 getViewEventBus().publish(this,
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
-                            nomReferenceCombobox.getValue().getId(),
+                            nomReferenceCombobox.getValue().getUuid(),
                             nomReferenceCombobox,
                             this)
                 );
@@ -318,12 +319,12 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         basionymsComboboxSelect.setEditActionListener(e -> {
 
             Object fieldValue = e.getSource().getValue();
-            Integer beanId = null;
+            UUID beanUuid = null;
             if(fieldValue != null){
-                beanId = ((CdmBase)fieldValue).getId();
+                beanUuid = ((CdmBase)fieldValue).getUuid();
 
             }
-            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanId, e.getSource(), this));
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, e.getSource(), this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;

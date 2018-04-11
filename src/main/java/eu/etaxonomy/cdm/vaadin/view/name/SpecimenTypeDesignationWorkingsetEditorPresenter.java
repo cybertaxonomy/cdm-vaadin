@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -125,7 +126,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
 
             if(idset.baseEntityRef != null){
-                workingSetDto = specimenTypeDesignationWorkingSetService.loadDtoByIds(idset.registrationId, idset.baseEntityRef);
+                workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntityRef);
                 if(workingSetDto.getFieldUnit() == null){
                     workingSetDto = specimenTypeDesignationWorkingSetService.fixMissingFieldUnit(workingSetDto);
                         // FIXME open Dialog to warn user about adding an empty fieldUnit to the typeDesignations
@@ -137,7 +138,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationId, idset.publicationId, idset.typifiedNameId);
+                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
                 cache.load(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getOwner());
@@ -205,7 +206,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd());
                 row.collection.addClickListenerEditEntity(e -> {
                         if(row.collection.getValue() != null){
-                            doCollectionEditorEdit(row.collection.getValue().getId());
+                            doCollectionEditorEdit(row.collection.getValue().getUuid());
                         }
                     });
 
@@ -222,7 +223,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd());
                 row.mediaSpecimenReference.addClickListenerEditEntity(e -> {
                     if(row.mediaSpecimenReference.getValue() != null){
-                        doReferenceEditorEdit(row.mediaSpecimenReference.getValue().getId());
+                        doReferenceEditorEdit(row.mediaSpecimenReference.getValue().getUuid());
                     }
                 });
 
@@ -312,13 +313,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         collectionPopupEditor.loadInEditor(null);
     }
 
-    public void doCollectionEditorEdit(int collectionId) {
+    public void doCollectionEditorEdit(UUID collectionUuid) {
 
         collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
-        collectionPopupEditor.loadInEditor(collectionId);
+        collectionPopupEditor.loadInEditor(collectionUuid);
     }
 
 
@@ -326,7 +327,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onCollectionEvent(EntityChangeEvent event){
 
         Collection newCollection = getRepo().getCollectionService().load(
-                event.getEntityId(), Arrays.asList(new String[]{"$.institute"})
+                event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})
                 );
         cache.load(newCollection);
 
@@ -346,19 +347,19 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         referencePopupEditor.loadInEditor(null);
     }
 
-    public void doReferenceEditorEdit(int referenceId) {
+    public void doReferenceEditorEdit(UUID referenceUuid) {
 
         referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);
-        referencePopupEditor.loadInEditor(referenceId);
+        referencePopupEditor.loadInEditor(referenceUuid);
     }
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
     public void onReferenceEvent(EntityChangeEvent event){
 
-        Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));
+        Reference newRef = getRepo().getReferenceService().load(event.getEntityUuid(), Arrays.asList(new String[]{"$"}));
         cache.load(newRef);
 
         for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {

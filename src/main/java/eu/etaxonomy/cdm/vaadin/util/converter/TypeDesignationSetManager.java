@@ -112,7 +112,7 @@ public class TypeDesignationSetManager {
      */
     public TypeDesignationSetManager(TaxonName typifiedName) {
         this.typeDesignations = new ArrayList<>();
-        this.typifiedNameRef = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+        this.typifiedNameRef = new EntityReference(typifiedName.getUuid(), typifiedName.getTitleCache());
     }
 
     /**
@@ -155,7 +155,7 @@ public class TypeDesignationSetManager {
             final VersionableEntity baseEntity = baseEntity(td);
             final TypedEntityReference<VersionableEntity> baseEntityReference = makeEntityReference(baseEntity);
 
-            EntityReference typeDesignationEntityReference = new EntityReference(td.getId(), stringify(td));
+            EntityReference typeDesignationEntityReference = new EntityReference(td.getUuid(), stringify(td));
 
             TypeDesignationWorkingSet typedesignationWorkingSet;
             if(!byBaseEntityByTypeStatus.containsKey(baseEntityReference)){
@@ -211,7 +211,7 @@ public class TypeDesignationSetManager {
                 label = ((FieldUnit)baseEntity).getTitleCache();
         }
 
-        TypedEntityReference<VersionableEntity> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), label);
+        TypedEntityReference<VersionableEntity> baseEntityReference = new TypedEntityReference(baseEntity.getClass(), baseEntity.getUuid(), label);
 
         return baseEntityReference;
     }
@@ -394,7 +394,7 @@ public class TypeDesignationSetManager {
             } else {
                 // compare
                 TaxonName otherTypifiedName = typeDesignation.getTypifiedNames().iterator().next();
-                if(typifiedName.getId() != otherTypifiedName.getId()){
+                if(!typifiedName.getUuid().equals(otherTypifiedName.getUuid())){
                   //TODO instead throw RegistrationValidationException()
                     problems.add("Multiple typifiedName in " + typeDesignation.toString());
                 }
@@ -409,7 +409,7 @@ public class TypeDesignationSetManager {
         if(typifiedName != null){
             // ON SUCCESS -------------------
             this.typifiedName = typifiedName;
-            this.typifiedNameRef = new EntityReference(typifiedName.getId(), typifiedName.getTitleCache());
+            this.typifiedNameRef = new EntityReference(typifiedName.getUuid(), typifiedName.getTitleCache());
 
         }
     }
@@ -446,7 +446,7 @@ public class TypeDesignationSetManager {
      */
     public TypeDesignationBase findTypeDesignation(EntityReference typeDesignationRef) {
         for(TypeDesignationBase td : typeDesignations){
-            if(td.getId() == typeDesignationRef.getId()){
+            if(td.getUuid().equals(typeDesignationRef.getUuid())){
                 return td;
             }
         }

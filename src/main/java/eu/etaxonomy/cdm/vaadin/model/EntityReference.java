@@ -8,19 +8,22 @@
 */
 package eu.etaxonomy.cdm.vaadin.model;
 
+import java.util.UUID;
+
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class EntityReference {
-    int id;
+    UUID uuid;
     String label;
 
-    public EntityReference(int id, String label) {
-        this.id = id;
+    public EntityReference(UUID uuid, String label) {
+        this.uuid = uuid;
         this.label = label;
     }
 
-    public int getId() {
-        return id;
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     public String getLabel() {
@@ -34,7 +37,7 @@ public class EntityReference {
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
                 .append(label)
-                .append(id)
+                .append(uuid)
                 .toHashCode();
     }
 
@@ -45,7 +48,7 @@ public class EntityReference {
     public boolean equals(Object obj) {
         try {
             EntityReference other = (EntityReference) obj;
-            return id == other.id && label.equals(other.label);
+            return uuid.equals(other.uuid) && label.equals(other.label);
 
         } catch (Exception e) {
             return false;

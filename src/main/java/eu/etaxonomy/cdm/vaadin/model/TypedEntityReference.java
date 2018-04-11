@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.model;
 
+import java.util.UUID;
+
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
@@ -18,16 +20,16 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class TypedEntityReference<T> extends EntityReference {
 
     /**
-     * @param id
+     * @param uuid
      * @param label
      */
-    public TypedEntityReference(Class<T> type, int id, String label) {
-        super(id, label);
+    public TypedEntityReference(Class<T> type, UUID uuid, String label) {
+        super(uuid, label);
         this.type = type;
     }
 
-    public TypedEntityReference(Class<T> type, int id) {
-        super(id, null);
+    public TypedEntityReference(Class<T> type, UUID uuid) {
+        super(uuid, null);
         this.type = type;
     }
 
@@ -55,7 +57,7 @@ public class TypedEntityReference<T> extends EntityReference {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 31)
-                .append(id)
+                .append(uuid)
                 .appendSuper(type.hashCode())
                 .hashCode();
     }
@@ -68,7 +70,7 @@ public class TypedEntityReference<T> extends EntityReference {
     public boolean equals(Object obj) {
         try {
             TypedEntityReference other = (TypedEntityReference) obj;
-            return id == other.id && type.equals(other.type);
+            return uuid.equals(other.uuid) && type.equals(other.type);
 
         } catch (Exception e) {
             return false;
@@ -77,7 +79,7 @@ public class TypedEntityReference<T> extends EntityReference {
 
     @Override
     public String toString(){
-        return type.getSimpleName() + "#" + id;
+        return type.getSimpleName() + "#" + uuid;
 
     }
 

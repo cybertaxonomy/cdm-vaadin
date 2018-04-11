@@ -13,6 +13,7 @@ import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -191,10 +192,10 @@ public class RegistrationItem extends GridLayout {
         this.regDto = regDto;
 
         NavigationEvent navigationEvent = null;
-        if(regDto.getCitationID() != null) {
+        if(regDto.getCitationUuid() != null) {
             navigationEvent = new NavigationEvent(
                     RegistrationWorksetViewBean.NAME,
-                    Integer.toString(regDto.getCitationID())
+                    regDto.getCitationUuid().toString()
                     );
         } else {
             setComponentError(new UserError("Citation is missing"));
@@ -208,11 +209,11 @@ public class RegistrationItem extends GridLayout {
         this.parentView = parentView;
 
         ReferenceEditorAction referenceEditorAction = null;
-        if(workingSet.getCitationId() != null){
-            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
-                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId(), null, parentView);
+        if(workingSet.getCitationUuid() != null){
+            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, parentView);
             }
-            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
             if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
@@ -245,13 +246,13 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().addClickListener(e -> {
                 ShowDetailsEvent detailsEvent;
                 if(regDto != null){
-                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, Integer>(
+                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
                             e,
                             RegistrationDTO.class,
-                            regDto.getId(),
+                            regDto.getUuid(),
                             VALIDATION_PROBLEMS);
                 } else {
-                    detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, Integer>(
+                    detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, UUID>(
                             e,
                             RegistrationWorkingSet.class,
                             null,
@@ -329,8 +330,8 @@ public class RegistrationItem extends GridLayout {
         }
     }
 
-    public int getRegistrationId(){
-        return regDto.getId();
+    public UUID getRegistrationUuid(){
+        return regDto.getUuid();
     }
 
     /**

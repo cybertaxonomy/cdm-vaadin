@@ -33,7 +33,7 @@ public class EntityChangeEvent<T extends CdmBase> extends AbstractEntityEvent<En
     private T entity;
 
     public EntityChangeEvent(T entity, Type type, AbstractView sourceView) {
-        super(type, entity.getId(), sourceView);
+        super(type, entity.getUuid(), sourceView);
         this.entityType = (Class<T>) entity.getClass();
         this.entity = entity;
     }

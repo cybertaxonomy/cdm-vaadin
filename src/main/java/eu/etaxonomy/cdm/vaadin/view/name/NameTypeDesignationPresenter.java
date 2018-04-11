@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -71,11 +72,11 @@ public class NameTypeDesignationPresenter
         if(identifier instanceof Integer || identifier == null){
             return super.loadBeanById(identifier);
 //        } else if(identifier instanceof TypedEntityReference && ((TypedEntityReference)identifier).getType().equals(TaxonName.class)) {
-//            typifiedNameInContext = getRepo().getNameService().find(((TypedEntityReference)identifier).getId());
+//            typifiedNameInContext = getRepo().getNameService().find(((TypedEntityReference)identifier).getUuid());
 //            bean = super.loadBeanById(null);
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
-            RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(idset.registrationId);
+            RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
             typifiedNameInContext = regDTO.getTypifiedName();
             // find the working set
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
@@ -85,8 +86,8 @@ public class NameTypeDesignationPresenter
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
             }
             // TypeDesignationWorkingSet for NameTyped only contain one item!!!
-            int nameTypeDesignationId = typeDesignationWorkingSet.getTypeDesignations().get(0).getId();
-            return super.loadBeanById(nameTypeDesignationId);
+            UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
+            return super.loadBeanById(nameTypeDesignationUuid);
         }
     }
 
@@ -95,7 +96,7 @@ public class NameTypeDesignationPresenter
      * {@inheritDoc}
      */
     @Override
-    protected NameTypeDesignation loadCdmEntityById(Integer identifier) {
+    protected NameTypeDesignation loadCdmEntity(UUID uuid) {
         List<String> initStrategy = Arrays.asList(new String []{
                 "$",
                 "typifiedNames.typeDesignations", // important !!
@@ -105,8 +106,8 @@ public class NameTypeDesignationPresenter
         );
 
         NameTypeDesignation typeDesignation;
-        if(identifier != null){
-            typeDesignation = (NameTypeDesignation) getRepo().getNameService().loadTypeDesignation(identifier, initStrategy);
+        if(uuid != null){
+            typeDesignation = (NameTypeDesignation) getRepo().getNameService().loadTypeDesignation(uuid, initStrategy);
         } else {
             if(beanInstantiator != null){
                 typeDesignation = beanInstantiator.createNewBean();
@@ -153,7 +154,7 @@ public class NameTypeDesignationPresenter
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(NameTypeDesignation.class, identifier, crud, null);
         }
@@ -251,7 +252,7 @@ public class NameTypeDesignationPresenter
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         // TODO configure Modes???
-        typeNamePopup.loadInEditor(action.getEntityId());
+        typeNamePopup.loadInEditor(action.getEntityUuid());
 
     }
 

@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.security;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Profile;
@@ -65,11 +66,11 @@ public class PermissionDebugUtils implements Serializable {
      }
 
     public static Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType,
-            Integer entitiyId, EnumSet<CRUD> crud, String property){
+            UUID entitiyUuid, EnumSet<CRUD> crud, String property){
 
         PermissionDebugUtils pu = PermissionDebugUtils.fromSession();
         if(pu != null){
-            Button button = pu.gainPerEntityPermissionButton(cdmType, entitiyId, crud, property);
+            Button button = pu.gainPerEntityPermissionButton(cdmType, entitiyUuid, crud, property);
             if(button != null){
                 toContainer.addComponent(button);
             }
@@ -78,10 +79,10 @@ public class PermissionDebugUtils implements Serializable {
         return null;
     }
 
-    public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property){
+    public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property){
 
        Button button = new Button(FontAwesome.BOLT);
-       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyId, crud, property));
+       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyUuid, crud, property));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
 

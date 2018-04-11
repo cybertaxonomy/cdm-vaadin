@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.service;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
@@ -31,6 +32,8 @@ public interface IRegistrationWorkingSetService {
      */
     public RegistrationDTO loadDtoById(Integer id);
 
+    public RegistrationDTO loadDtoByUuid(UUID uuid);
+
     public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex);
 
     public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
@@ -43,6 +46,12 @@ public interface IRegistrationWorkingSetService {
      */
     public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException;
 
-    public Set<RegistrationDTO> loadBlockingRegistrations(Integer blockedRegistrationId);
+    /**
+     * @param referenceID
+     * @return
+     */
+    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid) throws RegistrationValidationException;
+
+    public Set<RegistrationDTO> loadBlockingRegistrations(UUID blockedRegistrationUuid);
 
 }

@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.EnumSet;
+import java.util.UUID;
 
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -153,6 +154,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
     }
 
+    @SuppressWarnings("null")
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
@@ -160,21 +162,21 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             return;
         }
 
-        Integer referenceId = null;
+        UUID referenceUuid = null;
         LazyComboBox<Reference> referenceCombobox = getView().getReferenceCombobox();
         referenceCombobox.commit();
         if(newReference != null){
-            referenceId = newReference.getId();
+            referenceUuid = newReference.getUuid();
        // } else if(referenceCombobox.getValue() != null) {
-        } else if ( event.getEntityId() != null) { // HACKED, see view implementation
-            referenceId = event.getEntityId();
+        } else if ( event.getEntityUuid() != null) { // HACKED, see view implementation
+            referenceUuid = event.getEntityUuid();
         }
-        if(referenceId == null){
+        if(referenceUuid == null){
             getView().getContinueButton().setComponentError(new UserError("Can't continue. No Reference is chosen."));
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorksetViewBean.NAME, Integer.toString(referenceId)));
+        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorksetViewBean.NAME, referenceUuid.toString()));
 
     }
 

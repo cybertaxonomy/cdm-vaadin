@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 
@@ -162,8 +163,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             item.setWidth(100, Unit.PERCENTAGE);
             item.getBlockedByButton().addClickListener(e -> getViewEventBus().publish(
                     this,
-                    new ShowDetailsEvent<Registration, Integer>(
-                            e, Registration.class, regDto.getId(), "blockedBy"
+                    new ShowDetailsEvent<Registration, UUID>(
+                            e, Registration.class, regDto.getUuid(), "blockedBy"
                             )
                     ));
             listContainer.addComponent(item);
@@ -274,10 +275,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         return viewMode;
     }
 
-    public RegistrationItem getRegistrationItem(int registrationId){
+    @Override
+    public RegistrationItem getRegistrationItem(UUID registrationUuid){
         for(Component c : listContainer){
             RegistrationItem item = (RegistrationItem)c;
-            if(registrationId == item.getRegistrationId()){
+            if(registrationUuid.equals(item.getRegistrationUuid())){
                 return item;
             }
 

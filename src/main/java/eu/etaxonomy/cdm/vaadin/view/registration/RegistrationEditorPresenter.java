@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Scope;
 
@@ -46,7 +47,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
      * {@inheritDoc}
      */
     @Override
-    protected Registration loadCdmEntityById(Integer identifier) {
+    protected Registration loadCdmEntity(UUID identifier) {
 
         Registration reg;
         if(identifier != null){
@@ -62,7 +63,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, identifier, crud, null);
         }

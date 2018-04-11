@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 
@@ -33,7 +34,7 @@ public class RegistrationWorkingSet {
 
     private List<RegistrationDTO> registrationDTOs = new ArrayList<>();
 
-    private Integer citationId = null;
+    private UUID citationUuid = null;
 
     private DateTime created = null;
 
@@ -43,7 +44,7 @@ public class RegistrationWorkingSet {
      * Creates an empty working set
      */
     public RegistrationWorkingSet(Reference citation) {
-        citationId = citation.getId();
+        citationUuid = citation.getUuid();
         this.citationString= citation.getTitleCache();
 
     }
@@ -83,11 +84,11 @@ public class RegistrationWorkingSet {
         }
         for(RegistrationDTO regDto : candidates){
                 Reference citation = publicationUnit(regDto);
-                if(citationId == null){
-                    citationId = citation.getId();
+                if(citationUuid == null){
+                    citationUuid = citation.getUuid();
                     citationString = citation.getTitleCache();
                 } else {
-                    if(citation.getId() != citationId.intValue()){
+                    if(!citation.getUuid().equals(citationUuid)){
                         problems.add("Removing Registration " + regDto.getSummary() + " from set since this refers to a different citationString.");
                         continue;
                     }
@@ -180,15 +181,15 @@ public class RegistrationWorkingSet {
         return registrationDTOs;
     }
 
-    public Optional<RegistrationDTO> getRegistrationDTO(int registrationId) {
-        return registrationDTOs.stream().filter(r -> r.getId() == registrationId).findFirst();
+    public Optional<RegistrationDTO> getRegistrationDTO(UUID registrationUuid) {
+        return registrationDTOs.stream().filter(r -> r.getUuid().equals(registrationUuid) ).findFirst();
     }
 
     /**
      * @return the citationId
      */
-    public Integer getCitationId() {
-        return citationId;
+    public UUID getCitationUuid() {
+        return citationUuid;
     }
 
     /**

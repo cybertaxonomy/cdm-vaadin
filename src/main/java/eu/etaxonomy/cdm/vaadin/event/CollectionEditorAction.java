@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.UUID;
+
 import com.vaadin.ui.Component;
 
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -40,8 +42,8 @@ public class CollectionEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public CollectionEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId, source, sourceView);
+    public CollectionEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView) {
+        super(action, entityUuid, source, sourceView);
     }
 
 }

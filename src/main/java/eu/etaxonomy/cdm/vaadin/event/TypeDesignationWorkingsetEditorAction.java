@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.Stack;
+import java.util.UUID;
 
 import com.vaadin.ui.Component;
 
@@ -28,16 +29,16 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
 
     private TypeDesignationWorkingSetType workingSetType;
 
-    private int registrationId;
+    private UUID registrationUuid;
 
-    private int typifiedNameId;
+    private UUID typifiedNameUuid;
 
     private TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
 
     /**
      *
      * @param action
-     * @param typeDesignationWorkingsetId
+     * @param baseEntityRef
      * @param workingSetType
      * @param registrationId
      * @param source
@@ -45,12 +46,12 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      */
     public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
             TypeDesignationWorkingSetType workingSetType,
-            int registrationId, int typifiedNameId,
+            UUID registrationUuid, UUID typifiedNameUuid,
             Component source, AbstractView sourceView, Stack<EditorActionContext> context) {
         super(action, null, source, sourceView);
         this.baseEntityRef = baseEntityRef;
-        this.registrationId = registrationId;
-        this.typifiedNameId = typifiedNameId;
+        this.registrationUuid = registrationUuid;
+        this.typifiedNameUuid = typifiedNameUuid;
         this.workingSetType = workingSetType;
         this.context = context;
 
@@ -60,19 +61,19 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      *
      * @param action
      * @param workingSetType
-     * @param registrationId
+     * @param registrationUuid
      * @param source
      * @param sourceView
      */
     public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypeDesignationWorkingSetType workingSetType,
-            int registrationId, int typifiedNameId,
+            UUID registrationUuid, UUID typifiedNameUuid,
             Component source, AbstractView sourceView) {
         super(action, null, source, sourceView);
         this.workingSetType = workingSetType;
-        this.registrationId = registrationId;
-        this.typifiedNameId = typifiedNameId;
+        this.registrationUuid = registrationUuid;
+        this.typifiedNameUuid = typifiedNameUuid;
         this.context = new Stack<>();
-        this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationId), sourceView));
+        this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationUuid), sourceView));
     }
 
 
@@ -86,14 +87,14 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
     }
 
     /**
-     * @return the registrationId
+     * @return the registrationUuid
      */
-    public int getRegistrationId() {
-        return registrationId;
+    public UUID getRegistrationUuid() {
+        return registrationUuid;
     }
 
-    public Integer getTypeDesignationWorkingsetId(){
-        return getEntityId();
+    public UUID getTypeDesignationWorkingsetUuid(){
+        return getEntityUuid();
     }
 
     /**
@@ -104,10 +105,10 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
     }
 
     /**
-     * @return the typifiedNameId
+     * @return the typifiedNameUuid
      */
-    public int getTypifiedNameId() {
-        return typifiedNameId;
+    public UUID getTypifiedNameUuid() {
+        return typifiedNameUuid;
     }
 
 

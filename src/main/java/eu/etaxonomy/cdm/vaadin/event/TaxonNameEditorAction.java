@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.Stack;
+import java.util.UUID;
 
 import com.vaadin.ui.Component;
 
@@ -41,8 +42,8 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId, source, sourceView);
+    public TaxonNameEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView) {
+        super(action, entityUuid, source, sourceView);
     }
 
     /**
@@ -52,9 +53,9 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param sourceView
      * @param context
      */
-    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+    public TaxonNameEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView,
             Stack<EditorActionContext> context) {
-        super(action, entityId, source, sourceView, context);
+        super(action, entityUuid, source, sourceView, context);
     }
 
 

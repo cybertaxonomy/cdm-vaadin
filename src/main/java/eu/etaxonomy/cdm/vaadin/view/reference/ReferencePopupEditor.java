@@ -140,7 +140,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                 getViewEventBus().publish(this,
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
-                            inReferenceCombobox.getValue().getId(),
+                            inReferenceCombobox.getValue().getUuid(),
                             inReferenceCombobox,
                             this)
                 );

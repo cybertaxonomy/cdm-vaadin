@@ -80,33 +80,30 @@ public interface RegistrationWorkingsetView extends ApplicationView{
 
     public LazyComboBox<TaxonName> getAddExistingNameCombobox();
 
-    Integer getCitationID();
-
+    /**
+     * @return
+     */
+    UUID getCitationUuid();
 
     /**
      * selecting a type will cause a {@link TypeDesignationWorkingsetEditorAction} to be emitted.
      * On Cancel .. TODO
-     * @param registrationEntityId
+     * @param registrationEntityUuid
      */
-    void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId);
+    void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid);
 
     /**
      * @param registrationId
      * @param blockingRegDTOs
      */
-    void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs);
+    void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs);
 
     /**
      * Returns the registrationItemMap as unmodifiableMap.
      *
      * @return
      */
-    Map<Integer, RegistrationDetailsItem> getRegistrationItemMap();
-
-
-
-
-
+    Map<UUID, RegistrationDetailsItem> getRegistrationItemMap();
 
 
 }

@@ -11,6 +11,7 @@ package eu.etaxonomy.vaadin.mvp;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
@@ -75,13 +76,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
 
         DTO cdmEntitiy;
         if(identifier != null) {
-            Integer integerID = (Integer)identifier;
+            UUID uuidIdentifier = (UUID)identifier;
             // CdmAuthority is needed before the bean is loaded into the session.
             // otherwise adding the authority to the user would cause a flush
-            guaranteePerEntityCRUDPermissions(integerID);
-            cdmEntitiy = loadCdmEntityById(integerID);
+            guaranteePerEntityCRUDPermissions(uuidIdentifier);
+            cdmEntitiy = loadCdmEntity(uuidIdentifier);
         } else {
-            cdmEntitiy = loadCdmEntityById(null);
+            cdmEntitiy = loadCdmEntity(null);
             if(cdmEntitiy != null){
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
@@ -101,13 +102,13 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
      * @param identifier
      * @return
      */
-    protected abstract DTO loadCdmEntityById(Integer identifier);
+    protected abstract DTO loadCdmEntity(UUID uuid);
 
     /**
      * Grant per entity CdmAuthority to the current user <b>for the bean which is not yet loaded</b>
      * into the editor. The <code>CRUD</code> to be granted are stored in the <code>crud</code> field.
      */
-    protected abstract void guaranteePerEntityCRUDPermissions(Integer identifier);
+    protected abstract void guaranteePerEntityCRUDPermissions(UUID identifier);
 
     /**
      * Grant per entity CdmAuthority to the current user for the bean which is loaded

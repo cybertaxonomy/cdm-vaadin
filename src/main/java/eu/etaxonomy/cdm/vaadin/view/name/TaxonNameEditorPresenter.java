@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -135,7 +136,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      * {@inheritDoc}
      */
     @Override
-    protected TaxonName loadCdmEntityById(Integer identifier) {
+    protected TaxonName loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
 
@@ -216,7 +217,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(TaxonName.class, identifier, crud, null);
         }
@@ -316,7 +317,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
-        referenceEditorPopup.loadInEditor(event.getEntityId());
+        referenceEditorPopup.loadInEditor(event.getEntityUuid());
         if(newReferenceInstantiator != null){
             // this is a bit clumsy, we actually need to inject something like a view configurer
             // which can enable, disable fields
@@ -375,7 +376,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 .filter(
                         m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                 .forEach(m -> basionymNamePopup.enableMode(m));
-        basionymNamePopup.loadInEditor(event.getEntityId());
+        basionymNamePopup.loadInEditor(event.getEntityUuid());
         basionymNamePopup.getBasionymToggle().setVisible(false);
 
     }
