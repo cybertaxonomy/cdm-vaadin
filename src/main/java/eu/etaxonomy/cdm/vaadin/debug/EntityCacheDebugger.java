@@ -13,17 +13,19 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.vaadin.spring.events.Event;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBus.ViewEventBus;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 import org.vaadin.spring.events.EventBusListener;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
@@ -40,17 +42,19 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  *
  */
 @Component
+@UIScope
 @Profile("debug")
 public class EntityCacheDebugger implements ViewChangeListener, EventBusListener<PopEditorOpenedEvent> {
 
     Logger logger = Logger.getLogger(EntityCacheDebugger.class);
-    private ViewEventBus viewEventBus;
+
+    private UIEventBus uiEventBus;
 
 
-    // @Autowired // FIXME autowiring fails, need to put in UI Scope?
-    protected final void setViewEventBus(EventBus.ViewEventBus viewEventBus){
-        this.viewEventBus = viewEventBus;
-        viewEventBus.subscribe(this);
+    @Autowired
+    protected final void setUIEventBus(EventBus.UIEventBus uiEventBus){
+        this.uiEventBus = uiEventBus;
+        uiEventBus.subscribe(this);
     }
 
     EntityCacheDebuggerShortcutListener shortcutListener;
