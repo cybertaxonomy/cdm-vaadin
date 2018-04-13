@@ -115,9 +115,7 @@ public class PersonField extends CompositeCustomField<Person> {
             personSelect.clear();
         });
         selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
-        newPersonButton.addClickListener(e -> {
-            setValue(Person.NewInstance());
-        });
+        newPersonButton.addClickListener(e -> createNewPerson());
 
         // edit person
         addStyledComponent(titleCacheField);
@@ -271,12 +269,17 @@ public class PersonField extends CompositeCustomField<Person> {
         return Person.class;
     }
 
+    private void createNewPerson(){
+        Person p = Person.NewInstance();
+        setValue(p);
+    }
+
     @Override
     public void setValue(Person person){
         super.setValue(person);
-//        PersonFieldAccess personWrapper = new PersonFieldAccess(person);
-//        super.setValue(personWrapper);
-        personSelect.setValue(person);
+        if(person != null && person.getId() != 0){
+            personSelect.setValue(person);
+        }
     }
 
     /**
