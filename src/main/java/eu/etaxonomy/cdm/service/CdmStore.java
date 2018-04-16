@@ -206,7 +206,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         T mergedBean = mergedBean(bean);
 
         // NOTE: saveOrUpdate is really needed here even if we to a merge before
-        repo.getCommonService().saveOrUpdate(mergedBean);
+        // repo.getCommonService().saveOrUpdate(mergedBean);
         session.flush();
         commitTransction();
 

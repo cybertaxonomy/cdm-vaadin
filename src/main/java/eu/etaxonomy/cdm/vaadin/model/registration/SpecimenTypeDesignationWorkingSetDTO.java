@@ -293,7 +293,7 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
         return fieldUnit.getGatheringEvent().getGatheringDate();
     }
 
-    public void getGatheringDate(Partial gatheringDate){
+    public void setGatheringDate(Partial gatheringDate){
         fieldUnit.getGatheringEvent().setGatheringDate(gatheringDate);
     }
 
