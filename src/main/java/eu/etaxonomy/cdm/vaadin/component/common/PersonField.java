@@ -304,7 +304,8 @@ public class PersonField extends CompositeCustomField<Person> {
         detailsContainer.setVisible(person != null);
         unlockSwitch.setVisible(person != null);
         titleCacheField.setVisible(person != null);
-        nomenclaturalTitleField.setVisible(nomenclaturalTitleField.getValue().equals(titleCacheField.getValue()));
+        String nomTitle = nomenclaturalTitleField.getValue();
+        nomenclaturalTitleField.setVisible(nomTitle != null && nomTitle.equals(titleCacheField.getValue()));
         nomenclaturalTitleButtonChooseIcon();
 
     }
