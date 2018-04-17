@@ -61,9 +61,7 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 @Scope("prototype")
 public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonName, TaxonNamePopupEditorView> {
 
-    /**
-     *
-     */
+
     private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList(
             "$",
             "relationsFromThisName",
@@ -72,6 +70,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             );
 
     private static final List<String> REFERENCE_INIT_STRATEGY = Arrays.asList("authorship", "inReference.authorship", "inReference.inReference.authorship", "inReference.inReference.inReference.authorship");
+
+    private static final List<String> TEAM_OR_PERSON_INIT_STRATEGY = Arrays.asList(
+            "$",
+            "teamMembers.$"
+            );
 
     private static final long serialVersionUID = -3538980627079389221L;
 
@@ -104,6 +107,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
+        termOrPersonPagingProvider.setInitStrategy(TEAM_OR_PERSON_INIT_STRATEGY);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
 
         getView().getCombinationAuthorshipField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
