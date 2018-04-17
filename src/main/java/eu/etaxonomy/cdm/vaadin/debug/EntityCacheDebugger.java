@@ -31,6 +31,7 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
@@ -138,13 +139,13 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
     @Override
     public void onEvent(Event<PopEditorOpenedEvent> event){
         PopupView popupView = event.getPayload().getPopupView();
-        if(popupView != null && popupView instanceof AbstractCdmPopupEditor){
-            findWindow(((AbstractCdmPopupEditor)popupView)).addShortcutListener(shortcutListener);
+        if(popupView != null && popupView instanceof AbstractPopupView){
+            findWindow((AbstractPopupView)popupView).addShortcutListener(shortcutListener);
         }
 
     }
 
-    private Window findWindow(AbstractCdmPopupEditor view){
+    private Window findWindow(AbstractPopupView view){
         Optional<Window> popUpWindow = UI.getCurrent().getWindows().stream().filter(w -> w.getContent().equals(view)).findFirst();
         if(popUpWindow.isPresent()){
             return popUpWindow.get();
@@ -190,8 +191,8 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
                 if(sender instanceof AbstractView) {
                     EntityCacheDebugger.this.openFor((AbstractView)sender);
                 }
-                if(sender instanceof Window && ((Window)sender).getContent() instanceof AbstractCdmPopupEditor) {
-                    EntityCacheDebugger.this.openFor((AbstractCdmPopupEditor)((Window)sender).getContent());
+                if(sender instanceof Window && ((Window)sender).getContent() instanceof AbstractPopupView) {
+                    EntityCacheDebugger.this.openFor((AbstractPopupView)((Window)sender).getContent());
                 }
 
             }
