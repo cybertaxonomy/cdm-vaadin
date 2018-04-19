@@ -348,7 +348,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             if(event.isCreateOrModifiedType()){
 
                 getCache().load(event.getEntity());
-                ((ReloadableSelect)basionymSourceField).reload();
+                if(event.isCreatedType()){
+                    basionymSourceField.setValue((TaxonName) event.getEntity());
+                } else {
+                    ((ReloadableSelect)basionymSourceField).reload();
+                }
                 getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
                 getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
                 getView().updateAuthorshipFields();
