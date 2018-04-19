@@ -39,8 +39,8 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.idminter.IdentifierMinter.Identifier;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.model.common.User;
@@ -95,6 +95,18 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 @SpringComponent
 @ViewScope
 public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> {
+
+    /**
+     *
+     */
+    private static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(
+            "$",
+            "blockedBy",
+            "name.combinationAuthorship.teamMembers",
+            "name.exCombinationAuthorship.teamMembers",
+            "name.basionymAuthorship.teamMembers",
+            "name.exBasionymAuthorship.teamMembers"
+            );
 
     private static final long serialVersionUID = 1L;
 
@@ -622,7 +634,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 if(rootContext.getParentView().equals(getView())){
                     Registration blockingRegistration = createNewRegistrationForName(event.getEntityUuid());
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), Arrays.asList("$", "blockedBy"));
+                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), REGISTRATION_INIT_STRATEGY);
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
