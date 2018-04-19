@@ -333,9 +333,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             if(event.isCreateOrModifiedType()){
 
                 getCache().load(event.getEntity());
-                getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
-                if(event.getType().equals(EntityChangeEvent.Type.CREATED)){
+                if(event.isCreatedType()){
                     getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
+                } else {
+                    getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
                 }
                 getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
                 getView().updateAuthorshipFields();

@@ -60,4 +60,8 @@ public class EntityChangeEvent<T extends CdmBase> extends AbstractEntityEvent<En
         return Type.REMOVED.equals(type);
      }
 
+    public boolean isCreatedType() {
+        return Type.CREATED.equals(type);
+     }
+
 }
