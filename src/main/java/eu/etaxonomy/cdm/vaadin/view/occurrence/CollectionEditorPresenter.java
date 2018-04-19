@@ -141,7 +141,11 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
                 Collection newCollection = (Collection) event.getEntity();
                 getCache().load(newCollection);
-                getView().getSuperCollectionCombobox().getSelect().setValue(newCollection);
+                if(event.isCreatedType()){
+                    getView().getSuperCollectionCombobox().setValue(newCollection);
+                } else {
+                    getView().getSuperCollectionCombobox().reload();
+                }
             }
 
             collectionPopuEditor = null;
