@@ -262,7 +262,11 @@ public class NameTypeDesignationPresenter
         if(event.getSourceView() == typeNamePopup){
             if(event.isCreateOrModifiedType()){
                 getCache().load(event.getEntity());
-                getView().getTypeNameField().reload();
+                if(event.isCreatedType()){
+                    getView().getTypeNameField().setValue((TaxonName) event.getEntity());
+                } else {
+                    getView().getTypeNameField().reload();
+                }
             }
             if(event.isRemovedType()){
                 getView().getTypeNameField().selectNewItem(null);
