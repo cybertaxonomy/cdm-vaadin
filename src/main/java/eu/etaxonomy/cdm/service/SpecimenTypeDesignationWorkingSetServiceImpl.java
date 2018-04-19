@@ -133,7 +133,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             FieldUnit fieldUnit = FieldUnit.NewInstance();
             GatheringEvent gatheringEvent = GatheringEvent.NewInstance();
             fieldUnit.setGatheringEvent(gatheringEvent);
-            repo.getOccurrenceService().save(fieldUnit);
+            fieldUnit = (FieldUnit) repo.getOccurrenceService().save(fieldUnit);
 
             VersionableEntity baseEntity = bean.getBaseEntity();
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
@@ -182,18 +182,15 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             Session session = repo.getSession();
 
-//            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
-//            regAnalyzer.printEntityGraph(System.out);
-//            regAnalyzer.printCopyEntities(System.out);
-
             session.merge(dto.getOwner());
             session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
+            // this step also includes the deletion of DerivedUnits which have been converted by
+            // the DerivedUnitConverter in turn of a kindOfUnit change
             for(SpecimenTypeDesignation std : dto.deletedSpecimenTypeDesignations()){
                 deleteSpecimenTypeDesignation(dto, std);
             }
-            session.flush();
         }
 
 

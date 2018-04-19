@@ -169,12 +169,13 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
-                //getPresenter().specimenTypeDesignationDTOInstantiator(getBean());
                 SpecimenTypeDesignationDTORow.class
                 );
         typeDesignationsCollectionField.withCaption("Types");
         typeDesignationsCollectionField.getLayout().setSpacing(false);
         typeDesignationsCollectionField.getLayout().setColumns(3);
+
+        typeDesignationsCollectionField.setVisibleProperties(SpecimenTypeDesignationDTORow.visibleFields());
 
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
         typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
@@ -274,7 +275,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         super.afterItemDataSourceSet();
         GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
         for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){ // first row is header
-            Component item = gridLayout.getComponent(0, rowIndex);
+            Component item = gridLayout.getComponent(SpecimenTypeDesignationDTORow.rowListSelectColumn(), rowIndex);
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
         updateAllowDelete();

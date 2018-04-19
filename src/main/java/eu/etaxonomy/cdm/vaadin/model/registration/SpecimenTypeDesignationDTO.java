@@ -15,7 +15,6 @@ import org.apache.commons.collections.CollectionUtils;
 
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
-import eu.etaxonomy.cdm.api.utility.DerivedUnitConverterFactory;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
@@ -53,12 +52,17 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 public class SpecimenTypeDesignationDTO {
 
     SpecimenTypeDesignation std;
+    private DerivedUnit replacedTypeSpecimen;
 
     /**
      * @return the std
      */
     public SpecimenTypeDesignation asSpecimenTypeDesignation() {
         return std;
+    }
+
+    public DerivedUnit replacedTypeSpecimen(){
+        return replacedTypeSpecimen;
     }
 
     /**
@@ -103,25 +107,32 @@ public class SpecimenTypeDesignationDTO {
         Class<? extends DerivedUnit> currentType = typeSpecimen.getClass();
 
         if(!requiredSpecimenType.equals(currentType)){
-
-            DerivedUnit convertedSpecimen;
-
             SpecimenOrObservationType convertToType = specimenOrObservationTypeFor(kindOfUnit);
             if(requiredSpecimenType.equals(MediaSpecimen.class)){
-                DerivedUnitConverter<MediaSpecimen> converter = DerivedUnitConverterFactory.createDerivedUnitConverter(typeSpecimen, MediaSpecimen.class);
-                convertedSpecimen = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, convertToType);
+                DerivedUnitConverter<MediaSpecimen> converter = new DerivedUnitConverter<MediaSpecimen>(std);
+                std = converter.convertTo((Class<MediaSpecimen>)requiredSpecimenType, convertToType);
             } else {
                  if(currentType == MediaSpecimen.class){
                      MediaSpecimen mediaSpecimen = (MediaSpecimen)typeSpecimen;
                      // set null to allow conversion
                      mediaSpecimen.setMediaSpecimen(null);
                  }
-                DerivedUnitConverter<DerivedUnit> converter = DerivedUnitConverterFactory.createDerivedUnitConverter(typeSpecimen, DerivedUnit.class);
-                convertedSpecimen = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, convertToType);
+                DerivedUnitConverter<DerivedUnit> converter = new DerivedUnitConverter<DerivedUnit>(std);
+                std = converter.convertTo((Class<DerivedUnit>)requiredSpecimenType, convertToType);
+            }
+            if(typeSpecimen.getId() != 0){
+                replacedTypeSpecimen = typeSpecimen;
             }
 
-            std.setTypeSpecimen(convertedSpecimen);
         }
+    }
+
+    /**
+     *
+     * @return the total count of typeDesignations associated with the type specimen
+     */
+    public int getAssociatedTypeDesignationCount() {
+        return std.getTypeSpecimen().getSpecimenTypeDesignations().size();
     }
 
 
