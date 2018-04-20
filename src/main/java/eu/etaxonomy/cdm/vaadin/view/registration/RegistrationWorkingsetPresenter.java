@@ -231,7 +231,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
 
                 boolean activeMessages = messageCount > 0;
-                boolean currentUserIsSubmitter = regDto.getSubmitterUserName().equals(UserHelper.fromSession().userName());
+                boolean currentUserIsSubmitter = regDto.getSubmitterUserName() != null && regDto.getSubmitterUserName().equals(UserHelper.fromSession().userName());
                 boolean currentUserIsCurator = UserHelper.fromSession().userIsRegistrationCurator();
                 messageButton.setEnabled(false);
                 if(currentUserIsCurator){
