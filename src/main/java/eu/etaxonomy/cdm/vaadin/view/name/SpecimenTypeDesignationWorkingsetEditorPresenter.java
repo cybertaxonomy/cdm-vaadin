@@ -166,7 +166,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
-        personPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
+        termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
