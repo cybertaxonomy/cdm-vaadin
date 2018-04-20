@@ -37,12 +37,11 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.security.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
@@ -51,7 +50,6 @@ import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
-import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
  * @author a.kohlbecker
@@ -310,13 +308,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
         addField(basionymsComboboxSelect, "basionyms", 0, row, 3, row);
         basionymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
         basionymsComboboxSelect.withEditButton(true);
-        basionymsComboboxSelect.setEditPermissionTester(new EditPermissionTester() {
-
-            @Override
-            public boolean userHasEditPermission(Object bean) {
-                return  UserHelper.fromSession().userHasPermission((CdmBase)bean, CRUD.UPDATE, CRUD.DELETE);
-            }
-        });
+        basionymsComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         basionymsComboboxSelect.setEditActionListener(e -> {
 
             Object fieldValue = e.getSource().getValue();

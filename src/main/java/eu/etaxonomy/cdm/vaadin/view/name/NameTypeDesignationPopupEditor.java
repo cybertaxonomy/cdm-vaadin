@@ -21,6 +21,7 @@ import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.security.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -155,6 +156,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
         typifiedNamesComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        typifiedNamesComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
         typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help
 
