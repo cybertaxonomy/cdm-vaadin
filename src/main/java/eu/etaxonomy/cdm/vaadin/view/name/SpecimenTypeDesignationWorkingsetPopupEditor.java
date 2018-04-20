@@ -104,6 +104,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
         TextArea localityField = new TextArea("Locality");
+        localityField.setNullRepresentation("");
         addField(localityField, "locality", 0, row , 2, row);
         localityField.setWidth("100%");
         // NOTE: setRows and SetCold breaks he width setting,
