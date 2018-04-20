@@ -131,10 +131,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.setStyleName(ValoTheme.BUTTON_PRIMARY);
         save.addClickListener(e -> save());
 
-        cancel = new Button("Cancel", FontAwesome.TRASH);
+        cancel = new Button("Cancel", FontAwesome.REMOVE);
         cancel.addClickListener(e -> cancel());
 
-        delete = new Button("Delete", FontAwesome.REMOVE);
+        delete = new Button("Delete", FontAwesome.TRASH);
         delete.setStyleName(ValoTheme.BUTTON_DANGER);
         delete.addClickListener(e -> delete());
         delete.setVisible(false);
