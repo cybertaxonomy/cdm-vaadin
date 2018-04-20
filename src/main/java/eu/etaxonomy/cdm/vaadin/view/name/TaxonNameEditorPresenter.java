@@ -49,6 +49,7 @@ import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ReloadableSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
@@ -375,7 +376,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
             return;
         }
 
-        basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
+        basionymSourceField = (ReloadableLazyComboBox<TaxonName>)event.getSourceComponent();
 
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));

@@ -45,6 +45,7 @@ import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.security.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
+import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -324,7 +325,8 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
                 beanUuid = ((CdmBase)fieldValue).getUuid();
 
             }
-            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, e.getSource(), this));
+            ReloadableLazyComboBox<TaxonName>  lazyCombobox = (ReloadableLazyComboBox<TaxonName>) e.getSource();
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, lazyCombobox, this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
         row++;

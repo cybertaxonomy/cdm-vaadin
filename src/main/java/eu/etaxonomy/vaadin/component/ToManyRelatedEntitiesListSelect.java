@@ -408,8 +408,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             if(withEditButton){
                 addButtonIndex++;
                 // edit
-                ((Button)buttonGroup.getComponent(0)).setDescription(field.getValue() == null ? "New" : "Edit");
-                buttonGroup.getComponent(0).setEnabled(field.getValue() == null
+                Button editCreateButton = ((Button)buttonGroup.getComponent(0));
+                editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
+                editCreateButton.setEnabled(field.getValue() == null
                         || field.getValue() != null && testEditButtonPermission(field.getValue()));
             }
             // add
