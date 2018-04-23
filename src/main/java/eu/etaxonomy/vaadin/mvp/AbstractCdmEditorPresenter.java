@@ -81,6 +81,7 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
             // CdmAuthority is needed before the bean is loaded into the session.
             // otherwise adding the authority to the user would cause a flush
             cdmEntitiy = loadCdmEntity(uuidIdentifier);
+            guaranteePerEntityCRUDPermissions(cdmEntitiy);
         } else {
             cdmEntitiy = loadCdmEntity(null);
             if(cdmEntitiy != null){

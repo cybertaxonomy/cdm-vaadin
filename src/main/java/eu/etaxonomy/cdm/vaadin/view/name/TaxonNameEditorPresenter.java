@@ -315,7 +315,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
         }
         referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
 
-        referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
         referenceEditorPopup.loadInEditor(event.getEntityUuid());
