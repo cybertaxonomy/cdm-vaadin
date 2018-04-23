@@ -47,6 +47,16 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected abstract DTO loadBeanById(Object identifier);
 
     /**
+     * Set ui elements to readonly or disabled to adapt the editor to
+     * the permissions that are given to the current user etc.
+     *
+     * @param beanToEdit
+     */
+    protected void adaptToUserPermission(DTO beanToEdit) {
+
+    }
+
+    /**
      * @param beanInstantiator the beanInstantiator to set
      */
     public void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {

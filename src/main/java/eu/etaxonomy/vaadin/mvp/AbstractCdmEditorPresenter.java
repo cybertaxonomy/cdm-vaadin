@@ -87,7 +87,6 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
         }
-        adaptToUserPermission(cdmEntitiy);
         cache = new CdmTransientEntityCacher(this);
         // need to use load but put see #7214
         cdmEntitiy = cache.load(cdmEntitiy);
@@ -99,7 +98,8 @@ public abstract class AbstractCdmEditorPresenter<DTO extends CdmBase, V extends 
     /**
      * @param cdmEntitiy
      */
-    private void adaptToUserPermission(DTO cdmEntitiy) {
+    @Override
+    protected void adaptToUserPermission(DTO cdmEntitiy) {
         UserHelper userHelper = UserHelper.fromSession();
         boolean canDelte = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
         boolean canEdit = userHelper.userHasPermission(cdmEntitiy, CRUD.UPDATE);

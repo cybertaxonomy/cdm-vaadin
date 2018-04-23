@@ -560,6 +560,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         DTO beanToEdit = getPresenter().loadBeanById(identifier);
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
+        getPresenter().adaptToUserPermission(beanToEdit);
         isBeanLoaded = true;
     }
 
