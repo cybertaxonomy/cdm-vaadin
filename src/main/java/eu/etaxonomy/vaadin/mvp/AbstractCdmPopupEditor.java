@@ -15,7 +15,6 @@ import java.util.List;
 
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Layout;
@@ -98,30 +97,6 @@ public abstract class AbstractCdmPopupEditor<DTO extends CdmBase, P extends Abst
     public void grantToCurrentUser(EnumSet<CRUD> crud){
         getPresenter().setGrantsForCurrentUser(crud);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        super.setReadOnly(readOnly);
-        recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
-    }
-
-    /**
-     * @param readOnly
-     * @param layout
-     */
-    protected void recursiveReadonly(boolean readOnly, AbstractComponentContainer layout) {
-        for(Component c : layout){
-            c.setReadOnly(readOnly);
-            if(c instanceof AbstractComponentContainer){
-                recursiveReadonly(readOnly, layout);
-            }
-        }
-    }
-
-
 
 
 

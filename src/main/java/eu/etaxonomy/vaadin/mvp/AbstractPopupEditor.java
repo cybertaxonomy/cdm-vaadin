@@ -25,6 +25,7 @@ import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -180,6 +181,20 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.setVisible(!readOnly);
         delete.setVisible(!readOnly);
         cancel.setCaption(readOnly ? "Close" : "Cancel");
+        recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
+    }
+
+    /**
+     * @param readOnly
+     * @param layout
+     */
+    protected void recursiveReadonly(boolean readOnly, AbstractComponentContainer layout) {
+        for(Component c : layout){
+            c.setReadOnly(readOnly);
+            if(c instanceof AbstractComponentContainer){
+                recursiveReadonly(readOnly, layout);
+            }
+        }
     }
 
     /**
