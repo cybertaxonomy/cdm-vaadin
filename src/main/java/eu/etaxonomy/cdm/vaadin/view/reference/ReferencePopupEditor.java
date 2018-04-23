@@ -109,25 +109,24 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addField(typeSelect, "type", 3, row);
         grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
+
         SwitchableTextField titleCacheField = addSwitchableTextField("Reference cache", "titleCache", "protectedTitleCache", 0, row, GRID_COLS-1, row);
         titleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
+
         SwitchableTextField abbrevTitleCacheField = addSwitchableTextField("Abbrev. cache", "abbrevTitleCache", "protectedAbbrevTitleCache", 0, row, GRID_COLS-1, row);
         abbrevTitleCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
+
         titleField = addTextField("Title", "title", 0, row, GRID_COLS-1, row);
         titleField.setWidth(100, Unit.PERCENTAGE);
         row++;
         addTextField("Nomenclatural title", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
+
         authorshipField = new TeamOrPersonField("Author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.BIBLIOGRAPHIC_TITLE);
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, 3, row);
-        row++;
-        addTextField("Series", "seriesPart", 0, row);
-        addTextField("Volume", "volume", 1, row);
-        addTextField("Pages", "pages", 2, row);
-        addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
 
         inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
@@ -148,12 +147,20 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             });
         addField(inReferenceCombobox, "inReference", 0, row, 3, row);
         row++;
+
+        addTextField("Series", "seriesPart", 0, row);
+        addTextField("Volume", "volume", 1, row);
+        addTextField("Pages", "pages", 2, row);
+        addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
+
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
         publisherField.setWidth(100, Unit.PERCENTAGE);
         TimePeriodField timePeriodField = new TimePeriodField("Date published");
         addField(timePeriodField, "datePublished");
         row++;
+
         addTextField("ISSN", "issn", 0, row);
         addTextField("ISBN", "isbn", 1, row);
         TextFieldNFix doiField = new TextFieldNFix("DOI");
