@@ -9,6 +9,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
 
 /**
  * Provides generic save operations of modified cdm entities.
@@ -17,18 +18,16 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, V extends ApplicationView<?>> extends CdmEditorPresenterBase<CDM, CDM, V> {
+public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityDecoraterDTO<CDM>, CDM extends CdmBase, V extends ApplicationView<?>> extends CdmEditorPresenterBase<DTO, CDM, V> {
 
     private static final long serialVersionUID = -6315824180341694825L;
 
-    @Override
-    protected CDM createDTODecorator(CDM cdmEntitiy) {
-        return cdmEntitiy;
-    }
 
     @Override
-    protected CDM cdmEntity(CDM dto) {
-        return dto;
+    protected CDM cdmEntity(DTO dto) {
+        return dto.cdmEntity();
     }
+
+
 
 }
