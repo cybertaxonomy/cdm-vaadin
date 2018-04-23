@@ -45,13 +45,14 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ReloadableSelect;
-import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 
 /**
@@ -61,7 +62,7 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
  */
 @SpringComponent
 @Scope("prototype")
-public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonName, TaxonNamePopupEditorView> {
+public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNamePopupEditorView> {
 
 
     private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList(
@@ -236,7 +237,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
     }
 
     @Override
-    protected TaxonName handleTransientProperties(TaxonName bean) {
+    protected TaxonNameDTO handleTransientProperties(TaxonNameDTO dto) {
+
+        TaxonName bean = cdmEntity(dto);
 
         logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
 
@@ -274,7 +277,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 bean.addBasionym(addBasionymName);
             }
         }
-        return bean;
+        return dto;
     }
 
     /**
@@ -407,6 +410,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmEditorPresenter<TaxonNa
                 .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(null);
         basionymNamePopup.getBasionymToggle().setVisible(false);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TaxonNameDTO createDTODecorator(TaxonName cdmEntitiy) {
+        return new TaxonNameDTO(cdmEntitiy);
     }
 
 

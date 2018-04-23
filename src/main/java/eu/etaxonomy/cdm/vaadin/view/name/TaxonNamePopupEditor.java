@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
@@ -49,7 +50,7 @@ import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
-import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 
 /**
  * @author a.kohlbecker
@@ -58,7 +59,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
+public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
 
@@ -115,7 +116,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
      * @param dtoType
      */
     public TaxonNamePopupEditor() {
-        super(new GridLayout(GRID_COLS, GRID_ROWS), TaxonName.class);
+        super(new GridLayout(GRID_COLS, GRID_ROWS), TaxonNameDTO.class);
     }
 
     /**
@@ -380,7 +381,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
     @Override
     protected void afterItemDataSourceSet() {
-        TaxonName taxonName = getBean();
+        TaxonNameDTO taxonName = getBean();
         boolean showBasionymSection = taxonName.getBasionyms().size() > 0
                 || taxonName.getBasionymAuthorship() != null
                 || taxonName.getExBasionymAuthorship() != null;
@@ -422,7 +423,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
     @Override
     public void updateAuthorshipFields() {
 
-        TaxonName taxonName = getBean();
+        TaxonNameDTO taxonName = getBean();
 
         // ------------- CombinationAuthors
         isInferredCombinationAuthorship = updateAuthorshipFieldData(
@@ -527,7 +528,7 @@ public class TaxonNamePopupEditor extends AbstractCdmPopupEditor<TaxonName, Taxo
 
         // TODO use getField() instead and remove field references
 
-        TaxonName taxonName = getBean();
+        TaxonNameDTO taxonName = getBean();
         Rank rank = taxonName.getRank();
 
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
