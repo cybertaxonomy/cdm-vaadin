@@ -49,7 +49,7 @@ import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
-import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
+import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;

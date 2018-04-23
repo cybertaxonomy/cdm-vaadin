@@ -86,8 +86,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
     /**
      * Walks the entity graph of the Registration instance and collects all authorities which
      * could have been granted to users. Code parts in which this could have happened can be
-     * found by searching for usage of the methods {@link eu.etaxonomy.cdm.vaadin.security.UserHelper#createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)
-     * UserHelper.createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)} and {@link eu.etaxonomy.cdm.vaadin.security.UserHelper#createAuthorityForCurrentUser(Class, Integer, EnumSet, String)
+     * found by searching for usage of the methods {@link eu.etaxonomy.cdm.vaadin.permission.UserHelper#createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)
+     * UserHelper.createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)} and {@link eu.etaxonomy.cdm.vaadin.permission.UserHelper#createAuthorityForCurrentUser(Class, Integer, EnumSet, String)
      * UserHelper.createAuthorityForCurrentUser(Class, Integer, EnumSet, String)}
      * <p>
      * At the time of implementing this function these places are:

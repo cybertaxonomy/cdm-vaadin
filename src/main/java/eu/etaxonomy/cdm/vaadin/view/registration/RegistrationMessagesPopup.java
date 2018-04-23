@@ -31,7 +31,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.ext.registration.messages.Message;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupView;
 

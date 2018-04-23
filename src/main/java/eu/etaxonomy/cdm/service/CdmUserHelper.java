@@ -38,8 +38,8 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthorityParsingException;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.ICdmPermissionEvaluator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
-import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
-import eu.etaxonomy.cdm.vaadin.security.VaadinUserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 
 /**
  * @author a.kohlbecker

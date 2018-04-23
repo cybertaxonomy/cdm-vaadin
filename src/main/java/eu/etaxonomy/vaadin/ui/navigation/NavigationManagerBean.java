@@ -26,8 +26,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
-import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;

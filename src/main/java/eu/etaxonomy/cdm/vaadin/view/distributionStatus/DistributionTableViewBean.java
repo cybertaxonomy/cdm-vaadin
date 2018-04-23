@@ -53,7 +53,7 @@ import eu.etaxonomy.cdm.vaadin.component.distributionStatus.HelpWindow;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
 import eu.etaxonomy.cdm.vaadin.event.error.HibernateExceptionHandler;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;

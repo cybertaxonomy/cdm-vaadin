@@ -54,7 +54,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
-import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 
 /**
  *
