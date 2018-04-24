@@ -142,7 +142,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         personButton.setDescription("Add person");
         teamButton.addClickListener(e -> {
             setValue(Team.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
-            // updateToolBarButtonStates();
         });
         teamButton.setDescription("Add team");
 
