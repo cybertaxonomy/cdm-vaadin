@@ -21,7 +21,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Layout;
+import com.vaadin.ui.HasComponents;
 
 /**
  * TODO implement height methods for full component size support
@@ -34,6 +34,8 @@ import com.vaadin.ui.Layout;
  */
 @SuppressWarnings("serial")
 public abstract class CompositeCustomField<T> extends CustomField<T> implements NestedFieldGroup {
+
+    protected static final String READ_ONLY_CAPTION_SUFFIX = " (read only)";
 
     private List<Component> styledComponents = new ArrayList<>();
 
@@ -217,15 +219,19 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     /**
      * @param readOnly
      */
-    protected void setDeepReadOnly(boolean readOnly, Component component) {
+    protected void setDeepReadOnly(boolean readOnly, Component component, Collection<Component> ignore) {
+
+        if(ignore != null && ignore.contains(component)){
+            return;
+        }
 
         component.setReadOnly(readOnly);
         if(Button.class.isAssignableFrom(component.getClass())){
             component.setEnabled(!readOnly);
         }
-        if(Layout.class.isAssignableFrom(component.getClass())){
-            for(Component nestedComponent : ((Layout)component)){
-                setDeepReadOnly(readOnly, nestedComponent);
+        if(HasComponents.class.isAssignableFrom(component.getClass())){
+            for(Component nestedComponent : ((HasComponents)component)){
+                setDeepReadOnly(readOnly, nestedComponent, ignore);
             }
         }
     }
@@ -234,6 +240,14 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     public String toString(){
         return this.getClass().getSimpleName() + ": " +
                 ( getValue() != null ? getValue() : "null");
+    }
+
+    protected void updateCaptionReadonlyNotice() {
+        if(isReadOnly()){
+            setCaption(getCaption() + READ_ONLY_CAPTION_SUFFIX);
+        } else {
+            setCaption(getCaption().replace(READ_ONLY_CAPTION_SUFFIX, ""));
+        }
     }
 
 }

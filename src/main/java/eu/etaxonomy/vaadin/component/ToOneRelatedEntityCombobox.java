@@ -199,7 +199,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        setDeepReadOnly(readOnly, getContent(), null);
     }
 
 

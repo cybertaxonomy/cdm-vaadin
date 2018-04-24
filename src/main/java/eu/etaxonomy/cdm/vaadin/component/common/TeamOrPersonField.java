@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -203,8 +204,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
                 nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
                 fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+                boolean readonlyState = personsListEditor.isReadOnly();
                 fieldGroup.bind(personsListEditor, "teamMembers"); // here personField is set readonly since setTeamMembers does not exist
-                personsListEditor.setReadOnly(false); // fixing the readonly state
+                personsListEditor.setReadOnly(readonlyState); // fixing the readonly state
 
                 personsListEditor.registerParentFieldGroup(fieldGroup);
 
@@ -213,8 +215,22 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             }
 
         }
-
+        adaptToUserPermissions(newValue);
         updateToolBarButtonStates();
+    }
+
+
+    private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
+
+        if(teamOrPerson == null){
+            return;
+        }
+
+        UserHelper userHelper = UserHelper.fromSession();
+        boolean canEdit = userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
+        if(!canEdit){
+            setContentReadOnly(true);
+        }
     }
 
     private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
@@ -346,7 +362,18 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        setContentReadOnly(readOnly);
+    }
+
+    /**
+     * Set the nested team or person to read only but keep the state of the <code>TeamOrPersonField</code> untouched so
+     * that the <code>removeButton</code>, <code>personButton</code> and <code>teamButton</code> can stay operational.
+     *
+     * @param readOnly
+     */
+    public void setContentReadOnly(boolean readOnly) {
+        setDeepReadOnly(readOnly, getContent(), Arrays.asList(removeButton, personButton, teamButton));
+        updateCaptionReadonlyNotice();
     }
 
 

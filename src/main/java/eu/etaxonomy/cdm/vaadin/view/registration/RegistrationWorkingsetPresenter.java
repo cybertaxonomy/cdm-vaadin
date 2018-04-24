@@ -347,8 +347,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
         popup.loadInEditor(event.getEntityUuid());
-        if(event.getSourceComponent() != null){
-            popup.setReadOnly(event.getSourceComponent().isReadOnly());
+        if(event.getSourceComponent() != null && event.getSourceComponent().isReadOnly()){
+            // avoid resetting readonly to false
+            popup.setReadOnly(true);
         }
 
     }

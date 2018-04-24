@@ -625,7 +625,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        setDeepReadOnly(readOnly, getContent(), null);
         updateButtonStates();
     }
 
