@@ -135,9 +135,8 @@ public class PersonField extends CompositeCustomField<Person> {
      *
      */
     private void checkUserPermissions(Person newValue) {
-        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        boolean isUnsavedEnitity = newValue.getId() == 0;
-        setEnabled(isUnsavedEnitity || userCanEdit);
+        boolean userCanEdit = newValue == null || !newValue.isPersited() || UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+        setEnabled(userCanEdit);
     }
 
     private void setMode(Mode mode){

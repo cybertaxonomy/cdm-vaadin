@@ -139,8 +139,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // TODO remove from nested fields
         updateValue();
         updateButtonStates();
-
     }
+
 
     /**
      * @param field
@@ -184,7 +184,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         List<V> beanList = getValue();
         beanList.clear();
         beanList.addAll(nestedValues);
-        setInternalValue(beanList, false);
+        setInternalValue(beanList);
     }
 
     /**
@@ -216,12 +216,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     protected void setInternalValue(List<V> newValue) {
 
-        setInternalValue(newValue, true);
-
-    }
-
-    protected void setInternalValue(List<V> newValue, boolean doUpdateFields) {
-
         super.setInternalValue(newValue);
 
         if(valueInitiallyWasNull == null){
@@ -231,12 +225,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         if(newValue != null){
             // newValue is already converted, need to use the original value from the data source
             boolean isListType = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+            // if(valueInitiallyWasNull && isOrderedCollection != isListType){
             if(valueInitiallyWasNull && isOrderedCollection != isListType){
                 // need to reset the grid in this case, so that the button groups are created correctly
                 grid.setRows(1);
                 grid.removeAllComponents();
             }
             isOrderedCollection = isListType;
+        } else {
+            // reset the grid
+            grid.removeAllComponents();
+            grid.setRows(1);
         }
 
         if(!creatingFields){

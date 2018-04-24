@@ -98,6 +98,12 @@ public class SwitchableTextField extends CompositeCustomField<String> {
         textField.setEnabled(unlockSwitch.getValue());
     }
 
+    public void unbindFrom(FieldGroup fieldGroup){
+        fieldGroup.unbind(textField);
+        fieldGroup.unbind(unlockSwitch);
+        textField.setEnabled(false);
+    }
+
     /**
      * {@inheritDoc}
      */

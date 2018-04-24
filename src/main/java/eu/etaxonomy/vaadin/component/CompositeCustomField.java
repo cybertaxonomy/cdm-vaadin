@@ -41,6 +41,21 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
 
     private List<Component> sizedComponents = new ArrayList<>();
 
+    private CommitHandler commitHandler = new CommitHandler() {
+
+        @Override
+        public void preCommit(CommitEvent commitEvent) throws CommitException {
+            // commit the nested bean(s) first
+            if(getFieldGroup() != null){
+                getFieldGroup().commit();
+            }
+        }
+
+        @Override
+        public void postCommit(CommitEvent commitEvent) throws CommitException {
+            // noting to do
+        }};
+
     protected List<Component> getStyledComponents() {
         if(styledComponents == null){
             styledComponents = new ArrayList<>();
@@ -190,21 +205,12 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
 
     @Override
     public void registerParentFieldGroup(FieldGroup parent) {
-        parent.addCommitHandler(new CommitHandler() {
+        parent.addCommitHandler(commitHandler);
+    }
 
-            @Override
-            public void preCommit(CommitEvent commitEvent) throws CommitException {
-                // commit the nested bean(s) first
-                if(getFieldGroup() != null){
-                    getFieldGroup().commit();
-                }
-            }
-
-            @Override
-            public void postCommit(CommitEvent commitEvent) throws CommitException {
-                // noting to do
-            }}
-       );
+    @Override
+    public void unregisterParentFieldGroup(FieldGroup parent) {
+        parent.removeCommitHandler(commitHandler);
     }
 
     /**
