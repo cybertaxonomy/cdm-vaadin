@@ -228,19 +228,21 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             // if(valueInitiallyWasNull && isOrderedCollection != isListType){
             if(valueInitiallyWasNull && isOrderedCollection != isListType){
                 // need to reset the grid in this case, so that the button groups are created correctly
-                grid.setRows(1);
-                grid.removeAllComponents();
+                clearRows();
             }
             isOrderedCollection = isListType;
         } else {
-            // reset the grid
-            grid.removeAllComponents();
-            grid.setRows(1);
+            clearRows();
         }
 
         if(!creatingFields){
             createFieldsForData();
         }
+    }
+
+    private void clearRows() {
+        grid.removeAllComponents();
+        grid.setRows(1);
     }
 
     private void createFieldsForData(){
