@@ -214,15 +214,6 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setReadOnly(boolean readOnly) {
-        super.setReadOnly(readOnly);
-        // setDeepReadOnly(readOnly, getContent());
-    }
-
-    /**
      * @param readOnly
      */
     protected void setDeepReadOnly(boolean readOnly, Component component, Collection<Component> ignore) {
@@ -248,8 +239,8 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
                 ( getValue() != null ? getValue() : "null");
     }
 
-    protected void updateCaptionReadonlyNotice() {
-        if(isReadOnly()){
+    protected void updateCaptionReadonlyNotice(boolean readOnly) {
+        if(readOnly){
             setCaption(getCaption() + READ_ONLY_CAPTION_SUFFIX);
         } else {
             setCaption(getCaption().replace(READ_ONLY_CAPTION_SUFFIX, ""));

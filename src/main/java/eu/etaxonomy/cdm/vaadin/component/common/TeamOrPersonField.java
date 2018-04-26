@@ -80,6 +80,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private TeamOrPersonBaseCaptionGenerator.CacheType cacheType;
 
+    protected List<Component> editorComponents = Arrays.asList(removeButton, personButton, teamButton, teamOrPersonSelect);
+
     public TeamOrPersonField(String caption, TeamOrPersonBaseCaptionGenerator.CacheType cacheType){
 
         setCaption(caption);
@@ -123,25 +125,27 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
         selectConfirmButton.addClickListener(e -> {
             // new entitiy being set, reset the readonly state
-            resetReadOnlyComponents();
-            setValue(teamOrPersonSelect.getValue());
+//            resetReadOnlyComponents();
+//            getPropertyDataSource().setReadOnly(false);
+            setValue(teamOrPersonSelect.getValue(), false, true);
             teamOrPersonSelect.clear();
             updateToolBarButtonStates();
         });
         removeButton.addClickListener(e -> {
-            resetReadOnlyComponents();
-            setValue(null);
+//            resetReadOnlyComponents();
+//            getPropertyDataSource().setReadOnly(false);
+            setValue(null, false, true);
             updateToolBarButtonStates();
         });
         removeButton.setDescription("Remove");
 
         personButton.addClickListener(e -> {
-            setValue(Person.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            setValue(Person.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
 
         });
         personButton.setDescription("Add person");
         teamButton.addClickListener(e -> {
-            setValue(Team.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            setValue(Team.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
         });
         teamButton.setDescription("Add team");
 
@@ -243,14 +247,11 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
 
-        if(teamOrPerson == null){
-            return;
-        }
-
         UserHelper userHelper = UserHelper.fromSession();
-        boolean canEdit = !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
+        boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
-            setReadOnlyComponents(true);
+            getPropertyDataSource().setReadOnly(true);
+            //setReadOnlyComponents(true); will be set later on automatically by vaadin
         }
     }
 
@@ -382,8 +383,16 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      */
     @Override
     public void setReadOnly(boolean readOnly) {
-        super.setReadOnly(readOnly);
+//        super.setReadOnly(readOnly); // moved into setEditorReadOnly()
         setReadOnlyComponents(readOnly);
+    }
+
+    public void setEditorReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        for(Component c : editorComponents){
+            c.setReadOnly(readOnly);
+        }
+
     }
 
     /**
@@ -403,9 +412,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      *
      * @param readOnly
      */
-    public void setReadOnlyComponents(boolean readOnly) {
-        setDeepReadOnly(readOnly, getContent(), Arrays.asList(removeButton, personButton, teamButton, teamOrPersonSelect));
-        updateCaptionReadonlyNotice();
+    protected void setReadOnlyComponents(boolean readOnly) {
+        setDeepReadOnly(readOnly, getContent(), editorComponents);
+        updateCaptionReadonlyNotice(readOnly);
     }
 
 

@@ -668,6 +668,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         boolean basionymToggleReadonly = basionymToggle.isReadOnly();
         boolean validationToggleReadonly = validationToggle.isReadOnly();
         super.setReadOnly(readOnly);
+        combinationAuthorshipField.setEditorReadOnly(readOnly);
+        exCombinationAuthorshipField.setEditorReadOnly(readOnly);
+        basionymAuthorshipField.setEditorReadOnly(readOnly);
+        exBasionymAuthorshipField.setEditorReadOnly(readOnly);
         // preserve old readonly states if they were true
         if(basionymToggleReadonly){
             basionymToggle.setReadOnly(true);
