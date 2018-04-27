@@ -152,19 +152,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
                 "status.type",
 
-                "combinationAuthorship.teamMembers",
-                "exCombinationAuthorship.teamMembers",
-                "basionymAuthorship.teamMembers",
-                "exBasionymAuthorship.teamMembers",
+                "combinationAuthorship",
+                "exCombinationAuthorship",
+                "basionymAuthorship",
+                "exBasionymAuthorship",
 
                 // basionyms: relationsToThisName.fromName
                 "relationsToThisName.type",
                 "relationsToThisName.fromName.rank",
-                "relationsToThisName.fromName.combinationAuthorship.teamMembers",
-                "relationsToThisName.fromName.exCombinationAuthorship.teamMembers",
-                "relationsToThisName.fromName.nomenclaturalReference.authorship.teamMembers",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship.teamMembers",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship.teamMembers",
+                "relationsToThisName.fromName.combinationAuthorship",
+                "relationsToThisName.fromName.exCombinationAuthorship",
+                "relationsToThisName.fromName.nomenclaturalReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
 

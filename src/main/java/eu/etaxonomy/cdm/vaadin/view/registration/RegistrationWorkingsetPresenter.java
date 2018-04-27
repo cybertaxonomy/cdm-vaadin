@@ -102,10 +102,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     private static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(
             "$",
             "blockedBy",
-            "name.combinationAuthorship.teamMembers",
-            "name.exCombinationAuthorship.teamMembers",
-            "name.basionymAuthorship.teamMembers",
-            "name.exBasionymAuthorship.teamMembers"
+            "name.combinationAuthorship",
+            "name.exCombinationAuthorship",
+            "name.basionymAuthorship",
+            "name.exBasionymAuthorship"
             );
 
     private static final long serialVersionUID = 1L;

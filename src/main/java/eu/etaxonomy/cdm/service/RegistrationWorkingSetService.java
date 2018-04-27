@@ -100,7 +100,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
           "gatheringEvent.$",
           "gatheringEvent.country",
           "gatheringEvent.collectingAreas",
-          "gatheringEvent.actor.teamMembers",
+          "gatheringEvent.actor",
           "derivationEvents.derivatives" // important, otherwise the DerivedUnits are not included into the graph of initialized entities!!!
   });
 
