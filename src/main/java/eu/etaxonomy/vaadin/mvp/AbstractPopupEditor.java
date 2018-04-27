@@ -10,8 +10,10 @@ package eu.etaxonomy.vaadin.mvp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -42,6 +44,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Layout.MarginHandler;
 import com.vaadin.ui.Notification;
@@ -93,6 +96,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private CssLayout toolBar = new CssLayout();
 
     private CssLayout toolBarButtonGroup = new CssLayout();
+
+    private Label statusMessageLabel = new Label();
+
+    Set<String> statusMessages = new HashSet<>();
 
     private GridLayout _gridLayoutCache;
 
@@ -161,7 +168,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
-        mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
+        statusMessageLabel.setWidthUndefined();
+
+        mainLayout.addComponents(toolBar, fieldLayout, statusMessageLabel, buttonLayout);
+        mainLayout.setComponentAlignment(statusMessageLabel, Alignment.BOTTOM_RIGHT);
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
 
         updateToolBarVisibility();
@@ -206,7 +216,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         for(Component c : layout){
             c.setReadOnly(readOnly);
             if(c instanceof AbstractComponentContainer){
-                recursiveReadonly(readOnly, layout);
+                recursiveReadonly(readOnly, (AbstractComponentContainer)c);
             }
         }
     }
@@ -596,6 +606,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         gridLayout().addComponent(component, column1, row1, column2, row2);
     }
 
+    public void setSaveButtonEnabled(boolean enabled){
+        save.setEnabled(enabled);
+    }
 
     public void withDeleteButton(boolean withDelete){
 
@@ -609,6 +622,30 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         delete.setVisible(withDelete);
     }
 
+    public boolean addStatusMessage(String message){
+        boolean returnVal = statusMessages.add(message);
+        updateStatusLabel();
+        return returnVal;
+    }
+
+    public boolean removeStatusMessage(String message){
+        boolean returnVal = statusMessages.remove(message);
+        updateStatusLabel();
+        return returnVal;
+    }
+
+    /**
+     *
+     */
+    private void updateStatusLabel() {
+        String text = "";
+        for(String s : statusMessages){
+            text += s + " ";
+        }
+        statusMessageLabel.setValue(text);
+        statusMessageLabel.setVisible(!text.isEmpty());
+        statusMessageLabel.addStyleName(ValoTheme.LABEL_COLORED);
+    }
 
     // ------------------------ data binding ------------------------ //
 

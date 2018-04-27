@@ -50,6 +50,11 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
     /**
+     *
+     */
+    private static final String CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING = "Can't save as long as type designations are missing.";
+
+    /**
      * @param layout
      * @param dtoType
      */
@@ -182,6 +187,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
+        typeDesignationsCollectionField.addElementAddedListener( e -> updateAllowSave());
+        typeDesignationsCollectionField.addElementRemovedListener( e -> updateAllowSave());
 
         // typeDesignationsCollectionField.getLayout().setMargin(false);
         // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
@@ -280,6 +287,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
         updateAllowDelete();
+        updateAllowSave();
     }
 
     /**
@@ -294,6 +302,17 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
             gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);
         }
+    }
+
+    public void updateAllowSave(){
+        boolean hasTypeDesignations = getBean().getSpecimenTypeDesignationDTOs().size() > 0;
+        setSaveButtonEnabled(hasTypeDesignations);
+        if(!hasTypeDesignations){
+            addStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
+        } else {
+            removeStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
+        }
+
     }
 
     /**
