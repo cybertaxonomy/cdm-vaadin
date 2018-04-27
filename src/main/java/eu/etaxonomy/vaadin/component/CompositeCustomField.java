@@ -222,14 +222,25 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
             return;
         }
 
-        component.setReadOnly(readOnly);
-        if(Button.class.isAssignableFrom(component.getClass())){
-            component.setEnabled(!readOnly);
-        }
+        applyReadOnlyState(component, readOnly);
         if(HasComponents.class.isAssignableFrom(component.getClass())){
             for(Component nestedComponent : ((HasComponents)component)){
                 setDeepReadOnly(readOnly, nestedComponent, ignore);
             }
+        }
+    }
+
+    /**
+     * Sets the readonly state for the component but treats Buttons differently.
+     * Buttons are also set to disabled to make them inactive.
+
+     * @param readOnly
+     * @param component
+     */
+    protected void applyReadOnlyState(Component component, boolean readOnly) {
+        component.setReadOnly(readOnly);
+        if(Button.class.isAssignableFrom(component.getClass())){
+            component.setEnabled(!readOnly);
         }
     }
 

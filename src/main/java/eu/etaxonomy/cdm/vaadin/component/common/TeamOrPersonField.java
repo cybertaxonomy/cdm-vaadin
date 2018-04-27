@@ -390,7 +390,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     public void setEditorReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         for(Component c : editorComponents){
-            c.setReadOnly(readOnly);
+            applyReadOnlyState(c, readOnly);
         }
 
     }
