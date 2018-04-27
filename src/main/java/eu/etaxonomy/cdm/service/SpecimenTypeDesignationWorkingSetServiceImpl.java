@@ -66,12 +66,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     }
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
-            "name.$",
-            "name.nomenclaturalReference.authorship",
-            "name.nomenclaturalReference.inReference",
-            "name.rank",
-            "name.status.type",
-            "name.typeDesignations"
+            "$",
+            "nomenclaturalReference.authorship",
+            "nomenclaturalReference.inReference.authorship",
+            "nomenclaturalReference.inReference.inReference.authorship",
+            "status.type",
+            "typeDesignations"
             }
     );
 
