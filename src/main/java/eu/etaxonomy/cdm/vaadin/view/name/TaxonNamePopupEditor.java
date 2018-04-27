@@ -527,13 +527,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private void updateFieldVisibility() {
 
         // TODO use getField() instead and remove field references
-
-        TaxonNameDTO taxonName = getBean();
-        Rank rank = taxonName.getRank();
+        Rank rank = (Rank) rankSelect.getValue();
 
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
         Boolean withBasionym = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidation = BooleanUtils.isTrue(validationToggle.getValue());
+
+        specificEpithetField.setVisible(isSpeciesOrBelow);
+        infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
+        infraGenericEpithetField.setVisible(rank.isInfraGeneric());
+
 
         basionymAuthorshipField.setVisible(withBasionym != null && withBasionym);
         exBasionymAuthorshipField.setVisible(withBasionym);
