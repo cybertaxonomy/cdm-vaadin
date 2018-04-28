@@ -8,7 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.name;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -18,8 +21,10 @@ import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Credit;
 import eu.etaxonomy.cdm.model.common.Extension;
 import eu.etaxonomy.cdm.model.common.Identifier;
+import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.HomotypicalGroup;
+import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -67,16 +72,42 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
         return name.getAuthorshipCache();
     }
 
-    public TaxonName getBasionym() {
-        return name.getBasionym();
-    }
-
     public TeamOrPersonBase<?> getBasionymAuthorship() {
         return name.getBasionymAuthorship();
     }
 
     public Set<TaxonName> getBasionyms() {
-        return name.getBasionyms();
+        return name.getRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM());
+    }
+
+    public void setBasionyms(Set<TaxonName> basionyms) {
+        setRelatedTaxa(Direction.relatedTo, NameRelationshipType.BASIONYM(), basionyms);
+    }
+
+    /**
+     * @param basionyms
+     * @param relType
+     * @param direction
+     */
+    protected void setRelatedTaxa(Direction direction, NameRelationshipType relType, Set<TaxonName> basionyms) {
+        Map<Integer, TaxonName> currentBasionymUuids = new HashMap<>();
+        Set<Integer> basionymsSeen = new HashSet<>();
+
+        for(TaxonName tn : name.getRelatedNames(direction, relType)){
+            currentBasionymUuids.put(tn.getId(), tn);
+        }
+        for(TaxonName tn : basionyms){
+            if(!currentBasionymUuids.containsKey(tn.getId())){
+                name.addBasionym(tn);
+            } else {
+                basionymsSeen.add(tn.getId());
+            }
+        }
+        for(TaxonName tn : basionyms){
+            if(!basionymsSeen.contains(tn.getId())){
+                name.removeRelationWithTaxonName(tn, direction, relType);
+            }
+        }
     }
 
     public TeamOrPersonBase<?> getCombinationAuthorship() {
