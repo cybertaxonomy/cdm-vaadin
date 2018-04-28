@@ -158,7 +158,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         typifiedNamesComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
         typifiedNamesComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
-        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help
+        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
 
         row++;
         citationCombobox = new ToOneRelatedEntityCombobox<Reference>("Citation", Reference.class);
