@@ -8,10 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.name;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -90,21 +88,20 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
      * @param direction
      */
     protected void setRelatedTaxa(Direction direction, NameRelationshipType relType, Set<TaxonName> basionyms) {
-        Map<Integer, TaxonName> currentBasionymUuids = new HashMap<>();
-        Set<Integer> basionymsSeen = new HashSet<>();
+        Set<TaxonName> currentBasionyms = new HashSet<>();
+        Set<TaxonName> basionymsSeen = new HashSet<>();
 
         for(TaxonName tn : name.getRelatedNames(direction, relType)){
-            currentBasionymUuids.put(tn.getId(), tn);
+            currentBasionyms.add(tn);
         }
         for(TaxonName tn : basionyms){
-            if(!currentBasionymUuids.containsKey(tn.getId())){
+            if(!currentBasionyms.contains(tn)){
                 name.addBasionym(tn);
-            } else {
-                basionymsSeen.add(tn.getId());
             }
+            basionymsSeen.add(tn);
         }
-        for(TaxonName tn : basionyms){
-            if(!basionymsSeen.contains(tn.getId())){
+        for(TaxonName tn : currentBasionyms){
+            if(!basionymsSeen.contains(tn)){
                 name.removeRelationWithTaxonName(tn, direction, relType);
             }
         }

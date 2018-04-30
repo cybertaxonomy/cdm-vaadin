@@ -549,12 +549,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
         }
         //
+         */
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
-        if(getValue().isEmpty() && valueInitiallyWasNull){
-            setPropertyDataSource(null);
-        }
-         */
+//        if(getValue().isEmpty() && valueInitiallyWasNull){
+//            setPropertyDataSource(null);
+//        }
     }
 
     /**

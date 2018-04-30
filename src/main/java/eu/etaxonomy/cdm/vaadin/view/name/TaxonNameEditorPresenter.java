@@ -10,9 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -28,7 +26,6 @@ import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.TermType;
-import eu.etaxonomy.cdm.model.name.NameRelationship;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
@@ -239,11 +236,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     @Override
     protected TaxonNameDTO handleTransientProperties(TaxonNameDTO dto) {
 
-        TaxonName bean = cdmEntity(dto);
 
         logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
 
+        /*
+        dto.updateTargetEntity();
 
+        TaxonName bean = cdmEntity(dto);
         List<TaxonName> newBasionymNames = getView().getBasionymComboboxSelect().getValueFromNestedFields();
         Set<TaxonName> oldBasionyms = bean.getBasionyms();
         Set<TaxonName> updateBasionyms = new HashSet<>();
@@ -277,6 +276,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 bean.addBasionym(addBasionymName);
             }
         }
+        */
         return dto;
     }
 
