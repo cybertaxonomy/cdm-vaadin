@@ -34,7 +34,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 /**
  * @author cmathew
- * @date 10 Mar 2015
+ * @since 10 Mar 2015
  *
  */
 public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container.Hierarchical  {

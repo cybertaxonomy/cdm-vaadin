@@ -15,7 +15,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 /**
  * @author freimeier
- * @date 22.11.2017
+ * @since 22.11.2017
  *
  */
 public class TaxonNodeUuidTitleStringConverter extends UuidTitleStringConverter {

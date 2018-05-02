@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStat
 
 /**
  * @author alex
- * @date 22.04.2015
+ * @since 22.04.2015
  *
  */
 public class DistributionStatusSettingsConfigWindow

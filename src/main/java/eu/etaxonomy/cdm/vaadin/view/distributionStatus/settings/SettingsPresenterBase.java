@@ -15,7 +15,7 @@ import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionStatusSe
  * Note: This presenter is used for {@link DistributionStatusSettingsConfigWindow} AND {@link AreaAndTaxonSettingsConfigWindow}
  *
  * @author alex
- * @date 22.04.2015
+ * @since 22.04.2015
  *
  *
  */

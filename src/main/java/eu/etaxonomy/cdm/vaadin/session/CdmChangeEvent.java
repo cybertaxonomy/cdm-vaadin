@@ -14,7 +14,7 @@ import com.vaadin.ui.Component;
 
 /**
  * @author cmathew
- * @date 7 Apr 2015
+ * @since 7 Apr 2015
  *
  */
 public class CdmChangeEvent {

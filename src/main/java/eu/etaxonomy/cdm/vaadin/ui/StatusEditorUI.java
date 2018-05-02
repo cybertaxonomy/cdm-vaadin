@@ -22,7 +22,7 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.StatusComposite;
 
 /**
  * @author cmathew
- * @date 11 Mar 2015
+ * @since 11 Mar 2015
  *
  */
 @Theme("edit")

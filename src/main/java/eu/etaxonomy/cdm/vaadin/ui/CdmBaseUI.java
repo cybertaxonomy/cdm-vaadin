@@ -17,7 +17,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 
 /**
  * @author cmathew
- * @date 7 Apr 2015
+ * @since 7 Apr 2015
  *
  */
 public class CdmBaseUI extends UI {

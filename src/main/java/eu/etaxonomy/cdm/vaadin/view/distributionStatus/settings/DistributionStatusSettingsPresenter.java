@@ -19,7 +19,7 @@ import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 
 /**
  * @author a.mueller
- * @date 22.10.2017
+ * @since 22.10.2017
  *
  */
 public class DistributionStatusSettingsPresenter extends SettingsPresenterBase {

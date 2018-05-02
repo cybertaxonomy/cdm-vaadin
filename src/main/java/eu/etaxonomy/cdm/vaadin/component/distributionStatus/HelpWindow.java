@@ -26,7 +26,7 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 
 /**
  * @author freimeier
- * @date 9 Mar 2018
+ * @since 9 Mar 2018
  *
  */
 public class HelpWindow extends CustomComponent{

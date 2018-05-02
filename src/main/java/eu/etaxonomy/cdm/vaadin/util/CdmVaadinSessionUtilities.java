@@ -20,7 +20,7 @@ import eu.etaxonomy.cdm.vaadin.session.SelectionService;
 
 /**
  * @author cmathew
- * @date 7 Apr 2015
+ * @since 7 Apr 2015
  *
  */
 public class CdmVaadinSessionUtilities {

@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
  * @author a.mueller
- * @date 22.10.2017
+ * @since 22.10.2017
  *
  */
 public class AreaAndTaxonSettingsPresenter extends SettingsPresenterBase {

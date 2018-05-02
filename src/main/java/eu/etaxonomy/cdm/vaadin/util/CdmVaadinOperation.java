@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 
 /**
  * @author cmathew
- * @date 14 Apr 2015
+ * @since 14 Apr 2015
  *
  */
 public abstract class CdmVaadinOperation implements Runnable {

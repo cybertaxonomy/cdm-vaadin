@@ -12,7 +12,7 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 
 /**
  * @author cmathew
- * @date 8 Apr 2015
+ * @since 8 Apr 2015
  *
  */
 public class D3CTreeState extends JavaScriptComponentState {

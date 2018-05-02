@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 
 /**
  * @author cmathew
- * @date 1 Apr 2015
+ * @since 1 Apr 2015
  *
  */
 public class CdmQueryFactory {

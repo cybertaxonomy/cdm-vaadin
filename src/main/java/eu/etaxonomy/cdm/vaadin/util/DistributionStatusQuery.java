@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 
 /**
  * @author freimeier
- * @date 16.11.2017
+ * @since 16.11.2017
  *
  */
 
