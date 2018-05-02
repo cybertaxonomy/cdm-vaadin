@@ -102,6 +102,9 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
             currentRelatedNames.add(tn);
         }
         for(TaxonName tn : relatedNames){
+            if(tn == null){
+                continue;
+            }
             if(!currentRelatedNames.contains(tn)){
                 if(direction.equals(Direction.relatedTo)){
                     tn.addRelationshipToName(name, relType, null);
