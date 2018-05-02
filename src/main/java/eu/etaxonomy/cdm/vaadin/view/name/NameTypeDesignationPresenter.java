@@ -195,7 +195,7 @@ public class NameTypeDesignationPresenter
      * {@inheritDoc}
      */
     @Override
-    protected NameTypeDesignation handleTransientProperties(NameTypeDesignation bean) {
+    protected NameTypeDesignation preSaveBean(NameTypeDesignation bean) {
 
         // the typifiedNames can only be set on the name side, so we need to
         // handle changes explicitly here

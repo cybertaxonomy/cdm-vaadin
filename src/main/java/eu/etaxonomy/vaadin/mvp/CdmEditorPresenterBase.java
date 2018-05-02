@@ -191,15 +191,16 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
             pca.printEntityGraph(System.err);
             pca.printCopyEntities(System.err);
         }
-        dto = handleTransientProperties(dto);
 
         if(logger.isTraceEnabled()){
             PersistentContextAnalyzer pca = new PersistentContextAnalyzer(cdmEntity);
             pca.printEntityGraph(System.err);
             pca.printCopyEntities(System.err);
         }
+        EntityChangeEvent changeEvent = null;
         try {
-            EntityChangeEvent changeEvent = getStore().saveBean(cdmEntity, (AbstractView) getView());
+            dto = preSaveBean(dto);
+            changeEvent = getStore().saveBean(cdmEntity, (AbstractView) getView());
 
             if(changeEvent != null){
                 viewEventBus.publish(this, changeEvent);
@@ -209,52 +210,53 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
                 UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
             }
             throw e;
+        } finally {
+            postSaveBean(changeEvent);
         }
     }
 
     /**
-     * EditorPresenters for beans with transient properties should overwrite this method to
-     * update the beanItem with the changes made to the transient properties.
-     * <p>
-     * This is necessary because Vaadin MethodProperties are readonly when no setter is
-     * available. This can be the case with transient properties. Automatic updating
-     * of the property during the fieldGroup commit does not work in this case.
+     * This method is intended to be used for the following purposes:
+     * <ol>
+     *   <li>
+     *   EditorPresenters for beans with transient properties can overwrite this method to
+     *   update the beanItem with the changes made to the transient properties.
+     *   This can be necessary because Vaadin MethodProperties are readonly when no setter is
+     *   available. This can be the case with transient properties. Automatic updating
+     *   of the property during the fieldGroup commit does not work in this case.
+     *   Presenters, however, should <b>operate on DTOs instead, which can implement the missing setter</b>.</li>
      *
-     * @deprecated editors should operate on DTOs instead, remove this method if unused.
+     *   <li>When modifying a bi-directional relation between two instances the user would
+     *   need to have GrantedAuthorities for both sides of the relationship. This, however is not
+     *   always possible. As a temporary solution the user can be granted the missing authority just
+     *   for the time of saving the new relationship. You may also want to implement
+     *   {@link #postSaveBean(EntityChangeEvent)} in this case.
+     *   See {@link https://dev.e-taxonomy.eu/redmine/issues/7390 #7390}
+     *   </li>
+     * </ol>
+     *
      */
-    @Deprecated
-    protected DTO handleTransientProperties(DTO bean) {
-        // no need to handle transient properties in the generic case
+    protected DTO preSaveBean(DTO bean) {
+        // blank implementation, to be implemented by sub classes if needed
         return bean;
     }
-
-//    @Override
-//    protected DTO prepareAsFieldGroupDataSource(DTO bean){
-//        DTO mergedBean = getStore().mergedBean(bean);
-//        // DTO mergedBean = bean;
-//        return mergedBean;
-//    }
-
-//    /**
-//     * If the bean is contained in the session it is being updated by
-//     * doing an evict and merge. The fieldGroup is updated with the merged bean.
-//     *
-//     * @param bean
-//     *
-//     * @return The bean merged to the session or original bean in case a merge was not necessary.
-//     */
-//    private DTO mergedBean(DTO bean) {
-//        DTO mergedBean = getStore().mergedBean(bean);
-//        ((AbstractPopupEditor<DTO, AbstractCdmEditorPresenter<DTO, V>>)getView()).updateItemDataSource(mergedBean);
-//        return mergedBean;
-//
-//    }
 
     @Override
     protected
     final void saveBean(DTO bean){
         // blank implementation, since this is not needed in this or any sub class
         // see onEditorSaveEvent() instead
+    }
+
+    /**
+     * Called after saving the DTO to the persistent storage.
+     * This method is called in any case even if the save operation failed.
+     * See {@link  #postSaveBean(EntityChangeEvent)}.
+     *
+     * @param changeEvent may be null in case of errors during the save operation
+     */
+    protected void postSaveBean(EntityChangeEvent changeEvent) {
+        // blank implementation, to be implemented by sub classes if needed
     }
 
     @Override
