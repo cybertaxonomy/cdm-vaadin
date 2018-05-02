@@ -45,6 +45,8 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
 
     private TaxonName name;
 
+    private Set<TaxonName> persistedBasionyms;
+
     /**
      * @param entity
      */
@@ -75,11 +77,16 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
     }
 
     public Set<TaxonName> getBasionyms() {
-        return name.getRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM());
+        Set<TaxonName> basionyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM());
+        if(persistedBasionyms == null){
+            // remember the persisted state before starting to operate on the DTO
+            persistedBasionyms = basionyms;
+        }
+        return basionyms;
     }
 
     public void setBasionyms(Set<TaxonName> basionyms) {
-        setRelatedTaxa(Direction.relatedTo, NameRelationshipType.BASIONYM(), basionyms);
+        setRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM(), basionyms);
     }
 
     /**
@@ -87,24 +94,32 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
      * @param relType
      * @param direction
      */
-    protected void setRelatedTaxa(Direction direction, NameRelationshipType relType, Set<TaxonName> basionyms) {
-        Set<TaxonName> currentBasionyms = new HashSet<>();
-        Set<TaxonName> basionymsSeen = new HashSet<>();
+    protected void setRelatedNames(Direction direction, NameRelationshipType relType, Set<TaxonName> relatedNames) {
+        Set<TaxonName> currentRelatedNames = new HashSet<>();
+        Set<TaxonName> namesSeen = new HashSet<>();
 
         for(TaxonName tn : name.getRelatedNames(direction, relType)){
-            currentBasionyms.add(tn);
+            currentRelatedNames.add(tn);
         }
-        for(TaxonName tn : basionyms){
-            if(!currentBasionyms.contains(tn)){
-                name.addBasionym(tn);
+        for(TaxonName tn : relatedNames){
+            if(!currentRelatedNames.contains(tn)){
+                if(direction.equals(Direction.relatedTo)){
+                    tn.addRelationshipToName(name, relType, null);
+                } else {
+                    tn.addRelationshipFromName(name, relType, null);
+                }
             }
-            basionymsSeen.add(tn);
+            namesSeen.add(tn);
         }
-        for(TaxonName tn : currentBasionyms){
-            if(!basionymsSeen.contains(tn)){
+        for(TaxonName tn : currentRelatedNames){
+            if(!namesSeen.contains(tn)){
                 name.removeRelationWithTaxonName(tn, direction, relType);
             }
         }
+    }
+
+    public Set<TaxonName> persistedBasionyms(){
+        return persistedBasionyms;
     }
 
     public TeamOrPersonBase<?> getCombinationAuthorship() {
