@@ -255,11 +255,11 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
     }
 
-    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
-        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        setEnabled(userCanEdit);
-        personsListEditor.setEnabled(userCanEdit);
-    }
+//    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
+//        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+//        setEnabled(userCanEdit);
+//        personsListEditor.setEnabled(userCanEdit);
+//    }
 
     /**
      * {@inheritDoc}
@@ -298,29 +298,27 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         //need to commit the subfields propagation through the fielGroups is not enough
         personField.commit();
         personsListEditor.commit();
+        if(!getState(false).readOnly && getPropertyDataSource().isReadOnly()){
+            // the TeamOrPersonBase Editor (remove, addPerson, addTeam) is not readonly
+            // thus removing the TeamOrPerson is allowed. In case the datasource is readonly
+            // due to missing user grants for the TeamOrPerson it must be set to readWrite to
+            // make it possible to change the property of the parent
+            getPropertyDataSource().setReadOnly(false);
+        }
+
         super.commit();
+
+        if(hasNullContent()){
+            getPropertyDataSource().setValue(null);
+            setValue(null);
+        }
 
         TeamOrPersonBase<?> bean = getValue();
         if(bean != null && bean instanceof Team){
-
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved){
                 UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
-        }
-
-        if(hasNullContent()){
-            if(!getState(false).readOnly && getPropertyDataSource().isReadOnly()){
-                // the TeamOrPersonBase Editor (remove, addPerson, addTeam) is not readonly
-                // thus removing the TeamOrPerson is allowed. In case the datasource is readonly
-                // due to missing user grants for the TeamOrPerson it must be set to readWrite to
-                // before setting to null
-                getPropertyDataSource().setReadOnly(false);
-            }
-            getPropertyDataSource().setValue(null);
-            setValue(null);
-
-
         }
     }
 
