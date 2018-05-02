@@ -173,7 +173,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         super.onEditorPreSaveEvent(preSaveEvent);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     // @EventBusListenerMethod // already annotated at super class
     public void onEditorSaveEvent(EditorSaveEvent<DTO> saveEvent){
@@ -197,10 +196,10 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
             pca.printEntityGraph(System.err);
             pca.printCopyEntities(System.err);
         }
-        EntityChangeEvent changeEvent = null;
+        EntityChangeEvent<?> changeEvent = null;
         try {
             dto = preSaveBean(dto);
-            changeEvent = getStore().saveBean(cdmEntity, (AbstractView) getView());
+            changeEvent = getStore().saveBean(cdmEntity, (AbstractView<?>) getView());
 
             if(changeEvent != null){
                 viewEventBus.publish(this, changeEvent);
