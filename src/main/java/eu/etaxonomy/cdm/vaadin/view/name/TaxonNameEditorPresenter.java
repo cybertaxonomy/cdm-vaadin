@@ -85,8 +85,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
-    private BeanInstantiator<TaxonName> newBasionymNameInstantiator;
-
     private AbstractField<TaxonName> basionymSourceField;
 
     /**
@@ -231,53 +229,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
         }
-    }
-
-    @Override
-    protected TaxonNameDTO handleTransientProperties(TaxonNameDTO dto) {
-
-
-        logger.trace(this._toString() + ".onEditorSaveEvent - handling transient properties");
-
-        /*
-        dto.updateTargetEntity();
-
-        TaxonName bean = cdmEntity(dto);
-        List<TaxonName> newBasionymNames = getView().getBasionymComboboxSelect().getValueFromNestedFields();
-        Set<TaxonName> oldBasionyms = bean.getBasionyms();
-        Set<TaxonName> updateBasionyms = new HashSet<>();
-        Set<TaxonName> removeBasionyms = new HashSet<>();
-
-        for(TaxonName newB : newBasionymNames){
-            if(!oldBasionyms.contains(newB)){
-                updateBasionyms.add(newB);
-            }
-        }
-
-        for(TaxonName oldB : oldBasionyms){
-            if(!newBasionymNames.contains(oldB)){
-                removeBasionyms.add(oldB);
-            }
-        }
-        for(TaxonName removeBasionym :removeBasionyms){
-            Set<NameRelationship> removeRelations = new HashSet<NameRelationship>();
-            for (NameRelationship nameRelation : bean.getRelationsToThisName()){
-                if (nameRelation.getType().isBasionymRelation() && nameRelation.getFromName().equals(removeBasionym)){
-                    removeRelations.add(nameRelation);
-                }
-            }
-            for (NameRelationship relation : removeRelations){
-                bean.removeNameRelationship(relation);
-            }
-        }
-        getRepo().getSession().clear();
-        for(TaxonName addBasionymName :updateBasionyms){
-            if(addBasionymName != null){
-                bean.addBasionym(addBasionymName);
-            }
-        }
-        */
-        return dto;
     }
 
     /**
