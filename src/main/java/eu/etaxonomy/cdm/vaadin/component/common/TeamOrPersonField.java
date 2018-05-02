@@ -251,7 +251,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
             getPropertyDataSource().setReadOnly(true);
-            //setReadOnlyComponents(true); will be set later on automatically by vaadin
+            setReadOnlyComponents(true);
         }
     }
 
@@ -310,8 +310,16 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
 
         if(hasNullContent()){
+            if(!getState(false).readOnly && getPropertyDataSource().isReadOnly()){
+                // the TeamOrPersonBase Editor (remove, addPerson, addTeam) is not readonly
+                // thus removing the TeamOrPerson is allowed. In case the datasource is readonly
+                // due to missing user grants for the TeamOrPerson it must be set to readWrite to
+                // before setting to null
+                getPropertyDataSource().setReadOnly(false);
+            }
             getPropertyDataSource().setValue(null);
             setValue(null);
+
 
         }
     }
