@@ -65,7 +65,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 13;
+    private final static int GRID_ROWS = 15;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -91,7 +91,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private ToManyRelatedEntitiesComboboxSelect<TaxonName> basionymsComboboxSelect;
 
+    private ToManyRelatedEntitiesComboboxSelect<TaxonName> replacedSynonymsComboboxSelect;
+
     private CheckBox basionymToggle;
+
+    private CheckBox replacedSynonymsToggle;
 
     private CheckBox validationToggle;
 
@@ -238,6 +242,15 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
 
         row++;
+        replacedSynonymsToggle = new CheckBox("With replaced synonym");
+        replacedSynonymsToggle.addValueChangeListener(e -> {
+            boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+            replacedSynonymsComboboxSelect.setVisible(enable);
+        });
+        grid.addComponent(replacedSynonymsToggle, 2, row, 3, row);
+        grid.setComponentAlignment(replacedSynonymsToggle, Alignment.BOTTOM_LEFT);
+
+        row++;
         validationToggle = new CheckBox("Validation");
         validationToggle.addValueChangeListener(e -> {
                 boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
@@ -322,6 +335,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, lazyCombobox, this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
+
         row++;
         basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
@@ -331,7 +345,26 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
 
+        // ReplacedSynonyms
+        row++;
+        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Replaced synonyms");
+        replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        addField(replacedSynonymsComboboxSelect, "replacedSynonyms", 0, row, 3, row);
+        replacedSynonymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
+        replacedSynonymsComboboxSelect.withEditButton(true);
+        replacedSynonymsComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
+        replacedSynonymsComboboxSelect.setEditActionListener(e -> {
 
+            Object fieldValue = e.getSource().getValue();
+            UUID beanUuid = null;
+            if(fieldValue != null){
+                beanUuid = ((CdmBase)fieldValue).getUuid();
+
+            }
+            ReloadableLazyComboBox<TaxonName>  lazyCombobox = (ReloadableLazyComboBox<TaxonName>) e.getSource();
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, lazyCombobox, this));
+        });
+        grid.setComponentAlignment(replacedSynonymsComboboxSelect, Alignment.TOP_RIGHT);
 
         setAdvancedModeEnabled(true);
         registerAdvancedModeComponents(fullTitleCacheFiled, protectedNameCacheField);
@@ -381,10 +414,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     @Override
     protected void afterItemDataSourceSet() {
-        TaxonNameDTO taxonName = getBean();
-        boolean showBasionymSection = taxonName.getBasionyms().size() > 0
-                || taxonName.getBasionymAuthorship() != null
-                || taxonName.getExBasionymAuthorship() != null;
+        TaxonNameDTO taxonNameDTO = getBean();
+        boolean showBasionymSection = taxonNameDTO.getBasionyms().size() > 0
+                || taxonNameDTO.getBasionymAuthorship() != null
+                || taxonNameDTO.getExBasionymAuthorship() != null;
         basionymToggle.setValue(showBasionymSection);
         basionymToggle.setReadOnly(showBasionymSection);
         basionymToggle.addValueChangeListener(e -> {
@@ -392,7 +425,12 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             updateFieldVisibility();
         });
 
-        boolean showExAuthors = taxonName.getExCombinationAuthorship() != null;
+        boolean showReplacedSynonyms = taxonNameDTO.getReplacedSynonyms().size() > 0;
+        replacedSynonymsToggle.setValue(showReplacedSynonyms);
+        replacedSynonymsToggle.setReadOnly(showReplacedSynonyms);
+        replacedSynonymsComboboxSelect.setVisible(showReplacedSynonyms);
+
+        boolean showExAuthors = taxonNameDTO.getExCombinationAuthorship() != null;
         validationToggle.setValue(showExAuthors);
         validationToggle.setReadOnly(showExAuthors);
         exCombinationAuthorshipField.setVisible(showExAuthors);
@@ -596,6 +634,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect() {
         return basionymsComboboxSelect;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ToManyRelatedEntitiesComboboxSelect<TaxonName> getReplacedSynonymsComboboxSelect() {
+        return replacedSynonymsComboboxSelect;
     }
 
     /**

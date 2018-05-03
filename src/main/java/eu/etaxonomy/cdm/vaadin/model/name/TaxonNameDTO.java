@@ -47,6 +47,8 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
 
     private Set<TaxonName> persistedBasionyms;
 
+    private Set<TaxonName> persistedReplacedSynonyms;
+
     /**
      * @param entity
      */
@@ -85,8 +87,21 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
         return basionyms;
     }
 
+    public Set<TaxonName> getReplacedSynonyms() {
+        Set<TaxonName> replacedSynonyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.REPLACED_SYNONYM());
+        if(persistedReplacedSynonyms == null){
+            // remember the persisted state before starting to operate on the DTO
+            persistedReplacedSynonyms = replacedSynonyms;
+        }
+        return replacedSynonyms;
+    }
+
     public void setBasionyms(Set<TaxonName> basionyms) {
         setRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM(), basionyms);
+    }
+
+    public void setReplacedSynonyms(Set<TaxonName> replacedSynonyms) {
+        setRelatedNames(Direction.relatedTo, NameRelationshipType.REPLACED_SYNONYM(), replacedSynonyms);
     }
 
     /**

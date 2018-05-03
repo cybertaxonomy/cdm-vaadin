@@ -83,4 +83,9 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
 
     void updateAuthorshipFields();
 
+    /**
+     * @return
+     */
+    ToManyRelatedEntitiesComboboxSelect<TaxonName> getReplacedSynonymsComboboxSelect();
+
 }
