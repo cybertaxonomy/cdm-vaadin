@@ -76,8 +76,8 @@ public class PersonField extends CompositeCustomField<Person> {
     private Button nomenclaturalTitleButton = new Button();
     private CssLayout detailsContainer = new CssLayout();
     private TextField initialsField = new TextFieldNFix();
-    private TextField firstNameField = new TextFieldNFix();
-    private TextField lastNameField = new TextFieldNFix();
+    private TextField givenNameField = new TextFieldNFix();
+    private TextField familyNameField = new TextFieldNFix();
     private TextField prefixField = new TextFieldNFix();
     private TextField suffixField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
@@ -120,8 +120,8 @@ public class PersonField extends CompositeCustomField<Person> {
         // edit person
         addStyledComponent(titleCacheField);
         addStyledComponents(initialsField);
-        addStyledComponent(firstNameField);
-        addStyledComponent(lastNameField);
+        addStyledComponent(givenNameField);
+        addStyledComponent(familyNameField);
         addStyledComponent(prefixField);
         addStyledComponent(suffixField);
         addStyledComponent(unlockSwitch);
@@ -174,11 +174,11 @@ public class PersonField extends CompositeCustomField<Person> {
         initialsField.setWidth(baseWidth, Unit.PERCENTAGE);
         initialsField.setInputPrompt("Initials");
 
-        firstNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        firstNameField.setInputPrompt("Other/given names");
+        givenNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
+        givenNameField.setInputPrompt("Other/given names");
 
-        lastNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
-        lastNameField.setInputPrompt("Family name");
+        familyNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
+        familyNameField.setInputPrompt("Family name");
 
         suffixField.setWidth(baseWidth, Unit.PERCENTAGE);
         suffixField.setInputPrompt("Suffix");
@@ -186,8 +186,8 @@ public class PersonField extends CompositeCustomField<Person> {
         detailsContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         detailsContainer.addComponent(prefixField);
         detailsContainer.addComponent(initialsField);
-        detailsContainer.addComponent(firstNameField);
-        detailsContainer.addComponent(lastNameField);
+        detailsContainer.addComponent(givenNameField);
+        detailsContainer.addComponent(familyNameField);
         detailsContainer.addComponent(suffixField);
         root.addComponent(detailsContainer);
 
@@ -213,7 +213,7 @@ public class PersonField extends CompositeCustomField<Person> {
                         titleCacheField.focus();
                         break;
                     case DETAILS_MODE:
-                        firstNameField.focus();
+                        givenNameField.focus();
                         break;
                     default:
                         break;
@@ -231,8 +231,8 @@ public class PersonField extends CompositeCustomField<Person> {
         fieldGroup.bind(titleCacheField, "titleCache");
         fieldGroup.bind(prefixField, "prefix");
         fieldGroup.bind(initialsField, "initials");
-        fieldGroup.bind(firstNameField, "firstname");
-        fieldGroup.bind(lastNameField, "lastname");
+        fieldGroup.bind(givenNameField, "givenname");
+        fieldGroup.bind(familyNameField, "familyname");
         fieldGroup.bind(suffixField, "suffix");
         fieldGroup.bind(unlockSwitch, "protectedTitleCache");
         fieldGroup.bind(nomenclaturalTitleField, "nomenclaturalTitle");
