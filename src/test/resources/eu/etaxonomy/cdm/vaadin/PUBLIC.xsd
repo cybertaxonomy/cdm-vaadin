@@ -6,7 +6,7 @@
 	<xsd:element name="GATHERINGEVENT_ANNOTATION" type="GATHERINGEVENT_ANNOTATION__type" />
 	<xsd:element name="MEDIA_LANGUAGESTRING_AUD" type="MEDIA_LANGUAGESTRING_AUD__type" />
 	<xsd:element name="SPECIMENOROBSERVATIONBASE_RIGHTSINFO" type="SPECIMENOROBSERVATIONBASE_RIGHTSINFO__type" />
-	<xsd:element name="WORKINGSET_ANNOTATION" type="WORKINGSET_ANNOTATION__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_ANNOTATION" type="DESCRIPTIVEDATASET_ANNOTATION__type" />
 	<xsd:element name="TERMVOCABULARY_EXTENSION_AUD" type="TERMVOCABULARY_EXTENSION_AUD__type" />
 	<xsd:element name="DESCRIPTIONBASE_CREDIT_AUD" type="DESCRIPTIONBASE_CREDIT_AUD__type" />
 	<xsd:element name="AGENTBASE_ORIGINALSOURCEBASE_AUD" type="AGENTBASE_ORIGINALSOURCEBASE_AUD__type" />
@@ -84,7 +84,7 @@
 	<xsd:element name="RIGHTSINFO_MARKER" type="RIGHTSINFO_MARKER__type" />
 	<xsd:element name="CLASSIFICATION_MARKER_AUD" type="CLASSIFICATION_MARKER_AUD__type" />
 	<xsd:element name="FEATURENODE_DEFINEDTERMBASE_ONLYAPPLICABLE_AUD" type="FEATURENODE_DEFINEDTERMBASE_ONLYAPPLICABLE_AUD__type" />
-	<xsd:element name="WORKINGSET_DESCRIPTIONBASE_AUD" type="WORKINGSET_DESCRIPTIONBASE_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_DESCRIPTIONBASE_AUD" type="DESCRIPTIVEDATASET_DESCRIPTIONBASE_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_STATISTICALMEASURE" type="DEFINEDTERMBASE_STATISTICALMEASURE__type" />
 	<xsd:element name="REFERENCE_RIGHTSINFO" type="REFERENCE_RIGHTSINFO__type" />
 	<xsd:element name="TERMVOCABULARY_ORIGINALSOURCEBASE_AUD" type="TERMVOCABULARY_ORIGINALSOURCEBASE_AUD__type" />
@@ -162,7 +162,7 @@
 	<xsd:element name="TERMVOCABULARY" type="TERMVOCABULARY__type" />
 	<xsd:element name="TAXONINTERACTION_LANGUAGESTRING_AUD" type="TAXONINTERACTION_LANGUAGESTRING_AUD__type" />
 	<xsd:element name="TAXONNAME" type="TAXONNAME__type" />
-	<xsd:element name="WORKINGSET_MARKER" type="WORKINGSET_MARKER__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_MARKER" type="DESCRIPTIVEDATASET_MARKER__type" />
 	<xsd:element name="SPECIMENOROBSERVATIONBASE_ANNOTATION" type="SPECIMENOROBSERVATIONBASE_ANNOTATION__type" />
 	<xsd:element name="SPECIMENOROBSERVATIONBASE_IDENTIFIER_AUD" type="SPECIMENOROBSERVATIONBASE_IDENTIFIER_AUD__type" />
 	<xsd:element name="HIBERNATE_SEQUENCES" type="HIBERNATE_SEQUENCES__type" />
@@ -212,12 +212,12 @@
 	<xsd:element name="DESCRIPTIONBASE_EXTENSION_AUD" type="DESCRIPTIONBASE_EXTENSION_AUD__type" />
 	<xsd:element name="AGENTBASE_IDENTIFIER_AUD" type="AGENTBASE_IDENTIFIER_AUD__type" />
 	<xsd:element name="TAXONNODEAGENTRELATION_ANNOTATION_AUD" type="TAXONNODEAGENTRELATION_ANNOTATION_AUD__type" />
-	<xsd:element name="WORKINGSET_MARKER_AUD" type="WORKINGSET_MARKER_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_MARKER_AUD" type="DESCRIPTIVEDATASET_MARKER_AUD__type" />
 	<xsd:element name="HOMOTYPICALGROUP_AUD" type="HOMOTYPICALGROUP_AUD__type" />
 	<xsd:element name="SEQUENCE_MARKER_AUD" type="SEQUENCE_MARKER_AUD__type" />
 	<xsd:element name="USERACCOUNT_AUD" type="USERACCOUNT_AUD__type" />
 	<xsd:element name="TAXONNAME_RIGHTSINFO" type="TAXONNAME_RIGHTSINFO__type" />
-	<xsd:element name="WORKINGSET_REPRESENTATION" type="WORKINGSET_REPRESENTATION__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_REPRESENTATION" type="DESCRIPTIVEDATASET_REPRESENTATION__type" />
 	<xsd:element name="ADDRESS" type="ADDRESS__type" />
 	<xsd:element name="ANNOTATION_AUD" type="ANNOTATION_AUD__type" />
 	<xsd:element name="TAXONRELATIONSHIP_ANNOTATION_AUD" type="TAXONRELATIONSHIP_ANNOTATION_AUD__type" />
@@ -229,7 +229,7 @@
 	<xsd:element name="SINGLEREAD_MARKER_AUD" type="SINGLEREAD_MARKER_AUD__type" />
 	<xsd:element name="MEDIA_REPRESENTATION_AUD" type="MEDIA_REPRESENTATION_AUD__type" />
 	<xsd:element name="AUDITEVENT" type="AUDITEVENT__type" />
-	<xsd:element name="WORKINGSET_AUD" type="WORKINGSET_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_AUD" type="DESCRIPTIVEDATASET_AUD__type" />
 	<xsd:element name="AMPLIFICATIONRESULT_ANNOTATION" type="AMPLIFICATIONRESULT_ANNOTATION__type" />
 	<xsd:element name="CLASSIFICATION_CREDIT_AUD" type="CLASSIFICATION_CREDIT_AUD__type" />
 	<xsd:element name="KEYSTATEMENT_AUD" type="KEYSTATEMENT_AUD__type" />
@@ -288,7 +288,7 @@
 	<xsd:element name="DESCRIPTIONBASE_SCOPE" type="DESCRIPTIONBASE_SCOPE__type" />
 	<xsd:element name="DNAQUALITY" type="DNAQUALITY__type" />
 	<xsd:element name="MEDIAKEY_TAXONSCOPE" type="MEDIAKEY_TAXONSCOPE__type" />
-	<xsd:element name="WORKINGSET_NAMEDAREA_AUD" type="WORKINGSET_NAMEDAREA_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_NAMEDAREA_AUD" type="DESCRIPTIVEDATASET_NAMEDAREA_AUD__type" />
 	<xsd:element name="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE" type="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE__type" />
 	<xsd:element name="STATEDATA_DEFINEDTERMBASE" type="STATEDATA_DEFINEDTERMBASE__type" />
 	<xsd:element name="TAXONNAME_AUD" type="TAXONNAME_AUD__type" />
@@ -301,7 +301,7 @@
 	<xsd:element name="DEFINEDTERMBASE_RIGHTSINFO_AUD" type="DEFINEDTERMBASE_RIGHTSINFO_AUD__type" />
 	<xsd:element name="TYPEDESIGNATIONBASE_AUD" type="TYPEDESIGNATIONBASE_AUD__type" />
 	<xsd:element name="DERIVATIONEVENT_MARKER" type="DERIVATIONEVENT_MARKER__type" />
-	<xsd:element name="WORKINGSET_REPRESENTATION_AUD" type="WORKINGSET_REPRESENTATION_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_REPRESENTATION_AUD" type="DESCRIPTIVEDATASET_REPRESENTATION_AUD__type" />
 	<xsd:element name="REFERENCE_AUD" type="REFERENCE_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_CREDIT_AUD" type="DEFINEDTERMBASE_CREDIT_AUD__type" />
 	<xsd:element name="REFERENCE_MEDIA_AUD" type="REFERENCE_MEDIA_AUD__type" />
@@ -324,7 +324,7 @@
 	<xsd:element name="TAXONBASE_RIGHTSINFO_AUD" type="TAXONBASE_RIGHTSINFO_AUD__type" />
 	<xsd:element name="TAXONNAME_NOMENCLATURALSTATUS" type="TAXONNAME_NOMENCLATURALSTATUS__type" />
 	<xsd:element name="FEATURETREE_RIGHTSINFO_AUD" type="FEATURETREE_RIGHTSINFO_AUD__type" />
-	<xsd:element name="WORKINGSET_NAMEDAREA" type="WORKINGSET_NAMEDAREA__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_NAMEDAREA" type="DESCRIPTIVEDATASET_NAMEDAREA__type" />
 	<xsd:element name="DETERMINATIONEVENT_ANNOTATION_AUD" type="DETERMINATIONEVENT_ANNOTATION_AUD__type" />
 	<xsd:element name="FEATURETREE_CREDIT" type="FEATURETREE_CREDIT__type" />
 	<xsd:element name="DERIVATIONEVENT_ANNOTATION" type="DERIVATIONEVENT_ANNOTATION__type" />
@@ -369,11 +369,11 @@
 	<xsd:element name="DEFINEDTERMBASE_AUD" type="DEFINEDTERMBASE_AUD__type" />
 	<xsd:element name="LANGUAGESTRING_MARKER_AUD" type="LANGUAGESTRING_MARKER_AUD__type" />
 	<xsd:element name="DEFINEDTERMBASE_IDENTIFIER_AUD" type="DEFINEDTERMBASE_IDENTIFIER_AUD__type" />
-	<xsd:element name="WORKINGSET_DESCRIPTIONBASE" type="WORKINGSET_DESCRIPTIONBASE__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_DESCRIPTIONBASE" type="DESCRIPTIVEDATASET_DESCRIPTIONBASE__type" />
 	<xsd:element name="POLYTOMOUSKEYNODE" type="POLYTOMOUSKEYNODE__type" />
 	<xsd:element name="REPRESENTATION" type="REPRESENTATION__type" />
 	<xsd:element name="TAXONRELATIONSHIP_MARKER" type="TAXONRELATIONSHIP_MARKER__type" />
-	<xsd:element name="WORKINGSET_TAXONNODE" type="WORKINGSET_TAXONNODE__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_TAXONNODE" type="DESCRIPTIVEDATASET_TAXONNODE__type" />
 	<xsd:element name="ORIGINALSOURCEBASE_ANNOTATION" type="ORIGINALSOURCEBASE_ANNOTATION__type" />
 	<xsd:element name="CREDIT_ANNOTATION" type="CREDIT_ANNOTATION__type" />
 	<xsd:element name="DESCRIPTIONBASE_RIGHTSINFO" type="DESCRIPTIONBASE_RIGHTSINFO__type" />
@@ -437,7 +437,7 @@
 	<xsd:element name="PRIMER_ANNOTATION_AUD" type="PRIMER_ANNOTATION_AUD__type" />
 	<xsd:element name="AMPLIFICATIONRESULT_MARKER_AUD" type="AMPLIFICATIONRESULT_MARKER_AUD__type" />
 	<xsd:element name="AMPLIFICATION_ANNOTATION_AUD" type="AMPLIFICATION_ANNOTATION_AUD__type" />
-	<xsd:element name="WORKINGSET" type="WORKINGSET__type" />
+	<xsd:element name="DESCRIPTIVEDATASET" type="DESCRIPTIVEDATASET__type" />
 	<xsd:element name="ORIGINALSOURCEBASE_MARKER_AUD" type="ORIGINALSOURCEBASE_MARKER_AUD__type" />
 	<xsd:element name="INTEXTREFERENCE" type="INTEXTREFERENCE__type" />
 	<xsd:element name="COLLECTION_MEDIA_AUD" type="COLLECTION_MEDIA_AUD__type" />
@@ -457,7 +457,7 @@
 	<xsd:element name="REPRESENTATION_MARKER" type="REPRESENTATION_MARKER__type" />
 	<xsd:element name="DESCRIPTIONBASE_IDENTIFIER" type="DESCRIPTIONBASE_IDENTIFIER__type" />
 	<xsd:element name="CDM_VIEW_CDM_VIEW" type="CDM_VIEW_CDM_VIEW__type" />
-	<xsd:element name="WORKINGSET_ANNOTATION_AUD" type="WORKINGSET_ANNOTATION_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_ANNOTATION_AUD" type="DESCRIPTIVEDATASET_ANNOTATION_AUD__type" />
 	<xsd:element name="DESCRIPTIONELEMENTBASE_ANNOTATION_AUD" type="DESCRIPTIONELEMENTBASE_ANNOTATION_AUD__type" />
 	<xsd:element name="IDENTIFIER_ANNOTATION" type="IDENTIFIER_ANNOTATION__type" />
 	<xsd:element name="TAXONBASE_CREDIT_AUD" type="TAXONBASE_CREDIT_AUD__type" />
@@ -539,7 +539,7 @@
 	<xsd:element name="AMPLIFICATION" type="AMPLIFICATION__type" />
 	<xsd:element name="MEDIA_MARKER_AUD" type="MEDIA_MARKER_AUD__type" />
 	<xsd:element name="NAMERELATIONSHIP_MARKER_AUD" type="NAMERELATIONSHIP_MARKER_AUD__type" />
-	<xsd:element name="WORKINGSET_TAXONNODE_AUD" type="WORKINGSET_TAXONNODE_AUD__type" />
+	<xsd:element name="DESCRIPTIVEDATASET_TAXONNODE_AUD" type="DESCRIPTIVEDATASET_TAXONNODE_AUD__type" />
 	<xsd:element name="COLLECTION_CREDIT" type="COLLECTION_CREDIT__type" />
 	<xsd:element name="DESCRIPTIONBASE_REFERENCE" type="DESCRIPTIONBASE_REFERENCE__type" />
 	<xsd:element name="SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT" type="SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT__type" />
@@ -597,9 +597,9 @@
 		<xsd:attribute name="SPECIMENOROBSERVATIONBASE_ID" use="optional" />
 		<xsd:attribute name="RIGHTS_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_ANNOTATION__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_ANNOTATION__type">
 		<xsd:attribute name="ANNOTATIONS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="TERMVOCABULARY_EXTENSION_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
@@ -1164,9 +1164,9 @@
 		<xsd:attribute name="FEATURENODE_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_DESCRIPTIONBASE_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_DESCRIPTIONBASE_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
-		<xsd:attribute name="WORKINGSETS_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASETS_ID" use="optional" />
 		<xsd:attribute name="DESCRIPTIONS_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
@@ -1832,9 +1832,9 @@
 		<xsd:attribute name="NOMENCLATURALREFERENCE_ID" use="optional" />
 		<xsd:attribute name="LSID_LSID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_MARKER__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_MARKER__type">
 		<xsd:attribute name="MARKERS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="SPECIMENOROBSERVATIONBASE_ANNOTATION__type">
 		<xsd:attribute name="ANNOTATIONS_ID" use="optional" />
@@ -2171,10 +2171,10 @@
 		<xsd:attribute name="TAXONNODEAGENTRELATION_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_MARKER_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_MARKER_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="MARKERS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="HOMOTYPICALGROUP_AUD__type">
@@ -2212,9 +2212,9 @@
 		<xsd:attribute name="TAXONNAME_ID" use="optional" />
 		<xsd:attribute name="RIGHTS_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_REPRESENTATION__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_REPRESENTATION__type">
 		<xsd:attribute name="REPRESENTATIONS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="ADDRESS__type">
 		<xsd:attribute name="POBOX" use="optional" />
@@ -2317,7 +2317,7 @@
 		<xsd:attribute name="TIMESTAMP" use="optional" />
 		<xsd:attribute name="UUID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_AUD__type">
 		<xsd:attribute name="DESCRIPTIVESYSTEM_ID" use="optional" />
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="CREATED" use="optional" />
@@ -2671,7 +2671,7 @@
 		<xsd:attribute name="LSID_AUTHORITY" use="optional" />
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
-		<xsd:attribute name="FIRSTNAME" use="optional" />
+		<xsd:attribute name="GIVENNAME" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />
 		<xsd:attribute name="TITLECACHE" use="optional" />
 		<xsd:attribute name="PROTECTEDTITLECACHE" use="optional" />
@@ -2679,7 +2679,7 @@
 		<xsd:attribute name="CREATED" use="optional" />
 		<xsd:attribute name="LIFESPAN_END" use="optional" />
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
-		<xsd:attribute name="LASTNAME" use="optional" />
+		<xsd:attribute name="FAMILYNAME" use="optional" />
 		<xsd:attribute name="PROTECTEDNOMENCLATURALTITLECACHE" use="optional" />
 		<xsd:attribute name="LIFESPAN_FREETEXT" use="optional" />
 		<xsd:attribute name="DTYPE" use="optional" />
@@ -2817,10 +2817,10 @@
 		<xsd:attribute name="MEDIAKEY_ID" use="optional" />
 		<xsd:attribute name="TAXONOMICSCOPE_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_NAMEDAREA_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_NAMEDAREA_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="GEOFILTER_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="DESCRIPTIONELEMENTBASE_ORIGINALSOURCEBASE__type">
@@ -2948,10 +2948,10 @@
 		<xsd:attribute name="MARKERS_ID" use="optional" />
 		<xsd:attribute name="DERIVATIONEVENT_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_REPRESENTATION_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_REPRESENTATION_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="REPRESENTATIONS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="REFERENCE_AUD__type">
@@ -3210,9 +3210,9 @@
 		<xsd:attribute name="RIGHTS_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_NAMEDAREA__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_NAMEDAREA__type">
 		<xsd:attribute name="GEOFILTER_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="DETERMINATIONEVENT_ANNOTATION_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
@@ -3614,8 +3614,8 @@
 		<xsd:attribute name="IDENTIFIERS_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_DESCRIPTIONBASE__type">
-		<xsd:attribute name="WORKINGSETS_ID" use="optional" />
+	<xsd:complexType name="DESCRIPTIVEDATASET_DESCRIPTIONBASE__type">
+		<xsd:attribute name="DESCRIPTIVEDATASETS_ID" use="optional" />
 		<xsd:attribute name="DESCRIPTIONS_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="POLYTOMOUSKEYNODE__type">
@@ -3652,8 +3652,8 @@
 		<xsd:attribute name="MARKERS_ID" use="optional" />
 		<xsd:attribute name="TAXONRELATIONSHIP_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_TAXONNODE__type">
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+	<xsd:complexType name="DESCRIPTIVEDATASET_TAXONNODE__type">
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="TAXONSUBTREEFILTER_ID" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="ORIGINALSOURCEBASE_ANNOTATION__type">
@@ -4099,7 +4099,7 @@
 		<xsd:attribute name="ANNOTATIONS_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET__type">
 		<xsd:attribute name="DESCRIPTIVESYSTEM_ID" use="optional" />
 		<xsd:attribute name="CREATED" use="optional" />
 		<xsd:attribute name="MINRANK_ID" use="optional" />
@@ -4258,10 +4258,10 @@
 		<xsd:attribute name="CDM_VIEW_ID" use="optional" />
 		<xsd:attribute name="SUPERVIEWS_ID" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_ANNOTATION_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_ANNOTATION_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
 		<xsd:attribute name="ANNOTATIONS_ID" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
 	<xsd:complexType name="DESCRIPTIONELEMENTBASE_ANNOTATION_AUD__type">
@@ -4604,7 +4604,7 @@
 		<xsd:attribute name="INITIALS" use="optional" />
 		<xsd:attribute name="LSID_AUTHORITY" use="optional" />
 		<xsd:attribute name="UPDATED" use="optional" />
-		<xsd:attribute name="FIRSTNAME" use="optional" />
+		<xsd:attribute name="GIVENNAME" use="optional" />
 		<xsd:attribute name="CREATEDBY_ID" use="optional" />
 		<xsd:attribute name="TITLECACHE" use="optional" />
 		<xsd:attribute name="PROTECTEDTITLECACHE" use="optional" />
@@ -4612,7 +4612,7 @@
 		<xsd:attribute name="CREATED" use="optional" />
 		<xsd:attribute name="LIFESPAN_END" use="optional" />
 		<xsd:attribute name="UPDATEDBY_ID" use="optional" />
-		<xsd:attribute name="LASTNAME" use="optional" />
+		<xsd:attribute name="FAMILYNAME" use="optional" />
 		<xsd:attribute name="PROTECTEDNOMENCLATURALTITLECACHE" use="optional" />
 		<xsd:attribute name="LIFESPAN_FREETEXT" use="optional" />
 		<xsd:attribute name="DTYPE" use="optional" />
@@ -4948,9 +4948,9 @@
 		<xsd:attribute name="NAMERELATIONSHIP_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
-	<xsd:complexType name="WORKINGSET_TAXONNODE_AUD__type">
+	<xsd:complexType name="DESCRIPTIVEDATASET_TAXONNODE_AUD__type">
 		<xsd:attribute name="REV" use="optional" />
-		<xsd:attribute name="WORKINGSET_ID" use="optional" />
+		<xsd:attribute name="DESCRIPTIVEDATASET_ID" use="optional" />
 		<xsd:attribute name="TAXONSUBTREEFILTER_ID" use="optional" />
 		<xsd:attribute name="REVTYPE" use="optional" />
 	</xsd:complexType>
