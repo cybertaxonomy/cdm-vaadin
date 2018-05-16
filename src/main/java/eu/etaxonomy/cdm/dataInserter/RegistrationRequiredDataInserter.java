@@ -340,11 +340,11 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         // data imported from IAPT does not have typedesignation citations and sometimes no nomref
 
                         if(isPhycobankID){
-                            youngestPub = (Reference) name.getNomenclaturalReference();
+                            youngestPub = name.getNomenclaturalReference();
                             youngestDate = partial(youngestPub.getDatePublished());
 
                             if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
-                                for(TypeDesignationBase td : name.getTypeDesignations()){
+                                for(TypeDesignationBase<?> td : name.getTypeDesignations()){
                                     if(td.getCitation() == null){
                                         continue;
                                     }
@@ -366,8 +366,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         }
                         if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
                             // do not add the collection directly to avoid "Found shared references to a collection" problem
-                            HashSet<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
-                            for(TypeDesignationBase td : name.getTypeDesignations()){
+                            Set<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
+                            for(TypeDesignationBase<?> td : name.getTypeDesignations()){
                                 if(td.getCitation() == null && isPhycobankID){
                                     logger.error("Missing TypeDesignation Citation in Phycobank data");
                                     continue;
