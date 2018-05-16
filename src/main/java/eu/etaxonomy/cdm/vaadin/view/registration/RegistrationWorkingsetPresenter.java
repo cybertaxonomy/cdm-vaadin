@@ -347,7 +347,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.withDeleteButton(true);
         configureTaxonNameEditor(popup);
         popup.loadInEditor(event.getEntityUuid());
-        if(event.getSourceComponent() != null && event.getSourceComponent().isReadOnly()){
+        if(event.hasSource() && event.getSource().isReadOnly()){
             // avoid resetting readonly to false
             popup.setReadOnly(true);
         }
@@ -467,9 +467,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
-            if(event.getSourceComponent() != null){
-                // propagate readonly state from source component to popup
-                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+            if(event.hasSource()){
+                // propagate readonly state from source button to popup
+                popup.setReadOnly(event.getSource().isReadOnly());
             }
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class, getView());
@@ -480,9 +480,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
 
-            if(event.getSourceComponent() != null){
-                // propagate readonly state from source component to popup
-                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+            if(event.hasSource()){
+                // propagate readonly state from source button to popup
+                popup.setReadOnly(event.getSource().isReadOnly());
             }
             newNameTypeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
         }
@@ -491,7 +491,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onTypeDesignationWorkingsetAdd(TypeDesignationWorkingsetEditorAction event) {
 
-        if(event.getSourceComponent() != null){
+        if(!event.hasSource()){
             return;
         }
 
@@ -521,9 +521,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.loadInEditor(identifierSet);
             popup.withDeleteButton(true);
-            if(event.getSourceComponent() != null){
+            if(event.hasSource()){
                 // propagate readonly state from source component to popup
-                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+                popup.setReadOnly(event.getSource().isReadOnly());
             }
         } else {
             NameTypeDesignationPopupEditor popup = getNavigationManager().showInPopup(NameTypeDesignationPopupEditor.class, getView());
@@ -546,9 +546,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.loadInEditor(null);
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
-            if(event.getSourceComponent() != null){
+            if(event.hasSource()){
                 // propagate readonly state from source component to popup
-                popup.setReadOnly(event.getSourceComponent().isReadOnly());
+                popup.setReadOnly(event.getSource().isReadOnly());
             }
         }
     }

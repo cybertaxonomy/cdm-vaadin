@@ -241,7 +241,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this)));
+                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
 
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
@@ -305,6 +305,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     EditorActionType.EDIT,
                     nameuUuid,
                     e.getButton(),
+                    null,
                     this,
                     context
                     )
@@ -324,6 +325,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                         registrationEntityUuid,
                         typifiedNameRef.getUuid(),
                         e.getButton(),
+                        null,
                         this,
                         context
                         )
@@ -399,6 +401,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             editRegistrationButton.addClickListener(e -> getViewEventBus().publish(this, new RegistrationEditorAction(
                 EditorActionType.EDIT,
                 dto.getUuid(),
+                e.getButton(),
                 null,
                 this
                 )));
@@ -459,6 +462,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 newWorkingsetType,
                 registrationEntityUuid,
                 typifiedNameRef.getUuid(),
+                null,
                 null,
                 this
                 ));

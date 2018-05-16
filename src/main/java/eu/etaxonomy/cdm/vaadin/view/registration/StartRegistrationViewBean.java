@@ -90,7 +90,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
 
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, this)
+                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, null, this)
                 ));
         newPublicationButton.setCaption("New");
         newPublicationButton.setWidth(ELEMENT_WIDTH);
@@ -102,7 +102,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, this)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, referenceCombobox, this)
                 ));
 
         removeNewPublicationButton.setVisible(false);
@@ -139,6 +139,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
                         // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
                         refUuid,
                         continueButton,
+                        null,
                         StartRegistrationViewBean.this)
                 );
               }

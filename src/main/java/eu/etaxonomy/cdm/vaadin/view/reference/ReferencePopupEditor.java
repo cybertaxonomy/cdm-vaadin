@@ -132,7 +132,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
         inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
         inReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.ADD, null, inReferenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.ADD, e.getButton(), inReferenceCombobox, this)
                 ));
         inReferenceCombobox.addClickListenerEditEntity(e -> {
             if(inReferenceCombobox.getValue() != null){
@@ -140,6 +140,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
                             inReferenceCombobox.getValue().getUuid(),
+                            e.getButton(),
                             inReferenceCombobox,
                             this)
                 );

@@ -10,8 +10,10 @@ package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.UUID;
 
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
 
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
@@ -19,31 +21,36 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  */
-public class ReferenceEditorAction extends AbstractEditorAction {
+public class ReferenceEditorAction extends AbstractEditorAction<Reference> {
+
 
     /**
-     * @param eventType
+     * @param type
      */
     public ReferenceEditorAction(EditorActionType type) {
         super(type);
     }
 
+
     /**
      * @param action
      * @param source
+     * @param target
+     * @param sourceView
      */
-    public ReferenceEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
-        super(action, source, sourceView);
+    public ReferenceEditorAction(EditorActionType action, Button source, Field<Reference> target, AbstractView sourceView) {
+        super(action, source, target, sourceView);
     }
 
     /**
      * @param action
-     * @param entityId
+     * @param entityUuid
      * @param source
+     * @param target
      * @param sourceView
      */
-    public ReferenceEditorAction(EditorActionType action, UUID entityUuid, Component source, AbstractView sourceView) {
-        super(action, entityUuid, source, sourceView);
+    public ReferenceEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<Reference> target, AbstractView sourceView) {
+        super(action, entityUuid, source, target, sourceView);
     }
 
 }

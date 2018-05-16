@@ -342,7 +342,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        ReloadableLazyComboBox<TaxonName> sourceField = (ReloadableLazyComboBox<TaxonName>)event.getSourceComponent();
+        ReloadableLazyComboBox<TaxonName> sourceField = (ReloadableLazyComboBox<TaxonName>)event.getTarget();
 
         if(sourceField == getView().getValidationField().getValidatedNameComboBox().getSelect()){
             // validatedNameSourceField .. this is awkward, better use a map to correlate fields to popup editors!!!!
@@ -370,7 +370,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             return;
         }
 
-        basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
+        basionymSourceField = (AbstractField<TaxonName>)event.getTarget();
 
         basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));

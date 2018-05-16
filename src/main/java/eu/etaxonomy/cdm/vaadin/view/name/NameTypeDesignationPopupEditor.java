@@ -147,6 +147,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
                     new TaxonNameEditorAction(
                             EditorActionType.EDIT,
                             typeNameField.getValue().getUuid(),
+                            e.getButton(),
                             typeNameField,
                             this)
                 );

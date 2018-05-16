@@ -11,9 +11,11 @@ package eu.etaxonomy.cdm.vaadin.event;
 import java.util.Stack;
 import java.util.UUID;
 
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -25,7 +27,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Mar 22, 2017
  *
  */
-public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction {
+public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<TypeDesignationWorkingSet> {
 
     private TypeDesignationWorkingSetType workingSetType;
 
@@ -47,8 +49,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
     public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
             TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Component source, AbstractView sourceView, Stack<EditorActionContext> context) {
-        super(action, null, source, sourceView);
+            Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
+        super(action, null, source, target, sourceView);
         this.baseEntityRef = baseEntityRef;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
@@ -67,8 +69,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction 
      */
     public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Component source, AbstractView sourceView) {
-        super(action, null, source, sourceView);
+            Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView) {
+        super(action, null, source, target, sourceView);
         this.workingSetType = workingSetType;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;

@@ -146,6 +146,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                     new CollectionEditorAction(
                             EditorActionType.EDIT,
                             superCollectionCombobox.getValue().getUuid(),
+                            e.getButton(),
                             superCollectionCombobox,
                             this)
                 );
@@ -174,6 +175,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                             new CollectionEditorAction(
                                 EditorActionType.EDIT,
                                 superCollectionCombobox.getValue().getUuid(),
+                                e.getButton(),
                                 superCollectionCombobox,
                                 this
                             )

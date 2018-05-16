@@ -90,7 +90,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
-        if(getView() == null || getView().getNewPublicationButton() != event.getSourceComponent()){
+        if(getView() == null || getView().getNewPublicationButton() != event.getSource()){
             return;
         }
 
@@ -106,7 +106,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Remove.class)
     public void onReferenceEditorActionRemove(ReferenceEditorAction event) {
 
-        if(getView().getRemoveNewPublicationButton() != event.getSourceComponent()){
+        if(getView().getRemoveNewPublicationButton() != event.getSource()){
             return;
         }
         DeleteResult result = getRepo().getReferenceService().delete(newReference);
@@ -159,7 +159,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onRegistrationEditorActionAdd(RegistrationEditorAction event) {
 
-        if(getView().getContinueButton() != event.getSourceComponent()){
+        if(getView().getContinueButton() != event.getSource()){
             return;
         }
 

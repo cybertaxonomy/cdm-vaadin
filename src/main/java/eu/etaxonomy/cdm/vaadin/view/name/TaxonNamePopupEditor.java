@@ -307,6 +307,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
                             nomReferenceCombobox.getValue().getUuid(),
+                            e.getButton(),
                             nomReferenceCombobox,
                             this)
                 );
@@ -337,7 +338,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
             }
             ReloadableLazyComboBox<TaxonName>  lazyCombobox = (ReloadableLazyComboBox<TaxonName>) e.getSource();
-            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, lazyCombobox, this));
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, null, lazyCombobox, this));
         });
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
 
@@ -367,7 +368,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
             }
             ReloadableLazyComboBox<TaxonName>  lazyCombobox = (ReloadableLazyComboBox<TaxonName>) e.getSource();
-            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, lazyCombobox, this));
+            getViewEventBus().publish(this, new TaxonNameEditorAction(e.getAction(), beanUuid, null, lazyCombobox, this));
         });
         grid.setComponentAlignment(replacedSynonymsComboboxSelect, Alignment.TOP_RIGHT);
 
@@ -386,6 +387,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     new TaxonNameEditorAction(
                             EditorActionType.EDIT,
                             validatedNameComboBox.getValue().getUuid(),
+                            e.getButton(),
                             validatedNameComboBox,
                             this)
                 );
@@ -402,6 +404,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     new ReferenceEditorAction(
                             EditorActionType.EDIT,
                             validationCitatonComboBox.getValue().getUuid(),
+                            e.getButton(),
                             validationCitatonComboBox,
                             this)
                 );

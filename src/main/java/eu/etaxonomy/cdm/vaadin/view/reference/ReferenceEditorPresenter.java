@@ -143,11 +143,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
    @EventBusListenerMethod
    public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
 
-       if(!isFromOwnView(editorAction) || editorAction.getSourceComponent() == null){
+       if(!isFromOwnView(editorAction) || editorAction.getTarget() == null){
            return;
        }
 
-       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
+       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
            if(editorAction.isAddAction()){
                inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
                inReferencePopup.loadInEditor(null);
