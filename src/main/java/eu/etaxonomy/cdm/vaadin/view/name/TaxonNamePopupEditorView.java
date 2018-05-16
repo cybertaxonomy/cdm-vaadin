@@ -16,6 +16,7 @@ import com.vaadin.ui.ListSelect;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.vaadin.component.NameRelationField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -87,5 +88,10 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     ToManyRelatedEntitiesComboboxSelect<TaxonName> getReplacedSynonymsComboboxSelect();
+
+    /**
+     * @return
+     */
+    NameRelationField getValidationField();
 
 }

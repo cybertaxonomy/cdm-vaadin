@@ -130,6 +130,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getReplacedSynonymsComboboxSelect().setCaptionGenerator( new CdmTitleCacheCaptionGenerator<TaxonName>());
         // reusing the basionymPagingProvider for the replaced synonyms to benefit from caching
         getView().getReplacedSynonymsComboboxSelect().setPagingProviders(basionymPagingProvider, basionymPagingProvider, basionymPagingProvider.getPageSize(), this);
+
+        getView().getValidationField().getValidatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+        // reusing the basionymPagingProvider for the replaced synonyms to benefit from caching
+        getView().getValidationField().getValidatedNameComboBox().loadFrom(basionymPagingProvider, basionymPagingProvider, basionymPagingProvider.getPageSize());
+        getView().getValidationField().getValidatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getValidatedNameComboBox(), this));
+
+
+        getView().getValidationField().getCitatonComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+        getView().getValidationField().getCitatonComboBox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        getView().getValidationField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getCitatonComboBox(), this));
+
     }
 
     /**
@@ -331,18 +342,24 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
+        ReloadableLazyComboBox<TaxonName> sourceField = (ReloadableLazyComboBox<TaxonName>)event.getSourceComponent();
 
-        basionymSourceField = (ReloadableLazyComboBox<TaxonName>)event.getSourceComponent();
+        if(sourceField == getView().getValidationField().getValidatedNameComboBox().getSelect()){
+            // validatedNameSourceField .. this is awkward, better use a map to correlate fields to popup editors!!!!
 
-        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
-        basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-        basionymNamePopup.withDeleteButton(true);
-        getView().getModesActive().stream()
-                .filter(
-                        m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                .forEach(m -> basionymNamePopup.enableMode(m));
-        basionymNamePopup.loadInEditor(event.getEntityUuid());
-        basionymNamePopup.getBasionymToggle().setVisible(false);
+        } else {
+            basionymSourceField = sourceField;
+
+            basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+            basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            basionymNamePopup.withDeleteButton(true);
+            getView().getModesActive().stream()
+                    .filter(
+                            m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                    .forEach(m -> basionymNamePopup.enableMode(m));
+            basionymNamePopup.loadInEditor(event.getEntityUuid());
+            basionymNamePopup.getBasionymToggle().setVisible(false);
+        }
 
     }
 

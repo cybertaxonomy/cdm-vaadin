@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.model.name;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
@@ -22,6 +23,7 @@ import eu.etaxonomy.cdm.model.common.Identifier;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.HomotypicalGroup;
+import eu.etaxonomy.cdm.model.name.NameRelationship;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
@@ -37,10 +39,6 @@ import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
  */
 public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
 
-    class TN extends TaxonName {
-
-    }
-
     private static final long serialVersionUID = -8018109905949198530L;
 
     private TaxonName name;
@@ -48,6 +46,8 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
     private Set<TaxonName> persistedBasionyms;
 
     private Set<TaxonName> persistedReplacedSynonyms;
+
+    private TaxonName persistedValidatedName;
 
     /**
      * @param entity
@@ -94,6 +94,68 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
             persistedReplacedSynonyms = replacedSynonyms;
         }
         return replacedSynonyms;
+    }
+
+    public NameRelationshipDTO getValidationFor() {
+        NameRelationshipDTO nameRelDto  = null;
+        NameRelationship validatingRelationship = validatingRelationship();
+        if(validatingRelationship != null){
+            nameRelDto = new NameRelationshipDTO(Direction.relatedTo, validatingRelationship);
+            if(persistedValidatedName == null){
+               persistedValidatedName = nameRelDto.getOtherName();
+            }
+        }
+        return nameRelDto;
+    }
+
+    /**
+     * @return
+     */
+    protected NameRelationship validatingRelationship() {
+        Set<NameRelationship> toRelations = name.getRelationsToThisName();
+        Set<NameRelationship> validatedNameRelations = toRelations.stream().filter(
+                    nr -> nr.getType().equals(NameRelationshipType.VALIDATED_BY_NAME())
+                ).collect(Collectors.toSet());
+        if(validatedNameRelations.size() > 1){
+            // TODO use non RuntimeException
+            throw new RuntimeException("More than one validated name found.");
+        } else if(validatedNameRelations.size() == 0) {
+            return null;
+        }
+        return validatedNameRelations.iterator().next();
+    }
+
+    public void setValidationFor(NameRelationshipDTO nameRelDto) {
+
+        if(nameRelDto != null && nameRelDto.getOtherName() == null){
+            // treat as if there is no validation
+            nameRelDto = null;
+        }
+
+        NameRelationship validatingRelationship = validatingRelationship();
+
+        if(nameRelDto != null){
+            // add or update ...
+            if(validatingRelationship != null && persistedValidatedName != null && validatingRelationship.getFromName().equals(persistedValidatedName)){
+                // validated name has not changed, so we can update the relation
+                validatingRelationship.setCitation(nameRelDto.getCitation());
+                validatingRelationship.setCitationMicroReference(nameRelDto.getCitationMicroReference());
+                validatingRelationship.setRuleConsidered(nameRelDto.getRuleConsidered());
+            } else {
+                // need to remove the old relationship and to create a new one.
+                // the actual removal will take place ....
+                name.addRelationshipFromName(nameRelDto.getOtherName(), NameRelationshipType.VALIDATED_BY_NAME(),
+                        nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
+                if(persistedValidatedName != null){
+                    name.removeRelationWithTaxonName(persistedValidatedName, Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+                }
+            }
+        } else {
+            // remove ...
+            if(persistedValidatedName != null && validatingRelationship != null){
+                name.removeRelationWithTaxonName(persistedValidatedName, Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+            }
+        }
     }
 
     public void setBasionyms(Set<TaxonName> basionyms) {
