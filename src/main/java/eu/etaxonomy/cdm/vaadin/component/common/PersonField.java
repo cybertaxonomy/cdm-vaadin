@@ -231,8 +231,8 @@ public class PersonField extends CompositeCustomField<Person> {
         fieldGroup.bind(titleCacheField, "titleCache");
         fieldGroup.bind(prefixField, "prefix");
         fieldGroup.bind(initialsField, "initials");
-        fieldGroup.bind(givenNameField, "givenname");
-        fieldGroup.bind(familyNameField, "familyname");
+        fieldGroup.bind(givenNameField, "givenName");
+        fieldGroup.bind(familyNameField, "familyName");
         fieldGroup.bind(suffixField, "suffix");
         fieldGroup.bind(unlockSwitch, "protectedTitleCache");
         fieldGroup.bind(nomenclaturalTitleField, "nomenclaturalTitle");
