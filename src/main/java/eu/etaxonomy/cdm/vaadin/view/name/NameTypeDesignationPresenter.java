@@ -230,7 +230,7 @@ public class NameTypeDesignationPresenter
             return;
         }
 
-        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), null);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         // TODO configure Modes???
@@ -248,7 +248,7 @@ public class NameTypeDesignationPresenter
 
         //  basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
 
-        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), null);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         // TODO configure Modes???

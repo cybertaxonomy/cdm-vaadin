@@ -18,8 +18,10 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -50,6 +52,7 @@ import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ReloadableSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 
 /**
@@ -84,8 +87,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     private Reference publishedUnit;
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
-
-    private AbstractField<TaxonName> basionymSourceField;
 
     /**
      * {@inheritDoc}
@@ -192,7 +193,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){
             if(taxonName.getNomenclaturalReference() != null){
-                Reference nomRef = (Reference)taxonName.getNomenclaturalReference();
+                Reference nomRef = taxonName.getNomenclaturalReference();
                 //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
                 publishedUnit = nomRef;
                 while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
@@ -260,7 +261,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             return;
         }
 
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
@@ -281,7 +282,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
 
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
@@ -297,42 +298,50 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-        if(event.getSourceView() == referenceEditorPopup){
-            if(event.isCreateOrModifiedType()){
+        if(event.getSourceView() instanceof AbstractPopupEditor) {
 
-                getCache().load(event.getEntity());
-                if(event.isCreatedType()){
-                    getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
-                } else {
-                    getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
+            AbstractPopupEditor popupEditor = (AbstractPopupEditor) event.getSourceView();
+            Field<?> targetField = getNavigationManager().targetFieldOf(getView(), popupEditor);
+
+            Property ds = targetField.getPropertyDataSource();
+            if(event.getSourceView() == referenceEditorPopup){
+                if(event.isCreateOrModifiedType()){
+
+                    getCache().load(event.getEntity());
+                    if(event.isCreatedType()){
+                        getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
+                    } else {
+                        getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
+                    }
+                    getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
+                    getView().updateAuthorshipFields();
                 }
-                getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
-                getView().updateAuthorshipFields();
+
+                referenceEditorPopup = null;
             }
+            if(event.getSourceView()  == basionymNamePopup){
+                AbstractSelect basionymSourceField = (AbstractSelect) targetField;
+                if(event.isCreateOrModifiedType()){
 
-            referenceEditorPopup = null;
-        }
-        if(event.getSourceView()  == basionymNamePopup){
-            if(event.isCreateOrModifiedType()){
+                    getCache().load(event.getEntity());
+                    if(event.isCreatedType()){
+                        basionymSourceField .setValue(event.getEntity());
+                    } else {
+                        ((ReloadableSelect)basionymSourceField).reload();
+                    }
+                    getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
+                    getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
+                    getView().updateAuthorshipFields();
 
-                getCache().load(event.getEntity());
-                if(event.isCreatedType()){
-                    basionymSourceField.setValue((TaxonName) event.getEntity());
-                } else {
-                    ((ReloadableSelect)basionymSourceField).reload();
                 }
-                getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
-                getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
-                getView().updateAuthorshipFields();
+                if(event.isRemovedType()){
+                    basionymSourceField.setValue(null);
+                    getView().updateAuthorshipFields();
+                }
 
-            }
-            if(event.isRemovedType()){
-                basionymSourceField.setValue(null);
-                getView().updateAuthorshipFields();
+                basionymNamePopup = null;
             }
 
-            basionymNamePopup = null;
-            basionymSourceField = null;
         }
     }
 
@@ -342,20 +351,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        ReloadableLazyComboBox<TaxonName> sourceField = (ReloadableLazyComboBox<TaxonName>)event.getTarget();
+        ReloadableLazyComboBox<TaxonName> targetField = (ReloadableLazyComboBox<TaxonName>)event.getTarget();
 
-        if(sourceField == getView().getValidationField().getValidatedNameComboBox().getSelect()){
+        if(targetField == getView().getValidationField().getValidatedNameComboBox().getSelect()){
             // validatedNameSourceField .. this is awkward, better use a map to correlate fields to popup editors!!!!
 
         } else {
-            basionymSourceField = sourceField;
-
-            basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+            basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), event.getTarget());
             basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             basionymNamePopup.withDeleteButton(true);
             getView().getModesActive().stream()
-                    .filter(
-                            m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                    .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                     .forEach(m -> basionymNamePopup.enableMode(m));
             basionymNamePopup.loadInEditor(event.getEntityUuid());
             basionymNamePopup.getBasionymToggle().setVisible(false);
@@ -370,14 +376,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             return;
         }
 
-        basionymSourceField = (AbstractField<TaxonName>)event.getTarget();
-
-        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView());
+        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), event.getTarget());
         basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         basionymNamePopup.withDeleteButton(true);
         getView().getModesActive().stream()
-                .filter(
-                        m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                 .forEach(m -> basionymNamePopup.enableMode(m));
         basionymNamePopup.loadInEditor(null);
         basionymNamePopup.getBasionymToggle().setVisible(false);

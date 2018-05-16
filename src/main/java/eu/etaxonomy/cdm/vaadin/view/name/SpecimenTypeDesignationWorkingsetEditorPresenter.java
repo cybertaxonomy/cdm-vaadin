@@ -309,7 +309,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
+        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -320,7 +320,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
+        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -351,7 +351,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
 
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
@@ -363,7 +363,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);

@@ -1,11 +1,7 @@
 package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +18,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.spring.navigator.SpringNavigator;
 import com.vaadin.spring.navigator.SpringViewProvider;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
@@ -87,7 +84,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     @Autowired(required=false)
     private PermissionDebugUtils permissionDebugUtils;
 
-	private Map<PopupView, Window> popupMap;
+	private PopupViewRegistration popupViewRegistration;
 
 	private String defaultViewName = null;
 
@@ -110,11 +107,10 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 
 	public NavigationManagerBean() {
-	    popupMap = new HashMap<>();
+	    popupViewRegistration = new PopupViewRegistration();
 	}
 
-	private Collection<PopupView> popupViews = new HashSet<>();
-
+//	private Collection<PopupView> popupViews = new HashSet<>();
 //	@Lazy
 //    @Autowired(required=false)
 //    private void popUpViews(Collection<PopupView> popupViews){
@@ -147,6 +143,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		} else {
 			super.navigateTo(navigationState);
 		}
+		popupViewRegistration.removeOrphan();
 	}
 
 	@Override
@@ -156,6 +153,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	    }
 		super.navigateTo(navigationState);
 		//eventBus.publishEvent(new NavigationEvent(navigationState));
+		popupViewRegistration.removeOrphan();
 	}
 
 	@EventBusListenerMethod
@@ -164,7 +162,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	@Override
-	public <T extends PopupView> T showInPopup(Class<T> popupType, ApplicationView parentView) {
+	public <T extends PopupView> T showInPopup(Class<T> popupType, ApplicationView parentView, Field<?> targetField) {
 
 	    PopupView popupView =  findPopupView(popupType);
 
@@ -175,7 +173,6 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	            ((AbstractPopupEditor)popupView).setParentEditorActionContext(parentEditorActionContext);
 	        }
 	    }
-
 
 		Window window = new Window();
 		window.setCaption(popupView.getWindowCaption());
@@ -197,19 +194,24 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		popupView.focusFirst();
 		uiEventBus.publish(this, new PopEditorOpenedEvent(this, popupView));
 
-		popupMap.put(popupView, window);
+		popupViewRegistration.put(window, parentView, popupView, targetField);
 
 		return (T) popupView;
+	}
+
+	@Override
+    public Field<?> targetFieldOf(ApplicationView parentView, PopupView popupView){
+	    return popupViewRegistration.get(parentView, popupView);
 	}
 
     @EventBusListenerMethod
 	protected void onDoneWithTheEditor(DoneWithPopupEvent e) {
 
 		PopupView popup = e.getPopup();
-        Window window = popupMap.get(popup);
+        Window window = popupViewRegistration.getWindow(popup);
 		if (window != null) {
 			window.close();
-			popupMap.remove(popup);
+			popupViewRegistration.remove(popup);
 		}
 		if(AbstractPopupEditor.class.isAssignableFrom(popup.getClass())){
 		    ((AbstractPopupEditor)popup).presenter().unsubscribeFromEventBuses();

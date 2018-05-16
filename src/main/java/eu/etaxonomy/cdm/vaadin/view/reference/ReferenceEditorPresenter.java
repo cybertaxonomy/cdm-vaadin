@@ -149,11 +149,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
            if(editorAction.isAddAction()){
-               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
                inReferencePopup.loadInEditor(null);
            }
            if(editorAction.isEditAction()){
-               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
                inReferencePopup.withDeleteButton(true);
                inReferencePopup.loadInEditor(editorAction.getEntityUuid());
            }
