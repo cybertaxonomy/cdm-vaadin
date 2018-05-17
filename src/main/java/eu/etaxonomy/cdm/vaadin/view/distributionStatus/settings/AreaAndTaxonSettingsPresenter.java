@@ -29,7 +29,7 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 
 /**
  * @author a.mueller
- * @date 22.10.2017
+ * @since 22.10.2017
  *
  */
 public class AreaAndTaxonSettingsPresenter extends SettingsPresenterBase {
@@ -73,7 +73,7 @@ public class AreaAndTaxonSettingsPresenter extends SettingsPresenterBase {
         return CdmSpringContextHelper.getVocabularyService().load(areaVocabUUID, VOCABULARY_INIT_STRATEGY);
     }
 
-
+    // TODO: Currently unused. Remove?
     public List<TaxonNode> getChosenTaxonNodes(){
         List<UUID> nodeUuids = (List<UUID>) VaadinSession.getCurrent()
                 .getAttribute(DistributionEditorUtil.SATTR_TAXON_NODES_UUID);

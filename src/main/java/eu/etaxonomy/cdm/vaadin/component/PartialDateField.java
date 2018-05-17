@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.component;
 
 import com.vaadin.data.Property;
-import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaTimePartialConverter;
 
@@ -23,7 +22,7 @@ import eu.etaxonomy.cdm.vaadin.util.converter.JodaTimePartialConverter;
  * @since Apr 7, 2017
  *
  */
-public class PartialDateField extends TextField {
+public class PartialDateField extends TextFieldNFix {
 
     private static final long serialVersionUID = -347319052346135100L;
 

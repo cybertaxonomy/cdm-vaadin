@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.component.taxon;
 
 /**
  * @author cmathew
- * @date 2 Apr 2015
+ * @since 2 Apr 2015
  *
  */
 public interface INewTaxonBaseComposite {

@@ -18,7 +18,7 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -67,7 +67,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
      * {@inheritDoc}
      */
     @Override
-    public int getWindowPixelWidth() {
+    public int getWindowWidth() {
         return 500;
     }
 
@@ -145,7 +145,8 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                 getViewEventBus().publish(this,
                     new CollectionEditorAction(
                             EditorActionType.EDIT,
-                            superCollectionCombobox.getValue().getId(),
+                            superCollectionCombobox.getValue().getUuid(),
+                            e.getButton(),
                             superCollectionCombobox,
                             this)
                 );
@@ -173,7 +174,8 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                     getViewEventBus().publish(this,
                             new CollectionEditorAction(
                                 EditorActionType.EDIT,
-                                superCollectionCombobox.getValue().getId(),
+                                superCollectionCombobox.getValue().getUuid(),
+                                e.getButton(),
                                 superCollectionCombobox,
                                 this
                             )

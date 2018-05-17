@@ -41,7 +41,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 
 /**
  * @author cmathew
- * @date 2 Apr 2015
+ * @since 2 Apr 2015
  *
  */
 public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonBaseComposite {

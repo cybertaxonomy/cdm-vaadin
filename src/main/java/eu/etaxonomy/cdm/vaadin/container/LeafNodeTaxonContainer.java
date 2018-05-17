@@ -34,7 +34,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 /**
  * @author cmathew
- * @date 10 Mar 2015
+ * @since 10 Mar 2015
  *
  */
 public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container.Hierarchical  {
@@ -42,14 +42,14 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
     private static final Logger logger = Logger.getLogger(LeafNodeTaxonContainer.class);
 
 
-    public static final String NAME_ID = "Name";
-    public static final String ACCTAXON_ID = "AccTaxonId";
-    public static final String PB_ID = "Pb";
-    public static final String FN_ID = "Fn";
-    public static final String UNP_ID = "Unp";
-    public static final String UNR_ID = "Unr";
-    public static final String RANK_ID = "Rank";
-    public static final String HAS_SYN_ID = "HasSynonyms";
+    public static final String NAME_ID = "NAME";
+    public static final String ACCTAXON_ID = "ACCTAXON";
+    public static final String PB_ID = "PB";
+    public static final String FN_ID = "FN";
+    public static final String UNP_ID = "UNP";
+    public static final String UNR_ID = "UNR";
+    public static final String RANK_ID = "RANK";
+    public static final String HAS_SYN_ID = "HASSYN";
 
     public Set<Filter> currentFilters;
 

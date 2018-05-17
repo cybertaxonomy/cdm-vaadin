@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.session;
 
 /**
  * @author cmathew
- * @date 21 Apr 2015
+ * @since 21 Apr 2015
  *
  */
 public interface IBasicEventListener {

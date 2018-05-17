@@ -15,7 +15,7 @@ import com.vaadin.data.util.sqlcontainer.connection.JDBCConnectionPool;
 
 /**
  * @author cmathew
- * @date 9 Mar 2015
+ * @since 9 Mar 2015
  *
  * @deprecated unused! should be deleted
  */

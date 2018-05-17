@@ -25,7 +25,7 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationPresenter;
 
 /**
  * @author cmathew
- * @date 28 Apr 2015
+ * @since 28 Apr 2015
  *
  */
 public class AuthenticationPresenterTest extends CdmVaadinBaseTest {

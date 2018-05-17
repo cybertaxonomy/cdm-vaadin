@@ -13,22 +13,25 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.vaadin.spring.events.Event;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBus.ViewEventBus;
+import org.vaadin.spring.events.EventBus.UIEventBus;
 import org.vaadin.spring.events.EventBusListener;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupView;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
@@ -40,17 +43,19 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  *
  */
 @Component
+@UIScope
 @Profile("debug")
 public class EntityCacheDebugger implements ViewChangeListener, EventBusListener<PopEditorOpenedEvent> {
 
     Logger logger = Logger.getLogger(EntityCacheDebugger.class);
-    private ViewEventBus viewEventBus;
+
+    private UIEventBus uiEventBus;
 
 
-    // @Autowired // FIXME autowiring fails, need to put in UI Scope?
-    protected final void setViewEventBus(EventBus.ViewEventBus viewEventBus){
-        this.viewEventBus = viewEventBus;
-        viewEventBus.subscribe(this);
+    @Autowired
+    protected final void setUIEventBus(EventBus.UIEventBus uiEventBus){
+        this.uiEventBus = uiEventBus;
+        uiEventBus.subscribe(this);
     }
 
     EntityCacheDebuggerShortcutListener shortcutListener;
@@ -134,13 +139,13 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
     @Override
     public void onEvent(Event<PopEditorOpenedEvent> event){
         PopupView popupView = event.getPayload().getPopupView();
-        if(popupView != null && popupView instanceof AbstractCdmPopupEditor){
-            findWindow(((AbstractCdmPopupEditor)popupView)).addShortcutListener(shortcutListener);
+        if(popupView != null && popupView instanceof AbstractPopupView){
+            findWindow((AbstractPopupView)popupView).addShortcutListener(shortcutListener);
         }
 
     }
 
-    private Window findWindow(AbstractCdmPopupEditor view){
+    private Window findWindow(AbstractPopupView view){
         Optional<Window> popUpWindow = UI.getCurrent().getWindows().stream().filter(w -> w.getContent().equals(view)).findFirst();
         if(popUpWindow.isPresent()){
             return popUpWindow.get();
@@ -186,8 +191,8 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
                 if(sender instanceof AbstractView) {
                     EntityCacheDebugger.this.openFor((AbstractView)sender);
                 }
-                if(sender instanceof Window && ((Window)sender).getContent() instanceof AbstractCdmPopupEditor) {
-                    EntityCacheDebugger.this.openFor((AbstractCdmPopupEditor)((Window)sender).getContent());
+                if(sender instanceof Window && ((Window)sender).getContent() instanceof AbstractPopupView) {
+                    EntityCacheDebugger.this.openFor((AbstractPopupView)((Window)sender).getContent());
                 }
 
             }

@@ -18,7 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author cmathew
- * @date 28 Apr 2015
+ * @since 28 Apr 2015
  *
  */
 public class CdmVaadinAuthentication {

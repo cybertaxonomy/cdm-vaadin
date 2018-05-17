@@ -95,6 +95,17 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     }
   }
   
+  // ------------ NameRelationField ------------ //
+  .v-name-relation-field {
+      .toolbar {
+            float: right;
+            height: $v-unit-size;
+      }
+      .margin-wrapper {
+          @include composite-field-wrapper;
+      }
+  }
+  
   // ------------ v-person-field ------------ //
   .v-person-field {
     position: relative;

@@ -68,7 +68,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 
 /**
  * @author cmathew
- * @date 11 Mar 2015
+ * @since 11 Mar 2015
  *
  */
 public class StatusComposite extends CustomComponent implements View, IStatusComposite, ICdmChangeListener {

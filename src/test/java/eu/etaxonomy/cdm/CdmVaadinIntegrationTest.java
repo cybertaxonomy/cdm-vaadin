@@ -10,13 +10,13 @@ package eu.etaxonomy.cdm;
 
 import org.hibernate.SessionFactory;
 import org.junit.runner.RunWith;
+import org.unitils.AlternativeUnitilsJUnit4TestClassRunner;
 import org.unitils.database.annotations.Transactional;
 import org.unitils.database.util.TransactionMode;
 import org.unitils.spring.annotation.SpringApplicationContext;
 import org.unitils.spring.annotation.SpringBeanByType;
 
 import eu.etaxonomy.cdm.test.integration.CdmIntegrationTest;
-import unitils.AlternativeUnitilsJUnit4TestClassRunner;
 
 /**
  * Base test class for pure service layer tests.

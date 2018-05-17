@@ -35,6 +35,18 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> 
 
     @Override
     public String getCaption(T option) {
+        String caption = chooseTitle(option);
+        if(caption == null){
+            caption = option.getTitleCache();
+        }
+        return caption;
+    }
+
+    /**
+     * @param option
+     * @return
+     */
+    protected String chooseTitle(T option) {
         switch(cacheType){
         case NOMENCLATURAL_TITLE:
             return option.getNomenclaturalTitle();
@@ -42,7 +54,7 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> 
             // return option.getCollectorTitle(); // enable once #4311 is solved
         case BIBLIOGRAPHIC_TITLE:
         default:
-            return option.getTitleCache();
+            return null;
         }
     }
 }

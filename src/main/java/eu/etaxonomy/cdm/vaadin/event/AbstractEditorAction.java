@@ -9,14 +9,16 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.Stack;
+import java.util.UUID;
 
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
- * Base implementation for an event which which represents the request to start
+ * Base implementation for an event which represents the request to start
  * an editor to enable the user to perform the <code>action</code> transported
  * with this event.
  *
@@ -24,22 +26,24 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Mar 22, 2017
  *
  */
-public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorActionType> {
+public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<EditorActionType> {
 
-    private Component sourceComponent = null;
+    private Button source = null;
+
+    private Field<V> target = null;
 
     protected Stack<EditorActionContext> context;
 
     public AbstractEditorAction(EditorActionType action) {
-        this(action, null, null);
+        this(action, null, null, null);
     }
 
-    public AbstractEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
-        this(action, null, source, sourceView);
+    public AbstractEditorAction(EditorActionType action, Button source, Field<V> target, AbstractView sourceView) {
+        this(action, null, source, target, sourceView);
     }
 
-    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        this(action, entityId, source, sourceView, null);
+    public AbstractEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<V> target, AbstractView sourceView) {
+        this(action, entityUuid, source, target, sourceView, null);
     }
 
     /**
@@ -57,10 +61,11 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
      *            Editor actions from previous views and editors that lead to the point
      *            from where this action is spawned.
      */
-    public AbstractEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+    public AbstractEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<V> target, AbstractView sourceView,
             Stack<EditorActionContext> context) {
-        super(action, entityId, sourceView);
-        this.sourceComponent = source;
+        super(action, entityUuid, sourceView);
+        this.source = source;
+        this.target = target;
         this.context = context;
     }
 
@@ -76,12 +81,19 @@ public abstract class AbstractEditorAction extends AbstractEntityEvent<EditorAct
         return type.equals(EditorActionType.REMOVE);
     }
 
-    public Component getSourceComponent() {
-        return sourceComponent;
+    public Button getSource() {
+        return source;
+    }
+
+    /**
+     * @return the target
+     */
+    public Field<V> getTarget() {
+        return target;
     }
 
     public boolean hasSource() {
-        return sourceComponent != null;
+        return source != null;
     }
 
     /**

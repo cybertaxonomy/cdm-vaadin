@@ -12,7 +12,7 @@ import com.vaadin.ui.Component;
 
 /**
  * @author cmathew
- * @date 21 Apr 2015
+ * @since 21 Apr 2015
  *
  */
 public class BasicEvent {

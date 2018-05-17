@@ -19,7 +19,7 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 
 /**
  * @author freimeier
- * @date 22.11.2017
+ * @since 22.11.2017
  *
  */
 public class DistributionStatusQueryDefinition extends LazyQueryDefinition {

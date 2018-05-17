@@ -8,7 +8,12 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -25,6 +30,7 @@ import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
@@ -38,7 +44,9 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.Layout.MarginHandler;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PopupDateField;
@@ -89,6 +97,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private CssLayout toolBarButtonGroup = new CssLayout();
 
+    private Label statusMessageLabel = new Label();
+
+    Set<String> statusMessages = new HashSet<>();
+
     private GridLayout _gridLayoutCache;
 
     private boolean isBeanLoaded;
@@ -97,6 +109,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private boolean isContextUpdated;
 
+    private boolean isAdvancedMode = false;
+
+    private List<Component> advancedModeComponents = new ArrayList<>();
+
+    private Button advancedModeButton;
+
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
         mainLayout = new VerticalLayout();
@@ -104,6 +122,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         // popup window may have problems with automatic resizing of its
         // content.
         mainLayout.setSizeFull();
+
         setCompositionRoot(mainLayout);
 
         fieldGroup = new BeanFieldGroup<>(dtoType);
@@ -121,6 +140,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         if(fieldLayout instanceof AbstractOrderedLayout){
             ((AbstractOrderedLayout)fieldLayout).setSpacing(true);
         }
+        if(MarginHandler.class.isAssignableFrom(fieldLayout.getClass())){
+            ((MarginHandler)fieldLayout).setMargin(new MarginInfo(false, true, true, true));
+        }
 
         buttonLayout = new HorizontalLayout();
         buttonLayout.setStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
@@ -131,10 +153,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.setStyleName(ValoTheme.BUTTON_PRIMARY);
         save.addClickListener(e -> save());
 
-        cancel = new Button("Cancel", FontAwesome.TRASH);
+        cancel = new Button("Cancel", FontAwesome.REMOVE);
         cancel.addClickListener(e -> cancel());
 
-        delete = new Button("Delete", FontAwesome.REMOVE);
+        delete = new Button("Delete", FontAwesome.TRASH);
         delete.setStyleName(ValoTheme.BUTTON_DANGER);
         delete.addClickListener(e -> delete());
         delete.setVisible(false);
@@ -146,7 +168,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
-        mainLayout.addComponents(toolBar, fieldLayout, buttonLayout);
+        statusMessageLabel.setWidthUndefined();
+
+        mainLayout.addComponents(toolBar, fieldLayout, statusMessageLabel, buttonLayout);
+        mainLayout.setComponentAlignment(statusMessageLabel, Alignment.BOTTOM_RIGHT);
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
 
         updateToolBarVisibility();
@@ -180,6 +205,20 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.setVisible(!readOnly);
         delete.setVisible(!readOnly);
         cancel.setCaption(readOnly ? "Close" : "Cancel");
+        recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
+    }
+
+    /**
+     * @param readOnly
+     * @param layout
+     */
+    protected void recursiveReadonly(boolean readOnly, AbstractComponentContainer layout) {
+        for(Component c : layout){
+            c.setReadOnly(readOnly);
+            if(c instanceof AbstractComponentContainer){
+                recursiveReadonly(readOnly, (AbstractComponentContainer)c);
+            }
+        }
     }
 
     /**
@@ -240,6 +279,41 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         toolBar.setVisible(true);
     }
 
+    /**
+     * @return the isAdvancedMode
+     */
+    public boolean isAdvancedMode() {
+        return isAdvancedMode;
+    }
+
+    /**
+     * @param isAdvancedMode the isAdvancedMode to set
+     */
+    public void setAdvancedMode(boolean isAdvancedMode) {
+        this.isAdvancedMode = isAdvancedMode;
+        advancedModeComponents.forEach(c -> c.setVisible(isAdvancedMode));
+    }
+
+    public void setAdvancedModeEnabled(boolean activate){
+        if(activate && advancedModeButton == null){
+            advancedModeButton = new Button(FontAwesome.WRENCH); // FontAwesome.FLASK
+            advancedModeButton.setIconAlternateText("Advanced mode");
+            advancedModeButton.addStyleName(ValoTheme.BUTTON_TINY);
+            toolBarButtonGroupAdd(advancedModeButton);
+            advancedModeButton.addClickListener(e -> {
+                setAdvancedMode(!isAdvancedMode);
+                }
+            );
+
+        } else if(advancedModeButton != null) {
+            toolBarButtonGroupRemove(advancedModeButton);
+            advancedModeButton = null;
+        }
+    }
+
+    public void registerAdvancedModeComponents(Component ... c){
+        advancedModeComponents.addAll(Arrays.asList(c));
+    }
 
 
     // ------------------------ event handler ------------------------ //
@@ -532,6 +606,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         gridLayout().addComponent(component, column1, row1, column2, row2);
     }
 
+    public void setSaveButtonEnabled(boolean enabled){
+        save.setEnabled(enabled);
+    }
 
     public void withDeleteButton(boolean withDelete){
 
@@ -545,6 +622,30 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         delete.setVisible(withDelete);
     }
 
+    public boolean addStatusMessage(String message){
+        boolean returnVal = statusMessages.add(message);
+        updateStatusLabel();
+        return returnVal;
+    }
+
+    public boolean removeStatusMessage(String message){
+        boolean returnVal = statusMessages.remove(message);
+        updateStatusLabel();
+        return returnVal;
+    }
+
+    /**
+     *
+     */
+    private void updateStatusLabel() {
+        String text = "";
+        for(String s : statusMessages){
+            text += s + " ";
+        }
+        statusMessageLabel.setValue(text);
+        statusMessageLabel.setVisible(!text.isEmpty());
+        statusMessageLabel.addStyleName(ValoTheme.LABEL_COLORED);
+    }
 
     // ------------------------ data binding ------------------------ //
 
@@ -560,6 +661,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         DTO beanToEdit = getPresenter().loadBeanById(identifier);
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
+        getPresenter().adaptToUserPermission(beanToEdit);
         isBeanLoaded = true;
     }
 

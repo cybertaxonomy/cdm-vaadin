@@ -8,8 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
-import com.vaadin.ui.Component;
+import java.util.UUID;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
+
+import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
@@ -17,7 +21,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  */
-public class CollectionEditorAction extends AbstractEditorAction {
+public class CollectionEditorAction extends AbstractEditorAction<Collection> {
 
     /**
      * @param eventType
@@ -30,8 +34,8 @@ public class CollectionEditorAction extends AbstractEditorAction {
      * @param action
      * @param source
      */
-    public CollectionEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
-        super(action, source, sourceView);
+    public CollectionEditorAction(EditorActionType action, Button source, Field<Collection> target, AbstractView sourceView) {
+        super(action, source, target, sourceView);
     }
 
     /**
@@ -40,8 +44,8 @@ public class CollectionEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public CollectionEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId, source, sourceView);
+    public CollectionEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<Collection> target, AbstractView sourceView) {
+        super(action, entityUuid, source, target, sourceView);
     }
 
 }

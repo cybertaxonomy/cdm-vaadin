@@ -12,7 +12,7 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.StringDecorator;
 
 /**
  * @author cmathew
- * @date 16 Mar 2015
+ * @since 16 Mar 2015
  *
  */
 public class CdmSQLStringDecorator extends StringDecorator {

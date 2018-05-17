@@ -8,8 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
-import com.vaadin.ui.Component;
+import java.util.UUID;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
+
+import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
@@ -17,7 +21,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  */
-public class RegistrationEditorAction extends AbstractEditorAction {
+public class RegistrationEditorAction extends AbstractEditorAction<Registration> {
 
     /**
      * @param eventType
@@ -31,8 +35,8 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param action
      * @param source
      */
-    public RegistrationEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
-        super(action, source, sourceView);
+    public RegistrationEditorAction(EditorActionType action, Button source, Field<Registration> target, AbstractView sourceView) {
+        super(action, source, target, sourceView);
     }
 
     /**
@@ -41,8 +45,8 @@ public class RegistrationEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public RegistrationEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId, source, sourceView);
+    public RegistrationEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<Registration> target, AbstractView sourceView) {
+        super(action, entityUuid, source, target, sourceView);
     }
 
 

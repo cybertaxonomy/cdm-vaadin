@@ -10,7 +10,9 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
+import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
@@ -45,7 +48,7 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
@@ -90,11 +93,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
-    private CollectionPopupEditor collectionPopupEditor;
+    private Map<CollectionPopupEditor, SpecimenTypeDesignationDTORow> collectionPopupEditorsRowMap = new HashMap<>();
 
-    private Set<CollectionRowItemCollection> collectionPopuEditorSourceRows = new HashSet<>();
+    private Map<ReferencePopupEditor, SpecimenTypeDesignationDTORow> referencePopupEditorsRowMap = new HashMap<>();
 
-    private ReferencePopupEditor referencePopupEditor;
+    private Set<CollectionRowItemCollection> popuEditorTypeDesignationSourceRows = new HashSet<>();
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
@@ -125,7 +128,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
 
             if(idset.baseEntityRef != null){
-                workingSetDto = specimenTypeDesignationWorkingSetService.loadDtoByIds(idset.registrationId, idset.baseEntityRef);
+                workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntityRef);
                 if(workingSetDto.getFieldUnit() == null){
                     workingSetDto = specimenTypeDesignationWorkingSetService.fixMissingFieldUnit(workingSetDto);
                         // FIXME open Dialog to warn user about adding an empty fieldUnit to the typeDesignations
@@ -137,7 +140,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationId, idset.publicationId, idset.typifiedNameId);
+                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
                 cache.load(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getOwner());
@@ -163,6 +166,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
@@ -170,7 +174,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
 
 
-        collectionPopuEditorSourceRows.clear();
+        popuEditorTypeDesignationSourceRows.clear();
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
@@ -202,10 +206,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
-                row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd());
+                row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd(row));
                 row.collection.addClickListenerEditEntity(e -> {
                         if(row.collection.getValue() != null){
-                            doCollectionEditorEdit(row.collection.getValue().getId());
+                            doCollectionEditorEdit(row);
                         }
                     });
 
@@ -219,16 +223,16 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
-                row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd());
+                row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row));
                 row.mediaSpecimenReference.addClickListenerEditEntity(e -> {
                     if(row.mediaSpecimenReference.getValue() != null){
-                        doReferenceEditorEdit(row.mediaSpecimenReference.getValue().getId());
+                        doReferenceEditorEdit(row);
                     }
                 });
 
                 getView().applyDefaultComponentStyle(row.components());
 
-                collectionPopuEditorSourceRows.add(row);
+                popuEditorTypeDesignationSourceRows.add(row);
 
                 return row;
             }
@@ -303,22 +307,26 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         return cache;
     }
 
-    public void doCollectionEditorAdd() {
+    public void doCollectionEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
+        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
         collectionPopupEditor.loadInEditor(null);
+
+        collectionPopupEditorsRowMap.put(collectionPopupEditor, row);
     }
 
-    public void doCollectionEditorEdit(int collectionId) {
+    public void doCollectionEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView());
+        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
-        collectionPopupEditor.loadInEditor(collectionId);
+        collectionPopupEditor.loadInEditor(row.collection.getValue().getUuid());
+
+        collectionPopupEditorsRowMap.put(collectionPopupEditor, row);
     }
 
 
@@ -326,44 +334,60 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void onCollectionEvent(EntityChangeEvent event){
 
         Collection newCollection = getRepo().getCollectionService().load(
-                event.getEntityId(), Arrays.asList(new String[]{"$.institute"})
+                event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})
                 );
         cache.load(newCollection);
 
-        for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
-            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 2);
+        if(event.isCreatedType()){
+            SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
+            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+            combobox.setValue((Collection) event.getEntity());
+        }
+        for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
             combobox.reload();
         }
     }
 
-    public void doReferenceEditorAdd() {
+    public void doReferenceEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
 
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);
         referencePopupEditor.loadInEditor(null);
+
+        referencePopupEditorsRowMap.put(referencePopupEditor, row);
     }
 
-    public void doReferenceEditorEdit(int referenceId) {
+    public void doReferenceEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);
-        referencePopupEditor.loadInEditor(referenceId);
+        referencePopupEditor.loadInEditor(row.mediaSpecimenReference.getValue().getUuid());
+
+        referencePopupEditorsRowMap.put(referencePopupEditor, row);
     }
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
     public void onReferenceEvent(EntityChangeEvent event){
 
-        Reference newRef = getRepo().getReferenceService().load(event.getEntityId(), Arrays.asList(new String[]{"$"}));
+        Reference newRef = getRepo().getReferenceService().load(event.getEntityUuid(), Arrays.asList(new String[]{"$"}));
         cache.load(newRef);
 
-        for( CollectionRowItemCollection row : collectionPopuEditorSourceRows) {
-            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 6);
-            combobox.reload();
+        if(event.isCreatedType()){
+            SpecimenTypeDesignationDTORow row = referencePopupEditorsRowMap.get(event.getSourceView());
+            ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
+            combobox.setValue((Reference) event.getEntity());
+
+        } else {
+            for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+                ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
+                combobox.reload();
+            }
         }
     }
 

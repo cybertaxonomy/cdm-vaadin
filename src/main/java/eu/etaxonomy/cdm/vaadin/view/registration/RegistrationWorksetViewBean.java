@@ -8,8 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,6 +29,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -40,13 +44,19 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.api.service.dto.EntityReference;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemEditButtonGroup.TypeDesignationWorkingSetButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
@@ -56,12 +66,11 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 
@@ -73,19 +82,6 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 @SpringView(name=RegistrationWorksetViewBean.NAME)
 public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
     implements RegistrationWorkingsetView, View, AccessRestrictedView {
-
-    private class RegistrationDetailsItem {
-
-        RegistrationItemEditButtonGroup registrationItemEditButtonGroup;
-        CssLayout itemFooter;
-
-        public RegistrationDetailsItem(RegistrationItemEditButtonGroup registrationItemEditButtonGroup, CssLayout itemFooter){
-            this.registrationItemEditButtonGroup = registrationItemEditButtonGroup;
-            this.itemFooter = itemFooter;
-        }
-
-
-    }
 
     /**
      *
@@ -115,7 +111,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     private String headerText = "Registration Workingset Editor";
     private String subheaderText = "";
 
-    private Integer citationID;
+    private UUID citationUuid;
 
     private Button addNewNameRegistrationButton;
 
@@ -129,7 +125,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private Panel registrationListPanel;
 
-    private Map<Integer, RegistrationDetailsItem> registrationItemMap = new HashMap<>();
+    /**
+     * uses the registrationId as key
+     */
+    private Map<UUID, RegistrationDetailsItem> registrationItemMap = new HashMap<>();
+
+    /**
+     * uses the registrationId as key
+     */
+    private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
 
     public RegistrationWorksetViewBean() {
         super();
@@ -153,7 +157,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
-            this.citationID = Integer.valueOf(event.getParameters());
+            this.citationUuid = UUID.fromString(event.getParameters());
 
             getPresenter().handleViewEntered();
         }
@@ -170,9 +174,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             getLayout().removeComponent(registrationListPanel);
         }
         workingsetHeader = new RegistrationItem(workingset, this);
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
-            workingsetHeader.getSubmitterLabel().setVisible(true);
-        }
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
@@ -184,9 +185,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     }
 
     @Override
-    public void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs) {
+    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs) {
 
-        RegistrationDetailsItem regItem = registrationItemMap.get(registrationId);
+        RegistrationDetailsItem regItem = registrationItemMap.get(registrationUuid);
 
         boolean blockingRegAdded = false;
         for(Iterator it = regItem.itemFooter.iterator(); it.hasNext(); ){
@@ -240,13 +241,13 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, this)));
+                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
 
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
-                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(citationID, RegistrationWorkingsetAction.Action.start))
+                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(citationUuid, RegistrationWorkingsetAction.Action.start))
                 );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
@@ -265,6 +266,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
         Panel namesTypesPanel = new Panel(registrationsGrid);
+        namesTypesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
         return namesTypesPanel;
     }
 
@@ -272,26 +274,38 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
-        RegistrationItemEditButtonGroup regItemButtonGroup = new RegistrationItemEditButtonGroup(dto);
-        Integer registrationEntityID = dto.getId();
+        EntityReference typifiedNameReference = dto.getTypifiedNameRef();
+        if(typifiedNameReference == null){
+            typifiedNameReference = dto.getNameRef();
+        }
+        typifiedNamesMap.put(dto.getUuid(), typifiedNameReference);
+
+        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
+        UUID registrationEntityUuid = dto.getUuid();
+
+        RegistrationItemButtons regItemButtons = new RegistrationItemButtons();
+
         CssLayout footer = new CssLayout();
         footer.setWidth(100, Unit.PERCENTAGE);
         footer.setStyleName("item-footer");
-        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, footer);
-        registrationItemMap.put(registrationEntityID, regDetailsItem);
+
+        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, regItemButtons, footer);
+        registrationItemMap.put(registrationEntityUuid, regDetailsItem);
+
         Stack<EditorActionContext> context = new Stack<EditorActionContext>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(Registration.class, registrationEntityID),
+                    new TypedEntityReference<>(Registration.class, registrationEntityUuid),
                     this)
                     );
 
         if(regItemButtonGroup.getNameButton() != null){
             regItemButtonGroup.getNameButton().getButton().addClickListener(e -> {
-                Integer nameId = regItemButtonGroup.getNameButton().getId();
+                UUID nameuUuid = regItemButtonGroup.getNameButton().getUuid();
                 getViewEventBus().publish(this, new TaxonNameEditorAction(
                     EditorActionType.EDIT,
-                    nameId,
+                    nameuUuid,
                     e.getButton(),
+                    null,
                     this,
                     context
                     )
@@ -302,13 +316,16 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         for(TypeDesignationWorkingSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
                 TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
+                EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                         EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
-                        registrationEntityID,
+                        registrationEntityUuid,
+                        typifiedNameRef.getUuid(),
                         e.getButton(),
+                        null,
                         this,
                         context
                         )
@@ -317,51 +334,64 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
 
         regItemButtonGroup.getAddTypeDesignationButton().addClickListener(
-                e -> chooseNewTypeRegistrationWorkingset(dto.getId())
+                e -> chooseNewTypeRegistrationWorkingset(dto.getUuid())
                 );
 
 
-        CssLayout buttonGroup = new CssLayout();
-        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-
-        Button blockingRegistrationButton = new Button(FontAwesome.WARNING);
+        Button blockingRegistrationButton = regItemButtons.getBlockingRegistrationButton();
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
-        if(!dto.isBlocked()){
-            blockingRegistrationButton.setEnabled(false);
-        } else {
-            blockingRegistrationButton.addStyleName(RegistrationItem.STYLE_NAME_BLOCKED);
+        blockingRegistrationButton.setDescription("No blocking registrations");
+        if(dto.isBlocked()){
+            blockingRegistrationButton.setEnabled(true);
+            blockingRegistrationButton.setDescription("This registration is currently blocked by other registrations");
+            blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
-                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+                    new ShowDetailsEvent<RegistrationDTO, UUID>(
                             e,
                             RegistrationDTO.class,
-                            dto.getId(),
-                            "blockedBy"
+                            dto.getUuid(),
+                            RegistrationItem.BLOCKED_BY
                             )
                     ));
         }
-        buttonGroup.addComponent(blockingRegistrationButton);
 
-        Button messageButton = new Button(FontAwesome.COMMENT);
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-        if(dto.getMessages().isEmpty()){
-            messageButton.setEnabled(false);
-        } else {
-            messageButton.addClickListener(e -> getViewEventBus().publish(this,
-                    new ShowDetailsEvent<RegistrationDTO, Integer>(
+        Button validationProblemsButton = regItemButtons.getValidationProblemsButton();
+        validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
+
+        if(!dto.getValidationProblems().isEmpty()){
+            validationProblemsButton.setEnabled(true);
+            validationProblemsButton.addClickListener(e -> getViewEventBus().publish(this,
+                    new ShowDetailsEvent<RegistrationDTO, UUID>(
                         e,
                         RegistrationDTO.class,
-                        dto.getId(),
-                        "messages"
+                        dto.getUuid(),
+                        RegistrationItem.VALIDATION_PROBLEMS
                         )
                     )
                 );
         }
-        messageButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getMessages().size() + "</span>");
-        messageButton.setCaptionAsHtml(true);
-        buttonGroup.addComponent(messageButton);
+        validationProblemsButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
+        validationProblemsButton.setCaptionAsHtml(true);
+
+        Button messageButton = regItemButtons.getMessagesButton();
+        messageButton.addClickListener(e -> getViewEventBus().publish(this,
+                    new ShowDetailsEvent<RegistrationDTO, UUID>(
+                        e,
+                        RegistrationDTO.class,
+                        dto.getUuid(),
+                        RegistrationItem.MESSAGES
+                        )
+                    )
+                );
+        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
         RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
+        Label submitterLabel = new Label(dto.getSubmitterUserName());
+        submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
+        submitterLabel.setIcon(FontAwesome.USER);
+        submitterLabel.setContentMode(ContentMode.HTML);
+        CssLayout stateAndSubmitter = new CssLayout(stateLabel, submitterLabel);
 
 
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
@@ -370,22 +400,23 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             editRegistrationButton.setDescription("Edit registration");
             editRegistrationButton.addClickListener(e -> getViewEventBus().publish(this, new RegistrationEditorAction(
                 EditorActionType.EDIT,
-                dto.getId(),
+                dto.getUuid(),
+                e.getButton(),
                 null,
                 this
                 )));
-            buttonGroup.addComponent(editRegistrationButton);
+            regItemButtons.addComponent(editRegistrationButton);
         }
 
-        PermissionDebugUtils.addGainPerEntityPermissionButton(buttonGroup, Registration.class, dto.getId(),
+        PermissionDebugUtils.addGainPerEntityPermissionButton(regItemButtons, Registration.class, dto.getUuid(),
                 EnumSet.of(CRUD.UPDATE), RegistrationStatus.PREPARATION.name());
 
         row++;
-        registrationsGrid.addComponent(stateLabel, COL_INDEX_STATE_LABEL, row);
-        registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
+        registrationsGrid.addComponent(stateAndSubmitter, COL_INDEX_STATE_LABEL, row);
+        // registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
         registrationsGrid.addComponent(regItemButtonGroup, COL_INDEX_REG_ITEM, row);
-        registrationsGrid.addComponent(buttonGroup, COL_INDEX_BUTTON_GROUP, row);
-        registrationsGrid.setComponentAlignment(buttonGroup, Alignment.TOP_LEFT);
+        registrationsGrid.addComponent(regItemButtons, COL_INDEX_BUTTON_GROUP, row);
+        registrationsGrid.setComponentAlignment(regItemButtons, Alignment.TOP_LEFT);
 
         row++;
         registrationsGrid.addComponent(footer, 0, row, COL_INDEX_BUTTON_GROUP, row);
@@ -399,17 +430,16 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      *
      */
     @Override
-    public void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId) {
-
+    public void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid){
         Window typeDesignationTypeCooser = new Window();
         typeDesignationTypeCooser.setModal(true);
         typeDesignationTypeCooser.setResizable(false);
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityId, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser));
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
         layout.setMargin(true);
@@ -424,12 +454,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * @param button
      *
      */
-    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, Integer registrationEntityId, Window typeDesignationTypeCooser) {
+    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
+        EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
         getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
                 EditorActionType.ADD,
                 newWorkingsetType,
-                registrationEntityId,
+                registrationEntityUuid,
+                typifiedNameRef.getUuid(),
+                null,
                 null,
                 this
                 ));
@@ -545,8 +578,13 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * @return the citationID
      */
     @Override
-    public Integer getCitationID() {
-        return citationID;
+    public UUID getCitationUuid() {
+        return citationUuid;
+    }
+
+    @Override
+    public Map<UUID, RegistrationDetailsItem> getRegistrationItemMap(){
+        return Collections.unmodifiableMap(registrationItemMap);
     }
 
 

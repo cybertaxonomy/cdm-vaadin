@@ -13,6 +13,7 @@ import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -33,6 +34,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -40,11 +42,11 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.security.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -59,10 +61,12 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 public class RegistrationItem extends GridLayout {
 
 
-    /**
-     *
-     */
-    public static final String STYLE_NAME_BLOCKED = "blocked";
+
+    public static final String VALIDATION_PROBLEMS = "validationProblems";
+
+    public static final String MESSAGES = "messages";
+
+    public static final String BLOCKED_BY = "blockedBy";
 
     private static final String LABEL_CAPTION_CREATED = "Created";
 
@@ -188,16 +192,16 @@ public class RegistrationItem extends GridLayout {
         this.regDto = regDto;
 
         NavigationEvent navigationEvent = null;
-        if(regDto.getCitationID() != null) {
+        if(regDto.getCitationUuid() != null) {
             navigationEvent = new NavigationEvent(
                     RegistrationWorksetViewBean.NAME,
-                    Integer.toString(regDto.getCitationID())
+                    regDto.getCitationUuid().toString()
                     );
         } else {
             setComponentError(new UserError("Citation is missing"));
         }
 
-        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getMessages().size(),
+        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getValidationProblems().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 
@@ -205,11 +209,11 @@ public class RegistrationItem extends GridLayout {
         this.parentView = parentView;
 
         ReferenceEditorAction referenceEditorAction = null;
-        if(workingSet.getCitationId() != null){
-            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationId(), CRUD.UPDATE)){
-                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationId(), null, parentView);
+        if(workingSet.getCitationUuid() != null){
+            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+                referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
-            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationId(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
             if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
@@ -219,7 +223,7 @@ public class RegistrationItem extends GridLayout {
         String submitterName = null;
         if(workingSet.getRegistrationDTOs().size() > 0){
             datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
-            submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
+            // submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
@@ -242,17 +246,17 @@ public class RegistrationItem extends GridLayout {
             getMessageButton().addClickListener(e -> {
                 ShowDetailsEvent detailsEvent;
                 if(regDto != null){
-                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, Integer>(
+                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
                             e,
                             RegistrationDTO.class,
-                            regDto.getId(),
-                            "messages");
+                            regDto.getUuid(),
+                            VALIDATION_PROBLEMS);
                 } else {
-                    detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, Integer>(
+                    detailsEvent = new ShowDetailsEvent<RegistrationWorkingSet, UUID>(
                             e,
                             RegistrationWorkingSet.class,
                             null,
-                            "messages");
+                            VALIDATION_PROBLEMS);
                 }
                 publishEvent(detailsEvent);
                 }
@@ -263,7 +267,7 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null && regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
-            getBlockedByButton().addStyleName(STYLE_NAME_BLOCKED);
+            getBlockedByButton().addStyleName(EditValoTheme.BUTTON_HIGHLITE);
         }
 
         labelMarkup.append(citationString);
@@ -298,6 +302,7 @@ public class RegistrationItem extends GridLayout {
 
         getCitationSummaryLabel().setValue(labelMarkup.toString());
         getSubmitterLabel().setValue(submitterUserName);
+        getSubmitterLabel().setVisible(submitterUserName != null);
         updateDateLabels(created, datePublished, registrationDate);
     }
 
@@ -325,8 +330,8 @@ public class RegistrationItem extends GridLayout {
         }
     }
 
-    public int getRegistrationId(){
-        return regDto.getId();
+    public UUID getRegistrationUuid(){
+        return regDto.getUuid();
     }
 
     /**
@@ -379,7 +384,7 @@ public class RegistrationItem extends GridLayout {
     }
 
     /**
-     * @return the messageButton
+     * @return the validationProblemsButton
      */
     public Button getMessageButton() {
         return messageButton;

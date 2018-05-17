@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Scope;
 
@@ -20,7 +21,7 @@ import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -46,7 +47,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
      * {@inheritDoc}
      */
     @Override
-    protected Registration loadCdmEntityById(Integer identifier) {
+    protected Registration loadCdmEntity(UUID identifier) {
 
         Registration reg;
         if(identifier != null){
@@ -62,7 +63,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, identifier, crud, null);
         }

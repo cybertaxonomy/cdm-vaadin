@@ -139,8 +139,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // TODO remove from nested fields
         updateValue();
         updateButtonStates();
-
     }
+
 
     /**
      * @param field
@@ -184,7 +184,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         List<V> beanList = getValue();
         beanList.clear();
         beanList.addAll(nestedValues);
-        setInternalValue(beanList, false);
+        setInternalValue(beanList);
     }
 
     /**
@@ -216,12 +216,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     protected void setInternalValue(List<V> newValue) {
 
-        setInternalValue(newValue, true);
-
-    }
-
-    protected void setInternalValue(List<V> newValue, boolean doUpdateFields) {
-
         super.setInternalValue(newValue);
 
         if(valueInitiallyWasNull == null){
@@ -231,17 +225,24 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         if(newValue != null){
             // newValue is already converted, need to use the original value from the data source
             boolean isListType = List.class.isAssignableFrom(getPropertyDataSource().getValue().getClass());
+            // if(valueInitiallyWasNull && isOrderedCollection != isListType){
             if(valueInitiallyWasNull && isOrderedCollection != isListType){
                 // need to reset the grid in this case, so that the button groups are created correctly
-                grid.setRows(1);
-                grid.removeAllComponents();
+                clearRows();
             }
             isOrderedCollection = isListType;
+        } else {
+            clearRows();
         }
 
         if(!creatingFields){
             createFieldsForData();
         }
+    }
+
+    private void clearRows() {
+        grid.removeAllComponents();
+        grid.setRows(1);
     }
 
     private void createFieldsForData(){
@@ -306,6 +307,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             F field = newFieldInstance(val);
             field.addValueChangeListener(e -> {
                 updateValue();
+                fireValueChange(true);
             });
             Property ds = getPropertyDataSource();
             if(ds != null){
@@ -407,8 +409,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             if(withEditButton){
                 addButtonIndex++;
                 // edit
-                ((Button)buttonGroup.getComponent(0)).setDescription(field.getValue() == null ? "New" : "Edit");
-                buttonGroup.getComponent(0).setEnabled(field.getValue() == null
+                Button editCreateButton = ((Button)buttonGroup.getComponent(0));
+                editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
+                editCreateButton.setEnabled(field.getValue() == null
                         || field.getValue() != null && testEditButtonPermission(field.getValue()));
             }
             // add
@@ -546,12 +549,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
         }
         //
+         */
         // calling super.commit() is useless if operating on a transient property!!
         super.commit();
-        if(getValue().isEmpty() && valueInitiallyWasNull){
-            setPropertyDataSource(null);
-        }
-         */
+//        if(getValue().isEmpty() && valueInitiallyWasNull){
+//            setPropertyDataSource(null);
+//        }
     }
 
     /**
@@ -623,7 +626,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        setDeepReadOnly(readOnly, getContent(), null);
         updateButtonStates();
     }
 
@@ -654,6 +657,5 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void setEditActionListener(EntityEditorActionListener editActionListener) {
         this.editActionListener = editActionListener;
     }
-
 
 }

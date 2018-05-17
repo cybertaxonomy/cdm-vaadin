@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.ui.Button;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -79,26 +81,30 @@ public interface RegistrationWorkingsetView extends ApplicationView{
 
     public LazyComboBox<TaxonName> getAddExistingNameCombobox();
 
-    Integer getCitationID();
-
+    /**
+     * @return
+     */
+    UUID getCitationUuid();
 
     /**
      * selecting a type will cause a {@link TypeDesignationWorkingsetEditorAction} to be emitted.
      * On Cancel .. TODO
-     * @param registrationEntityId
+     * @param registrationEntityUuid
      */
-    void chooseNewTypeRegistrationWorkingset(Integer registrationEntityId);
+    void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid);
 
     /**
      * @param registrationId
      * @param blockingRegDTOs
      */
-    void setBlockingRegistrations(int registrationId, Set<RegistrationDTO> blockingRegDTOs);
+    void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs);
 
-
-
-
-
+    /**
+     * Returns the registrationItemMap as unmodifiableMap.
+     *
+     * @return
+     */
+    Map<UUID, RegistrationDetailsItem> getRegistrationItemMap();
 
 
 }

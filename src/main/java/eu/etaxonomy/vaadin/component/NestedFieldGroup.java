@@ -26,4 +26,9 @@ public interface NestedFieldGroup {
 
     public abstract void registerParentFieldGroup(FieldGroup parent);
 
+    /**
+     * @param parent
+     */
+    public abstract void unregisterParentFieldGroup(FieldGroup parent);
+
 }

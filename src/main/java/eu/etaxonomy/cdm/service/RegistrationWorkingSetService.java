@@ -15,14 +15,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.service.pager.impl.DefaultPagerImpl;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
@@ -37,8 +41,6 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.dao.initializer.IBeanInitializer;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationValidationException;
 
 /**
  * Provides RegistrationDTOs and RegistrationWorkingsets for Registrations in the database.
@@ -61,9 +63,13 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             "typeDesignations.typeName.$",
             "typeDesignations.citation",
             "typeDesignations.citation.authorship.$",
+            "typeDesignations.annotations", // needed for AnnotatableEntity.clone() in DerivedUnitConverter.copyPropertiesTo
+            "typeDesignations.markers", // needed for AnnotatableEntity.clone() in DerivedUnitConverter.copyPropertiesTo
+            "typeDesignations.registrations", // DerivedUnitConverter.copyPropertiesTo(TARGET n)
+
             // name
             "name.$",
-            "name.nomenclaturalReference.authorship",
+            "name.nomenclaturalReference.authorship.$",
             "name.nomenclaturalReference.inReference",
             "name.rank",
             "name.homotypicalGroup.typifiedNames",
@@ -94,7 +100,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
           "gatheringEvent.$",
           "gatheringEvent.country",
           "gatheringEvent.collectingAreas",
-          "gatheringEvent.actor.teamMembers",
+          "gatheringEvent.actor",
           "derivationEvents.derivatives" // important, otherwise the DerivedUnits are not included into the graph of initialized entities!!!
   });
 
@@ -152,6 +158,18 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     }
 
 
+    /**
+     * @param id the Registration entity id
+     * @return
+     */
+    @Override
+    public RegistrationDTO loadDtoByUuid(UUID uuid) {
+        Registration reg = repo.getRegistrationService().load(uuid, REGISTRATION_INIT_STRATEGY);
+        inititializeSpecimen(reg);
+        return new RegistrationDTO(reg);
+    }
+
+
     @Override
     public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex) {
 
@@ -183,17 +201,58 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      * @throws RegistrationValidationException
      */
     @Override
-    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
+    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid) throws RegistrationValidationException {
 
-        Reference reference = repo.getReferenceService().find(referenceID);
+        Reference reference = repo.getReferenceService().find(referenceUuid);
+        repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
+
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
+
+        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331 */
+        // debugIssue7331(pager);
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws RegistrationValidationException
+     */
     @Override
-    public Set<RegistrationDTO> loadBlockingRegistrations(Integer blockedRegistrationId){
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
 
-        Registration registration = repo.getRegistrationService().load(blockedRegistrationId, BLOCKING_REGISTRATION_INIT_STRATEGY);
+        Reference reference = repo.getReferenceService().find(referenceID);
+        repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
+
+        Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
+
+        /* for debugging https://dev.e-taxonomy.eu/redmine/issues/7331 */
+        // debugIssue7331(pager);
+
+        return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
+    }
+
+
+    /**
+     * @param pager
+     */
+    @SuppressWarnings("unused")
+    private void debugIssue7331(Pager<Registration> pager) {
+        for(Registration reg : pager.getRecords()){
+            if(reg.getName() != null && reg.getName().getNomenclaturalReference().getAuthorship() != null){
+                Reference ref = (Reference) reg.getName().getNomenclaturalReference();
+                if(!Hibernate.isInitialized(ref.getAuthorship())){
+                    logger.error("UNINITIALIZED");
+                }
+            } else {
+                logger.debug("NO AUTHORS");
+            }
+        }
+    }
+
+    @Override
+    public Set<RegistrationDTO> loadBlockingRegistrations(UUID blockedRegistrationUuid){
+
+        Registration registration = repo.getRegistrationService().load(blockedRegistrationUuid, BLOCKING_REGISTRATION_INIT_STRATEGY);
         Set<Registration> registrations = registration.getBlockedBy();
 
         Set<RegistrationDTO> blockingSet = new HashSet<>();

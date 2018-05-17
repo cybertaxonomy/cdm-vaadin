@@ -11,7 +11,7 @@ import org.vaadin.spring.events.EventBus;
 
 import com.vaadin.ui.CustomComponent;
 
-import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
+import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
 
 /**
  * AbstractView is the base class of all MVP views. It takes care of finding

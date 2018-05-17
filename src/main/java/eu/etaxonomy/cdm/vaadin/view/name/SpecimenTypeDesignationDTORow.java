@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Component;
@@ -40,7 +41,8 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
      */
-    RowListSelect kindOfUnit = new RowListSelect();
+    TextField associatedTypeDesignationCount = new TextField();
+    RowListSelect kindOfUnit = new RowListSelect(); // position is IMPORTANT, see rowListSelectColumn()
     ListSelect typeStatus = new ListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
@@ -57,6 +59,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         kindOfUnit.setRow(this);
         typeStatus.setRows(1);
         typeStatus.setRequired(true);
+
         accessionNumber.setWidth(100, Unit.PIXELS);
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
@@ -77,14 +80,26 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
      */
     public Component[] components() {
         Component[] components = new Component[]{
+            associatedTypeDesignationCount,
             kindOfUnit, typeStatus,
             collection, accessionNumber,
             preferredStableUri,
             mediaUri, mediaSpecimenReference,
-            mediaSpecimenReferenceDetail, mediaSpecimenReferenceDetail
+            mediaSpecimenReferenceDetail
             };
         addAll(Arrays.asList(components));
         return components;
+    }
+
+    public static List<String> visibleFields() {
+        List<String> visibleFields = Arrays.asList(new String[]{
+            "kindOfUnit", "typeStatus",
+            "collection", "accessionNumber",
+            "preferredStableUri",
+            "mediaUri", "mediaSpecimenReference",
+            "mediaSpecimenReferenceDetail"
+            });
+        return visibleFields;
     }
 
     @Override
@@ -95,10 +110,23 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         boolean publishedImageType = kindOfUnitTerm != null && kindOfUnitTerm.equals(KindOfUnitTerms.PUBLISHED_IMAGE());
         boolean unPublishedImageType = kindOfUnitTerm != null && kindOfUnitTerm.equals(KindOfUnitTerms.UNPUBLISHED_IMAGE());
 
-        mediaSpecimenReference.setEnabled(publishedImageType);
-        mediaSpecimenReferenceDetail.setEnabled(publishedImageType);
+        boolean kindOfUnitLocked = !associatedTypeDesignationCount.getValue().isEmpty() && Integer.valueOf(associatedTypeDesignationCount.getValue()) > 1;
+        kindOfUnit.setEnabled(!kindOfUnitLocked);
+        kindOfUnit.setDescription(kindOfUnitLocked ?
+                "Can not be changed since the type specimen is associated with multiple type designations" : "");
+        mediaSpecimenReference.setEnabled(publishedImageType || unPublishedImageType);
+        mediaSpecimenReferenceDetail.setEnabled(publishedImageType || unPublishedImageType);
         mediaUri.setEnabled(publishedImageType || unPublishedImageType);
 
+    }
+
+    /**
+     *
+     * @return the 0-based position index of the <code>kindOfUnit</code> field in this class
+     * which are visible according to {@link #visibleFields())
+     */
+    public static int rowListSelectColumn(){
+        return 0;
     }
 
     class RowListSelect extends ListSelect implements CollectionRowRepresentative {

@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.service;
 
 import java.io.Serializable;
 import java.util.EnumSet;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,8 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthorityParsingException;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.ICdmPermissionEvaluator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
-import eu.etaxonomy.cdm.vaadin.security.RolesAndPermissions;
-import eu.etaxonomy.cdm.vaadin.security.VaadinUserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 
 /**
  * @author a.kohlbecker
@@ -94,6 +95,15 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     }
 
     @Override
+    public User user() {
+        Authentication authentication = getAuthentication();
+        if(authentication != null && authentication.getPrincipal() != null) {
+            return (User) authentication.getPrincipal();
+        }
+        return null;
+    }
+
+    @Override
     public String userName() {
         Authentication authentication = getAuthentication();
         if(authentication != null) {
@@ -142,6 +152,18 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
         EnumSet<CRUD> crudSet = crudSetFromArgs(args);
         try {
             CdmBase entity = repo.getCommonService().find(cdmType, entitiyId);
+            return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
+        } catch (PermissionDeniedException e){
+            //IGNORE
+        }
+        return false;
+    }
+
+    @Override
+    public boolean userHasPermission(Class<? extends CdmBase> cdmType, UUID entitiyUuid, Object ... args){
+        EnumSet<CRUD> crudSet = crudSetFromArgs(args);
+        try {
+            CdmBase entity = repo.getCommonService().find(cdmType, entitiyUuid);
             return permissionEvaluator.hasPermission(getAuthentication(), entity, crudSet);
         } catch (PermissionDeniedException e){
             //IGNORE
@@ -251,6 +273,20 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     }
 
     /**
+     * @param username
+     * @param cdmType
+     * @param entitiyUuid
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityFor(String username, Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property) {
+
+        CdmBase cdmEntity = repo.getCommonService().find(cdmType, entitiyUuid);
+        return createAuthorityFor(username, cdmEntity, crud, property);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -268,6 +304,17 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
     @Override
     public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, Integer entitiyId, EnumSet<CRUD> crud, String property) {
         return createAuthorityFor(userName(), cdmType, entitiyId, crud, property);
+    }
+
+    /**
+     * @param cdmType
+     * @param entitiyUuid
+     * @param crud
+     * @return
+     */
+    @Override
+    public CdmAuthority createAuthorityForCurrentUser(Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property) {
+        return createAuthorityFor(userName(), cdmType, entitiyUuid, crud, property);
     }
 
     /**

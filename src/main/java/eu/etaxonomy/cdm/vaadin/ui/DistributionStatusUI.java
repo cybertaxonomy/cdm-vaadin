@@ -17,7 +17,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.vaadin.security.ReleasableResourcesView;
+import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionTableViewBean;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;

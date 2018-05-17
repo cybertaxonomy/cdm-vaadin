@@ -15,7 +15,7 @@ import com.vaadin.data.util.converter.Converter;
 
 /**
  * @author freimeier
- * @date 21.11.2017
+ * @since 21.11.2017
  *
  */
 abstract class UuidTitleStringConverter implements Converter<String, UUID> {

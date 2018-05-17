@@ -8,14 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings;
 
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.AreaAndTaxonSettingsConfigWindow;
-import eu.etaxonomy.cdm.vaadin.view.distributionStatus.DistributionStatusSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.AreaAndTaxonSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionStatusSettingsConfigWindow;
 
 /**
  * Note: This presenter is used for {@link DistributionStatusSettingsConfigWindow} AND {@link AreaAndTaxonSettingsConfigWindow}
  *
  * @author alex
- * @date 22.04.2015
+ * @since 22.04.2015
  *
  *
  */

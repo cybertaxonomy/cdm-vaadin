@@ -8,11 +8,13 @@
 */
 package eu.etaxonomy.cdm.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.hibernate.Session;
 import org.jboss.logging.Logger;
@@ -24,6 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -37,11 +42,8 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.util.converter.TypeDesignationSetManager.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
 
 /**
  * @author a.kohlbecker
@@ -64,12 +66,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     }
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
-            "name.$",
-            "name.nomenclaturalReference.authorship",
-            "name.nomenclaturalReference.inReference",
-            "name.rank",
-            "name.status.type",
-            "name.typeDesignations"
+            "$",
+            "nomenclaturalReference.authorship",
+            "nomenclaturalReference.inReference.authorship",
+            "nomenclaturalReference.inReference.inReference.authorship",
+            "status.type",
+            "typeDesignations"
             }
     );
 
@@ -85,11 +87,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      * {@inheritDoc}
      */
     @Override
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(int registrationId, int publicationId, int typifiedNameId) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
-        Registration reg = repo.getRegistrationService().load(registrationId, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
-        TaxonName typifiedName = repo.getNameService().load(typifiedNameId, TAXON_NAME_INIT_STRATEGY);
-        Reference citation = repo.getReferenceService().load(publicationId, Arrays.asList("$"));
+        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
+        TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
+        Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
@@ -99,12 +101,23 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      */
     @Override
     @Transactional
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> loadDtoByIds(int registrationId, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
-        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoById(registrationId);
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
+        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
         TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = regDTO.getSpecimenTypeDesignationWorkingSetDTO(typeDesignationWorkingSet.getBaseEntityReference());
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = specimenTypeDesignationWorkingSetDTO(regDTO, typeDesignationWorkingSet.getBaseEntityReference());
         return workingSetDto;
+    }
+
+    protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
+        Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntityReference);
+        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
+        typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
+        VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
+
+        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
+                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.getTypifiedName());
+        return dto;
     }
 
     @Override
@@ -114,17 +127,17 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
             // so that they are based on an empty FieldUnit with an associated Gathering Event
 
-            Registration reg = repo.getRegistrationService().find(bean.getOwner().getId());
+            Registration reg = repo.getRegistrationService().find(bean.getOwner().getUuid());
             RegistrationDTO regDTO = new RegistrationDTO(reg);
 
             FieldUnit fieldUnit = FieldUnit.NewInstance();
             GatheringEvent gatheringEvent = GatheringEvent.NewInstance();
             fieldUnit.setGatheringEvent(gatheringEvent);
-            repo.getOccurrenceService().save(fieldUnit);
+            fieldUnit = (FieldUnit) repo.getOccurrenceService().save(fieldUnit);
 
             VersionableEntity baseEntity = bean.getBaseEntity();
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
-                    new TypedEntityReference(baseEntity.getClass(), baseEntity.getId(), baseEntity.toString())
+                    new TypedEntityReference(baseEntity.getClass(), baseEntity.getUuid(), baseEntity.toString())
                     );
             for(TypeDesignationBase td : typeDesignations){
                 DerivationEvent de = DerivationEvent.NewInstance();//
@@ -169,18 +182,15 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             Session session = repo.getSession();
 
-//            PersistentContextAnalyzer regAnalyzer = new PersistentContextAnalyzer(dto.getOwner(), session);
-//            regAnalyzer.printEntityGraph(System.out);
-//            regAnalyzer.printCopyEntities(System.out);
-
             session.merge(dto.getOwner());
             session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
+            // this step also includes the deletion of DerivedUnits which have been converted by
+            // the DerivedUnitConverter in turn of a kindOfUnit change
             for(SpecimenTypeDesignation std : dto.deletedSpecimenTypeDesignations()){
                 deleteSpecimenTypeDesignation(dto, std);
             }
-            session.flush();
         }
 
 

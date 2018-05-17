@@ -43,13 +43,13 @@ import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
 import eu.etaxonomy.cdm.api.cache.CdmCacher;
+import eu.etaxonomy.cdm.api.config.ApplicationConfiguration;
+import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
-import eu.etaxonomy.cdm.common.ConfigFileUtil;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
-import eu.etaxonomy.cdm.opt.config.DataSourceConfigurer;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
-import eu.etaxonomy.cdm.vaadin.security.annotation.EnableAnnotationBasedAccessControl;
+import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
@@ -67,7 +67,8 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
         "eu.etaxonomy.vaadin.ui",
         "eu.etaxonomy.cdm.vaadin",
         "eu.etaxonomy.cdm.service",
-        "org.springframework.context.event"
+        "org.springframework.context.event",
+        "eu.etaxonomy.cdm.ext.registration.messages.redmine" // FIXME needed???
         },
         // exclude UI classes, these are provided via the @Bean annotated methods below
         excludeFilters={@Filter(
@@ -80,9 +81,6 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
 @EnableEventBus // enable the vaadin spring event bus
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
-
-
-    public static final String CDM_DATA_SOURCE_ID = DataSourceConfigurer.CDM_DATA_SOURCE_ID;
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";
@@ -98,11 +96,17 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private SessionFactory sessionFactory;
 
     @Autowired
+    private ApplicationConfiguration appConfig;
+
+    @Autowired
     private void  setTermCacher(CdmCacher termCacher){
         CdmTransientEntityCacher.setDefaultCacher(termCacher);
     }
 
     private boolean registrationUiHibernateEventListenersDone = false;
+
+
+    ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
 
     /*
      * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
@@ -198,10 +202,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @Bean
     public RegistrationIdentifierMinter registrationIdentifierMinter() throws IOException {
         RegistrationIdentifierMinter minter = new RegistrationIdentifierMinter();
-        ensureVaadinAppPropertiesLoaded();
-        minter.setMinLocalId(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_MINID));
-        minter.setMaxLocalId(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_MAXID));
-        minter.setIdentifierFormatString(appProps.getProperty(CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
+
+        minter.setMinLocalId(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_MINID));
+        minter.setMaxLocalId(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_MAXID));
+        minter.setIdentifierFormatString(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
         return minter;
     }
 
@@ -264,24 +268,15 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         String path = uiClass.getAnnotation(SpringUI.class).path().trim();
 
         if(activeUIpaths == null){
-            try {
+            String activatedVaadinUIs = env.getProperty(CDM_VAADIN_UI_ACTIVATED);
+            if(activatedVaadinUIs == null){
+                // not in environment? Read it from the config file!
+                activatedVaadinUIs = appConfig.getProperty(configFile , CDM_VAADIN_UI_ACTIVATED);
+            }
 
-                String activatedVaadinUIs = env.getProperty(CDM_VAADIN_UI_ACTIVATED);
-                if(activatedVaadinUIs == null){
-                    // not in environment? Read it from the config file!
-                    ensureVaadinAppPropertiesLoaded();
-                    if(appProps.get(CDM_VAADIN_UI_ACTIVATED) != null){
-                        activatedVaadinUIs = appProps.get(CDM_VAADIN_UI_ACTIVATED).toString();
-                    }
-                }
-
-                if(activatedVaadinUIs != null) {
-                    String[] uiPaths = activatedVaadinUIs.split("\\s*,\\s*");
-                    this.activeUIpaths = Arrays.asList(uiPaths);
-                }
-            } catch (IOException e) {
-                logger.error("Error reading the vaadin ui properties file. File corrupted?. Stopping instance ...");
-                throw new RuntimeException(e);
+            if(activatedVaadinUIs != null) {
+                String[] uiPaths = activatedVaadinUIs.split("\\s*,\\s*");
+                this.activeUIpaths = Arrays.asList(uiPaths);
             }
         }
         if(activeUIpaths.stream().anyMatch(p -> p.trim().equals(path))){
@@ -291,19 +286,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     }
 
-    /**
-     * @param currentDataSourceId
-     * @throws IOException
-     */
-    protected void ensureVaadinAppPropertiesLoaded() throws IOException {
 
-        String currentDataSourceId = env.getProperty(CDM_DATA_SOURCE_ID);
-        if(appProps == null){
-            appProps = new ConfigFileUtil()
-                    .setDefaultContent(APP_FILE_CONTENT)
-                    .getProperties(currentDataSourceId, PROPERTIES_FILE_NAME);
-        }
-    }
 
     /**
      * {@inheritDoc}

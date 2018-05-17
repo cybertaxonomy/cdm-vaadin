@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  * org.dbunit.util.SQLHelper class
  *
  * @author cmathew
- * @date 7 Apr 2015
+ * @since 7 Apr 2015
  *
  */
 public class SQLUtils {

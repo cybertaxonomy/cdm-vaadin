@@ -1,9 +1,8 @@
 package eu.etaxonomy.vaadin.ui.view;
 
-import com.vaadin.ui.Window;
+import com.vaadin.server.Sizeable.Unit;
 
 import eu.etaxonomy.vaadin.ui.CanCastComponent;
-import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 /**
  * This interface defines the api used by the {@link NavigationManagerBean} to
@@ -15,16 +14,12 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
  */
 public interface PopupView extends CanCastComponent {
 
-    String getWindowCaption();
-
     boolean isResizable();
 
     /**
-     * @return a positive number to define the initial with of the windows.
-     * A negative number implies <b>unspecified size</b> (terminal is free
-     * to set the size).
+     * Whether to show an activepopupView close button in the popup window header.
      */
-    int getWindowPixelWidth();
+    boolean isClosable();
 
     boolean isModal();
 
@@ -32,6 +27,30 @@ public interface PopupView extends CanCastComponent {
      * The initial width of the window. A value of <code>-1</code>
      * means undefined.
      *
+     * @return a positive number to define the initial with of the windows.
+     * A negative number implies <b>unspecified size</b> (terminal is free
+     * to set the size).
+     */
+    int getWindowWidth();
+
+
+    Unit getWindowWidthUnit();
+
+    int getWindowHeight();
+
+    /**
+     * The initial width of the window. A value of <code>-1</code>
+     * means undefined.
+     *
+     * @return a positive number to define the initial with of the windows.
+     * A negative number implies <b>unspecified size</b> (terminal is free
+     * to set the size).
+     */
+    Unit getWindowHeightUnit();
+
+    String getWindowCaption();
+
+    /**
      * @return
      */
     boolean isWindowCaptionAsHtml();

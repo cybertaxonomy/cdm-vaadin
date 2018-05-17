@@ -9,9 +9,12 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import java.util.Stack;
+import java.util.UUID;
 
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Field;
 
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
@@ -20,7 +23,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Mar 22, 2017
  *
  */
-public class TaxonNameEditorAction extends AbstractEditorAction {
+public class TaxonNameEditorAction extends AbstractEditorAction<TaxonName> {
 
 
     public TaxonNameEditorAction(EditorActionType eventType) {
@@ -31,8 +34,8 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param action
      * @param source
      */
-    public TaxonNameEditorAction(EditorActionType action, Component source, AbstractView sourceView) {
-        super(action, source, sourceView);
+    public TaxonNameEditorAction(EditorActionType action, Button source, Field<TaxonName> target, AbstractView sourceView) {
+        super(action, source, target, sourceView);
     }
 
     /**
@@ -41,8 +44,8 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param source
      * @param sourceView
      */
-    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView) {
-        super(action, entityId, source, sourceView);
+    public TaxonNameEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<TaxonName> target, AbstractView sourceView) {
+        super(action, entityUuid, source, target, sourceView);
     }
 
     /**
@@ -52,9 +55,9 @@ public class TaxonNameEditorAction extends AbstractEditorAction {
      * @param sourceView
      * @param context
      */
-    public TaxonNameEditorAction(EditorActionType action, Integer entityId, Component source, AbstractView sourceView,
+    public TaxonNameEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<TaxonName> target, AbstractView sourceView,
             Stack<EditorActionContext> context) {
-        super(action, entityId, source, sourceView, context);
+        super(action, entityUuid, source, target, sourceView, context);
     }
 
 

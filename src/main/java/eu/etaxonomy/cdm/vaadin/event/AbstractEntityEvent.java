@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.UUID;
+
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -17,14 +19,14 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public abstract class AbstractEntityEvent<T extends Enum> {
 
-    private Integer entityId = null;
+    private UUID entityUuid = null;
 
     protected T type;
 
     private AbstractView sourceView = null;
 
-    public AbstractEntityEvent(T type, Integer entityId, AbstractView sourceView) {
-        this.entityId = entityId;
+    public AbstractEntityEvent(T type, UUID entityUuid, AbstractView sourceView) {
+        this.entityUuid = entityUuid;
         this.type = type;
         this.sourceView = sourceView;
         if(type == null){
@@ -35,8 +37,8 @@ public abstract class AbstractEntityEvent<T extends Enum> {
     /**
      * @return the entityId
      */
-    public Integer getEntityId() {
-        return entityId;
+    public UUID getEntityUuid() {
+        return entityUuid;
     }
 
     public T getType() {

@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -27,7 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 
@@ -89,7 +90,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
 
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, this)
+                new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, null, this)
                 ));
         newPublicationButton.setCaption("New");
         newPublicationButton.setWidth(ELEMENT_WIDTH);
@@ -101,7 +102,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, this)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, referenceCombobox, this)
                 ));
 
         removeNewPublicationButton.setVisible(false);
@@ -128,16 +129,17 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         continueButton.setEnabled(false);
         continueButton.addClickListener(e -> {
 
-            Integer refId = null;
+            UUID refUuid = null;
             referenceCombobox.commit();
             if(referenceCombobox.getValue() != null){
-                refId = referenceCombobox.getValue().getId();
+                refUuid = referenceCombobox.getValue().getUuid();
             }
             getViewEventBus().publish(this,
                 new RegistrationEditorAction(EditorActionType.ADD,
                         // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
-                        refId,
+                        refUuid,
                         continueButton,
+                        null,
                         StartRegistrationViewBean.this)
                 );
               }

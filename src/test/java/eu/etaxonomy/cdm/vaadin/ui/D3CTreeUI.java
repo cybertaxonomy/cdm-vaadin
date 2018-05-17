@@ -21,7 +21,7 @@ import eu.etaxonomy.cdm.vaadin.jscomponent.D3CTree;
 
 /**
  * @author cmathew
- * @date 8 Apr 2015
+ * @since 8 Apr 2015
  *
  */
 @Theme("edit")

@@ -26,14 +26,16 @@ import com.vaadin.ui.TextArea;
 
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
+import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
-import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.converter.DoubleConverter;
+import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 
@@ -47,6 +49,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
+    /**
+     *
+     */
+    private static final String CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING = "Can't save as long as type designations are missing.";
+
     /**
      * @param layout
      * @param dtoType
@@ -102,6 +109,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
         TextArea localityField = new TextArea("Locality");
+        localityField.setNullRepresentation("");
         addField(localityField, "locality", 0, row , 2, row);
         localityField.setWidth("100%");
         // NOTE: setRows and SetCold breaks he width setting,
@@ -122,6 +130,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(absElevationMinMax.getMaxField(), "absoluteElevationMax");
         bindField(absElevationMinMax.getTextField(), "absoluteElevationText");
 
+        absElevationMinMax.getMaxField().setConverter(new IntegerConverter());
+        absElevationMinMax.getMinField().setConverter(new IntegerConverter());
+
         row++;
         MinMaxTextField distanceToWaterSurfaceMinMax = new MinMaxTextField("Distance to water surface", "m");
         distanceToWaterSurfaceMinMax.setWidth("100%");
@@ -131,6 +142,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToWaterSurfaceMinMax.getMinField(), "distanceToWaterSurface");
         bindField(distanceToWaterSurfaceMinMax.getMaxField(), "distanceToWaterSurfaceMax");
         bindField(distanceToWaterSurfaceMinMax.getTextField(), "distanceToWaterSurfaceText");
+        distanceToWaterSurfaceMinMax.getMaxField().setConverter(new DoubleConverter());
+        distanceToWaterSurfaceMinMax.getMinField().setConverter(new DoubleConverter());
         distanceToWaterSurfaceMinMax.getMaxField().addValidator(new DoubleRangeValidator("Negative values are not allowed here.", 0.0, Double.MAX_VALUE));
         distanceToWaterSurfaceMinMax.getMinField().addValidator(new DoubleRangeValidator("Negative values are not allowed here.", 0.0, Double.MAX_VALUE));
 
@@ -143,32 +156,39 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         bindField(distanceToGroundMinMax.getMinField(), "distanceToGround");
         bindField(distanceToGroundMinMax.getMaxField(), "distanceToGroundMax");
         bindField(distanceToGroundMinMax.getTextField(), "distanceToGroundText");
+        distanceToGroundMinMax.getMaxField().setConverter(new DoubleConverter());
+        distanceToGroundMinMax.getMinField().setConverter(new DoubleConverter());
 
         row++;
         collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
-        TimePeriodField collectionDateField = new TimePeriodField("Collection date");
+        PartialDateField collectionDateField = new PartialDateField("Collection date");
+        collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
         addTextField("Field number", "fieldNumber", 2, row);
+
 
         row++;
 
         // FIXME: can we use the Grid instead?
         typeDesignationsCollectionField = new ElementCollectionField<>(
                 SpecimenTypeDesignationDTO.class,
-                //getPresenter().specimenTypeDesignationDTOInstantiator(getBean());
                 SpecimenTypeDesignationDTORow.class
                 );
         typeDesignationsCollectionField.withCaption("Types");
         typeDesignationsCollectionField.getLayout().setSpacing(false);
         typeDesignationsCollectionField.getLayout().setColumns(3);
 
+        typeDesignationsCollectionField.setVisibleProperties(SpecimenTypeDesignationDTORow.visibleFields());
+
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
         typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
+        typeDesignationsCollectionField.addElementAddedListener( e -> updateAllowSave());
+        typeDesignationsCollectionField.addElementRemovedListener( e -> updateAllowSave());
 
         // typeDesignationsCollectionField.getLayout().setMargin(false);
         // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
@@ -263,10 +283,11 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         super.afterItemDataSourceSet();
         GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
         for(int rowIndex = 1; rowIndex < gridLayout.getRows(); rowIndex++){ // first row is header
-            Component item = gridLayout.getComponent(0, rowIndex);
+            Component item = gridLayout.getComponent(SpecimenTypeDesignationDTORow.rowListSelectColumn(), rowIndex);
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
         updateAllowDelete();
+        updateAllowSave();
     }
 
     /**
@@ -281,6 +302,17 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
             gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);
         }
+    }
+
+    public void updateAllowSave(){
+        boolean hasTypeDesignations = getBean().getSpecimenTypeDesignationDTOs().size() > 0;
+        setSaveButtonEnabled(hasTypeDesignations);
+        if(!hasTypeDesignations){
+            addStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
+        } else {
+            removeStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
+        }
+
     }
 
     /**

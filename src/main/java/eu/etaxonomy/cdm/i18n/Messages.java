@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2017 EDIT
 * European Distributed Institute of Taxonomy
@@ -16,10 +15,12 @@ import com.vaadin.server.VaadinSession;
 
 /**
  * @author freimeier
- * @date 07.12.2017
  *
  */
 public class Messages implements Serializable {
+
+    private static final long serialVersionUID = 863200898445493048L;
+
     public static final String BUNDLE_NAME = "eu.etaxonomy.cdm.i18n.messages";
     public static String AreaAndTaxonSettingsConfigWindow_AREAS = "AreaAndTaxonSettingsConfigWindow_AREAS";
     public static String AreaAndTaxonSettingsConfigWindow_CLASSIFICATION = "AreaAndTaxonSettingsConfigWindow_CLASSIFICATION";
@@ -50,6 +51,9 @@ public class Messages implements Serializable {
     public static String DistributionToolbar_LOGOUT = "DistributionToolbar_LOGOUT";
     public static String DistributionToolbar_SAVE = "DistributionToolbar_SAVE";
     public static String DistributionToolbar_STATUS = "DistributionToolbar_STATUS";
+    public static String DistributionToolbar_HELP = "DistributionToolbar_HELP";
+    public static String HelpWindow_RESOURCE = "HelpWindow_RESOURCE";
+    public static String HibernateExceptionHandler_PERMISSION_DENIED = "HibernateExceptionHandler_PERMISSION_DENIED";
     public static String SettingsDialogWindowBase_CANCEL = "SettingsDialogWindowBase_CANCEL";
     public static String SettingsDialogWindowBase_OK = "SettingsDialogWindowBase_OK";
 

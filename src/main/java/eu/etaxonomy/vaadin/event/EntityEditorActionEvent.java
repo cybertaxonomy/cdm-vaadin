@@ -13,8 +13,7 @@ import java.util.EnumSet;
 import com.vaadin.ui.AbstractField;
 
 /**
- * An Event
- * which represents the request to start an editor to enable the
+ * An Event which represents the request to start an editor to enable the
  * user to perform the <code>action</code> transported with this event.
  *
  * @author a.kohlbecker

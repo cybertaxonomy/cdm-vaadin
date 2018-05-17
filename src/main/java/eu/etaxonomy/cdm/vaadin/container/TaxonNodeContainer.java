@@ -57,9 +57,11 @@ public class TaxonNodeContainer extends HierarchicalContainer {
                 Item childItem = addItem(child);
                 if(childItem!=null){
                     setParent(child, parent);
+                    addChildItems(child);
                 }
+                   /*
                 Collection<UuidAndTitleCache<TaxonNode>> grandChildren = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(child);
-                setChildrenAllowed(child, !grandChildren.isEmpty());
+                setChildrenAllowed(child, !grandChildren.isEmpty());*/
             }
             itemCache.put(parent.getId(), true);
         }

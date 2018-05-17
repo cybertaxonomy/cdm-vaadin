@@ -51,4 +51,6 @@ public class RegistrationUIDefaults {
      *  TODO make configurable as preset and in TaxonNameEditor
      */
     public static final NomenclaturalCode NOMENCLATURAL_CODE = NomenclaturalCode.ICNAFP;
+
+    public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:editsupport@bgbm.org\">editsupport@bgbm.org</a> for support and more information.";
 }

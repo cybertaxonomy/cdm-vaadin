@@ -15,7 +15,7 @@ import eu.etaxonomy.cdm.vaadin.container.IdUuidName;
 
 /**
  * @author cmathew
- * @date 2 Apr 2015
+ * @since 2 Apr 2015
  *
  */
 public interface INewTaxonBaseComponentListener {

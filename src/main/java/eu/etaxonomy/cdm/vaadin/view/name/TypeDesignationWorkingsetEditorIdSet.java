@@ -8,45 +8,44 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.UUID;
+
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 
 public class TypeDesignationWorkingsetEditorIdSet {
 
-    Integer registrationId;
+    UUID registrationUuid;
     TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
-    Integer publicationId;
-    Integer typifiedNameId;
+    UUID publicationUuid;
+    UUID typifiedNameUuid;
 
     /**
-     * @param registrationId
+     * @param registrationUuid
      *            must be present
-     * @param workingsetId
-     *            can <code>null</code>. In this case the <code>publicationId</code>
-     *            and and typifiedNameId must be set.
-     *            <code>RegistrationAndWorkingsetId</code> refers to a not yet
-     *            existing working set, which should be created by the code in
-     *            case this makes sense.
-     * @param publicationId
-     *            Can <code>null</code> if the <code>workingsetId</code> is given.
-     * @param typifiedNameId
+     * @param baseEntityRef
+     *
+     * @param publicationUuid
+     *            Can <code>null</code> if the <code>workingsetID</code> is given.
+     * @param typifiedNameUuid
      *            Can <code>null</code> if the <code>workingsetId</code> is given
      */
-    protected TypeDesignationWorkingsetEditorIdSet(Integer registrationId, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef, Integer publicationId, Integer typifiedNameId) {
-        this.registrationId = registrationId;
+    protected TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
+            UUID publicationUuid, UUID typifiedNameUuid) {
+        this.registrationUuid = registrationUuid;
         this.baseEntityRef = baseEntityRef;
-        this.publicationId = publicationId;
-        this.typifiedNameId = typifiedNameId;
-        if(baseEntityRef == null && publicationId == null|| baseEntityRef == null && typifiedNameId == null){
+        this.publicationUuid = publicationUuid;
+        this.typifiedNameUuid = typifiedNameUuid;
+        if(baseEntityRef == null && publicationUuid == null|| baseEntityRef == null && typifiedNameUuid == null){
             throw new NullPointerException("When workingsetId is null, publicationId and typifiedNameId must be non null.");
         }
     }
 
-    public TypeDesignationWorkingsetEditorIdSet(Integer registrationId, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef) {
-        this(registrationId, baseEntityRef, null, null);
+    public TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef) {
+        this(registrationUuid, baseEntityRef, null, null);
     }
 
-    public TypeDesignationWorkingsetEditorIdSet(Integer registrationId, Integer publicationId, Integer typifiedNameId) {
-        this(registrationId, null, publicationId, typifiedNameId);
+    public TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
+        this(registrationUuid, null, publicationUuid, typifiedNameUuid);
     }
 }

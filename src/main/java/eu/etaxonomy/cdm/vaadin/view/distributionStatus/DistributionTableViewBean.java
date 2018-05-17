@@ -43,11 +43,17 @@ import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
+import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
-import eu.etaxonomy.cdm.vaadin.component.DetailWindow;
-import eu.etaxonomy.cdm.vaadin.component.DistributionToolbar;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.AreaAndTaxonSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DetailWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionStatusSettingsConfigWindow;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionToolbar;
+import eu.etaxonomy.cdm.vaadin.component.distributionStatus.HelpWindow;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
-import eu.etaxonomy.cdm.vaadin.security.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.HibernateExceptionHandler;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
@@ -78,6 +84,7 @@ public class DistributionTableViewBean
     private LazyQueryContainer gridcontainer;
 	private AreaAndTaxonSettingsConfigWindow areaAndTaxonConfigWindow;;
 	private DistributionStatusSettingsConfigWindow distributionStatusConfigWindow;
+	private HelpWindow helpWindow;
 
 	public DistributionTableViewBean() {
 		super();
@@ -105,7 +112,6 @@ public class DistributionTableViewBean
 				PresenceAbsenceTerm presenceAbsenceTerm = null;
 				Object value = property.getValue();
 				if(value instanceof String){
-//					presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) value);
                     try {
                         presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)value));
                     }catch(IllegalArgumentException|ClassCastException e) {
@@ -145,49 +151,53 @@ public class DistributionTableViewBean
 
 		table.addItemClickListener(event -> {
             if(!(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.TAXON_COLUMN))
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))
-            		// TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase("DE"))
-            		&& !(event.getPropertyId().toString().equalsIgnoreCase("Deutschland"))){
-                final Item item = event.getItem();
-                Property<?> itemProperty = item.getItemProperty("uuid");
-                UUID uuid = UUID.fromString(itemProperty.getValue().toString());
-                final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
-                		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
-                final String areaID = (String)event.getPropertyId();
-                PresenceAbsenceTerm presenceAbsenceTerm = null;
-                Object statusValue = item.getItemProperty(areaID).getValue();
-                if(statusValue instanceof String){
-//                	presenceAbsenceTerm = TermCacher.getInstance().getPresenceAbsenceTerm((String) statusValue);
-                    try {
-                        presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)statusValue));
-                    }catch(IllegalArgumentException|ClassCastException e) {
-                        // Not a PresenceAbsenceTerm Column
+            		&& !(event.getPropertyId().toString().equalsIgnoreCase(CdmQueryFactory.RANK_COLUMN))){
+
+                final String areaString = (String)event.getPropertyId();
+                final NamedArea area = getPresenter().getAreaFromString(areaString);
+
+                if(!getPresenter().getReadOnlyAreas().contains(area)) {
+                    final Item item = event.getItem();
+                    Property<?> itemProperty = item.getItemProperty(CdmQueryFactory.UUID_COLUMN);
+                    UUID uuid = UUID.fromString(itemProperty.getValue().toString());
+                    final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
+                    		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
+                    PresenceAbsenceTerm presenceAbsenceTerm = null;
+                    Object statusValue = item.getItemProperty(areaString).getValue();
+                    if(statusValue instanceof String){
+                        try {
+                            presenceAbsenceTerm = (PresenceAbsenceTerm)CdmSpringContextHelper.getTermService().load(UUID.fromString((String)statusValue));
+                        }catch(IllegalArgumentException|ClassCastException e) {
+                            // Not a PresenceAbsenceTerm Column
+                        }
                     }
+                    //popup window
+                    final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
+                    DelegatingErrorHandler errorHandler = new DelegatingErrorHandler();
+                    errorHandler.registerHandler(new HibernateExceptionHandler());
+                    popup.setErrorHandler(errorHandler);
+                    final ListSelect termSelect = new ListSelect();
+                    termSelect.setSizeFull();
+                    termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
+                    termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
+                    if(presenceAbsenceTerm != null){
+                    	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
+                    }else{
+                        logger.debug("No distribution status exists yet for area");
+                    }
+                    termSelect.setValue(presenceAbsenceTerm);
+                    termSelect.addValueChangeListener(valueChangeEvent -> {
+    						PresenceAbsenceTerm distributionStatus = (PresenceAbsenceTerm) valueChangeEvent.getProperty().getValue();
+    						getPresenter().updateDistributionField(area, distributionStatus, taxon);
+    						container.refresh();
+    						popup.close();
+    				});
+                    VerticalLayout layout = new VerticalLayout(termSelect);
+                    popup.setContent(layout);
+                    popup.setModal(true);
+                    popup.center();
+                    UI.getCurrent().addWindow(popup);
                 }
-                //popup window
-                final Window popup = new Window(Messages.getLocalizedString(Messages.DistributionTableViewBean_CHOOSE_DISTRIBUTION_STATUS));
-                final ListSelect termSelect = new ListSelect();
-                termSelect.setSizeFull();
-                termSelect.setContainerDataSource(getPresenter().getPresenceAbsenceTermContainer());
-                termSelect.setNullSelectionAllowed(presenceAbsenceTerm != null);
-                if(presenceAbsenceTerm != null){
-                	termSelect.setNullSelectionItemId(Messages.getLocalizedString(Messages.DistributionTableViewBean_NO_STATUS_SELECT));
-                }else{
-                    logger.debug("No distribution status exists yet for area");
-                }
-                termSelect.setValue(presenceAbsenceTerm);
-                termSelect.addValueChangeListener(valueChangeEvent -> {
-						Object distributionStatus = valueChangeEvent.getProperty().getValue();
-						getPresenter().updateDistributionField(areaID, distributionStatus, taxon);
-						container.refresh();
-						popup.close();
-				});
-                VerticalLayout layout = new VerticalLayout(termSelect);
-                popup.setContent(layout);
-                popup.setModal(true);
-                popup.center();
-                UI.getCurrent().addWindow(popup);
             }
         });
 
@@ -232,25 +242,6 @@ public class DistributionTableViewBean
 		columnHeaders.remove(CdmQueryFactory.ID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.UUID_COLUMN);
 		columnHeaders.remove(CdmQueryFactory.CLASSIFICATION_COLUMN);
-//		columnHeaders.sort(new Comparator<String>() {
-//            @Override
-//            public int compare(String o1, String o2) {
-//                if(o1.equals(CdmQueryFactory.TAXON_COLUMN) || o2.equals(CdmQueryFactory.TAXON_COLUMN)) {
-//                    return o1.equals(CdmQueryFactory.TAXON_COLUMN) ? -1 : 1;
-//                }
-//                if(o1.equals(CdmQueryFactory.RANK_COLUMN) || o2.equals(CdmQueryFactory.RANK_COLUMN)) {
-//                    return o1.equals(CdmQueryFactory.RANK_COLUMN) ? -1 : 1;
-//                }
-//
-//                // TODO: HACK FOR RL 2017, REMOVE AS SOON AS POSSIBLE
-//                if(o1.equals("DE") || o1.equals("Deutschland")
-//                        || o2.equals("DE") || o2.equals("Deutschland")) {
-//                    return (o1.equals("DE") || o1.equals("Deutschland")) ? -1 : 1;
-//                }
-//
-//                return o1.compareTo(o2);
-//            }
-//		});
 
 		List<String> columnList = new ArrayList<>(columnHeaders);
 
@@ -359,6 +350,10 @@ public class DistributionTableViewBean
 		//distr status
 		Button distrStatusButton = toolbar.getSettingsButton();
 		distrStatusButton.addClickListener(event -> openStatusSettings());
+
+	    //help
+        Button helpButton = toolbar.getHelpButton();
+        helpButton.addClickListener(event -> openHelpWindow());
 	}
 
     /**
@@ -385,6 +380,14 @@ public class DistributionTableViewBean
 		}
         Window window  = areaAndTaxonConfigWindow.createWindow(Messages.getLocalizedString(Messages.DistributionTableViewBean_AREAS_AND_TAXA));
         UI.getCurrent().addWindow(window);
+	}
+
+	public void openHelpWindow() {
+	       if(helpWindow==null){
+	           helpWindow = new HelpWindow(this);
+	        }
+	        Window window  = helpWindow.createWindow(Messages.getLocalizedString(Messages.DistributionToolbar_HELP));
+	        UI.getCurrent().addWindow(window);
 	}
 
     /**

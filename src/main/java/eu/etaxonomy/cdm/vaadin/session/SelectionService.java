@@ -15,7 +15,7 @@ import com.vaadin.ui.UI;
 
 /**
  * @author cmathew
- * @date 9 Apr 2015
+ * @since 9 Apr 2015
  *
  */
 public class SelectionService {

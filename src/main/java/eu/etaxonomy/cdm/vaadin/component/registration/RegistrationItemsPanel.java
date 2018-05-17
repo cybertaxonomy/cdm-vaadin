@@ -14,7 +14,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**

@@ -96,6 +96,9 @@ public class TextFieldNFix extends TextField {
     protected void setInternalValue(String newValue) {
         if(newValue != null){
             newValue = newValue.trim();
+            if(newValue.isEmpty()){
+                newValue = null;
+            }
         }
         super.setInternalValue(newValue);
     }

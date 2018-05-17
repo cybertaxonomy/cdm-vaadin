@@ -21,6 +21,7 @@ import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -54,7 +55,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private TextField citationDetailField;
 
-    private boolean showTypeFlags = false;
+    private boolean showTypeFlags = true;
 
 
     /**
@@ -145,7 +146,8 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
                 getViewEventBus().publish(this,
                     new TaxonNameEditorAction(
                             EditorActionType.EDIT,
-                            typeNameField.getValue().getId(),
+                            typeNameField.getValue().getUuid(),
+                            e.getButton(),
                             typeNameField,
                             this)
                 );
@@ -155,8 +157,9 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
         typifiedNamesComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        typifiedNamesComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
-        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help
+        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
 
         row++;
         citationCombobox = new ToOneRelatedEntityCombobox<Reference>("Citation", Reference.class);

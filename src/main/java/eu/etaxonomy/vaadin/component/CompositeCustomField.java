@@ -21,7 +21,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Layout;
+import com.vaadin.ui.HasComponents;
 
 /**
  * TODO implement height methods for full component size support
@@ -35,9 +35,26 @@ import com.vaadin.ui.Layout;
 @SuppressWarnings("serial")
 public abstract class CompositeCustomField<T> extends CustomField<T> implements NestedFieldGroup {
 
+    protected static final String READ_ONLY_CAPTION_SUFFIX = " (read only)";
+
     private List<Component> styledComponents = new ArrayList<>();
 
     private List<Component> sizedComponents = new ArrayList<>();
+
+    private CommitHandler commitHandler = new CommitHandler() {
+
+        @Override
+        public void preCommit(CommitEvent commitEvent) throws CommitException {
+            // commit the nested bean(s) first
+            if(getFieldGroup() != null){
+                getFieldGroup().commit();
+            }
+        }
+
+        @Override
+        public void postCommit(CommitEvent commitEvent) throws CommitException {
+            // noting to do
+        }};
 
     protected List<Component> getStyledComponents() {
         if(styledComponents == null){
@@ -188,45 +205,42 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
 
     @Override
     public void registerParentFieldGroup(FieldGroup parent) {
-        parent.addCommitHandler(new CommitHandler() {
-
-            @Override
-            public void preCommit(CommitEvent commitEvent) throws CommitException {
-                // commit the nested bean(s) first
-                if(getFieldGroup() != null){
-                    getFieldGroup().commit();
-                }
-            }
-
-            @Override
-            public void postCommit(CommitEvent commitEvent) throws CommitException {
-                // noting to do
-            }}
-       );
+        parent.addCommitHandler(commitHandler);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void setReadOnly(boolean readOnly) {
-        super.setReadOnly(readOnly);
-        // setDeepReadOnly(readOnly, getContent());
+    public void unregisterParentFieldGroup(FieldGroup parent) {
+        parent.removeCommitHandler(commitHandler);
     }
 
     /**
      * @param readOnly
      */
-    protected void setDeepReadOnly(boolean readOnly, Component component) {
+    protected void setDeepReadOnly(boolean readOnly, Component component, Collection<Component> ignore) {
 
+        if(ignore != null && ignore.contains(component)){
+            return;
+        }
+
+        applyReadOnlyState(component, readOnly);
+        if(HasComponents.class.isAssignableFrom(component.getClass())){
+            for(Component nestedComponent : ((HasComponents)component)){
+                setDeepReadOnly(readOnly, nestedComponent, ignore);
+            }
+        }
+    }
+
+    /**
+     * Sets the readonly state for the component but treats Buttons differently.
+     * Buttons are also set to disabled to make them inactive.
+
+     * @param readOnly
+     * @param component
+     */
+    protected void applyReadOnlyState(Component component, boolean readOnly) {
         component.setReadOnly(readOnly);
         if(Button.class.isAssignableFrom(component.getClass())){
             component.setEnabled(!readOnly);
-        }
-        if(Layout.class.isAssignableFrom(component.getClass())){
-            for(Component nestedComponent : ((Layout)component)){
-                setDeepReadOnly(readOnly, nestedComponent);
-            }
         }
     }
 
@@ -234,6 +248,14 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     public String toString(){
         return this.getClass().getSimpleName() + ": " +
                 ( getValue() != null ? getValue() : "null");
+    }
+
+    protected void updateCaptionReadonlyNotice(boolean readOnly) {
+        if(readOnly){
+            setCaption(getCaption() + READ_ONLY_CAPTION_SUFFIX);
+        } else {
+            setCaption(getCaption().replace(READ_ONLY_CAPTION_SUFFIX, ""));
+        }
     }
 
 }

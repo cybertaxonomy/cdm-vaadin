@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
 
@@ -32,17 +33,24 @@ public class MinMaxTextField extends HorizontalLayout {
     TextFieldNFix minField, textField;
     MaxTextField maxField;
 
+    Converter<String, ?> numberConverter;
+
     String unitOfMeasure;
 
-    public MinMaxTextField(String caption, String unitOfMeasure){
+    public MinMaxTextField(String caption, String unitOfMeasure, Converter<String, ?> numberConverter){
 
         this.unitOfMeasure = unitOfMeasure;
+        this.numberConverter = numberConverter;
 
         setCaption(caption);
         setPrimaryStyleName(PRIMARY_STYLE);
 
         initFields(unitOfMeasure);
 
+    }
+
+    public MinMaxTextField(String caption, String unitOfMeasure){
+        this(caption, unitOfMeasure, null);
     }
 
     /**

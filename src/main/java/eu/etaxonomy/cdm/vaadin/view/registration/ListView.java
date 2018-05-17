@@ -9,10 +9,12 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -74,7 +76,7 @@ public interface ListView extends ApplicationView<ListPresenter>{
      */
     Mode getViewMode();
 
-    public RegistrationItem getRegistrationItem(int registrationId);
+    public RegistrationItem getRegistrationItem(UUID registrationUuid);
 
 
 }

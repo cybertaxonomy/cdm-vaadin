@@ -15,12 +15,12 @@ package eu.etaxonomy.vaadin.event;
     myComboboxSelect.setEditActionListener(e -> {
 
             Object fieldValue = e.getSource().getValue();
-            Integer beanId = null;
+            UUID beanUuid = null;
             if(fieldValue != null){
-                beanId = ((CdmBase)fieldValue).getId();
+                beanUuid = ((CdmBase)fieldValue).getUUid();
 
             }
-            getViewEventBus().publish(this, new SomeEditorAction(e.getAction(), beanId, e.getSource(), this));
+            getViewEventBus().publish(this, new SomeEditorAction(e.getAction(), beanUuid, e.getSource(), this));
         });
   }
  *</pre>

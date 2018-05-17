@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.service;
 import java.io.FileNotFoundException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,6 +27,7 @@ import org.unitils.spring.annotation.SpringBeanByType;
 
 import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
@@ -43,7 +45,6 @@ import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
-import eu.etaxonomy.cdm.vaadin.model.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -69,11 +70,13 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
        // Logger.getLogger("org.dbunit").setLevel(Level.DEBUG);
     }
 
-    int registrationId = 5000;
+    UUID registrationUuid = UUID.fromString("c8bb4e70-ca85-43c3-ae81-c90a2b41a93f"); // 5000;
 
-    private Integer publicationId = 5000;
+    private UUID publicationUuid = UUID.fromString("45804c65-7df9-42fd-b43a-818a8958c264"); // 5000;
 
-    private Integer typifiedNameId = 5000;
+    private UUID typifiedNameUuid = UUID.fromString("47d9263e-b32a-42af-98ea-5528f154384f"); //  5000;
+
+    UUID fieldUnitUuid = UUID.fromString("22be718a-6f21-4b74-aae3-bb7d7d659e1c"); // 5001
 
     private final String[] includeTableNames_create = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
             "HIBERNATE_SEQUENCES"};
@@ -99,13 +102,13 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 //                "REPRESENTATION", "REPRESENTATION_AUD", "HIBERNATE_SEQUENCES"},
 //                "RegistrationTerms");
 
-       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationId, publicationId, typifiedNameId);
+       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationUuid, publicationUuid, typifiedNameUuid);
 
        Assert.assertNotNull(workingset.getOwner());
        Assert.assertEquals(Registration.class, workingset.getOwner().getClass());
 
        workingset.getFieldUnit().setFieldNotes("FieldNotes");
-       int baseEntityID = workingset.getFieldUnit().getId();
+       // int baseEntityID = workingset.getFieldUnit().getId();
        workingset.getFieldUnit().setFieldNumber("FieldNumber");
        workingset.getFieldUnit().getGatheringEvent().setLocality(LanguageString.NewInstance("Somewhere", Language.ENGLISH()));
 
@@ -124,9 +127,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
 
-       TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, baseEntity.getId(), baseEntity.getTitleCache());
+       TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, baseEntity.getUuid(), baseEntity.getTitleCache());
 
-       workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+       workingset = service.load(registrationUuid, baseEntityRef);
 
        Assert.assertNotNull(specimenTypeDesignationDTO.asSpecimenTypeDesignation().getTypeSpecimen());
        Assert.assertEquals(MediaSpecimen.class, specimenTypeDesignationDTO.asSpecimenTypeDesignation().getTypeSpecimen().getClass());
@@ -143,7 +146,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        service.save(workingset);
 
-       workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+       workingset = service.load(registrationUuid, baseEntityRef);
        Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 
 
@@ -174,8 +177,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     public void test03_deleteTypeDesignationTest() {
 
         // FieldUnit" ID="5001
-        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, 5001, "Somewhere, FieldNumber.");
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, fieldUnitUuid, "Somewhere, FieldNumber.");
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.load(registrationUuid, baseEntityRef);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 
         SpecimenTypeDesignationDTO deleteDTO = null;
@@ -191,7 +194,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
         // printDataSetWithNull(System.err, includeTableNames_delete);
 
-        workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+        workingset = service.load(registrationUuid, baseEntityRef);
         Registration reg = workingset.getOwner();
         Assert.assertEquals(1, workingset.getSpecimenTypeDesignationDTOs().size());
         reg = workingset.getOwner();
@@ -204,9 +207,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
 //        printDataSetWithNull(System.err, includeTableNames_delete);
 
-        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, 5001, null);
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, fieldUnitUuid, null);
 
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.loadDtoByIds(registrationId, baseEntityRef);
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.load(registrationUuid, baseEntityRef);
         Assert.assertNotNull(workingset.getOwner());
         Assert.assertEquals(2, workingset.getSpecimenTypeDesignationDTOs().size());
         service.delete(workingset, true);
@@ -241,19 +244,19 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
         Team team = Team.NewTitledInstance("Novis, Braidwood & Kilroy", "Novis, Braidwood & Kilroy");
         Reference nomRef = ReferenceFactory.newArticle();
+        nomRef.setUuid(publicationUuid);
         nomRef = cdmRepository.getReferenceService().save(nomRef);
-        publicationId = nomRef.getId();
 
         nomRef.setAuthorship(team);
         nomRef.setTitle("P.M. Novis, J. Braidwood & C. Kilroy, Small diatoms (Bacillariophyta) in cultures from the Styx River, New Zealand, including descriptions of three new species in Phytotaxa 64");
         TaxonName name = TaxonName.NewInstance(NomenclaturalCode.ICNAFP, Rank.SPECIES(), "Planothidium", null,  "victori", null, null, nomRef, "11-45", null);
+        name.setUuid(typifiedNameUuid);
         name = cdmRepository.getNameService().save(name);
-        typifiedNameId = name.getId();
 
         Registration reg = Registration.NewInstance();
         reg.setName(name);
+        reg.setUuid(registrationUuid);
         reg = cdmRepository.getRegistrationService().save(reg);
-        registrationId = reg.getId();
 
 
         //printDataSetWithNull(System.err, includeTableNames_create);

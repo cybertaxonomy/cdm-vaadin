@@ -18,6 +18,11 @@ import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
 
 /**
+ * Presenters of this type are usually be used in conjunction with a  {@link AbstractPopupEditor}.
+ * The presenter automatically handles save and delete operations. The methods {@link #saveBean(Object)} and
+ * {@link AbstractEditorPresenter#deleteBean(Object)} are executed internally in turn of an
+ * {@link EditorSaveEvent} or {@link EditorDeleteEvent} which are send by the {@link AbstractPopupEditor#save()}
+ * or {@link AbstractPopupEditor#delete()} method.
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
@@ -40,6 +45,16 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      * @return
      */
     protected abstract DTO loadBeanById(Object identifier);
+
+    /**
+     * Set ui elements to readonly or disabled to adapt the editor to
+     * the permissions that are given to the current user etc.
+     *
+     * @param beanToEdit
+     */
+    protected void adaptToUserPermission(DTO beanToEdit) {
+
+    }
 
     /**
      * @param beanInstantiator the beanInstantiator to set

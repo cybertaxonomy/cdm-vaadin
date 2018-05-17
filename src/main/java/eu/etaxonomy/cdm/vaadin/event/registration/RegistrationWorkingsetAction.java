@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.registration;
 
+import java.util.UUID;
+
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
@@ -16,16 +18,16 @@ package eu.etaxonomy.cdm.vaadin.event.registration;
 public class RegistrationWorkingsetAction {
 
     private Action action;
-    private Integer citationID = null;
+    private UUID citationUuid = null;
 
     /**
      *
      * @param citationID the id of a {@link Reference} denoting a
      * complete registration working set.
      */
-    public RegistrationWorkingsetAction(int citationID, Action action){
+    public RegistrationWorkingsetAction(UUID citationUuid, Action action){
         this.action = action;
-        this.citationID = citationID;
+        this.citationUuid = citationUuid;
     }
 
     /**
@@ -36,10 +38,10 @@ public class RegistrationWorkingsetAction {
     }
 
     /**
-     * @return the registrationID
+     * @return the citationUuid
      */
-    public Integer getCitationID() {
-        return citationID;
+    public UUID getCitationUuid() {
+        return citationUuid;
     }
 
     public boolean isStart() {

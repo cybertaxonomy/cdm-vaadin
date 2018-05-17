@@ -11,7 +11,6 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.OrderedTermVocabulary;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
-import eu.etaxonomy.cdm.vaadin.util.TermCacher;
 
 public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 
@@ -30,9 +29,7 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 	        Collections.sort(namedAreas, new AlphabeticallyAscendingNamedAreaComparator());
 	    }
 
-	    TermCacher termCacher = TermCacher.getInstance();
 	    for (NamedArea namedArea: namedAreas) {
-	        termCacher.addNamedArea(namedArea);
 	        addBean(namedArea);
 	    }
 	}

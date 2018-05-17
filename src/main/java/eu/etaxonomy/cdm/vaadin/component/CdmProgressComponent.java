@@ -19,7 +19,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 
 /**
  * @author cmathew
- * @date 15 Apr 2015
+ * @since 15 Apr 2015
  *
  */
 public class CdmProgressComponent extends CustomComponent {

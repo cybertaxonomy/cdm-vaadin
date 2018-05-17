@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -33,7 +34,7 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
@@ -79,6 +80,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private TeamOrPersonBaseCaptionGenerator.CacheType cacheType;
 
+    protected List<Component> editorComponents = Arrays.asList(removeButton, personButton, teamButton, teamOrPersonSelect);
+
     public TeamOrPersonField(String caption, TeamOrPersonBaseCaptionGenerator.CacheType cacheType){
 
         setCaption(caption);
@@ -121,24 +124,28 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
         selectConfirmButton.addClickListener(e -> {
-            setValue(teamOrPersonSelect.getValue());
+            // new entitiy being set, reset the readonly state
+//            resetReadOnlyComponents();
+//            getPropertyDataSource().setReadOnly(false);
+            setValue(teamOrPersonSelect.getValue(), false, true);
             teamOrPersonSelect.clear();
             updateToolBarButtonStates();
         });
         removeButton.addClickListener(e -> {
-            setValue(null);
+//            resetReadOnlyComponents();
+//            getPropertyDataSource().setReadOnly(false);
+            setValue(null, false, true);
             updateToolBarButtonStates();
         });
         removeButton.setDescription("Remove");
 
         personButton.addClickListener(e -> {
-            setValue(Person.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
-            updateToolBarButtonStates();
+            setValue(Person.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+
         });
         personButton.setDescription("Add person");
         teamButton.addClickListener(e -> {
-            setValue(Team.NewInstance()); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
-            updateToolBarButtonStates();
+            setValue(Team.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
         });
         teamButton.setDescription("Add team");
 
@@ -178,6 +185,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     @Override
     protected void setInternalValue(TeamOrPersonBase<?> newValue) {
 
+        TeamOrPersonBase<?> oldValue = getValue();
         super.setInternalValue(newValue);
 
         newValue = HibernateProxyHelper.deproxy(newValue);
@@ -188,7 +196,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         if(newValue != null) {
 
             if(Person.class.isAssignableFrom(newValue.getClass())){
-                // value is a Person:
+                // value is a Person
                 compositeWrapper.addComponent(personField);
 
                 personField.setValue((Person) newValue);
@@ -197,31 +205,61 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             }
             else if(Team.class.isAssignableFrom(newValue.getClass())){
                 // otherwise it a Team
-
                 compositeWrapper.addComponents(titleField, nomenclaturalTitleField, personsListEditor);
 
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
                 nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
                 fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+                boolean readonlyState = personsListEditor.isReadOnly();
                 fieldGroup.bind(personsListEditor, "teamMembers"); // here personField is set readonly since setTeamMembers does not exist
-                personsListEditor.setReadOnly(false); // fixing the readonly state
+                personsListEditor.setReadOnly(readonlyState); // fixing the readonly state
 
                 personsListEditor.registerParentFieldGroup(fieldGroup);
 
             } else {
                 setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
             }
-
+        } else {
+            if(oldValue != null){
+                // value is null --> clean up all nested fields
+                // allow replacing old content in the editor by null
+                setReadOnlyComponents(false);
+                if(oldValue instanceof Person){
+                    personField.unregisterParentFieldGroup(fieldGroup);
+                    personField.setReadOnly(false);
+                    personField.setValue((Person) null);
+                } else {
+                    titleField.unbindFrom(fieldGroup);
+                    nomenclaturalTitleField.unbindFrom(fieldGroup);
+                    fieldGroup.unbind(personsListEditor);
+                    fieldGroup.setItemDataSource((Team)null);
+                    personsListEditor.registerParentFieldGroup(null);
+                    personsListEditor.setReadOnly(false);
+                    personsListEditor.setValue(null);
+                    personsListEditor.registerParentFieldGroup(null);
+                }
+            }
         }
-
+        adaptToUserPermissions(newValue);
         updateToolBarButtonStates();
     }
 
-    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
-        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-        setEnabled(userCanEdit);
-        personsListEditor.setEnabled(userCanEdit);
+
+    private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
+
+        UserHelper userHelper = UserHelper.fromSession();
+        boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
+        if(!canEdit){
+            getPropertyDataSource().setReadOnly(true);
+            setReadOnlyComponents(true);
+        }
     }
+
+//    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
+//        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+//        setEnabled(userCanEdit);
+//        personsListEditor.setEnabled(userCanEdit);
+//    }
 
     /**
      * {@inheritDoc}
@@ -260,21 +298,27 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         //need to commit the subfields propagation through the fielGroups is not enough
         personField.commit();
         personsListEditor.commit();
-        super.commit();
-
-        TeamOrPersonBase<?> bean = getValue();
-        if(bean != null && bean instanceof Team){
-
-            boolean isUnsaved = bean.getId() == 0;
-            if(isUnsaved){
-                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
-            }
+        if(!getState(false).readOnly && getPropertyDataSource().isReadOnly()){
+            // the TeamOrPersonBase Editor (remove, addPerson, addTeam) is not readonly
+            // thus removing the TeamOrPerson is allowed. In case the datasource is readonly
+            // due to missing user grants for the TeamOrPerson it must be set to readWrite to
+            // make it possible to change the property of the parent
+            getPropertyDataSource().setReadOnly(false);
         }
+
+        super.commit();
 
         if(hasNullContent()){
             getPropertyDataSource().setValue(null);
             setValue(null);
+        }
 
+        TeamOrPersonBase<?> bean = getValue();
+        if(bean != null && bean instanceof Team){
+            boolean isUnsaved = bean.getId() == 0;
+            if(isUnsaved){
+                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+            }
         }
     }
 
@@ -345,8 +389,38 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      */
     @Override
     public void setReadOnly(boolean readOnly) {
+//        super.setReadOnly(readOnly); // moved into setEditorReadOnly()
+        setReadOnlyComponents(readOnly);
+    }
+
+    public void setEditorReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent());
+        for(Component c : editorComponents){
+            applyReadOnlyState(c, readOnly);
+        }
+
+    }
+
+    /**
+     * Reset the readonly state of nested components to <code>false</code>.
+     */
+    protected void resetReadOnlyComponents() {
+        if(!isReadOnly()){
+            setReadOnlyComponents(false);
+        }
+    }
+
+    /**
+     * Set the nested components (team or person fields) to read only but
+     * keep the state of the <code>TeamOrPersonField</code> untouched so
+     * that the <code>teamOrPersonSelect</code>, <code>removeButton</code>,
+     * <code>personButton</code> and <code>teamButton</code> stay operational.
+     *
+     * @param readOnly
+     */
+    protected void setReadOnlyComponents(boolean readOnly) {
+        setDeepReadOnly(readOnly, getContent(), editorComponents);
+        updateCaptionReadonlyNotice(readOnly);
     }
 
 

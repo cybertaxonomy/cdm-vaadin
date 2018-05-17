@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
@@ -25,14 +26,13 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.security.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
-import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
 /**
  * @author a.kohlbecker
@@ -75,7 +75,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(getView().getInReferenceCombobox(),this));
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService());
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
@@ -85,7 +85,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected Reference loadCdmEntityById(Integer identifier) {
+    protected Reference loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
 
@@ -118,7 +118,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
      * {@inheritDoc}
      */
     @Override
-    protected void guaranteePerEntityCRUDPermissions(Integer identifier) {
+    protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Reference.class, identifier, crud, null);
         }
@@ -143,32 +143,32 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
    @EventBusListenerMethod
    public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
 
-       if(!isFromOwnView(editorAction) || editorAction.getSourceComponent() == null){
+       if(!isFromOwnView(editorAction) || editorAction.getTarget() == null){
            return;
        }
 
-       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getSourceComponent().getClass())){
+       if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
            if(editorAction.isAddAction()){
-               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
                inReferencePopup.loadInEditor(null);
            }
            if(editorAction.isEditAction()){
-               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView());
+               inReferencePopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
                inReferencePopup.withDeleteButton(true);
-               inReferencePopup.loadInEditor(editorAction.getEntityId());
+               inReferencePopup.loadInEditor(editorAction.getEntityUuid());
            }
        }
    }
 
    @EventBusListenerMethod
-   public void doDoneWithPopupEvent(DoneWithPopupEvent event){
+   public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-       if(event.getPopup().equals(inReferencePopup)){
-           if(event.getReason().equals(Reason.SAVE)){
-               Reference bean = inReferencePopup.getBean();
-               getView().getInReferenceCombobox().reload(); //refreshSelectedValue(bean);
+       if(event.getSourceView() == inReferencePopup){
+           if(event.isCreateOrModifiedType()){
+               getCache().load(event.getEntity());
+               getView().getInReferenceCombobox().reload();
            }
-           if(event.getReason().equals(Reason.DELETE)){
+           if(event.isRemovedType()){
                getView().getInReferenceCombobox().selectNewItem(null);
            }
            inReferencePopup = null;
