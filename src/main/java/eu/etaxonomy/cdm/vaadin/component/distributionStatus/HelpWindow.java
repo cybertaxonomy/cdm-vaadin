@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 
 /**
+ * A help window to display useful information on the usage of the distribution editor.
  * @author freimeier
  * @since 9 Mar 2018
  *
@@ -34,11 +35,19 @@ public class HelpWindow extends CustomComponent{
     private AbstractOrderedLayout mainLayout;
     private IDistributionTableView view;
 
+    /**
+     * Creates a new help window.
+     * @param view The view the help window is related to.
+     */
     public HelpWindow(IDistributionTableView view) {
         this.view = view;
         buildMainLayout();
     }
 
+    /**
+     * Builds the layout of the help window and populates it with content.
+     * @return Layout of the help window.
+     */
     private AbstractLayout buildMainLayout() {
         mainLayout = new VerticalLayout();
         mainLayout.setSizeFull();
@@ -59,6 +68,11 @@ public class HelpWindow extends CustomComponent{
         return mainLayout;
     }
 
+    /**
+     * Creates the help window to display.
+     * @param caption The caption of the window.
+     * @return Help window to be displayed.
+     */
     public Window createWindow(String caption) {
         window = new Window();
         window.setModal(true);

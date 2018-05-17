@@ -27,6 +27,10 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
 	private static Collection<PresenceAbsenceTerm> defaultDistributionStatus;
 
+	/**
+	 * A comparator to sort {@link PresenceAbsenceTerm}s contained in {@link PresenceAbsenceTermContainer}s.
+	 *
+	 */
     static class PresenceAbsenceTermComparator implements Comparator<PresenceAbsenceTerm> {
         @Override
         public int compare(PresenceAbsenceTerm pa1, PresenceAbsenceTerm pa2) {
@@ -35,18 +39,29 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 
     }
 
+    /**
+     * Creates and initializes a new {@link PresenceAbsenceTermContainer}.
+     * @throws IllegalArgumentException
+     */
 	private PresenceAbsenceTermContainer()
 			throws IllegalArgumentException {
 		super(PresenceAbsenceTerm.class);
 		initDataModel();
 	}
 
+	/**
+	 * Initializes the data model of the container and adds all allowed {@link PresenceAbsenceTerm}s to the bean.
+	 */
     private void initDataModel() {
         Collection<PresenceAbsenceTerm> distributionStatus = getDistributionStatusList(TERMS_INIT_STRATEGY);
         defaultDistributionStatus = distributionStatus;
 		addAll(distributionStatus);
     }
 
+    /**
+     * Gets an existing instance of the {@link PresenceAbsenceTermContainer} or creates a new one.
+     * @return Instance of {@link PresenceAbsenceTermContainer}.
+     */
 	public static PresenceAbsenceTermContainer getInstance(){
 	    if(instance == null){
 	        instance = new PresenceAbsenceTermContainer();
@@ -64,6 +79,11 @@ public class PresenceAbsenceTermContainer extends BeanItemContainer<PresenceAbse
 	    return instance;
 	}
 
+	/**
+	 * Returns a list of all allowed {@link PresenceAbsenceTerm}s.
+	 * @param propertyPath The property path to use for calling {@link CdmSpringContextHelper} functions to load {@link PresenceAbsenceTerm}s.
+	 * @return List of all allowed {@link PresenceAbsenceTerm}s.
+	 */
     public static List<PresenceAbsenceTerm> getDistributionStatusList(List<String> propertyPath){
         CdmPreference statusPref = CdmSpringContextHelper.getPreferenceService().findVaadin(PreferencePredicate.AvailableDistributionStatus);
         List<PresenceAbsenceTerm> paList;

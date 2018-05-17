@@ -60,6 +60,8 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
+ * The main view of the distribution status editor.
+ * 
  * @author freimeier
  * @since 18.10.2017
  *
@@ -86,10 +88,19 @@ public class DistributionTableViewBean
 	private DistributionStatusSettingsConfigWindow distributionStatusConfigWindow;
 	private HelpWindow helpWindow;
 
+	/**
+	 * Creates a new distribution status editor view.
+	 */
 	public DistributionTableViewBean() {
 		super();
 	}
 
+	/**
+	 * Initializes the layout of the view,
+	 * adds the {@link DistributionToolbar} and
+	 * creates the distribution status table and adds click listener for editing to it.
+	 * @return Layout of the view.
+	 */
 	private AbsoluteLayout initLayout() {
 		AbsoluteLayout mainLayout = new AbsoluteLayout();
 		mainLayout.setImmediate(false);
@@ -319,6 +330,9 @@ public class DistributionTableViewBean
 //        footerCell.setText(String.format(Messages.DistributionTableViewBean_TOTAL_TAXA, gridcontainer.size()));
 	}
 
+	/**
+	 * Adds click listener to the buttons defined in the {@link DistributionToolbar}.
+	 */
 	private void createEditClickListener(){
 		//details
 	    Button detailButton = toolbar.getDetailButton();

@@ -13,6 +13,9 @@ import com.vaadin.navigator.View;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
+ * 
+ * Interface for the distribution status editor view.
+ * 
  * @author freimeier
  * @since 18.10.2017
  *

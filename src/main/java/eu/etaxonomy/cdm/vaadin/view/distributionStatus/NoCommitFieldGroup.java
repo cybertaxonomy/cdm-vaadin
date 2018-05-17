@@ -11,6 +11,9 @@ package eu.etaxonomy.cdm.vaadin.view.distributionStatus;
 import com.vaadin.data.fieldgroup.FieldGroup;
 
 /**
+ * Field group that might be used for vaadin grid
+ * instantiation of the distribution status editor.
+ * 
  * @author freimeier
  * @since 18.10.2017
  *
@@ -19,11 +22,19 @@ public class NoCommitFieldGroup extends FieldGroup{
 
     private static final long serialVersionUID = -1666206997756640330L;
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
 	public boolean isReadOnly() {
 		return false;
 	}
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
 	@Override
 	public void commit() {}
 }

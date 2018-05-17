@@ -59,12 +59,16 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.AreaAndTaxonSett
 /**
  *
  * @author pplitzner
+ * A Configuration window for choosing distribution areas and taxa to work with.
  *
  */
 public class AreaAndTaxonSettingsConfigWindow
             extends SettingsDialogWindowBase<AreaAndTaxonSettingsPresenter>
             implements ValueChangeListener, ClickListener, ExpandListener{
 
+	/**
+	 * 
+	 */
     private static final long serialVersionUID = 1439411115014088780L;
     private ComboBox classificationBox;
     private TextField taxonFilter;
@@ -85,7 +89,11 @@ public class AreaAndTaxonSettingsConfigWindow
         super();
         this.distributionTableView = distributionTableView;
     }
-
+    
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected void init() {
         //init classification
@@ -137,6 +145,10 @@ public class AreaAndTaxonSettingsConfigWindow
         updateButtons();
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected AbstractLayout buildMainLayout() {
 
@@ -230,6 +242,10 @@ public class AreaAndTaxonSettingsConfigWindow
         return leftAndRightContainer;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void valueChange(ValueChangeEvent event) {
         Property<?> property = event.getProperty();
@@ -271,11 +287,19 @@ public class AreaAndTaxonSettingsConfigWindow
         updateButtons();
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isValid() {
         return classificationBox.getValue()!=null && distAreaBox.getValue()!=null;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void buttonClick(ClickEvent event) {
         Object source = event.getSource();
@@ -305,12 +329,20 @@ public class AreaAndTaxonSettingsConfigWindow
         }
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void nodeExpand(ExpandEvent event) {
         UuidAndTitleCache<TaxonNode> parent = (UuidAndTitleCache<TaxonNode>) event.getItemId();
         ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
+    /**
+     * Starts a {@link TreeUpdater} thread to populate the {@link #taxonTree} with taxa of the classification specified by the given {@code rootNode}.
+     * @param rootNode The root node of the classification whose taxa should be shown in the {@link #taxonTree}.
+     */
     private void showClassificationTaxa(TaxonNode rootNode) {
         final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(rootNode);
         // Enable polling and set frequency to 0.5 seconds
@@ -318,10 +350,14 @@ public class AreaAndTaxonSettingsConfigWindow
         taxonTree.setEnabled(false);
         taxonTree.removeAllItems();
         Notification.show(Messages.getLocalizedString(Messages.AreaAndTaxonSettingsConfigWindow_LOADING_TAXA));
-
         new TreeUpdater(children).start();
     }
 
+    /**
+     * Returns the {@link UuidAndTitleCache} object of the classification specified by the given {@link RowId} of the {@link CdmSQLContainer} used in the {@link #classificationBox}.
+     * @param classificationSelection
+     * @return {@link UuidAndTitleCache} object of the given classification specified by {@code classificationSelection}
+     */
     private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue(); //$NON-NLS-1$
         Property<Integer> rootNodeContainerProperty = null;
@@ -350,18 +386,36 @@ public class AreaAndTaxonSettingsConfigWindow
         return new AreaAndTaxonSettingsPresenter();
     }
 
+    /**
+     * Thread to populate {@link AreaAndTaxonSettingsConfigWindow#taxonTree}.
+     *
+     */
     private class TreeUpdater extends Thread{
-
+    
+    	/**
+    	 * The taxa to show.
+    	 */
     	private Collection<UuidAndTitleCache<TaxonNode>> children;
 
-
+    	/**
+    	 * Creates a thread to show the given collection of taxa in {@link AreaAndTaxonSettingsConfigWindow#taxonTree}.
+    	 * @param children {@link UuidAndTitleCache} of the taxa to show.
+    	 */
 		public TreeUpdater(Collection<UuidAndTitleCache<TaxonNode>> children) {
 			this.children = children;
 		}
 
+		/**
+		 * 
+		 * {@inheritDoc}
+		 */
 		@Override
     	public void run() {
 			UI.getCurrent().access(new Runnable() {
+				/**
+				 * 
+				 * {@inheritDoc}
+				 */
 				@Override
 				public void run() {
 					taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
