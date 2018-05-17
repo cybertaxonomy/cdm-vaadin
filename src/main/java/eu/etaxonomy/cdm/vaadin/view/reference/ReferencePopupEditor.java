@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
-import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
+import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
@@ -158,7 +158,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
         TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
         publisherField.setWidth(100, Unit.PERCENTAGE);
-        TimePeriodField timePeriodField = new TimePeriodField("Date published");
+        VerbatimTimePeriodField timePeriodField = new VerbatimTimePeriodField("Date published");
         addField(timePeriodField, "datePublished");
         row++;
 
