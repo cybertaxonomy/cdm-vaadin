@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
@@ -13,7 +12,7 @@
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
-    <cdmlib.version>4.15.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>4.16.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib
