@@ -200,8 +200,8 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	@Override
-    public Field<?> targetFieldOf(ApplicationView parentView, PopupView popupView){
-	    return popupViewRegistration.get(parentView, popupView);
+    public Field<?> targetFieldOf(PopupView popupView){
+	    return popupViewRegistration.get(popupView);
 	}
 
     @EventBusListenerMethod

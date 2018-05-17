@@ -20,7 +20,6 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -50,7 +49,6 @@ import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
-import eu.etaxonomy.vaadin.component.ReloadableSelect;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
@@ -261,7 +259,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             return;
         }
 
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), event.getTarget());
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
@@ -282,13 +280,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
+        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), event.getTarget());
 
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
         referenceEditorPopup.loadInEditor(event.getEntityUuid());
         if(newReferenceInstantiator != null){
-            // this is a bit clumsy, we actually need to inject something like a view configurer
+            // this is a bit clumsy, we actually need to inject something like a view configurator
             // which can enable, disable fields
             referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
             referenceEditorPopup.getTypeSelect().setEnabled(false);
@@ -301,47 +299,53 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(event.getSourceView() instanceof AbstractPopupEditor) {
 
             AbstractPopupEditor popupEditor = (AbstractPopupEditor) event.getSourceView();
-            Field<?> targetField = getNavigationManager().targetFieldOf(getView(), popupEditor);
 
-            Property ds = targetField.getPropertyDataSource();
-            if(event.getSourceView() == referenceEditorPopup){
-                if(event.isCreateOrModifiedType()){
+            Field<?> targetField = getNavigationManager().targetFieldOf(popupEditor);
 
-                    getCache().load(event.getEntity());
-                    if(event.isCreatedType()){
-                        getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
-                    } else {
-                        getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
+            if(targetField != null){
+
+                Property ds = targetField.getPropertyDataSource();
+
+                if(event.getSourceView() == referenceEditorPopup){
+                    if(event.isCreateOrModifiedType()){
+
+                        getCache().load(event.getEntity());
+                        if(event.isCreatedType()){
+                            getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
+                        } else {
+                            getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
+                        }
+                        getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
+                        getView().updateAuthorshipFields();
                     }
-                    getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
-                    getView().updateAuthorshipFields();
+
+                    referenceEditorPopup = null;
                 }
+                if(event.getSourceView()  == basionymNamePopup){
+                    ReloadableLazyComboBox basionymSourceField = (ReloadableLazyComboBox)targetField;
 
-                referenceEditorPopup = null;
-            }
-            if(event.getSourceView()  == basionymNamePopup){
-                AbstractSelect basionymSourceField = (AbstractSelect) targetField;
-                if(event.isCreateOrModifiedType()){
+                    if(event.isCreateOrModifiedType()){
 
-                    getCache().load(event.getEntity());
-                    if(event.isCreatedType()){
-                        basionymSourceField .setValue(event.getEntity());
-                    } else {
-                        ((ReloadableSelect)basionymSourceField).reload();
+                        getCache().load(event.getEntity());
+                        if(event.isCreatedType()){
+                            basionymSourceField .setValue(event.getEntity());
+                        } else {
+                            basionymSourceField.reload();
+                        }
+                        getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
+                        getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
+                        getView().updateAuthorshipFields();
+
                     }
-                    getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
-                    getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
-                    getView().updateAuthorshipFields();
+                    if(event.isRemovedType()){
+                        basionymSourceField.setValue(null);
+                        getView().updateAuthorshipFields();
+                    }
 
-                }
-                if(event.isRemovedType()){
-                    basionymSourceField.setValue(null);
-                    getView().updateAuthorshipFields();
+                    basionymNamePopup = null;
                 }
 
-                basionymNamePopup = null;
             }
-
         }
     }
 
