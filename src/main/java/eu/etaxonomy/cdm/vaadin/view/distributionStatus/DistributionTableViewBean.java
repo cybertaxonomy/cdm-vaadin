@@ -57,6 +57,7 @@ import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
+import eu.etaxonomy.cdm.vaadin.util.DistributionStatusQuery;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -341,7 +342,7 @@ public class DistributionTableViewBean
 				Object selectedItemId = DistributionTableViewBean.this.table.getValue();
 //				Object selectedItemId = DistributionTableViewBean.this.grid.getSelectedRow();
 				if(selectedItemId!=null){
-				    final UUID uuid = UUID.fromString(table.getContainerDataSource().getItem(selectedItemId).getItemProperty("uuid").getValue().toString());
+				    final UUID uuid = UUID.fromString(table.getContainerDataSource().getItem(selectedItemId).getItemProperty(CdmQueryFactory.UUID_COLUMN).getValue().toString());
 //					final UUID uuid = (UUID) selectedItemId;
 					Taxon taxon = HibernateProxyHelper.deproxy(CdmSpringContextHelper.getTaxonService().load(uuid), Taxon.class);
 //					Taxon taxon = (Taxon) CdmSpringContextHelper.getTaxonService().load(uuid);

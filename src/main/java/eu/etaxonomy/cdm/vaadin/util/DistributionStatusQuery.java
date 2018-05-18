@@ -46,11 +46,11 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
  */
 public class DistributionStatusQuery implements Query{
     public static final String DTYPE_COLUMN = "DTYPE";
-    public static final String ID_COLUMN = "id";
-    public static final String UUID_COLUMN = "uuid";
-    public static final String CLASSIFICATION_COLUMN = "classification";
-    public static final String RANK_COLUMN = "Rang";
-    public static final String TAXON_COLUMN = "Taxon";
+    public static final String ID_COLUMN = "ID";
+    public static final String UUID_COLUMN = "UUID";
+    public static final String CLASSIFICATION_COLUMN = "CLASSIFICATION";
+    public static final String RANK_COLUMN = "RANK";
+    public static final String TAXON_COLUMN = "TAXON";
 
     private CdmRepository repo;
     private QueryDefinition definition;
