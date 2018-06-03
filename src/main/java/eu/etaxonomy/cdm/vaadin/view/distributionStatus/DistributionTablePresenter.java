@@ -62,8 +62,8 @@ import eu.etaxonomy.cdm.vaadin.util.DistributionStatusQueryFactory;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
- * The presenter of the distribution status editor. 
- * 
+ * The presenter of the distribution status editor.
+ *
  */
 @SpringComponent
 @ViewScope
@@ -87,12 +87,12 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     }
 
     /**
-     * Changes the distribution status of the given {@link Taxon} for the given {@link NamedArea} to the sepcified {@link PresenceAbsenceTerm}.  
+     * Changes the distribution status of the given {@link Taxon} for the given {@link NamedArea} to the sepcified {@link PresenceAbsenceTerm}.
      * @param area The area to update the distribution status for.
      * @param distributionStatus The distribution status to update the taxon with.
      * @param taxon The taxon to be updated.
-     * @return 
-     * {@code 0} if the update was successful. 
+     * @return
+     * {@code 0} if the update was successful.
      * {@code 1} if the distributionStatus was null and the {@link DescriptionElementBase} was deleted successfully.
      * {@code -1} if an error occurred.
      */
@@ -166,7 +166,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     }
 
     /**
-     * Returns a {@link PresenceAbsenceTermContainer} containing all allowed and chosen {@link PresenceAbsenceTerm}s. 
+     * Returns a {@link PresenceAbsenceTermContainer} containing all allowed and chosen {@link PresenceAbsenceTerm}s.
      * @return {@link PresenceAbsenceTermContainer} containing all allowed and chosen {@link PresenceAbsenceTerm}s.
      */
     public PresenceAbsenceTermContainer getPresenceAbsenceTermContainer() {
@@ -229,7 +229,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     }
 
     /**
-     * Returns the {@link Distribution} of the given {@link Taxon}. 
+     * Returns the {@link Distribution} of the given {@link Taxon}.
      * @param taxon Taxon to get the {@link Distribution} of.
      * @return {@link Distribution} of the given {@link Taxon}.
      */
@@ -242,14 +242,14 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     }
 
     /**
-     * Returns the list of chosen {@link NamedArea}s defined in the 
+     * Returns the list of chosen {@link NamedArea}s defined in the
      * related vaadin session attribute {@link DistributionEditorUtil#SATTR_SELECTED_AREAS}.
-     * If this vaadin session attribute is not set, all allowed {@link NamedArea}s of the 
+     * If this vaadin session attribute is not set, all allowed {@link NamedArea}s of the
      * chosen {@link TermVocabulary} defined by the vaadin session attribute
      * {@link DistributionEditorUtil#SATTR_SELECTED_AREA_VOCABULARY_UUID} are returned.
-     * @return List of chosen {@link NamedArea}s defined in the 
+     * @return List of chosen {@link NamedArea}s defined in the
      * related vaadin session attribute {@link DistributionEditorUtil#SATTR_SELECTED_AREAS}.
-     * If this vaadin session attribute is not set, all allowed {@link NamedArea}s of the 
+     * If this vaadin session attribute is not set, all allowed {@link NamedArea}s of the
      * chosen {@link TermVocabulary} defined by the vaadin session attribute
      * {@link DistributionEditorUtil#SATTR_SELECTED_AREA_VOCABULARY_UUID}.
      */
@@ -262,10 +262,10 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	/**
-	 * Returns all {@link NamedArea}s of the {@link TermVocabulary} defined 
+	 * Returns all {@link NamedArea}s of the {@link TermVocabulary} defined
 	 * by the vaadin session attribute {@link DistributionEditorUtil#SATTR_SELECTED_AREA_VOCABULARY_UUID}
 	 * ordered by labels.
-	 * @return all {@link NamedArea}s of the {@link TermVocabulary} defined 
+	 * @return all {@link NamedArea}s of the {@link TermVocabulary} defined
 	 * by the vaadin session attribute {@link DistributionEditorUtil#SATTR_SELECTED_AREA_VOCABULARY_UUID}
 	 * ordered by labels..
 	 */
@@ -285,15 +285,15 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	}
 
 	/**
-	 * Returns all {@link TaxonNode}s defined by the 
+	 * Returns all {@link TaxonNode}s defined by the
 	 * vaadin session attribute {@link DistributionEditorUtil#SATTR_TAXON_NODES_UUID}.
 	 * If this session attribute is not set, all {@link TaxonNode}s of the chosen
-	 * classification defined by the vaadin session attribute 
+	 * classification defined by the vaadin session attribute
 	 * {@link DistributionEditorUtil#SATTR_CLASSIFICATION} are returned.
-	 * @return All {@link TaxonNode}s defined by the 
+	 * @return All {@link TaxonNode}s defined by the
 	 * vaadin session attribute {@link DistributionEditorUtil#SATTR_TAXON_NODES_UUID}.
 	 * If this session attribute is not set, all {@link TaxonNode}s of the chosen
-	 * classification defined by the vaadin session attribute 
+	 * classification defined by the vaadin session attribute
 	 * {@link DistributionEditorUtil#SATTR_CLASSIFICATION}.
 	 */
 	private List<TaxonNode> getChosenTaxonNodes() {
@@ -320,14 +320,16 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	 * and their children.
 	 */
 	private List<TaxonNode> getAllNodes(){
-		List<TaxonNode> allNodes = new ArrayList<>();
+	    boolean includeUnpublished = true;
+
+	    List<TaxonNode> allNodes = new ArrayList<>();
 
 		List<TaxonNode> taxonNodes = getChosenTaxonNodes();
 		for (TaxonNode taxonNode : taxonNodes) {
 			if(taxonNode.getTaxon()!=null){
 				allNodes.add(taxonNode);
 			}
-			allNodes.addAll(CdmSpringContextHelper.getTaxonNodeService().loadChildNodesOfTaxonNode(taxonNode, null, true, null));
+			allNodes.addAll(CdmSpringContextHelper.getTaxonNodeService().loadChildNodesOfTaxonNode(taxonNode, null, true, includeUnpublished, null));
 		}
 		return allNodes;
 	}
