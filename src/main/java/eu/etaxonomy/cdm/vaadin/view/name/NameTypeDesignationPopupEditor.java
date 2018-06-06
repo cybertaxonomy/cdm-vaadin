@@ -137,9 +137,12 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         typeNameField = new ToOneRelatedEntityCombobox<TaxonName>("Type name", TaxonName.class);
         addField(typeNameField, "typeName", 0, row, 3, row);
-        typeNameField.addClickListenerAddEntity(e -> getViewEventBus().publish(
-                this,
-                new TaxonNameEditorAction(EditorActionType.ADD, null, typeNameField, this))
+        typeNameField.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
+                new TaxonNameEditorAction(
+                        EditorActionType.ADD,
+                        e.getButton(),
+                        typeNameField,
+                        this))
         );
         typeNameField.addClickListenerEditEntity(e -> {
             if(typeNameField.getValue() != null){

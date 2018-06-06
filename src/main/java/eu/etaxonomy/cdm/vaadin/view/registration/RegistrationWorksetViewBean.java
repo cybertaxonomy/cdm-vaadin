@@ -437,9 +437,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser));
+                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
         layout.setMargin(true);
@@ -454,7 +454,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * @param button
      *
      */
-    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser) {
+    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser, Button sourceButton) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
         getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
@@ -462,7 +462,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 newWorkingsetType,
                 registrationEntityUuid,
                 typifiedNameRef.getUuid(),
-                null,
+                sourceButton,
                 null,
                 this
                 ));

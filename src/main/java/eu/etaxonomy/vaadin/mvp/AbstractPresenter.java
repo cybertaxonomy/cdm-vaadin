@@ -12,9 +12,13 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.vaadin.spring.events.EventBus;
 
+import com.vaadin.ui.Field;
+
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * AbstractPresenter is the base class of all presenter components. Presenter's
@@ -200,6 +204,36 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
     protected boolean checkFromOwnView(AbstractEditorAction event) {
         return getView() != null && getView() == event.getSourceView();
+    }
+
+    /**
+     * Opens a new PopView or editor of the type <code>popupViewClass</code> for the current view.
+     * If the <code>event</code> is not null and if it contains a target field the newly created editor
+     * will be registered with this field as target. Once the popup editor is being saved a
+     * {@link eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent} will be emitted which will hold a
+     * reference to the popup editor in the {@link eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent#getSourceView() sourceView}
+     * property. By this reference the target field can be retrieved in editor presenters via the method
+     * {@link AbstractEditorPresenter#boundTargetField(PopupView)}:
+     * <p>
+     * {@code
+     *   BoundField targetField = boundTargetField(entityChangeEvent.getSourceView())
+     * }
+     * </p>
+     * In case the target field is bound to a bean property the propertyId is available in the {@link BoundField}
+     * object and can be used to decide on which bean property to update with the data saved in the popup editor or to
+     * act in any other appropriate way.
+     *
+     * @param popupViewClass
+     * @param event
+     * @return
+     */
+    protected <T extends PopupView> T openPopupEditor(Class<T> popupViewClass, AbstractEditorAction<?> event) {
+        Field<?> targetField = event != null? event.getTarget(): null;
+        return getNavigationManager().showInPopup(popupViewClass, getView(), targetField);
+    }
+
+    protected boolean isFromOwnView(EntityChangeEvent event) {
+        return event.getSourceView() != null && event.getSourceView().equals(getView());
     }
 
 }

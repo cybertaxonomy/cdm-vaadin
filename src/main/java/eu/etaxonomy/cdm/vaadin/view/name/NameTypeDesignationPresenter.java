@@ -36,13 +36,15 @@ import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.mvp.BoundField;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -58,8 +60,6 @@ public class NameTypeDesignationPresenter
     private IRegistrationWorkingSetService registrationWorkingSetService;
 
     HashSet<TaxonName> typifiedNamesAsLoaded;
-
-    private TaxonNamePopupEditor typeNamePopup;
 
     private TaxonName typifiedNameInContext;
 
@@ -230,7 +230,7 @@ public class NameTypeDesignationPresenter
             return;
         }
 
-        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), null);
+        TaxonNamePopupEditor typeNamePopup = openPopupEditor(TaxonNamePopupEditor.class, action);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         // TODO configure Modes???
@@ -246,9 +246,7 @@ public class NameTypeDesignationPresenter
             return;
         }
 
-        //  basionymSourceField = (AbstractField<TaxonName>)event.getSourceComponent();
-
-        typeNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), null);
+        TaxonNamePopupEditor typeNamePopup = openPopupEditor(TaxonNamePopupEditor.class, action);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         // TODO configure Modes???
@@ -259,20 +257,23 @@ public class NameTypeDesignationPresenter
     @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent<?>event){
 
-        if(event.getSourceView() == typeNamePopup){
-            if(event.isCreateOrModifiedType()){
-                getCache().load(event.getEntity());
-                if(event.isCreatedType()){
-                    getView().getTypeNameField().setValue((TaxonName) event.getEntity());
-                } else {
-                    getView().getTypeNameField().reload();
-                }
-            }
-            if(event.isRemovedType()){
-                getView().getTypeNameField().selectNewItem(null);
-            }
-            typeNamePopup = null;
+        BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
 
+        if(boundTargetField != null){
+            if(boundTargetField.matchesPropertyIdPath("typeName")){
+                if(event.isCreateOrModifiedType()){
+                    getCache().load(event.getEntity());
+                    if(event.isCreatedType()){
+                        getView().getTypeNameField().setValue((TaxonName) event.getEntity());
+                    } else {
+                        getView().getTypeNameField().reload();
+                    }
+                }
+                if(event.isRemovedType()){
+                    getView().getTypeNameField().selectNewItem(null);
+                }
+
+            }
         }
     }
 

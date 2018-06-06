@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.vaadin.spring.events.EventScope;
 
@@ -43,6 +44,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
@@ -65,6 +67,7 @@ import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
+import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
  *
@@ -519,6 +522,57 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected Field<?> getField(Object propertyId){
         return fieldGroup.getField(propertyId);
+    }
+
+    public PropertyIdPath boundPropertyIdPath(Field<?> field){
+
+        PropertyIdPath propertyIdPath = null;
+        Object propertyId = fieldGroup.getPropertyId(field);
+
+        if(propertyId == null){
+            // not found in the editor field group. Maybe the field is bound to a nested fieldgroup?
+            // 1. find the NestedFieldGroup implementations from the field up to the editor
+            logger.setLevel(Level.DEBUG);
+            PropertyIdPath nestedPropertyIds = new PropertyIdPath();
+            Field parentField = field;
+            HasComponents parentComponent = parentField.getParent();
+            logger.debug("field: " + parentField.getClass().getSimpleName());
+            while(parentComponent != null){
+                logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
+                if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
+                    Object propId = ((NestedFieldGroup)parentComponent).getFieldGroup().getPropertyId(parentField);
+                    if(propId != null){
+                        logger.debug("propId: " + propId.toString());
+                        nestedPropertyIds.addParent(propId);
+                    }
+                    logger.debug("parentField: " + parentField.getClass().getSimpleName());
+                    parentField = (Field)parentComponent;
+                } else if(parentComponent == this) {
+                    // we reached the editor itself
+                    Object propId = fieldGroup.getPropertyId(parentField);
+                    if(propId != null){
+                        logger.debug("propId: " + propId.toString());
+                        nestedPropertyIds.addParent(propId);
+                    }
+                    propertyIdPath = nestedPropertyIds;
+                    break;
+                }
+                parentComponent = parentComponent.getParent();
+            }
+            // 2. check the NestedFieldGroup binding the field is direct or indirect child component of the editor
+//            NO lONGER NEEDED
+//            parentComponent = parentField.getParent(); // get component containing the last parent field found
+//            while(true){
+//                if(parentComponent == getFieldLayout()){
+//                    propertyIdPath = nestedPropertyIds;
+//                    break;
+//                }
+//                parentComponent = parentComponent.getParent();
+//            }
+        } else {
+            propertyIdPath = new PropertyIdPath(propertyId);
+        }
+        return propertyIdPath;
     }
 
     protected void addComponent(Component component) {

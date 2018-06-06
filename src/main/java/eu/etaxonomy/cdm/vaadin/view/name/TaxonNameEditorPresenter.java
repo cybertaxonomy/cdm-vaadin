@@ -18,9 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
-import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -52,6 +50,9 @@ import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
+import eu.etaxonomy.vaadin.mvp.BoundField;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
+import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
  * @author a.kohlbecker
@@ -75,10 +76,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     private static final long serialVersionUID = -3538980627079389221L;
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
-
-    private ReferencePopupEditor referenceEditorPopup = null;
-
-    private TaxonNamePopupEditor basionymNamePopup = null;
 
     private CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider;
 
@@ -259,7 +256,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             return;
         }
 
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), event.getTarget());
+        ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
@@ -280,7 +277,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        referenceEditorPopup = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), event.getTarget());
+        ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
 
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
@@ -298,15 +295,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         if(event.getSourceView() instanceof AbstractPopupEditor) {
 
-            AbstractPopupEditor popupEditor = (AbstractPopupEditor) event.getSourceView();
+            BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
 
-            Field<?> targetField = getNavigationManager().targetFieldOf(popupEditor);
-
-            if(targetField != null){
-
-                Property ds = targetField.getPropertyDataSource();
-
-                if(event.getSourceView() == referenceEditorPopup){
+            if(boundTargetField != null){
+                if(boundTargetField.matchesPropertyIdPath("nomenclaturalReference")){
                     if(event.isCreateOrModifiedType()){
 
                         getCache().load(event.getEntity());
@@ -318,36 +310,45 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
                     }
-
-                    referenceEditorPopup = null;
                 }
-                if(event.getSourceView()  == basionymNamePopup){
-                    ReloadableLazyComboBox basionymSourceField = (ReloadableLazyComboBox)targetField;
-
+                if(boundTargetField.matchesPropertyIdPath("validationFor.otherName")){
+                    ReloadableLazyComboBox<TaxonName> otherNameField = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
                     if(event.isCreateOrModifiedType()){
-
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
-                            basionymSourceField .setValue(event.getEntity());
+                            otherNameField.setValue((TaxonName) event.getEntity());
+                        } else {
+                            otherNameField.reload();
+                        }
+                    } else
+                    if(event.isRemovedType()){
+                        otherNameField.setValue(null);
+                    }
+                } else
+                if(boundTargetField.matchesPropertyIdPath("basionyms")){
+                    ReloadableLazyComboBox<TaxonName> basionymSourceField = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
+                    if(event.isCreateOrModifiedType()){
+                        getCache().load(event.getEntity());
+                        if(event.isCreatedType()){
+                            basionymSourceField .setValue((TaxonName) event.getEntity());
                         } else {
                             basionymSourceField.reload();
                         }
                         getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
                         getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
-
-                    }
+                    } else
                     if(event.isRemovedType()){
                         basionymSourceField.setValue(null);
                         getView().updateAuthorshipFields();
                     }
-
-                    basionymNamePopup = null;
                 }
 
             }
         }
     }
+
+
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction event) {
@@ -355,39 +356,59 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
-        ReloadableLazyComboBox<TaxonName> targetField = (ReloadableLazyComboBox<TaxonName>)event.getTarget();
 
-        if(targetField == getView().getValidationField().getValidatedNameComboBox().getSelect()){
-            // validatedNameSourceField .. this is awkward, better use a map to correlate fields to popup editors!!!!
+        PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
 
-        } else {
-            basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), event.getTarget());
-            basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-            basionymNamePopup.withDeleteButton(true);
-            getView().getModesActive().stream()
+        if(boundPropertyId != null){
+            if(boundPropertyId.matches("validationFor.otherName")){
+                TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                validatedNamePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
                     .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                    .forEach(m -> basionymNamePopup.enableMode(m));
-            basionymNamePopup.loadInEditor(event.getEntityUuid());
-            basionymNamePopup.getBasionymToggle().setVisible(false);
+                    .forEach(m -> validatedNamePopup.enableMode(m));
+                validatedNamePopup.loadInEditor(event.getEntityUuid());
+            } else if(boundPropertyId.matches("basionyms")) {
+                TaxonNamePopupEditor basionymNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                basionymNamePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
+                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                        .forEach(m -> basionymNamePopup.enableMode(m));
+                basionymNamePopup.loadInEditor(event.getEntityUuid());
+                basionymNamePopup.getBasionymToggle().setVisible(false);
+            }
         }
 
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
-    public void oTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
+    public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
 
         if(getView() == null || event.getSourceView() != getView() ){
             return;
         }
 
-        basionymNamePopup = getNavigationManager().showInPopup(TaxonNamePopupEditor.class, getView(), event.getTarget());
-        basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-        basionymNamePopup.withDeleteButton(true);
-        getView().getModesActive().stream()
-                .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                .forEach(m -> basionymNamePopup.enableMode(m));
-        basionymNamePopup.loadInEditor(null);
-        basionymNamePopup.getBasionymToggle().setVisible(false);
+        PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
+
+        if(boundPropertyId != null){
+            if(boundPropertyId.matches("validationFor.otherName")){
+                TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                validatedNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                validatedNamePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
+                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                        .forEach(m -> validatedNamePopup.enableMode(m));
+                validatedNamePopup.loadInEditor(null);
+            } else if(boundPropertyId.matches("basionyms")) {
+                TaxonNamePopupEditor basionymNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                basionymNamePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
+                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                        .forEach(m -> basionymNamePopup.enableMode(m));
+                basionymNamePopup.loadInEditor(null);
+                basionymNamePopup.getBasionymToggle().setVisible(false);
+            }
+        }
     }
 
     /**
