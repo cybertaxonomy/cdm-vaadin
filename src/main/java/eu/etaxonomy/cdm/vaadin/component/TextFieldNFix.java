@@ -45,6 +45,7 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix() {
         super();
+        setNullSettingAllowed(true);
     }
 
 
