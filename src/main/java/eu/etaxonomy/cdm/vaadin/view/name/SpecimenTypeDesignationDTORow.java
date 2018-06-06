@@ -17,11 +17,13 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
+import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRow;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -52,6 +54,8 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
     ToOneRelatedEntityCombobox<Reference> mediaSpecimenReference =
             new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
     TextField mediaSpecimenReferenceDetail = new TextFieldNFix(); //"Image reference detail");
+    private ToOneRelatedEntityButtonUpdater<Reference> mediaSpecimenReferenceUpdater;
+    private ToOneRelatedEntityButtonUpdater<Collection> collectionFieldUpdater;
 
     public SpecimenTypeDesignationDTORow(){
         kindOfUnit.setRows(1);
@@ -64,9 +68,17 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
         collection.setWidth(200, Unit.PIXELS);
+        collectionFieldUpdater = new ToOneRelatedEntityButtonUpdater<Collection>(collection);
+        collection.addValueChangeListener(
+                collectionFieldUpdater
+                );
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
+        mediaSpecimenReferenceUpdater = new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference);
+        mediaSpecimenReference.addValueChangeListener(
+                mediaSpecimenReferenceUpdater
+                );
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->
@@ -114,6 +126,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         kindOfUnit.setEnabled(!kindOfUnitLocked);
         kindOfUnit.setDescription(kindOfUnitLocked ?
                 "Can not be changed since the type specimen is associated with multiple type designations" : "");
+
         mediaSpecimenReference.setEnabled(publishedImageType || unPublishedImageType);
         mediaSpecimenReferenceDetail.setEnabled(publishedImageType || unPublishedImageType);
         mediaUri.setEnabled(publishedImageType || unPublishedImageType);

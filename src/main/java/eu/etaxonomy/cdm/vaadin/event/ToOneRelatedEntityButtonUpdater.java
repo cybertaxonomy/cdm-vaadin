@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -21,7 +20,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
  * @since 19.10.2017
  *
  */
-public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements ValueChangeListener {
+public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements NestedButtonStateUpdater {
 
     private static final long serialVersionUID = 4472031263172275012L;
 
@@ -33,6 +32,7 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Val
     public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
         this.type = toOneRelatedEntityField.getType();
+        toOneRelatedEntityField.setEditButtonEnabled(false);
     }
 
     /**

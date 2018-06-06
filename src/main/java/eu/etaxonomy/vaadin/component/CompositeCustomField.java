@@ -17,11 +17,14 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HasComponents;
+
+import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 
 /**
  * TODO implement height methods for full component size support
@@ -232,8 +235,10 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
 
     /**
      * Sets the readonly state for the component but treats Buttons differently.
-     * Buttons are also set to disabled to make them inactive.
-
+     * For nested Buttons the readonly state is projected to enabled state to
+     * make them inactive. Finally NestedButtonStateUpdaters are triggered to
+     * allow to disable buttons accordingly to user permissions.
+     *
      * @param readOnly
      * @param component
      */
@@ -242,6 +247,21 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
         if(Button.class.isAssignableFrom(component.getClass())){
             component.setEnabled(!readOnly);
         }
+        triggerNestedButtonStateUpdaters();
+    }
+
+    /**
+     *
+     */
+    protected void triggerNestedButtonStateUpdaters() {
+        for(Object l : getListeners(AbstractField.ValueChangeEvent.class)){
+           if(NestedButtonStateUpdater.class.isAssignableFrom(l.getClass())){
+               // trigger a fake ValueChangeEvent to let the ToOneRelatedEntityButtonUpdater fix the states
+               // of nested buttons
+               ((NestedButtonStateUpdater)l).valueChange(new AbstractField.ValueChangeEvent(this));
+           }
+        }
+
     }
 
     @Override
