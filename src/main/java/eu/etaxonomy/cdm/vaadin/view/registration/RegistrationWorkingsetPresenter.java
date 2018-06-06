@@ -614,6 +614,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent event){
+
         if(workingset == null){
             return;
         }
@@ -627,7 +628,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 refreshView(true);
             }
         } else
-        if(TaxonName.class.isAssignableFrom(event.getEntityType())){
+        if(TaxonName.class.isAssignableFrom(event.getEntityType()) && isFromOwnView(event)){
             if(event.getType().equals(EntityChangeEvent.Type.CREATED)){
                 // new name! create a blocking registration
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
@@ -640,7 +641,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
                 } else {
-                    logger.debug("Nn blocking registration, since a new name for a new registration has been created");
+                    logger.debug("Non blocking registration, since a new name for a new registration has been created");
                 }
             }
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
