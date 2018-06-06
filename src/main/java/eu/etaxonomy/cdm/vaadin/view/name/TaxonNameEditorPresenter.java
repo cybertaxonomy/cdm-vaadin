@@ -172,6 +172,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
+                "relationsToThisName.citation",
 
                 "relationsFromThisName",
                 "homotypicalGroup.typifiedNames"
