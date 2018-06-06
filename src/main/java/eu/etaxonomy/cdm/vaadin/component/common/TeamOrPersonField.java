@@ -384,6 +384,13 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         });
     }
 
+    @Override
+    public void setValue(TeamOrPersonBase<?> newFieldValue) {
+        // ignore readonly states of the datasource
+        setValue(newFieldValue, false, super.isReadOnly());
+    }
+
+
     /**
      * {@inheritDoc}
      */
