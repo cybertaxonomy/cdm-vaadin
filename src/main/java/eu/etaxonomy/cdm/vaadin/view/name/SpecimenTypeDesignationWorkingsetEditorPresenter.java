@@ -36,6 +36,7 @@ import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
@@ -90,6 +91,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private EnumSet<CRUD> crud = null;
 
     private ICdmCacher cache;
+
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
@@ -179,7 +183,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
 
-            CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+            CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
             @Override
             public SpecimenTypeDesignationDTORow create() {

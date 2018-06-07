@@ -70,7 +70,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         });
 
-        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = pagingProviderFactory.referencePagingProvider();
         getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(getView().getInReferenceCombobox(),this));

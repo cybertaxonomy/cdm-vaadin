@@ -135,7 +135,7 @@ public class NameTypeDesignationPresenter
         getView().getTypeStatusSelect().setItemCaptionPropertyId("description");
 
         getView().getCitationCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
         getView().getCitationCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
         getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getCitationCombobox(), this));

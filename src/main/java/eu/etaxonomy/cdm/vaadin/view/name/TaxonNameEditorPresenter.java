@@ -83,6 +83,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
+
     /**
      * {@inheritDoc}
      */
@@ -112,13 +113,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getExBasionymAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+        referencePagingProvider = pagingProviderFactory.referencePagingProvider();
         referencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
         getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getNomReferenceCombobox(), this));
 
         getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+
         CdmFilterablePagingProvider<TaxonName, TaxonName> basionymPagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
         basionymPagingProvider.setInitStrategy(BASIONYM_INIT_STRATEGY);
         getView().getBasionymComboboxSelect().setPagingProviders(basionymPagingProvider, basionymPagingProvider, basionymPagingProvider.getPageSize(), this);

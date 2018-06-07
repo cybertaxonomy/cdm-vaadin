@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.EnumSet;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -26,6 +27,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
@@ -54,6 +56,9 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
     private boolean registrationInProgress;
 
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
+
     public StartRegistrationPresenter (){
         super();
     }
@@ -67,8 +72,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
         super.onPresenterReady();
 
-        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
-                getRepo().getReferenceService());
+        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = pagingProviderFactory.referencePagingProvider();
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
