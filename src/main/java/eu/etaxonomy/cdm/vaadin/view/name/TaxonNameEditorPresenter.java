@@ -361,21 +361,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
 
         if(boundPropertyId != null){
-            if(boundPropertyId.matches("validationFor.otherName")){
+            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
                 TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
                 validatedNamePopup.withDeleteButton(true);
                 getView().getModesActive().stream()
                     .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                     .forEach(m -> validatedNamePopup.enableMode(m));
                 validatedNamePopup.loadInEditor(event.getEntityUuid());
-            } else if(boundPropertyId.matches("basionyms")) {
-                TaxonNamePopupEditor basionymNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
-                basionymNamePopup.withDeleteButton(true);
-                getView().getModesActive().stream()
-                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                        .forEach(m -> basionymNamePopup.enableMode(m));
-                basionymNamePopup.loadInEditor(event.getEntityUuid());
-                basionymNamePopup.getBasionymToggle().setVisible(false);
             }
         }
 
@@ -391,7 +383,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
 
         if(boundPropertyId != null){
-            if(boundPropertyId.matches("validationFor.otherName")){
+            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
                 TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
                 validatedNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
                 validatedNamePopup.withDeleteButton(true);
@@ -399,15 +391,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                         .forEach(m -> validatedNamePopup.enableMode(m));
                 validatedNamePopup.loadInEditor(null);
-            } else if(boundPropertyId.matches("basionyms")) {
-                TaxonNamePopupEditor basionymNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
-                basionymNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-                basionymNamePopup.withDeleteButton(true);
-                getView().getModesActive().stream()
-                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                        .forEach(m -> basionymNamePopup.enableMode(m));
-                basionymNamePopup.loadInEditor(null);
-                basionymNamePopup.getBasionymToggle().setVisible(false);
             }
         }
     }
