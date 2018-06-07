@@ -381,7 +381,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 this,
                 new TaxonNameEditorAction(EditorActionType.ADD, null, validatedNameComboBox, this)
                 ));
-        validatedNameComboBox.addClickListenerAddEntity(e -> {
+        validatedNameComboBox.addClickListenerEditEntity(e -> {
             if(validatedNameComboBox.getValue() != null){
                 getViewEventBus().publish(this,
                     new TaxonNameEditorAction(
@@ -398,7 +398,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, validationCitatonComboBox, this)
                 ));
-        validationCitatonComboBox.addClickListenerAddEntity(e -> {
+        validationCitatonComboBox.addClickListenerEditEntity(e -> {
             if(validationCitatonComboBox.getValue() != null){
                 getViewEventBus().publish(this,
                     new ReferenceEditorAction(
