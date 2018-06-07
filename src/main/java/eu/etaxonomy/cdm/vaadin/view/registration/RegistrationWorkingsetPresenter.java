@@ -264,7 +264,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     protected void loadWorkingSet(UUID referenceUuid) {
         try {
-            workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid);
+            workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid, true);
         } catch (RegistrationValidationException error) {
             logger.error(error);
             Window errorDialog = new Window("Validation Error");
