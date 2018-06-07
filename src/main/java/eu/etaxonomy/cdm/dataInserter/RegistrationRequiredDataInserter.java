@@ -157,6 +157,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REFERENCE, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.COLLECTION, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         if(repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid()) == null){
