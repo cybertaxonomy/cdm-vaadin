@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component;
 
 import com.vaadin.data.Property;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.TextField;
 
 /**
@@ -82,39 +83,50 @@ public class TextFieldNFix extends TextField {
     }
 
 
-
-    /**
-     *
-     */
     protected void init() {
         setNullSettingAllowed(true);
+        addBlurListener(e -> {
+            AbstractTextField c = ((AbstractTextField) e.getComponent());
+            if (c.getValue() != null) {
+                c.setValue(c.getValue().trim());
+            }
+        });
     }
 
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getNullRepresentation() {
         return "";
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setInternalValue(String newValue) {
-        if(newValue != null){
-            newValue = newValue.trim();
-            if(newValue.isEmpty()){
-                newValue = null;
-            }
-        }
-        super.setInternalValue(newValue);
-    }
+//    @Override
+//    protected void setValue(String newFieldValue, boolean repaintIsNotNeeded,
+//            boolean ignoreReadOnly) {
+//        newFieldValue = trimValue(newFieldValue);
+//        super.setValue(newFieldValue, repaintIsNotNeeded, ignoreReadOnly);
+//    }
+//
+//    @Override
+//    protected void setInternalValue(String newValue) {
+//        newValue = trimValue(newValue);
+//        super.setInternalValue(newValue);
+//    }
+//
+//
+//
+//    /**
+//     * @param newValue
+//     * @return
+//     */
+//    protected String trimValue(String newValue) {
+//        if(newValue != null){
+//            newValue = newValue.trim();
+//            if(newValue.isEmpty()){
+//                newValue = null;
+//            }
+//        }
+//        return newValue;
+//    }
 
 
 
