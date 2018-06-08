@@ -77,7 +77,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
 
-    private CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider;
+    private CdmFilterablePagingProvider<Reference, Reference> nomReferencePagingProvider;
 
     private Reference publishedUnit;
 
@@ -113,9 +113,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getExBasionymAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
         getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        referencePagingProvider = pagingProviderFactory.referencePagingProvider();
-        referencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
-        getView().getNomReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        nomReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
+        nomReferencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
+        getView().getNomReferenceCombobox().loadFrom(nomReferencePagingProvider, nomReferencePagingProvider, nomReferencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getNomReferenceCombobox(), this));
 
@@ -134,11 +134,23 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getValidationField().getValidatedNameComboBox().loadFrom(basionymPagingProvider, basionymPagingProvider, basionymPagingProvider.getPageSize());
         getView().getValidationField().getValidatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getValidatedNameComboBox(), this));
 
-
+        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+        CdmFilterablePagingProvider<Reference, Reference> icbnCodesPagingProvider = pagingProviderFactory.referencePagingProvider();
+        icbnCodesPagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
+        // @formatter:off
+        // TODO use markers on references instead of isbn. The marker type MarkerType.NOMENCLATURAL_RELEVANT() has already prepared (#7466)
+        icbnCodesPagingProvider.getCriteria().add(Restrictions.in("isbn", new String[]{
+                "3-904144-22-7",     // Saint Louis Code
+                "3-906166-48-1",     // Vienna Code
+                "978-3-87429-425-6", // Melbourne Code
+                "978-3-946583-16-5", // Shenzhen Code
+                "0-85301-006-4"      // ICZN 1999
+                                     // ICNB
+                }));
+        // @formatter:on
         getView().getValidationField().getCitatonComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-        getView().getValidationField().getCitatonComboBox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        getView().getValidationField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getValidationField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getCitatonComboBox(), this));
-
     }
 
     /**
@@ -198,8 +210,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     publishedUnit = nomRef.getInReference();
                 }
                 // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
-                // referencePagingProvider
-                referencePagingProvider.getCriteria().add(Restrictions.or(
+                // nomReferencePagingProvider
+                nomReferencePagingProvider.getCriteria().add(Restrictions.or(
                         Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
                         Restrictions.idEq(publishedUnit.getId())
                         )
