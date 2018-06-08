@@ -36,6 +36,7 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix(String format) {
         super(format);
+        init();
     }
 
 
@@ -45,7 +46,7 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix() {
         super();
-        setNullSettingAllowed(true);
+        init();
     }
 
 
@@ -55,6 +56,7 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix(Property dataSource) {
         super(dataSource);
+        init();
     }
 
 
@@ -65,6 +67,7 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix(String caption, Property dataSource) {
         super(caption, dataSource);
+        init();
     }
 
 
@@ -75,7 +78,16 @@ public class TextFieldNFix extends TextField {
      */
     public TextFieldNFix(String caption, String value) {
         super(caption, value);
-        // TODO Auto-generated constructor stub
+        init();
+    }
+
+
+
+    /**
+     *
+     */
+    protected void init() {
+        setNullSettingAllowed(true);
     }
 
 
