@@ -365,12 +365,13 @@ public class PersonField extends CompositeCustomField<Person> {
         super.commit();
 
         Person bean =  getValue();
-        String nomTitle = nomenclaturalTitleField.getValue();
-        if(nomTitle != null && nomTitle.equals(titleCacheField.getValue())){
-            // no point having a nomenclaturalTitle if it is equal to the titleCache
-            bean.setNomenclaturalTitle(null);
-        }
+
         if(bean != null){
+            String nomTitle = nomenclaturalTitleField.getValue();
+            if(nomTitle != null && nomTitle.equals(titleCacheField.getValue())){
+                // no point having a nomenclaturalTitle if it is equal to the titleCache
+                bean.setNomenclaturalTitle(null);
+            }
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
                 UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
