@@ -19,6 +19,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.log4j.Level;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
+import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -73,13 +74,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
-    private TextField genusOrUninomialField;
+    private AbstractField<String> genusOrUninomialField;
 
-    private TextField infraGenericEpithetField;
+    private AbstractField<String> infraGenericEpithetField;
 
-    private TextField specificEpithetField;
+    private AbstractField<String> specificEpithetField;
 
-    private TextField infraSpecificEpithetField;
+    private AbstractField<String> infraSpecificEpithetField;
 
     private SwitchableTextField fullTitleCacheFiled;
 
@@ -277,7 +278,12 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         protectedNameCacheField = addSwitchableTextField("Name cache", "nameCache", "protectedNameCache", 0, row, GRID_COLS-1, row);
         protectedNameCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        genusOrUninomialField = addTextField("Genus or uninomial", "genusOrUninomial", 0, row, 1, row);
+        if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
+            genusOrUninomialField = addTextField("Genus or uninomial", "genusOrUninomial", 0, row, 1, row);
+        } else {
+            genusOrUninomialField = new LazyComboBox<String>(String.class);
+            addField(genusOrUninomialField, "genusOrUninomial", 0, row, 1, row);
+        }
         genusOrUninomialField.setWidth(200, Unit.PIXELS);
         infraGenericEpithetField = addTextField("Infrageneric epithet", "infraGenericEpithet", 2, row, 3, row);
         infraGenericEpithetField.setWidth(200, Unit.PIXELS);
@@ -731,6 +737,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractField<String> getGenusOrUninomialField(){
+        return genusOrUninomialField;
+    }
+
+    /**
      * @return the exBasionymAuthorshipField
      */
     @Override
@@ -813,7 +827,29 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         }
     }
 
+    /**
+     * @return the infraGenericEpithetField
+     */
+    @Override
+    public AbstractField<String> getInfraGenericEpithetField() {
+        return infraGenericEpithetField;
+    }
 
+    /**
+     * @return the specificEpithetField
+     */
+    @Override
+    public AbstractField<String> getSpecificEpithetField() {
+        return specificEpithetField;
+    }
+
+    /**
+     * @return the infraSpecificEpithetField
+     */
+    @Override
+    public AbstractField<String> getInfraSpecificEpithetField() {
+        return infraSpecificEpithetField;
+    }
 
 
 }

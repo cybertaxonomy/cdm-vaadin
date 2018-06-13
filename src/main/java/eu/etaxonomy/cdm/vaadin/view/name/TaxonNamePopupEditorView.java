@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.EnumSet;
 
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ListSelect;
 
@@ -93,5 +94,25 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return
      */
     NameRelationField getValidationField();
+
+    /**
+     * @return
+     */
+    AbstractField<String> getGenusOrUninomialField();
+
+    /**
+     * @return the infraGenericEpithetField
+     */
+    public AbstractField<String> getInfraGenericEpithetField();
+
+    /**
+     * @return the specificEpithetField
+     */
+    public AbstractField<String> getSpecificEpithetField();
+
+    /**
+     * @return the infraSpecificEpithetField
+     */
+    public AbstractField<String> getInfraSpecificEpithetField();
 
 }

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.spring.annotation.SpringComponent;
 
@@ -33,6 +34,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.TaxonNameStringFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
@@ -83,6 +85,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
+    private TaxonNameStringFilterablePagingProvider taxonNamePartPagingProvider;
+
 
     /**
      * {@inheritDoc}
@@ -95,6 +99,18 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
         getView().getRankSelect().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(TermType.Rank));
         getView().getRankSelect().setItemCaptionPropertyId("label");
+
+        // genusOrUninomialField
+        if(getView().getGenusOrUninomialField() instanceof LazyComboBox){
+            taxonNamePartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService());
+            taxonNamePartPagingProvider.listenToFields(
+                    getView().getGenusOrUninomialField(),
+                    getView().getInfraGenericEpithetField(),
+                    getView().getSpecificEpithetField(),
+                    getView().getInfraSpecificEpithetField()
+                   );
+            ((LazyComboBox)getView().getGenusOrUninomialField()).loadFrom(taxonNamePartPagingProvider, taxonNamePartPagingProvider, taxonNamePartPagingProvider.getPageSize());
+        }
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);

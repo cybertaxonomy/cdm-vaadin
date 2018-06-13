@@ -36,6 +36,12 @@ public enum TaxonNamePopupEditorMode {
      * that existing data is considered complete if the combination
      * authors are set.
      */
-    REQUIRE_NOMENCLATURALREFERENCE
+    REQUIRE_NOMENCLATURALREFERENCE,
+
+    /**
+     * The next higher name must be in the system or it needs to be entered. For species the next higher name is
+     * the genus, for sub-species it is the species, etc.
+     */
+    VALIDATE_AGAINST_HIGHER_NAME_PART
 
 }
