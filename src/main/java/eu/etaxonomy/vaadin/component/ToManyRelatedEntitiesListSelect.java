@@ -11,7 +11,9 @@ package eu.etaxonomy.vaadin.component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -531,9 +533,15 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void commit() throws SourceException, InvalidValueException {
 
         List<F> nestedFields = getNestedFields();
+        Set<F> emptyFields = new HashSet<>();
         for(F f : nestedFields){
             f.commit();
-
+            if(f.getValue() == null){
+                emptyFields.add(f);
+            }
+        }
+        for(F deleteF : emptyFields){
+            removeRow(deleteF);
         }
         /*
         List<V> list = (List<V>) getPropertyDataSource().getValue();
