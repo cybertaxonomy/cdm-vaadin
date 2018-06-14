@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.LazyComboBox;
 
+import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -89,6 +90,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     private TaxonNameStringFilterablePagingProvider genusOrUninomialPartPagingProvider;
 
     private TaxonNameStringFilterablePagingProvider specificEpithetPartPagingProvider;
+
+    private Property.ValueChangeListener refreshSpecificEpithetComboBoxListener;
 
     /**
      * {@inheritDoc}
@@ -337,13 +340,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getView().getGenusOrUninomialField(),
                         null, null, null);
                 specificEpithetPartPagingProvider.updateFromFields();
-                ((LazyComboBox)event.getNewField()).loadFrom(specificEpithetPartPagingProvider, specificEpithetPartPagingProvider, specificEpithetPartPagingProvider.getPageSize());
+                LazyComboBox<String> specificEpithetField = (LazyComboBox<String>)event.getNewField();
+                refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.refresh(); specificEpithetField.setValue(null);};
+                getView().getGenusOrUninomialField().addValueChangeListener(refreshSpecificEpithetComboBoxListener);
+                specificEpithetField.loadFrom(specificEpithetPartPagingProvider, specificEpithetPartPagingProvider, specificEpithetPartPagingProvider.getPageSize());
             } else {
                 if(specificEpithetPartPagingProvider != null){
                     specificEpithetPartPagingProvider.unlistenAllFields();
                 }
+                if(refreshSpecificEpithetComboBoxListener != null){
+                    getView().getGenusOrUninomialField().removeValueChangeListener(refreshSpecificEpithetComboBoxListener);
+                    refreshSpecificEpithetComboBoxListener = null;
+                }
             }
-
         }
 
     }
