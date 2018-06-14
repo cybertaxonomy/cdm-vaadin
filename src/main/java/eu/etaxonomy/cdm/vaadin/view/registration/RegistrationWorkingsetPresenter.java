@@ -187,7 +187,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return getRepo().getRegistrationService().load(event.getEntityUuid(), Arrays.asList(new String []{"blockedBy"}));
     }
 
-
     /**
      * @param doReload TODO
      *
@@ -199,29 +198,43 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(doReload){
             loadWorkingSet(workingset.getCitationUuid());
         }
-        getView().setWorkingset(workingset);
+        applyWorkingset();
     }
-
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void handleViewEntered() {
-
         super.handleViewEntered();
-
         loadWorkingSet(getView().getCitationUuid());
-        getView().setWorkingset(workingset);
+        applyWorkingset();
 
+    }
+
+    private void applyWorkingset(){
+         getView().setWorkingset(workingset);
         // PagingProviders and CacheGenerator for the existingNameCombobox
+        activateComboboxes();
+        // update the messages
+        updateMessages();
+    }
+
+    /**
+     *
+     */
+    protected void activateComboboxes() {
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 getRepo().getNameService());
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+    }
 
-        // update the messages
+    /**
+     *
+     */
+    protected void updateMessages() {
         User user = UserHelper.fromSession().user();
         for (UUID registrationUuid : getView().getRegistrationItemMap().keySet()) {
             Button messageButton = getView().getRegistrationItemMap().get(registrationUuid).regItemButtons.getMessagesButton();
@@ -255,7 +268,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 messageButton.setComponentError(new SystemError(e.getMessage(), e));
             }
         }
-
     }
 
 
