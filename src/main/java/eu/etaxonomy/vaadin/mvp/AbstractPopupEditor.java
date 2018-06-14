@@ -821,7 +821,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected AbstractField<String> replaceComponent(String propertyId, AbstractField<String> oldField, AbstractField<String> newField, int column1, int row1, int column2,
             int row2) {
                 String value = oldField.getValue();
-                newField.setValue(value);
                 newField.setCaption(oldField.getCaption());
                 GridLayout grid = (GridLayout)getFieldLayout();
                 grid.removeComponent(oldField);
@@ -829,6 +828,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 unbindField(oldField);
                 addField(newField, propertyId, column1, row1, column2, row2);
                 getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+                // important: set newField value at last!
+                newField.setValue(value);
                 return newField;
             }
 

@@ -242,15 +242,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setRows(1);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
-        rankSelect.addValueChangeListener(e -> updateFieldVisibility());
         addField(rankSelect, "rank", 0, row, 1, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
 
         basionymToggle = new CheckBox("With basionym");
         basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
-        basionymToggle.addValueChangeListener(e -> {
-            updateAuthorshipFields();
-        });
 
         basionymToggle.setStyleName(getDefaultComponentStyles());
         grid.addComponent(basionymToggle, 2, row, 3, row);
@@ -258,18 +254,12 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         row++;
         replacedSynonymsToggle = new CheckBox("With replaced synonym");
-        replacedSynonymsToggle.addValueChangeListener(e -> {
-            boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
-            replacedSynonymsComboboxSelect.setVisible(enable);
-        });
         grid.addComponent(replacedSynonymsToggle, 2, row, 3, row);
         grid.setComponentAlignment(replacedSynonymsToggle, Alignment.BOTTOM_LEFT);
 
         row++;
         validationToggle = new CheckBox("Validation");
-        validationToggle.addValueChangeListener(e -> {
-            updateAuthorshipFields();
-            });
+
         grid.addComponent(validationToggle, 2, row, 3, row);
         grid.setComponentAlignment(validationToggle, Alignment.BOTTOM_LEFT);
 
@@ -324,7 +314,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             }
             });
         logger.setLevel(Level.DEBUG);
-        nomReferenceCombobox.getSelect().addValueChangeListener(e -> logger.debug("nomReferenceCombobox value changed #1"));
+        // nomReferenceCombobox.getSelect().addValueChangeListener(e -> logger.debug("nomReferenceCombobox value changed #1"));
         // nomReferenceCombobox.setWidth(300, Unit.PIXELS);
         nomReferenceCombobox.setWidth("100%");
         addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 2, row);
@@ -492,7 +482,21 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     @Override
     protected void afterItemDataSourceSet() {
-        
+
+
+        rankSelect.addValueChangeListener(e -> updateFieldVisibility());
+        basionymToggle.addValueChangeListener(e -> {
+            updateAuthorshipFields();
+        });
+        validationToggle.addValueChangeListener(e -> {
+            updateAuthorshipFields();
+            });
+        replacedSynonymsToggle.addValueChangeListener(e -> {
+            boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+            replacedSynonymsComboboxSelect.setVisible(enable);
+        });
+
+
         TaxonNameDTO taxonNameDTO = getBean();
         boolean showBasionymSection = taxonNameDTO.getBasionyms().size() > 0
                 || taxonNameDTO.getBasionymAuthorship() != null
