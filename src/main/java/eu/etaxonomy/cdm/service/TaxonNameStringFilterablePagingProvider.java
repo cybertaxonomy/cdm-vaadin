@@ -21,6 +21,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
@@ -78,15 +79,40 @@ public class TaxonNameStringFilterablePagingProvider implements FilterablePaging
     public void listenToFields(AbstractField<String> genusOrUninomialField, AbstractField<String> infraGenericEpithetField,
             AbstractField<String> specificEpithetField, AbstractField<String> infraSpecificEpithetField){
 
-        for(AbstractField<String> f : registeredToFields.keySet()){
-            f.removeValueChangeListener(registeredToFields.get(f));
-        }
-        registeredToFields.clear();
+        unlistenAllFields();
 
         registerNullSave(genusOrUninomialField, e -> namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue()));
         registerNullSave(infraGenericEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraGenericEpithetField.getValue()));
         registerNullSave(specificEpithetField, e -> namePartsFilter.setGenusOrUninomial(specificEpithetField.getValue()));
         registerNullSave(infraSpecificEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue()));
+    }
+
+    /**
+     *
+     */
+    public void unlistenAllFields() {
+        for(AbstractField<String> f : registeredToFields.keySet()){
+            f.removeValueChangeListener(registeredToFields.get(f));
+        }
+        registeredToFields.clear();
+    }
+
+    public void replaceFields(AbstractField<String> unlistenField, AbstractField<String> listenToField) throws UnknownFieldException{
+        if(registeredToFields.containsKey(unlistenField)){
+            ValueChangeListener listener = registeredToFields.get(unlistenField);
+            unlistenField.removeValueChangeListener(listener);
+            registeredToFields.remove(unlistenField);
+            registerNullSave(listenToField, listener);
+        } else {
+            throw new UnknownFieldException();
+        }
+    }
+
+    public void updateFromFields(){
+        for(AbstractField<String> f : registeredToFields.keySet()){
+            ValueChangeListener listener = registeredToFields.get(f);
+            listener.valueChange(new Field.ValueChangeEvent(f));
+        }
     }
 
     /**
@@ -186,5 +212,12 @@ public class TaxonNameStringFilterablePagingProvider implements FilterablePaging
      */
     public List<Criterion> getCriteria() {
         return criteria;
+    }
+
+    public class UnknownFieldException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
+
     }
 }

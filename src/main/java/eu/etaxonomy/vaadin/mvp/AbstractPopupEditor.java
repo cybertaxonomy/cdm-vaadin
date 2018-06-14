@@ -62,6 +62,7 @@ import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -584,6 +585,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         fieldGroup.bind(field, propertyId);
     }
 
+    protected void unbindField(Field field){
+        fieldGroup.unbind(field);
+    }
+
     /**
      * @param component
      */
@@ -812,5 +817,19 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             this.context.addAll(context);
         }
     }
+
+    protected AbstractField<String> replaceComponent(String propertyId, AbstractField<String> oldField, AbstractField<String> newField, int column1, int row1, int column2,
+            int row2) {
+                String value = oldField.getValue();
+                newField.setValue(value);
+                newField.setCaption(oldField.getCaption());
+                GridLayout grid = (GridLayout)getFieldLayout();
+                grid.removeComponent(oldField);
+
+                unbindField(oldField);
+                addField(newField, propertyId, column1, row1, column2, row2);
+                getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+                return newField;
+            }
 
 }

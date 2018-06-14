@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -123,6 +124,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private Map<AbstractField, Property.ValueChangeListener> authorshipUpdateListeners = new HashMap<>();
 
     private Boolean isInferredExCombinationAuthorship;
+
+    private int specificEpithetFieldRow;
 
     /**
      * @param layout
@@ -288,6 +291,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         infraGenericEpithetField = addTextField("Infrageneric epithet", "infraGenericEpithet", 2, row, 3, row);
         infraGenericEpithetField.setWidth(200, Unit.PIXELS);
         row++;
+        specificEpithetFieldRow = row;
         specificEpithetField = addTextField("Specific epithet", "specificEpithet", 0, row, 1, row);
         specificEpithetField.setWidth(200, Unit.PIXELS);
         infraSpecificEpithetField = addTextField("Infraspecific epithet", "infraSpecificEpithet", 2, row, 3, row);
@@ -488,6 +492,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     @Override
     protected void afterItemDataSourceSet() {
+        
         TaxonNameDTO taxonNameDTO = getBean();
         boolean showBasionymSection = taxonNameDTO.getBasionyms().size() > 0
                 || taxonNameDTO.getBasionymAuthorship() != null
@@ -657,6 +662,18 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = isSpeciesOrBelow && BooleanUtils.isTrue(validationToggle.getValue());
 
+        if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
+            if(rank.isInfraSpecific()) {
+                if(TextField.class.isAssignableFrom(specificEpithetField.getClass())) {
+                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new LazyComboBox<String>(String.class), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                }
+            } else {
+                if(LazyComboBox.class.isAssignableFrom(specificEpithetField.getClass())) {
+                    specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new TextFieldNFix(), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+               }
+            }
+        }
+
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         infraGenericEpithetField.setVisible(rank.isInfraGeneric());
@@ -681,6 +698,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
     }
+
 
     @Override
     public void cancel() {
