@@ -127,6 +127,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private int specificEpithetFieldRow;
 
+    private ValueChangeListener updateFieldVisibilityListener = e -> updateFieldVisibility();
+
     /**
      * @param layout
      * @param dtoType
@@ -484,7 +486,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     protected void afterItemDataSourceSet() {
 
 
-        rankSelect.addValueChangeListener(e -> updateFieldVisibility());
+        rankSelect.addValueChangeListener(updateFieldVisibilityListener);
         basionymToggle.addValueChangeListener(e -> {
             updateAuthorshipFields();
         });
@@ -707,6 +709,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public void cancel() {
         authorshipUpdateListeners.keySet().forEach(field -> field.removeValueChangeListener(authorshipUpdateListeners.get(field)));
+        rankSelect.removeValueChangeListener(updateFieldVisibilityListener);
         super.cancel();
     }
 

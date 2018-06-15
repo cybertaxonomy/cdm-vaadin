@@ -16,6 +16,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -112,6 +113,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         return action.getSourceView() != null && getView().equals(action.getSourceView());
     }
 
+    protected boolean isFromOwnView(FieldReplaceEvent event){
+        return event.getSourceView() != null && getView().equals(event.getSourceView());
+    }
 
     protected abstract void saveBean(DTO bean);
 

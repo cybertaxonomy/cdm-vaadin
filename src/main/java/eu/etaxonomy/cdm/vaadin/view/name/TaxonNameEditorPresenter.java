@@ -310,7 +310,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
 
 
-        if(getView() == null || event.getSourceView() != getView() ){
+        if(!isFromOwnView(event)){
             return;
         }
         ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
@@ -330,7 +330,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     public void onFieldReplaceEvent(FieldReplaceEvent<String> event){
 
         PropertyIdPath boundPropertyIdPath = boundPropertyIdPath(event.getNewField());
-        if(boundPropertyIdPath.matches("specificEpithet")){
+        if(boundPropertyIdPath != null && boundPropertyIdPath.matches("specificEpithet")){
             if(event.getNewField() instanceof LazyComboBox){
 
                 if(specificEpithetPartPagingProvider  == null){
