@@ -20,6 +20,7 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.UserError;
+import com.vaadin.shared.AbstractFieldState;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -387,7 +388,12 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     @Override
     public void setValue(TeamOrPersonBase<?> newFieldValue) {
         // ignore readonly states of the datasource
-        setValue(newFieldValue, false, !super.isReadOnly());
+        setValue(newFieldValue, false, !hasSharedStateReadOnly());
+    }
+
+    protected boolean hasSharedStateReadOnly(){
+        AbstractFieldState sharedState = getState(false);
+        return sharedState.readOnly;
     }
 
 
