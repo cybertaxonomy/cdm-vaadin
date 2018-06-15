@@ -10,17 +10,24 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions;
+import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions.UnimplemetedCaseException;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -59,6 +66,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private TeamOrPersonField authorshipField;
 
     private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
+
+    private static Map<String,String> propertyNameLabelMap = new HashMap<>();
+
+    static {
+        propertyNameLabelMap.put("inReference", "In reference");
+        propertyNameLabelMap.put("inJournal", "In journal");
+        propertyNameLabelMap.put("inSeries", "In series");
+        propertyNameLabelMap.put("inBook", "In book");
+    }
 
     /**
      * @param layout
@@ -186,16 +202,28 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
      * @return
      */
     private Object updateFieldVisibility(ReferenceType value) {
-        getField("volume").setVisible(value.isVolumeReference());
 
-        getField("placePublished").setVisible(value.isPublication());
-        getField("publisher").setVisible(value.isPublication());
-
-        getField("editor").setVisible(value.isPrintedUnit());
-        getField("seriesPart").setVisible(value.isPrintedUnit());
-
-        getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
-        getField("pages").setVisible(value.isSection());
+        try {
+            Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(value);
+            setAllFieldsVisible(false);
+            for(String fieldName : fieldPropertyDefinition.keySet()){
+                Field<?> field = getField(fieldName);
+                if(field == null){
+                    continue;
+                }
+                field.setVisible(true);
+                String propertyName = fieldPropertyDefinition.get(fieldName);
+                if(propertyName != fieldName){
+                        field.setCaption(propertyNameLabelMap.get(propertyName));
+                }
+            }
+        } catch (UnimplemetedCaseException e) {
+            logger.error(e);
+            // enable all fields
+            setAllFieldsVisible(true);
+            // fix inReference label
+            getField("inReference").setCaption(propertyNameLabelMap.get("inReference"));
+        }
 
         EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
         EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
@@ -203,6 +231,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         getField("title").setVisible(!hideTitle.contains(value));
 
         return null;
+    }
+
+    protected void setAllFieldsVisible(boolean visible){
+        GridLayout grid = (GridLayout)getFieldLayout();
+        for(Component c : grid){
+            if(AbstractField.class.isAssignableFrom(c.getClass())){
+                c.setVisible(visible);
+            }
+        }
     }
 
     /**
