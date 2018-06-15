@@ -409,6 +409,23 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         basionymSourceField.setValue(null);
                         getView().updateAuthorshipFields();
                     }
+                } else
+                if(boundTargetField.matchesPropertyIdPath("replacedSynonyms")){
+                    ReloadableLazyComboBox<TaxonName> replacedSynonyms = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
+                    if(event.isCreateOrModifiedType()){
+                        getCache().load(event.getEntity());
+                        if(event.isCreatedType()){
+                            replacedSynonyms .setValue((TaxonName) event.getEntity());
+                        } else {
+                            replacedSynonyms.reload();
+                        }
+                        getView().getExCombinationAuthorshipField().discard(); //refresh from the datasource
+                        getView().updateAuthorshipFields();
+                    } else
+                    if(event.isRemovedType()){
+                        replacedSynonyms.setValue(null);
+                        getView().updateAuthorshipFields();
+                    }
                 }
 
             }
