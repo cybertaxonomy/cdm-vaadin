@@ -21,11 +21,13 @@ import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -50,6 +52,7 @@ import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
+import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -379,7 +382,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     }
                 }
                 if(boundTargetField.matchesPropertyIdPath("validationFor.otherName")){
-                    ReloadableLazyComboBox<TaxonName> otherNameField = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
+                    ReloadableLazyComboBox<TaxonName> otherNameField = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
@@ -393,7 +396,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     }
                 } else
                 if(boundTargetField.matchesPropertyIdPath("basionyms")){
-                    ReloadableLazyComboBox<TaxonName> basionymSourceField = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
+                    ReloadableLazyComboBox<TaxonName> basionymSourceField = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
@@ -411,7 +414,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     }
                 } else
                 if(boundTargetField.matchesPropertyIdPath("replacedSynonyms")){
-                    ReloadableLazyComboBox<TaxonName> replacedSynonyms = (ReloadableLazyComboBox<TaxonName>)boundTargetField.getField(TaxonName.class);
+                    ReloadableLazyComboBox<TaxonName> replacedSynonyms = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
@@ -430,6 +433,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
             }
         }
+    }
+
+    protected <CDM extends CdmBase> ReloadableLazyComboBox<CDM> asReloadableLazyComboBox(Field<CDM> field){
+
+        if(field instanceof ToOneRelatedEntityCombobox){
+            field = ((ToOneRelatedEntityCombobox<CDM>)field).getSelect();
+        }
+        return (ReloadableLazyComboBox<CDM>)field;
     }
 
 
