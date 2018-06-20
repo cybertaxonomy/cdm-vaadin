@@ -320,7 +320,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	 * and their children.
 	 */
 	private List<TaxonNode> getAllNodes(){
-	    boolean includeUnpublished = true;
+	    boolean includeUnpublished = DistributionEditorUtil.INCLUDE_UNPUBLISHED;
 
 	    List<TaxonNode> allNodes = new ArrayList<>();
 

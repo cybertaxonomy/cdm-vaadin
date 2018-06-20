@@ -36,8 +36,10 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
+    public static final boolean INCLUDE_UNPUBLISHED = true;
+
     /**
-     * Updates the vaadin session attributes related to the chosen 
+     * Updates the vaadin session attributes related to the chosen
      * {@link TaxonNode}s, {@link NamedArea}s and {@link Classification}
      * and refreshes the given {@code distributionStatusTableView}.
      * @param distributionTableView The view to refresh after updating the session variables.
@@ -56,7 +58,7 @@ public class DistributionEditorUtil {
 	}
 
     /**
-     * Clears the session attributes related to the chosen 
+     * Clears the session attributes related to the chosen
      * {@link TaxonNode}s, {@link TermVocabulary} of {@link NamedArea}s,
      * {@link NamedArea}s and {@link Classification}.
      */

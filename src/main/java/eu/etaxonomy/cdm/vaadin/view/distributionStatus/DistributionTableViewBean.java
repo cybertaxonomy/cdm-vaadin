@@ -57,12 +57,11 @@ import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
-import eu.etaxonomy.cdm.vaadin.util.DistributionStatusQuery;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
  * The main view of the distribution status editor.
- * 
+ *
  * @author freimeier
  * @since 18.10.2017
  *

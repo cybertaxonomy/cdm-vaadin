@@ -40,7 +40,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 /**
  * A {@link Query} for populating a {@link LazyQueryContainer} with distribution status data.
  * Currently unused.
- * 
+ *
  * @author freimeier
  * @since 16.11.2017
  */
@@ -73,16 +73,16 @@ public class DistributionStatusQuery implements Query{
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
     public Item constructItem() {
         return null;
     }
-    
+
    /**
-    * 
+    *
     * {@inheritDoc}
     */
     @Override
@@ -91,7 +91,7 @@ public class DistributionStatusQuery implements Query{
     }
 
 	/**
-	 * 
+	 *
 	 * {@inheritDoc}
 	 */
     @Override
@@ -120,7 +120,7 @@ public class DistributionStatusQuery implements Query{
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -138,7 +138,7 @@ public class DistributionStatusQuery implements Query{
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
