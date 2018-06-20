@@ -56,6 +56,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final INameService nameService;
     private final ICdmRepository app;
 
+    final boolean includeUnpublished = true;
 
 
     @Override
@@ -82,7 +83,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
     private boolean checkIfNameExists(INonViralName nvn) {
         TaxonName name = TaxonName.castAndDeproxy(nvn);
-        Pager<TaxonName> names = nameService.findByName(name.getClass(),
+        Pager<TaxonName> names = nameService.findByName(TaxonName.class,
                 name.getNameCache(),
                 MatchMode.EXACT,
                 null,
@@ -144,7 +145,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
         UUID accTaxonRefUuid = accTaxonSecRefContainer.getUuid(accTaxonSecRefItemId);
         Reference accTaxonSec = CdmBase.deproxy(referenceService.load(accTaxonRefUuid), Reference.class);
-        Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, ACC_TAXON_INIT_STRATEGY), Taxon.class);
+        Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, includeUnpublished, ACC_TAXON_INIT_STRATEGY), Taxon.class);
         accTaxon.setSec(accTaxonSec);
 
         accTaxon.addSynonym(newSynonym, SynonymType.SYNONYM_OF());
