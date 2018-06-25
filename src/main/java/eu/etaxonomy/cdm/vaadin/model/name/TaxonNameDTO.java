@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.name;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +64,25 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
 
     public Set<Annotation> getAnnotations() {
         return name.getAnnotations();
+    }
+
+    public void setAnnotations(Set<Annotation> annotations) {
+        List<Annotation> currentAnnotations = new ArrayList<>(name.getAnnotations());
+        List<Annotation> annotationsSeen = new ArrayList<>();
+        for(Annotation a : annotations){
+            if(a == null){
+                continue;
+            }
+            if(!currentAnnotations.contains(a)){
+                name.addAnnotation(a);
+            }
+            annotationsSeen.add(a);
+        }
+        for(Annotation a : currentAnnotations){
+            if(!annotationsSeen.contains(a)){
+                name.removeAnnotation(a);
+            }
+        }
     }
 
     public String getAppendedPhrase() {

@@ -29,6 +29,17 @@ import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 /**
  * TODO implement height methods for full component size support
  *
+ * Implementations need to override {@link  AbstractField#setInternalValue(TeamOrPersonBase<?> newValue)} in order to
+ * to set the item datasource of the fieldGroup for example:
+ * <pre>
+ * @Override
+   protected void setInternalValue(TeamOrPersonBase<?> newValue) {
+     ...
+     fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+     ...
+   }
+ * </pre>
+ *
  * @author a.kohlbecker
  * @since May 12, 2017
  *

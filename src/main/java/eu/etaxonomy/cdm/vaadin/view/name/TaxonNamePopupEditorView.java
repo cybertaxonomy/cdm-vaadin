@@ -16,6 +16,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.vaadin.component.NameRelationField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -114,5 +115,10 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      * @return the infraSpecificEpithetField
      */
     public AbstractField<String> getInfraSpecificEpithetField();
+
+    /**
+     * @return
+     */
+    FilterableAnnotationsField getAnnotationsField();
 
 }

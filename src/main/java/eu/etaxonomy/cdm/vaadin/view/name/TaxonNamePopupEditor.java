@@ -34,6 +34,7 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
@@ -41,6 +42,7 @@ import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -65,13 +67,14 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter> implements TaxonNamePopupEditorView, AccessRestrictedView {
+public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
+    implements TaxonNamePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -7037436241474466359L;
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 16;
+    private final static int GRID_ROWS = 17;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -129,6 +132,30 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private ValueChangeListener updateFieldVisibilityListener = e -> updateFieldVisibility();
 
+    private FilterableAnnotationsField annotationsListField;
+
+    private AnnotationType[] editableAnotationTypes = new AnnotationType[]{AnnotationType.EDITORIAL()};
+
+
+    /**
+     * By default  AnnotationType.EDITORIAL() is enabled.
+     *
+     * @return the editableAnotationTypes
+     */
+    public AnnotationType[] getEditableAnotationTypes() {
+        return editableAnotationTypes;
+    }
+
+    /**
+     * By default  AnnotationType.EDITORIAL() is enabled.
+     *
+     *
+     * @param editableAnotationTypes the editableAnotationTypes to set
+     */
+    public void setEditableAnotationTypes(AnnotationType ... editableAnotationTypes) {
+        this.editableAnotationTypes = editableAnotationTypes;
+    }
+
     /**
      * @param layout
      * @param dtoType
@@ -144,7 +171,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     public String getWindowCaption() {
         return "Name editor";
     }
-
 
 
     /**
@@ -419,6 +445,12 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
+
+        row++;
+        annotationsListField = new FilterableAnnotationsField("Editorial notes");
+        annotationsListField.setWidth(100, Unit.PERCENTAGE);
+        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        addField(annotationsListField, "annotations", 0, row, GRID_COLS-1, row);
 
         // -----------------------------------------------------------------------------
 
@@ -831,6 +863,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         return basionymToggle;
     }
 
+    @Override
+    public FilterableAnnotationsField getAnnotationsField() {
+        return annotationsListField;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -851,6 +888,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             validationToggle.setReadOnly(true);
         }
     }
+
+
 
     /**
      * @return the infraGenericEpithetField

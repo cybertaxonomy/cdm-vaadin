@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -175,6 +176,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getValidationField().getCitatonComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         getView().getValidationField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getValidationField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getCitatonComboBox(), this));
+
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
+                AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
     /**
@@ -183,9 +187,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     @Override
     protected TaxonName loadCdmEntity(UUID identifier) {
 
-        List<String> initStrategy = Arrays.asList(new String []{
-
+        List<String> initStrategy = Arrays.asList(
                 "$",
+                "annotations.type",
+                "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalReference.authorship",
@@ -214,8 +219,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
                 "relationsFromThisName",
                 "homotypicalGroup.typifiedNames"
-
-                }
         );
 
         TaxonName taxonName;
@@ -255,7 +258,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
             }
         }
-
         return taxonName;
     }
 

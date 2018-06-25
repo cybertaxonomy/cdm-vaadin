@@ -20,7 +20,7 @@ public interface NestedFieldGroup {
     /**
      * Implementations return the local fieldGroup
      *
-     * @return
+     * @return the FieldGroup, may be <code>null</code>.
      */
     public abstract FieldGroup getFieldGroup();
 
