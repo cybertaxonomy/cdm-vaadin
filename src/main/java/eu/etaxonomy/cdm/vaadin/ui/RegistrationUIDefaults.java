@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 
 import java.util.EnumSet;
 
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 
@@ -51,6 +52,12 @@ public class RegistrationUIDefaults {
      *  TODO make configurable as preset and in TaxonNameEditor
      */
     public static final NomenclaturalCode NOMENCLATURAL_CODE = NomenclaturalCode.ICNAFP;
+
+    /**
+     * should be configurable per UI
+     */
+    public static final AnnotationType[] EDITABLE_ANOTATION_TYPES = new AnnotationType[]{AnnotationType.EDITORIAL()};
+
 
     public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:editsupport@bgbm.org\">editsupport@bgbm.org</a> for support and more information.";
 }

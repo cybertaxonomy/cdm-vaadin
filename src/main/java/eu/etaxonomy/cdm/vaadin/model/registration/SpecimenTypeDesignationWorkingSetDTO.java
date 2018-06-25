@@ -16,6 +16,7 @@ import java.util.Set;
 import org.joda.time.Partial;
 
 import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -23,7 +24,6 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.location.Point;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -334,6 +334,36 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
         Set<SpecimenTypeDesignation> deletedEntities = new HashSet<>(specimenTypeDesignationsLoaded);
         deletedEntities.removeAll(getSpecimenTypeDesignations());
         return deletedEntities;
+    }
+
+    public Set<Annotation> getAnnotations() {
+        if(fieldUnit != null){
+            return fieldUnit.getAnnotations();
+        } else {
+            return null;
+        }
+    }
+
+    public void setAnnotations(Set<Annotation> annotations) {
+
+        if(fieldUnit != null){
+            List<Annotation> currentAnnotations = new ArrayList<>(fieldUnit.getAnnotations());
+            List<Annotation> annotationsSeen = new ArrayList<>();
+            for(Annotation a : annotations){
+                if(a == null){
+                    continue;
+                }
+                if(!currentAnnotations.contains(a)){
+                    fieldUnit.addAnnotation(a);
+                }
+                annotationsSeen.add(a);
+            }
+            for(Annotation a : currentAnnotations){
+                if(!annotationsSeen.contains(a)){
+                    fieldUnit.removeAnnotation(a);
+                }
+            }
+        }
     }
 
 }

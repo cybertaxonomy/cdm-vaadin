@@ -98,6 +98,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
    */
   private List<String> FIELDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
           "$",
+          "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
           "gatheringEvent.$",
           "gatheringEvent.country",
           "gatheringEvent.collectingAreas",

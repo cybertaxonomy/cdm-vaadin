@@ -50,6 +50,7 @@ import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.NameRelationField;
@@ -68,7 +69,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-    implements TaxonNamePopupEditorView, AccessRestrictedView {
+    implements TaxonNamePopupEditorView, AccessRestrictedView{
 
     private static final long serialVersionUID = -7037436241474466359L;
 
@@ -134,14 +135,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private FilterableAnnotationsField annotationsListField;
 
-    private AnnotationType[] editableAnotationTypes = new AnnotationType[]{AnnotationType.EDITORIAL()};
-
+    private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
      *
      * @return the editableAnotationTypes
      */
+    @Override
     public AnnotationType[] getEditableAnotationTypes() {
         return editableAnotationTypes;
     }
@@ -152,6 +153,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      *
      * @param editableAnotationTypes the editableAnotationTypes to set
      */
+    @Override
     public void setEditableAnotationTypes(AnnotationType ... editableAnotationTypes) {
         this.editableAnotationTypes = editableAnotationTypes;
     }

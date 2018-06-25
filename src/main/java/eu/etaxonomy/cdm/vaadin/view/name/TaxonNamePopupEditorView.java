@@ -16,8 +16,8 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
 import eu.etaxonomy.vaadin.component.NameRelationField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -28,7 +28,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since May 22, 2017
  *
  */
-public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEditorPresenter> {
+public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEditorPresenter>, AnnotationsEditor {
 
     /**
      * @return
@@ -116,9 +116,5 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     public AbstractField<String> getInfraSpecificEpithetField();
 
-    /**
-     * @return
-     */
-    FilterableAnnotationsField getAnnotationsField();
 
 }
