@@ -47,8 +47,6 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
 
     private static final long serialVersionUID = -8258550787601028813L;
 
-    Class<List<Annotation>> type = (Class<List<Annotation>>)new ArrayList<Annotation>().getClass();
-
     private CssLayout root = new CssLayout();
 
     private Table table = new Table();
@@ -210,8 +208,8 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
      * {@inheritDoc}
      */
     @Override
-    public Class<List<Annotation>> getType() {
-        return type;
+    public Class<? extends List<Annotation>> getType() {
+        return (Class<? extends List<Annotation>>) new ArrayList<Annotation>().getClass();
     }
 
     /**
