@@ -17,11 +17,14 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -39,7 +42,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     implements NameTypeDesignationEditorView {
 
     private static final int GRID_COLS = 4;
-    private static final int GRID_ROWS = 6;
+    private static final int GRID_ROWS = 7;
 
     private CheckBox conservedTypeField;
     private CheckBox rejectedTypeField;
@@ -56,6 +59,11 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     private TextField citationDetailField;
 
     private boolean showTypeFlags = true;
+
+
+    private FilterableAnnotationsField annotationsListField;
+
+    private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
 
     /**
@@ -169,6 +177,12 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         addField(citationCombobox, "citation", 0, row, 2, row);
         citationCombobox.setWidth(400, Unit.PIXELS);
         citationDetailField = addTextField("Citation detail", "citationMicroReference", 3, row);
+
+        row++;
+        annotationsListField = new FilterableAnnotationsField("Editorial notes");
+        annotationsListField.setWidth(100, Unit.PERCENTAGE);
+        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        addField(annotationsListField, "annotations", 0, row, 3, row);
     }
 
     /**
@@ -218,5 +232,29 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     @Override
     public void setShowTypeFlags(boolean showTypeFlags) {
         this.showTypeFlags = showTypeFlags;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AnnotationType[] getEditableAnotationTypes() {
+        return editableAnotationTypes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEditableAnotationTypes(AnnotationType... editableAnotationTypes) {
+        this.editableAnotationTypes = editableAnotationTypes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterableAnnotationsField getAnnotationsField() {
+        return annotationsListField;
     }
 }

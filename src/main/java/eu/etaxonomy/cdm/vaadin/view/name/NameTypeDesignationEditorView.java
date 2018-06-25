@@ -12,6 +12,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -21,7 +22,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Jan 26, 2018
  *
  */
-public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeDesignationPresenter> {
+public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeDesignationPresenter>, AnnotationsEditor  {
 
     ToOneRelatedEntityCombobox<Reference> getCitationCombobox();
 

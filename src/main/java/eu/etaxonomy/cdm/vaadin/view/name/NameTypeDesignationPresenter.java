@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -99,6 +101,7 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadCdmEntity(UUID uuid) {
         List<String> initStrategy = Arrays.asList(new String []{
                 "$",
+                "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
                 "typifiedNames.typeDesignations", // important !!
                 "typeName.$",
                 "citation.authorship.$",
@@ -217,6 +220,26 @@ public class NameTypeDesignationPresenter
             }
             // FIXME do we need to save the names here or is the delete cascaded from the typedesignation to the name?
         }
+
+        // handle annotation changes
+        List<Annotation> annotations = getView().getAnnotationsField().getValue();
+        List<Annotation> currentAnnotations = new ArrayList<>(bean.getAnnotations());
+        List<Annotation> annotationsSeen = new ArrayList<>();
+        for(Annotation a : annotations){
+            if(a == null){
+                continue;
+            }
+            if(!currentAnnotations.contains(a)){
+                bean.addAnnotation(a);
+            }
+            annotationsSeen.add(a);
+        }
+        for(Annotation a : currentAnnotations){
+            if(!annotationsSeen.contains(a)){
+                bean.removeAnnotation(a);
+            }
+        }
+
 
         return bean;
     }
