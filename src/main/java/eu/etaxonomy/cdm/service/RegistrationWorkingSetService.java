@@ -205,7 +205,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     @Override
     public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid, boolean resolveSections) throws RegistrationValidationException {
 
-        Reference reference = repo.getReferenceService().find(referenceUuid);
+        Reference reference = repo.getReferenceService().find(referenceUuid); // needed to use load to avoid the problem described in #7331
         if(resolveSections){
             reference = resolveSection(reference);
         }
