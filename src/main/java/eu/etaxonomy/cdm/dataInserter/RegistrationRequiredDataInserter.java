@@ -173,20 +173,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
         }
 
-        // --- remove after release 4.12.0 ------------------------------------------------------
-        // delete old DerivationEventTypes terms which are no longer used, see #7059
-        // UUID_PUBLISHED_IMAGE = UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3");
-        // UUID UUID_UNPUBLISHED_IMAGE = UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890");
-        // UUID UUID_CULTURE_METABOLIC_INACTIVE = UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2");
-        for(UUID uuid : new UUID[]{
-                UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3"),
-                UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890"),
-                UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2")}){
-            if(repo.getTermService().find(uuid) != null){
-                repo.getTermService().delete(uuid);
-            }
-        }
-        // --------------------------------------------------------------------------------------
         txStatus.flush();
         repo.commitTransaction(txStatus);
 
