@@ -219,5 +219,15 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         this.typeSelectItemContainer = typeSelectItemContainer;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, table, null);
+    }
+
+
 
 }

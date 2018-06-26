@@ -228,7 +228,13 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
     }
 
     /**
+     *
      * @param readOnly
+     *            the readonly state
+     * @param component
+     *            the component to process on
+     * @param ignore
+     *            can be <code>null</code>
      */
     protected void setDeepReadOnly(boolean readOnly, Component component, Collection<Component> ignore) {
 
