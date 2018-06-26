@@ -39,9 +39,12 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
+import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
+import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -160,20 +163,35 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.COLLECTION, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
-        if(repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
+
+        DefinedTermBase kouSpecimen = repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid());
+        DefinedTermBase kouImage = repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid());
+        DefinedTermBase kouUnpublishedImage = repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid());
+        DefinedTermBase kouCulture = repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid());
+
+        if(kouSpecimen == null){
+            kouSpecimen = repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
         }
-        if(repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.PUBLISHED_IMAGE());
+        if(kouImage == null){
+            kouImage = repo.getTermService().save(KindOfUnitTerms.PUBLISHED_IMAGE());
         }
-        if(repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.UNPUBLISHED_IMAGE());
+        if(kouUnpublishedImage == null){
+            kouUnpublishedImage = repo.getTermService().save(KindOfUnitTerms.UNPUBLISHED_IMAGE());
         }
-        if(repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
+        if(kouCulture == null){
+            kouCulture = repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
         }
 
+        TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
+        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
+            kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
+            kindOfUnitVocabulary.addTerm((DefinedTerm)kouSpecimen);
+            kindOfUnitVocabulary.addTerm((DefinedTerm)kouImage);
+            kindOfUnitVocabulary.addTerm((DefinedTerm)kouUnpublishedImage);
+            kindOfUnitVocabulary.addTerm((DefinedTerm)kouCulture);
+        }
         txStatus.flush();
+
         repo.commitTransaction(txStatus);
 
     }

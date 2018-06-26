@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.TermType;
+import eu.etaxonomy.cdm.model.common.TermVocabulary;
 
 /**
  * Terms to be used as kindOfUnit for {@link SpecimenOrObservationBase#setKindOfUnit()}.
@@ -30,10 +31,14 @@ public class KindOfUnitTerms {
     private static final UUID UUID_UNPUBLISHED_IMAGE = UUID.fromString("87adcd8d-ce69-4d16-ac35-4e77fb698e00");
     private static final UUID UUID_CULTURE_METABOLIC_INACTIVE = UUID.fromString("fc1ac3b2-fde4-43c0-a100-48053b88c550");
 
+    private static final UUID UUID_KIND_OF_UNIT_VOCAB = UUID.fromString("88b7e7ab-ab99-4760-9b66-c070b98148fc");
+
     private static DefinedTerm specimen = null;
     private static DefinedTerm publishedImage = null;
     private static DefinedTerm unpublishedImage = null;
     private static DefinedTerm cultureMetabolicInactive = null;
+
+    private static TermVocabulary<DefinedTerm> kindOfUnitVocabulary = null;
 
     public static DefinedTerm SPECIMEN() {
         if(specimen == null){
@@ -65,6 +70,15 @@ public class KindOfUnitTerms {
             cultureMetabolicInactive.setUuid(UUID_CULTURE_METABOLIC_INACTIVE);
         }
         return cultureMetabolicInactive;
+    }
+
+    public static TermVocabulary<DefinedTerm> KIND_OF_UNIT_VOCABULARY() {
+        if(kindOfUnitVocabulary == null){
+            kindOfUnitVocabulary = TermVocabulary.NewInstance(TermType.KindOfUnit);
+            kindOfUnitVocabulary.setTitleCache("Registration Kind-of-Units", true);
+            kindOfUnitVocabulary.setUuid(UUID_KIND_OF_UNIT_VOCAB);
+        }
+        return kindOfUnitVocabulary;
     }
 
 }
