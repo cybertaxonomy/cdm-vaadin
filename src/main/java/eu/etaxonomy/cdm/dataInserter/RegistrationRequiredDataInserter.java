@@ -163,6 +163,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.COLLECTION, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
+        TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
+        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
+            kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
+        }
 
         DefinedTermBase kouSpecimen = repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid());
         DefinedTermBase kouImage = repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid());
@@ -182,15 +186,14 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             kouCulture = repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
         }
 
-        TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
-        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
-            kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
-            kindOfUnitVocabulary.addTerm((DefinedTerm)kouSpecimen);
-            kindOfUnitVocabulary.addTerm((DefinedTerm)kouImage);
-            kindOfUnitVocabulary.addTerm((DefinedTerm)kouUnpublishedImage);
-            kindOfUnitVocabulary.addTerm((DefinedTerm)kouCulture);
+        Set<DefinedTerm> termInVocab = kindOfUnitVocabulary.getTerms();
+        List<DefinedTermBase> kouTerms = Arrays.asList(kouCulture, kouImage, kouSpecimen, kouUnpublishedImage);
+
+        for(DefinedTermBase t : kouTerms){
+            if(!termInVocab.contains(t)){
+                kindOfUnitVocabulary.addTerm((DefinedTerm)t);
+            }
         }
-        txStatus.flush();
 
         repo.commitTransaction(txStatus);
 
