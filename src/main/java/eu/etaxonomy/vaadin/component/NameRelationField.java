@@ -212,4 +212,15 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         return citatonComboBox;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, grid, null);
+        setDeepReadOnly(readOnly, toolBar, null);
+    }
+
+
 }

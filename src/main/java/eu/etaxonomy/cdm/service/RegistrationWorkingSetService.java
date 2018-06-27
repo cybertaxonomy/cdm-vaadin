@@ -39,6 +39,7 @@ import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.initializer.IBeanInitializer;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 
@@ -97,6 +98,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
    */
   private List<String> FIELDUNIT_INIT_STRATEGY = Arrays.asList(new String[]{
           "$",
+          "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
           "gatheringEvent.$",
           "gatheringEvent.country",
           "gatheringEvent.collectingAreas",
@@ -196,15 +198,18 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         return dtoPager;
     }
 
+
     /**
      * {@inheritDoc}
      * @throws RegistrationValidationException
      */
     @Override
-    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid) throws RegistrationValidationException {
+    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid, boolean resolveSections) throws RegistrationValidationException {
 
-        Reference reference = repo.getReferenceService().find(referenceUuid);
-        repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
+        Reference reference = repo.getReferenceService().find(referenceUuid); // needed to use load to avoid the problem described in #7331
+        if(resolveSections){
+            reference = resolveSection(reference);
+        }
 
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
 
@@ -213,14 +218,30 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         return new RegistrationWorkingSet(makeDTOs(pager.getRecords()));
     }
 
+
+    /**
+     * @param reference
+     * @return
+     */
+    protected Reference resolveSection(Reference reference) {
+        repo.getReferenceService().load(reference.getUuid(), Arrays.asList(new String[]{"inReference"})); // needed to avoid the problem described in #7331
+        if(reference.isOfType(ReferenceType.Section) && reference.getInReference() != null) {
+            reference = reference.getInReference();
+        }
+        return reference;
+    }
+
     /**
      * {@inheritDoc}
      * @throws RegistrationValidationException
      */
     @Override
-    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException {
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID, boolean resolveSections) throws RegistrationValidationException {
 
         Reference reference = repo.getReferenceService().find(referenceID);
+        if(resolveSections){
+            reference = resolveSection(reference);
+        }
         repo.getReferenceService().load(reference.getUuid()); // needed to avoid the problem described in #7331
 
         Pager<Registration> pager = repo.getRegistrationService().page(Optional.of(reference), null, null, null, REGISTRATION_INIT_STRATEGY);
@@ -239,7 +260,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     private void debugIssue7331(Pager<Registration> pager) {
         for(Registration reg : pager.getRecords()){
             if(reg.getName() != null && reg.getName().getNomenclaturalReference().getAuthorship() != null){
-                Reference ref = (Reference) reg.getName().getNomenclaturalReference();
+                Reference ref = reg.getName().getNomenclaturalReference();
                 if(!Hibernate.isInitialized(ref.getAuthorship())){
                     logger.error("UNINITIALIZED");
                 }

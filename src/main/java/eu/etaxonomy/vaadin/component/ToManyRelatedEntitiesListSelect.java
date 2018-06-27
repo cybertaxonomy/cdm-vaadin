@@ -11,7 +11,9 @@ package eu.etaxonomy.vaadin.component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -417,7 +419,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
             // remove
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(field.getValue() != null);
+            // can be always true, removing the last entry causes an new empty entry to be added.
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(true);
             // up
             if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
                 buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
@@ -530,9 +533,15 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     public void commit() throws SourceException, InvalidValueException {
 
         List<F> nestedFields = getNestedFields();
+        Set<F> emptyFields = new HashSet<>();
         for(F f : nestedFields){
             f.commit();
-
+            if(f.getValue() == null){
+                emptyFields.add(f);
+            }
+        }
+        for(F deleteF : emptyFields){
+            removeRow(deleteF);
         }
         /*
         List<V> list = (List<V>) getPropertyDataSource().getValue();

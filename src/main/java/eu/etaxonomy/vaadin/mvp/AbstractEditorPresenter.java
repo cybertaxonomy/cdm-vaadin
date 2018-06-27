@@ -11,11 +11,18 @@ package eu.etaxonomy.vaadin.mvp;
 import org.hibernate.FlushMode;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.data.Property;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
+
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorViewEvent;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
+import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
  * Presenters of this type are usually be used in conjunction with a  {@link AbstractPopupEditor}.
@@ -106,6 +113,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         return action.getSourceView() != null && getView().equals(action.getSourceView());
     }
 
+    protected boolean isFromOwnView(FieldReplaceEvent event){
+        return event.getSourceView() != null && getView().equals(event.getSourceView());
+    }
 
     protected abstract void saveBean(DTO bean);
 
@@ -114,4 +124,51 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
      */
     protected abstract void deleteBean(DTO bean);
 
+    /**
+     *
+     * @param popupView
+     * @return <code>null</code> in case no target field has been found for the supplied <code>popupView</code>.
+     */
+    protected BoundField boundTargetField(PopupView popupView) {
+        Field<?> field = getNavigationManager().targetFieldOf(popupView);
+        PropertyIdPath propertyIdPath = boundPropertyIdPath(field);
+        if(field != null){
+            return new BoundField(field, propertyIdPath);
+        } else {
+            return null;
+        }
+    }
+
+    protected PropertyIdPath boundPropertyIdPath(Field<?> targetField){
+
+        if(targetField == null || getView() == null){
+            return null;
+        }
+
+        Field<?> boundField  = findBoundField(targetField);
+        if(boundField != null) {
+            return ((AbstractPopupEditor)getView()).boundPropertyIdPath(boundField);
+        }
+        return null;
+    }
+
+    /**
+     * @param targetField
+     * @return
+     */
+    protected Field<?> findBoundField(Field<?> targetField) {
+
+        Component parentComponent = targetField;
+        Property<?> p = null;
+        while(parentComponent != null){
+            if(Field.class.isAssignableFrom(parentComponent.getClass())){
+                Field<?> parentField = (Field<?>)parentComponent;
+                if(parentField.getPropertyDataSource() != null){
+                    return parentField;
+                }
+            }
+            parentComponent = parentComponent.getParent();
+        }
+        return null;
+    }
 }

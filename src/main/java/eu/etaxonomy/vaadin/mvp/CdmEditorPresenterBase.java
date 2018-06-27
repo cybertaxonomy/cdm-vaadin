@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
@@ -24,6 +25,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
@@ -64,6 +66,9 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     CdmStore<CDM, IService<CDM>> store ;
 
     protected CdmAuthority newAuthorityCreated;
+
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     protected CdmStore<CDM, IService<CDM>> getStore() {
         if(store == null){

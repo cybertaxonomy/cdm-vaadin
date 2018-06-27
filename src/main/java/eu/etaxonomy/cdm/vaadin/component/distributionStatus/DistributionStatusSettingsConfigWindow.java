@@ -28,6 +28,8 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.DistributionStatusSettingsPresenter;
 
 /**
+ *A configuration window to set the available distribution status and toggle the usage of
+ *abbreviated labels.
  * @author alex
  * @since 22.04.2015
  *
@@ -54,6 +56,10 @@ public class DistributionStatusSettingsConfigWindow
     	this.distributionTableView = distributionTableView;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected void init() {
         boxToggleAbbreviatedLabels.addValueChangeListener(this);
@@ -66,6 +72,10 @@ public class DistributionStatusSettingsConfigWindow
         updateButtons();
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected AbstractLayout buildMainLayout() {
 
@@ -102,11 +112,19 @@ public class DistributionStatusSettingsConfigWindow
         return mainLayout;
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isValid() {
     	return true;
     }
-
+    
+    /**
+     * 
+     * {@inheritDoc}
+     */
 	@Override
 	public void valueChange(ValueChangeEvent event) {
 		Property<?> property = event.getProperty();
@@ -115,6 +133,10 @@ public class DistributionStatusSettingsConfigWindow
 		}
 	}
 
+	/**
+	 * 
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void buttonClick(ClickEvent event) {
 		Object source = event.getSource();

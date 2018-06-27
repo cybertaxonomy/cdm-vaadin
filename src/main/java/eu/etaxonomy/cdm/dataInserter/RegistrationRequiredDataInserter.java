@@ -39,9 +39,12 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
+import eu.etaxonomy.cdm.model.common.DefinedTerm;
+import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.ExtensionType;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
+import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -157,36 +160,41 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REFERENCE, CREATE_READ).toString());
         assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.COLLECTION, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
-        if(repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
-        }
-        if(repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.PUBLISHED_IMAGE());
-        }
-        if(repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.UNPUBLISHED_IMAGE());
-        }
-        if(repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid()) == null){
-            repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
+        TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
+        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
+            kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
         }
 
-        // --- remove after release 4.12.0 ------------------------------------------------------
-        // delete old DerivationEventTypes terms which are no longer used, see #7059
-        // UUID_PUBLISHED_IMAGE = UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3");
-        // UUID UUID_UNPUBLISHED_IMAGE = UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890");
-        // UUID UUID_CULTURE_METABOLIC_INACTIVE = UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2");
-        for(UUID uuid : new UUID[]{
-                UUID.fromString("b8cba359-4202-4741-8ed8-4f17ae94b3e3"),
-                UUID.fromString("6cd5681f-0918-4ed6-89a8-bda1480dc890"),
-                UUID.fromString("eaf1c853-ba8d-4c40-aa0a-56beac96b0d2")}){
-            if(repo.getTermService().find(uuid) != null){
-                repo.getTermService().delete(uuid);
+        DefinedTermBase kouSpecimen = repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid());
+        DefinedTermBase kouImage = repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid());
+        DefinedTermBase kouUnpublishedImage = repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid());
+        DefinedTermBase kouCulture = repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid());
+
+        if(kouSpecimen == null){
+            kouSpecimen = repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
+        }
+        if(kouImage == null){
+            kouImage = repo.getTermService().save(KindOfUnitTerms.PUBLISHED_IMAGE());
+        }
+        if(kouUnpublishedImage == null){
+            kouUnpublishedImage = repo.getTermService().save(KindOfUnitTerms.UNPUBLISHED_IMAGE());
+        }
+        if(kouCulture == null){
+            kouCulture = repo.getTermService().save(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE());
+        }
+
+        Set<DefinedTerm> termInVocab = kindOfUnitVocabulary.getTerms();
+        List<DefinedTermBase> kouTerms = Arrays.asList(kouCulture, kouImage, kouSpecimen, kouUnpublishedImage);
+
+        for(DefinedTermBase t : kouTerms){
+            if(!termInVocab.contains(t)){
+                kindOfUnitVocabulary.addTerm((DefinedTerm)t);
             }
         }
-        // --------------------------------------------------------------------------------------
-        txStatus.flush();
+
         repo.commitTransaction(txStatus);
 
     }
@@ -340,11 +348,11 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         // data imported from IAPT does not have typedesignation citations and sometimes no nomref
 
                         if(isPhycobankID){
-                            youngestPub = (Reference) name.getNomenclaturalReference();
+                            youngestPub = name.getNomenclaturalReference();
                             youngestDate = partial(youngestPub.getDatePublished());
 
                             if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
-                                for(TypeDesignationBase td : name.getTypeDesignations()){
+                                for(TypeDesignationBase<?> td : name.getTypeDesignations()){
                                     if(td.getCitation() == null){
                                         continue;
                                     }
@@ -366,8 +374,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                         }
                         if(name.getTypeDesignations() != null && !name.getTypeDesignations().isEmpty()){
                             // do not add the collection directly to avoid "Found shared references to a collection" problem
-                            HashSet<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
-                            for(TypeDesignationBase td : name.getTypeDesignations()){
+                            Set<TypeDesignationBase> typeDesignations = new HashSet<>(name.getTypeDesignations().size());
+                            for(TypeDesignationBase<?> td : name.getTypeDesignations()){
                                 if(td.getCitation() == null && isPhycobankID){
                                     logger.error("Missing TypeDesignation Citation in Phycobank data");
                                     continue;

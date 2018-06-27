@@ -37,5 +37,5 @@ public interface NavigationManager {
 	 */
 	public List<String> getCurrentViewParameters();
 
-    Field<?> targetFieldOf(ApplicationView parentView, PopupView popupView);
+    Field<?> targetFieldOf(PopupView popupView);
 }

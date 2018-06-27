@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import org.vaadin.spring.events.EventScope;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
@@ -53,6 +54,7 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         setCompositionRoot(root);
 
         loginDialog.getLoginButton().addClickListener(e -> handleLoginClick(e));
+        loginDialog.getLoginButton().setClickShortcut(KeyCode.ENTER);
         loginDialog.getRegisterButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new RegisterNewUserEvent(e)));
         loginDialog.getSendOnetimeLogin().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new PasswordRevoveryEvent(e)));
         // NOTE: null viewName will be replaced by the default view name in NavigationManagerBean

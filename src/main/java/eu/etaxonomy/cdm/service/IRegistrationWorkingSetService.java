@@ -42,15 +42,20 @@ public interface IRegistrationWorkingSetService {
 
     /**
      * @param referenceID
+     * @param resolveSections resolve the higher publication unit and build the RegistrationWorkingSet for that reference. E.e. For journal sections the
+     *  use the inReference which is the journal article.
+     *
      * @return
      */
-    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID) throws RegistrationValidationException;
+    public RegistrationWorkingSet loadWorkingSetByReferenceID(Integer referenceID, boolean resolveSections) throws RegistrationValidationException;
 
     /**
      * @param referenceID
+     * @param resolveSections resolve the higher publication unit and build the RegistrationWorkingSet for that reference. E.e. For journal sections the
+     *  use the inReference which is the journal article.
      * @return
      */
-    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid) throws RegistrationValidationException;
+    public RegistrationWorkingSet loadWorkingSetByReferenceUuid(UUID referenceUuid, boolean resolveSections) throws RegistrationValidationException;
 
     public Set<RegistrationDTO> loadBlockingRegistrations(UUID blockedRegistrationUuid);
 

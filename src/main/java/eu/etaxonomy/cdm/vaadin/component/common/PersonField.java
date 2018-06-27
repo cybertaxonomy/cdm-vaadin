@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.vaadin.teemu.switchui.Switch;
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -42,6 +43,8 @@ public class PersonField extends CompositeCustomField<Person> {
     private static final long serialVersionUID = 8346575511284469356L;
 
     private static final String PRIMARY_STYLE = "v-person-field";
+
+    private static final Pattern EMPTY_ENTITY_TITLE_CACHE_PATTERN = Pattern.compile("[a-zA-Z]+#[0-9]+<[a-f0-9\\-]+>");
 
     /**
      * do not allow entities which are having only <code>null</code> values in all fields
@@ -202,6 +205,11 @@ public class PersonField extends CompositeCustomField<Person> {
         });
         // nomenclaturalTitleField.setCaption("Nomenclatural title");
         nomenclaturalTitleField.setWidth(100, Unit.PERCENTAGE);
+//        nomenclaturalTitleField.addValueChangeListener( e -> {
+//            if(e.getProperty().getValue() != null && ((String)e.getProperty().getValue()).isEmpty()){
+//
+//            }
+//        });
 
         root.addComponent(nomenclaturalTitleField);
         root.addComponent(nomenclaturalTitleButton);
@@ -304,7 +312,9 @@ public class PersonField extends CompositeCustomField<Person> {
         unlockSwitch.setVisible(person != null);
         titleCacheField.setVisible(person != null);
         String nomTitle = nomenclaturalTitleField.getValue();
-        nomenclaturalTitleField.setVisible(nomTitle != null && nomTitle.equals(titleCacheField.getValue()));
+        boolean isEmptyItemTitle = nomTitle == null || EMPTY_ENTITY_TITLE_CACHE_PATTERN.matcher(nomTitle).matches();
+        boolean nomTitleEqualsTitleCache = nomTitle != null && nomTitle.equals(titleCacheField.getValue());
+        nomenclaturalTitleField.setVisible( !isEmptyItemTitle && !nomTitleEqualsTitleCache);
         nomenclaturalTitleButtonChooseIcon();
 
     }
@@ -355,7 +365,13 @@ public class PersonField extends CompositeCustomField<Person> {
         super.commit();
 
         Person bean =  getValue();
+
         if(bean != null){
+            String nomTitle = nomenclaturalTitleField.getValue();
+            if(nomTitle != null && nomTitle.equals(titleCacheField.getValue())){
+                // no point having a nomenclaturalTitle if it is equal to the titleCache
+                bean.setNomenclaturalTitle(null);
+            }
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
                 UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);

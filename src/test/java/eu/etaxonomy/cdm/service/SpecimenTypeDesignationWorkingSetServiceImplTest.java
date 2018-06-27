@@ -162,6 +162,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
           <AUDITEVENT />
           <TAXONNAME_AUD />
           <DERIVATIONEVENT_AUD />
+          <GATHERINGEVENT_AUD />
+          <LANGUAGESTRING_AUD />
           <TYPEDESIGNATIONBASE_AUD />
           <SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT_AUD />
           <REGISTRATION_AUD />

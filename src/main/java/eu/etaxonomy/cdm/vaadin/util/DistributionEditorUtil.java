@@ -10,8 +10,14 @@ import com.vaadin.ui.Notification.Type;
 
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.taxon.Classification;
+import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 
+/**
+ * A utility class for the distribution status editor.
+ *
+ */
 public class DistributionEditorUtil {
 
 	public static final String VIEW_TABLE = "table";
@@ -30,6 +36,18 @@ public class DistributionEditorUtil {
 
     public static final String SEPARATOR = ";;";
 
+    public static final boolean INCLUDE_UNPUBLISHED = true;
+
+    /**
+     * Updates the vaadin session attributes related to the chosen
+     * {@link TaxonNode}s, {@link NamedArea}s and {@link Classification}
+     * and refreshes the given {@code distributionStatusTableView}.
+     * @param distributionTableView The view to refresh after updating the session variables.
+     * @param taxonNodes The taxa to be shown in the {@code distributionTableView}.
+     * @param areaVoc The {@link TermVocabulary} of {@link NamedArea}s to be used.
+     * @param selectedAreas The {@link NamedArea}s to be availbale in the {@code distributionTableView}.
+     * @param classificationUuid The {@link UUID} of the {@link Classification} the {@code taxonNodes} belong to.
+     */
     public static void updateDistributionView(IDistributionTableView distributionTableView, List<UUID> taxonNodes, TermVocabulary<NamedArea> areaVoc,
             List<NamedArea> selectedAreas, UUID classificationUuid) {
 	    VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, taxonNodes);
@@ -39,6 +57,11 @@ public class DistributionEditorUtil {
 	    distributionTableView.update();
 	}
 
+    /**
+     * Clears the session attributes related to the chosen
+     * {@link TaxonNode}s, {@link TermVocabulary} of {@link NamedArea}s,
+     * {@link NamedArea}s and {@link Classification}.
+     */
     public static void clearSessionAttributes(){
     	VaadinSession.getCurrent().setAttribute(SATTR_TAXON_NODES_UUID, null);
     	VaadinSession.getCurrent().setAttribute(SATTR_SELECTED_AREA_VOCABULARY_UUID, null);
@@ -46,11 +69,19 @@ public class DistributionEditorUtil {
     	VaadinSession.getCurrent().setAttribute(SATTR_CLASSIFICATION, null);
     }
 
+    /**
+     * Returns {@code true} if abbreviated labels should be used.
+     * @return {@code true} if abbreviated labels should be used.
+     */
     public static boolean isAbbreviatedLabels(){
     	Object isAbbreviated = VaadinSession.getCurrent().getAttribute(DistributionEditorUtil.SATTR_ABBREVIATED_LABELS);
 		return (isAbbreviated==null || (boolean) isAbbreviated);
     }
 
+    /**
+     * Shows an {@link SQLException} to the user.
+     * @param e The exception to show.
+     */
 	public static void showSqlError(SQLException e) {
 		Notification.show("Error while accessing data base.","Cause: "+e.getMessage(), Type.ERROR_MESSAGE);
 		e.printStackTrace();

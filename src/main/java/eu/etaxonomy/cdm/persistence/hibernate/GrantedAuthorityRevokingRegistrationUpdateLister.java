@@ -56,7 +56,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
 
     /**
      *
-     * Registrations having these states must no longer be midifiable by users having only per entity permissions on the
+     * Registrations having these states must no longer be modifiable by users having only per entity permissions on the
      * Registration subgraph
      */
     private static final EnumSet<RegistrationStatus> MODIFICATION_STOP_STATES = EnumSet.of(
@@ -130,7 +130,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         }
         name = HibernateProxyHelper.deproxy(name);
         deleteCandidates.add(new CdmAuthority(name, UPDATE_DELETE));
-        addDeleteCandidates(deleteCandidates, (Reference)name.getNomenclaturalReference());
+        addDeleteCandidates(deleteCandidates, name.getNomenclaturalReference());
         addDeleteCandidates(deleteCandidates, name.getCombinationAuthorship());
         addDeleteCandidates(deleteCandidates, name.getExCombinationAuthorship());
         addDeleteCandidates(deleteCandidates, name.getBasionymAuthorship());

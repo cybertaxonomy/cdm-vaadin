@@ -15,6 +15,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
+import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -22,7 +23,8 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Jun 13, 2017
  *
  */
-public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends ApplicationView<SpecimenTypeDesignationWorkingsetEditorPresenter> {
+public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends ApplicationView<SpecimenTypeDesignationWorkingsetEditorPresenter>,
+    AnnotationsEditor {
 
     public ListSelect getCountrySelectField();
 

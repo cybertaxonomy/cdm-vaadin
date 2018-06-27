@@ -36,6 +36,7 @@ import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
@@ -90,6 +91,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private EnumSet<CRUD> crud = null;
 
     private ICdmCacher cache;
+
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
@@ -179,7 +183,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
 
-            CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(getRepo().getReferenceService());
+            CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
             @Override
             public SpecimenTypeDesignationDTORow create() {
@@ -309,7 +313,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
+        CollectionPopupEditor collectionPopupEditor = openPopupEditor(CollectionPopupEditor.class, null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -320,7 +324,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doCollectionEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        CollectionPopupEditor collectionPopupEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
+        CollectionPopupEditor collectionPopupEditor = openPopupEditor(CollectionPopupEditor.class, null);
 
         collectionPopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         collectionPopupEditor.withDeleteButton(true);
@@ -332,6 +336,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.OccurrenceCollectionFilter.class)
     public void onCollectionEvent(EntityChangeEvent event){
+
+        if(!isFromOwnView(event)){
+            return;
+        }
 
         Collection newCollection = getRepo().getCollectionService().load(
                 event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})
@@ -351,7 +359,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorAdd(SpecimenTypeDesignationDTORow row) {
 
-        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
+        ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
 
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
@@ -363,7 +371,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     public void doReferenceEditorEdit(SpecimenTypeDesignationDTORow row) {
 
-        ReferencePopupEditor referencePopupEditor = getNavigationManager().showInPopup(ReferencePopupEditor.class, getView(), null);
+        ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);

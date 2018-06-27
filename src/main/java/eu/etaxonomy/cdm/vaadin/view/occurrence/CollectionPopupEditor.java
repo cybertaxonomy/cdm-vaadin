@@ -137,21 +137,8 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         row++;
 
         superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("Super-collection", Collection.class);
-        superCollectionCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
-                new CollectionEditorAction(EditorActionType.ADD, null, superCollectionCombobox, this)
-                ));
-        superCollectionCombobox.addClickListenerEditEntity(e -> {
-            if(superCollectionCombobox.getValue() != null){
-                getViewEventBus().publish(this,
-                    new CollectionEditorAction(
-                            EditorActionType.EDIT,
-                            superCollectionCombobox.getValue().getUuid(),
-                            e.getButton(),
-                            superCollectionCombobox,
-                            this)
-                );
-            }
-            });
+
+
         superCollectionCombobox.setWidth(300, Unit.PIXELS);
         addField(superCollectionCombobox, "superCollection", 0, row, 1, row);
 
@@ -161,6 +148,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         superCollectionCombobox.getSelect().addValueChangeListener(
                 new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox)
                 );
+
 
         superCollectionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new CollectionEditorAction(
@@ -182,6 +170,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                     );
                 }
             });
+
     }
 
     /* ------------------ View Interface methods -------------------- */

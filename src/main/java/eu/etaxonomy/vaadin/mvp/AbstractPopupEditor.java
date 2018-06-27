@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.vaadin.spring.events.EventScope;
 
@@ -43,6 +44,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.GridLayout.OutOfBoundsException;
 import com.vaadin.ui.GridLayout.OverlapsException;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
@@ -60,11 +62,13 @@ import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
+import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorDeleteEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
+import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
  *
@@ -521,6 +525,57 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return fieldGroup.getField(propertyId);
     }
 
+    public PropertyIdPath boundPropertyIdPath(Field<?> field){
+
+        PropertyIdPath propertyIdPath = null;
+        Object propertyId = fieldGroup.getPropertyId(field);
+
+        if(propertyId == null){
+            // not found in the editor field group. Maybe the field is bound to a nested fieldgroup?
+            // 1. find the NestedFieldGroup implementations from the field up to the editor
+            logger.setLevel(Level.DEBUG);
+            PropertyIdPath nestedPropertyIds = new PropertyIdPath();
+            Field parentField = field;
+            HasComponents parentComponent = parentField.getParent();
+            logger.debug("field: " + parentField.getClass().getSimpleName());
+            while(parentComponent != null){
+                logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
+                if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
+                    Object propId = ((NestedFieldGroup)parentComponent).getFieldGroup().getPropertyId(parentField);
+                    if(propId != null){
+                        logger.debug("propId: " + propId.toString());
+                        nestedPropertyIds.addParent(propId);
+                    }
+                    logger.debug("parentField: " + parentField.getClass().getSimpleName());
+                    parentField = (Field)parentComponent;
+                } else if(parentComponent == this) {
+                    // we reached the editor itself
+                    Object propId = fieldGroup.getPropertyId(parentField);
+                    if(propId != null){
+                        logger.debug("propId: " + propId.toString());
+                        nestedPropertyIds.addParent(propId);
+                    }
+                    propertyIdPath = nestedPropertyIds;
+                    break;
+                }
+                parentComponent = parentComponent.getParent();
+            }
+            // 2. check the NestedFieldGroup binding the field is direct or indirect child component of the editor
+//            NO lONGER NEEDED
+//            parentComponent = parentField.getParent(); // get component containing the last parent field found
+//            while(true){
+//                if(parentComponent == getFieldLayout()){
+//                    propertyIdPath = nestedPropertyIds;
+//                    break;
+//                }
+//                parentComponent = parentComponent.getParent();
+//            }
+        } else {
+            propertyIdPath = new PropertyIdPath(propertyId);
+        }
+        return propertyIdPath;
+    }
+
     protected void addComponent(Component component) {
         fieldLayout.addComponent(component);
         applyDefaultComponentStyles(component);
@@ -528,6 +583,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected void bindField(Field field, String propertyId){
         fieldGroup.bind(field, propertyId);
+    }
+
+    protected void unbindField(Field field){
+        fieldGroup.unbind(field);
     }
 
     /**
@@ -758,5 +817,20 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             this.context.addAll(context);
         }
     }
+
+    protected AbstractField<String> replaceComponent(String propertyId, AbstractField<String> oldField, AbstractField<String> newField, int column1, int row1, int column2,
+            int row2) {
+                String value = oldField.getValue();
+                newField.setCaption(oldField.getCaption());
+                GridLayout grid = (GridLayout)getFieldLayout();
+                grid.removeComponent(oldField);
+
+                unbindField(oldField);
+                addField(newField, propertyId, column1, row1, column2, row2);
+                getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+                // important: set newField value at last!
+                newField.setValue(value);
+                return newField;
+            }
 
 }

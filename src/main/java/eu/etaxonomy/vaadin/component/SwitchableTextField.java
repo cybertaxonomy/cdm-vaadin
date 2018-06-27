@@ -130,4 +130,14 @@ public class SwitchableTextField extends CompositeCustomField<String> {
         unlockSwitch.setVisible(visible);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
+        setDeepReadOnly(readOnly, root, null);
+    }
+
+
 }

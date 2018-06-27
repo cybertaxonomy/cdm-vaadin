@@ -41,12 +41,16 @@ public class DistributionStatusUI extends UI{
     @Autowired
     NavigationManagerBean navigator;
 
+    /**
+     * Sets the access AcessDeniedView for the UI.
+     */
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
     }
 
     /**
-     * @return
+     * Returns the state of the UI.
+     * @return State of the UI.
      */
     private String pageFragmentAsState() {
         Page page = Page.getCurrent();
@@ -68,10 +72,17 @@ public class DistributionStatusUI extends UI{
     @Autowired
     UIEventBus uiEventBus;
 
+    /**
+     * Creates a new DistributionStatusUI.
+     */
     public DistributionStatusUI() {
 
     }
 
+    /**
+     * 
+     * {@inheritDoc}
+     */
 	@Override
 	protected void init(VaadinRequest request) {
 

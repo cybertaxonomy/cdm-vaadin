@@ -26,6 +26,8 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BoundField;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -37,7 +39,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collection, CollectionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
-    private CollectionPopupEditor collectionPopuEditor;
 
 
     /**
@@ -113,7 +114,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
+        CollectionPopupEditor collectionPopuEditor = openPopupEditor(CollectionPopupEditor.class, event);
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
@@ -127,7 +128,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
             return;
         }
 
-        collectionPopuEditor = getNavigationManager().showInPopup(CollectionPopupEditor.class, getView(), null);
+        CollectionPopupEditor collectionPopuEditor = openPopupEditor(CollectionPopupEditor.class, event);
 
         collectionPopuEditor.grantToCurrentUser(this.crud);
         collectionPopuEditor.withDeleteButton(true);
@@ -136,19 +137,23 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
     @EventBusListenerMethod()
     public void onEntityChangeEvent(EntityChangeEvent<?> event){
-        if(event.getSourceView() == collectionPopuEditor){
-            if(event.isCreateOrModifiedType()){
 
-                Collection newCollection = (Collection) event.getEntity();
-                getCache().load(newCollection);
-                if(event.isCreatedType()){
-                    getView().getSuperCollectionCombobox().setValue(newCollection);
-                } else {
-                    getView().getSuperCollectionCombobox().reload();
+        BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
+
+        if(boundTargetField != null){
+            if(boundTargetField.matchesPropertyIdPath("superCollection")){
+                if(event.isCreateOrModifiedType()){
+
+                    Collection newCollection = (Collection) event.getEntity();
+                    getCache().load(newCollection);
+                    if(event.isCreatedType()){
+                        getView().getSuperCollectionCombobox().setValue(newCollection);
+                    } else {
+                        getView().getSuperCollectionCombobox().reload();
+                    }
                 }
-            }
 
-            collectionPopuEditor = null;
+            }
         }
     }
 

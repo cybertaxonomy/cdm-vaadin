@@ -24,6 +24,9 @@ import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
+/**
+ * A toolbar for the distribution app. Displayed at the top of the screen.
+ */
 @SpringComponent("distributionToolbar")
 @ViewScope
 public class DistributionToolbar extends HorizontalLayout implements Serializable{
@@ -72,6 +75,9 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 //	private final Authentication authentication;
 //	private ExcelExporter exporter = new ExcelExporter();
 
+	/**
+	 * Constructs the toolbar.
+	 */
 	@PostConstruct
     public void init() {
 		setMargin(true);
@@ -109,6 +115,10 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 		updateAuthenticationButtons();
     }
 
+	/**
+	 * Called when authentication was successful. Updates the user menu buttons.
+	 * @param event
+	 */
 	@EventBusListenerMethod
     public void onAuthenticationSuccessEvent(org.vaadin.spring.events.Event<AuthenticationSuccessEvent> event){
         boolean isInitialized = userButton != null;
@@ -120,9 +130,9 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
         }
     }
 
-    /**
-     * @param event
-     */
+	/**
+	 * Updates the user menu buttons on login and logout.
+	 */
     protected void updateAuthenticationButtons() {
         if(userHelper.userIsAutheticated() && !userHelper.userIsAnnonymous()){
             userButton.setCaption(userHelper.userName());
@@ -154,34 +164,60 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
         uiEventBus.publish(this, new NavigationEvent("login", navigationManager.getCurrentViewName())); //$NON-NLS-1$
     }
 
-
+    /**
+     * Logs the user out and closes the session.
+     */
     private void performLogout() {
         userHelper.logout();
         updateAuthenticationButtons();
         navigationManager.reloadCurrentView();
     }
 
+    /**
+     * The settings button.
+     * @return
+     */
     public Button getSettingsButton(){
         return settingsButton;
     }
 
+    /**
+     * Button to open the {@link DistributionStatusSettingsConfigWindow}.
+     * @return Button to display the {@link DistributionStatusSettingsConfigWindow}.
+     */
     public Button getDistributionSettingsButton() {
 		return distributionSettingsButton;
 	}
 
+    /**
+     * Unused.
+     * @return
+     */
 	public Button getEditButton() {
 		return editButton;
 	}
 
+	/**
+	 * Unused.
+	 * @return
+	 */
 	public Button getSaveButton() {
 		return saveButton;
 	}
 
+	/**
+	 * Button to open the {@link DetailWindow}.
+	 * @return  Button to open the {@link DetailWindow}.
+	 */
 	public Button getDetailButton() {
 		return detailButton;
 	}
 
-   public Button getHelpButton() {
-        return helpButton;
-    }
+	/**
+	 * Button to open the {@link HelpWindow}.
+	 * @return Button to open the {@link HelpWindow}.
+	 */
+	public Button getHelpButton() {
+		return helpButton;
+	}
 }

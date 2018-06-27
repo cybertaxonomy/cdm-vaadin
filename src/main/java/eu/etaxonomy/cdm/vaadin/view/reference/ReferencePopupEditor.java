@@ -10,17 +10,24 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions;
+import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions.UnimplemetedCaseException;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -48,7 +55,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private TextField titleField;
 
-    private final static int GRID_COLS = 4;
+    private final static int GRID_COLS = 4; // 12 would fits for 2,3, and 4 Components per row
 
     private final static int GRID_ROWS = 10;
 
@@ -59,6 +66,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private TeamOrPersonField authorshipField;
 
     private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
+
+    private static Map<String,String> propertyNameLabelMap = new HashMap<>();
+
+    static {
+        propertyNameLabelMap.put("inReference", "In reference");
+        propertyNameLabelMap.put("inJournal", "In journal");
+        propertyNameLabelMap.put("inSeries", "In series");
+        propertyNameLabelMap.put("inBook", "In book");
+    }
 
     /**
      * @param layout
@@ -101,12 +117,14 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         "inReference"
          */
         int row = 0;
+        VerbatimTimePeriodField timePeriodField = new VerbatimTimePeriodField("Date published");
+        addField(timePeriodField, "datePublished", 0, row, 1, row);
         typeSelect = new ListSelect("Reference type");
         typeSelect.addItems(referenceTypes);
         typeSelect.setNullSelectionAllowed(false);
         typeSelect.setRows(1);
         typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
-        addField(typeSelect, "type", 3, row);
+        addField(typeSelect, "type", GRID_COLS - 1, row);
         grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
         row++;
 
@@ -126,7 +144,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
         authorshipField = new TeamOrPersonField("Author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.BIBLIOGRAPHIC_TITLE);
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
-        addField(authorshipField, "authorship", 0, row, 3, row);
+        addField(authorshipField, "authorship", 0, row, GRID_COLS -1, row);
         row++;
 
         inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
@@ -146,29 +164,30 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                 );
             }
             });
-        addField(inReferenceCombobox, "inReference", 0, row, 3, row);
+        addField(inReferenceCombobox, "inReference", 0, row, GRID_COLS -1, row);
         row++;
 
-        addTextField("Series", "seriesPart", 0, row);
-        addTextField("Volume", "volume", 1, row);
-        addTextField("Pages", "pages", 2, row);
-        addTextField("Editor", "editor", 3, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Series", "seriesPart", 0, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Volume", "volume", 1, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Pages", "pages", 2, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Edition", "edition", 3, row).setWidth(100, Unit.PERCENTAGE);
         row++;
 
-        addTextField("Place published", "placePublished", 0, row, 1, row).setWidth(100, Unit.PERCENTAGE);
-        TextField publisherField = addTextField("Publisher", "publisher", 2, row, 3, row);
+        addTextField("Place published", "placePublished", 0, row, 0, row).setWidth(100, Unit.PERCENTAGE);
+        TextField publisherField = addTextField("Publisher", "publisher", 1, row, 1, row);
         publisherField.setWidth(100, Unit.PERCENTAGE);
-        VerbatimTimePeriodField timePeriodField = new VerbatimTimePeriodField("Date published");
-        addField(timePeriodField, "datePublished");
+        addTextField("Editor", "editor", 2, row).setWidth(100, Unit.PERCENTAGE);
         row++;
 
-        addTextField("ISSN", "issn", 0, row);
-        addTextField("ISBN", "isbn", 1, row);
+        addTextField("ISSN", "issn", 0, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("ISBN", "isbn", 1, row).setWidth(100, Unit.PERCENTAGE);
         TextFieldNFix doiField = new TextFieldNFix("DOI");
         doiField.setConverter(new DoiConverter());
+        doiField.setWidth(100, Unit.PERCENTAGE);
         addField(doiField, "doi", 2, row);
         TextFieldNFix uriField = new TextFieldNFix("Uri");
         uriField.setConverter(new UriConverter());
+        uriField.setWidth(100, Unit.PERCENTAGE);
         addField(uriField, "uri", 3, row);
 
 //        titleField.setRequired(true);
@@ -186,16 +205,30 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
      * @return
      */
     private Object updateFieldVisibility(ReferenceType value) {
-        getField("volume").setVisible(value.isVolumeReference());
 
-        getField("placePublished").setVisible(value.isPublication());
-        getField("publisher").setVisible(value.isPublication());
+        try {
+            Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(value);
+            setAllFieldsVisible(false);
+            for(String fieldName : fieldPropertyDefinition.keySet()){
+                Field<?> field = getField(fieldName);
+                if(field == null){
+                    continue;
+                }
+                field.setVisible(true);
+                String propertyName = fieldPropertyDefinition.get(fieldName);
+                if(propertyName != fieldName){
+                        field.setCaption(propertyNameLabelMap.get(propertyName));
+                }
+            }
+        } catch (UnimplemetedCaseException e) {
+            logger.error(e);
+            // enable all fields
+            setAllFieldsVisible(true);
+            // fix inReference label
+            getField("inReference").setCaption(propertyNameLabelMap.get("inReference"));
+        }
 
-        getField("editor").setVisible(value.isPrintedUnit());
-        getField("seriesPart").setVisible(value.isPrintedUnit());
 
-        getField("inReference").setVisible(value.isPrintedUnit() || value.isSection());
-        getField("pages").setVisible(value.isSection());
 
         EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
         EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
@@ -203,6 +236,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         getField("title").setVisible(!hideTitle.contains(value));
 
         return null;
+    }
+
+    protected void setAllFieldsVisible(boolean visible){
+        GridLayout grid = (GridLayout)getFieldLayout();
+        for(Component c : grid){
+            if(AbstractField.class.isAssignableFrom(c.getClass())){
+                c.setVisible(visible);
+            }
+        }
     }
 
     /**

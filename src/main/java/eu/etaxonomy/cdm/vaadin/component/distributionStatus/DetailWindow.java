@@ -22,7 +22,10 @@ import eu.etaxonomy.cdm.model.description.StateData;
 import eu.etaxonomy.cdm.model.description.TextData;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 
-
+/**
+ * A window to display details of a taxon.
+ *
+ */
 @Scope("prototype")
 public class DetailWindow extends CustomComponent{
 
@@ -30,12 +33,21 @@ public class DetailWindow extends CustomComponent{
 	private final Collection<DescriptionElementBase> listDescriptions;
 	private final Taxon taxon;
 
+	/**
+	 * Displays a window showing the given details of the given taxon.
+	 * @param taxon The taxon the details belong to.
+	 * @param listDescriptions The details to show.
+	 */
 	public DetailWindow(Taxon taxon, Collection<DescriptionElementBase> listDescriptions) {
 		this.taxon = taxon;
 		this.listDescriptions = listDescriptions;
 
 	}
 
+	/**
+	 * Creates the detail window.
+	 * @return Window to be displayed.
+	 */
 	public Window createWindow(){
 		Window window = new Window();
 		window.setHeightUndefined();
@@ -47,12 +59,16 @@ public class DetailWindow extends CustomComponent{
 			window.setContent(new Label(Messages.getLocalizedString(Messages.DetailWindow_NO_DESCRIPTIVE_DATA_FOUND)));
 		}
 		else{
-			window.setContent(constructDescriptionTree(taxon));
+			window.setContent(constructDescriptionTree());
 		}
 		return window;
 	}
 
-	private Tree constructDescriptionTree(Taxon taxon){
+	/**
+	 * Creates a tree view of the details contained in {@link #listDescriptions}.
+	 * @return Tree of details contained in {@link #listDescriptions}.
+	 */
+	private Tree constructDescriptionTree(){
 		Tree tree = new Tree();
 		tree.setSizeUndefined();
 		String parent = "Descriptive Data"; //$NON-NLS-1$
@@ -61,6 +77,12 @@ public class DetailWindow extends CustomComponent{
 		return tree;
 	}
 
+	/**
+	 * Populates a given {@link Tree} with the details contained in {@code listDescriptions} and sets its root to {@code parent}. 
+	 * @param tree The tree to populate.
+	 * @param listDescriptions The details to show.
+	 * @param parent The root of the tree.
+	 */
 	private void initDescriptionTree(Tree tree, Collection<DescriptionElementBase>listDescriptions, Object parent) {
 		//TODO: sorting List
 		for (DescriptionElementBase deb : listDescriptions){

@@ -18,7 +18,8 @@ import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityDecoraterDTO<CDM>, CDM extends CdmBase, V extends ApplicationView<?>> extends CdmEditorPresenterBase<DTO, CDM, V> {
+public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityDecoraterDTO<CDM>, CDM extends CdmBase, V extends ApplicationView<?>>
+    extends CdmEditorPresenterBase<DTO, CDM, V> {
 
     private static final long serialVersionUID = -6315824180341694825L;
 

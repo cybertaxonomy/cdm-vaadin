@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import com.vaadin.server.VaadinSession;
 
 /**
+ * Internationalization class.
  * @author freimeier
  *
  */

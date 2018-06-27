@@ -24,15 +24,18 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoubleConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
@@ -75,6 +78,10 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     private TeamOrPersonField collectorField;
 
+    private FilterableAnnotationsField annotationsListField;
+
+    private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
+
     /**
      * @return the countrySelectField
      */
@@ -93,7 +100,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         grid.setSpacing(true);
         grid.setMargin(true);
         grid.setColumns(3);
-        grid.setRows(9);
+        grid.setRows(10);
 
         //TODO typifyingAuthors
 
@@ -200,6 +207,12 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         bindField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs");
         addComponent(scrollPanel, 0, row, 2, row);
+
+        row++;
+        annotationsListField = new FilterableAnnotationsField("Editorial notes");
+        annotationsListField.setWidth(100, Unit.PERCENTAGE);
+        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        addField(annotationsListField, "annotations", 0, row, 2, row);
 
      }
 
@@ -332,6 +345,35 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     @Override
     public TeamOrPersonField getCollectorField() {
         return collectorField;
+    }
+
+    /**
+     * By default  AnnotationType.EDITORIAL() is enabled.
+     *
+     * @return the editableAnotationTypes
+     */
+    @Override
+    public AnnotationType[] getEditableAnotationTypes() {
+        return editableAnotationTypes;
+    }
+
+    /**
+     * By default  AnnotationType.EDITORIAL() is enabled.
+     *
+     *
+     * @param editableAnotationTypes the editableAnotationTypes to set
+     */
+    @Override
+    public void setEditableAnotationTypes(AnnotationType ... editableAnotationTypes) {
+        this.editableAnotationTypes = editableAnotationTypes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterableAnnotationsField getAnnotationsField() {
+        return annotationsListField;
     }
 
 

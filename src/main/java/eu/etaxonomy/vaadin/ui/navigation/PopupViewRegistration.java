@@ -38,7 +38,6 @@ public class PopupViewRegistration {
 
         popupWindowMap.put(popup, window);
 
-
         if(!popupViewFieldMap.containsKey(parentView)){
             popupViewFieldMap.put(parentView, new HashMap<>());
         }
@@ -49,6 +48,15 @@ public class PopupViewRegistration {
     public Field<?> get(ApplicationView view, PopupView popup){
         if(!popupViewFieldMap.containsKey(view)){
             popupViewFieldMap.get(view).get(popup);
+        }
+        return null;
+    }
+
+    public Field<?> get(PopupView popup){
+        for(Map<PopupView, Field<?>> popupFieldMap : popupViewFieldMap.values()){
+            if(popupFieldMap.containsKey(popup)){
+                return popupFieldMap.get(popup);
+            }
         }
         return null;
     }
