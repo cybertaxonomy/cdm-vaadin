@@ -46,6 +46,18 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 
 /**
+ * This Hibernate {@link PostUpdateEventListener} is responsible for
+ * revoking GrantedAuthorities from any user which is having per entity
+ * permissions in the object graph of the `Registration`being updated
+ * This encompasses GrantedAuthotities with the CRUD values CRUD.UPDATE, CRUD.DELETE.
+ * Please refer to the method documentation of {@link #collectDeleteCandidates(Registration)}
+ * for further details.
+ * <p>
+ * The according permissions are revoked when the RegistrationStatus is being changed
+ * by a database update. The RegistrationStatus causing this are contained in the constant
+ * {@link GrantedAuthorityRevokingRegistrationUpdateLister#MODIFICATION_STOP_STATES MODIFICATION_STOP_STATES}
+ *
+ *
  * @author a.kohlbecker
  * @since Dec 18, 2017
  *
@@ -55,9 +67,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
     private static final long serialVersionUID = -3542204523291766866L;
 
     /**
-     *
-     * Registrations having these states must no longer be modifiable by users having only per entity permissions on the
-     * Registration subgraph
+     * Registrations having these states must no longer be modifiable by users having
+     * only per entity permissions on the Registration subgraph.
      */
     private static final EnumSet<RegistrationStatus> MODIFICATION_STOP_STATES = EnumSet.of(
             RegistrationStatus.PUBLISHED,
