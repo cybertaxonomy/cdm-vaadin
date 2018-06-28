@@ -255,33 +255,37 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         // -----------------------------------------------------------------------------------------
         // this needs to be executed in a separate session to avoid concurrent modification problems
         Session newSession = session.getSessionFactory().openSession();
-        Transaction txState = newSession.beginTransaction();
+        try {
+            Transaction txState = newSession.beginTransaction();
 
-        Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
-        userQuery.setParameterList("authorities", authorityStrings);
-        List<User> users = userQuery.list();
-        for(User user : users){
-            List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
-                        ga -> authorityStrings.contains(ga.getAuthority())
-                    )
-                    .collect(Collectors.toList());
-            user.getGrantedAuthorities().removeAll(deleteFromUser);
+            Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
+            userQuery.setParameterList("authorities", authorityStrings);
+            List<User> users = userQuery.list();
+            for(User user : users){
+                List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
+                            ga -> authorityStrings.contains(ga.getAuthority())
+                        )
+                        .collect(Collectors.toList());
+                user.getGrantedAuthorities().removeAll(deleteFromUser);
+            }
+
+            Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
+            groupQuery.setParameterList("authorities", authorityStrings);
+            List<Group> groups = groupQuery.list();
+            for(Group group : groups){
+                List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(
+                            ga -> authorityStrings.contains(ga.getAuthority())
+                        )
+                        .collect(Collectors.toList());
+                group.getGrantedAuthorities().removeAll(deleteFromUser);
+            }
+            newSession.flush();
+            txState.commit();
+        } finally {
+            // no catching of the exception, if the session flush fails the transaction should roll back and
+            // the exception needs to bubble up so that the transaction in enclosing session is also rolled back
+            newSession.close();
         }
-
-        Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
-        groupQuery.setParameterList("authorities", authorityStrings);
-        List<Group> groups = groupQuery.list();
-        for(Group group : groups){
-            List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(
-                        ga -> authorityStrings.contains(ga.getAuthority())
-                    )
-                    .collect(Collectors.toList());
-            group.getGrantedAuthorities().removeAll(deleteFromUser);
-        }
-
-        newSession.flush();
-        txState.commit();
-        newSession.close();
         // -----------------------------------------------------------------------------------------
 
         String hql = "delete from GrantedAuthorityImpl as ga where ga.authority in (:authorities)";
