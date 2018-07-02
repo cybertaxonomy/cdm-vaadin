@@ -458,7 +458,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             institution = instituteMap.get(office);
         } else {
 
-            Pager<AgentBase> pager = repo.getAgentService().findByTitle(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
+            Pager<AgentBase> pager = repo.getAgentService().findByTitleWithRestrictions(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
             if(!pager.getRecords().isEmpty()){
                 institution =  (Institution) pager.getRecords().get(0);
             } else {

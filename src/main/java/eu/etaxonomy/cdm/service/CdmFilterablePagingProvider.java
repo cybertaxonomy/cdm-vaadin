@@ -20,6 +20,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 
@@ -48,6 +49,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
     private List<Criterion> criteria = new ArrayList<>();
+
+    private List<Restriction<?>> restrictions = new ArrayList<>();
 
 
     /**
@@ -116,16 +119,33 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     public List<V> findEntities(int firstRow, String filter) {
 
         Integer pageIndex = firstRow / pageSize;
-        Pager<V> page = (Pager<V>) service.findByTitle(
-                type,
-                filter,
-                matchMode,
-                criteria,
-                pageSize,
-                pageIndex ,
-                orderHints,
-                initStrategy
-              );
+        Pager<V> page;
+        if(!restrictions.isEmpty() && criteria.isEmpty()){
+            page = (Pager<V>) service.findByTitleWithRestrictions(
+                    type,
+                    filter,
+                    matchMode,
+                    restrictions,
+                    pageSize,
+                    pageIndex ,
+                    orderHints,
+                    initStrategy
+                    );
+        } else if(restrictions.isEmpty() && !criteria.isEmpty()){
+            page = (Pager<V>) service.findByTitle(
+                    type,
+                    filter,
+                    matchMode,
+                    criteria,
+                    pageSize,
+                    pageIndex ,
+                    orderHints,
+                    initStrategy
+                    );
+        } else {
+            // this will never be reaced sind the size() method is always called before.
+            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
+        }
         if(logger.isTraceEnabled()){
             logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
         }
@@ -138,16 +158,33 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     @Override
     public int size(String filter) {
 
-        Pager<V> page = (Pager<V>) service.findByTitle(
-                type,
-                filter,
-                matchMode,
-                criteria,
-                1,
-                0,
-                null,
-                null
-              );
+        Pager<V> page;
+        if(!restrictions.isEmpty() && criteria.isEmpty()){
+            page = (Pager<V>) service.findByTitleWithRestrictions(
+                    type,
+                    filter,
+                    matchMode,
+                    restrictions,
+                    1,
+                    0,
+                    null,
+                    null
+                  );
+        } else if(restrictions.isEmpty() && !criteria.isEmpty()){
+            page = (Pager<V>) service.findByTitle(
+                    type,
+                    filter,
+                    matchMode,
+                    criteria,
+                    1,
+                    0,
+                    null,
+                    null
+                  );
+        } else {
+            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
+        }
+
         if(logger.isTraceEnabled()){
             logger.trace("size() -  count: " + page.getCount().intValue());
         }
@@ -189,5 +226,22 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      */
     public List<Criterion> getCriteria() {
         return criteria;
+    }
+
+    public void addCriterion(Criterion criterion){
+        criteria.add(criterion);
+    }
+
+    /**
+     * The list of restrictions is initially empty.
+     *
+     * @return the restrictions
+     */
+    public List<Restriction<?>> getRestrictions() {
+        return restrictions;
+    }
+
+    public void addRestriction(Restriction<?> restriction){
+        restrictions.add(restriction);
     }
 }
