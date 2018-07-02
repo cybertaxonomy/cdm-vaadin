@@ -97,6 +97,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         super();
         this.type = type;
         this.service = service;
+
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
     }
 
 
@@ -110,6 +112,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         this.service = service;
         this.matchMode = matchMode;
         this.orderHints = orderHints;
+
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
     }
 
     /**
