@@ -119,12 +119,15 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<V> findEntities(int firstRow, String filter) {
 
+        checkNotMixed();
+
         Integer pageIndex = firstRow / pageSize;
         Pager<V> page;
-        if(!restrictions.isEmpty() && criteria.isEmpty()){
+        if(!restrictions.isEmpty()){
             page = (Pager<V>) service.findByTitleWithRestrictions(
                     type,
                     filter,
@@ -135,7 +138,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     orderHints,
                     initStrategy
                     );
-        } else if(restrictions.isEmpty() && !criteria.isEmpty()){
+        } else {
             page = (Pager<V>) service.findByTitle(
                     type,
                     filter,
@@ -146,10 +149,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     orderHints,
                     initStrategy
                     );
-        } else {
-            // this will never be reaced sind the size() method is always called before.
-            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
         }
+
         if(logger.isTraceEnabled()){
             logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
         }
@@ -159,11 +160,14 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public int size(String filter) {
 
+        checkNotMixed();
+
         Pager<V> page;
-        if(!restrictions.isEmpty() && criteria.isEmpty()){
+        if(!restrictions.isEmpty()){
             page = (Pager<V>) service.findByTitleWithRestrictions(
                     type,
                     filter,
@@ -174,7 +178,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     null,
                     null
                   );
-        } else if(restrictions.isEmpty() && !criteria.isEmpty()){
+        } else {
             page = (Pager<V>) service.findByTitle(
                     type,
                     filter,
@@ -185,14 +189,21 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     null,
                     null
                   );
-        } else {
-            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
         }
 
         if(logger.isTraceEnabled()){
             logger.trace("size() -  count: " + page.getCount().intValue());
         }
         return page.getCount().intValue();
+    }
+
+    /**
+     *
+     */
+    protected void checkNotMixed() {
+        if(!restrictions.isEmpty() && !criteria.isEmpty()){
+            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
+        }
     }
 
     /**
