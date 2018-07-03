@@ -24,6 +24,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -31,13 +32,17 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.vaadin.component.PagerComponent;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -62,6 +67,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private CssLayout listContainer;
 
     private HorizontalLayout toolBar;
+
+    private PagerComponent pagerTop;
 
     private Label filterInstructionLabel = new Label("Filter the registrations by");
 
@@ -111,7 +118,19 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
 
         toolBar.setSpacing(true);
+        toolBar.iterator().forEachRemaining( c -> c.addStyleName(ValoTheme.LABEL_TINY));
         addContentComponent(toolBar, null);
+
+        pagerTop =  new PagerComponent(new PagerComponent.PagerClickListener() {
+
+            @Override
+            public void pageIndexClicked(Integer index) {
+                getViewEventBus().publish(ListViewBean.this, new PagingEvent(ListViewBean.this, index));
+
+            }
+        });
+        addContentComponent(pagerTop, null);
+        ((VerticalLayout)getLayout()).setComponentAlignment(pagerTop, Alignment.MIDDLE_CENTER);
 
         listContainer = new CssLayout();
         listContainer.setId("registration-list");
@@ -150,6 +169,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public void populate(Pager<RegistrationDTO> regDtoPager) {
 
         ArrayList<RegistrationDTO> regDtos = new ArrayList<RegistrationDTO>(regDtoPager.getRecords());
+
+        pagerTop.updatePager(regDtoPager);
 
         populateList(regDtos);
     }

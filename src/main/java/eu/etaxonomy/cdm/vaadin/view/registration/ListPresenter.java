@@ -8,15 +8,19 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.navigator.Navigator;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.TextField;
@@ -30,9 +34,11 @@ import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 /**
  *
@@ -55,6 +61,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
 
+    private Integer pageIndex = 0;
+    private Integer pageSize = null;
+
     /**
      * @return the workingSetService
      */
@@ -66,11 +75,21 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     @Override
     public void handleViewEntered() {
 
-        if(getNavigationManager().getCurrentViewParameters().get(0).equals(ListView.Mode.inProgress.name())){
+        List<String> viewParameters = getNavigationManager().getCurrentViewParameters();
+        if(viewParameters.get(0).equals(ListView.Mode.inProgress.name())){
             getView().setViewMode(ListViewBean.Mode.inProgress);
             getView().getStatusFilter().setVisible(false);
         } else {
             getView().setViewMode(ListViewBean.Mode.all);
+        }
+        if(viewParameters.size() > 1){
+            // expecting the second param to be the page index
+            try {
+                pageIndex = Integer.parseInt(viewParameters.get(1));
+            } catch (NumberFormatException e) {
+                // only log and display the page 0
+                logger.error("Invalid page index parameter " + viewParameters.get(1) + " in " + ((Navigator)getNavigationManager()).getState());
+            }
         }
 
         CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
@@ -129,8 +148,8 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 includeStatus,
                 StringUtils.trimToNull(identifierFilter),
                 StringUtils.trimToNull(nameFilter),
-                null,
-                null);
+                pageSize,
+                pageIndex);
         return dtoPager;
     }
 
@@ -168,6 +187,22 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     @EventBusListenerMethod
     public void onUpdateResultsEvent(UpdateResultsEvent event){
         getView().populate(pageRegistrations(event.getField(), event.getNewText()));
+    }
+
+    @EventBusListenerMethod
+    public void onPagingEvent(PagingEvent event){
+
+        if(!event.getSourceView().equals(getView())){
+            return;
+        }
+        String viewName = getNavigationManager().getCurrentViewName();
+        List<String> viewNameParams = new ArrayList(getNavigationManager().getCurrentViewParameters());
+        if(viewNameParams.size() > 1){
+            viewNameParams.set(1, event.getPageIndex().toString());
+        } else {
+            viewNameParams.add(event.getPageIndex().toString());
+        }
+        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(viewName, viewNameParams.toArray(new String[viewNameParams.size()])));
     }
 
 }

@@ -41,6 +41,8 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.initializer.IBeanInitializer;
+import eu.etaxonomy.cdm.persistence.query.OrderHint;
+import eu.etaxonomy.cdm.persistence.query.OrderHint.SortOrder;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 
 /**
@@ -190,11 +192,17 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
             pageSize = PAGE_SIZE;
         }
 
-        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus,
-                identifierFilterPattern, taxonNameFilterPattern,
-                PAGE_SIZE, 0, null, REGISTRATION_INIT_STRATEGY);
+        List<OrderHint> orderHints = Arrays.asList(new OrderHint("identifier", SortOrder.ASCENDING));
+
+        Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, identifierFilterPattern, taxonNameFilterPattern,
+                PAGE_SIZE, pageIndex, orderHints , REGISTRATION_INIT_STRATEGY);
         List<Registration> registrations = pager.getRecords();
         Pager<RegistrationDTO> dtoPager = new DefaultPagerImpl(pager.getCurrentIndex(), pager.getCount(), pager.getPageSize(), makeDTOs(registrations));
+        if(logger.isDebugEnabled()){
+            logger.debug(String.format("pageDTOs() pageIndex: $1%d, pageSize: $2%d, includedStatus: $3%s, identifierFilterPattern: $4%s, taxonNameFilterPattern: $5%s",
+                    pageIndex, pageSize, includedStatus, identifierFilterPattern, taxonNameFilterPattern));
+            logger.debug("pageDTOs() result: " + pager.toString());
+        }
         return dtoPager;
     }
 

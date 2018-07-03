@@ -231,7 +231,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     }
 
     /**
-     * This method requires that the {@SpringView} annotation is used to ser the name of the <code>View</code>.
+     * This method requires that the {@SpringView} annotation is used to set the name of the <code>View</code>.
      *
      * @return the current view name or <code>null</code>
      */
