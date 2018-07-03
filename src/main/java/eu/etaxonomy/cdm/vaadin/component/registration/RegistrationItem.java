@@ -47,7 +47,6 @@ import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -79,8 +78,6 @@ public class RegistrationItem extends GridLayout {
     private static final int GRID_COLS = 3;
 
     private static final long serialVersionUID = -211003770452173644L;
-
-    private RegistrationTypeConverter regTypeConverter = new RegistrationTypeConverter();
 
     private AbstractView<?> parentView;
 
