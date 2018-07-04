@@ -9,7 +9,10 @@
 package eu.etaxonomy.cdm.service;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +40,7 @@ import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthorityParsingException;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.ICdmPermissionEvaluator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -344,6 +349,33 @@ public class CdmUserHelper extends VaadinUserHelper implements Serializable {
             logger.debug("security context refreshed with user " + username);
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<CdmAuthority> findUserPermissions(CdmBase cdmEntity, EnumSet<CRUD> crud) {
+        Set<CdmAuthority> matches = new HashSet<>();
+        CdmPermissionClass permissionClass = CdmPermissionClass.getValueOf(cdmEntity);
+        Collection<? extends GrantedAuthority> authorities = getAuthentication().getAuthorities();
+        for(GrantedAuthority ga : authorities){
+            try {
+                CdmAuthority cdmAuthority = CdmAuthority.fromGrantedAuthority(ga);
+                if(cdmAuthority.getPermissionClass().equals(permissionClass)){
+                    if(cdmAuthority.getOperation().containsAll(crud)){
+                        if(cdmAuthority.hasTargetUuid() && cdmAuthority.getTargetUUID().equals(cdmEntity.getUuid())){
+                            matches.add(cdmAuthority);
+                        } else {
+                            matches.add(cdmAuthority);
+                        }
+                    }
+                }
+            } catch (CdmAuthorityParsingException e) {
+                continue;
+            }
+        }
+        return matches;
     }
 
 }

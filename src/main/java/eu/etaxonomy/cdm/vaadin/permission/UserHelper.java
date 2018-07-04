@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.permission;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.UUID;
 
@@ -123,6 +124,15 @@ public interface UserHelper {
      * <code>null</code> in case the operation failed of if the user was already granted with this authority.
      */
     public CdmAuthority createAuthorityForCurrentUser(CdmBase cdmEntity, EnumSet<CRUD> crud, String property);
+
+    /**
+     * Scans the currently authenticated user for CdmAuthorities which match the given parameters
+     *
+     * @param cdmEntity
+     * @param crud
+     * @return
+     */
+    public Collection<CdmAuthority> findUserPermissions(CdmBase cdmEntity, EnumSet<CRUD> crud);
 
     /**
      * @param newAuthority
