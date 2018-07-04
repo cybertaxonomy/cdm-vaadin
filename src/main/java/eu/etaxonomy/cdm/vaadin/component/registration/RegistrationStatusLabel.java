@@ -20,7 +20,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
  * @since Mar 30, 2017
  *
  */
-public class RegistrationStateLabel extends Label {
+public class RegistrationStatusLabel extends Label {
 
 
     /**
@@ -31,7 +31,7 @@ public class RegistrationStateLabel extends Label {
     /**
     *
     */
-   public RegistrationStateLabel update(RegistrationStatus status) {
+   public RegistrationStatusLabel update(RegistrationStatus status) {
 
        setValue(StringUtils.capitalize((status.name().toLowerCase())));
        addStyleName("registration-status registration-status-" + status.name());

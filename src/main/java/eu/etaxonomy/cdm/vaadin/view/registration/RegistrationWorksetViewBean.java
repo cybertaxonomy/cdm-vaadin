@@ -58,7 +58,7 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
@@ -386,7 +386,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 );
         messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
-        RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
+        RegistrationStatusLabel stateLabel = new RegistrationStatusLabel().update(dto.getStatus());
         Label submitterLabel = new Label(dto.getSubmitterUserName());
         submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
         submitterLabel.setIcon(FontAwesome.USER);

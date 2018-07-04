@@ -87,7 +87,7 @@ public class RegistrationItem extends GridLayout {
 
     // --------------------------------------------------
 
-    private RegistrationStateLabel stateLabel = new RegistrationStateLabel();
+    private RegistrationStatusLabel stateLabel = new RegistrationStatusLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
