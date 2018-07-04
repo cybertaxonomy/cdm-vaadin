@@ -11,7 +11,9 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -26,6 +28,7 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -34,6 +37,7 @@ import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
 import eu.etaxonomy.cdm.api.service.dto.EntityReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
@@ -59,7 +63,10 @@ import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusSelect;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
@@ -209,6 +216,42 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
+        // TODO currently cannot specify type more precisely, see AbstractSelect
+        // FIXME externalize into class file!!!!!!!!!!!!
+        getView().setStatusComponentInstantiator(new RegistrationStatusFieldInstantiator<Object>(){
+
+            private static final long serialVersionUID = 7099181280977511048L;
+
+            @Override
+            public AbstractField<Object> create(RegistrationDTO regDto) {
+
+                CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
+                // submitters have GrantedAuthorities like REGISTRATION(PREPARATION).[UPDATE]{ab4459eb-3b96-40ba-bfaa-36915107d59e}
+                UserHelper userHelper = UserHelper.fromSession();
+                Set<RegistrationStatus> availableStatus = new HashSet<>();
+
+                boolean canChangeStatus = userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
+                availableStatus.add(regDto.getStatus());
+                if(canChangeStatus){
+                    if(userHelper.userIsAdmin()){
+                        availableStatus.addAll(Arrays.asList(RegistrationStatus.values()));
+                    } else {
+                        availableStatus.addAll(RegistrationStatusTransitions.possibleTransitions(regDto.getStatus()));
+                    }
+                }
+
+                RegistrationStatusSelect select = new RegistrationStatusSelect(null, selectFieldFactory.buildBeanItemContainer(
+                        RegistrationStatus.class,
+                        availableStatus.toArray(new RegistrationStatus[availableStatus.size()]))
+                        );
+                select.addValueChangeListener(e -> saveRegistrationStatusChange(regDto.getUuid(), e.getProperty().getValue()));
+                select.setEnabled(canChangeStatus);
+                select.setNullSelectionAllowed(false);
+                return select;
+            }
+
+
+        });
         loadWorkingSet(getView().getCitationUuid());
         applyWorkingset();
 
@@ -293,6 +336,18 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(workingset == null || workingset.getCitationUuid() == null){
             Reference citation = getRepo().getReferenceService().find(referenceUuid);
             workingset = new RegistrationWorkingSet(citation);
+        }
+    }
+
+    private void saveRegistrationStatusChange(UUID uuid, Object value) {
+        Registration reg = getRepo().getRegistrationService().load(uuid);
+        if(value != null && value instanceof RegistrationStatus && !Objects.equals(value, reg.getStatus())){
+            reg.setStatus((RegistrationStatus)value);
+            getRegistrationStore().saveBean(reg, (AbstractView)getView());
+            refreshView(true);
+        } else {
+            // only log an error here!
+            logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value.toString(), "NULL"));
         }
     }
 

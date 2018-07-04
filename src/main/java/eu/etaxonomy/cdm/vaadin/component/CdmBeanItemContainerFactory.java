@@ -19,6 +19,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
+import eu.etaxonomy.cdm.model.common.IEnumTerm;
 import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
@@ -110,6 +111,17 @@ public class CdmBeanItemContainerFactory {
 
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type) {
         return buildBeanItemContainer(type, null);
+    }
+
+    /**
+     * @param values
+     * @return
+     */
+    public <T extends IEnumTerm<T>> BeanItemContainer<T> buildBeanItemContainer(Class<T> termType, T ... enumTerms) {
+        BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termType);
+        List<T> termList = Arrays.asList(enumTerms);
+        termItemContainer.addAll(termList);
+        return termItemContainer;
     }
 
 

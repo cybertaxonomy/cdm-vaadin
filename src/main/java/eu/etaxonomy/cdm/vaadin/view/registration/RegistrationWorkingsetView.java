@@ -19,6 +19,7 @@ import com.vaadin.ui.Button;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -105,6 +106,8 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      * @return
      */
     Map<UUID, RegistrationDetailsItem> getRegistrationItemMap();
+
+    void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator);
 
 
 }

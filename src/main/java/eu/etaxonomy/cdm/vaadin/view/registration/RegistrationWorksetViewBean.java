@@ -31,8 +31,10 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -58,6 +60,7 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
@@ -134,6 +137,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * uses the registrationId as key
      */
     private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
+
+    private RegistrationStatusFieldInstantiator statusFieldInstantiator;
+
 
     public RegistrationWorksetViewBean() {
         super();
@@ -386,12 +392,19 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 );
         messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
-        RegistrationStatusLabel stateLabel = new RegistrationStatusLabel().update(dto.getStatus());
+        Component statusComponent;
+        if(statusFieldInstantiator != null){
+            AbstractField<Object> statusField = statusFieldInstantiator.create(dto);
+            statusField.setValue(dto.getStatus());
+            statusComponent = statusField;
+        } else {
+            statusComponent = new RegistrationStatusLabel().update(dto.getStatus());
+        }
         Label submitterLabel = new Label(dto.getSubmitterUserName());
         submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
         submitterLabel.setIcon(FontAwesome.USER);
         submitterLabel.setContentMode(ContentMode.HTML);
-        CssLayout stateAndSubmitter = new CssLayout(stateLabel, submitterLabel);
+        CssLayout stateAndSubmitter = new CssLayout(statusComponent, submitterLabel);
 
 
         if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
@@ -585,6 +598,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     public Map<UUID, RegistrationDetailsItem> getRegistrationItemMap(){
         return Collections.unmodifiableMap(registrationItemMap);
+    }
+
+
+    /**
+     * @param statusFieldInstantiator the statusFieldInstantiator to set
+     */
+    @Override
+    public void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator) {
+        this.statusFieldInstantiator = statusComponentInstantiator;
     }
 
 
