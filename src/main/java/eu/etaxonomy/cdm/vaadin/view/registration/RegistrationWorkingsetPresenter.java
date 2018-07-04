@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,9 +106,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 @ViewScope
 public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> {
 
-    /**
-     *
-     */
+    private static final Logger logger = Logger.getLogger(RegistrationWorkingsetPresenter.class);
+
     private static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(
             "$",
             "blockedBy",
@@ -341,12 +341,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private void saveRegistrationStatusChange(UUID uuid, Object value) {
         Registration reg = getRepo().getRegistrationService().load(uuid);
-        if(value != null && value instanceof RegistrationStatus && !Objects.equals(value, reg.getStatus())){
-            reg.setStatus((RegistrationStatus)value);
-            getRegistrationStore().saveBean(reg, (AbstractView)getView());
-            refreshView(true);
+        if(value != null && value instanceof RegistrationStatus){
+            if(!Objects.equals(value, reg.getStatus())){
+                reg.setStatus((RegistrationStatus)value);
+                getRegistrationStore().saveBean(reg, (AbstractView)getView());
+                refreshView(true);
+            }
         } else {
-            // only log an error here!
+            // only log here as error
             logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value.toString(), "NULL"));
         }
     }

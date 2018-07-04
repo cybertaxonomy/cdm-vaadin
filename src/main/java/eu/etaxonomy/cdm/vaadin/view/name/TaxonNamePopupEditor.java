@@ -137,6 +137,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
+    private int genusOrUninomialRow;
+
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
      *
@@ -301,12 +303,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         protectedNameCacheField = addSwitchableTextField("Name cache", "nameCache", "protectedNameCache", 0, row, GRID_COLS-1, row);
         protectedNameCacheField.setWidth(100, Unit.PERCENTAGE);
         row++;
-        if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
-            genusOrUninomialField = addTextField("Genus or uninomial", "genusOrUninomial", 0, row, 1, row);
-        } else {
-            genusOrUninomialField = new LazyComboBox<String>(String.class);
-            addField(genusOrUninomialField, "genusOrUninomial", 0, row, 1, row);
-        }
+        genusOrUninomialRow = row;
+        genusOrUninomialField = addTextField("Genus or uninomial", "genusOrUninomial", 0, row, 1, row);
         genusOrUninomialField.setWidth(200, Unit.PIXELS);
         infraGenericEpithetField = addTextField("Infrageneric epithet", "infraGenericEpithet", 2, row, 3, row);
         infraGenericEpithetField.setWidth(200, Unit.PIXELS);
@@ -701,6 +699,18 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = isSpeciesOrBelow && BooleanUtils.isTrue(validationToggle.getValue());
+
+        if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
+            if(isSpeciesOrBelow) {
+                if(TextField.class.isAssignableFrom(genusOrUninomialField.getClass())){
+                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new LazyComboBox<String>(String.class), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                }
+            } else {
+                if(LazyComboBox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
+                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new TextFieldNFix(), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                }
+            }
+        }
 
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(rank.isInfraSpecific()) {
