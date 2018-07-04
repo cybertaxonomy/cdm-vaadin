@@ -208,7 +208,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         // NOTE: saveOrUpdate is really needed here even if we to a merge before
         // repo.getCommonService().saveOrUpdate(mergedBean);
         session.flush();
-        commitTransction();
+        commitTransaction();
 
         return new EntityChangeEvent(mergedBean, changeEventType, view);
     }
@@ -227,7 +227,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         DeleteResult result = service.delete(bean);
         if (result.isOk()) {
             getSession().flush();
-            commitTransction();
+            commitTransaction();
             logger.trace(this._toString() + ".deleteBean - transaction comitted");
             return new EntityChangeEvent(bean, Type.REMOVED, view);
         } else {
@@ -273,7 +273,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     }
 
 
-    protected void commitTransction() {
+    protected void commitTransaction() {
 
 //        if(conversationHolder != null){
 //            conversationHolder.commit();
