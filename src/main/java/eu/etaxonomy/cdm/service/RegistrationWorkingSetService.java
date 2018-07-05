@@ -35,6 +35,7 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
@@ -177,7 +178,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
     @Override
     public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex) {
 
-        return pageDTOs(null, null, null, null, pageSize, pageIndex);
+        return pageDTOs(null, null, null, null, null, pageSize, pageIndex);
     }
 
     /**
@@ -185,7 +186,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
      */
     @Override
     public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
-            String identifierFilterPattern, String taxonNameFilterPattern,
+            String identifierFilterPattern, String taxonNameFilterPattern, Set<TypeDesignationStatusBase> typeStatusFilter,
             Integer pageSize, Integer pageIndex) {
 
         if(pageSize == null){
@@ -195,7 +196,7 @@ public class RegistrationWorkingSetService implements IRegistrationWorkingSetSer
         List<OrderHint> orderHints = Arrays.asList(new OrderHint("identifier", SortOrder.ASCENDING));
 
         Pager<Registration> pager = repo.getRegistrationService().page(submitter, includedStatus, identifierFilterPattern, taxonNameFilterPattern,
-                PAGE_SIZE, pageIndex, orderHints , REGISTRATION_INIT_STRATEGY);
+                typeStatusFilter, PAGE_SIZE, pageIndex , orderHints, REGISTRATION_INIT_STRATEGY);
         List<Registration> registrations = pager.getRecords();
         Pager<RegistrationDTO> dtoPager = new DefaultPagerImpl(pager.getCurrentIndex(), pager.getCount(), pager.getPageSize(), makeDTOs(registrations));
         if(logger.isDebugEnabled()){

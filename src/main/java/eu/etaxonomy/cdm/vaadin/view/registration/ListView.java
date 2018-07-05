@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.List;
 import java.util.UUID;
 
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
@@ -77,6 +78,8 @@ public interface ListView extends ApplicationView<ListPresenter>{
     Mode getViewMode();
 
     public RegistrationItem getRegistrationItem(UUID registrationUuid);
+
+    AbstractSelect getStatusTypeFilter();
 
 
 }

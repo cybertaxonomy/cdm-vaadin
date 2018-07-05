@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
@@ -27,8 +28,11 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -37,6 +41,7 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -99,6 +104,16 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             getView().getSubmitterFilter().setItemCaptionPropertyId("username");
         }
 
+        List<UUID> typeDesignationStatusUUIDS = new ArrayList<>();
+        typeDesignationStatusUUIDS.addAll(RegistrationTermLists.NAME_TYPE_DESIGNATION_STATUS_UUIDS());
+        typeDesignationStatusUUIDS.addAll(RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
+        BeanItemContainer<DefinedTermBase> buildTermItemContainer = selectFieldFactory.buildTermItemContainer(typeDesignationStatusUUIDS);
+        getView().getStatusTypeFilter().setContainerDataSource(buildTermItemContainer);
+        for(DefinedTermBase dt : buildTermItemContainer.getItemIds()){
+            String classAbbreviation = dt instanceof SpecimenTypeDesignationStatus ? "ST" : "NT";
+            getView().getStatusTypeFilter().setItemCaption(dt, classAbbreviation + " - " + dt.getLabel());
+        }
+
         getView().populate(pageRegistrations(null, null));
     }
 
@@ -119,12 +134,14 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         } else {
             identifierFilter = getView().getIdentifierFilter().getValue();
         }
+
         String nameFilter;
         if(textFieldOverride != null && textFieldOverride == getView().getTaxonNameFilter()){
             nameFilter = alternativeText;
         } else {
             nameFilter = getView().getTaxonNameFilter().getValue();
         }
+
         User submitter = null;
         if(getView().getSubmitterFilter() != null){
             Object o = getView().getSubmitterFilter().getValue();
@@ -134,6 +151,12 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         } else {
             submitter = (User) authentication.getPrincipal();
         }
+
+        Set<TypeDesignationStatusBase> typeStatusFilter = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
+        if(typeStatusFilter.isEmpty()){
+            typeStatusFilter = null;
+        }
+
         EnumSet<RegistrationStatus> includeStatus = inProgressStatus;
         if(getView().getViewMode().equals(ListView.Mode.all)){
             includeStatus = null;
@@ -148,6 +171,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 includeStatus,
                 StringUtils.trimToNull(identifierFilter),
                 StringUtils.trimToNull(nameFilter),
+                typeStatusFilter ,
                 pageSize,
                 pageIndex);
         return dtoPager;

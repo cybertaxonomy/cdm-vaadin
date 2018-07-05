@@ -17,6 +17,7 @@ import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 
 /**
@@ -37,7 +38,7 @@ public interface IRegistrationWorkingSetService {
     public Pager<RegistrationDTO> pageDTOs(Integer pageSize, Integer pageIndex);
 
     public Pager<RegistrationDTO> pageDTOs(User submitter, Collection<RegistrationStatus> includedStatus,
-            String identifierFilterPattern, String taxonNameFilterPattern,
+            String identifierFilterPattern, String taxonNameFilterPattern, Set<TypeDesignationStatusBase> typeStatusFilter,
             Integer pageSize, Integer pageIndex);
 
     /**

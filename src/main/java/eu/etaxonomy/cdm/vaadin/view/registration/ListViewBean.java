@@ -24,6 +24,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -72,7 +73,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private Label filterInstructionLabel = new Label("Filter the registrations by");
 
-    private ListSelect statusFilter = null;
+    private ListSelect registrationStatusFilter = null;
 
     private ListSelect submitterFilter = null; // must be null, the presenter relies on this
 
@@ -81,6 +82,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private TextField taxonNameFilter = new TextFieldNFix("Name");
 
     private TextField referenceFilter = new TextFieldNFix("Publication");
+
+    private AbstractSelect statusTypeFilter;
 
     public ListViewBean() {
         super();
@@ -103,14 +106,20 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         }
 
         if(viewMode.equals(Mode.all)){
-            statusFilter = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
-            statusFilter.setNullSelectionAllowed(true);
-            statusFilter.setRows(1);
-            statusFilter.addValueChangeListener(e -> updateResults(null, null));
-            toolBar.addComponent(statusFilter);
+            registrationStatusFilter = new ListSelect("Registration status", Arrays.asList(RegistrationStatus.values()));
+            registrationStatusFilter.setNullSelectionAllowed(true);
+            registrationStatusFilter.setRows(1);
+            registrationStatusFilter.addValueChangeListener(e -> updateResults(null, null));
+            toolBar.addComponent(registrationStatusFilter);
         }
 
-        toolBar.addComponents(identifierFilter, taxonNameFilter);
+        statusTypeFilter = new ListSelect("Type Status");
+        ((ListSelect)statusTypeFilter).setRows(3);
+        statusTypeFilter.setMultiSelect(true);
+        statusTypeFilter.setNullSelectionAllowed(true);
+        statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
+
+        toolBar.addComponents(identifierFilter, taxonNameFilter, statusTypeFilter);
         int textChangeTimeOut = 200;
         identifierFilter.addTextChangeListener(e -> updateResults(identifierFilter, e.getText()));
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
@@ -268,11 +277,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     }
 
     /**
-     * @return the statusFilter
+     * @return the registrationStatusFilter
      */
     @Override
     public ListSelect getStatusFilter() {
-        return statusFilter;
+        return registrationStatusFilter;
     }
 
     /**
@@ -307,6 +316,14 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         }
         return null;
+    }
+
+    /**
+     * @return the statusTypeFilter
+     */
+    @Override
+    public AbstractSelect getStatusTypeFilter() {
+        return statusTypeFilter;
     }
 
 
