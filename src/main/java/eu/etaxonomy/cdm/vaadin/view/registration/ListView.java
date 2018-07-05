@@ -60,7 +60,7 @@ public interface ListView extends ApplicationView<ListPresenter>{
     /**
      * @return the statusFilter
      */
-    public ListSelect getStatusFilter();
+    public ListSelect getRegistrationStatusFilter();
 
     /**
      * @return the submitterFilter

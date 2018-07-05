@@ -25,7 +25,9 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
@@ -57,6 +59,11 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
 
+    /**
+     *
+     */
+    private static final String REGISTRATION_LIST_PRESENTER_SEARCH_FILTER = "registration.listPresenter.searchFilter";
+
     private static final EnumSet<RegistrationStatus> inProgressStatus = EnumSet.of(
             RegistrationStatus.PREPARATION,
             RegistrationStatus.CURATION,
@@ -87,7 +94,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         List<String> viewParameters = getNavigationManager().getCurrentViewParameters();
         if(viewParameters.get(0).equals(ListView.Mode.inProgress.name())){
             getView().setViewMode(ListViewBean.Mode.inProgress);
-            getView().getStatusFilter().setVisible(false);
+            getView().getRegistrationStatusFilter().setVisible(false);
         } else {
             getView().setViewMode(ListViewBean.Mode.all);
         }
@@ -124,7 +131,18 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             getView().getStatusTypeFilter().setItemCaption(dt, caption);
         }
 
+        loadSearchFilterFromSession();
+
         getView().populate(pageRegistrations(null, null));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onViewExit() {
+        preserveSearchFilterInSession();
+        super.onViewExit();
     }
 
     /**
@@ -138,58 +156,38 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         Authentication authentication = currentSecurityContext().getAuthentication();
 
         // prepare the filters
-        String identifierFilter;
+        SearchFilter filter = loadFilterFromView();
         if(textFieldOverride != null && textFieldOverride == getView().getIdentifierFilter()){
-            identifierFilter = alternativeText;
-        } else {
-            identifierFilter = getView().getIdentifierFilter().getValue();
+            filter.identifierPattern = alternativeText;
         }
 
-        String nameFilter;
         if(textFieldOverride != null && textFieldOverride == getView().getTaxonNameFilter()){
-            nameFilter = alternativeText;
-        } else {
-            nameFilter = getView().getTaxonNameFilter().getValue();
+            filter.namePattern = alternativeText;
         }
 
-        User submitter = null;
-        if(getView().getSubmitterFilter() != null){
-            Object o = getView().getSubmitterFilter().getValue();
-            if(o != null){
-                submitter = (User)o;
-            }
+       if(filter.typeStatus.isEmpty()){
+           filter.typeStatus = null;
         } else {
-            submitter = (User) authentication.getPrincipal();
-        }
-
-        Set<TypeDesignationStatusBase> typeStatusFilter = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
-        if(typeStatusFilter.isEmpty()){
-            typeStatusFilter = null;
-        } else {
-            if(typeStatusFilter.contains(NULL_TYPE_STATUS)){
+            if(filter.typeStatus.contains(NULL_TYPE_STATUS)){
                Set<TypeDesignationStatusBase> tmpSet = new HashSet<>();
-               tmpSet.addAll(typeStatusFilter);
+               tmpSet.addAll(filter.typeStatus);
                tmpSet.remove(NULL_TYPE_STATUS);
                tmpSet.add(null);
-               typeStatusFilter = tmpSet;
+               filter.typeStatus = tmpSet;
             }
         }
 
-        EnumSet<RegistrationStatus> includeStatus = inProgressStatus;
-        if(getView().getViewMode().equals(ListView.Mode.all)){
-            includeStatus = null;
-            Object o = getView().getStatusFilter().getValue();
-            if(o != null){
-                includeStatus = EnumSet.of((RegistrationStatus)o);
-            }
+
+        if(getView().getViewMode().equals(ListView.Mode.inProgress)){
+            filter.registrationStatus = inProgressStatus;
         }
 
         Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
-                submitter,
-                includeStatus,
-                StringUtils.trimToNull(identifierFilter),
-                StringUtils.trimToNull(nameFilter),
-                typeStatusFilter ,
+                filter.submitter,
+                filter.registrationStatus,
+                StringUtils.trimToNull(filter.identifierPattern),
+                StringUtils.trimToNull(filter.namePattern),
+                filter.typeStatus ,
                 pageSize,
                 pageIndex);
         return dtoPager;
@@ -245,6 +243,82 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             viewNameParams.add(event.getPageIndex().toString());
         }
         viewEventBus.publish(EventScope.UI, this, new NavigationEvent(viewName, viewNameParams.toArray(new String[viewNameParams.size()])));
+    }
+
+
+    /**
+     *
+     */
+    private void preserveSearchFilterInSession() {
+
+        SearchFilter filter = loadFilterFromView();
+        UI.getCurrent().getSession().setAttribute(REGISTRATION_LIST_PRESENTER_SEARCH_FILTER, filter);
+    }
+
+
+    /**
+     *
+     */
+    public SearchFilter loadFilterFromView() {
+        SearchFilter filter = new SearchFilter();
+        filter.identifierPattern = getView().getIdentifierFilter().getValue();
+        filter.namePattern = getView().getTaxonNameFilter().getValue();
+        if(getView().getSubmitterFilter() != null){
+            Object o = getView().getSubmitterFilter().getValue();
+            if(o != null){
+                filter.submitter = (User)o;
+            }
+        }
+        filter.typeStatus = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
+        EnumSet<RegistrationStatus> registrationStatusFilter = null;
+        Object o = getView().getRegistrationStatusFilter().getValue();
+        if(o != null){
+            filter.registrationStatus = EnumSet.of((RegistrationStatus)o);
+        }
+        return filter;
+    }
+
+
+    /**
+     *
+     */
+    private void loadSearchFilterFromSession() {
+        Object o = UI.getCurrent().getSession().getAttribute(REGISTRATION_LIST_PRESENTER_SEARCH_FILTER);
+        if(o != null){
+            SearchFilter filter = (SearchFilter)o;
+            getView().getIdentifierFilter().setValue(filter.identifierPattern);
+            getView().getTaxonNameFilter().setValue(filter.namePattern);
+            if(getView().getSubmitterFilter() != null){
+                getView().getSubmitterFilter().setValue(filter.submitter);
+            }
+            setSelectValue(getView().getStatusTypeFilter(), filter.typeStatus);
+            setSelectValue(getView().getRegistrationStatusFilter(), filter.registrationStatus);
+        }
+
+    }
+
+    /**
+     * @param statusTypeFilter
+     * @param typeStatus
+     */
+    private void setSelectValue(AbstractSelect select, Set<?> itemsToChoose) {
+
+        for(Object item : select.getContainerDataSource().getItemIds()){
+            if(item != null){
+                if(itemsToChoose.contains(item)){
+                    select.select(item);
+                }
+            }
+        }
+
+    }
+
+    class SearchFilter {
+        String identifierPattern;
+        String namePattern;
+        User submitter;
+        Set<TypeDesignationStatusBase> typeStatus;
+        Set<RegistrationStatus> registrationStatus;
     }
 
 }

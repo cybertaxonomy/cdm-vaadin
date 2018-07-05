@@ -280,7 +280,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
      * @return the registrationStatusFilter
      */
     @Override
-    public ListSelect getStatusFilter() {
+    public ListSelect getRegistrationStatusFilter() {
         return registrationStatusFilter;
     }
 
@@ -313,23 +313,15 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             if(registrationUuid.equals(item.getRegistrationUuid())){
                 return item;
             }
-
         }
         return null;
     }
 
     /**
-     * @return the statusTypeFilter
+     * @return the statusTypeFilter for the TypeDesignation.statusType
      */
     @Override
     public AbstractSelect getStatusTypeFilter() {
         return statusTypeFilter;
     }
-
-
-
-
-
-
-
 }
