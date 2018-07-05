@@ -118,6 +118,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         statusTypeFilter.setMultiSelect(true);
         statusTypeFilter.setNullSelectionAllowed(true);
         statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
+        statusTypeFilter.setDescription("Strg + Click to unselect");
 
         toolBar.addComponents(identifierFilter, taxonNameFilter, statusTypeFilter);
         int textChangeTimeOut = 200;
