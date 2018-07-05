@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
@@ -62,6 +64,8 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             );
 
     private static final long serialVersionUID = 5419947244621450665L;
+
+    protected TypeDesignationStatusBase<?> NULL_TYPE_STATUS = NameTypeDesignationStatus.NewInstance("- none -", "- none -", "- none -");
 
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
@@ -108,10 +112,16 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.NAME_TYPE_DESIGNATION_STATUS_UUIDS());
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
         BeanItemContainer<DefinedTermBase> buildTermItemContainer = selectFieldFactory.buildTermItemContainer(typeDesignationStatusUUIDS);
+        buildTermItemContainer.addItem(NULL_TYPE_STATUS);
         getView().getStatusTypeFilter().setContainerDataSource(buildTermItemContainer);
         for(DefinedTermBase dt : buildTermItemContainer.getItemIds()){
-            String classAbbreviation = dt instanceof SpecimenTypeDesignationStatus ? "ST" : "NT";
-            getView().getStatusTypeFilter().setItemCaption(dt, classAbbreviation + " - " + dt.getLabel());
+            String caption;
+            if(dt == NULL_TYPE_STATUS){
+                caption = "- NONE -";
+            } else {
+                caption = (dt instanceof SpecimenTypeDesignationStatus ? "ST" : "NT") + " - " + dt.getLabel();
+            }
+            getView().getStatusTypeFilter().setItemCaption(dt, caption);
         }
 
         getView().populate(pageRegistrations(null, null));
@@ -155,6 +165,14 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         Set<TypeDesignationStatusBase> typeStatusFilter = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
         if(typeStatusFilter.isEmpty()){
             typeStatusFilter = null;
+        } else {
+            if(typeStatusFilter.contains(NULL_TYPE_STATUS)){
+               Set<TypeDesignationStatusBase> tmpSet = new HashSet<>();
+               tmpSet.addAll(typeStatusFilter);
+               tmpSet.remove(NULL_TYPE_STATUS);
+               tmpSet.add(null);
+               typeStatusFilter = tmpSet;
+            }
         }
 
         EnumSet<RegistrationStatus> includeStatus = inProgressStatus;
