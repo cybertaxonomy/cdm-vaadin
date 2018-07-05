@@ -358,9 +358,14 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                                     }
                                     Partial pubdate = partial(td.getCitation().getDatePublished());
                                     if(pubdate != null){
-                                        if(youngestDate== null || comparePartials(youngestDate, pubdate)){
-                                            youngestDate = pubdate;
-                                            youngestPub = td.getCitation();
+
+                                        try {
+                                            if(youngestDate== null || earlierThanOther(youngestDate, pubdate)){
+                                                youngestDate = pubdate;
+                                                youngestPub = td.getCitation();
+                                            }
+                                        } catch (Exception e) {
+                                            logger.error("Error comparing " + youngestDate + " with" + pubdate , e);
                                         }
                                     }
                                 }
@@ -415,19 +420,25 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
      * @param pubdate
      * @return
      */
-    protected boolean comparePartials(Partial youngestDate, Partial pubdate) {
+    protected boolean earlierThanOther(Partial basePartial, Partial other) {
 
-        if(youngestDate.size() == pubdate.size()) {
-            return youngestDate.compareTo(pubdate) < 0;
+        if(basePartial == null || basePartial.getValues().length == 0){
+            return false;
         }
-        youngestDate = youngestDate.without(DateTimeFieldType.dayOfMonth());
-        pubdate = pubdate.without(DateTimeFieldType.dayOfMonth());
-        if(youngestDate.size() == pubdate.size()) {
-            return youngestDate.compareTo(pubdate) < 0;
+        if(other == null || other.getValues().length == 0){
+            return true;
         }
-        youngestDate = youngestDate.without(DateTimeFieldType.monthOfYear());
-        pubdate = pubdate.without(DateTimeFieldType.monthOfYear());
-        return youngestDate.compareTo(pubdate) < 0;
+        if(basePartial.size() == other.size()) {
+            return basePartial.compareTo(other) < 0;
+        }
+        basePartial = basePartial.without(DateTimeFieldType.dayOfMonth());
+        other = other.without(DateTimeFieldType.dayOfMonth());
+        if(basePartial.size() == other.size()) {
+            return basePartial.compareTo(other) < 0;
+        }
+        basePartial = basePartial.without(DateTimeFieldType.monthOfYear());
+        other = other.without(DateTimeFieldType.monthOfYear());
+        return basePartial.compareTo(other) < 0;
 
     }
 
