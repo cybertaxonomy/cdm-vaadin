@@ -152,9 +152,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      */
     private Pager<RegistrationDTO> pageRegistrations(TextField textFieldOverride, String alternativeText) {
 
-        // list all if the authenticated user is having the role CURATION of if it is an admin
-        Authentication authentication = currentSecurityContext().getAuthentication();
-
         // prepare the filters
         SearchFilter filter = loadFilterFromView();
         if(textFieldOverride != null && textFieldOverride == getView().getIdentifierFilter()){
@@ -176,7 +173,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                filter.typeStatus = tmpSet;
             }
         }
-
 
         if(getView().getViewMode().equals(ListView.Mode.inProgress)){
             filter.registrationStatus = inProgressStatus;
@@ -260,6 +256,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      *
      */
     public SearchFilter loadFilterFromView() {
+
+        Authentication authentication = currentSecurityContext().getAuthentication();
+
         SearchFilter filter = new SearchFilter();
         filter.identifierPattern = getView().getIdentifierFilter().getValue();
         filter.namePattern = getView().getTaxonNameFilter().getValue();
@@ -268,6 +267,8 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             if(o != null){
                 filter.submitter = (User)o;
             }
+        } else {
+            filter.submitter = (User) authentication.getPrincipal();
         }
         filter.typeStatus = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
         EnumSet<RegistrationStatus> registrationStatusFilter = null;
