@@ -54,7 +54,6 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
 
-    private Button personSelectConfirmButton = new Button("OK");
     private Button newPersonButton = new Button("New");
 
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
@@ -85,9 +84,6 @@ public class PersonField extends CompositeCustomField<Person> {
     private TextField suffixField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
 
-    private boolean onCommit = false;
-
-
 
     /**
      * @param caption
@@ -106,18 +102,15 @@ public class PersonField extends CompositeCustomField<Person> {
         root.setPrimaryStyleName(PRIMARY_STYLE);
 
         // select existing or create new person
-        addStyledComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        addStyledComponents(personSelect, newPersonButton);
         personSelect.addValueChangeListener(e -> {
             if(personSelect.getValue() != null){
-                personSelectConfirmButton.setEnabled(true);
+                setValue(personSelect.getValue());
+                personSelect.clear();
             }
         });
-        personSelectConfirmButton.setEnabled(false);
-        personSelectConfirmButton.addClickListener(e -> {
-            setValue(personSelect.getValue());
-            personSelect.clear();
-        });
-        selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
+
+        selectOrNewContainer.addComponents(personSelect, newPersonButton);
         newPersonButton.addClickListener(e -> createNewPerson());
 
         // edit person
@@ -391,10 +384,6 @@ public class PersonField extends CompositeCustomField<Person> {
         if(bean == null){
             return null;
         }
-       // boolean isUnsaved = bean.getId() == 0;
-//        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
-//            return null;
-//        }
         return bean;
     }
 

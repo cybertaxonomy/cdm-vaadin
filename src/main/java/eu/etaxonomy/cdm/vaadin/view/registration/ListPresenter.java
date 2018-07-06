@@ -303,10 +303,12 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      */
     private void setSelectValue(AbstractSelect select, Set<?> itemsToChoose) {
 
-        for(Object item : select.getContainerDataSource().getItemIds()){
-            if(item != null){
-                if(itemsToChoose.contains(item)){
-                    select.select(item);
+        if(itemsToChoose != null){
+            for(Object item : select.getContainerDataSource().getItemIds()){
+                if(item != null){
+                    if(itemsToChoose.contains(item)){
+                        select.select(item);
+                    }
                 }
             }
         }

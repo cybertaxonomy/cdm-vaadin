@@ -62,7 +62,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private ReloadableLazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new ReloadableLazyComboBox<TeamOrPersonBase>(TeamOrPersonBase.class);
 
-    private Button selectConfirmButton = new Button("OK");
     private Button removeButton = new Button(FontAwesome.REMOVE);
     private Button personButton = new Button(FontAwesome.USER);
     private Button teamButton = new Button(FontAwesome.USERS);
@@ -96,7 +95,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addStyledComponent(titleField);
         addStyledComponent(nomenclaturalTitleField);
         addStyledComponent(personsListEditor);
-        addStyledComponents(selectConfirmButton, removeButton, personButton, teamButton);
+        addStyledComponents(removeButton, personButton, teamButton);
 
 
         addSizedComponent(root);
@@ -118,40 +117,29 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     protected Component initContent() {
 
         teamOrPersonSelect.addValueChangeListener(e -> {
-            selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
-            selectConfirmButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
+            setValue(teamOrPersonSelect.getValue(), false, true);
+            updateToolBarButtonStates();
         });
         teamOrPersonSelect.setWidthUndefined();
 
-        selectConfirmButton.setEnabled(teamOrPersonSelect.getValue() != null);
-        selectConfirmButton.addClickListener(e -> {
-            // new entitiy being set, reset the readonly state
-//            resetReadOnlyComponents();
-//            getPropertyDataSource().setReadOnly(false);
-            setValue(teamOrPersonSelect.getValue(), false, true);
-            teamOrPersonSelect.clear();
-            updateToolBarButtonStates();
-        });
         removeButton.addClickListener(e -> {
-//            resetReadOnlyComponents();
-//            getPropertyDataSource().setReadOnly(false);
             setValue(null, false, true);
             updateToolBarButtonStates();
         });
         removeButton.setDescription("Remove");
 
         personButton.addClickListener(e -> {
-            setValue(Person.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            setValue(Person.NewInstance(), false, true);
 
         });
         personButton.setDescription("Add person");
         teamButton.addClickListener(e -> {
-            setValue(Team.NewInstance(), false, true); // FIXME add SelectField or open select dialog, use ToOneSelect field!!
+            setValue(Team.NewInstance(), false, true);
         });
         teamButton.setDescription("Add team");
 
         toolBar.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP + " toolbar");
-        toolBar.addComponents(teamOrPersonSelect, selectConfirmButton,  removeButton, personButton, teamButton);
+        toolBar.addComponents(teamOrPersonSelect,  removeButton, personButton, teamButton);
 
         compositeWrapper.setStyleName("margin-wrapper");
         compositeWrapper.addComponent(toolBar);
@@ -174,7 +162,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         boolean userCanCreate = UserHelper.fromSession().userHasPermission(Person.class, "CREATE");
 
         teamOrPersonSelect.setVisible(val == null);
-        selectConfirmButton.setVisible(val == null);
+        if(teamOrPersonSelect.getValue() != val){
+            teamOrPersonSelect.clear();
+        }
         removeButton.setVisible(val != null);
         personButton.setEnabled(userCanCreate && val == null);
         teamButton.setEnabled(userCanCreate && val == null);
@@ -256,11 +246,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
     }
 
-//    private void checkUserPermissions(TeamOrPersonBase<?> newValue) {
-//        boolean userCanEdit = UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
-//        setEnabled(userCanEdit);
-//        personsListEditor.setEnabled(userCanEdit);
-//    }
 
     /**
      * {@inheritDoc}
