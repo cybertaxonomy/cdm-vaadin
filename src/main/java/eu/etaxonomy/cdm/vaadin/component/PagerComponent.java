@@ -60,7 +60,7 @@ public class PagerComponent extends GridLayout {
             pagerComponents.add(button);
         }
 
-        if(pager.getCurrentIndex().intValue() != pager.getPagesAvailable()-1 ){
+        if(pager.getCurrentIndex() != pager.getPagesAvailable()-1){
             pagerComponents.add(pagerButton(pager.getCurrentIndex() + 1, null, FontAwesome.ANGLE_RIGHT));
             pagerComponents.add(pagerButton(pager.getPagesAvailable() - 1, null, FontAwesome.ANGLE_DOUBLE_RIGHT));
         }
