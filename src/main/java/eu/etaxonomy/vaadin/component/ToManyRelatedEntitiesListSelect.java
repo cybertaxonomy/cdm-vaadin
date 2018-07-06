@@ -308,8 +308,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         try {
             F field = newFieldInstance(val);
             field.addValueChangeListener(e -> {
-                updateValue();
-                fireValueChange(true);
+                if(!creatingFields){
+                    updateValue();
+                    fireValueChange(true);
+                }
             });
             Property ds = getPropertyDataSource();
             if(ds != null){
