@@ -350,6 +350,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * @param value
      */
     public void updateEditOrCreateButton(ButtonGroup buttonGroup, Object value) {
+
+        if(buttonGroup == null || buttonGroup.getEditOrCreateButton() == null){
+            return;
+        }
+
         ButtonFactory buttonStyle;
         if(value == null){
             buttonStyle = ButtonFactory.CREATE_NEW;
