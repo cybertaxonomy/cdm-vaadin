@@ -16,7 +16,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -32,6 +31,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
@@ -128,7 +128,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 labels.add(label);
             }
         }
-        addTypeDesignationButton = new Button(FontAwesome.PLUS);
+        addTypeDesignationButton = ButtonFactory.ADD_ITEM.createButton();
         addTypeDesignationButton.setDescription("Add a new type designation workingset.");
         addTypeDesignationButton.setVisible(!isRegistrationLocked && userHasAddPermission);
         addComponent(addTypeDesignationButton);

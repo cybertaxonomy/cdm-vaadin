@@ -268,7 +268,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 filter.submitter = (User)o;
             }
         } else {
-            filter.submitter = (User) authentication.getPrincipal();
+            if(authentication.getPrincipal() != null && authentication.getPrincipal() instanceof User){
+                filter.submitter = (User) authentication.getPrincipal();
+            }
         }
         filter.typeStatus = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
         EnumSet<RegistrationStatus> registrationStatusFilter = null;

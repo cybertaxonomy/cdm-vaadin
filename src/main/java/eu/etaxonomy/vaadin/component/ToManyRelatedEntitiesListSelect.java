@@ -29,6 +29,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.event.EntityEditorActionEvent;
 import eu.etaxonomy.vaadin.event.EntityEditorActionListener;
@@ -307,9 +308,13 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            ButtonGroup buttonGroup = new ButtonGroup(field);
+            updateEditOrCreateButton(buttonGroup, val);
             field.addValueChangeListener(e -> {
                 if(!creatingFields){
                     updateValue();
+                    Object value = e.getProperty().getValue();
+                    updateEditOrCreateButton(buttonGroup, value);
                     fireValueChange(true);
                 }
             });
@@ -326,7 +331,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 grid.setRows(grid.getRows() + 1);
             }
             grid.addComponent(field, GRID_X_FIELD, row);
-            grid.addComponent(buttonGroup(field), 1, row);
+            grid.addComponent(buttonGroup, 1, row);
             updateButtonStates();
             nestFieldGroup(field);
             row++;
@@ -340,42 +345,64 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return row;
     }
 
-    private Component buttonGroup(F field){
+    /**
+     * @param buttonGroup
+     * @param value
+     */
+    public void updateEditOrCreateButton(ButtonGroup buttonGroup, Object value) {
+        ButtonFactory buttonStyle;
+        if(value == null){
+            buttonStyle = ButtonFactory.CREATE_NEW;
+        } else {
+            buttonStyle = ButtonFactory.EDIT_ITEM;
+        }
+        buttonGroup.getEditOrCreateButton().setIcon(buttonStyle.getIcon());
+        buttonGroup.getEditOrCreateButton().setDescription(buttonStyle.getDescription());
+    }
 
-        CssLayout buttonGroup = new CssLayout();
-        Button add = new Button(FontAwesome.PLUS);
-        add.setDescription("Add item");
-        add.addClickListener(e -> addRowAfter(field));
+    class ButtonGroup extends CssLayout{
 
-        if(withEditButton){
-            Button edit = new Button(FontAwesome.EDIT);
-            edit.addClickListener(e -> editOrCreate(field));
-            buttonGroup.addComponent(edit);
-            addStyledComponents(edit);
+        private Button editOrCreate;
+
+        ButtonGroup (F field){
+
+            Button add = ButtonFactory.ADD_ITEM.createButton();
+            add.setDescription("Add item");
+            add.addClickListener(e -> addRowAfter(field));
+
+            if(withEditButton){
+                editOrCreate = ButtonFactory.EDIT_ITEM.createButton();
+                editOrCreate.addClickListener(e -> editOrCreate(field));
+                addComponent(editOrCreate);
+                addStyledComponents(editOrCreate);
+            }
+
+            Button remove = ButtonFactory.REMOVE_ITEM.createButton();
+            remove.setDescription("Remove item");
+            remove.addClickListener(e -> removeRow(field));
+
+
+            addComponent(add);
+            addComponent(remove);
+            addStyledComponents(add, remove);
+            if(isOrderedCollection){
+                Button moveUp = new Button(FontAwesome.ARROW_UP);
+                moveUp.setDescription("Move up");
+                moveUp.addClickListener(e -> moveRowUp(field));
+                Button moveDown = new Button(FontAwesome.ARROW_DOWN);
+                moveDown.addClickListener(e -> moveRowDown(field));
+                moveDown.setDescription("Move down");
+
+                addComponents(moveUp, moveDown);
+                addStyledComponents(moveUp, moveDown);
+            }
+            setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         }
 
-        Button remove = new Button(FontAwesome.MINUS);
-        remove.setDescription("Remove item");
-        remove.addClickListener(e -> removeRow(field));
-
-
-        buttonGroup.addComponent(add);
-        buttonGroup.addComponent(remove);
-        addStyledComponents(add, remove);
-        if(isOrderedCollection){
-            Button moveUp = new Button(FontAwesome.ARROW_UP);
-            moveUp.setDescription("Move up");
-            moveUp.addClickListener(e -> moveRowUp(field));
-            Button moveDown = new Button(FontAwesome.ARROW_DOWN);
-            moveDown.addClickListener(e -> moveRowDown(field));
-            moveDown.setDescription("Move down");
-
-            buttonGroup.addComponents(moveUp, moveDown);
-            addStyledComponents(moveUp, moveDown);
+        Button getEditOrCreateButton(){
+            return editOrCreate;
         }
-        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 
-        return buttonGroup;
     }
 
     /**

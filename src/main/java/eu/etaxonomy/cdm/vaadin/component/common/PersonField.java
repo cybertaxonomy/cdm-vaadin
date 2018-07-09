@@ -28,6 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
@@ -54,7 +55,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
 
-    private Button newPersonButton = new Button("New");
+    private Button newPersonButton = ButtonFactory.CREATE_NEW.createButton();
 
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
 

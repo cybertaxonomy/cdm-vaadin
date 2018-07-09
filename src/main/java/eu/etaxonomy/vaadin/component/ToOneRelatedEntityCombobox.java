@@ -14,12 +14,13 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.converter.Converter.ConversionException;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 
 /**
  * @author a.kohlbecker
@@ -39,8 +40,8 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     private ReloadableLazyComboBox<V> lazySelect;
 
-    private Button addButton = new Button(FontAwesome.PLUS);
-    private Button editButton  = new Button(FontAwesome.EDIT);
+    private Button addButton = ButtonFactory.CREATE_NEW.createButton();
+    private Button editButton = ButtonFactory.EDIT_ITEM.createButton();
 
     public ToOneRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;

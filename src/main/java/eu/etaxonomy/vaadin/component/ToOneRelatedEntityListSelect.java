@@ -11,13 +11,14 @@ package eu.etaxonomy.vaadin.component;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 
 /**
  * @author a.kohlbecker
@@ -37,8 +38,8 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
     private ListSelect select;
 
 
-    private Button addButton = new Button(FontAwesome.PLUS);
-    private Button editButton  = new Button(FontAwesome.EDIT);
+    private Button addButton = ButtonFactory.ADD_ITEM.createButton();
+    private Button editButton  = ButtonFactory.EDIT_ITEM.createButton();
 
     public ToOneRelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
         this.type = type;
