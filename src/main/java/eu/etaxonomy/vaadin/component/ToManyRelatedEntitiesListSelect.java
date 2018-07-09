@@ -79,6 +79,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     private static final int GRID_X_FIELD = 0;
 
+    private static final int GRID_X_BUTTON_GROUP = 1;
+
     private int GRID_COLS = 2;
 
     private GridLayout grid = new GridLayout(GRID_COLS, 1);
@@ -269,6 +271,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
             if(newRowNeeded){
                 addNewRow(row, data.get(row));
+            } else {
+                // update the editOrCreate buttons
+                ButtonGroup bg = (ToManyRelatedEntitiesListSelect<V, F>.ButtonGroup) grid.getComponent(GRID_X_BUTTON_GROUP, row);
+                updateEditOrCreateButton(bg, data.get(row));
             }
         }
         creatingFields = false;
@@ -331,7 +337,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 grid.setRows(grid.getRows() + 1);
             }
             grid.addComponent(field, GRID_X_FIELD, row);
-            grid.addComponent(buttonGroup, 1, row);
+            grid.addComponent(buttonGroup, GRID_X_BUTTON_GROUP, row);
             updateButtonStates();
             nestFieldGroup(field);
             row++;
@@ -351,7 +357,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     public void updateEditOrCreateButton(ButtonGroup buttonGroup, Object value) {
 
-        if(buttonGroup == null || buttonGroup.getEditOrCreateButton() == null){
+        if(!withEditButton || buttonGroup == null || buttonGroup.getEditOrCreateButton() == null){
             return;
         }
 
@@ -631,6 +637,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
+        if(getPropertyDataSource() != null) {
+            throw new RuntimeException("withEditButton must not be changed after the datasource is set.");
+        }
     }
 
     /**
