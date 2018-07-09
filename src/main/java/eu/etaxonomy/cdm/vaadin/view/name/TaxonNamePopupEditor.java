@@ -473,7 +473,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     protected TeamOrPersonBase inferBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
-        if(!basionyms.isEmpty()){
+        if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
             if(basionym.getCombinationAuthorship() != null){
                 return basionym.getCombinationAuthorship();
@@ -486,7 +486,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     protected TeamOrPersonBase inferExBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
-        if(!basionyms.isEmpty()){
+        if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
                 return basionym.getExCombinationAuthorship();
         }
