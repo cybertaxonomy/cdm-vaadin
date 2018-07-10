@@ -147,6 +147,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
                 cache.load(workingSetDto.getOwner());
+                cache.load(workingSetDto.getTypifiedName());
                 rootEntities.add(workingSetDto.getOwner());
             }
 

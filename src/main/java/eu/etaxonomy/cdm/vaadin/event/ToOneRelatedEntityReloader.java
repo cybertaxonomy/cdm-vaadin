@@ -48,7 +48,7 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
     @Override
     public void valueChange(ValueChangeEvent event) {
 
-        // TODO during the view intitialization this method is called twice with the same value.
+        // TODO during the view initialization this method is called twice with the same value.
         // for faster view initialization it might make sense to reduce this to only one call.
         // only one call should be sufficient since the same value object is use in both calls
         // whereas i observed that it is a hibnerate proxy during the first call,
