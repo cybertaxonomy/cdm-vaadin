@@ -57,6 +57,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -167,6 +168,25 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
 
+    public boolean canCreateRegistrationForName(TaxonName name) {
+        for(Registration reg : name.getRegistrations()){
+            if(minter.isFromOwnRegistration(reg.getIdentifier())){
+                return false;
+            }
+        }
+        Reference nomRef = name.getNomenclaturalReference();
+        UUID citationUuid = workingset.getCitationUuid();
+        // @formatter:off
+        return nomRef != null && (
+                // nomref matches
+                nomRef.getUuid().equals(citationUuid) ||
+                // nomref.inreference matches
+                (nomRef.getType() != null && nomRef.getType() == ReferenceType.Section && nomRef.getInReference() != null && nomRef.getInReference().getUuid().equals(citationUuid))
+                );
+        // @formatter:on
+    }
+
+
     /**
      * @param taxonNameId
      * @return
@@ -183,7 +203,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         Registration reg = Registration.NewInstance(
                 identifiers.getIdentifier(),
                 identifiers.getLocalId(),
-                taxonNameUuid != null ? getRepo().getNameService().find(taxonNameUuid) : null,
+                taxonNameUuid != null ? getRepo().getNameService().load(taxonNameUuid, Arrays.asList("nomenclaturalReference.inReference")) : null,
                 null);
         Authentication authentication = currentSecurityContext().getAuthentication();
         reg.setSubmitter((User)authentication.getPrincipal());
@@ -269,7 +289,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     protected void activateComboboxes() {
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 getRepo().getNameService());
-        // pagingProvider.addRestriction(new Restriction<>("registrations.identifier", true, MatchMode.BEGINNING, "http://phycobank.org/"));
+        pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference"));
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
@@ -511,12 +531,23 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         getView().getAddExistingNameCombobox().commit();
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
         if(typifiedName != null){
-            Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
+            boolean reloadWorkingSet = false;
             Reference citation = getRepo().getReferenceService().find(workingset.getCitationUuid());
-            newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
+            if(event.getType() == ExistingNameRegistrationType.NAME_TYPIFICATION && canCreateRegistrationForName(typifiedName)){
+                Registration newRegistrationWithExistingName = createNewRegistrationForName(typifiedName.getUuid());
+                newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
+                reloadWorkingSet = true;
+            } else {
+                // case: ExistingNameRegistrationType.TYPIFICATION_ONLY
+                Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
+                newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
+                Registration blockingRegistration = createNewRegistrationForName(typifiedName.getUuid());
+                newRegistrationWithExistingName.getBlockedBy().add(blockingRegistration);
+            }
             workingset.add(newRegistrationDTOWithExistingName);
             // tell the view to update the workingset
-            getView().setWorkingset(workingset);
+//            getView().setWorkingset(workingset);
+            refreshView(reloadWorkingSet);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
             getView().getAddExistingNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
         } else {

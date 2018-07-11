@@ -109,5 +109,4 @@ public interface RegistrationWorkingsetView extends ApplicationView{
 
     void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator);
 
-
 }

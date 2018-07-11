@@ -39,6 +39,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
@@ -124,6 +125,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private Button addExistingNameButton;
 
+    private ListSelect existingNameRegistrationTypeSelect;
+
     private RegistrationItem workingsetHeader;
 
     private Panel registrationListPanel;
@@ -139,7 +142,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
 
     private RegistrationStatusFieldInstantiator statusFieldInstantiator;
-
 
     public RegistrationWorksetViewBean() {
         super();
@@ -235,7 +237,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.setColumnExpandRatio(1, 1f);
 
         registrationItemMap.clear();
-        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 2);
+        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 3);
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
             row = putRegistrationListComponent(row, dto);
@@ -249,19 +251,53 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton.addClickListener(
                 e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
 
+        existingNameRegistrationTypeSelect = new ListSelect(null, EnumSet.allOf(ExistingNameRegistrationType.class));
+        existingNameRegistrationTypeSelect.setRows(1);
+        existingNameRegistrationTypeSelect.setNullSelectionAllowed(true);
+        existingNameRegistrationTypeSelect.setEnabled(false);
         addExistingNameButton = new Button("existing name:");
-        addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
-                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(citationUuid, RegistrationWorkingsetAction.Action.start))
-                );
+                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(
+                        citationUuid,
+                        RegistrationWorkingsetAction.Action.start,
+                        (ExistingNameRegistrationType)existingNameRegistrationTypeSelect.getValue())
+                )
+             );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(
-                e -> addExistingNameButton.setEnabled(e.getProperty().getValue() != null)
+                e -> {
+                    boolean selectionNotEmpty = e.getProperty().getValue() != null;
+                    addExistingNameButton.setEnabled(selectionNotEmpty);
+                    existingNameRegistrationTypeSelect.setEnabled(selectionNotEmpty);
+                    if(selectionNotEmpty){
+                        TaxonName name = (TaxonName)e.getProperty().getValue();
+                        if(getPresenter().canCreateRegistrationForName(name)){
+                            existingNameRegistrationTypeSelect.setValue(ExistingNameRegistrationType.NAME_TYPIFICATION);
+                            existingNameRegistrationTypeSelect.setEnabled(true);
+                            existingNameRegistrationTypeSelect.setNullSelectionAllowed(false);
+                        } else {
+                            existingNameRegistrationTypeSelect.setValue(ExistingNameRegistrationType.TYPIFICATION_ONLY);
+                            existingNameRegistrationTypeSelect.setEnabled(false);
+                        }
+                    } else {
+                        existingNameRegistrationTypeSelect.setNullSelectionAllowed(true);
+                        existingNameRegistrationTypeSelect.clear();
+                        existingNameRegistrationTypeSelect.setEnabled(false);
+
+                    }
+                }
                 );
 
-        HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel_1, addNewNameRegistrationButton, addRegistrationLabel_2, addExistingNameButton, existingNameCombobox);
+        HorizontalLayout buttonContainer = new HorizontalLayout(
+                addRegistrationLabel_1,
+                addNewNameRegistrationButton,
+                addRegistrationLabel_2,
+                addExistingNameButton,
+                existingNameCombobox,
+                existingNameRegistrationTypeSelect
+                );
         buttonContainer.setSpacing(true);
 //        buttonContainer.setWidth(100, Unit.PERCENTAGE);
         buttonContainer.setComponentAlignment(addRegistrationLabel_1, Alignment.MIDDLE_LEFT);
@@ -271,11 +307,19 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.addComponent(buttonContainer, 0, row, COL_INDEX_BUTTON_GROUP, row);
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
+        row++;
+        Label hint = new Label(
+                "For most names that already exist in the system it is only possible to create a registration covering type designations. "
+                + "Only in those rare cases where the citation of this workingset and the nomenclatural reference of a name are the same it is possible to create a registration covering the name also. "
+                + "In all other cases please choose <a href=\"registration#!regStart\">\"New\"</a> from the main menu and start a registration for the nomenclatural reference of the name to be registered.",
+                ContentMode.HTML);
+        registrationsGrid.addComponent(hint, 0, row, COL_INDEX_BUTTON_GROUP, row);
+        registrationsGrid.setComponentAlignment(hint, Alignment.MIDDLE_RIGHT);
+
         Panel namesTypesPanel = new Panel(registrationsGrid);
         namesTypesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
         return namesTypesPanel;
     }
-
 
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
