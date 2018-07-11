@@ -453,19 +453,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(field.getValue() == null
-                        || field.getValue() != null && testEditButtonPermission(field.getValue()));
+                editCreateButton.setEnabled(!isReadOnly() && (field.getValue() == null
+                        || field.getValue() != null && testEditButtonPermission(field.getValue())));
             }
             // add
-            buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
+            buttonGroup.getComponent(addButtonIndex).setEnabled(!isReadOnly() && (isLast || isOrderedCollection));
             // remove
             // can be always true, removing the last entry causes an new empty entry to be added.
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(true);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(!isReadOnly());
             // up
             if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
-                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
+                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isReadOnly() && !isFirst);
                 // down
-                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);
+                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isReadOnly()  && !isLast);
             }
         }
     }

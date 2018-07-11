@@ -546,7 +546,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
             workingset.add(newRegistrationDTOWithExistingName);
             // tell the view to update the workingset
-//            getView().setWorkingset(workingset);
             refreshView(reloadWorkingSet);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
             if(newRegistrationDTOWithExistingName.registration().getName() == null){
