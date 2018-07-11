@@ -549,7 +549,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 //            getView().setWorkingset(workingset);
             refreshView(reloadWorkingSet);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
-            getView().getAddExistingNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
+            if(newRegistrationDTOWithExistingName.registration().getName() == null){
+                getView().getAddExistingNameCombobox().setEnabled(false);
+                getView().getAddNewNameRegistrationButton().setEnabled(false);
+                getView().getAddNewNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
+                getView().getAddExistingNameCombobox().setDescription("You first need to add a type designation to the previously created registration.");
+                getView().getAddExistingNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
+            }
         } else {
             logger.error("Seletced name is NULL");
         }
