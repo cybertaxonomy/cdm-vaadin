@@ -187,8 +187,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private void updateValue() {
         List<V> nestedValues = getValueFromNestedFields();
         List<V> beanList = getValue();
-        beanList.clear();
-        beanList.addAll(nestedValues);
+        if(beanList != null){
+            beanList.clear();
+            beanList.addAll(nestedValues);
+        }
         setInternalValue(beanList);
     }
 
