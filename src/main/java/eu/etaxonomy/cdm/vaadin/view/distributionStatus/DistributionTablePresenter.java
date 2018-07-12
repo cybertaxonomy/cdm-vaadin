@@ -51,7 +51,7 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
-import eu.etaxonomy.cdm.service.CdmUserHelper;
+import eu.etaxonomy.cdm.service.VaadinCdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
@@ -72,7 +72,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	private static final long serialVersionUID = 3313043335587777217L;
 
     @Autowired
-    private CdmUserHelper userHelper;
+    private VaadinCdmUserHelper userHelper;
 
     @Autowired
     @Qualifier("cdmRepository")

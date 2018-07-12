@@ -36,7 +36,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
@@ -160,7 +160,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void updateToolBarButtonStates(){
         TeamOrPersonBase<?> val = getInternalValue();
-        boolean userCanCreate = UserHelper.fromSession().userHasPermission(Person.class, "CREATE");
+        boolean userCanCreate = VaadinUserHelper.fromSession().userHasPermission(Person.class, "CREATE");
 
         teamOrPersonSelect.setVisible(val == null);
         if(teamOrPersonSelect.getValue() != val){
@@ -239,7 +239,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
 
-        UserHelper userHelper = UserHelper.fromSession();
+        VaadinUserHelper userHelper = VaadinUserHelper.fromSession();
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
             getPropertyDataSource().setReadOnly(true);
@@ -304,7 +304,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         if(bean != null && bean instanceof Team){
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved){
-                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+                VaadinUserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }
     }

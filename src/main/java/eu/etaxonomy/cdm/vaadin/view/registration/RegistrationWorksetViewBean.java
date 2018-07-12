@@ -50,6 +50,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.service.dto.EntityReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -70,10 +71,9 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -243,6 +243,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             row = putRegistrationListComponent(row, dto);
         }
 
+        // --- Footer with UI to create new registrations ----
         Label addRegistrationLabel_1 = new Label("Add a new registration for a");
         Label addRegistrationLabel_2 = new Label("or an");
 
@@ -451,7 +452,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         CssLayout stateAndSubmitter = new CssLayout(statusComponent, submitterLabel);
 
 
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
+        if(VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin()) {
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");

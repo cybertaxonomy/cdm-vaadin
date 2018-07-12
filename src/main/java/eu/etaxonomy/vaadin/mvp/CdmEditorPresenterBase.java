@@ -28,7 +28,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -117,7 +117,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
         CDM cdmEntitiy = cdmEntity(dto);
 
-        UserHelper userHelper = UserHelper.fromSession();
+        VaadinUserHelper userHelper = VaadinUserHelper.fromSession();
         boolean canDelte = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
         boolean canEdit = userHelper.userHasPermission(cdmEntitiy, CRUD.UPDATE);
 
@@ -211,7 +211,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
             }
         } catch (HibernateException e){
             if(newAuthorityCreated != null){
-                UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
+                VaadinUserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
             }
             throw e;
         } finally {

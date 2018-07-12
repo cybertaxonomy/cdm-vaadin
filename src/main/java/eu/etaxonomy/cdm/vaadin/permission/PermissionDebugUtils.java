@@ -82,7 +82,7 @@ public class PermissionDebugUtils implements Serializable {
     public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property){
 
        Button button = new Button(FontAwesome.BOLT);
-       button.addClickListener(e -> UserHelper.fromSession().createAuthorityFor(UserHelper.fromSession().userName(), cdmType, entitiyUuid, crud, property));
+       button.addClickListener(e -> VaadinUserHelper.fromSession().createAuthorityFor(VaadinUserHelper.fromSession().userName(), cdmType, entitiyUuid, crud, property));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
 

@@ -49,7 +49,7 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
@@ -254,7 +254,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
 
         if(crud != null){
-            UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
+            VaadinUserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
         }
 
         specimenTypeDesignationWorkingSetService.save(dto);

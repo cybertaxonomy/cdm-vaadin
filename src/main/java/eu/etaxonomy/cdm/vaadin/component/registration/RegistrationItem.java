@@ -35,15 +35,15 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
@@ -207,12 +207,12 @@ public class RegistrationItem extends GridLayout {
 
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationUuid() != null){
-            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+            if(VaadinUserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
-            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
+            if(VaadinUserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
             }
         }

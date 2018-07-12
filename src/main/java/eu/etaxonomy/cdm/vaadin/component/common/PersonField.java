@@ -30,7 +30,7 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
 
@@ -132,7 +132,7 @@ public class PersonField extends CompositeCustomField<Person> {
      *
      */
     private void checkUserPermissions(Person newValue) {
-        boolean userCanEdit = newValue == null || !newValue.isPersited() || UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+        boolean userCanEdit = newValue == null || !newValue.isPersited() || VaadinUserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
         setEnabled(userCanEdit);
     }
 
@@ -368,7 +368,7 @@ public class PersonField extends CompositeCustomField<Person> {
             }
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
-                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+                VaadinUserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }
     }

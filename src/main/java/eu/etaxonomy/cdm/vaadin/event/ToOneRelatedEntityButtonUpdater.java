@@ -12,7 +12,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 
 /**
@@ -43,8 +43,8 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
 
         CdmBase value = (CdmBase)event.getProperty().getValue();
 
-        boolean userIsAllowedToUpdate = value != null && UserHelper.fromSession().userHasPermission(value, CRUD.UPDATE);
-        boolean userIsAllowedToCreate = UserHelper.fromSession().userHasPermission(type, CRUD.CREATE);
+        boolean userIsAllowedToUpdate = value != null && VaadinUserHelper.fromSession().userHasPermission(value, CRUD.UPDATE);
+        boolean userIsAllowedToCreate = VaadinUserHelper.fromSession().userHasPermission(type, CRUD.CREATE);
 
         toOneRelatedEntityField.setAddButtonEnabled(userIsAllowedToCreate);
         toOneRelatedEntityField.setEditButtonEnabled(userIsAllowedToUpdate);

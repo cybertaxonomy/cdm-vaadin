@@ -47,7 +47,7 @@ import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -97,7 +97,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         toolBar.addComponent(filterInstructionLabel);
 
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
+        if(VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin()){
 
             submitterFilter = new ListSelect("Submitter");
             submitterFilter.setRows(1);
@@ -188,7 +188,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         listContainer.removeAllComponents();
-        boolean isCurator = UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin();
+        boolean isCurator = VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this);
             item.getSubmitterLabel().setVisible(isCurator);
