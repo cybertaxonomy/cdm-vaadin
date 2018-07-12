@@ -47,16 +47,16 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.EntityReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.ref.EntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;

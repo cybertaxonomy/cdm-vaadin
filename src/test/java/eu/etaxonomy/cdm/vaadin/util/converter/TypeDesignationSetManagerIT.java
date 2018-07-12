@@ -24,8 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
-import eu.etaxonomy.cdm.api.service.dto.EntityReference;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
@@ -43,6 +41,8 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.ref.EntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 
 /**
  * @author a.kohlbecker
