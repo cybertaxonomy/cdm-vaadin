@@ -137,7 +137,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         typifiedName.addTypeDesignation(std_IT_3, false);
 
         TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(tds);
-        String result = typeDesignationManager.buildString().print();
+        String result = typeDesignationManager.print();
 
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
@@ -161,7 +161,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         typifiedName.setTitleCache("Prionus coriatius L.", true);
 
         TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName);
-        String result = typeDesignationManager.buildString().print();
+        String result = typeDesignationManager.print();
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
@@ -174,7 +174,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
 
         assertEquals(
                 "Prionus coriatius L. NameType: Prionus L. Species Plantarum"
-                , typeDesignationManager.buildString().print()
+                , typeDesignationManager.print()
                 );
 
         typifiedName.addTypeDesignation(std_HT, false);
@@ -182,7 +182,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
 
         assertEquals(
                 "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA); NameType: Prionus L. Species Plantarum"
-                , typeDesignationManager.buildString().print()
+                , typeDesignationManager.print()
                 );
 
     }
