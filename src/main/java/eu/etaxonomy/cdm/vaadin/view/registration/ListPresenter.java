@@ -185,7 +185,8 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 StringUtils.trimToNull(filter.namePattern),
                 filter.typeStatus ,
                 pageSize,
-                pageIndex);
+                pageIndex,
+                null);
         return dtoPager;
     }
 

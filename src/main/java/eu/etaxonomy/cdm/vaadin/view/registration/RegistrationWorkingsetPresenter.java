@@ -759,7 +759,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrationDTOs().stream().anyMatch(
-                    reg -> reg.getTypeDesignations() != null && reg.getTypeDesignations().stream().anyMatch(
+                    reg -> reg.typeDesignations() != null && reg.typeDesignations().stream().anyMatch(
                             td -> td.getUuid() == event.getEntityUuid()
                             )
                         )
