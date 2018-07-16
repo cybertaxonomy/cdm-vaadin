@@ -46,6 +46,7 @@ import eu.etaxonomy.cdm.api.service.idminter.IdentifierMinter.Identifier;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.model.common.User;
@@ -64,6 +65,7 @@ import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
@@ -78,7 +80,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -208,7 +210,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         Authentication authentication = currentSecurityContext().getAuthentication();
         reg.setSubmitter((User)authentication.getPrincipal());
         EntityChangeEvent event = getRegistrationStore().saveBean(reg, (AbstractView) getView());
-        VaadinUserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, event.getEntityUuid(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
+        UserHelperAccess.userHelper().createAuthorityForCurrentUser(Registration.class, event.getEntityUuid(), Operation.UPDATE, RegistrationStatus.PREPARATION.name());
         getRepo().commitTransaction(txStatus);
         // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return getRepo().getRegistrationService().load(event.getEntityUuid(), Arrays.asList(new String []{"blockedBy"}));
@@ -245,7 +247,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                 CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
                 // submitters have GrantedAuthorities like REGISTRATION(PREPARATION).[UPDATE]{ab4459eb-3b96-40ba-bfaa-36915107d59e}
-                VaadinUserHelper userHelper = VaadinUserHelper.fromSession();
+                UserHelper userHelper = UserHelperAccess.userHelper();
                 Set<RegistrationStatus> availableStatus = new HashSet<>();
 
                 boolean canChangeStatus = userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
@@ -299,7 +301,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     protected void updateMessages() {
-        User user = VaadinUserHelper.fromSession().user();
+        User user = UserHelperAccess.userHelper().user();
         for (UUID registrationUuid : getView().getRegistrationItemMap().keySet()) {
             Button messageButton = getView().getRegistrationItemMap().get(registrationUuid).regItemButtons.getMessagesButton();
 
@@ -308,8 +310,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
 
                 boolean activeMessages = messageCount > 0;
-                boolean currentUserIsSubmitter = regDto.getSubmitterUserName() != null && regDto.getSubmitterUserName().equals(VaadinUserHelper.fromSession().userName());
-                boolean currentUserIsCurator = VaadinUserHelper.fromSession().userIsRegistrationCurator();
+                boolean currentUserIsSubmitter = regDto.getSubmitterUserName() != null && regDto.getSubmitterUserName().equals(UserHelperAccess.userHelper().userName());
+                boolean currentUserIsCurator = UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe());
                 messageButton.setEnabled(false);
                 if(currentUserIsCurator){
                     if(currentUserIsSubmitter){

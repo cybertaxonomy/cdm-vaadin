@@ -23,8 +23,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
-import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -64,25 +62,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         uiEventBus.subscribe(this);
     }
 
-
-	/**
-	 * This reference will cause the scoped VaadinUserHelper being initialized
-	 * It is not used in this class but attaches itself to the vaadin session
-	 * from where it will be accessible via VaadinUserHelper.fromSession()
-	 */
-	@Autowired
-    private VaadinUserHelper userHelper;
-
-    /**
-     * This reference will cause the scoped PermissionDebugUtils being initialized.
-     * It is not used in this class but attaches itself to the vaadin session
-     * from where it will be accessible via VaadinUserHelper.fromSession()
-     *
-     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
-     * See
-     */
-    @Autowired(required=false)
-    private PermissionDebugUtils permissionDebugUtils;
+//    /**
+//     * This reference will cause the scoped PermissionDebugUtils being initialized.
+//     * It is not used in this class but attaches itself to the vaadin session
+//     * from where it will be accessible via VaadinUserHelper.fromSession()
+//     *
+//     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
+//     * See
+//     */
+//    @Autowired(required=false)
+//    private PermissionDebugUtils permissionDebugUtils;
 
 	private PopupViewRegistration popupViewRegistration;
 

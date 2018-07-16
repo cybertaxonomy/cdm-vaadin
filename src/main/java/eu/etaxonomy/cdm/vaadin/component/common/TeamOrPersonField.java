@@ -27,6 +27,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -34,9 +35,9 @@ import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
@@ -160,7 +161,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void updateToolBarButtonStates(){
         TeamOrPersonBase<?> val = getInternalValue();
-        boolean userCanCreate = VaadinUserHelper.fromSession().userHasPermission(Person.class, "CREATE");
+        boolean userCanCreate = UserHelperAccess.userHelper().userHasPermission(Person.class, "CREATE");
 
         teamOrPersonSelect.setVisible(val == null);
         if(teamOrPersonSelect.getValue() != val){
@@ -239,7 +240,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
 
-        VaadinUserHelper userHelper = VaadinUserHelper.fromSession();
+        UserHelper userHelper = UserHelperAccess.userHelper();
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
             getPropertyDataSource().setReadOnly(true);
@@ -304,7 +305,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         if(bean != null && bean instanceof Team){
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved){
-                VaadinUserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+                UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }
     }

@@ -20,11 +20,11 @@ import com.vaadin.spring.annotation.SpringComponent;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BoundField;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
@@ -70,7 +70,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
-            newAuthorityCreated = VaadinUserHelper.fromSession().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
+            newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
         }
 
     }
@@ -81,7 +81,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
     @Override
     protected void guaranteePerEntityCRUDPermissions(Collection bean) {
         if(crud != null){
-            newAuthorityCreated = VaadinUserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+            newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, crud, null);
         }
 
     }

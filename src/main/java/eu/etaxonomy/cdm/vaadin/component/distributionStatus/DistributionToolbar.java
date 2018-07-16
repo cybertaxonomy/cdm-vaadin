@@ -18,8 +18,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.i18n.Messages;
-import eu.etaxonomy.cdm.service.VaadinCdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
@@ -52,7 +52,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
     private NavigationManager navigationManager;
 
     @Autowired
-    private VaadinCdmUserHelper userHelper;
+    private UserHelper userHelper;
 
     private final Button loginButton = new Button(Messages.getLocalizedString(Messages.DistributionToolbar_LOGIN));
 

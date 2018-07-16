@@ -24,7 +24,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.service.VaadinCdmUserHelper;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
@@ -57,7 +57,7 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar, Ev
     protected NavigationManager navigationManager;
 
     @Autowired
-    VaadinCdmUserHelper userHelper;
+    UserHelper userHelper;
 
     CssLayout buttonGroup = new CssLayout();
     Button messageButton;

@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.permission;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
@@ -22,6 +23,6 @@ import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 public class CdmEditDeletePermissionTester implements EditPermissionTester {
     @Override
     public boolean userHasEditPermission(Object bean) {
-        return  VaadinUserHelper.fromSession().userHasPermission((CdmBase)bean, CRUD.UPDATE, CRUD.DELETE);
+        return  UserHelperAccess.userHelper().userHasPermission((CdmBase)bean, CRUD.UPDATE, CRUD.DELETE);
     }
 }

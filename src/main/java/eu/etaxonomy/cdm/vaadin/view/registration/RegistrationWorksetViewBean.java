@@ -57,6 +57,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
@@ -73,7 +74,7 @@ import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -452,7 +453,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         CssLayout stateAndSubmitter = new CssLayout(statusComponent, submitterLabel);
 
 
-        if(VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin()) {
+        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin()) {
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");

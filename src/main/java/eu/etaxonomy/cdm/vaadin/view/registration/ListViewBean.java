@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.PagerComponent;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
@@ -47,7 +48,7 @@ import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -97,7 +98,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         toolBar.addComponent(filterInstructionLabel);
 
-        if(VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin()){
+        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin()){
 
             submitterFilter = new ListSelect("Submitter");
             submitterFilter.setRows(1);
@@ -188,7 +189,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         listContainer.removeAllComponents();
-        boolean isCurator = VaadinUserHelper.fromSession().userIsRegistrationCurator() || VaadinUserHelper.fromSession().userIsAdmin();
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this);
             item.getSubmitterLabel().setVisible(isCurator);

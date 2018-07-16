@@ -31,9 +31,9 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.VaadinUserHelper;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
 /**
@@ -78,7 +78,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getUuid(), nameButton);
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
-            boolean userHasPermission = VaadinUserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
+            boolean userHasPermission = UserHelperAccess.userHelper().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
             nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
@@ -92,7 +92,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = VaadinUserHelper.fromSession().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
+        boolean userHasAddPermission = UserHelperAccess.userHelper().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -100,7 +100,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = VaadinUserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = UserHelperAccess.userHelper().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
                 addComponent(tdButton);
 

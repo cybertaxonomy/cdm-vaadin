@@ -12,19 +12,19 @@ import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import javax.annotation.PostConstruct;
+
 import org.springframework.context.annotation.Profile;
 
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringComponent;
-import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.AbstractComponentContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 
 /**
  * PermissionDebugUtils provide the following tools:
@@ -32,7 +32,6 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
  *   <li>{@link #addGainPerEntityPermissionButton(AbstractComponentContainer, Class, Integer, EnumSet)}:
  *   A button which gives a per entity authority to the current user.</li>
  * </ul>
- *
  *
  *
  * To enable the PermissionDebugUtils you need to activate the spring profile <code>debug</code>. You can add
@@ -44,31 +43,26 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
  *
  */
 @SpringComponent
-@UIScope
 @Profile("debug")
 public class PermissionDebugUtils implements Serializable {
 
     private static final long serialVersionUID = -210079304170235459L;
 
-    private final static Logger logger = Logger.getLogger(PermissionDebugUtils.class);
+    private static PermissionDebugUtils bean;
 
-    public static final String VADDIN_SESSION_KEY = "PERMISSION_DEBUG_UTILS";
-
-    public static final String SYSTEM_PROP_KEY = "GainPerEntityPermissionButtons";
-
-
-    public PermissionDebugUtils() {
-        VaadinSession.getCurrent().setAttribute(VADDIN_SESSION_KEY, this);
+    @PostConstruct
+    public void registerBean() {
+        PermissionDebugUtils.bean = this;
     }
 
-    public static PermissionDebugUtils fromSession() {
-        return (PermissionDebugUtils)VaadinSession.getCurrent().getAttribute(VADDIN_SESSION_KEY);
+    public static PermissionDebugUtils bean() {
+        return bean;
      }
 
     public static Button addGainPerEntityPermissionButton(AbstractComponentContainer toContainer, Class<? extends CdmBase> cdmType,
             UUID entitiyUuid, EnumSet<CRUD> crud, String property){
 
-        PermissionDebugUtils pu = PermissionDebugUtils.fromSession();
+        PermissionDebugUtils pu = PermissionDebugUtils.bean();
         if(pu != null){
             Button button = pu.gainPerEntityPermissionButton(cdmType, entitiyUuid, crud, property);
             if(button != null){
@@ -82,7 +76,7 @@ public class PermissionDebugUtils implements Serializable {
     public Button gainPerEntityPermissionButton(Class<? extends CdmBase> cdmType, UUID entitiyUuid, EnumSet<CRUD> crud, String property){
 
        Button button = new Button(FontAwesome.BOLT);
-       button.addClickListener(e -> VaadinUserHelper.fromSession().createAuthorityFor(VaadinUserHelper.fromSession().userName(), cdmType, entitiyUuid, crud, property));
+       button.addClickListener(e -> UserHelperAccess.userHelper().createAuthorityFor(UserHelperAccess.userHelper().userName(), cdmType, entitiyUuid, crud, property));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
 
