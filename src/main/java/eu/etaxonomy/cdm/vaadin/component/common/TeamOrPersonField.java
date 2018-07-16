@@ -132,11 +132,13 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         personButton.addClickListener(e -> {
             setValue(Person.NewInstance(), false, true);
+            resetReadOnlyComponents();
 
         });
         personButton.setDescription("Add person");
         teamButton.addClickListener(e -> {
             setValue(Team.NewInstance(), false, true);
+            resetReadOnlyComponents();
         });
         teamButton.setDescription("Add team");
 
