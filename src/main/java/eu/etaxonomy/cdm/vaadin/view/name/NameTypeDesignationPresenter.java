@@ -189,7 +189,7 @@ public class NameTypeDesignationPresenter
             EntityChangeEvent changeEvent = new EntityChangeEvent(bean, Type.REMOVED, (AbstractView) getView());
             viewEventBus.publish(this, changeEvent);
         } else {
-            CdmStore.handleDeleteresultInError(deletResult);
+            CdmStore.handleDeleteresultInError(deletResult, getRepo().getSession());
         }
     }
 

@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.service;
 
 import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.transaction.TransactionStatus;
@@ -130,7 +131,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @return The bean merged to the session or original bean in case a merge
      *         was not necessary.
      */
-    public T mergedBean(T bean) {
+    public T mergedBean(T bean) throws IllegalStateException {
 
         Session session = getSession();
 
@@ -191,26 +192,37 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         }
 
         Session session = getSession();
-        logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
+        try {
+            logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
 
-        if(txStatus == null
-//                || (conversationHolder != null && !conversationHolder.isTransactionActive())
-                ){
-            // no running transaction, start one ...
-            startTransaction();
+            if(txStatus == null
+    //                || (conversationHolder != null && !conversationHolder.isTransactionActive())
+                    ){
+                // no running transaction, start one ...
+                startTransaction();
+            }
+
+            logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
+            // merge the changes into the session, ...
+
+            T mergedBean = mergedBean(bean);
+
+            // NOTE: saveOrUpdate is really needed here even if we to a merge before
+            // repo.getCommonService().saveOrUpdate(mergedBean);
+            session.flush();
+            commitTransaction();
+            return new EntityChangeEvent(mergedBean, changeEventType, view);
+        } catch (HibernateException | IllegalStateException e){
+            session.clear();
+            throw e;
+        } finally {
+            try {
+                session.close();
+            } catch (HibernateException e2) {
+                /* IGNORE HERE */
+            }
         }
 
-        logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
-        // merge the changes into the session, ...
-
-        T mergedBean = mergedBean(bean);
-
-        // NOTE: saveOrUpdate is really needed here even if we to a merge before
-        // repo.getCommonService().saveOrUpdate(mergedBean);
-        session.flush();
-        commitTransaction();
-
-        return new EntityChangeEvent(mergedBean, changeEventType, view);
     }
 
     /**
@@ -221,18 +233,29 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     public final EntityChangeEvent deleteBean(T bean, AbstractView view) {
 
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-
-        startTransaction();
-        logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
-        DeleteResult result = service.delete(bean);
-        if (result.isOk()) {
-            getSession().flush();
-            commitTransaction();
-            logger.trace(this._toString() + ".deleteBean - transaction comitted");
-            return new EntityChangeEvent(bean, Type.REMOVED, view);
-        } else {
-            handleDeleteresultInError(result);
-            txStatus = null;
+        Session session = getSession();
+        try {
+            startTransaction();
+            logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
+            DeleteResult result = service.delete(bean);
+            if (result.isOk()) {
+                session.flush();
+                commitTransaction();
+                logger.trace(this._toString() + ".deleteBean - transaction comitted");
+                return new EntityChangeEvent(bean, Type.REMOVED, view);
+            } else {
+                handleDeleteresultInError(result, session);
+                txStatus = null;
+            }
+        } catch (HibernateException e){
+            session.clear();
+            throw e;
+        } finally {
+            try {
+                session.close();
+            } catch (HibernateException e2) {
+                /* IGNORE HERE */
+            }
         }
         return null;
     }
@@ -240,7 +263,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     /**
      * @param result
      */
-    public static void handleDeleteresultInError(DeleteResult result) {
+    public static void handleDeleteresultInError(DeleteResult result, Session session) {
         String notificationTitle;
         StringBuffer messageBody = new StringBuffer();
         if (result.isAbort()) {
@@ -252,6 +275,9 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
             result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
             messageBody.append("</ul>");
+            if(result.getExceptions().stream().anyMatch(e -> HibernateException.class.isAssignableFrom(e.getClass()))){
+                session.clear();
+            }
         }
         if (!result.getRelatedObjects().isEmpty()) {
             messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
