@@ -213,11 +213,12 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             commitTransaction();
             return new EntityChangeEvent(mergedBean, changeEventType, view);
         } catch (HibernateException | IllegalStateException e){
-            session.clear();
+//            session.clear(); // #7558
             throw e;
         } finally {
             try {
-                session.close();
+//                session.close(); // #7558
+                session.clear();
             } catch (HibernateException e2) {
                 /* IGNORE HERE */
             }
@@ -248,11 +249,12 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
                 txStatus = null;
             }
         } catch (HibernateException e){
-            session.clear();
+//            session.clear(); // #7558
             throw e;
         } finally {
             try {
-                session.close();
+//                session.close(); // #7558
+                session.clear(); // #7558
             } catch (HibernateException e2) {
                 /* IGNORE HERE */
             }
@@ -276,7 +278,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
             messageBody.append("</ul>");
             if(result.getExceptions().stream().anyMatch(e -> HibernateException.class.isAssignableFrom(e.getClass()))){
-                session.clear();
+                session.clear(); // #7558
             }
         }
         if (!result.getRelatedObjects().isEmpty()) {
