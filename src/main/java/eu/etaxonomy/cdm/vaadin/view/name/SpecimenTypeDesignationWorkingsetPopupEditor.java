@@ -167,7 +167,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         distanceToGroundMinMax.getMinField().setConverter(new DoubleConverter());
 
         row++;
-        collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
+        collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.COLLECTOR_TITLE);
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
