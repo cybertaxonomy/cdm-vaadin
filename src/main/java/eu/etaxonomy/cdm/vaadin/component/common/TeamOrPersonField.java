@@ -117,7 +117,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     protected Component initContent() {
 
         teamOrPersonSelect.addValueChangeListener(e -> {
-            teamOrPersonSelect.refresh();
             setValue(teamOrPersonSelect.getValue(), false, true);
         });
         teamOrPersonSelect.setWidthUndefined();
@@ -348,13 +347,14 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     public void setFilterableTeamPagingProvider(CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> pagingProvider, CachingPresenter cachingPresenter){
         teamOrPersonSelect.loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
-        ToOneRelatedEntityReloader<TeamOrPersonBase> teamOrPersonReloader = new ToOneRelatedEntityReloader<TeamOrPersonBase>(teamOrPersonSelect, cachingPresenter);
-        teamOrPersonSelect.addValueChangeListener(teamOrPersonReloader );
+        // NOTE:
+        //   it is important to add the ToOneRelatedEntityReloader to the TeamOrPersonField directly
+        //   since the value of the select will be immediately passed to the TeamOrPersonField
+        ToOneRelatedEntityReloader<TeamOrPersonBase<?>> teamOrPersonReloader = new ToOneRelatedEntityReloader<TeamOrPersonBase<?>>(this, cachingPresenter);
+        this.addValueChangeListener(teamOrPersonReloader);
     }
 
     public void setFilterablePersonPagingProvider(CdmFilterablePagingProvider<AgentBase, Person> pagingProvider, CachingPresenter cachingPresenter){
-
-        teamOrPersonSelect.addValueChangeListener(new ToOneRelatedEntityReloader<TeamOrPersonBase>(teamOrPersonSelect, cachingPresenter));
 
         personsListEditor.setEntityFieldInstantiator(new EntityFieldInstantiator<PersonField>() {
 
@@ -364,7 +364,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 f.setAllowNewEmptyEntity(true); // otherwise new entities can not be added to the personsListEditor
                 f.getPersonSelect().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
                 f.getPersonSelect().setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<Person>(cacheType));
-                f.getPersonSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Person>(f.getPersonSelect(), cachingPresenter));
+                // NOTE:
+                //   it is important to add the ToOneRelatedEntityReloader to the PersonField directly
+                //   since the value of the select will be immediately passed to the PersonField:
+                f.addValueChangeListener(new ToOneRelatedEntityReloader<Person>(f, cachingPresenter));
                 return f;
             }
         });
