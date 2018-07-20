@@ -335,6 +335,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         getFieldLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
+        collectorField.setEditorReadOnly(readOnly);
         typeDesignationsCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
 
     }
