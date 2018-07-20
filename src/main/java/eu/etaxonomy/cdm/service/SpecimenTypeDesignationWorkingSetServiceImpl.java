@@ -27,6 +27,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationComparator;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
@@ -104,6 +105,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Override
     @Transactional
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
+
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
         TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
@@ -112,9 +114,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     }
 
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
+
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
+        specimenTypeDesignations.sort(new TypeDesignationComparator());
         VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
