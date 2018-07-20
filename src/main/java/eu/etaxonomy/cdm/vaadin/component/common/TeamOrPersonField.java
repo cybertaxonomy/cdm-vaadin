@@ -78,8 +78,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 
-    private CdmFilterablePagingProvider<AgentBase, Person> pagingProviderPerson;
-
     private TeamOrPersonBaseCaptionGenerator.CacheType cacheType;
 
     protected List<Component> editorComponents = Arrays.asList(removeButton, personButton, teamButton, teamOrPersonSelect);
@@ -119,14 +117,14 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     protected Component initContent() {
 
         teamOrPersonSelect.addValueChangeListener(e -> {
+            teamOrPersonSelect.refresh();
             setValue(teamOrPersonSelect.getValue(), false, true);
-            updateToolBarButtonStates();
         });
         teamOrPersonSelect.setWidthUndefined();
 
         removeButton.addClickListener(e -> {
+            teamOrPersonSelect.clear();
             setValue(null, false, true);
-            updateToolBarButtonStates();
         });
         removeButton.setDescription("Remove");
 
@@ -162,13 +160,11 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     }
 
     private void updateToolBarButtonStates(){
+
         TeamOrPersonBase<?> val = getInternalValue();
         boolean userCanCreate = UserHelperAccess.userHelper().userHasPermission(Person.class, "CREATE");
 
         teamOrPersonSelect.setVisible(val == null);
-        if(teamOrPersonSelect.getValue() != val){
-            teamOrPersonSelect.clear();
-        }
         removeButton.setVisible(val != null);
         personButton.setEnabled(userCanCreate && val == null);
         teamButton.setEnabled(userCanCreate && val == null);
