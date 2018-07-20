@@ -24,6 +24,7 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.TransactionStatus;
+import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.server.SystemError;
@@ -95,6 +96,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 
@@ -728,9 +730,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
         if(Reference.class.isAssignableFrom(event.getEntityType())){
+
             if(workingset.getCitationUuid().equals(event.getEntityUuid())){
-                refreshView(true);
+                if(event.isRemovedType()){
+                    viewEventBus.publish(EventScope.UI, this, new NavigationEvent(StartRegistrationViewBean.NAME));
+                } else {
+                    refreshView(true);
+                }
             }
+
         } else
         if(Registration.class.isAssignableFrom(event.getEntityType())){
             if(workingset.getRegistrations().stream().anyMatch(reg -> reg.getUuid() == event.getEntityUuid())){
