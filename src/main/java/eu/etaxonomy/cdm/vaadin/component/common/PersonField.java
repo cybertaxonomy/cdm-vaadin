@@ -107,7 +107,7 @@ public class PersonField extends CompositeCustomField<Person> {
         personSelect.addValueChangeListener(e -> {
             if(personSelect.getValue() != null){
                 setValue(personSelect.getValue());
-                personSelect.clear();
+//                 personSelect.clear();
             }
         });
 
