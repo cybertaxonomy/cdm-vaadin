@@ -72,7 +72,6 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
         ICdmCacher cache = cachingPresenter.getCache();
         if(cache != null){
             CDM cachedEntity = cache.load(value);
-            // cachingPresenter.addRootEntity(cachedEntity);
             if(// pure object comparison is not reliable since the entity may have been changed
                 cachedEntity.getId() == value.getId() && cachedEntity.getClass() == value.getClass()
                 ){
