@@ -22,6 +22,7 @@ import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -145,7 +146,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         addField(superCollectionCombobox, "superCollection", 0, row, 1, row);
 
         superCollectionCombobox.getSelect().setCaptionGenerator(
-                new CdmTitleCacheCaptionGenerator<Collection>()
+                new CollectionCaptionGenerator()
                 );
         superCollectionCombobox.getSelect().addValueChangeListener(
                 new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox)
