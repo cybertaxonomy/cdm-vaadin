@@ -17,6 +17,10 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 
 /**
+ * A DTO for cdm entities which itself implements the
+ * <a href="https://en.wikipedia.org/wiki/Adapter_pattern#Object_Adapter_pattern">Object Adaptor Pattern</a>.
+ *
+ *
  * @author a.kohlbecker
  * @since Apr 23, 2018
  *
