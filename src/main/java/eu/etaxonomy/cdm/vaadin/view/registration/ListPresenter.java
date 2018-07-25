@@ -258,7 +258,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      */
     public SearchFilter loadFilterFromView() {
 
-        Authentication authentication = currentSecurityContext().getAuthentication();
 
         SearchFilter filter = new SearchFilter();
         filter.identifierPattern = getView().getIdentifierFilter().getValue();
@@ -269,7 +268,8 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 filter.submitter = (User)o;
             }
         } else {
-            if(authentication.getPrincipal() != null && authentication.getPrincipal() instanceof User){
+            Authentication authentication = currentSecurityContext().getAuthentication();
+            if(authentication != null && authentication.getPrincipal() != null && authentication.getPrincipal() instanceof User){
                 filter.submitter = (User) authentication.getPrincipal();
             }
         }
