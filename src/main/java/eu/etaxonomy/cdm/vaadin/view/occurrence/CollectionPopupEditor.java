@@ -15,12 +15,16 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.utility.RoleProber;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -173,6 +177,9 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                     );
                 }
             });
+
+        UserHelper userHelper = UserHelperAccess.userHelper();
+        superCollectionCombobox.setVisible(RegistrationUIDefaults.COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION.stream().anyMatch( role -> userHelper.userIs(new RoleProber(role))));
 
         row++;
         institutionCombobox  = new ToOneRelatedEntityCombobox<Institution>("Institute", Institution.class);
