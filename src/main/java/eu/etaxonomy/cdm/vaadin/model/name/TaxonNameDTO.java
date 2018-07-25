@@ -44,10 +44,6 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private TaxonName name;
 
-    private Set<TaxonName> persistedBasionyms;
-
-    private Set<TaxonName> persistedReplacedSynonyms;
-
     private TaxonName persistedValidatedName;
 
     /**
@@ -100,19 +96,11 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     public Set<TaxonName> getBasionyms() {
         Set<TaxonName> basionyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM());
-        if(persistedBasionyms == null){
-            // remember the persisted state before starting to operate on the DTO
-            persistedBasionyms = basionyms;
-        }
         return basionyms;
     }
 
     public Set<TaxonName> getReplacedSynonyms() {
         Set<TaxonName> replacedSynonyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.REPLACED_SYNONYM());
-        if(persistedReplacedSynonyms == null){
-            // remember the persisted state before starting to operate on the DTO
-            persistedReplacedSynonyms = replacedSynonyms;
-        }
         return replacedSynonyms;
     }
 
@@ -216,10 +204,6 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
                 name.removeRelationWithTaxonName(tn, direction, relType);
             }
         }
-    }
-
-    public Set<TaxonName> persistedBasionyms(){
-        return persistedBasionyms;
     }
 
     public TeamOrPersonBase<?> getCombinationAuthorship() {
