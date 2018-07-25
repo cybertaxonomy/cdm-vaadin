@@ -21,13 +21,13 @@ import eu.etaxonomy.cdm.model.common.User;
  * @since Apr 23, 2018
  *
  */
-public class CdmEntityDecoraterDTO<CDM extends CdmBase> implements Serializable {
+public class CdmEntityAdapterDTO<CDM extends CdmBase> implements Serializable {
 
     private static final long serialVersionUID = 1715911851453178727L;
 
     protected CDM entity;
 
-    public CdmEntityDecoraterDTO(CDM entity){
+    public CdmEntityAdapterDTO(CDM entity){
         this.entity = entity;
     }
 

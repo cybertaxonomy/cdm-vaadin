@@ -31,14 +31,14 @@ import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
-import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
+import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 
 /**
  * @author a.kohlbecker
  * @since Apr 23, 2018
  *
  */
-public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
+public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private static final long serialVersionUID = -8018109905949198530L;
 
