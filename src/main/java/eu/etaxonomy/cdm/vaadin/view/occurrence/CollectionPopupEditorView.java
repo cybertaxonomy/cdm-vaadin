@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -20,5 +21,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 public interface CollectionPopupEditorView extends ApplicationView<CollectionEditorPresenter> {
 
     ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox();
+
+    ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox();
 
 }

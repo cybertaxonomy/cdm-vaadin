@@ -15,8 +15,10 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -37,12 +39,13 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
 
     private static final int GRID_COLS = 3;
 
-    private static final int GRID_ROWS = 3;
+    private static final int GRID_ROWS = 4;
 
     TextField codeField;
     TextField codeStandardField;
     TextField townOrLocationField;
     ToOneRelatedEntityCombobox<Collection> superCollectionCombobox;
+    ToOneRelatedEntityCombobox<Institution> institutionCombobox;
 
 
     /**
@@ -135,7 +138,6 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         townOrLocationField.setWidth(100, Unit.PIXELS);
 
         row++;
-
         superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("Super-collection", Collection.class);
 
 
@@ -171,12 +173,50 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                 }
             });
 
+        row++;
+        institutionCombobox  = new ToOneRelatedEntityCombobox<Institution>("Institute", Institution.class);
+        addField(institutionCombobox, "institute", 0, row, 1, row);
+
+        institutionCombobox.getSelect().setCaptionGenerator(
+                new CdmTitleCacheCaptionGenerator<Institution>()
+                );
+        institutionCombobox.getSelect().addValueChangeListener(
+                new ToOneRelatedEntityButtonUpdater<Institution>(institutionCombobox)
+                );
+
+
+        institutionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
+                new InstitutionEditorAction(
+                        EditorActionType.ADD,
+                        null,
+                        institutionCombobox,
+                        this)
+                ));
+        institutionCombobox.addClickListenerEditEntity(e -> {
+                if(institutionCombobox.getValue() != null){
+                    getViewEventBus().publish(this,
+                            new InstitutionEditorAction(
+                                EditorActionType.EDIT,
+                                institutionCombobox.getValue().getUuid(),
+                                e.getButton(),
+                                institutionCombobox,
+                                this
+                            )
+                    );
+                }
+            });
+
     }
 
     /* ------------------ View Interface methods -------------------- */
     @Override
     public ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox() {
         return superCollectionCombobox;
+    }
+
+    @Override
+    public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox() {
+        return institutionCombobox;
     }
 
 }

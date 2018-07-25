@@ -18,13 +18,17 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BoundField;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
@@ -104,7 +108,11 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
         getView().getSuperCollectionCombobox().getSelect().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
-        getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(),this));
+        getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(), this));
+
+        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<AgentBase, Institution>(getRepo().getAgentService(), Institution.class);
+        getView().getInstitutionCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
+        getView().getInstitutionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getInstitutionCombobox(), this));
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
@@ -135,6 +143,34 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         collectionPopuEditor.loadInEditor(event.getEntityUuid());
     }
 
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+    public void onInstitutionEditorActionEdit(InstitutionEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
+
+        InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+        institutionPopuEditor.grantToCurrentUser(this.crud);
+        institutionPopuEditor.withDeleteButton(true);
+        institutionPopuEditor.loadInEditor(event.getEntityUuid());
+    }
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+    public void onInstitutionEditorActionAdd(InstitutionEditorAction event) {
+
+        if(!checkFromOwnView(event)){
+            return;
+        }
+
+        InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+        institutionPopuEditor.grantToCurrentUser(this.crud);
+        institutionPopuEditor.withDeleteButton(true);
+        institutionPopuEditor.loadInEditor(null);
+    }
+
     @EventBusListenerMethod()
     public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
@@ -150,6 +186,18 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
                         getView().getSuperCollectionCombobox().setValue(newCollection);
                     } else {
                         getView().getSuperCollectionCombobox().reload();
+                    }
+                }
+
+            } else if(boundTargetField.matchesPropertyIdPath("institution")){
+                if(event.isCreateOrModifiedType()){
+
+                    Institution newInstitution = (Institution) event.getEntity();
+                    getCache().load(newInstitution);
+                    if(event.isCreatedType()){
+                        getView().getInstitutionCombobox().setValue(newInstitution);
+                    } else {
+                        getView().getInstitutionCombobox().reload();
                     }
                 }
 
