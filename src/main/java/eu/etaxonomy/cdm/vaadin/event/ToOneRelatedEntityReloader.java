@@ -80,8 +80,12 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
                         ((EntitySupport)toOneRelatedEntityField).replaceEntityValue(cachedEntity);
                     } else {
                         toOneRelatedEntityField.removeValueChangeListener(this);
+                        // TODO it would be better to add this as ValueChangeListener to the PropertyDataSource directly instead of listenting at the Field
+                        boolean readOnly = toOneRelatedEntityField.getPropertyDataSource().isReadOnly();
+                        toOneRelatedEntityField.getPropertyDataSource().setReadOnly(false);
                         toOneRelatedEntityField.setValue(null); // reset to trick equals check in vaadin
                         toOneRelatedEntityField.setValue(cachedEntity);
+                        toOneRelatedEntityField.getPropertyDataSource().setReadOnly(readOnly);
                         toOneRelatedEntityField.addValueChangeListener(this);
                     }
                     onSettingReloadedEntity = false;
