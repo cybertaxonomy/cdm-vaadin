@@ -240,7 +240,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         UserHelper userHelper = UserHelperAccess.userHelper();
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
-            getPropertyDataSource().setReadOnly(true);
             setReadOnlyComponents(true);
         }
     }
