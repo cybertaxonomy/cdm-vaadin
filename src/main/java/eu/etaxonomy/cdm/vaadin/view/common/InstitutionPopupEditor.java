@@ -130,10 +130,7 @@ public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<Institutio
         partOfCombobox.getSelect().setCaptionGenerator(
                 new CdmTitleCacheCaptionGenerator<Institution>()
                 );
-        partOfCombobox.getSelect().addValueChangeListener(
-                new ToOneRelatedEntityButtonUpdater<Institution>(partOfCombobox)
-                );
-
+        partOfCombobox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Institution>(partOfCombobox));
 
         partOfCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new InstitutionEditorAction(

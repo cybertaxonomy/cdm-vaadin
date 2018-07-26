@@ -21,6 +21,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
+import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 
 /**
  * @author a.kohlbecker
@@ -42,6 +43,8 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     private Button addButton = ButtonFactory.CREATE_NEW.createButton();
     private Button editButton = ButtonFactory.EDIT_ITEM.createButton();
+
+    private NestedButtonStateUpdater<V> buttonUpdater;
 
     public ToOneRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;
@@ -184,6 +187,9 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     @Override
     public void setPropertyDataSource(Property newDataSource) {
         lazySelect.setPropertyDataSource(newDataSource);
+        if(buttonUpdater != null){
+            buttonUpdater.updateButtons(lazySelect.getValue());
+        }
     }
 
     /**
@@ -201,6 +207,18 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         setDeepReadOnly(readOnly, getContent(), null);
+        if(buttonUpdater != null){
+            buttonUpdater.updateButtons(lazySelect.getValue());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setNestedButtonStateUpdater(NestedButtonStateUpdater<V> buttonUpdater) {
+        this.buttonUpdater = buttonUpdater;
+        lazySelect.addValueChangeListener(buttonUpdater);
     }
 
 

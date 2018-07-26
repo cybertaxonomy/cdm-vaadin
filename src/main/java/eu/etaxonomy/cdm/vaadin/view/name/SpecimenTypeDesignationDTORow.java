@@ -68,17 +68,11 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
         collection.setWidth(200, Unit.PIXELS);
-        collectionFieldUpdater = new ToOneRelatedEntityButtonUpdater<Collection>(collection);
-        collection.addValueChangeListener(
-                collectionFieldUpdater
-                );
+        collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(collection));
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
-        mediaSpecimenReferenceUpdater = new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference);
-        mediaSpecimenReference.addValueChangeListener(
-                mediaSpecimenReferenceUpdater
-                );
+        mediaSpecimenReference.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference));
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->

@@ -111,8 +111,8 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
                 setValue(null);
                 updateToolBarButtonStates();
             });
-        validatedNameComboBox.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<TaxonName>(validatedNameComboBox));
-        citatonComboBox.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox));
+        validatedNameComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(validatedNameComboBox));
+        citatonComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox));
 
         grid = new GridLayout(2, 3);
 

@@ -152,10 +152,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         superCollectionCombobox.getSelect().setCaptionGenerator(
                 new CollectionCaptionGenerator()
                 );
-        superCollectionCombobox.getSelect().addValueChangeListener(
-                new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox)
-                );
-
+        superCollectionCombobox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox));
 
         superCollectionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new CollectionEditorAction(
@@ -188,10 +185,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         institutionCombobox.getSelect().setCaptionGenerator(
                 new CdmTitleCacheCaptionGenerator<Institution>()
                 );
-        institutionCombobox.getSelect().addValueChangeListener(
-                new ToOneRelatedEntityButtonUpdater<Institution>(institutionCombobox)
-                );
-
+        institutionCombobox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Institution>(institutionCombobox));
 
         institutionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new InstitutionEditorAction(

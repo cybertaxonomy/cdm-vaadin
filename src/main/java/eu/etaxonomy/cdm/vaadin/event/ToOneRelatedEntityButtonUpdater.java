@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.event;
 
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -20,7 +21,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
  * @since 19.10.2017
  *
  */
-public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements NestedButtonStateUpdater {
+public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements NestedButtonStateUpdater<CDM> {
 
     private static final long serialVersionUID = 4472031263172275012L;
 
@@ -32,6 +33,7 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
     public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
         this.type = toOneRelatedEntityField.getType();
+        updateButtons(((Field<CDM>)toOneRelatedEntityField).getValue());
         toOneRelatedEntityField.setEditButtonEnabled(false);
     }
 
@@ -41,13 +43,22 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
     @Override
     public void valueChange(ValueChangeEvent event) {
 
-        CdmBase value = (CdmBase)event.getProperty().getValue();
+        CDM value = (CDM)event.getProperty().getValue();
+        updateButtons(value);
+    }
+
+    /**
+     * @param value
+     */
+    @Override
+    public void updateButtons(CDM value) {
 
         boolean userIsAllowedToUpdate = value != null && UserHelperAccess.userHelper().userHasPermission(value, CRUD.UPDATE);
         boolean userIsAllowedToCreate = UserHelperAccess.userHelper().userHasPermission(type, CRUD.CREATE);
+        boolean isReadOnlyField = ((Field)toOneRelatedEntityField).isReadOnly();
 
-        toOneRelatedEntityField.setAddButtonEnabled(userIsAllowedToCreate);
-        toOneRelatedEntityField.setEditButtonEnabled(userIsAllowedToUpdate);
+        toOneRelatedEntityField.setAddButtonEnabled(!isReadOnlyField && userIsAllowedToCreate);
+        toOneRelatedEntityField.setEditButtonEnabled(!isReadOnlyField && userIsAllowedToUpdate);
 
     }
 
