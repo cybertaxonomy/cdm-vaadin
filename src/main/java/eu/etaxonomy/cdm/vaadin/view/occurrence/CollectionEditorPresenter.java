@@ -21,6 +21,9 @@ import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
@@ -107,6 +110,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         super.handleViewEntered();
 
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
+        collectionPagingProvider.getRestrictions().add(new Restriction<String>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
         getView().getSuperCollectionCombobox().getSelect().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(), this));
 
@@ -189,7 +193,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
                     }
                 }
 
-            } else if(boundTargetField.matchesPropertyIdPath("institution")){
+            } else if(boundTargetField.matchesPropertyIdPath("institute")){
                 if(event.isCreateOrModifiedType()){
 
                     Institution newInstitution = (Institution) event.getEntity();

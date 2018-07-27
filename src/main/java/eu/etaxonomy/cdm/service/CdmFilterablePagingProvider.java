@@ -34,6 +34,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
+    public static final String QUERY_STRING_PLACEHOLDER = "{query-string}";
+
     private static final Logger logger = Logger.getLogger(CdmFilterablePagingProvider.class);
 
     private int pageSize = 20;
@@ -128,11 +130,12 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         Integer pageIndex = firstRow / pageSize;
         Pager<V> page;
         if(!restrictions.isEmpty()){
+            List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             page = (Pager<V>) service.findByTitleWithRestrictions(
                     type,
                     filter,
                     matchMode,
-                    restrictions,
+                    preparedRestrictions,
                     pageSize,
                     pageIndex ,
                     orderHints,
@@ -168,11 +171,12 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         Pager<V> page;
         if(!restrictions.isEmpty()){
+            List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             page = (Pager<V>) service.findByTitleWithRestrictions(
                     type,
                     filter,
                     matchMode,
-                    restrictions,
+                    preparedRestrictions,
                     1,
                     0,
                     null,
@@ -195,6 +199,26 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
             logger.trace("size() -  count: " + page.getCount().intValue());
         }
         return page.getCount().intValue();
+    }
+
+    /**
+     * @return
+     */
+    private List<Restriction<?>> prepareRestrictions(String filter, MatchMode matchMode) {
+        List<Restriction<?>> prepared = new ArrayList<>(restrictions.size());
+        for(Restriction<?> r : restrictions) {
+            List<Object> values = new ArrayList<>(r.getValues().size());
+            for(Object v : r.getValues()){
+                if(v instanceof String){
+                    String expandedValue = ((String)v).replace(QUERY_STRING_PLACEHOLDER, matchMode.queryStringFrom(filter));
+                    values.add(expandedValue);
+                } else {
+                    values.add(v);
+                }
+            }
+            prepared.add(new Restriction(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new String[values.size()])));
+        }
+        return prepared;
     }
 
     /**
@@ -249,6 +273,10 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     /**
      * The list of restrictions is initially empty.
+     * <p>
+     * Occurrences of the {@link QUERY_STRING_PLACEHOLDER} in the value
+     * of String type Restrictions will be replaced by the <code>filter</code> parameter passed to the paging provider.
+     *
      *
      * @return the restrictions
      */
@@ -256,6 +284,12 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         return restrictions;
     }
 
+    /**
+     * Occurrences of the {@link QUERY_STRING_PLACEHOLDER} in the value
+     * of String type Restrictions will be replaced by the <code>filter</code> parameter passed to the paging provider.
+     *
+     * @param restriction
+     */
     public void addRestriction(Restriction<?> restriction){
         restrictions.add(restriction);
     }
