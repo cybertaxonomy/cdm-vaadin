@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
@@ -159,7 +158,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
             logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
         }
 
-        Logger.getLogger("org.hibernate.SQL").setLevel(Level.WARN);
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.WARN);
         return page.getRecords();
     }
 
@@ -175,7 +174,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         Pager<V> page;
         if(!restrictions.isEmpty()){
 
-            Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
+            // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             page = (Pager<V>) service.findByTitleWithRestrictions(
                     type,
