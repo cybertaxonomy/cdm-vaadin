@@ -142,7 +142,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); Type: (Isotype, M); NameType: Prionus L. Species Plantarum"
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; Isotypes: BER, KEW; Type: Isotype, M; NameType: Prionus L. Species Plantarum"
                 , result
                 );
 
@@ -181,7 +181,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         typeDesignationManager.addTypeDesigations(null, std_HT);
 
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA); NameType: Prionus L. Species Plantarum"
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; NameType: Prionus L. Species Plantarum"
                 , typeDesignationManager.print()
                 );
 
