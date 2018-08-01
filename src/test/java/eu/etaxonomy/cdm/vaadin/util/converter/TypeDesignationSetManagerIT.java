@@ -111,7 +111,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         std_IT_3.setId(4);
         DerivedUnit specimen_IT_3 = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT_3.setTitleCache("M", true);
-        createDerivationEvent(fu_1, specimen_IT_3);
+        createDerivationEvent(fu_2, specimen_IT_3);
         std_IT_3.setTypeSpecimen(specimen_IT_3);
         std_IT_3.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
 
@@ -175,16 +175,20 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; Isotypes: BER, KEW; Type: Isotype, M; NameType: Prionus L. Species Plantarum"
+                "Prionus coriatius L. Type: Dreamland, near Kissingen, A.Kohlbecker 66211, 2017 Isotype, M; Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; Isotypes: BER, KEW; NameType: Prionus L. Species Plantarum"
                 , result
                 );
 
         LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedTypeDesignations =
                 typeDesignationManager.getOrderdTypeDesignationWorkingSets();
-        Map<TypeDesignationStatusBase<?>, Collection<TypedEntityReference>> byStatusMap = orderedTypeDesignations.values().iterator().next();
-        Iterator<TypeDesignationStatusBase<?>> keyIt = byStatusMap.keySet().iterator();
-        assertEquals("Holotype", keyIt.next().getLabel());
-        assertEquals("Isotype", keyIt.next().getLabel());
+        Iterator<TypeDesignationWorkingSet> byStatusMapIterator = orderedTypeDesignations.values().iterator();
+        Map<TypeDesignationStatusBase<?>, Collection<TypedEntityReference>> byStatusMap_1 = byStatusMapIterator.next();
+        Map<TypeDesignationStatusBase<?>, Collection<TypedEntityReference>> byStatusMap_2 = byStatusMapIterator.next();
+        Iterator<TypeDesignationStatusBase<?>> keyIt_1 = byStatusMap_1.keySet().iterator();
+        assertEquals("Isotype", keyIt_1.next().getLabel());
+        Iterator<TypeDesignationStatusBase<?>> keyIt_2 = byStatusMap_2.keySet().iterator();
+        assertEquals("Holotype", keyIt_2.next().getLabel());
+        assertEquals("Isotype", keyIt_2.next().getLabel());
     }
 
     @Test
