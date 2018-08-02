@@ -25,7 +25,7 @@ public class RegistrationCuratorRoleProbe implements RoleProbe {
         if(authentication != null) {
             return authentication.getAuthorities().stream().anyMatch(a -> {
                 return a.equals(RolesAndPermissions.ROLE_CURATION)
-                        // doing faster regex check here instreas of using CdmAuthoritiy.fromString()
+                        // doing faster regex check here instead of using CdmAuthoritiy.fromString()
                         || a.getAuthority().matches("^Registration\\.\\[.*UPDATE");
             });
         }
