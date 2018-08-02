@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -55,6 +57,8 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
+
+    private static final Logger logger = Logger.getLogger(ReferencePopupEditor.class);
 
     private TextField titleField;
 
@@ -224,27 +228,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
         GridLayout grid = (GridLayout)getFieldLayout();
 
-        // initialize the map of adaptive fields
-        if(adaptiveFields.isEmpty()){
-            try{
-                Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(null);
-                Set<String> fieldNames = fieldPropertyDefinition.keySet();
-                for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
-                    for(int x=0; x < grid.getColumns(); x++){
-                        Component c = grid.getComponent(x, row);
-                        if(c != null && c instanceof Field){
-                            Field<?> field = (Field<?>)c;
-                            PropertyIdPath propertyIdPath = boundPropertyIdPath(field);
-                            if(propertyIdPath != null && fieldNames.contains(propertyIdPath.toString())){
-                                adaptiveFields.put(propertyIdPath.toString(), field);
-                            }
-                        }
-                    }
-                }
-            } catch (UnimplemetedCaseException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        initAdaptiveFields();
 
         // clear the variable grid part
         for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
@@ -286,6 +270,37 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         getField("title").setVisible(!hideTitle.contains(referenceType));
 
         return null;
+    }
+
+    /**
+     * @param grid
+     */
+    protected void initAdaptiveFields() {
+        GridLayout grid = (GridLayout)getFieldLayout();
+        // initialize the map of adaptive fields
+        logger.setLevel(Level.DEBUG);
+        if(adaptiveFields.isEmpty()){
+            try{
+                Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(null);
+                Set<String> fieldNames = fieldPropertyDefinition.keySet();
+                for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
+                    for(int x=0; x < grid.getColumns(); x++){
+                        Component c = grid.getComponent(x, row);
+                        logger.debug("initAdaptiveFields() - y: " + row + " x: " + x + "  component:" + (c != null ? c.getClass().getSimpleName(): "NULL"));
+                        if(c != null && c instanceof Field){
+                            Field<?> field = (Field<?>)c;
+                            PropertyIdPath propertyIdPath = boundPropertyIdPath(field);
+                            logger.debug("initAdaptiveFields() - " + field.getCaption() + " -> " + propertyIdPath);
+                            if(propertyIdPath != null && fieldNames.contains(propertyIdPath.toString())){
+                                adaptiveFields.put(propertyIdPath.toString(), field);
+                            }
+                        }
+                    }
+                }
+            } catch (UnimplemetedCaseException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     protected void setAllFieldsVisible(boolean visible){
