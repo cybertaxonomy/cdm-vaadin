@@ -311,8 +311,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         row++;
         Label hint = new Label(
-                "For most names that already exist in the system it is only possible to create a registration covering type designations. "
-                + "Only in those rare cases where the citation of this workingset and the nomenclatural reference of a name are the same it is possible to create a registration covering the name also. "
+                "For most names that already exist in the system, it is only possible to create a registration covering type designations. "
                 + "In all other cases please choose <a href=\"registration#!regStart\">\"New\"</a> from the main menu and start a registration for the nomenclatural reference of the name to be registered.",
                 ContentMode.HTML);
         registrationsGrid.addComponent(hint, 0, row, COL_INDEX_BUTTON_GROUP, row);
