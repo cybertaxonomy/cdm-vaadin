@@ -171,7 +171,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return new  CdmStore<TaxonName, INameService>(getRepo(), getRepo().getNameService());
     }
 
-
+    /**
+     * Checks
+     * <ol>
+     * <li>if there is any registration for this name created in the current registration system</li>
+     * <li>Checks if the name belongs to the current workingset</li>
+     * </ol>
+     * If both checks are successful the method returns <code>true</code>.
+     */
     public boolean canCreateRegistrationForName(TaxonName name) {
         for(Registration reg : name.getRegistrations()){
             if(minter.isFromOwnRegistration(reg.getIdentifier())){
@@ -532,21 +539,26 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        getView().getAddExistingNameCombobox().commit();
+        getView().getAddExistingNameCombobox().commit(); // update the chosen value in the datasource
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
         if(typifiedName != null){
             boolean reloadWorkingSet = false;
             Reference citation = getRepo().getReferenceService().find(workingset.getCitationUuid());
-            if(event.getType() == ExistingNameRegistrationType.NAME_TYPIFICATION && canCreateRegistrationForName(typifiedName)){
+            // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
+            // to create a typification only registration in the working (publication) set which contains
+            // the protologe. This is known from the nomenclatural reference.
+            if(canCreateRegistrationForName(typifiedName)){
+                // the citation which is the base for workingset contains the protologe of the name and the name hast not
+                // been registered before:
+                // create a registration for the name and the first typifications
                 Registration newRegistrationWithExistingName = createNewRegistrationForName(typifiedName.getUuid());
                 newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
                 reloadWorkingSet = true;
             } else {
-                // case: ExistingNameRegistrationType.TYPIFICATION_ONLY
+                // create a typification only registration
+                // FIXME: this should not be possible if the names protologue is in the workingset --> #
                 Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
                 newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
-                Registration blockingRegistration = createNewRegistrationForName(typifiedName.getUuid());
-                newRegistrationWithExistingName.getBlockedBy().add(blockingRegistration);
             }
             workingset.add(newRegistrationDTOWithExistingName);
             // tell the view to update the workingset
