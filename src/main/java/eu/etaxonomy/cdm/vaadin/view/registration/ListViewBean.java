@@ -98,8 +98,9 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         toolBar.addComponent(filterInstructionLabel);
 
-        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin()){
-
+        boolean userIsCurator = UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe());
+        boolean userIsAdmin = UserHelperAccess.userHelper().userIsAdmin();
+        if(userIsCurator || userIsAdmin){
             submitterFilter = new ListSelect("Submitter");
             submitterFilter.setRows(1);
             submitterFilter.addValueChangeListener(e -> updateResults(null, null));
