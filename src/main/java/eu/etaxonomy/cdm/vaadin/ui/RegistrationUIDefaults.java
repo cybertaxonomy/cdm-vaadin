@@ -32,6 +32,7 @@ public class RegistrationUIDefaults {
             ReferenceType.Journal,
             ReferenceType.PrintSeries,
             ReferenceType.Proceedings,
+            ReferenceType.BookSection,
             ReferenceType.Section,
             ReferenceType.Thesis);
 
