@@ -174,17 +174,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     /**
      * Checks
      * <ol>
-     * <li>if there is any registration for this name created in the current registration system</li>
+     * <li>if there is NOT any registration for this name created in the current registration system</li>
      * <li>Checks if the name belongs to the current workingset</li>
      * </ol>
      * If both checks are successful the method returns <code>true</code>.
      */
-    public boolean canCreateRegistrationForName(TaxonName name) {
-        for(Registration reg : name.getRegistrations()){
-            if(minter.isFromOwnRegistration(reg.getIdentifier())){
-                return false;
-            }
-        }
+    public boolean canCreateNameRegistrationFor(TaxonName name) {
+        return !checkRegistrationExistsFor(name) && checkWokingsetContainsProtologe(name);
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public boolean checkWokingsetContainsProtologe(TaxonName name) {
         Reference nomRef = name.getNomenclaturalReference();
         UUID citationUuid = workingset.getCitationUuid();
         // @formatter:off
@@ -196,6 +199,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 );
         // @formatter:on
     }
+
+    /**
+     * @param name
+     */
+    public boolean checkRegistrationExistsFor(TaxonName name) {
+
+        for(Registration reg : name.getRegistrations()){
+            if(minter.isFromOwnRegistration(reg.getIdentifier())){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
 
     /**
@@ -547,18 +564,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
             // to create a typification only registration in the working (publication) set which contains
             // the protologe. This is known from the nomenclatural reference.
-            if(canCreateRegistrationForName(typifiedName)){
-                // the citation which is the base for workingset contains the protologe of the name and the name hast not
+            if(canCreateNameRegistrationFor(typifiedName)){
+                // the citation which is the base for workingset contains the protologe of the name and the name has not
                 // been registered before:
                 // create a registration for the name and the first typifications
                 Registration newRegistrationWithExistingName = createNewRegistrationForName(typifiedName.getUuid());
                 newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
                 reloadWorkingSet = true;
             } else {
-                // create a typification only registration
-                // FIXME: this should not be possible if the names protologue is in the workingset --> #
-                Registration newRegistrationWithExistingName = createNewRegistrationForName(null);
-                newRegistrationDTOWithExistingName = new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation);
+                if(!checkWokingsetContainsProtologe(typifiedName)){
+                    // create a typification only registration
+                    Registration typificationOnlyRegistration = createNewRegistrationForName(null);
+                    if(!checkRegistrationExistsFor(typifiedName)){
+                        // oops, yet no registration for this name, so we create it as blocking registration:
+                        Registration blockingNameRegistration = createNewRegistrationForName(typifiedName.getUuid());
+                        typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
+                    }
+                    newRegistrationDTOWithExistingName = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
+                }
             }
             workingset.add(newRegistrationDTOWithExistingName);
             // tell the view to update the workingset

@@ -10,8 +10,6 @@ package eu.etaxonomy.cdm.vaadin.event.registration;
 
 import java.util.UUID;
 
-import eu.etaxonomy.cdm.vaadin.view.registration.ExistingNameRegistrationType;
-
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
@@ -21,17 +19,15 @@ public class RegistrationWorkingsetAction {
 
     private Action action;
     private UUID citationUuid = null;
-    private ExistingNameRegistrationType type;
 
     /**
      *
      * @param citationID the id of a {@link Reference} denoting a
      * complete registration working set.
      */
-    public RegistrationWorkingsetAction(UUID citationUuid, Action action, ExistingNameRegistrationType type){
+    public RegistrationWorkingsetAction(UUID citationUuid, Action action){
         this.action = action;
         this.citationUuid = citationUuid;
-        this.type = type;
     }
 
     /**
@@ -50,10 +46,6 @@ public class RegistrationWorkingsetAction {
 
     public boolean isStart() {
         return action.equals(Action.start);
-    }
-
-    public ExistingNameRegistrationType getType() {
-        return type;
     }
 
 

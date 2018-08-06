@@ -39,7 +39,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
@@ -88,22 +87,17 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
     implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
-    /**
-     *
-     */
+
     private static final int COL_INDEX_STATE_LABEL = 0;
 
-    /**
-     *
-     */
     private static final int COL_INDEX_REG_ITEM = 1;
 
-    /**
-     *
-     */
     private static final int COL_INDEX_BUTTON_GROUP = 2;
 
     public static final String DOM_ID_WORKINGSET = "workingset";
+
+    public static final String TEXT_NAME_TYPIFICATION = "covering the name and typifications";
+    public static final String TEXT_TYPIFICATION_ONLY = "covering typifications only";
 
     private static final long serialVersionUID = -213040114015958970L;
 
@@ -126,7 +120,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private Button addExistingNameButton;
 
-    private ListSelect existingNameRegistrationTypeSelect;
+    private Label existingNameRegistrationTypeLabel;
 
     private RegistrationItem workingsetHeader;
 
@@ -253,41 +247,36 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton.addClickListener(
                 e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
 
-        existingNameRegistrationTypeSelect = new ListSelect(null, EnumSet.allOf(ExistingNameRegistrationType.class));
-        existingNameRegistrationTypeSelect.setRows(1);
-        existingNameRegistrationTypeSelect.setNullSelectionAllowed(true);
-        existingNameRegistrationTypeSelect.setEnabled(false);
+        existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
                 e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(
                         citationUuid,
-                        RegistrationWorkingsetAction.Action.start,
-                        (ExistingNameRegistrationType)existingNameRegistrationTypeSelect.getValue())
+                        RegistrationWorkingsetAction.Action.start
                 )
-             );
+             )
+                );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(
                 e -> {
                     boolean selectionNotEmpty = e.getProperty().getValue() != null;
-                    addExistingNameButton.setEnabled(selectionNotEmpty);
-                    existingNameRegistrationTypeSelect.setEnabled(selectionNotEmpty);
+                    addExistingNameButton.setEnabled(false);
+                    existingNameRegistrationTypeLabel.setValue(null);
                     if(selectionNotEmpty){
                         TaxonName name = (TaxonName)e.getProperty().getValue();
-                        if(getPresenter().canCreateRegistrationForName(name)){
-                            existingNameRegistrationTypeSelect.setValue(ExistingNameRegistrationType.NAME_TYPIFICATION);
-                            existingNameRegistrationTypeSelect.setEnabled(true);
-                            existingNameRegistrationTypeSelect.setNullSelectionAllowed(false);
+                        if(getPresenter().canCreateNameRegistrationFor(name)){
+                            existingNameRegistrationTypeLabel.setValue(TEXT_NAME_TYPIFICATION);
+                            addExistingNameButton.setEnabled(true);
                         } else {
-                            existingNameRegistrationTypeSelect.setValue(ExistingNameRegistrationType.TYPIFICATION_ONLY);
-                            existingNameRegistrationTypeSelect.setEnabled(false);
+                            if(!getPresenter().checkWokingsetContainsProtologe(name)){
+                                existingNameRegistrationTypeLabel.setValue(TEXT_TYPIFICATION_ONLY);
+                                addExistingNameButton.setEnabled(true);
+                            }
                         }
                     } else {
-                        existingNameRegistrationTypeSelect.setNullSelectionAllowed(true);
-                        existingNameRegistrationTypeSelect.clear();
-                        existingNameRegistrationTypeSelect.setEnabled(false);
-
+                        existingNameRegistrationTypeLabel.setValue(null);
                     }
                 }
                 );
@@ -298,7 +287,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 addRegistrationLabel_2,
                 addExistingNameButton,
                 existingNameCombobox,
-                existingNameRegistrationTypeSelect
+                existingNameRegistrationTypeLabel
                 );
         buttonContainer.setSpacing(true);
 //        buttonContainer.setWidth(100, Unit.PERCENTAGE);
