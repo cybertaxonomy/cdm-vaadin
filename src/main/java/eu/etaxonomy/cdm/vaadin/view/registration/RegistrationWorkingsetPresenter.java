@@ -11,8 +11,10 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
@@ -30,8 +32,6 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -135,9 +135,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private TaxonName newTaxonNameForRegistration = null;
 
-    // private RegistrationDTO newRegistrationDTOWithExistingName;
 
-    private RegistrationDTO typeDesignationTarget;
+    private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
 
     /**
@@ -268,7 +267,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     protected void activateComboboxes() {
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 getRepo().getNameService());
-        pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference"));
+        pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
@@ -528,33 +527,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 doReloadWorkingSet = true;
             } else {
                 if(!checkWokingsetContainsProtologe(typifiedName)){
-                    if(typeDesignationTarget != null){
-                        Notification.show("Can't create a new \"typification only\" registration as long as another new one exists.", Type.WARNING_MESSAGE);
-                    } else {
-                        // create a typification only registration
-                        Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
-                        // FIXME must only be done on save ----------------
-                        if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
-                            // oops, yet no registration for this name, so we create it as blocking registration:
-                            Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-                            typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
-                        }
-                        // ----------------------------------------------------
-                        typeDesignationTarget = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
-                        workingset.add(typeDesignationTarget);
+                    // create a typification only registration
+                    Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
+                    if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
+                        // oops, yet no registration for this name, so we create it as blocking registration:
+                        Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
+                        typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
                     }
+                    RegistrationDTO regDTO = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
+                    workingset.add(regDTO);
                 }
             }
             // tell the view to update the workingset
             refreshView(doReloadWorkingSet);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
-            if(typeDesignationTarget.registration().getName() == null){
-                getView().getAddExistingNameCombobox().setEnabled(false);
-                getView().getAddNewNameRegistrationButton().setEnabled(false);
-                getView().getAddNewNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
-                getView().getAddExistingNameCombobox().setDescription("You first need to add a type designation to the previously created registration.");
-                getView().getAddExistingNameRegistrationButton().setDescription("You first need to add a type designation to the previously created registration.");
-            }
         } else {
             logger.error("Seletced name is NULL");
         }
@@ -591,7 +577,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 // propagate readonly state from source button to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
             }
-            typeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+            nameTypeDesignationPopupEditorRegistrationUUIDMap.put(popup, event.getRegistrationUuid());
         }
     }
 
@@ -607,19 +593,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext());
             TypeDesignationWorkingsetEditorIdSet identifierSet;
             UUID typifiedNameUuid;
-            if(typeDesignationTarget != null){
-                typifiedNameUuid = typeDesignationTarget.getTypifiedNameRef().getUuid();
+
+            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+            EntityReference typifiedNameRef = registrationDTO.getTypifiedNameRef();
+            if(typifiedNameRef != null){
+                // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
+                typifiedNameUuid = typifiedNameRef.getUuid();
             } else {
-                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
-                EntityReference typifiedNameRef = registrationDTO.getTypifiedNameRef();
-                if(typifiedNameRef != null){
-                    // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
-                    typifiedNameUuid = typifiedNameRef.getUuid();
-                } else {
-                    // case of registrations with a name in the nomenclatural act.
-                    typifiedNameUuid = registrationDTO.getNameRef().getUuid();
-                }
+                // case of registrations with a name in the nomenclatural act.
+                typifiedNameUuid = registrationDTO.getNameRef().getUuid();
             }
+
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
                     event.getRegistrationUuid(),
                     getView().getCitationUuid(),
@@ -637,7 +621,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext());
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-            typeDesignationTarget = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+            RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+            Reference citation = regDto.getCitation();
+            nameTypeDesignationPopupEditorRegistrationUUIDMap.put(popup, event.getRegistrationUuid());
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
                 @Override
@@ -645,7 +631,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                     TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
-                    nameTypeDesignation.setCitation(typeDesignationTarget.getCitation());
+                    nameTypeDesignation.setCitation(citation);
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);
                     return nameTypeDesignation;
                 }
@@ -687,14 +673,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
                 getRepo().getSession().clear();
-                getRepo().getRegistrationService().addTypeDesignation(typeDesignationTarget.registration(), typeDesignationUuid);
+                UUID regUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(event.getPopup());
+                getRepo().getRegistrationService().addTypeDesignation(regUUID, typeDesignationUuid);
                 getRepo().getSession().clear();
-                typeDesignationTarget = null;
+                nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 refreshView(true);
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // noting to do
             }
-            typeDesignationTarget = null;
+
         }
         // ignore other editors
     }
