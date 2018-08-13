@@ -93,6 +93,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY);
+        if(reg == null){
+            reg = repo.getRegistrationService().newRegistration();
+            reg.setUuid(registrationUuid);
+        }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
         Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
@@ -166,6 +170,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
         if(dto.getOwner() instanceof Registration){
             Registration regPremerge = (Registration) dto.getOwner();
+
+            regPremerge = repo.getRegistrationService().assureIsPersisted(regPremerge);
 
             // find the newly created type designations
             Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationWorkingSetDTO<Registration>) dto);

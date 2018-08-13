@@ -92,7 +92,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = UserHelperAccess.userHelper().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
+        boolean userHasAddPermission = !regDto.isPersisted() || UserHelperAccess.userHelper().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -134,10 +134,11 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         addComponent(addTypeDesignationButton);
 
         //TODO make responsive and use specificIdentifier in case the space gets too narrow
-        identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
-        identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
-
-        addComponents(identifierLink);
+        if(regDto.isPersisted()){
+            identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
+            identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
+            addComponents(identifierLink);
+        }
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
         addDefaultStyles();

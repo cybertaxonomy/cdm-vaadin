@@ -38,19 +38,19 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
     private TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
 
     /**
+     * Constructor for {@link EditorActionType#EDIT EDIT} actions
      *
-     * @param action
      * @param baseEntityRef
      * @param workingSetType
      * @param registrationId
      * @param source
      * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
+    public TypeDesignationWorkingsetEditorAction(TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
             TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
             Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
-        super(action, null, source, target, sourceView);
+        super(EditorActionType.EDIT, null, source, target, sourceView);
         this.baseEntityRef = baseEntityRef;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
@@ -60,17 +60,17 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
     }
 
     /**
+     * Constructor for {@link EditorActionType#ADD ADD} actions
      *
-     * @param action
      * @param workingSetType
      * @param registrationUuid
      * @param source
      * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(EditorActionType action, TypeDesignationWorkingSetType workingSetType,
+    public TypeDesignationWorkingsetEditorAction(TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
             Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView) {
-        super(action, null, source, target, sourceView);
+        super(EditorActionType.ADD, null, source, target, sourceView);
         this.workingSetType = workingSetType;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;

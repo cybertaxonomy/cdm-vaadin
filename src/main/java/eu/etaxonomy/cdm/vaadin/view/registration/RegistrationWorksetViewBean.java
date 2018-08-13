@@ -359,7 +359,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
-                        EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
                         registrationEntityUuid,
@@ -505,7 +504,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
         getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
-                EditorActionType.ADD,
                 newWorkingsetType,
                 registrationEntityUuid,
                 typifiedNameRef.getUuid(),
