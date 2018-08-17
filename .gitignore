@@ -15,3 +15,4 @@ src/test/resources/eu/etaxonomy/cdm/database/schema/*.xsd
 .idea
 *.iml
 .directory
+env.properties
