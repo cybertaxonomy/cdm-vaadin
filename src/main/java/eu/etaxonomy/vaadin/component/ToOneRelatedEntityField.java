@@ -10,12 +10,16 @@ package eu.etaxonomy.vaadin.component;
 
 import com.vaadin.ui.Button.ClickListener;
 
+import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
+
 /**
  * @author a.kohlbecker
  * @since May 25, 2017
  *
  */
 public interface ToOneRelatedEntityField<V extends Object> {
+
+    public void setNestedButtonStateUpdater(NestedButtonStateUpdater<V> buttonUpdater);
 
     /**
      * Set the enabled state of the edit button

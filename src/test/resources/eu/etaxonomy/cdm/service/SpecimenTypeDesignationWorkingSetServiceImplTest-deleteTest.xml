@@ -43,7 +43,7 @@
   <HIBERNATE_SEQUENCES SEQUENCE_NAME="TaxonName" NEXT_VAL="5001"/>
   <HIBERNATE_SEQUENCES SEQUENCE_NAME="TermVocabulary" NEXT_VAL="5045"/>
   <HIBERNATE_SEQUENCES SEQUENCE_NAME="TypeDesignationBase" NEXT_VAL="5002"/>
-  <HIBERNATE_SEQUENCES SEQUENCE_NAME="UserAccount" NEXT_VAL="5002"/>
+  <!--<HIBERNATE_SEQUENCES SEQUENCE_NAME="UserAccount" NEXT_VAL="5002"/>  must not be contained !!!! -->
   <!-- Test data is being used by more than one test - need to reset a couple of *_AUD tables -->
   <AUDITEVENT />
   <TAXONNAME_AUD />

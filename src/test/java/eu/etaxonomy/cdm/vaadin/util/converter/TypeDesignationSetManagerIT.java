@@ -24,11 +24,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
-import eu.etaxonomy.cdm.api.service.dto.EntityReference;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.model.common.IdentifiableSource;
+import eu.etaxonomy.cdm.model.media.Media;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -40,9 +40,11 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.DerivationEvent;
 import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
+import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 
 /**
  * @author a.kohlbecker
@@ -57,6 +59,8 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
     private SpecimenTypeDesignation std_HT;
     private SpecimenTypeDesignation std_IT_2;
     private SpecimenTypeDesignation std_IT_3;
+    private SpecimenTypeDesignation mtd_HT_published;
+    private SpecimenTypeDesignation mtd_IT_unpublished;
 
     @Before
     public void init(){
@@ -82,9 +86,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         std_HT.setId(1);
         DerivedUnit specimen_HT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_HT.setTitleCache("OHA", true);
-        DerivationEvent derivationEvent_1 = DerivationEvent.NewInstance();
-        derivationEvent_1.addOriginal(fu_1);
-        derivationEvent_1.addDerivative(specimen_HT);
+        createDerivationEvent(fu_1, specimen_HT);
         specimen_HT.getOriginals().add(fu_1);
         std_HT.setTypeSpecimen(specimen_HT);
         std_HT.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
@@ -93,9 +95,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         std_IT.setId(2);
         DerivedUnit specimen_IT = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT.setTitleCache("BER", true);
-        DerivationEvent derivationEvent_2 = DerivationEvent.NewInstance();
-        derivationEvent_2.addOriginal(fu_1);
-        derivationEvent_2.addDerivative(specimen_IT);
+        createDerivationEvent(fu_1, specimen_IT);
         std_IT.setTypeSpecimen(specimen_IT);
         std_IT.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
 
@@ -103,9 +103,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         std_IT_2.setId(3);
         DerivedUnit specimen_IT_2 = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT_2.setTitleCache("KEW", true);
-        DerivationEvent derivationEvent_3 = DerivationEvent.NewInstance();
-        derivationEvent_3.addOriginal(fu_1);
-        derivationEvent_3.addDerivative(specimen_IT_2);
+        createDerivationEvent(fu_1, specimen_IT_2);
         std_IT_2.setTypeSpecimen(specimen_IT_2);
         std_IT_2.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
 
@@ -113,8 +111,43 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         std_IT_3.setId(4);
         DerivedUnit specimen_IT_3 = DerivedUnit.NewInstance(SpecimenOrObservationType.PreservedSpecimen);
         specimen_IT_3.setTitleCache("M", true);
+        createDerivationEvent(fu_2, specimen_IT_3);
         std_IT_3.setTypeSpecimen(specimen_IT_3);
         std_IT_3.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
+
+        mtd_HT_published = SpecimenTypeDesignation.NewInstance();
+        mtd_HT_published.setId(5);
+        MediaSpecimen mediaSpecimen_published = (MediaSpecimen)DerivedUnit.NewInstance(SpecimenOrObservationType.Media);
+        Media media = Media.NewInstance();
+        Reference ref = ReferenceFactory.newGeneric();
+        ref.setTitleCache("A.K. & W.K (2008) Algae of the BGBM", true);
+        media.addSource(IdentifiableSource.NewPrimaryMediaSourceInstance(ref, "p.33"));
+        mediaSpecimen_published.setMediaSpecimen(media);
+        createDerivationEvent(fu_1, mediaSpecimen_published);
+        mtd_HT_published.setTypeSpecimen(mediaSpecimen_published);
+        mtd_HT_published.setTypeStatus(SpecimenTypeDesignationStatus.HOLOTYPE());
+
+        mtd_IT_unpublished = SpecimenTypeDesignation.NewInstance();
+        mtd_IT_unpublished.setId(6);
+        MediaSpecimen mediaSpecimen_unpublished = (MediaSpecimen)DerivedUnit.NewInstance(SpecimenOrObservationType.Media);
+        eu.etaxonomy.cdm.model.occurrence.Collection collection = eu.etaxonomy.cdm.model.occurrence.Collection.NewInstance();
+        collection.setCode("B");
+        mediaSpecimen_unpublished.setCollection(collection);
+        mediaSpecimen_unpublished.setAccessionNumber("Slide A565656");
+        createDerivationEvent(fu_1, mediaSpecimen_unpublished);
+        mtd_IT_unpublished.setTypeSpecimen(mediaSpecimen_unpublished);
+        mtd_IT_unpublished.setTypeStatus(SpecimenTypeDesignationStatus.ISOTYPE());
+
+    }
+
+    /**
+     * @param fu_1
+     * @param specimen_IT_2
+     */
+    protected void createDerivationEvent(FieldUnit fu_1, DerivedUnit specimen_IT_2) {
+        DerivationEvent derivationEvent_3 = DerivationEvent.NewInstance();
+        derivationEvent_3.addOriginal(fu_1);
+        derivationEvent_3.addDerivative(specimen_IT_2);
     }
 
     @Test
@@ -137,21 +170,25 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         typifiedName.addTypeDesignation(std_IT_3, false);
 
         TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(tds);
-        String result = typeDesignationManager.buildString().print();
+        String result = typeDesignationManager.print();
 
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA; Isotypes: BER, KEW); Type: (Isotype, M); NameType: Prionus L. Species Plantarum"
+                "Prionus coriatius L. Type: Dreamland, near Kissingen, A.Kohlbecker 66211, 2017 Isotype, M; Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; Isotypes: BER, KEW; NameType: Prionus L. Species Plantarum"
                 , result
                 );
 
         LinkedHashMap<TypedEntityReference, TypeDesignationWorkingSet> orderedTypeDesignations =
                 typeDesignationManager.getOrderdTypeDesignationWorkingSets();
-        Map<TypeDesignationStatusBase<?>, Collection<EntityReference>> byStatusMap = orderedTypeDesignations.values().iterator().next();
-        Iterator<TypeDesignationStatusBase<?>> keyIt = byStatusMap.keySet().iterator();
-        assertEquals("Holotype", keyIt.next().getLabel());
-        assertEquals("Isotype", keyIt.next().getLabel());
+        Iterator<TypeDesignationWorkingSet> byStatusMapIterator = orderedTypeDesignations.values().iterator();
+        Map<TypeDesignationStatusBase<?>, Collection<TypedEntityReference>> byStatusMap_1 = byStatusMapIterator.next();
+        Map<TypeDesignationStatusBase<?>, Collection<TypedEntityReference>> byStatusMap_2 = byStatusMapIterator.next();
+        Iterator<TypeDesignationStatusBase<?>> keyIt_1 = byStatusMap_1.keySet().iterator();
+        assertEquals("Isotype", keyIt_1.next().getLabel());
+        Iterator<TypeDesignationStatusBase<?>> keyIt_2 = byStatusMap_2.keySet().iterator();
+        assertEquals("Holotype", keyIt_2.next().getLabel());
+        assertEquals("Isotype", keyIt_2.next().getLabel());
     }
 
     @Test
@@ -161,7 +198,7 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
         typifiedName.setTitleCache("Prionus coriatius L.", true);
 
         TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName);
-        String result = typeDesignationManager.buildString().print();
+        String result = typeDesignationManager.print();
         Logger.getLogger(this.getClass()).debug(result);
         assertNotNull(result);
         assertEquals(
@@ -174,16 +211,40 @@ public class TypeDesignationSetManagerIT extends CdmVaadinIntegrationTest {
 
         assertEquals(
                 "Prionus coriatius L. NameType: Prionus L. Species Plantarum"
-                , typeDesignationManager.buildString().print()
+                , typeDesignationManager.print()
                 );
 
         typifiedName.addTypeDesignation(std_HT, false);
         typeDesignationManager.addTypeDesigations(null, std_HT);
 
         assertEquals(
-                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 (Holotype, OHA); NameType: Prionus L. Species Plantarum"
-                , typeDesignationManager.buildString().print()
+                "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, OHA; NameType: Prionus L. Species Plantarum"
+                , typeDesignationManager.print()
                 );
+
+    }
+
+    @Test
+    public void test_mediaType(){
+
+        for(int i = 0; i < 10; i++ ){
+
+            init();
+            // repeat 10 times to assure the order of typedesignations is fix in the representations
+            TaxonName typifiedName = TaxonNameFactory.NewBacterialInstance(Rank.SPECIES());
+            typifiedName.setTitleCache("Prionus coriatius L.", true);
+            typifiedName.addTypeDesignation(mtd_HT_published, false);
+            typifiedName.addTypeDesignation(mtd_IT_unpublished, false);
+
+            TypeDesignationSetManager typeDesignationManager = new TypeDesignationSetManager(typifiedName);
+            typeDesignationManager.addTypeDesigations(null, mtd_HT_published);
+            typeDesignationManager.addTypeDesigations(null, mtd_IT_unpublished);
+
+            assertEquals("failed after repreating " + i + " times",
+                    "Prionus coriatius L. Type: Testland, near Bughausen, A.Kohlbecker 81989, 2017 Holotype, [icon] p.33 in A.K. & W.K (2008) Algae of the BGBM; Isotype, [icon] (B Slide A565656)."
+                    , typeDesignationManager.print()
+                    );
+        }
 
     }
 

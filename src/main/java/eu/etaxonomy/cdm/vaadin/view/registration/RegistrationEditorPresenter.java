@@ -20,8 +20,8 @@ import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 
 /**
@@ -65,7 +65,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
-            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(Registration.class, identifier, crud, null);
+            newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(Registration.class, identifier, crud, null);
         }
 
     }
@@ -76,7 +76,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     @Override
     protected void guaranteePerEntityCRUDPermissions(Registration bean) {
         if(crud != null){
-            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(bean, crud, null);
+            newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, crud, null);
         }
     }
 

@@ -20,6 +20,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 
@@ -32,6 +33,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
+
+    public static final String QUERY_STRING_PLACEHOLDER = "{query-string}";
 
     private static final Logger logger = Logger.getLogger(CdmFilterablePagingProvider.class);
 
@@ -48,6 +51,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
     private List<Criterion> criteria = new ArrayList<>();
+
+    private List<Restriction<?>> restrictions = new ArrayList<>();
 
 
     /**
@@ -94,6 +99,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         super();
         this.type = type;
         this.service = service;
+
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
     }
 
 
@@ -107,51 +114,124 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         this.service = service;
         this.matchMode = matchMode;
         this.orderHints = orderHints;
+
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public List<V> findEntities(int firstRow, String filter) {
 
+        checkNotMixed();
+
         Integer pageIndex = firstRow / pageSize;
-        Pager<V> page = (Pager<V>) service.findByTitle(
-                type,
-                filter,
-                matchMode,
-                criteria,
-                pageSize,
-                pageIndex ,
-                orderHints,
-                initStrategy
-              );
+        Pager<V> page;
+        if(!restrictions.isEmpty()){
+            List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
+            page = (Pager<V>) service.findByTitleWithRestrictions(
+                    type,
+                    filter,
+                    matchMode,
+                    preparedRestrictions,
+                    pageSize,
+                    pageIndex ,
+                    orderHints,
+                    initStrategy
+                    );
+        } else {
+            page = (Pager<V>) service.findByTitle(
+                    type,
+                    filter,
+                    matchMode,
+                    criteria,
+                    pageSize,
+                    pageIndex ,
+                    orderHints,
+                    initStrategy
+                    );
+        }
+
         if(logger.isTraceEnabled()){
             logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
         }
+
+        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.WARN);
         return page.getRecords();
     }
 
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     public int size(String filter) {
 
-        Pager<V> page = (Pager<V>) service.findByTitle(
-                type,
-                filter,
-                matchMode,
-                criteria,
-                1,
-                0,
-                null,
-                null
-              );
+        checkNotMixed();
+
+        Pager<V> page;
+        if(!restrictions.isEmpty()){
+
+            // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
+            List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
+            page = (Pager<V>) service.findByTitleWithRestrictions(
+                    type,
+                    filter,
+                    matchMode,
+                    preparedRestrictions,
+                    1,
+                    0,
+                    null,
+                    null
+                  );
+        } else {
+            page = (Pager<V>) service.findByTitle(
+                    type,
+                    filter,
+                    matchMode,
+                    criteria,
+                    1,
+                    0,
+                    null,
+                    null
+                  );
+        }
+
         if(logger.isTraceEnabled()){
             logger.trace("size() -  count: " + page.getCount().intValue());
         }
         return page.getCount().intValue();
+    }
+
+    /**
+     * @return
+     */
+    private List<Restriction<?>> prepareRestrictions(String filter, MatchMode matchMode) {
+        List<Restriction<?>> prepared = new ArrayList<>(restrictions.size());
+        for(Restriction<?> r : restrictions) {
+            List<Object> values = new ArrayList<>(r.getValues().size());
+            for(Object v : r.getValues()){
+                if(v instanceof String){
+                    String expandedValue = ((String)v).replace(QUERY_STRING_PLACEHOLDER, matchMode.queryStringFrom(filter));
+                    values.add(expandedValue);
+                } else {
+                    values.add(v);
+                }
+            }
+            prepared.add(new Restriction(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new String[values.size()])));
+        }
+        return prepared;
+    }
+
+    /**
+     *
+     */
+    protected void checkNotMixed() {
+        if(!restrictions.isEmpty() && !criteria.isEmpty()){
+            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
+        }
     }
 
     /**
@@ -189,5 +269,32 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      */
     public List<Criterion> getCriteria() {
         return criteria;
+    }
+
+    public void addCriterion(Criterion criterion){
+        criteria.add(criterion);
+    }
+
+    /**
+     * The list of restrictions is initially empty.
+     * <p>
+     * Occurrences of the {@link QUERY_STRING_PLACEHOLDER} in the value
+     * of String type Restrictions will be replaced by the <code>filter</code> parameter passed to the paging provider.
+     *
+     *
+     * @return the restrictions
+     */
+    public List<Restriction<?>> getRestrictions() {
+        return restrictions;
+    }
+
+    /**
+     * Occurrences of the {@link QUERY_STRING_PLACEHOLDER} in the value
+     * of String type Restrictions will be replaced by the <code>filter</code> parameter passed to the paging provider.
+     *
+     * @param restriction
+     */
+    public void addRestriction(Restriction<?> restriction){
+        restrictions.add(restriction);
     }
 }

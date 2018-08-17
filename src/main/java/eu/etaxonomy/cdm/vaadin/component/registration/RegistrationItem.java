@@ -35,19 +35,18 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationTypeConverter;
 import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -80,8 +79,6 @@ public class RegistrationItem extends GridLayout {
 
     private static final long serialVersionUID = -211003770452173644L;
 
-    private RegistrationTypeConverter regTypeConverter = new RegistrationTypeConverter();
-
     private AbstractView<?> parentView;
 
     private RegistrationDTO regDto;
@@ -90,7 +87,7 @@ public class RegistrationItem extends GridLayout {
 
     // --------------------------------------------------
 
-    private RegistrationStateLabel stateLabel = new RegistrationStateLabel();
+    private RegistrationStatusLabel stateLabel = new RegistrationStatusLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
@@ -210,12 +207,12 @@ public class RegistrationItem extends GridLayout {
 
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationUuid() != null){
-            if(UserHelper.fromSession().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+            if(UserHelperAccess.userHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
         } else {
-            if(UserHelper.fromSession().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
+            if(UserHelperAccess.userHelper().userHasPermission(Reference.class, CRUD.CREATE, null, null, parentView)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.ADD);
             }
         }

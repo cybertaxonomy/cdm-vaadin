@@ -10,7 +10,6 @@ package eu.etaxonomy.vaadin.component;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -22,6 +21,7 @@ import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
@@ -45,9 +45,9 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private CssLayout toolBar= new CssLayout();
 
-    private Button removeButton = new Button(FontAwesome.REMOVE);
+    private Button removeButton = ButtonFactory.REMOVE_ITEM.createButton();
 
-    private Button newButton = new Button(FontAwesome.PLUS);
+    private Button newButton = ButtonFactory.ADD_ITEM.createButton();
 
     private BeanFieldGroup<NameRelationshipDTO> fieldGroup = new BeanFieldGroup<>(NameRelationshipDTO.class);
 
@@ -111,8 +111,8 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
                 setValue(null);
                 updateToolBarButtonStates();
             });
-        validatedNameComboBox.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<TaxonName>(validatedNameComboBox));
-        citatonComboBox.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox));
+        validatedNameComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(validatedNameComboBox));
+        citatonComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox));
 
         grid = new GridLayout(2, 3);
 

@@ -24,8 +24,9 @@ import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.ext.registration.messages.Message;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.error.ExternalServiceExceptionHandler;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -75,7 +76,7 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
      */
     public void postMessage(String message) {
 
-        User user = UserHelper.fromSession().user();
+        User user = UserHelperAccess.userHelper().user();
         List<Message> activeMessages;
         try {
             activeMessages = messageService.listActiveMessagesFor(registration, user);
@@ -83,7 +84,7 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
             throw new RuntimeException(e);
         }
         User toUser = null;
-        if(UserHelper.fromSession().userIsRegistrationCurator()){
+        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe())){
             toUser = registration.getSubmitter();
         } else {
             Stack<Message> stack = new Stack<>();

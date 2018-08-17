@@ -28,8 +28,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.SwitchButton;
 
@@ -54,8 +55,7 @@ public class PersonField extends CompositeCustomField<Person> {
 
     private LazyComboBox<Person> personSelect = new LazyComboBox<Person>(Person.class);
 
-    private Button personSelectConfirmButton = new Button("OK");
-    private Button newPersonButton = new Button("New");
+    private Button newPersonButton = ButtonFactory.CREATE_NEW.createButton();
 
     private BeanFieldGroup<Person> fieldGroup = new BeanFieldGroup<>(Person.class);
 
@@ -85,9 +85,6 @@ public class PersonField extends CompositeCustomField<Person> {
     private TextField suffixField = new TextFieldNFix();
     private SwitchButton unlockSwitch = new SwitchButton();
 
-    private boolean onCommit = false;
-
-
 
     /**
      * @param caption
@@ -106,18 +103,15 @@ public class PersonField extends CompositeCustomField<Person> {
         root.setPrimaryStyleName(PRIMARY_STYLE);
 
         // select existing or create new person
-        addStyledComponents(personSelect, personSelectConfirmButton, newPersonButton);
+        addStyledComponents(personSelect, newPersonButton);
         personSelect.addValueChangeListener(e -> {
             if(personSelect.getValue() != null){
-                personSelectConfirmButton.setEnabled(true);
+                setValue(personSelect.getValue());
+//                 personSelect.clear();
             }
         });
-        personSelectConfirmButton.setEnabled(false);
-        personSelectConfirmButton.addClickListener(e -> {
-            setValue(personSelect.getValue());
-            personSelect.clear();
-        });
-        selectOrNewContainer.addComponents(personSelect, personSelectConfirmButton, newPersonButton);
+
+        selectOrNewContainer.addComponents(personSelect, newPersonButton);
         newPersonButton.addClickListener(e -> createNewPerson());
 
         // edit person
@@ -138,7 +132,7 @@ public class PersonField extends CompositeCustomField<Person> {
      *
      */
     private void checkUserPermissions(Person newValue) {
-        boolean userCanEdit = newValue == null || !newValue.isPersited() || UserHelper.fromSession().userHasPermission(newValue, "DELETE", "UPDATE");
+        boolean userCanEdit = newValue == null || !newValue.isPersited() || UserHelperAccess.userHelper().userHasPermission(newValue, "DELETE", "UPDATE");
         setEnabled(userCanEdit);
     }
 
@@ -374,7 +368,7 @@ public class PersonField extends CompositeCustomField<Person> {
             }
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved && !(hasNullContent() && !allowNewEmptyEntity)){
-                UserHelper.fromSession().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
+                UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }
     }
@@ -391,10 +385,6 @@ public class PersonField extends CompositeCustomField<Person> {
         if(bean == null){
             return null;
         }
-       // boolean isUnsaved = bean.getId() == 0;
-//        if(isUnsaved && hasNullContent() && !allowNewEmptyEntity) {
-//            return null;
-//        }
         return bean;
     }
 

@@ -23,8 +23,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
-import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -64,25 +62,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         uiEventBus.subscribe(this);
     }
 
-
-	/**
-	 * This reference will cause the scoped UserHelper being initialized
-	 * It is not used in this class but attaches itself to the vaadin session
-	 * from where it will be accessible via UserHelper.fromSession()
-	 */
-	@Autowired
-    private UserHelper userHelper;
-
-    /**
-     * This reference will cause the scoped PermissionDebugUtils being initialized.
-     * It is not used in this class but attaches itself to the vaadin session
-     * from where it will be accessible via UserHelper.fromSession()
-     *
-     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
-     * See
-     */
-    @Autowired(required=false)
-    private PermissionDebugUtils permissionDebugUtils;
+//    /**
+//     * This reference will cause the scoped PermissionDebugUtils being initialized.
+//     * It is not used in this class but attaches itself to the vaadin session
+//     * from where it will be accessible via VaadinUserHelper.fromSession()
+//     *
+//     * <b>NOTE:</b> PermissionDebugUtils is only available if the spring profile "debug" is active,
+//     * See
+//     */
+//    @Autowired(required=false)
+//    private PermissionDebugUtils permissionDebugUtils;
 
 	private PopupViewRegistration popupViewRegistration;
 
@@ -231,7 +220,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     }
 
     /**
-     * This method requires that the {@SpringView} annotation is used to ser the name of the <code>View</code>.
+     * This method requires that the {@SpringView} annotation is used to set the name of the <code>View</code>.
      *
      * @return the current view name or <code>null</code>
      */

@@ -18,6 +18,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.ICdmCacher;
@@ -27,8 +28,8 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.mvp.event.EditorPreSaveEvent;
 import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
@@ -117,7 +118,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
         CDM cdmEntitiy = cdmEntity(dto);
 
-        UserHelper userHelper = UserHelper.fromSession();
+        UserHelper userHelper = UserHelperAccess.userHelper();
         boolean canDelte = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
         boolean canEdit = userHelper.userHasPermission(cdmEntitiy, CRUD.UPDATE);
 
@@ -211,7 +212,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
             }
         } catch (HibernateException e){
             if(newAuthorityCreated != null){
-                UserHelper.fromSession().removeAuthorityForCurrentUser(newAuthorityCreated);
+                UserHelperAccess.userHelper().removeAuthorityForCurrentUser(newAuthorityCreated);
             }
             throw e;
         } finally {

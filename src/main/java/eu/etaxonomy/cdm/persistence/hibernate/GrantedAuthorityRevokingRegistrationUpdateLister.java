@@ -46,6 +46,18 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 
 /**
+ * This Hibernate {@link PostUpdateEventListener} is responsible for
+ * revoking GrantedAuthorities from any user which is having per entity
+ * permissions in the object graph of the `Registration`being updated
+ * This encompasses GrantedAuthotities with the CRUD values CRUD.UPDATE, CRUD.DELETE.
+ * Please refer to the method documentation of {@link #collectDeleteCandidates(Registration)}
+ * for further details.
+ * <p>
+ * The according permissions are revoked when the RegistrationStatus is being changed
+ * by a database update. The RegistrationStatus causing this are contained in the constant
+ * {@link GrantedAuthorityRevokingRegistrationUpdateLister#MODIFICATION_STOP_STATES MODIFICATION_STOP_STATES}
+ *
+ *
  * @author a.kohlbecker
  * @since Dec 18, 2017
  *
@@ -55,9 +67,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
     private static final long serialVersionUID = -3542204523291766866L;
 
     /**
-     *
-     * Registrations having these states must no longer be modifiable by users having only per entity permissions on the
-     * Registration subgraph
+     * Registrations having these states must no longer be modifiable by users having
+     * only per entity permissions on the Registration subgraph.
      */
     private static final EnumSet<RegistrationStatus> MODIFICATION_STOP_STATES = EnumSet.of(
             RegistrationStatus.PUBLISHED,
@@ -86,8 +97,9 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
     /**
      * Walks the entity graph of the Registration instance and collects all authorities which
      * could have been granted to users. Code parts in which this could have happened can be
-     * found by searching for usage of the methods {@link eu.etaxonomy.cdm.vaadin.permission.UserHelper#createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)
-     * UserHelper.createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)} and {@link eu.etaxonomy.cdm.vaadin.permission.UserHelper#createAuthorityForCurrentUser(Class, Integer, EnumSet, String)
+     * found by searching for usage of the methods {@link eu.etaxonomy.cdm.api.utility.UserHelper#createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)
+     * UserHelper.createAuthorityForCurrentUser(eu.etaxonomy.cdm.model.common.CdmBase, EnumSet, String)} and
+     * {@link eu.etaxonomy.cdm.api.utility.UserHelper#createAuthorityForCurrentUser(Class, Integer, EnumSet, String)
      * UserHelper.createAuthorityForCurrentUser(Class, Integer, EnumSet, String)}
      * <p>
      * At the time of implementing this function these places are:
@@ -244,33 +256,37 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         // -----------------------------------------------------------------------------------------
         // this needs to be executed in a separate session to avoid concurrent modification problems
         Session newSession = session.getSessionFactory().openSession();
-        Transaction txState = newSession.beginTransaction();
+        try {
+            Transaction txState = newSession.beginTransaction();
 
-        Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
-        userQuery.setParameterList("authorities", authorityStrings);
-        List<User> users = userQuery.list();
-        for(User user : users){
-            List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
-                        ga -> authorityStrings.contains(ga.getAuthority())
-                    )
-                    .collect(Collectors.toList());
-            user.getGrantedAuthorities().removeAll(deleteFromUser);
+            Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
+            userQuery.setParameterList("authorities", authorityStrings);
+            List<User> users = userQuery.list();
+            for(User user : users){
+                List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
+                            ga -> authorityStrings.contains(ga.getAuthority())
+                        )
+                        .collect(Collectors.toList());
+                user.getGrantedAuthorities().removeAll(deleteFromUser);
+            }
+
+            Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
+            groupQuery.setParameterList("authorities", authorityStrings);
+            List<Group> groups = groupQuery.list();
+            for(Group group : groups){
+                List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(
+                            ga -> authorityStrings.contains(ga.getAuthority())
+                        )
+                        .collect(Collectors.toList());
+                group.getGrantedAuthorities().removeAll(deleteFromUser);
+            }
+            newSession.flush();
+            txState.commit();
+        } finally {
+            // no catching of the exception, if the session flush fails the transaction should roll back and
+            // the exception needs to bubble up so that the transaction in enclosing session is also rolled back
+            newSession.close();
         }
-
-        Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
-        groupQuery.setParameterList("authorities", authorityStrings);
-        List<Group> groups = groupQuery.list();
-        for(Group group : groups){
-            List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(
-                        ga -> authorityStrings.contains(ga.getAuthority())
-                    )
-                    .collect(Collectors.toList());
-            group.getGrantedAuthorities().removeAll(deleteFromUser);
-        }
-
-        newSession.flush();
-        txState.commit();
-        newSession.close();
         // -----------------------------------------------------------------------------------------
 
         String hql = "delete from GrantedAuthorityImpl as ga where ga.authority in (:authorities)";

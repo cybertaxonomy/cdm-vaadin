@@ -31,22 +31,18 @@ import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
-import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
+import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 
 /**
  * @author a.kohlbecker
  * @since Apr 23, 2018
  *
  */
-public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
+public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private static final long serialVersionUID = -8018109905949198530L;
 
     private TaxonName name;
-
-    private Set<TaxonName> persistedBasionyms;
-
-    private Set<TaxonName> persistedReplacedSynonyms;
 
     private TaxonName persistedValidatedName;
 
@@ -100,19 +96,11 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
 
     public Set<TaxonName> getBasionyms() {
         Set<TaxonName> basionyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.BASIONYM());
-        if(persistedBasionyms == null){
-            // remember the persisted state before starting to operate on the DTO
-            persistedBasionyms = basionyms;
-        }
         return basionyms;
     }
 
     public Set<TaxonName> getReplacedSynonyms() {
         Set<TaxonName> replacedSynonyms = name.getRelatedNames(Direction.relatedTo, NameRelationshipType.REPLACED_SYNONYM());
-        if(persistedReplacedSynonyms == null){
-            // remember the persisted state before starting to operate on the DTO
-            persistedReplacedSynonyms = replacedSynonyms;
-        }
         return replacedSynonyms;
     }
 
@@ -216,10 +204,6 @@ public class TaxonNameDTO extends CdmEntityDecoraterDTO<TaxonName> {
                 name.removeRelationWithTaxonName(tn, direction, relType);
             }
         }
-    }
-
-    public Set<TaxonName> persistedBasionyms(){
-        return persistedBasionyms;
     }
 
     public TeamOrPersonBase<?> getCombinationAuthorship() {

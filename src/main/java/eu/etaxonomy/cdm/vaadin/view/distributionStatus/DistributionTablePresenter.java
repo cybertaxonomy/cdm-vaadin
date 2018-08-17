@@ -34,6 +34,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
@@ -51,7 +52,6 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
-import eu.etaxonomy.cdm.service.CdmUserHelper;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.PresenceAbsenceTermContainer;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
@@ -72,7 +72,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	private static final long serialVersionUID = 3313043335587777217L;
 
     @Autowired
-    private CdmUserHelper userHelper;
+    private UserHelper userHelper;
 
     @Autowired
     @Qualifier("cdmRepository")

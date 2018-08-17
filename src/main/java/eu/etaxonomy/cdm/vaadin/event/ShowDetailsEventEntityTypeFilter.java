@@ -41,7 +41,7 @@ public class ShowDetailsEventEntityTypeFilter implements EventBusListenerMethodF
     public static class RegistrationWorkingSet extends ShowDetailsEventEntityTypeFilter{
 
         public RegistrationWorkingSet(){
-            super(eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet.class);
+            super(eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet.class);
         }
     }
 

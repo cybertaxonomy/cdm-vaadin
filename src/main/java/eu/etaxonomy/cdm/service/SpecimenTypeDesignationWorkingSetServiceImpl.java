@@ -27,8 +27,10 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationComparator;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -42,6 +44,7 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 
@@ -89,7 +92,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Override
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
-        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_INIT_STRATEGY);
+        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY);
+        if(reg == null){
+            reg = repo.getRegistrationService().newRegistration();
+            reg.setUuid(registrationUuid);
+        }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
         Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
@@ -102,6 +109,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Override
     @Transactional
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
+
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
         TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
@@ -110,9 +118,11 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     }
 
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
+
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
+        specimenTypeDesignations.sort(new TypeDesignationComparator());
         VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
@@ -160,6 +170,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
         if(dto.getOwner() instanceof Registration){
             Registration regPremerge = (Registration) dto.getOwner();
+
+            regPremerge = repo.getRegistrationService().assureIsPersisted(regPremerge);
 
             // find the newly created type designations
             Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationWorkingSetDTO<Registration>) dto);

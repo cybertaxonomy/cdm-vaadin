@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
@@ -33,7 +34,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
-import eu.etaxonomy.cdm.service.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
@@ -41,7 +42,6 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -140,12 +140,12 @@ public class NameTypeDesignationPresenter
         getView().getCitationCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
         getView().getCitationCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
-        getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
+        getView().getCitationCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
         getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getCitationCombobox(), this));
 
         CdmFilterablePagingProvider<TaxonName,TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
         getView().getTypeNameField().loadFrom(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
-        getView().getTypeNameField().getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<TaxonName>(getView().getTypeNameField()));
+        getView().getTypeNameField().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(getView().getTypeNameField()));
         getView().getTypeNameField().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getTypeNameField(), this));
 
         getView().getTypifiedNamesComboboxSelect().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize(), this);
@@ -159,7 +159,7 @@ public class NameTypeDesignationPresenter
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
-            newAuthorityCreated = UserHelper.fromSession().createAuthorityForCurrentUser(NameTypeDesignation.class, identifier, crud, null);
+            newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(NameTypeDesignation.class, identifier, crud, null);
         }
     }
 
@@ -189,7 +189,7 @@ public class NameTypeDesignationPresenter
             EntityChangeEvent changeEvent = new EntityChangeEvent(bean, Type.REMOVED, (AbstractView) getView());
             viewEventBus.publish(this, changeEvent);
         } else {
-            CdmStore.handleDeleteresultInError(deletResult);
+            CdmStore.handleDeleteresultInError(deletResult, getRepo().getSession());
         }
     }
 

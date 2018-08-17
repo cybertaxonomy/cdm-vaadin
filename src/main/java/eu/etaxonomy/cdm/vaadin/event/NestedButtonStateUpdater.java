@@ -15,6 +15,8 @@ import com.vaadin.data.Property.ValueChangeListener;
  * @since Jun 6, 2018
  *
  */
-public interface NestedButtonStateUpdater extends ValueChangeListener{
+public interface NestedButtonStateUpdater<T> extends ValueChangeListener{
+
+    public void updateButtons(T value);
 
 }

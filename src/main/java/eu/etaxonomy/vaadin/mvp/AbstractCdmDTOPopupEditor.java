@@ -14,7 +14,7 @@ import com.vaadin.ui.Layout;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.vaadin.model.CdmEntityDecoraterDTO;
+import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 
 /**
@@ -22,7 +22,7 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
  * @since May 5, 2017
  *
  */
-public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityDecoraterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO, CDM, ? extends ApplicationView>>
+public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO, CDM, ? extends ApplicationView>>
     extends AbstractPopupEditor<DTO, P> implements PerEntityAuthorityGrantingEditor {
 
     /**

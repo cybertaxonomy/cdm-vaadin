@@ -31,8 +31,10 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -44,21 +46,24 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.EntityReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.ref.EntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStateLabel;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
@@ -66,10 +71,9 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -83,22 +87,17 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
     implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
-    /**
-     *
-     */
+
     private static final int COL_INDEX_STATE_LABEL = 0;
 
-    /**
-     *
-     */
     private static final int COL_INDEX_REG_ITEM = 1;
 
-    /**
-     *
-     */
     private static final int COL_INDEX_BUTTON_GROUP = 2;
 
     public static final String DOM_ID_WORKINGSET = "workingset";
+
+    public static final String TEXT_NAME_TYPIFICATION = "covering the name and typifications";
+    public static final String TEXT_TYPIFICATION_ONLY = "covering typifications only";
 
     private static final long serialVersionUID = -213040114015958970L;
 
@@ -121,6 +120,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private Button addExistingNameButton;
 
+    private Label existingNameRegistrationTypeLabel;
+
     private RegistrationItem workingsetHeader;
 
     private Panel registrationListPanel;
@@ -134,6 +135,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * uses the registrationId as key
      */
     private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
+
+    private RegistrationStatusFieldInstantiator statusFieldInstantiator;
 
     public RegistrationWorksetViewBean() {
         super();
@@ -229,12 +232,13 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.setColumnExpandRatio(1, 1f);
 
         registrationItemMap.clear();
-        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 2);
+        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 3);
         int row = 0;
         for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
             row = putRegistrationListComponent(row, dto);
         }
 
+        // --- Footer with UI to create new registrations ----
         Label addRegistrationLabel_1 = new Label("Add a new registration for a");
         Label addRegistrationLabel_2 = new Label("or an");
 
@@ -243,19 +247,48 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton.addClickListener(
                 e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
 
+        existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
-        addExistingNameButton.setDescription("A name which was previously published in a earlier publication.");
         addExistingNameButton.setEnabled(false);
         addExistingNameButton.addClickListener(
-                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(citationUuid, RegistrationWorkingsetAction.Action.start))
+                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(
+                        citationUuid,
+                        RegistrationWorkingsetAction.Action.start
+                )
+             )
                 );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(
-                e -> addExistingNameButton.setEnabled(e.getProperty().getValue() != null)
+                e -> {
+                    boolean selectionNotEmpty = e.getProperty().getValue() != null;
+                    addExistingNameButton.setEnabled(false);
+                    existingNameRegistrationTypeLabel.setValue(null);
+                    if(selectionNotEmpty){
+                        TaxonName name = (TaxonName)e.getProperty().getValue();
+                        if(getPresenter().canCreateNameRegistrationFor(name)){
+                            existingNameRegistrationTypeLabel.setValue(TEXT_NAME_TYPIFICATION);
+                            addExistingNameButton.setEnabled(true);
+                        } else {
+                            if(!getPresenter().checkWokingsetContainsProtologe(name)){
+                                existingNameRegistrationTypeLabel.setValue(TEXT_TYPIFICATION_ONLY);
+                                addExistingNameButton.setEnabled(true);
+                            }
+                        }
+                    } else {
+                        existingNameRegistrationTypeLabel.setValue(null);
+                    }
+                }
                 );
 
-        HorizontalLayout buttonContainer = new HorizontalLayout(addRegistrationLabel_1, addNewNameRegistrationButton, addRegistrationLabel_2, addExistingNameButton, existingNameCombobox);
+        HorizontalLayout buttonContainer = new HorizontalLayout(
+                addRegistrationLabel_1,
+                addNewNameRegistrationButton,
+                addRegistrationLabel_2,
+                addExistingNameButton,
+                existingNameCombobox,
+                existingNameRegistrationTypeLabel
+                );
         buttonContainer.setSpacing(true);
 //        buttonContainer.setWidth(100, Unit.PERCENTAGE);
         buttonContainer.setComponentAlignment(addRegistrationLabel_1, Alignment.MIDDLE_LEFT);
@@ -265,11 +298,18 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationsGrid.addComponent(buttonContainer, 0, row, COL_INDEX_BUTTON_GROUP, row);
         registrationsGrid.setComponentAlignment(buttonContainer, Alignment.MIDDLE_RIGHT);
 
+        row++;
+        Label hint = new Label(
+                "For most names that already exist in the system, it is only possible to create a registration covering type designations. "
+                + "In all other cases please choose <a href=\"registration#!regStart\">\"New\"</a> from the main menu and start a registration for the nomenclatural reference of the name to be registered.",
+                ContentMode.HTML);
+        registrationsGrid.addComponent(hint, 0, row, COL_INDEX_BUTTON_GROUP, row);
+        registrationsGrid.setComponentAlignment(hint, Alignment.MIDDLE_RIGHT);
+
         Panel namesTypesPanel = new Panel(registrationsGrid);
         namesTypesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
         return namesTypesPanel;
     }
-
 
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
@@ -319,7 +359,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
                 TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
                 getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
-                        EditorActionType.EDIT,
                         baseEntityRef,
                         workingsetType,
                         registrationEntityUuid,
@@ -386,15 +425,22 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 );
         messageButton.setStyleName(ValoTheme.BUTTON_TINY);
 
-        RegistrationStateLabel stateLabel = new RegistrationStateLabel().update(dto.getStatus());
+        Component statusComponent;
+        if(statusFieldInstantiator != null){
+            AbstractField<Object> statusField = statusFieldInstantiator.create(dto);
+            statusField.setValue(dto.getStatus());
+            statusComponent = statusField;
+        } else {
+            statusComponent = new RegistrationStatusLabel().update(dto.getStatus());
+        }
         Label submitterLabel = new Label(dto.getSubmitterUserName());
         submitterLabel.setStyleName(LABEL_NOWRAP + " submitter");
         submitterLabel.setIcon(FontAwesome.USER);
         submitterLabel.setContentMode(ContentMode.HTML);
-        CssLayout stateAndSubmitter = new CssLayout(stateLabel, submitterLabel);
+        CssLayout stateAndSubmitter = new CssLayout(statusComponent, submitterLabel);
 
 
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()) {
+        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin()) {
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");
@@ -458,7 +504,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
         getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
-                EditorActionType.ADD,
                 newWorkingsetType,
                 registrationEntityUuid,
                 typifiedNameRef.getUuid(),
@@ -585,6 +630,15 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     @Override
     public Map<UUID, RegistrationDetailsItem> getRegistrationItemMap(){
         return Collections.unmodifiableMap(registrationItemMap);
+    }
+
+
+    /**
+     * @param statusFieldInstantiator the statusFieldInstantiator to set
+     */
+    @Override
+    public void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator) {
+        this.statusFieldInstantiator = statusComponentInstantiator;
     }
 
 

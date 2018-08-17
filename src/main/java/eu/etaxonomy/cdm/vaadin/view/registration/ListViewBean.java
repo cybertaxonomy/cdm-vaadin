@@ -24,6 +24,8 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.Page;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -31,17 +33,22 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.PagerComponent;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
+import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
+import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 
 /**
@@ -63,9 +70,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private HorizontalLayout toolBar;
 
+    private PagerComponent pagerTop;
+
     private Label filterInstructionLabel = new Label("Filter the registrations by");
 
-    private ListSelect statusFilter = null;
+    private ListSelect registrationStatusFilter = null;
 
     private ListSelect submitterFilter = null; // must be null, the presenter relies on this
 
@@ -74,6 +83,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     private TextField taxonNameFilter = new TextFieldNFix("Name");
 
     private TextField referenceFilter = new TextFieldNFix("Publication");
+
+    private AbstractSelect statusTypeFilter;
 
     public ListViewBean() {
         super();
@@ -87,8 +98,9 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         toolBar.addComponent(filterInstructionLabel);
 
-        if(UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin()){
-
+        boolean userIsCurator = UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe());
+        boolean userIsAdmin = UserHelperAccess.userHelper().userIsAdmin();
+        if(userIsCurator || userIsAdmin){
             submitterFilter = new ListSelect("Submitter");
             submitterFilter.setRows(1);
             submitterFilter.addValueChangeListener(e -> updateResults(null, null));
@@ -96,14 +108,21 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         }
 
         if(viewMode.equals(Mode.all)){
-            statusFilter = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
-            statusFilter.setNullSelectionAllowed(true);
-            statusFilter.setRows(1);
-            statusFilter.addValueChangeListener(e -> updateResults(null, null));
-            toolBar.addComponent(statusFilter);
+            registrationStatusFilter = new ListSelect("Registration status", Arrays.asList(RegistrationStatus.values()));
+            registrationStatusFilter.setNullSelectionAllowed(true);
+            registrationStatusFilter.setRows(1);
+            registrationStatusFilter.addValueChangeListener(e -> updateResults(null, null));
+            toolBar.addComponent(registrationStatusFilter);
         }
 
-        toolBar.addComponents(identifierFilter, taxonNameFilter);
+        statusTypeFilter = new ListSelect("Type Status");
+        ((ListSelect)statusTypeFilter).setRows(3);
+        statusTypeFilter.setMultiSelect(true);
+        statusTypeFilter.setNullSelectionAllowed(true);
+        statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
+        statusTypeFilter.setDescription("Strg + Click to unselect");
+
+        toolBar.addComponents(identifierFilter, taxonNameFilter, statusTypeFilter);
         int textChangeTimeOut = 200;
         identifierFilter.addTextChangeListener(e -> updateResults(identifierFilter, e.getText()));
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
@@ -111,7 +130,19 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
 
         toolBar.setSpacing(true);
+        toolBar.iterator().forEachRemaining( c -> c.addStyleName(ValoTheme.LABEL_TINY));
         addContentComponent(toolBar, null);
+
+        pagerTop =  new PagerComponent(new PagerComponent.PagerClickListener() {
+
+            @Override
+            public void pageIndexClicked(Integer index) {
+                getViewEventBus().publish(ListViewBean.this, new PagingEvent(ListViewBean.this, index));
+
+            }
+        });
+        addContentComponent(pagerTop, null);
+        ((VerticalLayout)getLayout()).setComponentAlignment(pagerTop, Alignment.MIDDLE_CENTER);
 
         listContainer = new CssLayout();
         listContainer.setId("registration-list");
@@ -151,13 +182,15 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         ArrayList<RegistrationDTO> regDtos = new ArrayList<RegistrationDTO>(regDtoPager.getRecords());
 
+        pagerTop.updatePager(regDtoPager);
+
         populateList(regDtos);
     }
 
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         listContainer.removeAllComponents();
-        boolean isCurator = UserHelper.fromSession().userIsRegistrationCurator() || UserHelper.fromSession().userIsAdmin();
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe()) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this);
             item.getSubmitterLabel().setVisible(isCurator);
@@ -247,11 +280,11 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     }
 
     /**
-     * @return the statusFilter
+     * @return the registrationStatusFilter
      */
     @Override
-    public ListSelect getStatusFilter() {
-        return statusFilter;
+    public ListSelect getRegistrationStatusFilter() {
+        return registrationStatusFilter;
     }
 
     /**
@@ -283,15 +316,15 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             if(registrationUuid.equals(item.getRegistrationUuid())){
                 return item;
             }
-
         }
         return null;
     }
 
-
-
-
-
-
-
+    /**
+     * @return the statusTypeFilter for the TypeDesignation.statusType
+     */
+    @Override
+    public AbstractSelect getStatusTypeFilter() {
+        return statusTypeFilter;
+    }
 }

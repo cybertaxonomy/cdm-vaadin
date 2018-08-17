@@ -4,15 +4,15 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>5.1.0</version>
+  <version>5.2.0</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.7.10</vaadin.version>
+    <vaadin.version>7.7.13</vaadin.version>
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
-    <cdmlib.version>5.1.0</cdmlib.version>
+    <cdmlib.version>5.2.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <!-- 
         lucene.version must match the version as defined in cdmlib

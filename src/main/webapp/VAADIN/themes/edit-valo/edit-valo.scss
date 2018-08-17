@@ -74,7 +74,7 @@ $v-component-group-spacing: 6px;
 }
 
 // ========================================== //
-// Status colors for the redistration
+// Status colors for the registration
 // 
 // change-color cant be used since this is not fully supported by the vaadin sass-compiler
 // see https://github.com/vaadin/sass-compiler/issues/147
@@ -87,6 +87,43 @@ $status-preparation-color: adjust-color($plain-red, $hue: 60deg);
 $status-published-color: adjust-color($plain-red, $hue: 105deg); 
 $status-ready-color: adjust-color($plain-red, $hue: 180deg);
 // ========================================== //
+
+@mixin registration-status-colors($sub-selector: '') {
+    .registration-status-REJECTED #{$sub-selector} {
+        color: $status-rejected-color;
+    }
+    .registration-status-CURATION #{$sub-selector} {
+        color: $status-curation-color;
+    }
+    .registration-status-PREPARATION #{$sub-selector} {
+        color: $status-preparation-color;
+    }
+    .registration-status-PUBLISHED #{$sub-selector} {
+        color: $status-published-color;
+    }
+    .registration-status-READY #{$sub-selector} {
+        color: $status-ready-color;
+    }
+}
+
+@mixin registration-status-bg-colors($sub-selector: '') {
+    .bg-status-REJECTED #{$sub-selector} {
+        background-color: $status-rejected-color;
+    }
+    .bg-status-CURATION #{$sub-selector} {
+        background-color: $status-curation-color;
+    }
+    .bg-status-PREPARATION #{$sub-selector}  {
+        background-color: $status-preparation-color;
+    }
+    .bg-status-PUBLISHED #{$sub-selector} {
+        background-color: $status-published-color;
+    }
+    .bg-status-READY #{$sub-selector} {
+        background-color: $status-ready-color;
+    }
+}
+
 
 
 @mixin edit-valo {
@@ -361,38 +398,10 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         display: block;
     }
     
-   // status colors --------------------------------- //
-    .registration-status-REJECTED {
-        color: $status-rejected-color;
-    }
-    .registration-status-CURATION {
-        color: $status-curation-color;
-    }
-    .registration-status-PREPARATION {
-        color: $status-preparation-color;
-    }
-    .registration-status-PUBLISHED {
-        color: $status-published-color;
-    }
-    .registration-status-READY {
-        color: $status-ready-color;
-    }
-
-    .bg-status-REJECTED {
-        background-color: $status-rejected-color;
-    }
-    .bg-status-CURATION {
-        background-color: $status-curation-color;
-    }
-    .bg-status-PREPARATION {
-        background-color: $status-preparation-color;
-    }
-    .bg-status-PUBLISHED {
-        background-color: $status-published-color;
-    }
-    .bg-status-READY {
-        background-color: $status-ready-color;
-    }
+   @include registration-status-colors();
+   @include registration-status-bg-colors(); // TODO still needed?
+   @include registration-status-colors(.v-select-select);
+   
     // ----------------------------------------------- //
     
     #registration-list {
@@ -405,7 +414,7 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         border: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
         border-radius: $v-border-radius - first-number($v-border) $v-border-radius - first-number($v-border) 0 0;
         /* ----------------------------------------------- */
-        
+        // TODO can the mixin registration-status-colors() be used here?
         // for grid rows
         .status-REJECTED {
             color: $status-rejected-color;
@@ -462,7 +471,7 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             float: right;
         }
     }
-
+    
     // ---------- ---------- //
 
     .v-slot-message-item {

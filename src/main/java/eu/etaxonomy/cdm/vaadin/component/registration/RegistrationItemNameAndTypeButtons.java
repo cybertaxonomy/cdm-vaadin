@@ -16,14 +16,12 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.TypedEntityReference;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -32,8 +30,10 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
 /**
@@ -78,7 +78,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getUuid(), nameButton);
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
-            boolean userHasPermission = UserHelper.fromSession().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
+            boolean userHasPermission = UserHelperAccess.userHelper().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
             nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
@@ -92,7 +92,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = UserHelper.fromSession().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
+        boolean userHasAddPermission = !regDto.isPersisted() || UserHelperAccess.userHelper().userHasPermission(Registration.class, regDto.getUuid(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -100,7 +100,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = UserHelper.fromSession().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = UserHelperAccess.userHelper().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
                 addComponent(tdButton);
 
@@ -128,16 +128,17 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 labels.add(label);
             }
         }
-        addTypeDesignationButton = new Button(FontAwesome.PLUS);
+        addTypeDesignationButton = ButtonFactory.ADD_ITEM.createButton();
         addTypeDesignationButton.setDescription("Add a new type designation workingset.");
         addTypeDesignationButton.setVisible(!isRegistrationLocked && userHasAddPermission);
         addComponent(addTypeDesignationButton);
 
         //TODO make responsive and use specificIdentifier in case the space gets too narrow
-        identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
-        identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
-
-        addComponents(identifierLink);
+        if(regDto.isPersisted()){
+            identifierLink = new Link(regDto.getIdentifier(), new ExternalResource(regDto.getIdentifier()));
+            identifierLink.setEnabled(regDto.getStatus() == RegistrationStatus.PUBLISHED);
+            addComponents(identifierLink);
+        }
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
         addDefaultStyles();

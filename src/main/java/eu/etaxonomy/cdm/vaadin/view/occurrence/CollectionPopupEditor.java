@@ -15,11 +15,18 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.utility.RoleProber;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
@@ -37,12 +44,13 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
 
     private static final int GRID_COLS = 3;
 
-    private static final int GRID_ROWS = 3;
+    private static final int GRID_ROWS = 4;
 
     TextField codeField;
     TextField codeStandardField;
     TextField townOrLocationField;
     ToOneRelatedEntityCombobox<Collection> superCollectionCombobox;
+    ToOneRelatedEntityCombobox<Institution> institutionCombobox;
 
 
     /**
@@ -135,7 +143,6 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         townOrLocationField.setWidth(100, Unit.PIXELS);
 
         row++;
-
         superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("Super-collection", Collection.class);
 
 
@@ -143,12 +150,9 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         addField(superCollectionCombobox, "superCollection", 0, row, 1, row);
 
         superCollectionCombobox.getSelect().setCaptionGenerator(
-                new CdmTitleCacheCaptionGenerator<Collection>()
+                new CollectionCaptionGenerator()
                 );
-        superCollectionCombobox.getSelect().addValueChangeListener(
-                new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox)
-                );
-
+        superCollectionCombobox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(superCollectionCombobox));
 
         superCollectionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
                 new CollectionEditorAction(
@@ -171,12 +175,50 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                 }
             });
 
+        UserHelper userHelper = UserHelperAccess.userHelper();
+        superCollectionCombobox.setVisible(RegistrationUIDefaults.COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION.stream().anyMatch( role -> userHelper.userIs(new RoleProber(role))));
+
+        row++;
+        institutionCombobox  = new ToOneRelatedEntityCombobox<Institution>("Institute", Institution.class);
+        addField(institutionCombobox, "institute", 0, row, 1, row);
+
+        institutionCombobox.getSelect().setCaptionGenerator(
+                new CdmTitleCacheCaptionGenerator<Institution>()
+                );
+        institutionCombobox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Institution>(institutionCombobox));
+
+        institutionCombobox.addClickListenerAddEntity( e -> getViewEventBus().publish(this,
+                new InstitutionEditorAction(
+                        EditorActionType.ADD,
+                        null,
+                        institutionCombobox,
+                        this)
+                ));
+        institutionCombobox.addClickListenerEditEntity(e -> {
+                if(institutionCombobox.getValue() != null){
+                    getViewEventBus().publish(this,
+                            new InstitutionEditorAction(
+                                EditorActionType.EDIT,
+                                institutionCombobox.getValue().getUuid(),
+                                e.getButton(),
+                                institutionCombobox,
+                                this
+                            )
+                    );
+                }
+            });
+
     }
 
     /* ------------------ View Interface methods -------------------- */
     @Override
     public ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox() {
         return superCollectionCombobox;
+    }
+
+    @Override
+    public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox() {
+        return institutionCombobox;
     }
 
 }

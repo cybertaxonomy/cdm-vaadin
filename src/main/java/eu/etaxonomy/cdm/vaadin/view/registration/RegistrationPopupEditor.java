@@ -90,8 +90,8 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     @Override
     protected void afterItemDataSourceSet() {
-        identifierField.setEnabled(false);
-        specificIdentifierField.setEnabled(false);
+        identifierField.setEnabled(true);
+        specificIdentifierField.setEnabled(true);
     }
 
     /**

@@ -34,11 +34,15 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
@@ -49,9 +53,9 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
-import eu.etaxonomy.cdm.vaadin.permission.UserHelper;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -147,6 +151,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
                 cache.load(workingSetDto.getOwner());
+                cache.load(workingSetDto.getTypifiedName());
                 rootEntities.add(workingSetDto.getOwner());
             }
 
@@ -179,11 +184,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
 
         popuEditorTypeDesignationSourceRows.clear();
+        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
+        collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
+
+        CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
+
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
-
-            CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
-
-            CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
             @Override
             public SpecimenTypeDesignationDTORow create() {
@@ -206,8 +212,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider,
                         collectionPagingProvider.getPageSize()
                         );
-                row.collection.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Collection>());
-                row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
+                row.collection.getSelect().setCaptionGenerator(new CollectionCaptionGenerator());
+                row.collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
                 row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd(row));
@@ -253,7 +259,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
 
         if(crud != null){
-            UserHelper.fromSession().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
+            UserHelperAccess.userHelper().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
         }
 
         specimenTypeDesignationWorkingSetService.save(dto);

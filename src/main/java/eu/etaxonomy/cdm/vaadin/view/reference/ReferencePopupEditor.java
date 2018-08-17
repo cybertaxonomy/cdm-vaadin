@@ -11,8 +11,12 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -41,6 +45,7 @@ import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
+import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
  * @author a.kohlbecker
@@ -52,6 +57,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
 
     private static final long serialVersionUID = -4347633563800758815L;
+
+    private static final Logger logger = Logger.getLogger(ReferencePopupEditor.class);
 
     private TextField titleField;
 
@@ -68,6 +75,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
 
     private static Map<String,String> propertyNameLabelMap = new HashMap<>();
+
+    private int variableGridStartRow;
+
+    private int variableGridLastRow;
+
+    /**
+     * Used to record the fields from the variable grid part in their original order.
+     */
+    private LinkedHashMap<String, Field<?>> adaptiveFields = new LinkedHashMap<>();
 
     static {
         propertyNameLabelMap.put("inReference", "In reference");
@@ -167,6 +183,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addField(inReferenceCombobox, "inReference", 0, row, GRID_COLS -1, row);
         row++;
 
+        variableGridStartRow = row;
         addTextField("Series", "seriesPart", 0, row).setWidth(100, Unit.PERCENTAGE);
         addTextField("Volume", "volume", 1, row).setWidth(100, Unit.PERCENTAGE);
         addTextField("Pages", "pages", 2, row).setWidth(100, Unit.PERCENTAGE);
@@ -190,6 +207,9 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         uriField.setWidth(100, Unit.PERCENTAGE);
         addField(uriField, "uri", 3, row);
 
+
+        variableGridLastRow = row;
+
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
 
@@ -204,20 +224,36 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
      * @param value
      * @return
      */
-    private Object updateFieldVisibility(ReferenceType value) {
+    private Object updateFieldVisibility(ReferenceType referenceType) {
 
+        GridLayout grid = (GridLayout)getFieldLayout();
+
+        initAdaptiveFields();
+
+        // clear the variable grid part
+        for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
+            for(int x=0; x < grid.getColumns(); x++){
+                grid.removeComponent(x, row);
+            }
+        }
+
+        // set cursor at the beginning of the variable grid part
+        grid.setCursorY(variableGridStartRow);
+        grid.setCursorX(0);
+
+        // place the fields which are required for the given referenceType in the variable grid part while
+        // and retain the original order which is recorded in the adaptiveFields
         try {
-            Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(value);
-            setAllFieldsVisible(false);
-            for(String fieldName : fieldPropertyDefinition.keySet()){
-                Field<?> field = getField(fieldName);
-                if(field == null){
-                    continue;
-                }
-                field.setVisible(true);
-                String propertyName = fieldPropertyDefinition.get(fieldName);
-                if(propertyName != fieldName){
+            Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(referenceType);
+
+            for(String fieldName : adaptiveFields.keySet()){ // iterate over the LinkedHashMap to retain the original order of the fields
+                if(fieldPropertyDefinition.containsKey(fieldName)){
+                    Field<?> field = adaptiveFields.get(fieldName);
+                    grid.addComponent(field);
+                    String propertyName = fieldPropertyDefinition.get(fieldName);
+                    if(propertyName != fieldName){
                         field.setCaption(propertyNameLabelMap.get(propertyName));
+                    }
                 }
             }
         } catch (UnimplemetedCaseException e) {
@@ -228,14 +264,43 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             getField("inReference").setCaption(propertyNameLabelMap.get("inReference"));
         }
 
-
-
         EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
         EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
-        getField("abbrevTitle").setVisible(!hideNomTitle.contains(value));
-        getField("title").setVisible(!hideTitle.contains(value));
+        getField("abbrevTitle").setVisible(!hideNomTitle.contains(referenceType));
+        getField("title").setVisible(!hideTitle.contains(referenceType));
 
         return null;
+    }
+
+    /**
+     * @param grid
+     */
+    protected void initAdaptiveFields() {
+        GridLayout grid = (GridLayout)getFieldLayout();
+        // initialize the map of adaptive fields
+        logger.setLevel(Level.DEBUG);
+        if(adaptiveFields.isEmpty()){
+            try{
+                Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(null);
+                Set<String> fieldNames = fieldPropertyDefinition.keySet();
+                for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
+                    for(int x=0; x < grid.getColumns(); x++){
+                        Component c = grid.getComponent(x, row);
+                        logger.debug("initAdaptiveFields() - y: " + row + " x: " + x + "  component:" + (c != null ? c.getClass().getSimpleName(): "NULL"));
+                        if(c != null && c instanceof Field){
+                            Field<?> field = (Field<?>)c;
+                            PropertyIdPath propertyIdPath = boundPropertyIdPath(field);
+                            logger.debug("initAdaptiveFields() - " + field.getCaption() + " -> " + propertyIdPath);
+                            if(propertyIdPath != null && fieldNames.contains(propertyIdPath.toString())){
+                                adaptiveFields.put(propertyIdPath.toString(), field);
+                            }
+                        }
+                    }
+                }
+            } catch (UnimplemetedCaseException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     protected void setAllFieldsVisible(boolean visible){

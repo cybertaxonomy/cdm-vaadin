@@ -11,13 +11,15 @@ package eu.etaxonomy.vaadin.component;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.themes.ValoTheme;
+
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
+import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 
 /**
  * @author a.kohlbecker
@@ -36,9 +38,10 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
 
     private ListSelect select;
 
+    NestedButtonStateUpdater<V> buttonUpdater;
 
-    private Button addButton = new Button(FontAwesome.PLUS);
-    private Button editButton  = new Button(FontAwesome.EDIT);
+    private Button addButton = ButtonFactory.ADD_ITEM.createButton();
+    private Button editButton  = ButtonFactory.EDIT_ITEM.createButton();
 
     public ToOneRelatedEntityListSelect(String caption, Class<V> type, Container dataSource){
         this.type = type;
@@ -47,6 +50,7 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
         addStyledComponents(select, addButton, editButton);
         addSizedComponent(select);
     }
+
 
     /**
      * {@inheritDoc}
@@ -99,6 +103,9 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
     @Override
     public void setPropertyDataSource(Property newDataSource) {
         select.setPropertyDataSource(newDataSource);
+        if(buttonUpdater != null){
+            buttonUpdater.updateButtons((V) select.getValue());
+        }
     }
 
     @Override
@@ -146,6 +153,16 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
 
       select.addItem(bean);
       select.select(bean);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setNestedButtonStateUpdater(NestedButtonStateUpdater<V> buttonUpdater) {
+        this.buttonUpdater = buttonUpdater;
+        select.addValueChangeListener(buttonUpdater);
     }
 
 

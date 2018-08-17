@@ -29,6 +29,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.event.EntityEditorActionEvent;
 import eu.etaxonomy.vaadin.event.EntityEditorActionListener;
@@ -77,6 +78,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * X index of the data field in the grid
      */
     private static final int GRID_X_FIELD = 0;
+
+    private static final int GRID_X_BUTTON_GROUP = 1;
 
     private int GRID_COLS = 2;
 
@@ -184,8 +187,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     private void updateValue() {
         List<V> nestedValues = getValueFromNestedFields();
         List<V> beanList = getValue();
-        beanList.clear();
-        beanList.addAll(nestedValues);
+        if(beanList != null){
+            beanList.clear();
+            beanList.addAll(nestedValues);
+        }
         setInternalValue(beanList);
     }
 
@@ -268,6 +273,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
             if(newRowNeeded){
                 addNewRow(row, data.get(row));
+            } else {
+                // update the editOrCreate buttons
+                ButtonGroup bg = (ToManyRelatedEntitiesListSelect<V, F>.ButtonGroup) grid.getComponent(GRID_X_BUTTON_GROUP, row);
+                updateEditOrCreateButton(bg, data.get(row));
             }
         }
         creatingFields = false;
@@ -307,9 +316,15 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            ButtonGroup buttonGroup = new ButtonGroup(field);
+            updateEditOrCreateButton(buttonGroup, val);
             field.addValueChangeListener(e -> {
-                updateValue();
-                fireValueChange(true);
+                if(!creatingFields){
+                    updateValue();
+                    Object value = e.getProperty().getValue();
+                    updateEditOrCreateButton(buttonGroup, value);
+                    fireValueChange(true);
+                }
             });
             Property ds = getPropertyDataSource();
             if(ds != null){
@@ -324,7 +339,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 grid.setRows(grid.getRows() + 1);
             }
             grid.addComponent(field, GRID_X_FIELD, row);
-            grid.addComponent(buttonGroup(field), 1, row);
+            grid.addComponent(buttonGroup, GRID_X_BUTTON_GROUP, row);
             updateButtonStates();
             nestFieldGroup(field);
             row++;
@@ -338,42 +353,69 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return row;
     }
 
-    private Component buttonGroup(F field){
+    /**
+     * @param buttonGroup
+     * @param value
+     */
+    public void updateEditOrCreateButton(ButtonGroup buttonGroup, Object value) {
 
-        CssLayout buttonGroup = new CssLayout();
-        Button add = new Button(FontAwesome.PLUS);
-        add.setDescription("Add item");
-        add.addClickListener(e -> addRowAfter(field));
-
-        if(withEditButton){
-            Button edit = new Button(FontAwesome.EDIT);
-            edit.addClickListener(e -> editOrCreate(field));
-            buttonGroup.addComponent(edit);
-            addStyledComponents(edit);
+        if(!withEditButton || buttonGroup == null || buttonGroup.getEditOrCreateButton() == null){
+            return;
         }
 
-        Button remove = new Button(FontAwesome.MINUS);
-        remove.setDescription("Remove item");
-        remove.addClickListener(e -> removeRow(field));
-
-
-        buttonGroup.addComponent(add);
-        buttonGroup.addComponent(remove);
-        addStyledComponents(add, remove);
-        if(isOrderedCollection){
-            Button moveUp = new Button(FontAwesome.ARROW_UP);
-            moveUp.setDescription("Move up");
-            moveUp.addClickListener(e -> moveRowUp(field));
-            Button moveDown = new Button(FontAwesome.ARROW_DOWN);
-            moveDown.addClickListener(e -> moveRowDown(field));
-            moveDown.setDescription("Move down");
-
-            buttonGroup.addComponents(moveUp, moveDown);
-            addStyledComponents(moveUp, moveDown);
+        ButtonFactory buttonStyle;
+        if(value == null){
+            buttonStyle = ButtonFactory.CREATE_NEW;
+        } else {
+            buttonStyle = ButtonFactory.EDIT_ITEM;
         }
-        buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        buttonGroup.getEditOrCreateButton().setIcon(buttonStyle.getIcon());
+        buttonGroup.getEditOrCreateButton().setDescription(buttonStyle.getDescription());
+    }
 
-        return buttonGroup;
+    class ButtonGroup extends CssLayout{
+
+        private Button editOrCreate;
+
+        ButtonGroup (F field){
+
+            Button add = ButtonFactory.ADD_ITEM.createButton();
+            add.setDescription("Add item");
+            add.addClickListener(e -> addRowAfter(field));
+
+            if(withEditButton){
+                editOrCreate = ButtonFactory.EDIT_ITEM.createButton();
+                editOrCreate.addClickListener(e -> editOrCreate(field));
+                addComponent(editOrCreate);
+                addStyledComponents(editOrCreate);
+            }
+
+            Button remove = ButtonFactory.REMOVE_ITEM.createButton();
+            remove.setDescription("Remove item");
+            remove.addClickListener(e -> removeRow(field));
+
+
+            addComponent(add);
+            addComponent(remove);
+            addStyledComponents(add, remove);
+            if(isOrderedCollection){
+                Button moveUp = new Button(FontAwesome.ARROW_UP);
+                moveUp.setDescription("Move up");
+                moveUp.addClickListener(e -> moveRowUp(field));
+                Button moveDown = new Button(FontAwesome.ARROW_DOWN);
+                moveDown.addClickListener(e -> moveRowDown(field));
+                moveDown.setDescription("Move down");
+
+                addComponents(moveUp, moveDown);
+                addStyledComponents(moveUp, moveDown);
+            }
+            setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        }
+
+        Button getEditOrCreateButton(){
+            return editOrCreate;
+        }
+
     }
 
     /**
@@ -413,19 +455,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(field.getValue() == null
-                        || field.getValue() != null && testEditButtonPermission(field.getValue()));
+                editCreateButton.setEnabled(!getState().readOnly && (field.getValue() == null
+                        || field.getValue() != null && testEditButtonPermission(field.getValue())));
             }
             // add
-            buttonGroup.getComponent(addButtonIndex).setEnabled(isLast || isOrderedCollection);
+            buttonGroup.getComponent(addButtonIndex).setEnabled(!getState().readOnly && (isLast || isOrderedCollection));
             // remove
             // can be always true, removing the last entry causes an new empty entry to be added.
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(true);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(!getState().readOnly);
             // up
             if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
-                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!isFirst);
+                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!getState().readOnly && !isFirst);
                 // down
-                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!isLast);
+                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!getState().readOnly  && !isLast);
             }
         }
     }
@@ -597,6 +639,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      */
     public void withEditButton(boolean withEditButton){
         this.withEditButton = withEditButton;
+        if(getPropertyDataSource() != null) {
+            throw new RuntimeException("withEditButton must not be changed after the datasource is set.");
+        }
     }
 
     /**
@@ -638,6 +683,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         setDeepReadOnly(readOnly, getContent(), null);
         updateButtonStates();
     }
+
 
     /**
      * @return the editPermissionTester
