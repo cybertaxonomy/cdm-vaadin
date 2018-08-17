@@ -44,15 +44,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     TransactionStatus txStatus = null;
 
-//    ConversationHolder conversationHolder = null;
-//
-//    /**
-//     * @return the conversationHolder
-//     */
-//    public ConversationHolder getConversationHolder() {
-//        return conversationHolder;
-//    }
-
     protected DefaultTransactionDefinition txDefinition = null;
 
     /**
@@ -63,42 +54,19 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      *            a NullPointerException in this case.
      */
     public CdmStore(CdmRepository repo, S service) {
-
         this.repo = repo;
         this.service = service;
-
     }
 
-//    /**
-//     * constructor which takes a ConversationHolder. The supplying class of the conversationHolder needs
-//     * to care for <code>bind()</code>, <code>unbind()</code> and <code>close()</code> since the store is
-//     * only responsible for starting and committing of transactions.
-//     *
-//     * @param repo
-//     * @param service
-//     * @param conversationHolder
-//     */
-//    public CdmStore(CdmRepository repo, S service, ConversationHolder conversationHolder) {
-//
-//        this.repo = repo;
-//        this.service = service;
-//        this.conversationHolder = conversationHolder;
-//
-//    }
 
     /**
      * @return
      *
      */
     public TransactionStatus startTransaction() {
-//        if(conversationHolder != null && !conversationHolder.isTransactionActive()){
-//            //conversationHolder.setDefinition(getTransactionDefinition());
-//            return conversationHolder.startTransaction();
-//        } else {
-            checkExistingTransaction();
-            txStatus = repo.startTransaction();
-            return txStatus;
-//        }
+        checkExistingTransaction();
+        txStatus = repo.startTransaction();
+        return txStatus;
     }
 
     /**
@@ -135,7 +103,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
         Session session = getSession();
 
-        // session.clear();
         if (session.contains(bean)) {
             // evict bean before merge to avoid duplicate beans in same session
             logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
@@ -143,10 +110,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         }
 
         logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
-        // to avoid merge problems as described in
-        // https://dev.e-taxonomy.eu/redmine/issues/6687
-        // we are set the hibernate property
-        // hibernate.event.merge.entity_copy_observer=allow
+        // to avoid merge problems as described in https://dev.e-taxonomy.eu/redmine/issues/6687
+        // we are set the hibernate property hibernate.event.merge.entity_copy_observer=allow
         @SuppressWarnings("unchecked")
         T mergedBean = (T) session.merge(bean);
         logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
@@ -159,12 +124,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      */
     private Session getSession() {
 
-        Session session;
-//        if(conversationHolder != null){
-//            session = conversationHolder.getSession();
-//        } else {
-            session = repo.getSession();
-//        }
+        Session session = repo.getSession();
+
         logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
                 + ((SessionImplementor) session).getPersistenceContext() + " - " + session.toString());
 
@@ -195,20 +156,14 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         try {
             logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
 
-            if(txStatus == null
-    //                || (conversationHolder != null && !conversationHolder.isTransactionActive())
-                    ){
+            if(txStatus == null){
                 // no running transaction, start one ...
                 startTransaction();
             }
 
             logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
             // merge the changes into the session, ...
-
             T mergedBean = mergedBean(bean);
-
-            // NOTE: saveOrUpdate is really needed here even if we to a merge before
-            // repo.getCommonService().saveOrUpdate(mergedBean);
             session.flush();
             commitTransaction();
             return new EntityChangeEvent(mergedBean, changeEventType, view);
@@ -216,15 +171,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             session.clear(); // #7559
             throw e;
         }
-//        finally {
-//            try {
-////                session.close(); // #7559
-//                session.clear();
-//            } catch (HibernateException e2) {
-//                /* IGNORE HERE */
-//            }
-//        }
-
     }
 
     /**
@@ -253,14 +199,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             session.clear(); // #7559
             throw e;
         }
-//        finally {
-//            try {
-////                session.close(); // #7559
-//                session.clear(); // #7559
-//            } catch (HibernateException e2) {
-//                /* IGNORE HERE */
-//            }
-//        }
         return null;
     }
 
@@ -304,20 +242,14 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
 
     protected void commitTransaction() {
-
-//        if(conversationHolder != null){
-//            conversationHolder.commit();
-//        } else {
-            repo.commitTransaction(txStatus);
-            txStatus = null;
-//        }
+        repo.commitTransaction(txStatus);
+        txStatus = null;
     }
 
     /**
      * @param entityId
      */
     public T loadBean(int entityId) {
-//        conversationHolder.startTransaction();
         return service.find(entityId);
     }
 
