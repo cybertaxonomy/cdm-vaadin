@@ -37,7 +37,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
-import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
@@ -469,9 +468,9 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             institution = instituteMap.get(office);
         } else {
 
-            Pager<AgentBase> pager = repo.getAgentService().findByTitleWithRestrictions(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
+            Pager<Institution> pager = repo.getAgentService().findByTitleWithRestrictions(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
             if(!pager.getRecords().isEmpty()){
-                institution =  (Institution) pager.getRecords().get(0);
+                institution =  pager.getRecords().get(0);
             } else {
                 Institution institute = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
                 institution = institute;
