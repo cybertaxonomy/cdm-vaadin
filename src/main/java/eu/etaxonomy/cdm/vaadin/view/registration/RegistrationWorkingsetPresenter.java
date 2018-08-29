@@ -474,24 +474,28 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventBusListenerMethod
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
-            TransactionStatus txStatus = getRepo().startTransaction();
-            if(event.getReason().equals(Reason.SAVE)){
-                if(newTaxonNameForRegistration != null){
-                    UUID taxonNameUuid = newTaxonNameForRegistration.getUuid();
-                    getRepo().getSession().refresh(newTaxonNameForRegistration);
-                    Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
-                    // reload workingset into current session
-                    loadWorkingSet(workingset.getCitationUuid());
-                    workingset.add(reg);
+            try {
+                TransactionStatus txStatus = getRepo().startTransaction();
+                if(event.getReason().equals(Reason.SAVE)){
+                    if(newTaxonNameForRegistration != null){
+                        UUID taxonNameUuid = newTaxonNameForRegistration.getUuid();
+                        getRepo().getSession().refresh(newTaxonNameForRegistration);
+                        Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
+                        // reload workingset into current session
+                        loadWorkingSet(workingset.getCitationUuid());
+                        workingset.add(reg);
+                    }
+                    refreshView(true);
+                } else if(event.getReason().equals(Reason.CANCEL)){
+                    if(newTaxonNameForRegistration != null){
+                        // clean up
+                        getTaxonNameStore().deleteBean(newTaxonNameForRegistration, (AbstractView) getView());
+                    }
                 }
-                refreshView(true);
-            } else if(event.getReason().equals(Reason.CANCEL)){
-                if(newTaxonNameForRegistration != null){
-                    // clean up
-                    getTaxonNameStore().deleteBean(newTaxonNameForRegistration, (AbstractView) getView());
-                }
+                getRepo().commitTransaction(txStatus);
+            } finally {
+                getRepo().getSession().clear(); // #7702
             }
-            getRepo().commitTransaction(txStatus);
             newTaxonNameForRegistration = null;
         }
     }
