@@ -100,7 +100,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Autowired
     private void  setTermCacher(CdmCacher termCacher){
-        CdmTransientEntityCacher.setDefaultCacher(termCacher);
+        CdmTransientEntityCacher.setPermanentCacher(termCacher);
     }
 
     private boolean registrationUiHibernateEventListenersDone = false;
