@@ -493,6 +493,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             if(f == null){
                 logger.debug(String.format("NULL field at %d,%d", GRID_X_FIELD, r));
             } else {
+                logger.trace(String.format("field " + f.hashCode() + " at %d,%d", GRID_X_FIELD, r) + ", value: " + f.getValue());
                 nestedFields.add(f);
             }
         }
