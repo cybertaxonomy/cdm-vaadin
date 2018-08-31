@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
@@ -278,7 +277,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     protected void initAdaptiveFields() {
         GridLayout grid = (GridLayout)getFieldLayout();
         // initialize the map of adaptive fields
-        logger.setLevel(Level.DEBUG);
         if(adaptiveFields.isEmpty()){
             try{
                 Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(null);
