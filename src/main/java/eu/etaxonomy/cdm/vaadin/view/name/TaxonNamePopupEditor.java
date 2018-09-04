@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.log4j.Level;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.LazyComboBox;
@@ -75,7 +74,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 17;
+    private final static int GRID_ROWS = 18;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -341,13 +340,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 );
             }
             });
-        logger.setLevel(Level.DEBUG);
+
+
         // nomReferenceCombobox.getSelect().addValueChangeListener(e -> logger.debug("nomReferenceCombobox value changed #1"));
         // nomReferenceCombobox.setWidth(300, Unit.PIXELS);
         nomReferenceCombobox.setWidth("100%");
-        addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 2, row);
-        nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 3, row, 3, row);
-        nomenclaturalReferenceDetail.setWidth(100, Unit.PIXELS);
+        addField(nomReferenceCombobox, "nomenclaturalReference", 0, row, 3, row);
+
+        row++;
+        nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 2, row);
+        nomenclaturalReferenceDetail.setWidth(100, Unit.PERCENTAGE);
 
         // --------------- Basionyms
         row++;
