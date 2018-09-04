@@ -20,6 +20,7 @@ import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferenceEditorPresenter;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditorView;
@@ -79,6 +80,14 @@ public class CdmEditorPresenterTest {
          */
         @Override
         public TeamOrPersonField getAuthorshipField() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public FilterableAnnotationsField getAnnotationsField() {
             return null;
         }
 

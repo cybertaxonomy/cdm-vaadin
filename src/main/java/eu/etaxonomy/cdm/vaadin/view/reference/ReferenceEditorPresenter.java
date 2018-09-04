@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +24,13 @@ import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.Annotation;
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
@@ -70,6 +74,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         });
 
+        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
         CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = pagingProviderFactory.referencePagingProvider();
         getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
@@ -79,6 +84,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
+
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
+                AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
     /**
@@ -89,7 +97,8 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         List<String> initStrategy = Arrays.asList(new String []{
 
-                "$"
+                "$",
+                "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 }
         );
 
@@ -183,6 +192,37 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     protected IService<Reference> getService() {
         return getRepo().getReferenceService();
     }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Reference preSaveBean(Reference bean) {
+
+        // handle annotation changes
+        List<Annotation> annotations = getView().getAnnotationsField().getValue();
+        List<Annotation> currentAnnotations = new ArrayList<>(bean.getAnnotations());
+        List<Annotation> annotationsSeen = new ArrayList<>();
+        for(Annotation a : annotations){
+            if(a == null){
+                continue;
+            }
+            if(!currentAnnotations.contains(a)){
+                bean.addAnnotation(a);
+            }
+            annotationsSeen.add(a);
+        }
+        for(Annotation a : currentAnnotations){
+            if(!annotationsSeen.contains(a)){
+                bean.removeAnnotation(a);
+            }
+        }
+
+
+        return bean;
+    }
+
 
 
 

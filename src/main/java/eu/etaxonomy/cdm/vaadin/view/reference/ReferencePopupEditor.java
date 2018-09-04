@@ -28,15 +28,18 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions;
 import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions.UnimplemetedCaseException;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
@@ -63,13 +66,17 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private final static int GRID_COLS = 4; // 12 would fits for 2,3, and 4 Components per row
 
-    private final static int GRID_ROWS = 10;
+    private final static int GRID_ROWS = 11;
 
     private ListSelect typeSelect;
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     private TeamOrPersonField authorshipField;
+
+    private FilterableAnnotationsField annotationsListField;
+
+    private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
     private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
 
@@ -209,6 +216,13 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
         variableGridLastRow = row;
 
+        row++;
+        annotationsListField = new FilterableAnnotationsField("Editorial notes");
+        annotationsListField.setWidth(100, Unit.PERCENTAGE);
+        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        addField(annotationsListField, "annotations", 0, row, GRID_COLS-1, row);
+
+
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
 
@@ -327,7 +341,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritDoc}            // TODO Auto-generated method stub
      */
     @Override
     public void focusFirst() {
@@ -377,6 +391,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public TeamOrPersonField getAuthorshipField() {
         return authorshipField;
+    }
+
+    @Override
+    public FilterableAnnotationsField getAnnotationsField() {
+        return annotationsListField;
     }
 
     public void withReferenceTypes(EnumSet<ReferenceType> types){
