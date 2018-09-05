@@ -700,7 +700,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
-        Boolean withValidationSection = isSpeciesOrBelow && BooleanUtils.isTrue(validationToggle.getValue());
+        Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
 
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(isSpeciesOrBelow) {
