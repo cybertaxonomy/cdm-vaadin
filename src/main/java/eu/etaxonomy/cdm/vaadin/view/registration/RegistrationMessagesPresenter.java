@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
+import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.ext.registration.messages.Message;
@@ -26,7 +27,7 @@ import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.error.ExternalServiceExceptionHandler;
-import eu.etaxonomy.cdm.vaadin.permission.RegistrationCuratorRoleProbe;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
@@ -84,7 +85,7 @@ public class RegistrationMessagesPresenter extends AbstractPresenter<Registratio
             throw new RuntimeException(e);
         }
         User toUser = null;
-        if(UserHelperAccess.userHelper().userIs(new RegistrationCuratorRoleProbe())){
+        if(UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION))){
             toUser = registration.getSubmitter();
         } else {
             Stack<Message> stack = new Stack<>();
