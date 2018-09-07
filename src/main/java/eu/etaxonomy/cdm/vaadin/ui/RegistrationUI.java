@@ -76,28 +76,17 @@ public class RegistrationUI extends UI {
     @Autowired
     UIEventBus uiEventBus;
 
-    /*
-         * this HACKY solution forces the bean to be instantiated, TODO do it properly
-         */
-    //    @Autowired
-    //    MenuBeanDiscoveryBean bean;
 
-        @Autowired
-        private MainMenu mainMenu;
+    @Autowired
+    private MainMenu mainMenu;
 
-    /*
-             * this HACKY solution forces the bean to be instantiated, TODO do it properly
-             */
-        //    @Autowired
-        //    MenuBeanDiscoveryBean bean;
-
-            @Autowired
-            @Qualifier("registrationToolbar")
-            private Toolbar toolbar;
+    @Autowired
+    @Qualifier("registrationToolbar")
+    private Toolbar toolbar;
 
     //---------------------------------------------
 
-            public static final String INITIAL_VIEW =  DashBoardView.NAME;
+    public static final String INITIAL_VIEW =  DashBoardView.NAME;
 
     protected void configureAccessDeniedView() {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
@@ -117,15 +106,6 @@ public class RegistrationUI extends UI {
     }
 
     //---------------------------------------------
-
-
-
-
-    /*
-     * this HACKY solution forces the bean to be instantiated, TODO do it properly
-     */
-//    @Autowired
-//    MenuBeanDiscoveryBean bean;
 
     public RegistrationUI() {
 
