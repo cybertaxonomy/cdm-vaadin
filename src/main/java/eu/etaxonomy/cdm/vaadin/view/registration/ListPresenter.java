@@ -153,7 +153,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     private Pager<RegistrationDTO> pageRegistrations(TextField textFieldOverride, String alternativeText) {
 
         // prepare the filters
-        SearchFilter filter = loadFilterFromView();
+        RegistrationSearchFilter filter = loadFilterFromView();
         if(textFieldOverride != null && textFieldOverride == getView().getIdentifierFilter()){
             filter.identifierPattern = alternativeText;
         }
@@ -248,7 +248,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
      */
     private void preserveSearchFilterInSession() {
 
-        SearchFilter filter = loadFilterFromView();
+        RegistrationSearchFilter filter = loadFilterFromView();
         UI.getCurrent().getSession().setAttribute(REGISTRATION_LIST_PRESENTER_SEARCH_FILTER, filter);
     }
 
@@ -256,10 +256,10 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     /**
      *
      */
-    public SearchFilter loadFilterFromView() {
+    public RegistrationSearchFilter loadFilterFromView() {
 
 
-        SearchFilter filter = new SearchFilter();
+        RegistrationSearchFilter filter = new RegistrationSearchFilter();
         filter.identifierPattern = getView().getIdentifierFilter().getValue();
         filter.namePattern = getView().getTaxonNameFilter().getValue();
         if(getView().getSubmitterFilter() != null){
@@ -289,7 +289,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
     private void loadSearchFilterFromSession() {
         Object o = UI.getCurrent().getSession().getAttribute(REGISTRATION_LIST_PRESENTER_SEARCH_FILTER);
         if(o != null){
-            SearchFilter filter = (SearchFilter)o;
+            RegistrationSearchFilter filter = (RegistrationSearchFilter)o;
             getView().getIdentifierFilter().setValue(filter.identifierPattern);
             getView().getTaxonNameFilter().setValue(filter.namePattern);
             if(getView().getSubmitterFilter() != null){
@@ -317,14 +317,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             }
         }
 
-    }
-
-    class SearchFilter {
-        String identifierPattern;
-        String namePattern;
-        User submitter;
-        Set<TypeDesignationStatusBase> typeStatus;
-        Set<RegistrationStatus> registrationStatus;
     }
 
 }
