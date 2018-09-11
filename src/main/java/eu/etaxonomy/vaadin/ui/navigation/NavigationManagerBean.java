@@ -282,4 +282,15 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     public void setViewDisplay(ViewDisplay viewDisplay){
         this.viewDisplay = viewDisplay;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() {
+        super.destroy();
+        uiEventBus.unsubscribe(this);
+    }
+
+
 }

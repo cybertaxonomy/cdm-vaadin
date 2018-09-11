@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.vaadin.spring.events.EventBus;
@@ -29,7 +30,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent("distributionToolbar")
 @ViewScope
-public class DistributionToolbar extends HorizontalLayout implements Serializable{
+public class DistributionToolbar extends HorizontalLayout implements Serializable, DisposableBean{
 
 	/**
 	 * automatically generated ID
@@ -41,7 +42,7 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
     @Autowired
     private final void setViewEventBus(EventBus.UIEventBus viewEventBus){
         this.uiEventBus = viewEventBus;
-        viewEventBus.subscribe(AuthenticationSuccessEvent.class);
+        viewEventBus.subscribe(AuthenticationSuccessEvent.class); // FIXME shouldn't this be .subscribe(this) ??
     }
 
     @Autowired
@@ -220,4 +221,12 @@ public class DistributionToolbar extends HorizontalLayout implements Serializabl
 	public Button getHelpButton() {
 		return helpButton;
 	}
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        uiEventBus.unsubscribe(this);
+    }
 }
