@@ -308,4 +308,20 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        disposeCache();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeCache() {
+        cache.dispose();
+    }
 }

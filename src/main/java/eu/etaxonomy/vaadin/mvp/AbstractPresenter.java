@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.engine.internal.StatefulPersistenceContext;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContext;
@@ -30,7 +31,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @param <V>
  *            type of the view this presenter governs
  */
-public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable {
+public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, DisposableBean {
 
 
     private static final long serialVersionUID = 5260910510283481832L;
@@ -234,6 +235,12 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
     protected boolean isFromOwnView(EntityChangeEvent event) {
         return event.getSourceView() != null && event.getSourceView().equals(getView());
+    }
+
+    @Override
+    public
+    void destroy() throws Exception {
+        view = null;
     }
 
 }

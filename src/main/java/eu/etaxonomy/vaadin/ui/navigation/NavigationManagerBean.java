@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
@@ -194,9 +195,16 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
     @EventBusListenerMethod
-	protected void onDoneWithTheEditor(DoneWithPopupEvent e) {
+	protected void onDoneWithTheEditor(DoneWithPopupEvent event) {
 
-		PopupView popup = e.getPopup();
+		PopupView popup = event.getPopup();
+		if(DisposableBean.class.isAssignableFrom(popup.getClass())){
+		    try {
+                ((DisposableBean)popup).destroy();
+            } catch (Exception e) {
+                logger.error(e);
+            }
+		}
         Window window = popupViewRegistration.getWindow(popup);
 		if (window != null) {
 			window.close();
