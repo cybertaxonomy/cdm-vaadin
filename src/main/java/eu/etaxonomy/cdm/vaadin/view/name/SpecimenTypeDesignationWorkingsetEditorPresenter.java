@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -72,7 +73,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 @Scope("prototype")
 public class SpecimenTypeDesignationWorkingsetEditorPresenter
     extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView>
-    implements CachingPresenter {
+    implements CachingPresenter, DisposableBean {
 
     private static final long serialVersionUID = 4255636253714476918L;
 
@@ -317,6 +318,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         return cache;
     }
 
+    @Override
+    public void disposeCache() {
+        cache.dispose();
+    }
+
     public void doCollectionEditorAdd(SpecimenTypeDesignationDTORow row) {
 
         CollectionPopupEditor collectionPopupEditor = openPopupEditor(CollectionPopupEditor.class, null);
@@ -421,6 +427,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         return rootEntities ;
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        cache.dispose();
+    }
 
 }

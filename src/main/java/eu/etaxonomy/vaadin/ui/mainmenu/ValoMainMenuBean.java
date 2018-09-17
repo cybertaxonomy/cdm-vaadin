@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -30,7 +31,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
 @SpringComponent
 @UIScope
-class ValoMainMenuBean extends CssLayout implements MainMenu {
+class ValoMainMenuBean extends CssLayout implements MainMenu, DisposableBean {
 
 	private static final long serialVersionUID = -993548217313748689L;
 
@@ -115,5 +116,13 @@ class ValoMainMenuBean extends CssLayout implements MainMenu {
     @Override
     public void addMenuComponent(Component component) {
         menuArea.addComponent(component);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        uiEventBus.unsubscribe(this);
     }
 }

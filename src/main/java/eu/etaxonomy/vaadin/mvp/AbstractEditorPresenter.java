@@ -171,4 +171,5 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         }
         return null;
     }
+
 }

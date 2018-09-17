@@ -26,4 +26,5 @@ public interface CachingPresenter {
 
     public void addRootEntity(CdmBase entity);
 
+    public void disposeCache();
 }

@@ -51,7 +51,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
 
         Registration reg;
         if(identifier != null){
-            List<String> initStrategy = Arrays.asList(new String[] {"$"});
+            List<String> initStrategy = Arrays.asList(new String[] {"$", "typeDesignations"});
             reg = getRepo().getRegistrationService().load(identifier, initStrategy );
         } else {
             reg = Registration.NewInstance();

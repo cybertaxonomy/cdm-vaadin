@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.service;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.transaction.TransactionStatus;
@@ -167,9 +166,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             session.flush();
             commitTransaction();
             return new EntityChangeEvent(mergedBean, changeEventType, view);
-        } catch (HibernateException | IllegalStateException e){
+        } finally {
             session.clear(); // #7559
-            throw e;
         }
     }
 
@@ -195,9 +193,8 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
                 handleDeleteresultInError(result, session);
                 txStatus = null;
             }
-        } catch (HibernateException e){
+        } finally {
             session.clear(); // #7559
-            throw e;
         }
         return null;
     }
@@ -217,9 +214,12 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
             result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
             messageBody.append("</ul>");
+            /*
+             * not needed since covered by clear() in finally clause
             if(result.getExceptions().stream().anyMatch(e -> HibernateException.class.isAssignableFrom(e.getClass()))){
                 session.clear(); // #7559
             }
+            */
         }
         if (!result.getRelatedObjects().isEmpty()) {
             messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
