@@ -246,7 +246,11 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
+                e -> {
+                    getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this));
+
+                }
+        );
 
         existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
@@ -257,7 +261,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                         RegistrationWorkingsetAction.Action.start
                 )
              )
-                );
+        );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(

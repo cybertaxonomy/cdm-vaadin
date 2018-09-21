@@ -435,6 +435,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
+        getView().getAddNewNameRegistrationButton().setEnabled(false);
         newTaxonNameForRegistration = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
         newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationUuid()));
         EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration, (AbstractView) getView());
@@ -498,6 +499,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 getRepo().getSession().clear(); // #7702
             }
             newTaxonNameForRegistration = null;
+            getView().getAddNewNameRegistrationButton().setEnabled(true);
         }
     }
 
