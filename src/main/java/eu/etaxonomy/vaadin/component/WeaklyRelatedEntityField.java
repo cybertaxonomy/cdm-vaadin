@@ -56,4 +56,9 @@ public interface WeaklyRelatedEntityField<V extends IdentifiableEntity> {
 
     public Class<String> getType();
 
+    /**
+     * Update the enabled state of the add and edit buttons
+     */
+    public void updateButtons();
+
 }

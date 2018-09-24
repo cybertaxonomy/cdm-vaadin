@@ -44,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -705,7 +706,23 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(isSpeciesOrBelow) {
                 if(TextField.class.isAssignableFrom(genusOrUninomialField.getClass())){
-                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be relpaced <-", TaxonName.class);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
+                    combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                            this,
+                            new TaxonNameEditorActionStrRep(EditorActionType.ADD, e.getButton(), combobox, this)
+                        ));
+                    combobox.addClickListenerEditEntity(e -> {
+                        if(combobox.getValue() != null){
+                            getViewEventBus().publish(this,
+                                new TaxonNameEditorActionStrRep(
+                                        EditorActionType.EDIT,
+                                        combobox.getIdForValue(),
+                                        e.getButton(),
+                                        combobox,
+                                        this)
+                            );
+                        }
+                    });
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
@@ -718,8 +735,24 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(rank.isInfraSpecific()) {
                 if(TextField.class.isAssignableFrom(specificEpithetField.getClass())) {
-                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be relpaced <-", TaxonName.class);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, combobox, 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                            this,
+                            new TaxonNameEditorActionStrRep(EditorActionType.ADD, e.getButton(), combobox, this)
+                        ));
+                    combobox.addClickListenerEditEntity(e -> {
+                        if(combobox.getValue() != null){
+                            getViewEventBus().publish(this,
+                                new TaxonNameEditorActionStrRep(
+                                        EditorActionType.EDIT,
+                                        combobox.getIdForValue(),
+                                        e.getButton(),
+                                        combobox,
+                                        this)
+                            );
+                        }
+                    });
                 }
             } else {
                 if(ToOneRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {

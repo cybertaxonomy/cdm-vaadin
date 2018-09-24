@@ -254,4 +254,12 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         }
         return lastPagedEntityUUIDs.get(stringRepresentation);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clearIdCache() {
+        lastPagedEntityUUIDs = null;
+    }
 }

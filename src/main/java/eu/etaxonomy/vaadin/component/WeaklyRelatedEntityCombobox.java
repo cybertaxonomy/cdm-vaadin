@@ -61,7 +61,7 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         lazySelect = new ReloadableLazyComboBox<String>(String.class);
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
-        buttonUpdater = new WeaklyRelatedEntityButtonUpdater(this, type);
+        buttonUpdater = new WeaklyRelatedEntityButtonUpdater(this);
         lazySelect.addValueChangeListener(buttonUpdater);
         lazySelect.addValueChangeListener(e -> {
             // update the itemContainer immediately so that the edit button acts on the chosen item
@@ -128,8 +128,10 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
      */
     @Override
     public void reload() {
+        filterablePagingProvider.clearIdCache();
         getSelect().reload();
     }
+
 
     /**
      * {@inheritDoc}
@@ -181,6 +183,10 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         return lazySelect.getValue();
     }
 
+    public UUID getIdForValue(){
+        return filterablePagingProvider.idFor(getValue());
+    }
+
 
     /**
      * {@inheritDoc}
@@ -220,6 +226,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         }
     }
 
+    @Override
+    public void updateButtons(){
+        buttonUpdater.updateButtons(getValue());
+    }
+
     /**
      * {@inheritDoc}
      * @deprecated NestedButtonStateUpdater should rather be instantiated in the RelatedEntityField instead of passing it as property
@@ -236,12 +247,8 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
 
         WeaklyRelatedEntityCombobox<V>  toOneRelatedEntityField;
 
-        private Class<V> type;
-
-
-        public WeaklyRelatedEntityButtonUpdater(WeaklyRelatedEntityCombobox<V> toOneRelatedEntityField, Class<V> type){
+        public WeaklyRelatedEntityButtonUpdater(WeaklyRelatedEntityCombobox<V> toOneRelatedEntityField){
             this.toOneRelatedEntityField = toOneRelatedEntityField;
-            this.type = type;
             String stringValue = toOneRelatedEntityField.getValue();
             updateButtons(toOneRelatedEntityField.getValue());
             toOneRelatedEntityField.setEditButtonEnabled(false);

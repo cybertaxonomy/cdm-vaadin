@@ -19,5 +19,10 @@ public interface FilterableStringRepresentationPagingProvider<IDTYPE> extends Fi
 
     public IDTYPE idFor(String stringRepresentation);
 
+    /**
+     *
+     */
+    public void clearIdCache();
+
 
 }
