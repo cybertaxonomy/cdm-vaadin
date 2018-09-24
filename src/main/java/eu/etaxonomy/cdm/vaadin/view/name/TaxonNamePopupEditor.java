@@ -18,7 +18,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
-import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -57,6 +56,7 @@ import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 
@@ -705,10 +705,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(isSpeciesOrBelow) {
                 if(TextField.class.isAssignableFrom(genusOrUninomialField.getClass())){
-                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new LazyComboBox<String>(String.class), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be relpaced <-", TaxonName.class);
+                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
-                if(LazyComboBox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
+                if(ToOneRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new TextFieldNFix(), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             }
@@ -717,10 +718,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(rank.isInfraSpecific()) {
                 if(TextField.class.isAssignableFrom(specificEpithetField.getClass())) {
-                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new LazyComboBox<String>(String.class), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be relpaced <-", TaxonName.class);
+                    specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, combobox, 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
                 }
             } else {
-                if(LazyComboBox.class.isAssignableFrom(specificEpithetField.getClass())) {
+                if(ToOneRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new TextFieldNFix(), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
                }
             }

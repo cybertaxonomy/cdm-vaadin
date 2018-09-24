@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
-import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -53,8 +52,10 @@ import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -327,19 +328,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(boundPropertyIdPath != null){
             if(boundPropertyIdPath.matches("specificEpithet")){
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
-                if(event.getNewField() instanceof LazyComboBox){
-
-                    if(specificEpithetPartPagingProvider  == null){
+                if(event.getNewField() instanceof CompositeCustomField){
+                    if(specificEpithetPartPagingProvider == null){
                         specificEpithetPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService(), Rank.SPECIES());
                     }
                     specificEpithetPartPagingProvider.listenToFields(
                             genusOrUninomialField,
                             null, null, null);
                     specificEpithetPartPagingProvider.updateFromFields();
-                    LazyComboBox<String> specificEpithetField = (LazyComboBox<String>)event.getNewField();
-                    refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.refresh(); specificEpithetField.setValue(null);};
-                    genusOrUninomialField.addValueChangeListener(refreshSpecificEpithetComboBoxListener);
+                    WeaklyRelatedEntityCombobox<TaxonName> specificEpithetField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
+                    refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.getSelect().refresh(); specificEpithetField.setValue(null);};
                     specificEpithetField.loadFrom(specificEpithetPartPagingProvider, specificEpithetPartPagingProvider, specificEpithetPartPagingProvider.getPageSize());
+                    specificEpithetField.setValue(event.getOldField().getValue());
+                    genusOrUninomialField.addValueChangeListener(refreshSpecificEpithetComboBoxListener);
                 } else {
                     if(specificEpithetPartPagingProvider != null){
                         specificEpithetPartPagingProvider.unlistenAllFields();
@@ -350,7 +351,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     }
                 }
             } else if(boundPropertyIdPath.matches("genusOrUninomial")) {
-                if(event.getNewField() instanceof LazyComboBox){
+                if(event.getNewField() instanceof CompositeCustomField){
                     if(genusOrUninomialPartPagingProvider  == null){
                         genusOrUninomialPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService());
                     }
@@ -360,9 +361,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                                 getView().getSpecificEpithetField(),
                                 getView().getInfraSpecificEpithetField()
                                );
-                    LazyComboBox<String> genusOrUninomialField = (LazyComboBox<String>)event.getNewField();
+                    WeaklyRelatedEntityCombobox<TaxonName> genusOrUninomialField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
+                    // FIXME genusOrUninomialField.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(genusOrUninomialField));
                     genusOrUninomialField.loadFrom(genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider.getPageSize());
-
+                    genusOrUninomialField.setValue(event.getOldField().getValue());
                 }else {
                     if(genusOrUninomialPartPagingProvider != null){
                         genusOrUninomialPartPagingProvider.unlistenAllFields();

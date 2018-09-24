@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
-import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractField;
@@ -32,11 +32,16 @@ import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 
 /**
+ * IMPORTANT !!!
+ *
+ * The string representations returned as rankSpecificNamePart must be unique in the database since these are being used as weak references between e.g.
+ * genus name and the TaxonName entity for this genus.
+ *
  * @author a.kohlbecker
  * @since Jun 7, 2017
  *
  */
-public class TaxonNameStringFilterablePagingProvider implements FilterablePagingProvider<String>, FilterableCountProvider {
+public class TaxonNameStringFilterablePagingProvider implements FilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
@@ -57,6 +62,8 @@ public class TaxonNameStringFilterablePagingProvider implements FilterablePaging
     private TaxonNamePartsFilter namePartsFilter = new TaxonNamePartsFilter();
 
     private Map<AbstractField<String>, ValueChangeListener> registeredToFields = new HashMap<>();
+
+    private Map<String, UUID> lastPagedEntityUUIDs;
 
 
     public TaxonNameStringFilterablePagingProvider(INameService service) {
@@ -169,8 +176,15 @@ public class TaxonNameStringFilterablePagingProvider implements FilterablePaging
             logger.trace("findEntities() - page: " + taxonNamePager.getCurrentIndex() + "/" + taxonNamePager.getPagesAvailable() + " totalRecords: " + taxonNamePager.getCount() + "\n" + taxonNamePager.getRecords());
         }
         List<String> namePartStrings = new ArrayList<>(taxonNamePager.getRecords().size());
+        lastPagedEntityUUIDs = new HashMap<>(taxonNamePager.getRecords().size());
         for(TaxonNameParts tnp : taxonNamePager.getRecords()){
-               namePartStrings.add(tnp.rankSpecificNamePart());
+               String rankSpecificNamePart = tnp.rankSpecificNamePart();
+               String namePartKey = rankSpecificNamePart;
+               if(lastPagedEntityUUIDs.containsKey(namePartKey)){
+                   namePartKey = rankSpecificNamePart + " DUPLICATE[" + tnp.getTaxonNameUuid() + "]";
+               }
+               namePartStrings.add(namePartKey);
+               lastPagedEntityUUIDs.put(namePartKey, tnp.getTaxonNameUuid());
         }
         return namePartStrings;
     }
@@ -214,10 +228,30 @@ public class TaxonNameStringFilterablePagingProvider implements FilterablePaging
         return criteria;
     }
 
+    /**
+     * @return the lastPagedEntityUUIDs
+     */
+    public Map<String, UUID> getLastPagedEntityUUIDs() {
+        return lastPagedEntityUUIDs;
+    }
+
+
     public class UnknownFieldException extends Exception {
 
         private static final long serialVersionUID = 1L;
 
 
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UUID idFor(String stringRepresentation) {
+        if(lastPagedEntityUUIDs == null){
+            findEntities(0, stringRepresentation);
+        }
+        return lastPagedEntityUUIDs.get(stringRepresentation);
     }
 }
