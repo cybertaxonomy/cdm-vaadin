@@ -728,7 +728,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 refreshView(true);
             }
         } else
-        if(TaxonName.class.isAssignableFrom(event.getEntityType()) && isFromOwnView(event)){
+        if(TaxonName.class.isAssignableFrom(event.getEntityType())){
             if(event.getType().equals(EntityChangeEvent.Type.CREATED)){
                 // new name! create a blocking registration
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
