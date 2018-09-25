@@ -722,20 +722,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 if(rootContext.getParentView().equals(getView())){
                     Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(event.getEntityUuid());
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-//                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), REGISTRATION_INIT_STRATEGY);
-//                    if(registration == null){
                     Registration registration = null;
-                        for(int i = context.size()-1; i>0; i--){
-                            if(NameTypeDesignationEditorView.class.isAssignableFrom(context.elementAt(i).getParentView().getClass())){
-                                UUID registrationUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(context.elementAt(i).getParentView());
-                                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(registrationUUID).get();
-                                registration = registrationDTO.registration();
-                            }
+                    for(int i = context.size()-1; i>0; i--){
+                        if(NameTypeDesignationEditorView.class.isAssignableFrom(context.elementAt(i).getParentView().getClass())){
+                            UUID registrationUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(context.elementAt(i).getParentView());
+                            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(registrationUUID).get();
+                            registration = registrationDTO.registration();
                         }
-                        if(registration == null){
-                            throw new NullPointerException("Registration not found for the NameTypeDesignation");
-                        }
-//                    }
+                    }
+                    if(registration == null){
+                        throw new NullPointerException("Registration not found for the NameTypeDesignation");
+                    }
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
