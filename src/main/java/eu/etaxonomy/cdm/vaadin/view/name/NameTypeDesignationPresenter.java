@@ -42,6 +42,7 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -256,7 +257,7 @@ public class NameTypeDesignationPresenter
         TaxonNamePopupEditor typeNamePopup = openPopupEditor(TaxonNamePopupEditor.class, action);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
-        // TODO configure Modes???
+        TaxonNamePopupEditorConfig.configure(typeNamePopup);
         typeNamePopup.loadInEditor(null);
 
     }
@@ -272,7 +273,7 @@ public class NameTypeDesignationPresenter
         TaxonNamePopupEditor typeNamePopup = openPopupEditor(TaxonNamePopupEditor.class, action);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
-        // TODO configure Modes???
+        TaxonNamePopupEditorConfig.configure(typeNamePopup);
         typeNamePopup.loadInEditor(action.getEntityUuid());
 
     }

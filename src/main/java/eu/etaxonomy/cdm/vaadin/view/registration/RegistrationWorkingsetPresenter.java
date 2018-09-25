@@ -81,12 +81,12 @@ import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
+import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationEditorView;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
-import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
-import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorView;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -418,7 +418,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
         popup.setParentEditorActionContext(event.getContext());
         popup.withDeleteButton(true);
-        configureTaxonNameEditor(popup);
+        TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
             // avoid resetting readonly to false
@@ -444,22 +444,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.setParentEditorActionContext(event.getContext());
         popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
         popup.withDeleteButton(true);
-        configureTaxonNameEditor(popup);
+        TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
         popup.loadInEditor(newTaxonNameForRegistration.getUuid());
-    }
-
-    /**
-     * TODO consider putting this into a Configurer Bean per UIScope.
-     * In the configurator bean this methods popup papamerter should be of the type
-     * AbstractPopupEditor
-     *
-     * @param popup
-     */
-    protected void configureTaxonNameEditor(TaxonNamePopupEditorView popup) {
-        popup.enableMode(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA);
-        popup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-        popup.enableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-        // popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
     }
 
     /**
@@ -736,7 +722,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 if(rootContext.getParentView().equals(getView())){
                     Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(event.getEntityUuid());
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), REGISTRATION_INIT_STRATEGY);
+//                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), REGISTRATION_INIT_STRATEGY);
+//                    if(registration == null){
+                    Registration registration = null;
+                        for(int i = context.size()-1; i>0; i--){
+                            if(NameTypeDesignationEditorView.class.isAssignableFrom(context.elementAt(i).getParentView().getClass())){
+                                UUID registrationUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(context.elementAt(i).getParentView());
+                                RegistrationDTO registrationDTO = workingset.getRegistrationDTO(registrationUUID).get();
+                                registration = registrationDTO.registration();
+                            }
+                        }
+                        if(registration == null){
+                            throw new NullPointerException("Registration not found for the NameTypeDesignation");
+                        }
+//                    }
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
                     logger.debug("Blocking registration created");
