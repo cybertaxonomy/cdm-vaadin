@@ -199,8 +199,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      */
     @Override
     protected void saveBean(RegistrationDTO bean) {
-        // TODO Auto-generated method stub
-
+        // not needed //
     }
 
     /**
@@ -208,8 +207,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      */
     @Override
     protected void deleteBean(RegistrationDTO bean) {
-        // TODO Auto-generated method stub
-
+        // not needed //
     }
 
 }

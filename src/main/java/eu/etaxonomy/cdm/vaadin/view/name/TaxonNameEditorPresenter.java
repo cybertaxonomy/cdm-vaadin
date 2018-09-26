@@ -217,7 +217,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(identifier != null){
             taxonName = getRepo().getNameService().load(identifier, initStrategy);
         } else {
-            taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+            if(cdmEntityInstantiator != null) {
+                taxonName = cdmEntityInstantiator.createNewBean();
+            } else {
+                taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+            }
         }
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){

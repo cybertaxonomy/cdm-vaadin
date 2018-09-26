@@ -46,6 +46,7 @@ import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.mvp.BoundField;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
@@ -66,6 +67,19 @@ public class NameTypeDesignationPresenter
 
     private TaxonName typifiedNameInContext;
 
+    protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
+
+        @Override
+        public NameTypeDesignation createNewBean() {
+            return NameTypeDesignation.NewInstance();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
+    }
 
     /**
      * {@inheritDoc}
@@ -113,11 +127,7 @@ public class NameTypeDesignationPresenter
         if(uuid != null){
             typeDesignation = (NameTypeDesignation) getRepo().getNameService().loadTypeDesignation(uuid, initStrategy);
         } else {
-            if(beanInstantiator != null){
-                typeDesignation = beanInstantiator.createNewBean();
-            } else {
-                typeDesignation = NameTypeDesignation.NewInstance();
-            }
+            typeDesignation = createNewBean();
         }
 
         typifiedNamesAsLoaded = new HashSet<>(typeDesignation.getTypifiedNames());

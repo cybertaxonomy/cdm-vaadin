@@ -48,6 +48,29 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     private static final Logger logger = Logger.getLogger(CdmEditorPresenterBase.class);
 
+    protected BeanInstantiator<DTO> beanInstantiator = null;
+
+
+    /**
+     * @param beanInstantiator the beanInstantiator to set
+     */
+    public void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
+        this.beanInstantiator = beanInstantiator;
+    }
+
+
+    protected DTO createNewBean() {
+        if(this.beanInstantiator != null){
+            return beanInstantiator.createNewBean();
+        }
+        return defaultBeanInstantiator().createNewBean();
+    }
+
+    /**
+     * @return
+     */
+    protected abstract BeanInstantiator<DTO> defaultBeanInstantiator();
+
     /**
      * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.

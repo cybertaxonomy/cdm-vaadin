@@ -23,10 +23,26 @@ public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityAdapter
 
     private static final long serialVersionUID = -6315824180341694825L;
 
+    protected BeanInstantiator<CDM> cdmEntityInstantiator = null;
+
+    @Override
+    protected BeanInstantiator<DTO> defaultBeanInstantiator(){
+        // not needed in the AbstractCdmDTOEditorPresenter since replaced by cdmEntityInstantiator
+       return null;
+    }
+
 
     @Override
     protected CDM cdmEntity(DTO dto) {
         return dto.cdmEntity();
+    }
+
+
+    /**
+     * @param cdmEntityInstantiator the cdmEntityInstantiator to set
+     */
+    public void setCdmEntityInstantiator(BeanInstantiator<CDM> cdmEntityInstantiator) {
+        this.cdmEntityInstantiator = cdmEntityInstantiator;
     }
 
 
