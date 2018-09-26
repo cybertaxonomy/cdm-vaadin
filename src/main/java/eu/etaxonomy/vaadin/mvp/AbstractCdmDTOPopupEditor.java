@@ -40,6 +40,10 @@ public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<
         getPresenter().setGrantsForCurrentUser(crud);
     }
 
+    public void setCdmEntityInstantiator(BeanInstantiator<CDM> cdmEntityInstantiator) {
+        ((AbstractCdmDTOEditorPresenter)getPresenter()).setCdmEntityInstantiator(cdmEntityInstantiator);
+    }
+
 
 
 }

@@ -225,34 +225,33 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         }
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){
-            if(taxonName.getNomenclaturalReference() != null){
-                Reference nomRef = taxonName.getNomenclaturalReference();
-                //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
-                publishedUnit = nomRef;
-                while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
-                    publishedUnit = nomRef.getInReference();
-                }
-                // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
-                // nomReferencePagingProvider
-                nomReferencePagingProvider.getCriteria().add(Restrictions.or(
-                        Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
-                        Restrictions.idEq(publishedUnit.getId())
-                        )
-                );
-                // and remove the empty option
-                getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
+            Reference nomRef = taxonName.getNomenclaturalReference();
 
-                // new Reference only a sub sections of the publishedUnit
-                newReferenceInstantiator = new BeanInstantiator<Reference>() {
-                    @Override
-                    public Reference createNewBean() {
-                        Reference newRef = ReferenceFactory.newSection();
-                        newRef.setInReference(publishedUnit);
-                        return newRef;
-                    }
-                };
-
+            //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
+            publishedUnit = nomRef;
+            while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
+                publishedUnit = nomRef.getInReference();
             }
+            // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
+            // nomReferencePagingProvider
+            nomReferencePagingProvider.getCriteria().add(Restrictions.or(
+                    Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
+                    Restrictions.idEq(publishedUnit.getId())
+                    )
+            );
+            // and remove the empty option
+            getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
+
+            // new Reference only a sub sections of the publishedUnit
+            newReferenceInstantiator = new BeanInstantiator<Reference>() {
+                @Override
+                public Reference createNewBean() {
+                    Reference newRef = ReferenceFactory.newSection();
+                    newRef.setInReference(publishedUnit);
+                    return newRef;
+                }
+            };
+
         }
         return taxonName;
     }
