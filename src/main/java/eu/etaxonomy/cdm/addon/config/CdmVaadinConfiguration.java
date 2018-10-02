@@ -49,6 +49,7 @@ import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
+import eu.etaxonomy.cdm.persistence.hibernate.TaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
@@ -164,11 +165,12 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
             registerRegistrationUiHibernateEventListeners();
-
             return new RegistrationUI();
         }
         return null;
     }
+
+
 
     /**
      * this is only a quick implementation for testing,
@@ -178,8 +180,13 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         if(!registrationUiHibernateEventListenersDone){
             EventListenerRegistry listenerRegistry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry().getService(
                     EventListenerRegistry.class);
-            GrantedAuthorityRevokingRegistrationUpdateLister listener = new GrantedAuthorityRevokingRegistrationUpdateLister();
-            listenerRegistry.appendListeners(EventType.POST_UPDATE, listener);
+
+            listenerRegistry.appendListeners(EventType.POST_UPDATE, new GrantedAuthorityRevokingRegistrationUpdateLister());
+            // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
+
+            listenerRegistry.appendListeners(EventType.POST_UPDATE, new TaxonGraphHibernateListener());
+            listenerRegistry.appendListeners(EventType.POST_INSERT, new TaxonGraphHibernateListener());
+
             registrationUiHibernateEventListenersDone = true;
         }
     }
@@ -226,9 +233,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         }
         return null;
     }
-
-
-
 
     static final String PROPERTIES_FILE_NAME = "vaadin-apps";
 
