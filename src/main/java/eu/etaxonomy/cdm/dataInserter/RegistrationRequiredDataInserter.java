@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.dataInserter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -16,7 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,12 +28,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
+import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.model.taxon.TaxonBase;
+import eu.etaxonomy.cdm.persistence.dao.hibernate.taxonGraph.AbstractHibernateTaxonGraphProcessor;
+import eu.etaxonomy.cdm.persistence.dao.taxonGraph.TaxonGraphException;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
@@ -38,18 +50,22 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 
-/*
- * Can create missing registrations for names which have Extensions of the Type <code>IAPTRegdata.json</code>.
-* See https://dev.e-taxonomy.eu/redmine/issues/6621 for further details.
-    * This feature can be activated by by supplying one of the following jvm command line arguments:
-        * <ul>
-* <li><code>-DregistrationCreate=iapt</code>: create all iapt Registrations if missing</li>
-* <li><code>-DregistrationWipeout=iapt</code>: remove all iapt Registrations</li>
-* <li><code>-DregistrationWipeout=all</code>: remove all Registrations</li>
-* </ul>
-* The <code>-DregistrationWipeout</code> commands are executed before the <code>-DregistrationCreate</code> and will not change the name and type designations.
-*/
+///*
+// * Can create missing registrations for names which have Extensions of the Type <code>IAPTRegdata.json</code>.
+//* See https://dev.e-taxonomy.eu/redmine/issues/6621 for further details.
+//* This feature can be activated by by supplying one of the following jvm command line arguments:
+//* <ul>
+//* <li><code>-DregistrationCreate=iapt</code>: create all iapt Registrations if missing</li>
+//* <li><code>-DregistrationWipeout=iapt</code>: remove all iapt Registrations</li>
+//* <li><code>-DregistrationWipeout=all</code>: remove all Registrations</li>
+//* </ul>
+//* The <code>-DregistrationWipeout</code> commands are executed before the <code>-DregistrationCreate</code> and will not change the name and type designations.
+//*/
 /**
+ * This feature can be activated by by supplying one of the following jvm command line arguments:
+ * <ul>
+ *   <li><code>-DtaxonGraphCreate=true</code>: create taxon graph relations for all names below genus level</li>
+ * </ul>
  *
  * @author a.kohlbecker
  * @since May 9, 2017
@@ -60,6 +76,8 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 //    protected static final String PARAM_NAME_CREATE = "registrationCreate";
 //
 //    protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
+
+    protected static final String TAXON_GRAPH_CREATE = "taxonGraphCreate";
 
     protected static final UUID GROUP_SUBMITTER_UUID = UUID.fromString("c468c6a7-b96c-4206-849d-5a825f806d3e");
 
@@ -83,9 +101,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     public void setCdmRepository(CdmRepository repo){
       this.repo = repo;
     }
-
-
- // ==================== Registration creation ======================= //
 
     /**
      * {@inheritDoc}
@@ -218,7 +233,76 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             return;
         }
         commandsExecuted  = true;
-//
+
+        String taxonGraphCreate = System.getProperty(TAXON_GRAPH_CREATE);
+
+        if(taxonGraphCreate != null){
+            AbstractHibernateTaxonGraphProcessor processor = new AbstractHibernateTaxonGraphProcessor() {
+
+                @Override
+                public Session getSession() {
+                    return repo.getSession();
+                }
+            };
+            logger.setLevel(Level.DEBUG);
+            int chunksize = 1000;
+            int pageIndex = 0;
+            TransactionStatus tx;
+            Pager<Taxon> taxonPage;
+            List<TaxonBase> taxa = new ArrayList<>();
+            logger.debug("======= fixing sec refrences =========");
+            while(true){
+                tx = repo.startTransaction(false);
+                taxonPage = repo.getTaxonService().page(Taxon.class, chunksize, pageIndex++, null, null);
+                if(taxonPage.getRecords().size() == 0){
+                    repo.commitTransaction(tx);
+                    break;
+                }
+                for(Taxon taxon : taxonPage.getRecords()){
+                    taxon.setSec(processor.secReference());
+                    repo.getTaxonService().saveOrUpdate(taxon);
+                }
+                repo.commitTransaction(tx);
+            }
+
+            logger.debug("======= creating taxon graph =========");
+            pageIndex = 0;
+            Pager<TaxonName> page;
+            while(true){
+               tx = repo.startTransaction(false);
+               page = repo.getNameService().page(null, chunksize, pageIndex++, null, null);
+               if(page.getRecords().size() == 0){
+                   repo.commitTransaction(tx);
+                   break;
+               }
+               logger.debug(TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
+               taxa = new ArrayList<>();
+
+               for(TaxonName name : page.getRecords()){
+                   if(name.getRank() != null && name.getRank().isLower(Rank.GENUS())){
+                       NomenclaturalStatusType illegitimType = findILegitimateStatusType(name);
+                       if(illegitimType == null){
+                           Taxon taxon;
+                           try {
+                               logger.debug("Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
+                               taxon = processor.assureSingleTaxon(name);
+                               processor.updateEdges(taxon);
+                               taxa.add(taxon);
+                           } catch (TaxonGraphException e) {
+                               logger.error(e.getMessage());
+                           }
+                       } else {
+                           logger.debug("Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
+                       }
+                   } else {
+                       logger.debug("Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
+                   }
+               }
+               repo.getTaxonService().saveOrUpdate(taxa);
+               repo.commitTransaction(tx);
+            }
+        }
+
 //        String wipeoutCmd = System.getProperty(PARAM_NAME_WIPEOUT);
 //        String createCmd = System.getProperty(PARAM_NAME_CREATE);
 //
@@ -395,6 +479,15 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     }
 
+    private NomenclaturalStatusType findILegitimateStatusType(TaxonName name){
+        for(NomenclaturalStatus status : name.getStatus()){
+            if(status.getType() != null && !status.getType().isLegitimateType()){
+                return status.getType();
+            }
+        }
+        return null;
+    }
+
 
 //    /**
 //     * @param youngestDate
@@ -451,7 +544,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 //        } else {
 //
 //            Pager<Institution> pager = repo.getAgentService().findByTitleWithRestrictions(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
-//            if(!pager.getRecords().isEmpty()){
+//   )         if(!pager.getRecords().isEmpty()){
 //                institution =  pager.getRecords().get(0);
 //            } else {
 //                Institution institute = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
