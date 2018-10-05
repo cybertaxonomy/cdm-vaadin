@@ -437,6 +437,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         getView().getAddNewNameRegistrationButton().setEnabled(false);
         if(newNameForRegistrationPopupEditor == null){
             TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
+            newNameForRegistrationPopupEditor = popup;
             popup.setParentEditorActionContext(event.getContext());
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
             popup.withDeleteButton(true);
@@ -473,7 +474,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     TransactionStatus txStatus = getRepo().startTransaction();
                     if(newNameForRegistrationPopupEditor != null){
                         UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
-                        getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
+                        if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
+                            getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
+                        }
                         Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
                         // reload workingset into current session
                         loadWorkingSet(workingset.getCitationUuid());
