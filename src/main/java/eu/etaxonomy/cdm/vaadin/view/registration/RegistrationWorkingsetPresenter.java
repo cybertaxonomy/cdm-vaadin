@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,8 +47,11 @@ import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignati
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
+import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -83,6 +87,7 @@ import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
@@ -103,7 +108,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> {
+public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> implements CachingPresenter {
 
     private static final Logger logger = Logger.getLogger(RegistrationWorkingsetPresenter.class);
 
@@ -137,6 +142,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
+
+    private ICdmCacher cache;
+
+    private Collection<CdmBase> rootEntities = new HashSet<>();
 
     /**
      *
@@ -331,6 +340,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(workingset == null || workingset.getCitationUuid() == null){
             Reference citation = getRepo().getReferenceService().find(referenceUuid);
             workingset = new RegistrationWorkingSet(citation);
+        }
+        cache = new CdmTransientEntityCacher(this);
+        for(Registration registration : workingset.getRegistrations()) {
+            addRootEntity(registration);
         }
     }
 
@@ -758,7 +771,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
     public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
 
@@ -782,8 +794,41 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
             getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ICdmCacher getCache() {
+        return cache;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRootEntity(CdmBase entity) {
+        rootEntities.add(entity);
+        cache.put(entity);
+    }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<CdmBase> getRootEntities() {
+        return rootEntities;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeCache() {
+        cache.dispose();
     }
 
 }
