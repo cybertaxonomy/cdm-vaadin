@@ -22,6 +22,7 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -50,6 +51,7 @@ import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.api.service.taxonGraph.TaxonGraphBeforeTransactionCompleteProcess;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.config.CdmHibernateListener;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
@@ -84,6 +86,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
 @EnableEventBus // enable the vaadin spring event bus
+@CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
@@ -101,6 +104,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Autowired
     private ApplicationConfiguration appConfig;
+
+    @Autowired
+    @Qualifier("runAsAuthenticationProvider")
+    private AuthenticationProvider runAsAuthenticationProvider;
 
     @Autowired
     private ITaxonGraphHibernateListener taxonGraphHibernateListener;
@@ -189,7 +196,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
 
             try {
-                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin()}, new Class[]{IRunAs.class});
+                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin(runAsAuthenticationProvider)}, new Class[]{IRunAs.class});
             } catch (NoSuchMethodException | SecurityException e) {
                 // re-throw as RuntimeException as the context can not be created correctly
                 throw new RuntimeException(e);
