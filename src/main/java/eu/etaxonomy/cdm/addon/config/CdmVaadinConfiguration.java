@@ -42,14 +42,17 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
+import eu.etaxonomy.cdm.api.application.IRunAs;
+import eu.etaxonomy.cdm.api.application.RunAsAdmin;
 import eu.etaxonomy.cdm.api.cache.CdmCacher;
 import eu.etaxonomy.cdm.api.config.ApplicationConfiguration;
 import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.api.service.taxonGraph.TaxonGraphBeforeTransactionCompleteProcess;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
-import eu.etaxonomy.cdm.persistence.hibernate.TaxonGraphHibernateListener;
+import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
@@ -98,6 +101,9 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Autowired
     private ApplicationConfiguration appConfig;
+
+    @Autowired
+    private ITaxonGraphHibernateListener taxonGraphHibernateListener;
 
     @Autowired
     private void  setTermCacher(CdmCacher termCacher){
@@ -170,8 +176,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         return null;
     }
 
-
-
     /**
      * this is only a quick implementation for testing,
      * TODO see also the NOTE on CdmListenerIntegrator class declaration for a prospective better solution
@@ -184,8 +188,12 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             listenerRegistry.appendListeners(EventType.POST_UPDATE, new GrantedAuthorityRevokingRegistrationUpdateLister());
             // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
 
-            listenerRegistry.appendListeners(EventType.POST_UPDATE, new TaxonGraphHibernateListener());
-            listenerRegistry.appendListeners(EventType.POST_INSERT, new TaxonGraphHibernateListener());
+            try {
+                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin()}, new Class[]{IRunAs.class});
+            } catch (NoSuchMethodException | SecurityException e) {
+                // re-throw as RuntimeException as the context can not be created correctly
+                throw new RuntimeException(e);
+            }
 
             registrationUiHibernateEventListenersDone = true;
         }
