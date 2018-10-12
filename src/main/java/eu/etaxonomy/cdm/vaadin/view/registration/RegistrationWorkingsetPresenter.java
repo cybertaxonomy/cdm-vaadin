@@ -83,7 +83,6 @@ import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
-import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationEditorView;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
@@ -727,16 +726,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     UUID taxonNameUUID = event.getEntityUuid();
                     Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
                     TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    Registration registration = null;
-                    for(int i = context.size()-1; i>0; i--){
-                        if(NameTypeDesignationEditorView.class.isAssignableFrom(context.elementAt(i).getParentView().getClass())){
-                            UUID registrationUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(context.elementAt(i).getParentView());
-                            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(registrationUUID).get();
-                            registration = registrationDTO.registration();
-                        }
-                    }
+                    RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
+                    Registration registration = registrationDTO.registration();
                     if(registration == null){
-                        throw new NullPointerException("Registration not found for the NameTypeDesignation");
+                        throw new NullPointerException("Registration not found for " + regReference + " which has been hold in the rootContext");
                     }
                     registration.getBlockedBy().add(blockingRegistration);
                     getRepo().getRegistrationService().saveOrUpdate(registration);
