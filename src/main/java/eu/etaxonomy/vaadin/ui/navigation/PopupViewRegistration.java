@@ -11,6 +11,11 @@ package eu.etaxonomy.vaadin.ui.navigation;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import com.vaadin.server.ClientConnector;
+import com.vaadin.server.ClientConnector.DetachEvent;
+import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Window;
 
@@ -22,7 +27,11 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @since May 16, 2018
  *
  */
-public class PopupViewRegistration {
+public class PopupViewRegistration implements DetachListener {
+
+    private static final long serialVersionUID = -5946913287379095637L;
+
+    private static final Logger logger = Logger.getLogger(PopupViewRegistration.class);
 
     private Map<PopupView, Window> popupWindowMap = new HashMap<>();
 
@@ -36,6 +45,7 @@ public class PopupViewRegistration {
      */
     public Field<?> put(Window window, ApplicationView parentView, PopupView popup, Field<?> field){
 
+        ((ClientConnector)parentView).addDetachListener(this);
         popupWindowMap.put(popup, window);
 
         if(!popupViewFieldMap.containsKey(parentView)){
@@ -71,6 +81,9 @@ public class PopupViewRegistration {
         for(Map<PopupView, Field<?>> popupFieldMap : popupViewFieldMap.values()){
             if(popupFieldMap.containsKey(popup)){
                 popupFieldMap.remove(popup);
+                if(logger.isDebugEnabled()){
+                    logger.debug(popup +  " removed from popupViewFieldMap");
+                }
             }
         }
     }
@@ -84,10 +97,20 @@ public class PopupViewRegistration {
     }
 
     /**
-     *
+     * {@inheritDoc}
      */
-    public void removeOrphan() {
-        // unimplemented, only needed in case of memory leaks due to lost popups
+    @Override
+    public void detach(DetachEvent event) {
+        ClientConnector connector = event.getConnector();
+        if(ApplicationView.class.isAssignableFrom(connector.getClass())){
+            Map<PopupView, Field<?>> removal = popupViewFieldMap.remove(connector);
+            if(logger.isDebugEnabled() && removal != null){
+                logger.debug( connector +  " removed from popupViewFieldMap");
+            }
+        } else if(PopupView.class.isAssignableFrom(connector.getClass())){
+            remove((PopupView)connector);
+        }
+
     }
 
 }

@@ -133,7 +133,6 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 		} else {
 			super.navigateTo(navigationState);
 		}
-		popupViewRegistration.removeOrphan();
 	}
 
 	@Override
@@ -143,7 +142,6 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	    }
 		super.navigateTo(navigationState);
 		//eventBus.publishEvent(new NavigationEvent(navigationState));
-		popupViewRegistration.removeOrphan();
 	}
 
 	@EventBusListenerMethod
