@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
-import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -78,7 +78,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     protected EnumSet<CRUD> crud = null;
 
 
-    private ICdmCacher cache;
+    private ICdmEntityUuidCacher cache;
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
@@ -117,7 +117,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
         }
-        cache = new CdmTransientEntityCacher(this);
+        cache = new CdmTransientEntityAndUuidCacher(this);
         // need to use load but put see #7214
         cdmEntitiy = cache.load(cdmEntitiy);
         addRootEntity(cdmEntitiy);
@@ -309,7 +309,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      * {@inheritDoc}
      */
     @Override
-    public ICdmCacher getCache() {
+    public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 

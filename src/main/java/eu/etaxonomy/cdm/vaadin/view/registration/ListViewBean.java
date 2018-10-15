@@ -39,7 +39,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
-import eu.etaxonomy.cdm.model.ICdmUuidCacher;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -52,7 +51,6 @@ import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
-import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 
 /**
  * @author a.kohlbecker
@@ -195,7 +193,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer.removeAllComponents();
         boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
-            RegistrationItem item = new RegistrationItem(regDto, this, (ICdmUuidCacher)((CachingPresenter)getPresenter()).getCache());
+            RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
             item.getBlockedByButton().addClickListener(e -> getViewEventBus().publish(

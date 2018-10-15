@@ -51,7 +51,6 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
-import eu.etaxonomy.cdm.model.ICdmUuidCacher;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -178,7 +177,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             getLayout().removeComponent(workingsetHeader);
             getLayout().removeComponent(registrationListPanel);
         }
-        workingsetHeader = new RegistrationItem(workingset, this, (ICdmUuidCacher)getPresenter().getCache());
+        workingsetHeader = new RegistrationItem(workingset, this, getPresenter().getCache());
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
@@ -202,7 +201,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             }
         }
         if(!blockingRegAdded){
-            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs, (ICdmUuidCacher)getPresenter().getCache()));
+            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs, getPresenter().getCache()));
         }
     }
 

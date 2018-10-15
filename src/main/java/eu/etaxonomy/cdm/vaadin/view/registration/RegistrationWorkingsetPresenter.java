@@ -47,10 +47,10 @@ import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignati
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
-import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -143,7 +143,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
 
-    private ICdmCacher cache;
+    private ICdmEntityUuidCacher cache;
 
     private Collection<CdmBase> rootEntities = new HashSet<>();
 
@@ -341,7 +341,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             Reference citation = getRepo().getReferenceService().find(referenceUuid);
             workingset = new RegistrationWorkingSet(citation);
         }
-        cache = new CdmTransientEntityCacher(this);
+        cache = new CdmTransientEntityAndUuidCacher(this);
         for(Registration registration : workingset.getRegistrations()) {
             addRootEntity(registration);
         }
@@ -800,7 +800,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * {@inheritDoc}
      */
     @Override
-    public ICdmCacher getCache() {
+    public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 

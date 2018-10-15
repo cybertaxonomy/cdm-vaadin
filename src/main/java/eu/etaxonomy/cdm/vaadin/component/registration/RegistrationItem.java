@@ -36,8 +36,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.model.ICdmCacher;
-import eu.etaxonomy.cdm.model.ICdmUuidCacher;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -102,12 +102,12 @@ public class RegistrationItem extends GridLayout {
 
     private Panel blockingRelationsPanel;
 
-    private ICdmUuidCacher cache;
+    private ICdmEntityUuidCacher cache;
 
     /**
      *
      */
-    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView, ICdmUuidCacher cache) {
+    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
         this.cache = cache;
         init();
@@ -117,7 +117,7 @@ public class RegistrationItem extends GridLayout {
     /**
     *
     */
-   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView, ICdmUuidCacher cache) {
+   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
        super(GRID_COLS, GRID_ROWS);
        this.cache = cache;
        init();
@@ -213,7 +213,7 @@ public class RegistrationItem extends GridLayout {
 
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationUuid() != null){
-            if(UserHelperAccess.userHelper().withCache(cache).userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+            if(cdmUserHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
@@ -230,6 +230,17 @@ public class RegistrationItem extends GridLayout {
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
+    }
+
+    /**
+     * @return
+     */
+    private UserHelper cdmUserHelper() {
+        if(cache != null){
+            return UserHelperAccess.userHelper().withCache(cache);
+        } else {
+            return UserHelperAccess.userHelper();
+        }
     }
 
 

@@ -15,7 +15,7 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.model.ICdmUuidCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -31,7 +31,7 @@ public class RegistrationItemsPanel extends Panel {
      */
     private static final long serialVersionUID = -3763419770580196601L;
 
-    public RegistrationItemsPanel(AbstractView<?> parentView, String caption, Collection<RegistrationDTO> regDtos, ICdmUuidCacher cache){
+    public RegistrationItemsPanel(AbstractView<?> parentView, String caption, Collection<RegistrationDTO> regDtos, ICdmEntityUuidCacher cache){
 
         super(caption);
 
