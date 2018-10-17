@@ -750,7 +750,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     });
                 }
             } else {
-                if(ToOneRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {
+                if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new TextFieldNFix(), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
                }
             }
