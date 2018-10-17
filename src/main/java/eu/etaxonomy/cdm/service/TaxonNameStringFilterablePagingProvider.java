@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 
 import com.vaadin.data.Property.ValueChangeListener;
@@ -27,6 +26,7 @@ import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.utility.TaxonNamePartsFilter;
 import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.dto.TaxonNameParts;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
@@ -56,8 +56,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
 
     List<String> initStrategy = DEFAULT_INIT_STRATEGY;
-
-    private List<Criterion> criteria = new ArrayList<>();
 
     private TaxonNamePartsFilter namePartsFilter = new TaxonNamePartsFilter();
 
@@ -189,8 +187,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         return namePartStrings;
     }
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -218,16 +214,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         this.pageSize = pageSize;
     }
 
-
-    /**
-     * The list of criteria is initially empty.
-     *
-     * @return the criteria
-     */
-    public List<Criterion> getCriteria() {
-        return criteria;
-    }
-
     /**
      * @return the lastPagedEntityUUIDs
      */
@@ -239,10 +225,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     public class UnknownFieldException extends Exception {
 
         private static final long serialVersionUID = 1L;
-
-
     }
-
 
     /**
      * {@inheritDoc}
@@ -261,5 +244,16 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     @Override
     public void clearIdCache() {
         lastPagedEntityUUIDs = null;
+    }
+
+    /**
+     * @param asList
+     * @return
+     */
+    public void excludeNames(TaxonName ... excludedTaxonNames) {
+        namePartsFilter.getExludedNames().clear();
+        for(TaxonName n : excludedTaxonNames){
+            namePartsFilter.getExludedNames().add(n);
+        }
     }
 }

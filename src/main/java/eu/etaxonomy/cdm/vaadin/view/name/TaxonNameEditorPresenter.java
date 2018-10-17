@@ -331,6 +331,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         PropertyIdPath boundPropertyIdPath = boundPropertyIdPath(event.getNewField());
         if(boundPropertyIdPath != null){
+            TaxonNameDTO taxonNamedto = ((AbstractPopupEditor<TaxonNameDTO, AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName,?>>)getView()).getBean();
             if(boundPropertyIdPath.matches("specificEpithet")){
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
                 if(event.getNewField() instanceof CompositeCustomField){
@@ -340,11 +341,13 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     specificEpithetPartPagingProvider.listenToFields(
                             genusOrUninomialField,
                             null, null, null);
+                    specificEpithetPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
                     specificEpithetPartPagingProvider.updateFromFields();
                     WeaklyRelatedEntityCombobox<TaxonName> specificEpithetField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
                     refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.getSelect().refresh(); specificEpithetField.setValue(null);};
                     specificEpithetField.loadFrom(specificEpithetPartPagingProvider, specificEpithetPartPagingProvider, specificEpithetPartPagingProvider.getPageSize());
                     specificEpithetField.setValue(event.getOldField().getValue());
+                    specificEpithetField.reload();
                     genusOrUninomialField.addValueChangeListener(refreshSpecificEpithetComboBoxListener);
                 } else {
                     if(specificEpithetPartPagingProvider != null){
@@ -366,9 +369,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                                 getView().getSpecificEpithetField(),
                                 getView().getInfraSpecificEpithetField()
                                );
+                    genusOrUninomialPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
                     WeaklyRelatedEntityCombobox<TaxonName> genusOrUninomialField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
                     genusOrUninomialField.loadFrom(genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider.getPageSize());
                     genusOrUninomialField.setValue(event.getOldField().getValue());
+                    genusOrUninomialField.reload();
                 }else {
                     if(genusOrUninomialPartPagingProvider != null){
                         genusOrUninomialPartPagingProvider.unlistenAllFields();

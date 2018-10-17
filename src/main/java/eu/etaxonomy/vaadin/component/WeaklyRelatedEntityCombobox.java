@@ -189,12 +189,16 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
 
 
     /**
-     * {@inheritDoc}
+     * sets the selection to the <code>newFieldValue</code> only if the value can
+     * be provided by the FilterablePagingProvider
+     *
      */
     @Override
     public void setValue(String newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         lazySelect.refresh();
-        lazySelect.setValue(newFieldValue);
+        if(lazySelect.getOptions().contains(newFieldValue)){
+            lazySelect.setValue(newFieldValue);
+        }
         lazySelect.markAsDirty();
     }
 
