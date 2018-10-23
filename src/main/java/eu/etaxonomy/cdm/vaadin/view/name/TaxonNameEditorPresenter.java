@@ -58,6 +58,7 @@ import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityField;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -582,20 +583,29 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
                 namePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
                 namePopup.withDeleteButton(true);
-                String nameString = event.getTarget().getValue();
                 getView().getModesActive().stream()
-                        .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                        .forEach(m -> namePopup.enableMode(m));
+                .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                .forEach(m -> namePopup.enableMode(m));
                 namePopup.loadInEditor(null);
-                if(StringUtils.isNotEmpty(nameString)){
-                    if(boundPropertyId.matches("genusOrUninomial")){
-                        namePopup.getGenusOrUninomialField().setValue(nameString);
-                        namePopup.getRankSelect().setValue(Rank.GENUS());
-                    }
-                    if(boundPropertyId.matches("specificEpithet")){
-                        namePopup.getSpecificEpithetField().setValue(nameString);
-                        namePopup.getGenusOrUninomialField().setValue(getView().getGenusOrUninomialField().getValue());
-                        namePopup.getRankSelect().setValue(Rank.SPECIES());
+                if(boundPropertyId.matches("genusOrUninomial")){
+                    namePopup.getRankSelect().setValue(Rank.GENUS());
+                }
+                if(boundPropertyId.matches("specificEpithet")){
+                    namePopup.getGenusOrUninomialField().setValue(getView().getGenusOrUninomialField().getValue());
+                    namePopup.getRankSelect().setValue(Rank.SPECIES());
+                }
+                if(WeaklyRelatedEntityField.class.isAssignableFrom(event.getTarget().getClass())){
+                    WeaklyRelatedEntityField<TaxonName> taxoNameField = (WeaklyRelatedEntityField<TaxonName>)event.getTarget();
+                    if(!taxoNameField.isValueInOptions()){
+                        String nameString = event.getTarget().getValue();
+                        if(StringUtils.isNotEmpty(nameString)){
+                            if(boundPropertyId.matches("genusOrUninomial")){
+                                namePopup.getGenusOrUninomialField().setValue(nameString);
+                            }
+                            if(boundPropertyId.matches("specificEpithet")){
+                                namePopup.getSpecificEpithetField().setValue(nameString);
+                            }
+                        }
                     }
                 }
             }

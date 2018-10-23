@@ -203,6 +203,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
     }
 
     @Override
+    public boolean isValueInOptions(){
+        return lazySelect.getOptions().contains(lazySelect.getValue());
+    }
+
+    @Override
     public void setPropertyDataSource(Property newDataSource) {
         lazySelect.setPropertyDataSource(newDataSource);
         if(buttonUpdater != null){

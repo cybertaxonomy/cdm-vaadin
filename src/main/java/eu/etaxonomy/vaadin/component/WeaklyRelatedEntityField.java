@@ -61,4 +61,10 @@ public interface WeaklyRelatedEntityField<V extends IdentifiableEntity> {
      */
     public void updateButtons();
 
+    /**
+     * @return
+     *      true if the value currently set is in the options of the select
+     */
+    public boolean isValueInOptions();
+
 }

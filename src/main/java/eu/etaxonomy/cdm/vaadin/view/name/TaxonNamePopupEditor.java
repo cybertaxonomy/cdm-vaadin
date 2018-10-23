@@ -704,7 +704,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
                     combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                             this,
-                            new TaxonNameEditorActionStrRep(EditorActionType.ADD, e.getButton(), combobox, this)
+                            new TaxonNameEditorActionStrRep(
+                                    EditorActionType.ADD,
+                                    e.getButton(),
+                                    combobox,
+                                    this)
                         ));
                     combobox.addClickListenerEditEntity(e -> {
                         if(combobox.getValue() != null){
