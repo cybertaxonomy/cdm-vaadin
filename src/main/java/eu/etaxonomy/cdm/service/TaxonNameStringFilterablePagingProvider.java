@@ -251,9 +251,9 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
      * @return
      */
     public void excludeNames(TaxonName ... excludedTaxonNames) {
-        namePartsFilter.getExludedNames().clear();
+        namePartsFilter.getExludedNamesUuids();
         for(TaxonName n : excludedTaxonNames){
-            namePartsFilter.getExludedNames().add(n);
+            namePartsFilter.getExludedNamesUuids().add(n.getUuid());
         }
     }
 }
