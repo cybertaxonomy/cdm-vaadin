@@ -759,28 +759,37 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 EditorActionContext rootContext = context.get(0);
                 if(rootContext.getParentView().equals(getView()) && event.getSourceView() != newNameForRegistrationPopupEditor){
 
-                    // create a blocking registration, the new Registration will be persisted
-                    UUID taxonNameUUID = event.getEntityUuid();
-                    Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
+                    try {
+                        getRepo().getSession().clear();
+                        TransactionStatus txStatus = getRepo().startTransaction();
+                        // create a blocking registration, the new Registration will be persisted
+                        UUID taxonNameUUID = event.getEntityUuid();
+                        Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
 
-                    if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
-                        // Oha!! The event came from a popup editor and the
-                        // first popup in the context is a TaxonNameEditor with un-persisted name
-                        // This is a name for a new registration which has not yet been created.
-                        // It is necessary to store blocking registrations in the newNameBlockingRegistrations
-                        newNameBlockingRegistrations.add(blockingRegistration);
-                        logger.debug("Blocking registration created and memorized");
-                    } else {
-                        // some new name related somehow to an existing registration
-                        TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
-                        Registration registration = registrationDTO.registration();
-                        if(registration == null){
-                            throw new NullPointerException("Registration not found for " + regReference + " which has been hold in the rootContext");
+                        if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
+                            // Oha!! The event came from a popup editor and the
+                            // first popup in the context is a TaxonNameEditor with un-persisted name
+                            // This is a name for a new registration which has not yet been created.
+                            // It is necessary to store blocking registrations in the newNameBlockingRegistrations
+                            newNameBlockingRegistrations.add(blockingRegistration);
+                            logger.debug("Blocking registration created and memorized");
+                        } else {
+                            // some new name related somehow to an existing registration
+                            TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
+                            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
+                            Registration registration = registrationDTO.registration();
+
+                                registration = getRepo().getRegistrationService().load(registration.getUuid());
+                                if(registration == null){
+                                    throw new NullPointerException("Registration not found for " + regReference + " which has been hold in the rootContext");
+                                }
+                                registration.getBlockedBy().add(blockingRegistration);
+                                getRepo().getRegistrationService().saveOrUpdate(registration);
+                                getRepo().commitTransaction(txStatus);
+                            logger.debug("Blocking registration created and added to registion");
                         }
-                        registration.getBlockedBy().add(blockingRegistration);
-                        getRepo().getRegistrationService().saveOrUpdate(registration);
-                        logger.debug("Blocking registration created and added to registion");
+                    } finally {
+                        getRepo().getSession().clear();
                     }
                 } else {
                     // in case of creating a new name for a registration the parent view is the TaxonNamePopupEditor
