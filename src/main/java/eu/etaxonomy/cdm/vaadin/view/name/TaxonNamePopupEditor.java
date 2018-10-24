@@ -467,6 +467,9 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         setAdvancedMode(false);
 
+        //TODO remove below line once #7858 is fixed
+        withDeleteButton(false);
+
     }
 
     protected TeamOrPersonBase inferBasiomynAuthors() {
