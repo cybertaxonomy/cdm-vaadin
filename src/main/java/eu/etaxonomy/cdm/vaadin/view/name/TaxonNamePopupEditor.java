@@ -725,7 +725,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
-                if(ToOneRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
+                if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new TextFieldNFix(), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             }
