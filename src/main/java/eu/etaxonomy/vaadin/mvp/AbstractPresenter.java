@@ -238,8 +238,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     }
 
     @Override
-    public
-    void destroy() throws Exception {
+    public void destroy() throws Exception {
         unsubscribeFromEventBuses();
         view = null;
     }

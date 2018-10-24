@@ -165,4 +165,5 @@ public class RegistrationUI extends UI {
 //            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 //        }
     }
+
 }

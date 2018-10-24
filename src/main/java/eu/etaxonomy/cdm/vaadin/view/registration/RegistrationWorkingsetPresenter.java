@@ -857,6 +857,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return rootEntities;
     }
 
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        disposeCache();
+    }
 
     /**
      * {@inheritDoc}

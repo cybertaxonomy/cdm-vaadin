@@ -123,9 +123,15 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
 
     /*
-     * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
+     * NOTES:
+     *
+     * (1) It is necessary to map the URLs starting with /VAADIN/* since none of the
      * @WebServlets is mapped to the root path. It is sufficient to configure one of the
      * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
+     *
+     * (2) @VaadinServletConfiguration is not used here, all DeploymentConfiguration is
+     * configured in the web.xml. This way it it easier to modify the parameters for different
+     * build environments like test and production
      */
     @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {

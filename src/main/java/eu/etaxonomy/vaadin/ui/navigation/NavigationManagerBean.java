@@ -33,7 +33,7 @@ import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 @UIScope
-public class NavigationManagerBean extends SpringNavigator implements NavigationManager {
+public class NavigationManagerBean extends SpringNavigator implements NavigationManager, DisposableBean {
 
 	private static final long serialVersionUID = 6599898650948333853L;
 
@@ -261,14 +261,12 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         return null;
     }
 
-
     /**
      * @return the defaultViewName
      */
     public String getDefaultViewName() {
         return defaultViewName;
     }
-
 
     /**
      * @param defaultViewName the defaultViewName to set
@@ -282,13 +280,18 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
     }
 
     /**
-     * {@inheritDoc}
+     * implementation of the interface {@link DisposableBean} and overrides the
+     * method in {@link Navigator} which is not an implementation of {@link DisposableBean}
+     * in this class.
      */
     @Override
     public void destroy() {
         super.destroy();
         uiEventBus.unsubscribe(this);
+        popupViewRegistration = null;
+        // release the reference to the view kept in currentView
+        // which could be expensive
+        // by navigating to the default view
+        navigateTo(defaultViewName);
     }
-
-
 }
