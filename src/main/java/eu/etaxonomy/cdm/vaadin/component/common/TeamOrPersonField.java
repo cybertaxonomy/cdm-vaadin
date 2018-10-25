@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -55,6 +56,8 @@ import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>> {
 
     private static final long serialVersionUID = 660806402243118112L;
+
+    private static final Logger logger = Logger.getLogger(TeamOrPersonField.class);
 
     private static final String PRIMARY_STYLE = "v-team-or-person-field";
 
@@ -207,18 +210,20 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 personsListEditor.registerParentFieldGroup(fieldGroup);
 
             } else {
-                setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
+                UserError usererror = new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName());
+                setComponentError(usererror);
+                logger.error(usererror.getMessage());
             }
         } else {
             if(oldValue != null){
                 // value is null --> clean up all nested fields
                 // allow replacing old content in the editor by null
                 setReadOnlyComponents(false);
-                if(oldValue instanceof Person){
+                if(Person.class.isAssignableFrom(oldValue.getClass())){
                     personField.unregisterParentFieldGroup(fieldGroup);
                     personField.setReadOnly(false);
                     personField.setValue((Person) null);
-                } else {
+                } else if(Team.class.isAssignableFrom(oldValue.getClass())){
                     titleField.unbindFrom(fieldGroup);
                     nomenclaturalTitleField.unbindFrom(fieldGroup);
                     fieldGroup.unbind(personsListEditor);
@@ -227,6 +232,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                     personsListEditor.setReadOnly(false);
                     personsListEditor.setValue(null);
                     personsListEditor.registerParentFieldGroup(null);
+                } else {
+                    UserError usererror = new UserError("TeamOrPersonField Error: Unsupported value type in oldValue: " + oldValue.getClass().getName());
+                    setComponentError(usererror);
+                    logger.error(usererror.getMessage());
                 }
             }
         }
