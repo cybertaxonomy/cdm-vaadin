@@ -39,6 +39,4 @@ public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmE
         getPresenter().setGrantsForCurrentUser(crud);
     }
 
-
-
 }

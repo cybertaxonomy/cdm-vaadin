@@ -21,6 +21,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * Base implementation for an event which represents the request to start
  * an editor to enable the user to perform the <code>action</code> transported
  * with this event.
+ * <p>
+ * Which the {@link #context) stack the action can keep track of the chain of editors which where opened before and which lead
+ * to this action. This is important information when working with popup editors for which EntitySave events etc
+ * need to be also handled by the base view (e.g. see {@link eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkingsetPresenter}
+ * from which the the first popup editor of the chain has been opened. So the {@link #context) stack is just like a breadcrumbs information.
  *
  * @author a.kohlbecker
  * @since Mar 22, 2017
@@ -42,6 +47,11 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
         this(action, null, source, target, sourceView);
     }
 
+    /**
+     *
+     * @deprecated Consider using the constructor with Stack<EditorActionContext> context, so that the context is set for all popupeditors!!!
+     */
+    @Deprecated
     public AbstractEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<V> target, AbstractView sourceView) {
         this(action, entityUuid, source, target, sourceView, null);
     }
@@ -97,6 +107,10 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
     }
 
     /**
+     * Which the {@link #context) stack the action can keep track of the chain of editors
+     * which where opened before and which lead
+     * to this action.
+     *
      * @return the context
      */
     public Stack<EditorActionContext> getContext() {

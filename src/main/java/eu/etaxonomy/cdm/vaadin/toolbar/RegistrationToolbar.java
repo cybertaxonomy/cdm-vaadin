@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.toolbar;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.vaadin.spring.events.EventBus;
@@ -37,7 +38,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent("registrationToolbar")
 @UIScope
-public class RegistrationToolbar extends HorizontalLayout implements Toolbar, EventBusListener<AuthenticationSuccessEvent> {
+public class RegistrationToolbar extends HorizontalLayout implements Toolbar, EventBusListener<AuthenticationSuccessEvent>, DisposableBean {
 
     private static final long serialVersionUID = 2594781255088231474L;
 
@@ -130,6 +131,14 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar, Ev
         userHelper.logout();
         updateAuthenticationButtons();
         navigationManager.reloadCurrentView();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() throws Exception {
+        uiEventBus.unsubscribe(this);
     }
 
 }

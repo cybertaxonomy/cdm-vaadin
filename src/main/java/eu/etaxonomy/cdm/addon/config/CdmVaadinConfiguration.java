@@ -22,6 +22,7 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.internal.SessionFactoryImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
@@ -42,13 +43,18 @@ import com.vaadin.ui.UI;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
+import eu.etaxonomy.cdm.api.application.IRunAs;
+import eu.etaxonomy.cdm.api.application.RunAsAdmin;
 import eu.etaxonomy.cdm.api.cache.CdmCacher;
 import eu.etaxonomy.cdm.api.config.ApplicationConfiguration;
 import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
+import eu.etaxonomy.cdm.api.service.taxonGraph.TaxonGraphBeforeTransactionCompleteProcess;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.config.CdmHibernateListener;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
+import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
@@ -80,6 +86,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @EnableVaadinSpringNavigation // activate the NavigationManagerBean
 @EnableAnnotationBasedAccessControl // enable annotation based per view access control
 @EnableEventBus // enable the vaadin spring event bus
+@CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
@@ -99,6 +106,13 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private ApplicationConfiguration appConfig;
 
     @Autowired
+    @Qualifier("runAsAuthenticationProvider")
+    private AuthenticationProvider runAsAuthenticationProvider;
+
+    @Autowired
+    private ITaxonGraphHibernateListener taxonGraphHibernateListener;
+
+    @Autowired
     private void  setTermCacher(CdmCacher termCacher){
         CdmTransientEntityCacher.setPermanentCacher(termCacher);
     }
@@ -109,9 +123,15 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
 
     /*
-     * NOTE: It is necessary to map the URLs starting with /VAADIN/* since none of the
+     * NOTES:
+     *
+     * (1) It is necessary to map the URLs starting with /VAADIN/* since none of the
      * @WebServlets is mapped to the root path. It is sufficient to configure one of the
      * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
+     *
+     * (2) @VaadinServletConfiguration is not used here, all DeploymentConfiguration is
+     * configured in the web.xml. This way it it easier to modify the parameters for different
+     * build environments like test and production
      */
     @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class Servlet extends SpringVaadinServlet {
@@ -164,7 +184,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public RegistrationUI registrationUI() {
         if(isUIEnabled(RegistrationUI.class)){
             registerRegistrationUiHibernateEventListeners();
-
             return new RegistrationUI();
         }
         return null;
@@ -178,8 +197,17 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         if(!registrationUiHibernateEventListenersDone){
             EventListenerRegistry listenerRegistry = ((SessionFactoryImpl) sessionFactory).getServiceRegistry().getService(
                     EventListenerRegistry.class);
-            GrantedAuthorityRevokingRegistrationUpdateLister listener = new GrantedAuthorityRevokingRegistrationUpdateLister();
-            listenerRegistry.appendListeners(EventType.POST_UPDATE, listener);
+
+            listenerRegistry.appendListeners(EventType.POST_UPDATE, new GrantedAuthorityRevokingRegistrationUpdateLister());
+            // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
+
+            try {
+                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin(runAsAuthenticationProvider)}, new Class[]{IRunAs.class});
+            } catch (NoSuchMethodException | SecurityException e) {
+                // re-throw as RuntimeException as the context can not be created correctly
+                throw new RuntimeException(e);
+            }
+
             registrationUiHibernateEventListenersDone = true;
         }
     }
@@ -226,9 +254,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         }
         return null;
     }
-
-
-
 
     static final String PROPERTIES_FILE_NAME = "vaadin-apps";
 

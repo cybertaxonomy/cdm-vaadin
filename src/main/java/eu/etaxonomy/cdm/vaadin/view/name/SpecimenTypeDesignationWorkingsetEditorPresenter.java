@@ -24,8 +24,8 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IRegistrationService;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
-import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
@@ -95,7 +95,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     private EnumSet<CRUD> crud = null;
 
-    private ICdmCacher cache;
+    private ICdmEntityUuidCacher cache;
 
     @Autowired
     protected CdmFilterablePagingProviderFactory pagingProviderFactory;
@@ -131,7 +131,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> loadBeanById(Object identifier) {
 
-        cache = new CdmTransientEntityCacher(this);
+        cache = new CdmTransientEntityAndUuidCacher(this);
         if(identifier != null){
 
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
@@ -314,7 +314,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * {@inheritDoc}
      */
     @Override
-    public ICdmCacher getCache() {
+    public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 

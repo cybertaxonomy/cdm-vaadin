@@ -193,7 +193,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer.removeAllComponents();
         boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
-            RegistrationItem item = new RegistrationItem(regDto, this);
+            RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
             item.getBlockedByButton().addClickListener(e -> getViewEventBus().publish(

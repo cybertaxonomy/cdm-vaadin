@@ -36,6 +36,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -100,11 +102,14 @@ public class RegistrationItem extends GridLayout {
 
     private Panel blockingRelationsPanel;
 
+    private ICdmEntityUuidCacher cache;
+
     /**
      *
      */
-    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView) {
+    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
+        this.cache = cache;
         init();
         setItem(item, parentView);
     }
@@ -112,8 +117,9 @@ public class RegistrationItem extends GridLayout {
     /**
     *
     */
-   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView) {
+   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
        super(GRID_COLS, GRID_ROWS);
+       this.cache = cache;
        init();
        blockedByButton.setVisible(false);
        setWorkingSet(workingSet, parentView);
@@ -207,7 +213,7 @@ public class RegistrationItem extends GridLayout {
 
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationUuid() != null){
-            if(UserHelperAccess.userHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+            if(cdmUserHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
@@ -224,6 +230,17 @@ public class RegistrationItem extends GridLayout {
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
+    }
+
+    /**
+     * @return
+     */
+    private UserHelper cdmUserHelper() {
+        if(cache != null){
+            return UserHelperAccess.userHelper().withCache(cache);
+        } else {
+            return UserHelperAccess.userHelper();
+        }
     }
 
 
@@ -345,7 +362,7 @@ public class RegistrationItem extends GridLayout {
                 throw new RuntimeException("No point showing blocking registrations for an unblocked registration");
             }
 
-            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs);
+            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs, cache);
             addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
         }
 

@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Collection;
 
-import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 
 /**
@@ -20,7 +20,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
  */
 public interface CachingPresenter {
 
-    public ICdmCacher getCache();
+    public ICdmEntityUuidCacher getCache();
 
     public Collection<CdmBase> getRootEntities();
 

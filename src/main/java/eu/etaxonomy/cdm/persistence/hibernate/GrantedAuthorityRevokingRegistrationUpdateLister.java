@@ -255,6 +255,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
 
         // -----------------------------------------------------------------------------------------
         // this needs to be executed in a separate session to avoid concurrent modification problems
+        // See also TaxonGraphHibernateListener for a Listener with also a temporary sub-session
         Session newSession = session.getSessionFactory().openSession();
         try {
             Transaction txState = newSession.beginTransaction();

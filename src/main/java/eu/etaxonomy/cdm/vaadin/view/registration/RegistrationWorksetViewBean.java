@@ -177,7 +177,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             getLayout().removeComponent(workingsetHeader);
             getLayout().removeComponent(registrationListPanel);
         }
-        workingsetHeader = new RegistrationItem(workingset, this);
+        workingsetHeader = new RegistrationItem(workingset, this, getPresenter().getCache());
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
@@ -201,7 +201,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             }
         }
         if(!blockingRegAdded){
-            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs));
+            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs, getPresenter().getCache()));
         }
     }
 
@@ -245,8 +245,17 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
+        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        context.push(new EditorActionContext(
+                    null,
+                    this)
+                    );
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
+                e -> {
+                    getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this, context));
+
+                }
+        );
 
         existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
@@ -257,7 +266,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                         RegistrationWorkingsetAction.Action.start
                 )
              )
-                );
+        );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(

@@ -37,6 +37,7 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 
 /**
  * @author a.kohlbecker
@@ -89,6 +90,22 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
+
+    protected static BeanInstantiator<Reference> defaultBeanInstantiator = new BeanInstantiator<Reference>() {
+
+        @Override
+        public Reference createNewBean() {
+            return ReferenceFactory.newGeneric();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<Reference> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -106,22 +123,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         if(identifier != null){
             reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
-            reference = createNewReference();
+            reference = createNewBean();
         }
         return reference;
     }
 
-    /**
-     * TODO this should better go into {@link AbstractCdmEditorPresenter}
-     *
-     * @return
-     */
-    protected Reference createNewReference() {
-        if(this.beanInstantiator != null){
-            return beanInstantiator.createNewBean();
-        }
-        return ReferenceFactory.newGeneric();
-    }
 
     /**
      * {@inheritDoc}

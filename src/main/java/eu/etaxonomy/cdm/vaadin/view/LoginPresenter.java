@@ -130,7 +130,11 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
     @Override
     public void onEvent(Event<AuthenticationAttemptEvent> event) {
-        authenticate(event.getPayload().getUserName(), getView().getLoginDialog().getPassword().getValue());
+        if(getView()!= null){
+            authenticate(event.getPayload().getUserName(), getView().getLoginDialog().getPassword().getValue());
+        } else {
+            log.info("view is NULL, not yet disposed LoginPresenter?");
+        }
     }
 
 

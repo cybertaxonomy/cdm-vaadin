@@ -43,7 +43,6 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
 
     private static final long serialVersionUID = -1996365248431425021L;
 
-
     /**
      * {@inheritDoc}
      */
@@ -62,7 +61,7 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
         if(identifier != null){
             bean = (Institution) getRepo().getAgentService().load(identifier, initStrategy);
         } else {
-            bean = Institution.NewInstance();
+            bean = cdmEntityInstantiator.createNewBean();
         }
         return bean;
     }

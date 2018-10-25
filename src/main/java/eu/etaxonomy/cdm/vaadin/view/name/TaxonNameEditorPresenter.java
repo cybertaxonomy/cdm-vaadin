@@ -13,11 +13,11 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
-import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -47,14 +47,18 @@ import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityField;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -214,38 +218,41 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(identifier != null){
             taxonName = getRepo().getNameService().load(identifier, initStrategy);
         } else {
-            taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+            if(cdmEntityInstantiator != null) {
+                taxonName = cdmEntityInstantiator.createNewBean();
+            } else {
+                taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+            }
         }
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){
-            if(taxonName.getNomenclaturalReference() != null){
-                Reference nomRef = taxonName.getNomenclaturalReference();
-                //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
-                publishedUnit = nomRef;
-                while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
-                    publishedUnit = nomRef.getInReference();
-                }
-                // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
-                // nomReferencePagingProvider
-                nomReferencePagingProvider.getCriteria().add(Restrictions.or(
-                        Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
-                        Restrictions.idEq(publishedUnit.getId())
-                        )
-                );
-                // and remove the empty option
-                getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
+            Reference nomRef = taxonName.getNomenclaturalReference();
 
-                // new Reference only a sub sections of the publishedUnit
-                newReferenceInstantiator = new BeanInstantiator<Reference>() {
-                    @Override
-                    public Reference createNewBean() {
-                        Reference newRef = ReferenceFactory.newSection();
-                        newRef.setInReference(publishedUnit);
-                        return newRef;
-                    }
-                };
-
+            //getView().getNomReferenceCombobox().setEnabled(nomRef.isOfType(ReferenceType.Section));
+            publishedUnit = nomRef;
+            while(publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null){
+                publishedUnit = nomRef.getInReference();
             }
+            // reduce available references to those which are sections of the publishedUnit and the publishedUnit itself
+            // nomReferencePagingProvider
+            nomReferencePagingProvider.getCriteria().add(Restrictions.or(
+                    Restrictions.and(Restrictions.eq("inReference", publishedUnit), Restrictions.eq("type", ReferenceType.Section)),
+                    Restrictions.idEq(publishedUnit.getId())
+                    )
+            );
+            // and remove the empty option
+            getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
+
+            // new Reference only a sub sections of the publishedUnit
+            newReferenceInstantiator = new BeanInstantiator<Reference>() {
+                @Override
+                public Reference createNewBean() {
+                    Reference newRef = ReferenceFactory.newSection();
+                    newRef.setInReference(publishedUnit);
+                    return newRef;
+                }
+            };
+
         }
         return taxonName;
     }
@@ -325,21 +332,24 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         PropertyIdPath boundPropertyIdPath = boundPropertyIdPath(event.getNewField());
         if(boundPropertyIdPath != null){
+            TaxonNameDTO taxonNamedto = ((AbstractPopupEditor<TaxonNameDTO, AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName,?>>)getView()).getBean();
             if(boundPropertyIdPath.matches("specificEpithet")){
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
-                if(event.getNewField() instanceof LazyComboBox){
-
-                    if(specificEpithetPartPagingProvider  == null){
+                if(event.getNewField() instanceof CompositeCustomField){
+                    if(specificEpithetPartPagingProvider == null){
                         specificEpithetPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService(), Rank.SPECIES());
                     }
                     specificEpithetPartPagingProvider.listenToFields(
                             genusOrUninomialField,
                             null, null, null);
+                    specificEpithetPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
                     specificEpithetPartPagingProvider.updateFromFields();
-                    LazyComboBox<String> specificEpithetField = (LazyComboBox<String>)event.getNewField();
-                    refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.refresh(); specificEpithetField.setValue(null);};
-                    genusOrUninomialField.addValueChangeListener(refreshSpecificEpithetComboBoxListener);
+                    WeaklyRelatedEntityCombobox<TaxonName> specificEpithetField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
+                    refreshSpecificEpithetComboBoxListener = e -> { specificEpithetField.getSelect().refresh(); specificEpithetField.setValue(null);};
                     specificEpithetField.loadFrom(specificEpithetPartPagingProvider, specificEpithetPartPagingProvider, specificEpithetPartPagingProvider.getPageSize());
+                    specificEpithetField.setValue(event.getOldField().getValue());
+                    specificEpithetField.reload();
+                    genusOrUninomialField.addValueChangeListener(refreshSpecificEpithetComboBoxListener);
                 } else {
                     if(specificEpithetPartPagingProvider != null){
                         specificEpithetPartPagingProvider.unlistenAllFields();
@@ -350,7 +360,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     }
                 }
             } else if(boundPropertyIdPath.matches("genusOrUninomial")) {
-                if(event.getNewField() instanceof LazyComboBox){
+                if(event.getNewField() instanceof CompositeCustomField){
                     if(genusOrUninomialPartPagingProvider  == null){
                         genusOrUninomialPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService());
                     }
@@ -360,9 +370,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                                 getView().getSpecificEpithetField(),
                                 getView().getInfraSpecificEpithetField()
                                );
-                    LazyComboBox<String> genusOrUninomialField = (LazyComboBox<String>)event.getNewField();
+                    genusOrUninomialPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
+                    WeaklyRelatedEntityCombobox<TaxonName> genusOrUninomialField = (WeaklyRelatedEntityCombobox<TaxonName>)event.getNewField();
                     genusOrUninomialField.loadFrom(genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider.getPageSize());
-
+                    genusOrUninomialField.setValue(event.getOldField().getValue());
+                    genusOrUninomialField.reload();
                 }else {
                     if(genusOrUninomialPartPagingProvider != null){
                         genusOrUninomialPartPagingProvider.unlistenAllFields();
@@ -382,9 +394,43 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
 
             if(boundTargetField != null){
+                if(boundTargetField.matchesPropertyIdPath("genusOrUninomial")){
+                    if(event.isCreateOrModifiedType()){
+                        getCache().load(event.getEntity());
+                        if(getView().getGenusOrUninomialField() instanceof WeaklyRelatedEntityCombobox){
+                            WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>)getView().getGenusOrUninomialField();
+                            if(event.isCreatedType()){
+                                weaklyRelatedEntityCombobox.setValue(((TaxonName)event.getEntity()).getGenusOrUninomial());
+                                weaklyRelatedEntityCombobox.reload();
+                            } else {
+                                weaklyRelatedEntityCombobox.reload();
+                            }
+                            // NOTE: in constrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
+                            weaklyRelatedEntityCombobox.updateButtons();
+                        }
+                    }
+                } else
+                if(boundTargetField.matchesPropertyIdPath("specificEpithet")){
+                    if(event.isCreateOrModifiedType()){
+                        getCache().load(event.getEntity());
+
+                        if(getView().getSpecificEpithetField() instanceof WeaklyRelatedEntityCombobox){
+                            WeaklyRelatedEntityCombobox weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox)getView().getSpecificEpithetField();
+                            if(event.isCreatedType()){
+                                getView().getSpecificEpithetField().setValue(((TaxonName)event.getEntity()).getSpecificEpithet());
+                                weaklyRelatedEntityCombobox.reload();
+                            } else {
+                                weaklyRelatedEntityCombobox.reload();
+                            }
+                            // NOTE: in constrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
+                            weaklyRelatedEntityCombobox.updateButtons();
+                        }
+                    }
+                } else
                 if(boundTargetField.matchesPropertyIdPath("nomenclaturalReference")){
                     if(event.isCreateOrModifiedType()){
-
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
                             getView().getNomReferenceCombobox().setValue((Reference) event.getEntity());
@@ -394,7 +440,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
                     }
-                }
+                } else
                 if(boundTargetField.matchesPropertyIdPath("validationFor.otherName")){
                     ReloadableLazyComboBox<TaxonName> otherNameField = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
                     if(event.isCreateOrModifiedType()){
@@ -470,15 +516,35 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         if(boundPropertyId != null){
             if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
-                TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
-                validatedNamePopup.withDeleteButton(true);
+                TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                namePopup.withDeleteButton(true);
                 getView().getModesActive().stream()
                     .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                    .forEach(m -> validatedNamePopup.enableMode(m));
-                validatedNamePopup.loadInEditor(event.getEntityUuid());
+                    .forEach(m -> namePopup.enableMode(m));
+                namePopup.loadInEditor(event.getEntityUuid());
             }
         }
+    }
 
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+    public void onTaxonNameEditorActionStrRepEdit(TaxonNameEditorActionStrRep event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+
+        PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
+
+        if(boundPropertyId != null){
+            if(boundPropertyId.matches("genusOrUninomial") || boundPropertyId.matches("specificEpithet")){
+                TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                namePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
+                    .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                    .forEach(m -> namePopup.enableMode(m));
+                namePopup.loadInEditor(event.getEntityUuid());
+            }
+        }
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
@@ -492,13 +558,56 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         if(boundPropertyId != null){
             if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
-                TaxonNamePopupEditor validatedNamePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
-                validatedNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-                validatedNamePopup.withDeleteButton(true);
+                TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                namePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                namePopup.withDeleteButton(true);
                 getView().getModesActive().stream()
                         .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
-                        .forEach(m -> validatedNamePopup.enableMode(m));
-                validatedNamePopup.loadInEditor(null);
+                        .forEach(m -> namePopup.enableMode(m));
+                namePopup.loadInEditor(null);
+            }
+        }
+    }
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+    public void onTaxonNameEditorActionStrRepAdd(TaxonNameEditorActionStrRep event) {
+
+        if(getView() == null || event.getSourceView() != getView() ){
+            return;
+        }
+
+        PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
+
+        if(boundPropertyId != null){
+            if(boundPropertyId.matches("genusOrUninomial") || boundPropertyId.matches("specificEpithet")){
+                TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
+                namePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                namePopup.withDeleteButton(true);
+                getView().getModesActive().stream()
+                .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
+                .forEach(m -> namePopup.enableMode(m));
+                namePopup.loadInEditor(null);
+                if(boundPropertyId.matches("genusOrUninomial")){
+                    namePopup.getRankSelect().setValue(Rank.GENUS());
+                }
+                if(boundPropertyId.matches("specificEpithet")){
+                    namePopup.getGenusOrUninomialField().setValue(getView().getGenusOrUninomialField().getValue());
+                    namePopup.getRankSelect().setValue(Rank.SPECIES());
+                }
+                if(WeaklyRelatedEntityField.class.isAssignableFrom(event.getTarget().getClass())){
+                    WeaklyRelatedEntityField<TaxonName> taxoNameField = (WeaklyRelatedEntityField<TaxonName>)event.getTarget();
+                    if(!taxoNameField.isValueInOptions()){
+                        String nameString = event.getTarget().getValue();
+                        if(StringUtils.isNotEmpty(nameString)){
+                            if(boundPropertyId.matches("genusOrUninomial")){
+                                namePopup.getGenusOrUninomialField().setValue(nameString);
+                            }
+                            if(boundPropertyId.matches("specificEpithet")){
+                                namePopup.getSpecificEpithetField().setValue(nameString);
+                            }
+                        }
+                    }
+                }
             }
         }
     }

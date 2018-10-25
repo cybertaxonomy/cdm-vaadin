@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,8 +47,11 @@ import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignati
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
+import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -81,12 +85,12 @@ import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
+import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
-import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
-import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorView;
 import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -104,18 +108,9 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> {
+public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> implements CachingPresenter {
 
     private static final Logger logger = Logger.getLogger(RegistrationWorkingsetPresenter.class);
-
-    private static final List<String> REGISTRATION_INIT_STRATEGY = Arrays.asList(
-            "$",
-            "blockedBy",
-            "name.combinationAuthorship",
-            "name.exCombinationAuthorship",
-            "name.basionymAuthorship",
-            "name.exBasionymAuthorship"
-            );
 
     private static final long serialVersionUID = 1L;
 
@@ -134,11 +129,23 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private RegistrationWorkingSet workingset;
 
-    private TaxonName newTaxonNameForRegistration = null;
+    /**
+     * Contains the poupeditor which has neen opend to start the registration of a new name as long as it has not been saved or canceled.
+     * There can always only be one popup editor for this purpose.
+     */
+    private TaxonNamePopupEditor newNameForRegistrationPopupEditor = null;
 
+    /**
+     * Contains
+     */
+    private List<Registration> newNameBlockingRegistrations = new ArrayList<>();
 
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
+
+    private ICdmEntityUuidCacher cache;
+
+    private Collection<CdmBase> rootEntities = new HashSet<>();
 
     /**
      *
@@ -334,6 +341,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             Reference citation = getRepo().getReferenceService().find(referenceUuid);
             workingset = new RegistrationWorkingSet(citation);
         }
+        cache = new CdmTransientEntityAndUuidCacher(this);
+        for(Registration registration : workingset.getRegistrations()) {
+            addRootEntity(registration);
+        }
     }
 
     private void saveRegistrationStatusChange(UUID uuid, Object value) {
@@ -418,7 +429,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
         popup.setParentEditorActionContext(event.getContext());
         popup.withDeleteButton(true);
-        configureTaxonNameEditor(popup);
+        TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
             // avoid resetting readonly to false
@@ -435,39 +446,37 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        newTaxonNameForRegistration = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
-        newTaxonNameForRegistration.setNomenclaturalReference(getRepo().getReferenceService().find(workingset.getCitationUuid()));
-        EntityChangeEvent nameSaveEvent = getTaxonNameStore().saveBean(newTaxonNameForRegistration, (AbstractView) getView());
-        newTaxonNameForRegistration = getRepo().getNameService().find(nameSaveEvent.getEntityUuid());
-        TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
-        popup.setParentEditorActionContext(event.getContext());
-        popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
-        popup.withDeleteButton(true);
-        configureTaxonNameEditor(popup);
-        popup.loadInEditor(newTaxonNameForRegistration.getUuid());
-    }
+        getView().getAddNewNameRegistrationButton().setEnabled(false);
+        if(newNameForRegistrationPopupEditor == null){
+            TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
+            newNameForRegistrationPopupEditor = popup;
+            popup.setParentEditorActionContext(event.getContext());
+            popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
+            popup.withDeleteButton(true);
+            popup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
 
-    /**
-     * TODO consider putting this into a Configurer Bean per UIScope.
-     * In the configurator bean this methods popup papamerter should be of the type
-     * AbstractPopupEditor
-     *
-     * @param popup
-     */
-    protected void configureTaxonNameEditor(TaxonNamePopupEditorView popup) {
-        popup.enableMode(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA);
-        popup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-        popup.enableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-        // popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
+                @Override
+                public TaxonName createNewBean() {
+                    TaxonName newTaxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+                    newTaxonName.setNomenclaturalReference(getRepo().getReferenceService().load(workingset.getCitationUuid()));
+                    return newTaxonName;
+                }
+            });
+            TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
+            popup.loadInEditor(null);
+        }
     }
 
     /**
      * Creates a new <code>Registration</code> for a new name that has just been edited
-     * using the <code>TaxonNamePopupEditor</code>. The new name was previously created
-     * in this presenter as <code>newTaxonNameForRegistration</code> (see {@link #onTaxonNameEditorActionAdd(TaxonNameEditorAction)})
-     * and is either filled with data (<code>Reason.SAVE</code>) or it is still empty
-     * (<code>Reason.CANCEL</code>).
-     *
+     * using a <code>TaxonNamePopupEditor</code>. The popup editor which has been opened to
+     * edit the new name was remembered in <code>newNameForRegistrationPopupEditor</code>.
+     * Any blocking registrations which have been created while editing the new name are
+     * temporarily stored in <code>newNameBlockingRegistrations</code> until the registration
+     * for the first name has been created. Additional new names are created for example
+     * when a new name as basionym, replaced synonym, etc to the new name is created.
+     * <p>
+     * See also {@link #onTaxonNameEditorActionAdd(TaxonNameEditorAction)}).
      *
      * @param event
      * @throws RegistrationValidationException
@@ -475,29 +484,38 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventBusListenerMethod
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
-            try {
-                TransactionStatus txStatus = getRepo().startTransaction();
-                if(event.getReason().equals(Reason.SAVE)){
-                    if(newTaxonNameForRegistration != null){
-                        UUID taxonNameUuid = newTaxonNameForRegistration.getUuid();
-                        getRepo().getSession().refresh(newTaxonNameForRegistration);
-                        Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
-                        // reload workingset into current session
-                        loadWorkingSet(workingset.getCitationUuid());
-                        workingset.add(reg);
-                    }
-                    refreshView(true);
-                } else if(event.getReason().equals(Reason.CANCEL)){
-                    if(newTaxonNameForRegistration != null){
-                        // clean up
-                        getTaxonNameStore().deleteBean(newTaxonNameForRegistration, (AbstractView) getView());
+                    if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
+                        if(event.getReason().equals(Reason.SAVE)){
+                        try {
+                            TransactionStatus txStatus = getRepo().startTransaction();
+                            UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
+                            if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
+                                getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
+                            }
+                            Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
+                            if(!newNameBlockingRegistrations.isEmpty()){
+                                for(Registration blockingReg : newNameBlockingRegistrations){
+                                    blockingReg = getRepo().getRegistrationService().load(blockingReg.getUuid());
+                                    reg.getBlockedBy().add(blockingReg);
+                                }
+                                getRepo().getRegistrationService().saveOrUpdate(reg);
+                                newNameBlockingRegistrations.clear();
+                            }
+                            // reload workingset into current session
+                            loadWorkingSet(workingset.getCitationUuid());
+                            workingset.add(reg);
+                            getRepo().commitTransaction(txStatus);
+                        } finally {
+                            getRepo().getSession().clear(); // #7702
+                            refreshView(true);
+                            getView().getAddNewNameRegistrationButton().setEnabled(true);
+                        }
+                        // nullify and clear the memory on this popup editor in any case (SAVE, CANCEL, DELETE)
+                        newNameForRegistrationPopupEditor = null;
+                        newNameBlockingRegistrations.clear();
                     }
                 }
-                getRepo().commitTransaction(txStatus);
-            } finally {
-                getRepo().getSession().clear(); // #7702
-            }
-            newTaxonNameForRegistration = null;
+
         }
     }
 
@@ -726,19 +744,47 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 refreshView(true);
             }
         } else
-        if(TaxonName.class.isAssignableFrom(event.getEntityType()) && isFromOwnView(event)){
+        if(TaxonName.class.isAssignableFrom(event.getEntityType())){
             if(event.getType().equals(EntityChangeEvent.Type.CREATED)){
-                // new name! create a blocking registration
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
                 EditorActionContext rootContext = context.get(0);
-                if(rootContext.getParentView().equals(getView())){
-                    Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(event.getEntityUuid());
-                    TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
-                    Registration registration = getRepo().getRegistrationService().load(regReference.getUuid(), REGISTRATION_INIT_STRATEGY);
-                    registration.getBlockedBy().add(blockingRegistration);
-                    getRepo().getRegistrationService().saveOrUpdate(registration);
-                    logger.debug("Blocking registration created");
+                if(rootContext.getParentView().equals(getView()) && event.getSourceView() != newNameForRegistrationPopupEditor){
+
+                    try {
+                        getRepo().getSession().clear();
+                        TransactionStatus txStatus = getRepo().startTransaction();
+                        // create a blocking registration, the new Registration will be persisted
+                        UUID taxonNameUUID = event.getEntityUuid();
+                        Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
+
+                        if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
+                            // Oha!! The event came from a popup editor and the
+                            // first popup in the context is a TaxonNameEditor with un-persisted name
+                            // This is a name for a new registration which has not yet been created.
+                            // It is necessary to store blocking registrations in the newNameBlockingRegistrations
+                            newNameBlockingRegistrations.add(blockingRegistration);
+                            logger.debug("Blocking registration created and memorized");
+                        } else {
+                            // some new name related somehow to an existing registration
+                            TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootContext.getParentEntity();
+                            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
+                            Registration registration = registrationDTO.registration();
+
+                                registration = getRepo().getRegistrationService().load(registration.getUuid());
+                                if(registration == null){
+                                    throw new NullPointerException("Registration not found for " + regReference + " which has been hold in the rootContext");
+                                }
+                                registration.getBlockedBy().add(blockingRegistration);
+                                getRepo().getRegistrationService().saveOrUpdate(registration);
+                                getRepo().commitTransaction(txStatus);
+                            logger.debug("Blocking registration created and added to registion");
+                        }
+                    } finally {
+                        getRepo().getSession().clear();
+                    }
                 } else {
+                    // in case of creating a new name for a registration the parent view is the TaxonNamePopupEditor
+                    // this is set
                     logger.debug("Non blocking registration, since a new name for a new registration has been created");
                 }
             }
@@ -759,7 +805,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         }
     }
-
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
     public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
@@ -784,8 +829,46 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
             getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ICdmEntityUuidCacher getCache() {
+        return cache;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addRootEntity(CdmBase entity) {
+        rootEntities.add(entity);
+        cache.put(entity);
+    }
 
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<CdmBase> getRootEntities() {
+        return rootEntities;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        disposeCache();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disposeCache() {
+        cache.dispose();
     }
 
 }

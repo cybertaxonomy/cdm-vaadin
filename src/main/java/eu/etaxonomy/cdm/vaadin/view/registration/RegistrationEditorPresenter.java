@@ -23,6 +23,7 @@ import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 
 /**
  * @author a.kohlbecker
@@ -43,6 +44,21 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
         return getRepo().getRegistrationService();
     }
 
+
+    protected static BeanInstantiator<Registration> defaultBeanInstantiator = new BeanInstantiator<Registration>() {
+
+        @Override
+        public Registration createNewBean() {
+            return Registration.NewInstance();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<Registration> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -54,7 +70,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
             List<String> initStrategy = Arrays.asList(new String[] {"$", "typeDesignations"});
             reg = getRepo().getRegistrationService().load(identifier, initStrategy );
         } else {
-            reg = Registration.NewInstance();
+            reg = createNewBean();
         }
         return reg;
     }

@@ -742,7 +742,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @param beanInstantiator
      */
     public final void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
-        getPresenter().setBeanInstantiator(beanInstantiator);
+        if(AbstractCdmEditorPresenter.class.isAssignableFrom(getPresenter().getClass())){
+            ((CdmEditorPresenterBase)getPresenter()).setBeanInstantiator(beanInstantiator);
+        } else {
+            throw new RuntimeException("BeanInstantiator can only be set for popup editors with a peresenter of the type CdmEditorPresenterBase");
+        }
     }
 
     /**
