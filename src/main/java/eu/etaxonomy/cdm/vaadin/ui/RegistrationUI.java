@@ -24,6 +24,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Component;
@@ -114,9 +115,11 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        setErrorHandler(new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
+        WindowErrorHandler errorHandler = new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
-                + "You also might want to add a sreenshot of the browser page in error.</i>"));
+                + "You also might want to add a sreenshot of the browser page in error.</i>");
+        setErrorHandler(errorHandler);
+        VaadinSession.getCurrent().setErrorHandler(errorHandler);
 
         navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();
