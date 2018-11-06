@@ -27,11 +27,11 @@ import com.vaadin.ui.TextArea;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
-import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -171,8 +171,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
-        PartialDateField collectionDateField = new PartialDateField("Collection date");
-        collectionDateField.setInputPrompt("dd.mm.yyyy");
+
+        TimePeriodField collectionDateField = new TimePeriodField("Collection date");
+        // collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
         addTextField("Field number", "fieldNumber", 2, row);
 

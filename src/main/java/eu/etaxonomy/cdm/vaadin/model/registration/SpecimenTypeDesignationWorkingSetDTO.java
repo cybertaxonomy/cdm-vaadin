@@ -13,12 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.joda.time.Partial;
-
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
+import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.location.Point;
@@ -290,12 +289,12 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
        return fieldUnit.getGatheringEvent().getCollectingAreas();
     }
 
-    public Partial getGatheringDate(){
-        return fieldUnit.getGatheringEvent().getGatheringDate();
+    public TimePeriod getGatheringDate(){
+        return fieldUnit.getGatheringEvent().getTimeperiod();
     }
 
-    public void setGatheringDate(Partial gatheringDate){
-        fieldUnit.getGatheringEvent().setGatheringDate(gatheringDate);
+    public void setGatheringDate(TimePeriod gatheringDate){
+        fieldUnit.getGatheringEvent().setTimeperiod(gatheringDate);
     }
 
     /**
