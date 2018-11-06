@@ -117,38 +117,4 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
         return context;
     }
 
-    public static class EditorActionContext {
-
-        Object parentEntity;
-
-        AbstractView parentView;
-
-        /**
-         * @param parentEntity
-         * @param parentView
-         */
-        public EditorActionContext(Object parentEntity, AbstractView parentView) {
-            super();
-            this.parentEntity = parentEntity;
-            this.parentView = parentView;
-        }
-
-        /**
-         * @return the parentEntity
-         */
-        public Object getParentEntity() {
-            return parentEntity;
-        }
-
-        /**
-         * @return the parentView
-         */
-        public AbstractView getParentView() {
-            return parentView;
-        }
-
-
-
-    }
-
 }

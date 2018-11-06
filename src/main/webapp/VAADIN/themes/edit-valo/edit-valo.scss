@@ -472,6 +472,75 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         }
     }
     
+    #context-breadcrumbs .breadcrumbs {
+      // for an explanation of how the CSS Triangles to work 
+      // see https://css-tricks.com/triangle-breadcrumbs/
+    
+      $crumb-background-color: $v-app-background-color;
+      $crumb-active-background-color: #3a6972; //TODO calculate using active-color and $v-background-color or $v-app-background-color
+      $crumb-border-color: $v-textfield-background-color--readonly;
+      $crumb-height: 10px; 
+      $triangle-width: 10px; 
+      
+      $crumb-border: valo-border($color: $crumb-border-color);
+      
+      list-style: none; 
+      overflow: hidden;
+      margin: 0; 
+      padding: 0;
+      line-height: $crumb-height;
+      border-radius: $v-border-radius;
+      border: $crumb-border;
+      li {
+          float: left;
+          span.crumb {
+            padding: 10px 10px 10px 20px;
+            background-color: $crumb-background-color;
+            position: relative;
+            display: block;
+            float: left;
+            &::before {
+                  content: " "; 
+                  display: block;
+                  width: 0; 
+                  height: 0;
+                  border-left: $crumb-border;
+                  border-left-width: $triangle-width;
+                  border-top: $crumb-height*2 solid transparent;
+                  border-bottom: $crumb-height*2 solid transparent;
+                  position: absolute;
+                  top: 50%;
+                  margin-top: -$crumb-height*2;
+                  margin-left: 1px;
+                  left: 100%;
+                  z-index: 1; 
+              }
+              &::after {
+                  content: " "; 
+                  display: block;
+                  width: 0; 
+                  height: 0;
+                  border-left: $triangle-width solid $crumb-background-color;
+                  border-top: $crumb-height*2 solid transparent;
+                  border-bottom: $crumb-height*2 solid transparent;
+                  border-right: none;
+                  position: absolute;
+                  top: 50%;
+                  margin-top: -$crumb-height*2;
+                  left: 100%;
+                  z-index: 2; 
+              }
+          }
+          &::first-child span.crumb {
+            padding-left: 10px;
+          }
+          span.active {
+              background-color: $crumb-active-background-color;
+          }
+       }
+       
+    }
+    
     // ---------- ---------- //
 
     .v-slot-message-item {

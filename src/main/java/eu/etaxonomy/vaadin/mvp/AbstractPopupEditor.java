@@ -29,6 +29,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.FieldGroupInvalidValueException;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -58,8 +59,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormatter;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
@@ -106,6 +108,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private CssLayout toolBarButtonGroup = new CssLayout();
 
+    private Label contextBreadcrumbsLabel = new Label();
+
     private Label statusMessageLabel = new Label();
 
     Set<String> statusMessages = new HashSet<>();
@@ -139,6 +143,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         toolBar.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
         toolBar.setWidth(100, Unit.PERCENTAGE);
+        contextBreadcrumbsLabel.setId("context-breadcrumbs");
+        contextBreadcrumbsLabel.setWidthUndefined();
+        contextBreadcrumbsLabel.setContentMode(com.vaadin.shared.ui.label.ContentMode.HTML);
+        toolBar.addComponent(contextBreadcrumbsLabel);
         toolBarButtonGroup.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         toolBarButtonGroup.setWidthUndefined();
         toolBar.addComponent(toolBarButtonGroup);
@@ -718,6 +726,43 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         statusMessageLabel.addStyleName(ValoTheme.LABEL_COLORED);
     }
 
+    private void updateContextBreadcrumbs() {
+
+        List<EditorActionContext> contextInfo = new ArrayList<>(getEditorActionContext());
+        String breadcrumbs = "";
+        EditorActionContextFormatter formatter = new EditorActionContextFormatter();
+
+        GenericFontIcon operationPrefixIcon = new GenericFontIcon("IcoMoon", 0xe902);
+        GenericFontIcon operationSuffxIcon = new GenericFontIcon("IcoMoon", 0xe901);
+
+        int cnt = 0;
+        for(EditorActionContext cntxt : contextInfo){
+            cnt++;
+            boolean isLast = cnt == contextInfo.size();
+            boolean isFirst = cnt == 1;
+
+            boolean doClass = false; // will be removed in future
+            boolean classNameForMissingPropertyPath = true; // !doClass;
+            boolean doProperties = true;
+            boolean doCreateOrNew = !isFirst;
+            String contextmarkup = formatter.format(
+                    cntxt,
+                    new EditorActionContextFormat(doClass, doProperties, classNameForMissingPropertyPath, doCreateOrNew,
+                            EditorActionContextFormat.TargetInfoType.FIELD_CAPTION, (isLast ? "active" : ""))
+                    );
+//            if(!isLast){
+//                contextmarkup += " " + FontAwesome.ANGLE_RIGHT.getHtml() + " ";
+//            }
+            if(isLast){
+                contextmarkup = "<li><span class=\"crumb active\">" + contextmarkup + "</span></li>";
+            } else {
+                contextmarkup = "<li><span class=\"crumb\">" + contextmarkup + "</span></li>";
+            }
+            breadcrumbs += contextmarkup;
+        }
+        contextBreadcrumbsLabel.setValue("<ul class=\"breadcrumbs\">" + breadcrumbs + "</ul>");
+    }
+
     // ------------------------ data binding ------------------------ //
 
     protected void bindDesign(Component component) {
@@ -733,6 +778,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
         getPresenter().adaptToUserPermission(beanToEdit);
+        updateContextBreadcrumbs();
         isBeanLoaded = true;
     }
 
@@ -817,7 +863,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             if(getBean() == null){
                 throw new RuntimeException("getContext() is only possible after the bean is loaded");
             }
-            context.push(new AbstractEditorAction.EditorActionContext(getBean(), this));
+            context.push(new EditorActionContext(getBean(), this));
             isContextUpdated = true;
         }
         return context;
@@ -828,9 +874,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      * @param context the context to set
      */
-    public void setParentEditorActionContext(Stack<EditorActionContext> context) {
+    public void setParentEditorActionContext(Stack<EditorActionContext> context, Field<?> targetField) {
         if(context != null){
             this.context.addAll(context);
+        }
+        if(targetField != null){
+            this.context.get(context.size() - 1).setTargetField(targetField);
         }
     }
 

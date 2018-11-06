@@ -23,7 +23,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -158,7 +158,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	        if(parentView instanceof AbstractPopupEditor){
 	            // retain the chain of EditorActionContexts when starting a new pupupEditor
 	            Stack<EditorActionContext> parentEditorActionContext = ((AbstractPopupEditor)parentView).getEditorActionContext();
-	            ((AbstractPopupEditor)popupView).setParentEditorActionContext(parentEditorActionContext);
+	            ((AbstractPopupEditor)popupView).setParentEditorActionContext(parentEditorActionContext, targetField);
 	        }
 	    }
 

@@ -72,7 +72,7 @@ import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusSelect;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -428,7 +428,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
-        popup.setParentEditorActionContext(event.getContext());
+        popup.setParentEditorActionContext(event.getContext(), event.getTarget());
         popup.withDeleteButton(true);
         TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
         popup.loadInEditor(event.getEntityUuid());
@@ -451,7 +451,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(newNameForRegistrationPopupEditor == null){
             TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
             newNameForRegistrationPopupEditor = popup;
-            popup.setParentEditorActionContext(event.getContext());
+            popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE,CRUD.DELETE));
             popup.withDeleteButton(true);
             popup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
@@ -581,7 +581,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
-            popup.setParentEditorActionContext(event.getContext());
+            popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
             if(event.hasSource()){
@@ -590,7 +590,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         } else {
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
-            popup.setParentEditorActionContext(event.getContext());
+            popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
 
@@ -614,7 +614,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
-            popup.setParentEditorActionContext(event.getContext());
+            popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             TypeDesignationWorkingsetEditorIdSet identifierSet;
             UUID typifiedNameUuid;
 
@@ -642,7 +642,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         } else {
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
-            popup.setParentEditorActionContext(event.getContext());
+            popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();

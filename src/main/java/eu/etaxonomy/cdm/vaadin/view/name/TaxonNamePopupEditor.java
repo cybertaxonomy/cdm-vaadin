@@ -555,7 +555,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             updateAuthorshipFields();
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY) && getBean().getNomenclaturalReference() != null) {
-            nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and parts of it.");
+            nomReferenceCombobox.setDescription("Selection limited to nomenclatural reference and parts of it.");
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE)) {
             if(combinationAuthorshipField.getValue() == null){
