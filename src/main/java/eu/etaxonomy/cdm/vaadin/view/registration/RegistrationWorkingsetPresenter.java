@@ -485,38 +485,38 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventBusListenerMethod
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
         if(event.getPopup() instanceof TaxonNamePopupEditor){
-                    if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
-                        if(event.getReason().equals(Reason.SAVE)){
-                        try {
-                            TransactionStatus txStatus = getRepo().startTransaction();
-                            UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
-                            if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
-                                getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
-                            }
-                            Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
-                            if(!newNameBlockingRegistrations.isEmpty()){
-                                for(Registration blockingReg : newNameBlockingRegistrations){
-                                    blockingReg = getRepo().getRegistrationService().load(blockingReg.getUuid());
-                                    reg.getBlockedBy().add(blockingReg);
-                                }
-                                getRepo().getRegistrationService().saveOrUpdate(reg);
-                                newNameBlockingRegistrations.clear();
-                            }
-                            // reload workingset into current session
-                            loadWorkingSet(workingset.getCitationUuid());
-                            workingset.add(reg);
-                            getRepo().commitTransaction(txStatus);
-                        } finally {
-                            getRepo().getSession().clear(); // #7702
-                            refreshView(true);
-                            getView().getAddNewNameRegistrationButton().setEnabled(true);
+            if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
+                if(event.getReason().equals(Reason.SAVE)){
+                    try {
+                        TransactionStatus txStatus = getRepo().startTransaction();
+                        UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
+                        if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
+                            getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
                         }
-                        // nullify and clear the memory on this popup editor in any case (SAVE, CANCEL, DELETE)
-                        newNameForRegistrationPopupEditor = null;
-                        newNameBlockingRegistrations.clear();
+                        Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
+                        if(!newNameBlockingRegistrations.isEmpty()){
+                            for(Registration blockingReg : newNameBlockingRegistrations){
+                                blockingReg = getRepo().getRegistrationService().load(blockingReg.getUuid());
+                                reg.getBlockedBy().add(blockingReg);
+                            }
+                            getRepo().getRegistrationService().saveOrUpdate(reg);
+                            newNameBlockingRegistrations.clear();
+                        }
+                        // reload workingset into current session
+                        loadWorkingSet(workingset.getCitationUuid());
+                        workingset.add(reg);
+                        getRepo().commitTransaction(txStatus);
+                    } finally {
+                        getRepo().getSession().clear(); // #7702
+                        refreshView(true);
+                        getView().getAddNewNameRegistrationButton().setEnabled(true);
                     }
                 }
-
+                // nullify and clear the memory on this popup editor in any case (SAVE, CANCEL, DELETE)
+                newNameForRegistrationPopupEditor = null;
+                newNameBlockingRegistrations.clear();
+                getView().getAddNewNameRegistrationButton().setEnabled(true);
+            }
         }
     }
 
