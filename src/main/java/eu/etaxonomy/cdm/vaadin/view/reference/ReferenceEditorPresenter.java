@@ -113,7 +113,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     protected Reference loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
-
                 "$",
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 }
