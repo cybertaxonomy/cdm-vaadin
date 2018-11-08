@@ -13,6 +13,8 @@ import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.vaadin.ui.Component;
+
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat.TargetInfoType;
@@ -71,6 +73,18 @@ public class EditorActionContextFormatter {
                     PropertyIdPath propertyIdPath = parentCtx.getTargetPropertyIdPath();
                     if (propertyIdPath != null) {
                         targetInfo = propertyIdPath.toString();
+                    }
+                } else {
+                    // TargetInfoType.FIELD_CAPTION
+                    if(parentCtx.getTargetField() != null){
+                        Component captionComponent = parentCtx.getTargetField();
+                        while(captionComponent != null){
+                            targetInfo = captionComponent.getCaption();
+                            if(targetInfo != null){
+                                break;
+                            }
+                            captionComponent = captionComponent.getParent();
+                        }
                     }
                 }
             }
