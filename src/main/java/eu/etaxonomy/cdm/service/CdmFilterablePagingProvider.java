@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
@@ -129,9 +130,10 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         Integer pageIndex = firstRow / pageSize;
         Pager<V> page;
+        clearSession(); // clear the session from remains of previous service calls
         if(!restrictions.isEmpty()){
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
-            page = (Pager<V>) service.findByTitleWithRestrictions(
+            page = service.findByTitleWithRestrictions(
                     type,
                     filter,
                     matchMode,
@@ -142,7 +144,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     initStrategy
                     );
         } else {
-            page = (Pager<V>) service.findByTitle(
+            page = service.findByTitle(
                     type,
                     filter,
                     matchMode,
@@ -172,11 +174,12 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         checkNotMixed();
 
         Pager<V> page;
-        if(!restrictions.isEmpty()){
 
+        clearSession(); // clear the session from remains of previous service calls
+        if(!restrictions.isEmpty()){
             // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
-            page = (Pager<V>) service.findByTitleWithRestrictions(
+            page = service.findByTitleWithRestrictions(
                     type,
                     filter,
                     matchMode,
@@ -187,7 +190,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     null
                   );
         } else {
-            page = (Pager<V>) service.findByTitle(
+            page = service.findByTitle(
                     type,
                     filter,
                     matchMode,
@@ -199,10 +202,21 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                   );
         }
 
+
         if(logger.isTraceEnabled()){
             logger.trace("size() -  count: " + page.getCount().intValue());
         }
         return page.getCount().intValue();
+    }
+
+    /**
+     *
+     */
+    public void clearSession() {
+        Session session = service.getSession();
+        if(session.isOpen()){
+            session.clear();
+        }
     }
 
     /**
