@@ -130,7 +130,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         Integer pageIndex = firstRow / pageSize;
         Pager<V> page;
-        clearSession(); // clear the session from remains of previous service calls
+        clearSession(); // clear the session from remains of previous service calls, see issue #7559
         if(!restrictions.isEmpty()){
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             page = service.findByTitleWithRestrictions(
@@ -175,7 +175,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         Pager<V> page;
 
-        clearSession(); // clear the session from remains of previous service calls
+        clearSession(); // clear the session from remains of previous service calls, see issue #7559
         if(!restrictions.isEmpty()){
             // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
@@ -210,7 +210,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     }
 
     /**
-     *
+     * see issue #7559
      */
     public void clearSession() {
         Session session = service.getSession();
