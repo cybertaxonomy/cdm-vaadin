@@ -8,11 +8,10 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.util.Collection;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.vaadin.ui.Component;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
@@ -36,6 +35,7 @@ public class EditorActionContextFormatter {
 
         String className = null;
         String targetInfo = null;
+        String targetEntityStr = null;
         String createOrNew = null;
 
         Object parentEntity = cntxt.getParentEntity();
@@ -60,7 +60,7 @@ public class EditorActionContextFormatter {
             className += "[NULL_CLASS]";
         }
 
-        if (format.doTargetInfo && cntxt.getParentView() != null && AbstractPopupEditor.class.isAssignableFrom(cntxt.getParentView().getClass())) {
+        if ((format.doTargetInfo || format.doTargetEntity) && cntxt.getParentView() != null && AbstractPopupEditor.class.isAssignableFrom(cntxt.getParentView().getClass())) {
             // the top element is the cntxt istself!! we need to dig one step deeper to get the previous popup editor
             // TODO chaining the EditorActionContext would ease find the contexts of parent editors
             Stack<EditorActionContext> ctxtStack = ((AbstractPopupEditor)cntxt.getParentView()).getEditorActionContext();
@@ -72,27 +72,22 @@ public class EditorActionContextFormatter {
                     if (propertyIdPath != null) {
                         targetInfo = propertyIdPath.toString();
                     }
-                } else {
-                    // TargetInfoType.FIELD_CAPTION
-                    if(parentCtx.getTargetField() != null){
-                        Component captionComponent = parentCtx.getTargetField();
-                        while(captionComponent != null){
-                            targetInfo = captionComponent.getCaption();
-                            if(targetInfo != null){
-                                break;
-                            }
-                            captionComponent = captionComponent.getParent();
-                        }
-                    }
                 }
             }
         }
+        if(format.doTargetEntity){
+            targetEntityStr = formatTargetEntityString(cntxt.parentEntity, format);
+        }
 
         // create output
-        String markup = "";
+        String outStr = "";
 
         if (format.doCreateOrNew && createOrNew != null) {
-            markup += "<" + format.tagName + " class=\"operation " + format.classAttributes + "\">" + createOrNew + "</" + format.tagName + ">";
+            if(format.tagName != null){
+                outStr += "<" + format.tagName + " class=\"operation " + format.classAttributes + "\">" + createOrNew + "</" + format.tagName + ">";
+            } else {
+                outStr += createOrNew;
+            }
         }
 
         if (format.doTargetInfo) {
@@ -100,14 +95,58 @@ public class EditorActionContextFormatter {
                 targetInfo = className;
             }
             if(targetInfo != null){
-                if(!markup.isEmpty()){
-                    markup += " ";
+                if(!outStr.isEmpty()){
+                    outStr += " ";
                     targetInfo = normalizeTargetInfo(targetInfo);
                 }
-                markup += "<" + format.tagName + " class=\"target " + format.classAttributes + "\">" + targetInfo + "</" + format.tagName + ">";
+                if(format.tagName != null){
+                    outStr += "<" + format.tagName + " class=\"target " + format.classAttributes + "\">" + targetInfo + "</" + format.tagName + ">";
+                } else {
+                    outStr += targetInfo;
+                }
             }
         }
-        return markup;
+        if(format.doTargetEntity && targetEntityStr != null){
+            if(format.tagName != null){
+                outStr += "<" + format.tagName + " class=\"target-entity" + format.classAttributes + "\">" + targetEntityStr + "</" + format.tagName + ">";
+            } else {
+                outStr += " (" + targetEntityStr + ")";
+            }
+        }
+        return outStr;
+    }
+
+    public String format(Collection<EditorActionContext> cntxts, EditorActionContextFormat format) {
+        String outStr = "";
+        for(EditorActionContext ctx : cntxts){
+            if(!outStr.isEmpty()){
+                outStr += " > "; // FIXME allow configuring the separator
+            }
+            outStr += format(ctx, format) ;
+        }
+        return outStr;
+    }
+
+    /**
+     * @param value
+     * @param format
+     * @return
+     */
+    private String formatTargetEntityString(Object value, EditorActionContextFormat format) {
+
+        if(value == null){
+            return "NULL";
+        }
+        String outStr;
+        if(value instanceof CdmBase){
+            outStr = ((CdmBase)value).instanceToString();
+        } else if(value instanceof CdmEntityAdapterDTO) {
+            outStr = value.getClass().getSimpleName() + ": ";
+            outStr += ((CdmEntityAdapterDTO)value).cdmEntity().toString();
+        } else {
+            outStr = value.getClass().getSimpleName() + ": " + value.toString();
+        }
+        return outStr;
     }
 
     /**

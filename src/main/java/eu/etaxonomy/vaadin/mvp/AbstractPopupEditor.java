@@ -411,9 +411,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
                 Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
             } else {
-//                Logger.getLogger(this.getClass()).error("Error saving", e);
-//                Notification.show("Error saving", Type.ERROR_MESSAGE);
-                throw new RuntimeException("Error saving", e);
+                throw new PopupEditorException("Error saving popup editor", this, e);
             }
         }
     }

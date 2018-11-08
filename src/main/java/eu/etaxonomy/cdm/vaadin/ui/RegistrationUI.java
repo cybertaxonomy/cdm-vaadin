@@ -33,6 +33,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.debug.EntityCacheDebugger;
+import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.ErrorTypeErrorHandlerWrapper;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
@@ -115,11 +117,13 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
+        DelegatingErrorHandler delegatingErrorHander = new DelegatingErrorHandler();
         WindowErrorHandler errorHandler = new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
                 + "You also might want to add a sreenshot of the browser page in error.</i>");
-        setErrorHandler(errorHandler);
-        VaadinSession.getCurrent().setErrorHandler(errorHandler);
+        delegatingErrorHander.registerHandler(new ErrorTypeErrorHandlerWrapper<Exception>(Exception.class, errorHandler));
+        setErrorHandler(delegatingErrorHander);
+        VaadinSession.getCurrent().setErrorHandler(delegatingErrorHander);
 
         navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();

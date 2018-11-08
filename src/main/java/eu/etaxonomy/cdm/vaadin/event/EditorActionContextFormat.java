@@ -19,9 +19,14 @@ public class EditorActionContextFormat {
      */
     public boolean doClassName;
     /**
-     *
+     * add information on the target class and field if possible
      */
     public boolean doTargetInfo;
+
+    /**
+     * add on the target entity like including titlecache and uuid
+     */
+    public boolean doTargetEntity;
     /**
      *
      */
@@ -32,7 +37,7 @@ public class EditorActionContextFormat {
     public boolean doCreateOrNew;
 
     /**
-     * The name of the html tag to be used
+     * The name of the html tag to be used, may be <code>null</code> to format as plain text
      */
     public String tagName = "span";
 
