@@ -489,6 +489,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
                 if(event.getReason().equals(Reason.SAVE)){
                     try {
+                        // TODO move into a service class --------------
                         TransactionStatus txStatus = getRepo().startTransaction();
                         UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
                         if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
@@ -504,9 +505,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                             newNameBlockingRegistrations.clear();
                         }
                         // reload workingset into current session
+                        getRepo().commitTransaction(txStatus);
+                        // --------------------------------------------------
                         loadWorkingSet(workingset.getCitationUuid());
                         workingset.add(reg);
-                        getRepo().commitTransaction(txStatus);
                     } finally {
                         getRepo().getSession().clear(); // #7702
                         refreshView(true);
