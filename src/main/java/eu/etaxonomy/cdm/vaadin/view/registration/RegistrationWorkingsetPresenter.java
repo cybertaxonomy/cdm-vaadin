@@ -504,11 +504,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                             getRepo().getRegistrationService().saveOrUpdate(reg);
                             newNameBlockingRegistrations.clear();
                         }
-                        // reload workingset into current session
                         getRepo().commitTransaction(txStatus);
                         // --------------------------------------------------
+                        // reload workingset into current session
                         loadWorkingSet(workingset.getCitationUuid());
-                        workingset.add(reg);
                     } finally {
                         getRepo().getSession().clear(); // #7702
                         refreshView(true);
