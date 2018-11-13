@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEventFilter;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
@@ -61,6 +63,8 @@ import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.mvp.AbstractView;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -349,23 +353,29 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @EventBusListenerMethod(filter = EntityChangeEventFilter.OccurrenceCollectionFilter.class)
     public void onCollectionEvent(EntityChangeEvent event){
 
-        if(!isFromOwnView(event)){
-            return;
-        }
+        if(event.getSourceView() instanceof AbstractPopupEditor) {
 
-        Collection newCollection = getRepo().getCollectionService().load(
-                event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})
-                );
-        cache.load(newCollection);
+            Stack<EditorActionContext> context = ((AbstractPopupEditor) event.getSourceView()).getEditorActionContext();
+            if(context.size() > 1){
+               AbstractView<?> parentView = context.get(context.size() - 2).getParentView();
+               if(getView().equals(parentView)){
+                   Collection newCollection = getRepo().getCollectionService().load(
+                           event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})
+                           );
+                   cache.load(newCollection);
 
-        if(event.isCreatedType()){
-            SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
-            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
-            combobox.setValue((Collection) event.getEntity());
-        }
-        for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
-            ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
-            combobox.reload();
+                   if(event.isCreatedType()){
+                       SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
+                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                       combobox.setValue((Collection) event.getEntity());
+                   }
+                   for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                       combobox.reload();
+                   }
+               }
+            }
+
         }
     }
 
