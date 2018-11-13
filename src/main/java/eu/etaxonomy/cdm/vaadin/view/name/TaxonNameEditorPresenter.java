@@ -218,11 +218,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         if(identifier != null){
             taxonName = getRepo().getNameService().load(identifier, initStrategy);
         } else {
-            if(cdmEntityInstantiator != null) {
-                taxonName = cdmEntityInstantiator.createNewBean();
-            } else {
-                taxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
-            }
+            taxonName = createCdmEntity();
         }
 
         if(getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY)){
@@ -618,6 +614,20 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     @Override
     protected TaxonNameDTO createDTODecorator(TaxonName cdmEntitiy) {
         return new TaxonNameDTO(cdmEntitiy);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BeanInstantiator<TaxonName> defaultCdmEntityInstantiator() {
+        return new BeanInstantiator<TaxonName>() {
+
+            @Override
+            public TaxonName createNewBean() {
+                return  TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+            }
+        };
     }
 
 

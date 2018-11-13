@@ -45,6 +45,17 @@ public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityAdapter
         this.cdmEntityInstantiator = cdmEntityInstantiator;
     }
 
+    protected abstract BeanInstantiator<CDM> defaultCdmEntityInstantiator();
+
+    protected CDM createCdmEntity(){
+        CDM bean;
+        if(cdmEntityInstantiator != null) {
+            bean = cdmEntityInstantiator.createNewBean();
+        } else {
+            bean = defaultCdmEntityInstantiator().createNewBean();
+        }
+        return bean;
+    }
 
 
 }
