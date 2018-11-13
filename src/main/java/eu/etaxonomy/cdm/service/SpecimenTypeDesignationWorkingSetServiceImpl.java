@@ -107,7 +107,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
      * {@inheritDoc}
      */
     @Override
-    @Transactional
+    @Transactional(readOnly=true)
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
 
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
