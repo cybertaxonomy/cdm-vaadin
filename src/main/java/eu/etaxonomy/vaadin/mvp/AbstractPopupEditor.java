@@ -54,7 +54,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
@@ -171,7 +173,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.addClickListener(e -> save());
 
         cancel = new Button("Cancel", FontAwesome.REMOVE);
-        cancel.addClickListener(e -> cancel());
+        cancel.addClickListener(e -> cancelEditorDialog());
 
         delete = new Button("Delete", FontAwesome.TRASH);
         delete.setStyleName(ValoTheme.BUTTON_DANGER);
@@ -375,6 +377,40 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     protected void addCommitHandler(CommitHandler commitHandler) {
         fieldGroup.addCommitHandler(commitHandler);
+    }
+
+    protected void cancelEditorDialog(){
+
+        if(fieldGroup.isModified()){
+            String message = "<p>The editor has been modified.<br>Do you want to save your changes or discard them?<p>";
+            Window editorModifiedDialog = new Window("Cancel editor");
+            editorModifiedDialog.setModal(true);
+            VerticalLayout subContent = new VerticalLayout();
+            subContent.setMargin(true);
+            editorModifiedDialog.setContent(subContent);
+            Button save = new Button("Save", FontAwesome.SAVE);
+            save.setStyleName(ValoTheme.BUTTON_PRIMARY);
+            Button discard = new Button("Discard", FontAwesome.REMOVE);
+            discard.setStyleName(ValoTheme.BUTTON_DANGER);
+            Button cancel = new Button("Cancel", FontAwesome.ARROW_CIRCLE_LEFT);
+            Label messageLabel = new Label(message, com.vaadin.shared.ui.label.ContentMode.HTML);
+            subContent.addComponent(messageLabel);
+            HorizontalLayout buttonBar = new HorizontalLayout(save, discard, cancel);
+            buttonBar.setStyleName(ValoTheme.WINDOW_BOTTOM_TOOLBAR);
+            buttonBar.setWidth(100, Unit.PERCENTAGE);
+            buttonBar.setSpacing(true);
+            buttonBar.setExpandRatio(save, 1);
+            buttonBar.setComponentAlignment(discard, Alignment.TOP_RIGHT);
+            buttonBar.setComponentAlignment(save, Alignment.TOP_RIGHT);
+            buttonBar.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+            subContent.addComponent(buttonBar);
+            save.addClickListener(e -> {editorModifiedDialog.close(); save();});
+            discard.addClickListener(e -> {editorModifiedDialog.close(); cancel();});
+            cancel.addClickListener(e -> editorModifiedDialog.close());
+            UI.getCurrent().addWindow(editorModifiedDialog);
+        } else {
+            cancel();
+        }
     }
 
 
