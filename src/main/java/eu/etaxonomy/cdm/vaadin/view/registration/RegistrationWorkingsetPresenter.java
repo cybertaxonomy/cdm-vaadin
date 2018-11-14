@@ -848,7 +848,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @Override
     public void addRootEntity(CdmBase entity) {
         rootEntities.add(entity);
-        cache.put(entity);
+        cache.load(entity);
     }
 
 
