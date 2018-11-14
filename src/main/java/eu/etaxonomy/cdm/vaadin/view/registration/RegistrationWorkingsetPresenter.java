@@ -267,7 +267,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // PagingProviders and CacheGenerator for the existingNameCombobox
         activateComboboxes();
         // update the messages
-        updateMessages();
+        // updateMessages(); // disabled see  #7908
     }
 
     /**
