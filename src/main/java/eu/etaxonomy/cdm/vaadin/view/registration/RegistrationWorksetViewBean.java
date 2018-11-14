@@ -330,7 +330,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
         typifiedNamesMap.put(dto.getUuid(), typifiedNameReference);
 
-        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
+        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto, getPresenter().getCache());
         UUID registrationEntityUuid = dto.getUuid();
 
         RegistrationItemButtons regItemButtons = new RegistrationItemButtons();

@@ -232,7 +232,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                 CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
                 // submitters have GrantedAuthorities like REGISTRATION(PREPARATION).[UPDATE]{ab4459eb-3b96-40ba-bfaa-36915107d59e}
-                UserHelper userHelper = UserHelperAccess.userHelper();
+                UserHelper userHelper = UserHelperAccess.userHelper().withCache(getCache());
                 Set<RegistrationStatus> availableStatus = new HashSet<>();
 
                 boolean canChangeStatus = userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);

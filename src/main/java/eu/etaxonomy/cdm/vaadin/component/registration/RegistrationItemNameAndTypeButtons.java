@@ -24,6 +24,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
@@ -63,7 +65,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private Link identifierLink;
 
-    public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto) {
+    public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto, ICdmEntityUuidCacher entitiyCacher) {
 
         boolean isRegistrationLocked = EnumSet.of(
                 RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
@@ -71,13 +73,20 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
         setWidth(100, Unit.PERCENTAGE);
 
+        UserHelper userHelper;
+        if(entitiyCacher != null){
+            userHelper = UserHelperAccess.userHelper().withCache(entitiyCacher);
+        } else {
+            userHelper = UserHelperAccess.userHelper();
+        }
+
         if(regDto.getNameRef() != null){
             Button nameButton = new Button("Name:");
             nameButton.setDescription("Edit the Name");
             nameIdButton = new IdButton<TaxonName>(TaxonName.class, regDto.getNameRef().getUuid(), nameButton);
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
-            boolean userHasPermission = UserHelperAccess.userHelper().userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
+            boolean userHasPermission = userHelper.userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
             nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
 
             addComponent(nameIdButton.getButton());
@@ -91,7 +100,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = !regDto.isPersisted() || UserHelperAccess.userHelper().userHasPermission(regDto.registration(), CRUD.UPDATE);
+        boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
             for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
@@ -99,7 +108,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = UserHelperAccess.userHelper().userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
                 addComponent(tdButton);
 
