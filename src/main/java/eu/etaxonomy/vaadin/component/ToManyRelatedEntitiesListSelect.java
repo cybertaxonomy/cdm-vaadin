@@ -440,7 +440,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private void updateButtonStates(){
 
+        boolean isWritable = !getState().readOnly;
         int fieldsCount = getNestedFields().size();
+
         for(int row = 0; row < fieldsCount; row++){
 
             boolean isFirst = row == 0;
@@ -455,19 +457,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(!getState().readOnly && (field.getValue() == null
+                editCreateButton.setEnabled(isWritable && (field.getValue() == null
                         || field.getValue() != null && testEditButtonPermission(field.getValue())));
             }
             // add
-            buttonGroup.getComponent(addButtonIndex).setEnabled(!getState().readOnly && (isLast || isOrderedCollection));
+            buttonGroup.getComponent(addButtonIndex).setEnabled(isWritable && (isLast || isOrderedCollection));
             // remove
             // can be always true, removing the last entry causes an new empty entry to be added.
-            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(!getState().readOnly);
+            buttonGroup.getComponent(addButtonIndex + 1).setEnabled(isWritable);
             // up
             if(isOrderedCollection && buttonGroup.getComponentCount() >  addButtonIndex + 2){
-                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(!getState().readOnly && !isFirst);
+                buttonGroup.getComponent(addButtonIndex + 2).setEnabled(isWritable && !isFirst);
                 // down
-                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(!getState().readOnly  && !isLast);
+                buttonGroup.getComponent(addButtonIndex + 3).setEnabled(isWritable && !isLast);
             }
         }
     }
@@ -681,7 +683,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        setDeepReadOnly(readOnly, getContent(), null);
         updateButtonStates();
     }
 
