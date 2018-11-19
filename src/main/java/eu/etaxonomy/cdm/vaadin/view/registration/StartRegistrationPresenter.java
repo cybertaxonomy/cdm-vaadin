@@ -102,9 +102,11 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
         refTypes.remove(ReferenceType.Section);
         newReferencePopup.withReferenceTypes(refTypes);
+
         newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
         newReferencePopup.loadInEditor(null);
+        newReferencePopup.getTypeSelect().setValue(ReferenceType.Article);
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Remove.class)
