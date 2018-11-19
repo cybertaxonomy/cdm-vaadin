@@ -41,8 +41,6 @@ public class IntegerConverter implements Converter<String, Integer> {
         }
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
         NumberFormat nf = NumberFormat.getNumberInstance(locale);
-        String separator = symbols.getDecimalSeparator() + "";
-        value = value.replaceAll("[.,;]", separator);
         try {
             return nf.parse(value).intValue();
         } catch (ParseException e){
