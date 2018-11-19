@@ -26,6 +26,7 @@ import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
+import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 
 /**
@@ -73,6 +74,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     @Override
     protected Component initContent() {
         super.setPrimaryStyleName(PRIMARY_STYLE);
+
+        errorRadiusField.setConverter(new IntegerConverter());
 
         GridLayout root = new GridLayout();
         root.setRows(2);
