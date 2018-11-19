@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.util.converter;
 
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
@@ -16,6 +15,8 @@ import java.util.Locale;
 import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.data.util.converter.Converter;
+
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 
 /**
  * @author a.kohlbecker
@@ -36,11 +37,7 @@ public class IntegerConverter implements Converter<String, Integer> {
         if(StringUtils.isBlank(value)){
             return null;
         }
-        if(locale == null){
-            locale = Locale.getDefault();
-        }
-        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
-        NumberFormat nf = NumberFormat.getNumberInstance(locale);
+        NumberFormat nf = numberFormat(locale);
         try {
             return nf.parse(value).intValue();
         } catch (ParseException e){
@@ -58,11 +55,25 @@ public class IntegerConverter implements Converter<String, Integer> {
         if(value == null){
             return null;
         }
-        if(locale == null){
-            locale = Locale.getDefault();
-        }
-        NumberFormat nf = NumberFormat.getInstance(locale);
+        NumberFormat nf = numberFormat(locale);
         return nf.format(value);
+    }
+
+    /**
+     * @param locale
+     * @return
+     */
+    public NumberFormat numberFormat(Locale locale) {
+        NumberFormat nf;
+        if(RegistrationUIDefaults.NUMBER_FORMAT_OVERRIDE != null){
+            nf = RegistrationUIDefaults.NUMBER_FORMAT_OVERRIDE;
+        } else {
+            if(locale == null){
+                locale = Locale.getDefault();
+            }
+            nf = NumberFormat.getInstance(locale);
+        }
+        return nf;
     }
 
     /**
