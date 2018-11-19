@@ -259,6 +259,19 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         try {
             Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(referenceType);
 
+            // Authors and inReference
+            authorshipField.setVisible(fieldPropertyDefinition.containsKey("authorship"));
+            String inRefCaption = fieldPropertyDefinition.get("inReference");
+            inReferenceCombobox.setVisible(inRefCaption != null);
+            if(inRefCaption != null){
+                inReferenceCombobox.setCaption(propertyNameLabelMap.get(inRefCaption));
+            }
+            getField("title").setVisible(fieldPropertyDefinition.containsKey("title"));
+
+            EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings);
+//            EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
+            getField("abbrevTitle").setVisible(!hideNomTitle.contains(referenceType));
+
             for(String fieldName : adaptiveFields.keySet()){ // iterate over the LinkedHashMap to retain the original order of the fields
                 if(fieldPropertyDefinition.containsKey(fieldName)){
                     Field<?> field = adaptiveFields.get(fieldName);
@@ -277,10 +290,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             getField("inReference").setCaption(propertyNameLabelMap.get("inReference"));
         }
 
-        EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings, ReferenceType.PrintSeries);
-        EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
-        getField("abbrevTitle").setVisible(!hideNomTitle.contains(referenceType));
-        getField("title").setVisible(!hideTitle.contains(referenceType));
+
 
         return null;
     }
@@ -298,11 +308,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                 for(int row = variableGridStartRow; row <= variableGridLastRow; row++){
                     for(int x=0; x < grid.getColumns(); x++){
                         Component c = grid.getComponent(x, row);
-                        logger.debug("initAdaptiveFields() - y: " + row + " x: " + x + "  component:" + (c != null ? c.getClass().getSimpleName(): "NULL"));
+                        logger.trace("initAdaptiveFields() - y: " + row + " x: " + x + "  component:" + (c != null ? c.getClass().getSimpleName(): "NULL"));
                         if(c != null && c instanceof Field){
                             Field<?> field = (Field<?>)c;
                             PropertyIdPath propertyIdPath = boundPropertyIdPath(field);
-                            logger.debug("initAdaptiveFields() - " + field.getCaption() + " -> " + propertyIdPath);
+                            logger.trace("initAdaptiveFields() - " + field.getCaption() + " -> " + propertyIdPath);
                             if(propertyIdPath != null && fieldNames.contains(propertyIdPath.toString())){
                                 adaptiveFields.put(propertyIdPath.toString(), field);
                             }
