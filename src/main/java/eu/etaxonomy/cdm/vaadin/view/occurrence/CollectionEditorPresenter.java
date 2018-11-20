@@ -185,7 +185,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
 
         institutionPopuEditor.grantToCurrentUser(this.crud);
-        institutionPopuEditor.withDeleteButton(true);
+        institutionPopuEditor.withDeleteButton(false);
         institutionPopuEditor.loadInEditor(null);
     }
 
