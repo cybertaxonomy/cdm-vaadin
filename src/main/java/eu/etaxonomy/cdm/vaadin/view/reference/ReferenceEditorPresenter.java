@@ -22,6 +22,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
@@ -31,13 +32,18 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
+import eu.etaxonomy.vaadin.mvp.BoundField;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -85,6 +91,13 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
+
+        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<AgentBase, Institution>(getRepo().getAgentService(), Institution.class);
+        getView().getInstitutionCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
+        getView().getInstitutionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getInstitutionCombobox(), this));
+
+        getView().getSchoolCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
+        getView().getSchoolCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getSchoolCombobox(), this));
 
         getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
@@ -152,7 +165,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     /**
     *
     * @param editorAction
-     * @throws EditorEntityBeanException
+    * @throws EditorEntityBeanException
     */
    @EventBusListenerMethod
    public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
@@ -174,18 +187,71 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        }
    }
 
+   @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+   public void onInstitutionEditorActionEdit(InstitutionEditorAction event) {
+
+       if(!checkFromOwnView(event)){
+           return;
+       }
+
+       InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+       institutionPopuEditor.grantToCurrentUser(this.crud);
+       institutionPopuEditor.withDeleteButton(true);
+       institutionPopuEditor.loadInEditor(event.getEntityUuid());
+   }
+
+   @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+   public void onInstitutionEditorActionAdd(InstitutionEditorAction event) {
+
+       if(!checkFromOwnView(event)){
+           return;
+       }
+
+       InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+       institutionPopuEditor.grantToCurrentUser(this.crud);
+       institutionPopuEditor.withDeleteButton(false);
+       institutionPopuEditor.loadInEditor(null);
+   }
+
    @EventBusListenerMethod
    public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-       if(event.getSourceView() == inReferencePopup){
-           if(event.isCreateOrModifiedType()){
-               getCache().load(event.getEntity());
-               getView().getInReferenceCombobox().reload();
+       BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
+
+       if(boundTargetField != null){
+           if(boundTargetField.matchesPropertyIdPath("inReference")){
+               if(event.isCreateOrModifiedType()){
+                   getCache().load(event.getEntity());
+                   getView().getInReferenceCombobox().reload();
+               }
+               if(event.isRemovedType()){
+                   getView().getInReferenceCombobox().selectNewItem(null);
+               }
+               inReferencePopup = null;
            }
-           if(event.isRemovedType()){
-               getView().getInReferenceCombobox().selectNewItem(null);
+           else if(boundTargetField.matchesPropertyIdPath("institute")){
+               if(event.isCreateOrModifiedType()){
+                   Institution newInstitution = (Institution) event.getEntity();
+                   getCache().load(newInstitution);
+                   if(event.isCreatedType()){
+                       getView().getInstitutionCombobox().setValue(newInstitution);
+                   } else {
+                       getView().getInstitutionCombobox().reload();
+                   }
+               }
+           } else if(boundTargetField.matchesPropertyIdPath("school")){
+               if(event.isCreateOrModifiedType()){
+                   Institution newInstitution = (Institution) event.getEntity();
+                   getCache().load(newInstitution);
+                   if(event.isCreatedType()){
+                       getView().getSchoolCombobox().setValue(newInstitution);
+                   } else {
+                       getView().getSchoolCombobox().reload();
+                   }
+               }
            }
-           inReferencePopup = null;
        }
 
    }

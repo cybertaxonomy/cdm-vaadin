@@ -28,6 +28,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions;
@@ -37,9 +38,11 @@ import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
+import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
@@ -66,13 +69,16 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private final static int GRID_COLS = 4; // 12 would fits for 2,3, and 4 Components per row
 
-    private final static int GRID_ROWS = 11;
+    private final static int GRID_ROWS = 14;
 
     private ListSelect typeSelect;
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     private TeamOrPersonField authorshipField;
+
+    private ToOneRelatedEntityCombobox<Institution> institutionCombobox;
+    private ToOneRelatedEntityCombobox<Institution> schoolCombobox;
 
     private FilterableAnnotationsField annotationsListField;
 
@@ -187,9 +193,57 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             }
             });
         addField(inReferenceCombobox, "inReference", 0, row, GRID_COLS -1, row);
+
+        institutionCombobox = new ToOneRelatedEntityCombobox<Institution>("Institution", Institution.class);
+        institutionCombobox.getSelect().setCaptionGenerator(
+                new CdmTitleCacheCaptionGenerator<Institution>()
+                );
+        institutionCombobox.setWidth(100, Unit.PERCENTAGE);
+        institutionCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
+                new InstitutionEditorAction(EditorActionType.ADD, e.getButton(), institutionCombobox, this)
+                ));
+        institutionCombobox.addClickListenerEditEntity(e -> {
+            if(institutionCombobox.getValue() != null){
+                getViewEventBus().publish(this,
+                    new InstitutionEditorAction(
+                            EditorActionType.EDIT,
+                            institutionCombobox.getValue().getUuid(),
+                            e.getButton(),
+                            institutionCombobox,
+                            this)
+                );
+            }
+         });
+
+        schoolCombobox = new ToOneRelatedEntityCombobox<Institution>("School", Institution.class);
+        schoolCombobox.getSelect().setCaptionGenerator(
+                new CdmTitleCacheCaptionGenerator<Institution>()
+                );
+        schoolCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
+                new InstitutionEditorAction(EditorActionType.ADD, e.getButton(), schoolCombobox, this)
+                ));
+        schoolCombobox.addClickListenerEditEntity(e -> {
+            if(schoolCombobox.getValue() != null){
+                getViewEventBus().publish(this,
+                    new InstitutionEditorAction(
+                            EditorActionType.EDIT,
+                            schoolCombobox.getValue().getUuid(),
+                            e.getButton(),
+                            schoolCombobox,
+                            this)
+                );
+            }
+         });
+        row++;
+        addField(institutionCombobox, "institution", 0, row, GRID_COLS -1, row);
+        row++;
+        addField(schoolCombobox, "school", 0, row, GRID_COLS -1, row);
         row++;
 
         variableGridStartRow = row;
+
+        addTextField("Organization", "organization", 0, row).setWidth(100, Unit.PERCENTAGE);
+        row++;
         addTextField("Series", "seriesPart", 0, row).setWidth(100, Unit.PERCENTAGE);
         addTextField("Volume", "volume", 1, row).setWidth(100, Unit.PERCENTAGE);
         addTextField("Pages", "pages", 2, row).setWidth(100, Unit.PERCENTAGE);
@@ -269,8 +323,9 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             getField("title").setVisible(fieldPropertyDefinition.containsKey("title"));
 
             EnumSet<ReferenceType> hideNomTitle = EnumSet.of(ReferenceType.Article, ReferenceType.Section, ReferenceType.BookSection, ReferenceType.InProceedings);
-//            EnumSet<ReferenceType> hideTitle = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
             getField("abbrevTitle").setVisible(!hideNomTitle.contains(referenceType));
+            institutionCombobox.setVisible(fieldPropertyDefinition.containsKey("institution"));
+            schoolCombobox.setVisible(fieldPropertyDefinition.containsKey("school"));
 
             for(String fieldName : adaptiveFields.keySet()){ // iterate over the LinkedHashMap to retain the original order of the fields
                 if(fieldPropertyDefinition.containsKey(fieldName)){
@@ -414,6 +469,16 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             typeSelect.removeAllItems();
             typeSelect.addItems(referenceTypes);
         }
+    }
+
+    @Override
+    public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox() {
+        return institutionCombobox;
+    }
+
+    @Override
+    public ToOneRelatedEntityCombobox<Institution> getSchoolCombobox() {
+        return schoolCombobox;
     }
 
 

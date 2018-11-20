@@ -19,6 +19,7 @@ import org.vaadin.spring.events.EventBus.ViewEventBus;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -88,6 +89,22 @@ public class CdmEditorPresenterTest {
          */
         @Override
         public FilterableAnnotationsField getAnnotationsField() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox() {
+            return null;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public ToOneRelatedEntityCombobox<Institution> getSchoolCombobox() {
             return null;
         }
 
