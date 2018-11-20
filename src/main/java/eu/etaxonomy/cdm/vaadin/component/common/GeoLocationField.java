@@ -8,10 +8,13 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.vaadin.addon.leaflet.LCircle;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LOpenStreetMapLayer;
+import org.vaadin.addon.leaflet.LeafletClickEvent;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -52,6 +55,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     private LMap map = new LMap();
     private LMarker mapMarker = new LMarker();
+    private LCircle errorRadiusMarker = null;
 
     private CssLayout mapWrapper;
 
@@ -87,9 +91,11 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
         map = new LMap();
         map.addBaseLayer(new LOpenStreetMapLayer(), null);
-        map.setDraggingEnabled(false);
+        map.setDraggingEnabled(true);
         map.setScrollWheelZoomEnabled(false);
         map.removeControl(map.getLayersControl());
+        map.addClickListener(e -> refreshMap(e));
+        // map.getZoomControl().addListener(ClickEvent.class, target, method);
 
         root.setColumnExpandRatio(2, 1.0f);
         root.setRowExpandRatio(1, 1.0f);
@@ -111,6 +117,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         latitudeField.setBuffered(false);
         latitudeField.addValueChangeListener(e -> updateMap());
 
+        errorRadiusField.addValueChangeListener( e -> updateMap());
+
         addStyledComponents(longitudeField, latitudeField, errorRadiusField, referenceSystemField, longLatParsed);
         addSizedComponent(root);
 
@@ -122,16 +130,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         return root;
     }
 
-//    /**
-//     * @param longitudeField2
-//     * @param value
-//     * @return
-//     */
-//    private void updateParsedValue(TextField field, String value) {
-//        field.setComponentError(null);
-//        updateMap();
-//    }
-
     /**
      *
      */
@@ -139,11 +137,25 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         // using the string representations for UI display
         longLatParsed.setValue(longitudeField.getValue() + "/" + latitudeField.getValue());
         map.removeComponent(mapMarker);
+        if(errorRadiusMarker != null){
+            map.removeComponent(errorRadiusMarker);
+        }
         Double longitude = (Double) longitudeField.getConverter().convertToModel(longitudeField.getValue(), Double.class, null);
         Double latitude = (Double) latitudeField.getConverter().convertToModel(latitudeField.getValue(), Double.class, null);
         logger.debug("panning map to " + longitude + "/" + latitude);
         if(longitude != null && latitude != null){
             map.setZoomLevel(10);
+            if(!StringUtils.isEmpty(errorRadiusField.getValue())){
+                try{
+                    double errorRadius = Double.parseDouble(errorRadiusField.getValue());
+                    if(errorRadius > 0){
+                        errorRadiusMarker = new LCircle(latitude, longitude, errorRadius);
+                        errorRadiusMarker.setColor("#ff0000");
+                        errorRadiusMarker.setWeight(1);
+                        map.addComponents(errorRadiusMarker);
+                    }
+                } catch(Exception e){ /* IGNORE */ }
+            }
             mapMarker.setPoint(new org.vaadin.addon.leaflet.shared.Point(latitude, longitude));
             map.addComponents(mapMarker);
             map.setCenter(latitude, longitude);
@@ -151,6 +163,10 @@ public class GeoLocationField extends CompositeCustomField<Point> {
             map.setZoomLevel(1);
             map.setCenter(40, 0);
         }
+    }
+
+    protected void refreshMap(LeafletClickEvent e) {
+        logger.debug("map click");
     }
 
     /**
