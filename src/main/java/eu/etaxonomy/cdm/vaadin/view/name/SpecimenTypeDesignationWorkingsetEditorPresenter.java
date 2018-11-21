@@ -31,6 +31,7 @@ import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -184,9 +185,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
+        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(selectFactory.buildBeanItemContainer(TermType.ReferenceSystem));
+        getView().getExactLocationField().getReferenceSystemSelect().setItemCaptionPropertyId("label");
+
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
-
 
         popuEditorTypeDesignationSourceRows.clear();
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());

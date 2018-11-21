@@ -23,6 +23,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
@@ -48,16 +49,17 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     private BeanFieldGroup<Point> fieldGroup = new BeanFieldGroup<>(Point.class);
 
     private TextField longitudeField = new TextFieldNFix("Longitude");
-    TextField latitudeField = new TextFieldNFix("Latitude");
-    Label longLatParsed = new Label();
-    TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
-    TextField referenceSystemField = new TextFieldNFix("ReferenceSystem");
+    private TextField latitudeField = new TextFieldNFix("Latitude");
+    private Label longLatParsed = new Label();
+    private TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
+    private ListSelect referenceSystemSelect;
 
     private LMap map = new LMap();
     private LMarker mapMarker = new LMarker();
     private LCircle errorRadiusMarker = null;
 
     private CssLayout mapWrapper;
+
 
     /**
      *
@@ -80,14 +82,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
         errorRadiusField.setConverter(new IntegerConverter());
 
-        GridLayout root = new GridLayout();
-        root.setRows(2);
-        root.setColumns(3);
-        root.setStyleName("wrapper");
-        root.addComponent(latitudeField, 0, 0);
-        root.addComponent(longitudeField, 1, 0);
-        root.addComponent(errorRadiusField, 0, 1);
-        root.addComponent(referenceSystemField, 1, 1);
 
         map = new LMap();
         map.addBaseLayer(new LOpenStreetMapLayer(), null);
@@ -97,12 +91,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         map.addClickListener(e -> refreshMap(e));
         // map.getZoomControl().addListener(ClickEvent.class, target, method);
 
-        root.setColumnExpandRatio(2, 1.0f);
-        root.setRowExpandRatio(1, 1.0f);
-
-        root.addComponent(map, 2, 1);
         mapWrapper = new CssLayout(longLatParsed, map);
-        root.addComponent(mapWrapper, 2, 0, 2, 1);
         mapWrapper.setSizeFull();
         mapWrapper.setStyleName("map-wrapper");
         longLatParsed.setWidthUndefined();
@@ -119,13 +108,31 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
         errorRadiusField.addValueChangeListener( e -> updateMap());
 
-        addStyledComponents(longitudeField, latitudeField, errorRadiusField, referenceSystemField, longLatParsed);
+        referenceSystemSelect = new ListSelect("Reference system");
+        referenceSystemSelect.setNullSelectionAllowed(false);
+        referenceSystemSelect.setRows(1);
+        referenceSystemSelect.setWidth(100, Unit.PERCENTAGE);
+
+        GridLayout root = new GridLayout();
+        root.setRows(2);
+        root.setColumns(3);
+        root.setStyleName("wrapper");
+        root.addComponent(latitudeField, 0, 0);
+        root.addComponent(longitudeField, 1, 0);
+        root.addComponent(errorRadiusField, 0, 1);
+        root.addComponent(referenceSystemSelect, 1, 1);
+        // root.addComponent(map, 2, 1);
+        root.addComponent(mapWrapper, 2, 0, 2, 1);
+        root.setColumnExpandRatio(2, 1.0f);
+        root.setRowExpandRatio(1, 1.0f);
+
+        addStyledComponents(longitudeField, latitudeField, errorRadiusField, referenceSystemSelect, longLatParsed);
         addSizedComponent(root);
 
         fieldGroup.bind(longitudeField, "longitude");
         fieldGroup.bind(latitudeField, "latitude");
         fieldGroup.bind(errorRadiusField, "errorRadius");
-        fieldGroup.bind(referenceSystemField, "referenceSystem");
+        fieldGroup.bind(referenceSystemSelect, "referenceSystem");
 
         return root;
     }
@@ -184,7 +191,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         }
         super.setInternalValue(newValue);
         fieldGroup.setItemDataSource(new BeanItem<Point>(newValue));
-        referenceSystemField.setEnabled(false); // disabled since not fully implemented
         updateMap();
     }
 
@@ -203,6 +209,10 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     @Override
     public FieldGroup getFieldGroup() {
         return fieldGroup;
+    }
+
+    public ListSelect getReferenceSystemSelect() {
+        return referenceSystemSelect;
     }
 
 

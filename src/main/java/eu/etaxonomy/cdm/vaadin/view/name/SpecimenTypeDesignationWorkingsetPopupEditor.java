@@ -82,6 +82,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
+    private GeoLocationField exactLocationField;
+
     /**
      * @return the countrySelectField
      */
@@ -123,9 +125,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         //        see https://github.com/vaadin/framework/issues/3617
 
         row++;
-        GeoLocationField exactLocation = new GeoLocationField("Geo location");
-        addField(exactLocation, "exactLocation", 0, row, 2, row);
-        exactLocation.setWidth("100%");
+        exactLocationField = new GeoLocationField("Geo location");
+        addField(exactLocationField, "exactLocation", 0, row, 2, row);
+        exactLocationField.setWidth("100%");
 
         row++;
         MinMaxTextField absElevationMinMax = new MinMaxTextField("Altitude", "m");
@@ -376,6 +378,11 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     @Override
     public FilterableAnnotationsField getAnnotationsField() {
         return annotationsListField;
+    }
+
+    @Override
+    public GeoLocationField getExactLocationField() {
+        return exactLocationField;
     }
 
 

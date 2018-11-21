@@ -13,6 +13,7 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.ListSelect;
 
+import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
@@ -40,4 +41,6 @@ public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends Applic
     public void updateAllowDelete();
 
     TeamOrPersonField getCollectorField();
+
+    GeoLocationField getExactLocationField();
 }
