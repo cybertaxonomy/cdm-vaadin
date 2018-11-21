@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 import org.vaadin.addon.leaflet.LCircle;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
-import org.vaadin.addon.leaflet.LOpenStreetMapLayer;
+import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -84,7 +84,10 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
 
         map = new LMap();
-        map.addBaseLayer(new LOpenStreetMapLayer(), null);
+        // LTileLayer baseLayer = new LOpenStreetMapLayer();
+        LTileLayer baseLayer = new LTileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png");
+        baseLayer.setAttributionString("Map data © <a href=\"https://openstreetmap.org/copyright\">OpenStreetMap</a>-contributors, SRTM | Map style: © <a href=\"http://opentopomap.org\">OpenTopoMap</a> (<a href=\"https://creativecommons.org/licenses/by-sa/3.0/\">CC-BY-SA</a>)");
+        map.addBaseLayer(baseLayer, null);
         map.setDraggingEnabled(true);
         map.setScrollWheelZoomEnabled(false);
         map.removeControl(map.getLayersControl());
