@@ -94,7 +94,7 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
             try {
                 convertToModel((String)value, Double.class, null);
             } catch (com.vaadin.data.util.converter.Converter.ConversionException e) {
-                throw new InvalidValueException("Value can not be converted to " + axis.name());
+                throw new InvalidValueException("Invalid " + axis.name().toLowerCase());
             }
         }
 

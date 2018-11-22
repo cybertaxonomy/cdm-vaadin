@@ -16,9 +16,11 @@ import org.vaadin.addon.leaflet.LMarker;
 import org.vaadin.addon.leaflet.LTileLayer;
 import org.vaadin.addon.leaflet.LeafletClickEvent;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItem;
+import com.vaadin.data.util.converter.Converter.ConversionException;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
@@ -27,8 +29,8 @@ import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
+import eu.etaxonomy.cdm.vaadin.component.LongLatField;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.util.converter.GeoLocationConverterValidator;
 import eu.etaxonomy.cdm.vaadin.util.converter.GeoLocationConverterValidator.Axis;
 import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
@@ -48,8 +50,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     private BeanFieldGroup<Point> fieldGroup = new BeanFieldGroup<>(Point.class);
 
-    private TextField longitudeField = new TextFieldNFix("Longitude");
-    private TextField latitudeField = new TextFieldNFix("Latitude");
+    private TextField longitudeField = new LongLatField("Longitude", Axis.LONGITUDE);
+    private TextField latitudeField = new LongLatField("Latitude", Axis.LATITUDE);
     private Label longLatParsed = new Label();
     private TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
     private ListSelect referenceSystemSelect;
@@ -99,13 +101,9 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         mapWrapper.setStyleName("map-wrapper");
         longLatParsed.setWidthUndefined();
 
-        longitudeField.setConverter(new GeoLocationConverterValidator(Axis.LONGITUDE));
-        longitudeField.addValidator(new GeoLocationConverterValidator(Axis.LONGITUDE));
         longitudeField.setBuffered(false);
         longitudeField.addValueChangeListener(e -> updateMap());
 
-        latitudeField.setConverter(new GeoLocationConverterValidator(Axis.LATITUDE));
-        latitudeField.addValidator(new GeoLocationConverterValidator(Axis.LATITUDE));
         latitudeField.setBuffered(false);
         latitudeField.addValueChangeListener(e -> updateMap());
 
@@ -120,8 +118,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.setRows(2);
         root.setColumns(3);
         root.setStyleName("wrapper");
-        root.addComponent(latitudeField, 0, 0);
-        root.addComponent(longitudeField, 1, 0);
+        root.addComponent(longitudeField, 0, 0);
+        root.addComponent(latitudeField, 1, 0);
         root.addComponent(errorRadiusField, 0, 1);
         root.addComponent(referenceSystemSelect, 1, 1);
         // root.addComponent(map, 2, 1);
@@ -144,14 +142,26 @@ public class GeoLocationField extends CompositeCustomField<Point> {
      *
      */
     protected void updateMap() {
+
+        Double longitude  = null;
+        Double latitude = null;
+
         // using the string representations for UI display
         longLatParsed.setValue(longitudeField.getValue() + "/" + latitudeField.getValue());
         map.removeComponent(mapMarker);
         if(errorRadiusMarker != null){
             map.removeComponent(errorRadiusMarker);
         }
-        Double longitude = (Double) longitudeField.getConverter().convertToModel(longitudeField.getValue(), Double.class, null);
-        Double latitude = (Double) latitudeField.getConverter().convertToModel(latitudeField.getValue(), Double.class, null);
+
+        try {
+            longitudeField.validate();
+            longitude = (Double) longitudeField.getConverter().convertToModel(longitudeField.getValue(), Double.class, null);
+            latitudeField.validate();
+            latitude = (Double) latitudeField.getConverter().convertToModel(latitudeField.getValue(), Double.class, null);
+        } catch (InvalidValueException | ConversionException e){
+            // IGNORE validation error have been set in the UI in the validate() methods
+        }
+
         logger.debug("panning map to " + longitude + "/" + latitude);
         if(longitude != null && latitude != null){
             map.setZoomLevel(10);
