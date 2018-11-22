@@ -97,6 +97,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
      */
     private LinkedHashMap<String, Field<?>> adaptiveFields = new LinkedHashMap<>();
 
+    private VerbatimTimePeriodField datePublishedField;
+
     static {
         propertyNameLabelMap.put("inReference", "In reference");
         propertyNameLabelMap.put("inJournal", "In journal");
@@ -145,8 +147,8 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         "inReference"
          */
         int row = 0;
-        VerbatimTimePeriodField timePeriodField = new VerbatimTimePeriodField("Date published");
-        addField(timePeriodField, "datePublished", 0, row, 1, row);
+        datePublishedField = new VerbatimTimePeriodField("Date published");
+        addField(datePublishedField, "datePublished", 0, row, 1, row);
         typeSelect = new ListSelect("Reference type");
         typeSelect.addItems(referenceTypes);
         typeSelect.setNullSelectionAllowed(false);
@@ -313,7 +315,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         try {
             Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(referenceType);
 
-            // Authors and inReference
+            datePublishedField.setVisible(fieldPropertyDefinition.containsKey("datePublished"));
             authorshipField.setVisible(fieldPropertyDefinition.containsKey("authorship"));
             String inRefCaption = fieldPropertyDefinition.get("inReference");
             inReferenceCombobox.setVisible(inRefCaption != null);
