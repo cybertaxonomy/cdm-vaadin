@@ -428,16 +428,26 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             fieldGroup.commit();
         } catch (CommitException e) {
             fieldGroup.getFields().forEach(f -> ((AbstractField<?>)f).setValidationVisible(true));
-            if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
-                FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
-                updateFieldNotifications(invalidValueException.getInvalidFields());
-                Notification.show("The entered data in " + invalidValueException.getInvalidFields().size() + " fields is incomplete or invalid.");
-            } else if(e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof PermissionDeniedException){
-                PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
-                Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
-            } else {
+            Throwable cause = e.getCause();
+            while(cause != null) {
+                if(cause instanceof FieldGroupInvalidValueException){
+                    FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)cause;
+                    updateFieldNotifications(invalidValueException.getInvalidFields());
+                    int invalidFieldsCount = invalidValueException.getInvalidFields().size();
+                    Notification.show("The entered data in " + invalidFieldsCount + " field" + (invalidFieldsCount > 1 ? "s": "") + " is incomplete or invalid.");
+                    break;
+                } else if(cause instanceof PermissionDeniedException){
+                    PermissionDeniedException permissionDeniedException = (PermissionDeniedException)cause;
+                    Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
+                    break;
+                }
+                cause = cause.getCause();
+            }
+            if(cause == null){
+                // no known exception type found
                 throw new PopupEditorException("Error saving popup editor", this, e);
             }
+
         }
     }
 
