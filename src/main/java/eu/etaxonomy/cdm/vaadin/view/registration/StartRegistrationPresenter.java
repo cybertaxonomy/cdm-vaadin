@@ -68,9 +68,9 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      * {@inheritDoc}
      */
     @Override
-    public void onPresenterReady() {
+    public void handleViewEntered() {
 
-        super.onPresenterReady();
+        super.handleViewEntered();
 
         CdmFilterablePagingProvider<Reference, Reference> pagingProvider = pagingProviderFactory.referencePagingProvider();
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
