@@ -189,7 +189,8 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
      */
     @Override
     public void enter(ViewChangeEvent event) {
-        // TODO Auto-generated method stub
+
+        getPresenter().handleViewEntered();
 
     }
 
