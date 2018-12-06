@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -28,12 +29,14 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions;
 import eu.etaxonomy.cdm.model.reference.ReferencePropertyDefinitions.UnimplemetedCaseException;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -41,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
@@ -390,6 +394,21 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             }
         }
     }
+
+
+    @Override
+    public void setAdvancedMode(boolean isAdvancedMode) {
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean isAdmin = UserHelperAccess.userHelper().userIsAdmin();
+
+        boolean canEditAllCaches = isAdmin || isCurator;
+        super.setAdvancedMode(isAdvancedMode);
+        if(!canEditAllCaches){
+            advancedModeComponents.forEach(c -> c.setReadOnly(true));
+            Arrays.asList(authorshipField.getCachFields()).forEach(c -> c.setReadOnly(false));
+        }
+    }
+
 
     /**
      * {@inheritDoc}

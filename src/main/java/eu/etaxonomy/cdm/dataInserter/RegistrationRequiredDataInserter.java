@@ -224,7 +224,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     /**
      *
      */
-
     private void executeSuppliedCommands() {
 
         if(commandsExecuted){

@@ -127,7 +127,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private boolean isAdvancedMode = false;
 
-    private List<Component> advancedModeComponents = new ArrayList<>();
+    protected List<Component> advancedModeComponents = new ArrayList<>();
 
     private Button advancedModeButton;
 
