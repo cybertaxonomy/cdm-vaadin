@@ -31,7 +31,7 @@ public class TaxonNamePopupEditorConfig {
         popup.enableMode(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA);
         popup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
         popup.enableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-        // popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
+        popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
     }
 
     /**
@@ -42,7 +42,7 @@ public class TaxonNamePopupEditorConfig {
     public static void configure(TaxonNamePopupEditorView popup) {
         popup.enableMode(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA);
         popup.enableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-        // popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
+        popup.enableMode(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE);
     }
 
 }

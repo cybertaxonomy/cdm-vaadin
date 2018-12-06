@@ -164,6 +164,16 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
         .v-filterselect-button {
             right: $v-unit-size * 2 + 1px;
         }
+        .v-component-group {
+          .v-required-field-indicator {
+              // no not show the indicator of the nested select
+              display: none;
+          }
+          .v-errorindicator {
+             // no not show the indicator of the nested select
+              display: none;
+          }
+        }
     }
     
     // ------------ minMaxTextField ------------ //

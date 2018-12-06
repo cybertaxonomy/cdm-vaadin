@@ -320,6 +320,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
+        // nomReferenceCombobox.setImmediate(true);
         nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                 this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
@@ -560,15 +561,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE)) {
             if(combinationAuthorshipField.getValue() == null){
                 nomReferenceCombobox.setRequired(true);
+                nomReferenceCombobox.setImmediate(true);
             } else {
                 combinationAuthorshipField.addValueChangeListener(e -> {
                     if(e.getProperty().getValue() == null){
                         nomReferenceCombobox.setRequired(true);
+                        nomReferenceCombobox.setImmediate(true);
                     }
                 });
             }
         }
-
     }
 
     /**

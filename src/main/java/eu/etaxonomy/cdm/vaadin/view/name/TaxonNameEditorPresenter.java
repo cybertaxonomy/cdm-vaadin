@@ -250,6 +250,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             };
 
         }
+
         return taxonName;
     }
 
