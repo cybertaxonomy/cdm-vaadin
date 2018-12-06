@@ -234,7 +234,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     values.add(v);
                 }
             }
-            prepared.add(new Restriction(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new String[values.size()])));
+            prepared.add(new Restriction(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new Object[values.size()])));
         }
         return prepared;
     }
