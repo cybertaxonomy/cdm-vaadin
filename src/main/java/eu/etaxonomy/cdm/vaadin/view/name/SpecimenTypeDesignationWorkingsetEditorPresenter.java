@@ -52,7 +52,6 @@ import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEventFilter;
-import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
@@ -221,7 +220,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         collectionPagingProvider.getPageSize()
                         );
                 row.collection.getSelect().setCaptionGenerator(new CollectionCaptionGenerator());
-                row.collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(row.collection));
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
                 row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd(row));
@@ -238,7 +236,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
 
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
-                row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityButtonUpdater<Reference>(row.mediaSpecimenReference));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
                 row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row));
