@@ -116,5 +116,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     public AbstractField<String> getInfraSpecificEpithetField();
 
+    public NameRelationField getOrthographicVariantField();
+
 
 }

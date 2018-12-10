@@ -294,8 +294,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }
-
     }
+
 
     /**
      * @param crud

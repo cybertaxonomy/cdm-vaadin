@@ -51,7 +51,7 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private BeanFieldGroup<NameRelationshipDTO> fieldGroup = new BeanFieldGroup<>(NameRelationshipDTO.class);
 
-    ToOneRelatedEntityCombobox<TaxonName> validatedNameComboBox;
+    ToOneRelatedEntityCombobox<TaxonName> relatedNameComboBox;
 
     ToOneRelatedEntityCombobox<Reference> citatonComboBox;
 
@@ -65,18 +65,24 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private GridLayout grid;
 
+    private String nameFieldCaption;
+
 
     /**
      * @param string
      */
-    public NameRelationField(String caption, Direction direction, NameRelationshipType type) {
+    public NameRelationField(String caption, String nameFieldCaption, Direction direction, NameRelationshipType type) {
         this.direction = direction;
         this.type = type;
 
         setCaption(caption);
         setPrimaryStyleName(PRIMARY_STYLE);
 
-        validatedNameComboBox = new ToOneRelatedEntityCombobox<TaxonName>("Validated name", TaxonName.class);
+        if(nameFieldCaption == null){
+            this.nameFieldCaption = "Related name";
+        }
+
+        relatedNameComboBox = new ToOneRelatedEntityCombobox<TaxonName>(this.nameFieldCaption, TaxonName.class);
         citatonComboBox = new ToOneRelatedEntityCombobox<Reference>("Reference", Reference.class);
     }
 
@@ -111,14 +117,14 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
                 setValue(null);
                 updateToolBarButtonStates();
             });
-        validatedNameComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(validatedNameComboBox));
-        citatonComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox));
+        relatedNameComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(relatedNameComboBox));
+        citatonComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox, false));
 
         grid = new GridLayout(2, 3);
 
-        grid.addComponent(validatedNameComboBox, 0, 0, 1, 0);
+        grid.addComponent(relatedNameComboBox, 0, 0, 1, 0);
 
-        validatedNameComboBox.setCaption("Validated name");
+        relatedNameComboBox.setCaption(nameFieldCaption);
         citatonComboBox.setCaption("Reference");
         citationMicroReferenceField.setCaption("Reference detail");
         ruleConsideredField.setCaption("Rule considered");
@@ -127,9 +133,10 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         grid.addComponent(citationMicroReferenceField, 1, 1, 1, 1);
         grid.addComponent(ruleConsideredField, 0, 2, 1, 2);
 
-        validatedNameComboBox.setWidth(100, Unit.PERCENTAGE);
+        relatedNameComboBox.setWidth(100, Unit.PERCENTAGE);
         ruleConsideredField.setWidth(100, Unit.PERCENTAGE);
         citatonComboBox.setWidth(100, Unit.PERCENTAGE);
+
 
 
         grid.setColumnExpandRatio(0, 7);
@@ -142,7 +149,7 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         compositeWrapper.addComponents(toolBar);
 
         addSizedComponents(compositeWrapper);
-        addStyledComponents(validatedNameComboBox, citationMicroReferenceField, citatonComboBox, ruleConsideredField, newButton, removeButton);
+        addStyledComponents(relatedNameComboBox, citationMicroReferenceField, citatonComboBox, ruleConsideredField, newButton, removeButton);
 
         return compositeWrapper;
     }
@@ -169,7 +176,7 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         newValue = HibernateProxyHelper.deproxy(newValue);
         if(newValue != null) {
             compositeWrapper.addComponent(grid);
-            getFieldGroup().bind(validatedNameComboBox, "otherName");
+            getFieldGroup().bind(relatedNameComboBox, "otherName");
             getFieldGroup().bind(citationMicroReferenceField, "citationMicroReference");
             getFieldGroup().bind(citatonComboBox, "citation");
             getFieldGroup().bind(ruleConsideredField, "ruleConsidered");
@@ -178,7 +185,7 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         } else {
             if(oldValue != null){
                 compositeWrapper.removeComponent(grid);
-                getFieldGroup().unbind(validatedNameComboBox);
+                getFieldGroup().unbind(relatedNameComboBox);
                 getFieldGroup().unbind(citationMicroReferenceField);
                 getFieldGroup().unbind(citatonComboBox);
                 getFieldGroup().unbind(ruleConsideredField);
@@ -199,10 +206,10 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
    }
 
     /**
-     * @return the validatedNameComboBox
+     * @return the relatedNameComboBox
      */
-    public ToOneRelatedEntityCombobox<TaxonName> getValidatedNameComboBox() {
-        return validatedNameComboBox;
+    public ToOneRelatedEntityCombobox<TaxonName> getRelatedNameComboBox() {
+        return relatedNameComboBox;
     }
 
     /**

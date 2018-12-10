@@ -23,6 +23,8 @@ import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -79,7 +81,7 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNamePopupEditorView> {
 
 
-    private static final List<String> BASIONYM_INIT_STRATEGY = Arrays.asList(
+    private static final List<String> RELATED_NAME_INIT_STRATEGY = Arrays.asList(
             "$",
             "relationsFromThisName",
             "relationsToThisName.type",
@@ -105,6 +107,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     private Property.ValueChangeListener refreshSpecificEpithetComboBoxListener;
 
     private CdmFilterablePagingProvider<TaxonName, TaxonName> relatedNamePagingProvider;
+
+    private CdmFilterablePagingProvider<TaxonName, TaxonName> orthographicVariantNamePagingProvider;
+
+    private Restriction<Reference> orthographicCorrectionRestriction;
+
+    private Integer taxonNameId;
 
     /**
      * {@inheritDoc}
@@ -139,24 +147,19 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         nomReferencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
         getView().getNomReferenceCombobox().loadFrom(nomReferencePagingProvider, nomReferencePagingProvider, nomReferencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
+        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getNomReferenceCombobox(), this));
+        getView().getNomReferenceCombobox().getSelect().addValueChangeListener( e -> updateOrthographicCorrectionRestriction());
 
-        getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
 
         relatedNamePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
-        relatedNamePagingProvider.setInitStrategy(BASIONYM_INIT_STRATEGY);
+        relatedNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
+        getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         getView().getBasionymComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
 
         getView().getReplacedSynonymsComboboxSelect().setCaptionGenerator( new CdmTitleCacheCaptionGenerator<TaxonName>());
-        // reusing the basionymPagingProvider for the replaced synonyms to benefit from caching
         getView().getReplacedSynonymsComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
 
-        getView().getValidationField().getValidatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        // reusing the basionymPagingProvider for the replaced synonyms to benefit from caching
-        getView().getValidationField().getValidatedNameComboBox().loadFrom(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize());
-        getView().getValidationField().getValidatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getValidatedNameComboBox(), this));
-
-        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         CdmFilterablePagingProvider<Reference, Reference> icbnCodesPagingProvider = pagingProviderFactory.referencePagingProvider();
         icbnCodesPagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
         // @formatter:off
@@ -167,20 +170,59 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "978-3-87429-425-6", // Melbourne Code
                 "978-3-946583-16-5", // Shenzhen Code
                 "0-85301-006-4"      // ICZN 1999
-                                     // ICNB
-                }));
+                // ICNB
+        }));
         // @formatter:on
+
+        getView().getValidationField().getRelatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+        getView().getValidationField().getRelatedNameComboBox().loadFrom(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize());
+        getView().getValidationField().getRelatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getRelatedNameComboBox(), this));
         getView().getValidationField().getCitatonComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
         getView().getValidationField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getValidationField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getCitatonComboBox(), this));
+
+        getView().getOrthographicVariantField().getRelatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+        getView().getOrthographicVariantField().getRelatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getRelatedNameComboBox(), this));
+        getView().getOrthographicVariantField().getRelatedNameComboBox().loadFrom(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize());
+        // The Mode TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION will be handled in the updateOrthographicCorrectionRestriction() method
+        getView().getOrthographicVariantField().getCitatonComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+        getView().getOrthographicVariantField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
+        getView().getOrthographicVariantField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getCitatonComboBox(), this));
+
 
         getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    protected void adaptDataProviders() {
+        updateOrthographicCorrectionRestriction();
+    }
+
+    private void updateOrthographicCorrectionRestriction() {
+
+        if(getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
+            if(orthographicVariantNamePagingProvider == null){
+                orthographicVariantNamePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
+                orthographicVariantNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
+                orthographicVariantNamePagingProvider.addRestriction(new Restriction<>("id", Operator.AND_NOT, null, taxonNameId));
+                getView().getOrthographicVariantField().getRelatedNameComboBox().loadFrom(orthographicVariantNamePagingProvider, orthographicVariantNamePagingProvider, orthographicVariantNamePagingProvider.getPageSize());
+            }
+            Reference nomReference = getView().getNomReferenceCombobox().getValue();
+            if(nomReference == null && orthographicCorrectionRestriction != null){
+                orthographicVariantNamePagingProvider.getRestrictions().remove(orthographicCorrectionRestriction);
+            } else {
+                if(orthographicCorrectionRestriction == null){
+                    orthographicCorrectionRestriction = new Restriction<>("nomenclaturalReference", Operator.AND, null, nomReference);
+                    orthographicVariantNamePagingProvider.addRestriction(orthographicCorrectionRestriction);
+                } else{
+                    orthographicCorrectionRestriction.setValues(Arrays.asList(nomReference));
+                }
+            }
+            getView().getOrthographicVariantField().getRelatedNameComboBox().getSelect().refresh();
+        }
+    }
+
     @Override
     protected TaxonName loadCdmEntity(UUID identifier) {
 
@@ -255,7 +297,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         }
 
-        relatedNamePagingProvider.addRestriction(new Restriction<>("id", Operator.AND_NOT, null, Integer.valueOf(taxonName.getId())));
+        taxonNameId = Integer.valueOf(taxonName.getId());
+        relatedNamePagingProvider.addRestriction(new Restriction<>("id", Operator.AND_NOT, null, taxonNameId));
 
         return taxonName;
     }
@@ -518,12 +561,15 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
 
         if(boundPropertyId != null){
-            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
+            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")  || boundPropertyId.matches("orthographicVariant.otherName")){
                 TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
                 namePopup.withDeleteButton(true);
                 getView().getModesActive().stream()
                     .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                     .forEach(m -> namePopup.enableMode(m));
+                if(boundPropertyId.matches("orthographicVariant.otherName") && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
+                    namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+                }
                 namePopup.loadInEditor(event.getEntityUuid());
             }
         }
@@ -560,14 +606,32 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         PropertyIdPath boundPropertyId = boundPropertyIdPath(event.getTarget());
 
         if(boundPropertyId != null){
-            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms")){
+            if(boundPropertyId.matches("validationFor.otherName") || boundPropertyId.matches("basionyms") || boundPropertyId.matches("replacedSynonyms") || boundPropertyId.matches("orthographicVariant.otherName")){
                 TaxonNamePopupEditor namePopup = openPopupEditor(TaxonNamePopupEditor.class, event);
                 namePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
                 namePopup.withDeleteButton(true);
                 getView().getModesActive().stream()
                         .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                         .forEach(m -> namePopup.enableMode(m));
+                Reference nomrefPreset = null;
+                if(boundPropertyId.matches("orthographicVariant.otherName") && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
+                    namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+                    nomrefPreset = (Reference)((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter>)getView()).getBean().getNomenclaturalReference();
+                    if(nomrefPreset != null){
+                        // show warning and skip
+                        Notification.show("The nomenclatural reference needs to be set before creating a new ortographic correction is possible.", Type.HUMANIZED_MESSAGE);
+                        try {
+                            namePopup.destroy();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        return;
+                    }
+                }
                 namePopup.loadInEditor(null);
+                if(nomrefPreset != null){
+                    namePopup.getNomReferenceCombobox().setValue(nomrefPreset);
+                }
             }
         }
     }

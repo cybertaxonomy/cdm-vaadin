@@ -52,6 +52,35 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
     protected abstract DTO loadBeanById(Object identifier);
 
     /**
+     * Called by the view once the bean has been loaded bound to the fieldGroups and
+     * and the form elements are ready for editing. This is exactly after
+     * {@link AbstractPopupEditor#afterItemDataSourceSet()} has been called.
+     * <p>
+     * In this method the editor presenter can adapt the fields according to permissions,
+     * editor modes etc.
+     *
+     * @param beanToEdit
+     */
+    protected final void onViewFormReady(DTO beanToEdit) {
+        adaptDataProviders();
+        adaptToUserPermission(beanToEdit);
+    }
+
+    /**
+     * This method allows the presenter setup data providers, data sources or to adjust them
+     * by applying filters. These for example can be data providers for autosuggest comboboxes,
+     * etc.
+     * <p>
+     * The bean loaded into the editor is explicitly not passed to this method since the Methods called from within this
+     * method will often also be used as callbacks for form element value change events. Form elements can be
+     * buffered in which case the bean is only updated after the field group has been comitted. The value as edited in the
+     * form needs to be retrieved from the form elements directly.
+     */
+    protected void adaptDataProviders() {
+
+    }
+
+    /**
      * Set ui elements to readonly or disabled to adapt the editor to
      * the permissions that are given to the current user etc.
      *
