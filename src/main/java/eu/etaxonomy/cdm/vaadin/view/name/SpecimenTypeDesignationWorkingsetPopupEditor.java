@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.ElementCollectionField;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.validator.DoubleRangeValidator;
+import com.vaadin.server.ErrorMessage;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
@@ -83,6 +85,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
     private GeoLocationField exactLocationField;
+
+    private Panel typeDesignationsScrollPanel;
 
     /**
      * @return the countrySelectField
@@ -183,33 +187,52 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         row++;
 
         // FIXME: can we use the Grid instead?
-        typeDesignationsCollectionField = new ElementCollectionField<>(
+        typeDesignationsCollectionField = new ElementCollectionField<SpecimenTypeDesignationDTO>(
                 SpecimenTypeDesignationDTO.class,
                 SpecimenTypeDesignationDTORow.class
-                );
+                ){
+
+                    @Override
+                    public void commit() throws SourceException, InvalidValueException {
+                        validate(); // validate always so that empty rows are recognized
+                        super.commit();
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        Collection value = getValue();
+                        return value == null || value.isEmpty() ;
+                    }
+
+                    @Override
+                    public void setComponentError(ErrorMessage componentError) {
+                        typeDesignationsScrollPanel.setComponentError(componentError);
+                    }
+
+        };
         typeDesignationsCollectionField.withCaption("Types");
         typeDesignationsCollectionField.getLayout().setSpacing(false);
         typeDesignationsCollectionField.getLayout().setColumns(3);
-
+        typeDesignationsCollectionField.setRequired(true); // only works with the above overwritten commit()
+        typeDesignationsCollectionField.setRequiredError(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
         typeDesignationsCollectionField.setVisibleProperties(SpecimenTypeDesignationDTORow.visibleFields());
 
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
         typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
-        typeDesignationsCollectionField.addElementAddedListener( e -> updateAllowSave());
-        typeDesignationsCollectionField.addElementRemovedListener( e -> updateAllowSave());
+        typeDesignationsCollectionField.addElementAddedListener( e -> typeDesignationsCollectionField.setComponentError(null));
 
         // typeDesignationsCollectionField.getLayout().setMargin(false);
         // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
         // addField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs", 0, row, 2, row);
 
-        Panel scrollPanel = new Panel(typeDesignationsCollectionField.getLayout());
-        scrollPanel.setCaption("Types");
-        scrollPanel.setWidth(800, Unit.PIXELS);
+        typeDesignationsScrollPanel = new Panel(typeDesignationsCollectionField.getLayout());
+        typeDesignationsScrollPanel.setCaption("Types");
+        typeDesignationsScrollPanel.setWidth(800, Unit.PIXELS);
 
         bindField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs");
-        addComponent(scrollPanel, 0, row, 2, row);
+        addComponent(typeDesignationsScrollPanel, 0, row, 2, row);
 
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
@@ -303,7 +326,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
         updateAllowDelete();
-        updateAllowSave();
     }
 
     /**
@@ -320,16 +342,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         }
     }
 
-    public void updateAllowSave(){
-        boolean hasTypeDesignations = getBean().getSpecimenTypeDesignationDTOs().size() > 0;
-        setSaveButtonEnabled(hasTypeDesignations);
-        if(!hasTypeDesignations){
-            addStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
-        } else {
-            removeStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
-        }
-
-    }
 
     /**
      * {@inheritDoc}
