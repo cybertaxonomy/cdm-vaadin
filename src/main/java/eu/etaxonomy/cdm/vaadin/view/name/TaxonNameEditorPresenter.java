@@ -23,8 +23,6 @@ import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification.Type;
 
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -613,25 +611,20 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 getView().getModesActive().stream()
                         .filter(m -> !TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY.equals(m))
                         .forEach(m -> namePopup.enableMode(m));
-                Reference nomrefPreset = null;
                 if(boundPropertyId.matches("orthographicVariant.otherName") && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
                     namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-                    nomrefPreset = (Reference)((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter>)getView()).getBean().getNomenclaturalReference();
-                    if(nomrefPreset != null){
-                        // show warning and skip
-                        Notification.show("The nomenclatural reference needs to be set before creating a new ortographic correction is possible.", Type.HUMANIZED_MESSAGE);
-                        try {
-                            namePopup.destroy();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
+                    Reference nomrefPreset = (Reference)((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter>)getView()).getBean().getNomenclaturalReference();
+                    namePopup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
+
+                        @Override
+                        public TaxonName createNewBean() {
+                            TaxonName newTaxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
+                            newTaxonName.setNomenclaturalReference(getRepo().getReferenceService().load(nomrefPreset.getUuid(), TaxonNameEditorPresenter.REFERENCE_INIT_STRATEGY ));
+                            return newTaxonName;
                         }
-                        return;
-                    }
+                    });
                 }
                 namePopup.loadInEditor(null);
-                if(nomrefPreset != null){
-                    namePopup.getNomReferenceCombobox().setValue(nomrefPreset);
-                }
             }
         }
     }
