@@ -141,6 +141,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private int genusOrUninomialRow;
 
+    private OrthographicCorrectionReferenceValidator orthographicCorrectionValidator;
+
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
      *
@@ -832,11 +834,15 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         exCombinationAuthorshipField.setVisible(withValidationSection && isInferredExCombinationAuthorship != null && !isInferredExCombinationAuthorship);
 
         orthographicVariantField.setVisible(withOrthographicCorrectionSection);
-
-//        if(taxonName != null){
-//            if(modesActive.contains(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
-//            }
-//        }
+        if(withOrthographicCorrectionSection){
+            orthographicCorrectionValidator = new OrthographicCorrectionReferenceValidator(nomReferenceCombobox);
+            orthographicVariantField.addValidator(orthographicCorrectionValidator);
+        } else {
+            if(orthographicCorrectionValidator  != null){
+                orthographicVariantField.removeValidator(orthographicCorrectionValidator);
+                orthographicVariantField = null;
+            }
+        }
 
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         specificEpithetField.setVisible(isSpeciesOrBelow);
