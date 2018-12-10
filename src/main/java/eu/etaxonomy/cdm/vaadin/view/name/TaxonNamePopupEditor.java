@@ -820,9 +820,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             orthographicVariantToggle.setCaption("Orthographic variant");
         }
 
+        genusOrUninomialField.setRequired(true);
         specificEpithetField.setVisible(isSpeciesOrBelow);
+        specificEpithetField.setRequired(isSpeciesOrBelow);
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
+        infraSpecificEpithetField.setRequired(rank.isInfraSpecific());
         infraGenericEpithetField.setVisible(rank.isInfraGeneric());
+        infraGenericEpithetField.setRequired(rank.isInfraGeneric());
 
         basionymsComboboxSelect.setVisible(withBasionymSection);
 
