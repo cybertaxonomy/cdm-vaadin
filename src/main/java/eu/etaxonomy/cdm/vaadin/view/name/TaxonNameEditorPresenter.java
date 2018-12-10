@@ -485,7 +485,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getView().updateAuthorshipFields();
                     }
                 } else
-                if(boundTargetField.matchesPropertyIdPath("validationFor.otherName")){
+                if(boundTargetField.matchesPropertyIdPath("validationFor.otherName") || boundTargetField.matchesPropertyIdPath("orthographicVariant.otherName")){
                     ReloadableLazyComboBox<TaxonName> otherNameField = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
