@@ -812,7 +812,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         if(isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
             orthographicVariantField.setCaption("Orthographic correction");
-            orthographicVariantField.getRelatedNameComboBox().setCaption("Corrected name");
+            orthographicVariantField.getRelatedNameComboBox().setCaption("Incorrect name");
             orthographicVariantToggle.setCaption("Orthographic correction");
         } else {
             orthographicVariantField.setCaption("Orthographic variant");
