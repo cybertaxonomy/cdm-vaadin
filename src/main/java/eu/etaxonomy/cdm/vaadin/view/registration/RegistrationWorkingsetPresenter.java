@@ -249,6 +249,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         RegistrationStatus.class,
                         availableStatus.toArray(new RegistrationStatus[availableStatus.size()]))
                         );
+                select.setValue(regDto.getStatus());
                 select.addValueChangeListener(e -> saveRegistrationStatusChange(regDto.getUuid(), e.getProperty().getValue()));
                 select.setEnabled(canChangeStatus);
                 select.setNullSelectionAllowed(false);

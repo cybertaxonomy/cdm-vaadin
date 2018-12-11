@@ -31,7 +31,6 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -437,9 +436,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         Component statusComponent;
         if(statusFieldInstantiator != null){
-            AbstractField<Object> statusField = statusFieldInstantiator.create(dto);
-            statusField.setValue(dto.getStatus());
-            statusComponent = statusField;
+            statusComponent = statusFieldInstantiator.create(dto);
         } else {
             statusComponent = new RegistrationStatusLabel().update(dto.getStatus());
         }
