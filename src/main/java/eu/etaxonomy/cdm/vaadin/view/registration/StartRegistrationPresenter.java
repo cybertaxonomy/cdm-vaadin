@@ -25,6 +25,8 @@ import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
@@ -74,6 +76,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
         CdmFilterablePagingProvider<Reference, Reference> pagingProvider = pagingProviderFactory.referencePagingProvider();
         CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
+        pagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
