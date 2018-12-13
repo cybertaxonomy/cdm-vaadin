@@ -149,7 +149,7 @@ public class ReferenceLabelProvider implements ComboboxLabelProvider<Reference> 
 
         if(entity.getInReference() != null){
             EllipsisData inRefEd = ellypsis(entity.getInReference(), filterString);
-            label = label.replaceFirst(inRefEd.original, inRefEd.truncated);
+            label = label.replace(inRefEd.original, inRefEd.truncated);
         }
 
         EllipsisData ed = new EllipsisData(titleCache, label);
