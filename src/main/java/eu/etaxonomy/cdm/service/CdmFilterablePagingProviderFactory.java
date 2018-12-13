@@ -51,7 +51,7 @@ public class CdmFilterablePagingProviderFactory {
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
         TypifiedEntityFilterablePagingProvider<Reference> pagingProvider = new TypifiedEntityFilterablePagingProvider<Reference>(
-                repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints, labelProvider);
+                repo.getReferenceService(), MatchMode.BEGINNING, referenceOrderHints, labelProvider);
         pagingProvider.setInitStrategy(initStrategy);
 
         return pagingProvider;

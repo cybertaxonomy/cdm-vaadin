@@ -24,14 +24,17 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 
@@ -52,6 +55,8 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
             + "To start a new registration process, please choose an existing one or create a new publication.";
 
     private LazyComboBox<TypedEntityReference<Reference>> referenceCombobox;
+
+    private OptionGroup searchModeOptions = new OptionGroup("Search mode");
 
     private Button newPublicationButton;
 
@@ -104,6 +109,12 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
             continueButton.setEnabled(isValueSelected);
         });
 
+        searchModeOptions.addItems(MatchMode.BEGINNING, MatchMode.ANYWHERE);
+        searchModeOptions.setValue(MatchMode.BEGINNING);
+        searchModeOptions.addStyleName(ValoTheme.OPTIONGROUP_HORIZONTAL);
+        searchModeOptions.addStyleName(EditValoTheme.OPTIONGROUP_CAPTION_FIX);
+        searchModeOptions.addValueChangeListener(e -> getPresenter().updateReferenceSearchMode((MatchMode)e.getProperty().getValue()));
+
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
                 new ReferenceEditorAction(EditorActionType.ADD, newPublicationButton, null, this)
@@ -128,7 +139,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         labelLeft.setWidth(ELEMENT_WIDTH);
         labelRight.setWidth(ELEMENT_WIDTH);
 
-        CssLayout leftContainer = new CssLayout(labelLeft, referenceCombobox);
+        CssLayout leftContainer = new CssLayout(labelLeft, referenceCombobox, searchModeOptions);
         CssLayout rightContainer = new CssLayout(labelRight, newPublicationButton, removeNewPublicationButton, newPublicationLabel);
         leftContainer.setWidth(ELEMENT_WIDTH);
         rightContainer.setWidth(ELEMENT_WIDTH);

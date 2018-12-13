@@ -222,6 +222,10 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     .v-panel-padding-left .v-panel-content {
         padding-left: round($v-unit-size / 4);
     }
+    
+     .v-select-optiongroup-optiongroup-caption-fix {
+        margin-left: round($v-unit-size / 4);
+     }
 
     // ===== workflow ==== // 
     

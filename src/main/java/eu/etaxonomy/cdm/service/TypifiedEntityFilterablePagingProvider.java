@@ -82,4 +82,8 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         entityPagingProvider.setInitStrategy(initStrategy);
     }
 
+    public void setMatchMode(MatchMode matchMode){
+        entityPagingProvider.setMatchMode(matchMode);
+    }
+
 }

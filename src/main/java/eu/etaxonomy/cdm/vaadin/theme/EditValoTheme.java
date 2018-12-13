@@ -21,4 +21,6 @@ public class EditValoTheme extends ValoTheme {
 
     public static final String PANEL_CONTENT_PADDING_LEFT = "padding-left";
 
+    public static final String OPTIONGROUP_CAPTION_FIX = "optiongroup-caption-fix";
+
 }

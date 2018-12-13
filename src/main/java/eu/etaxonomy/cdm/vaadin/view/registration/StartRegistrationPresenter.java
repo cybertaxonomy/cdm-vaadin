@@ -28,6 +28,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.ReferenceLabelProvider;
@@ -62,6 +63,8 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @Autowired
     protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
+    private TypifiedEntityFilterablePagingProvider<Reference> referencePagingProvider;
+
     public StartRegistrationPresenter (){
         super();
     }
@@ -75,15 +78,25 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
         super.handleViewEntered();
 
-        TypifiedEntityFilterablePagingProvider<Reference> pagingProvider =
-                pagingProviderFactory.referenceEntityReferencePagingProvider(
-                        new ReferenceLabelProvider(ReferenceLabelProvider.LabelType.BIBLIOGRAPHIC),
-                        ReferenceLabelProvider.INIT_STRATEGY
-                        );
+        referencePagingProvider = pagingProviderFactory.referenceEntityReferencePagingProvider(
+                new ReferenceLabelProvider(ReferenceLabelProvider.LabelType.BIBLIOGRAPHIC),
+                ReferenceLabelProvider.INIT_STRATEGY
+                );
         TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
-        pagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
+        referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
-        getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+        getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    public void updateReferenceSearchMode(MatchMode value) {
+        if(referencePagingProvider != null && value != null){
+            referencePagingProvider.setMatchMode(value);
+            getView().getReferenceCombobox().refresh();
+        }
     }
 
     /**
