@@ -39,9 +39,22 @@ public class CdmFilterablePagingProviderFactory {
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
-        CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
+        CdmFilterablePagingProvider<Reference,Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
+                repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
 
-        return referencePagingProvider;
+        return pagingProvider;
+    }
+
+    public TypifiedEntityFilterablePagingProvider<Reference> referenceEntityReferencePagingProvider(ReferenceLabelProvider labelProvider, List<String> initStrategy){
+        List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
+        referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
+        referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
+        referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
+        TypifiedEntityFilterablePagingProvider<Reference> pagingProvider = new TypifiedEntityFilterablePagingProvider<Reference>(
+                repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints, labelProvider);
+        pagingProvider.setInitStrategy(initStrategy);
+
+        return pagingProvider;
     }
 
 

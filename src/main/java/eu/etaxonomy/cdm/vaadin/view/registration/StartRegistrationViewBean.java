@@ -17,8 +17,10 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -26,6 +28,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -48,7 +51,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
     public static final String SUBHEADER_DEEFAULT = "Any valid nomenclatural act can only be etablished in a publication. "
             + "To start a new registration process, please choose an existing one or create a new publication.";
 
-    private LazyComboBox<Reference> referenceCombobox;
+    private LazyComboBox<TypedEntityReference<Reference>> referenceCombobox;
 
     private Button newPublicationButton;
 
@@ -80,7 +83,20 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         HorizontalLayout publicationLayout = new HorizontalLayout();
         publicationLayout.setSpacing(true);
 
-        referenceCombobox = new LazyComboBox<Reference>(Reference.class);
+        Class<TypedEntityReference<Reference>> type = (Class<TypedEntityReference<Reference>>) new TypedEntityReference<Reference>(Reference.class, null).getClass();
+        referenceCombobox = new LazyComboBox<TypedEntityReference<Reference>>(type) {
+
+            @Override
+            protected void setSelectInstance(AbstractSelect select) {
+                if(select instanceof ComboBox){
+                    ComboBox combobox = (ComboBox)select;
+                    // uncomment the below line to set a defined width for the ComboBox popup
+                    // combobox.setPopupWidth("200%");
+                }
+                super.setSelectInstance(select);
+            }
+
+        };
         referenceCombobox.setWidth(ELEMENT_WIDTH);
         referenceCombobox.setBuffered(false);
         referenceCombobox.addValueChangeListener( e -> {
@@ -102,7 +118,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, referenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, null, this)
                 ));
 
         removeNewPublicationButton.setVisible(false);
@@ -200,7 +216,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
      * @return the referenceCombobox
      */
     @Override
-    public LazyComboBox<Reference> getReferenceCombobox() {
+    public LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox() {
         return referenceCombobox;
     }
 

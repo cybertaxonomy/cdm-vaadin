@@ -28,13 +28,14 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
+import eu.etaxonomy.cdm.service.ReferenceLabelProvider;
+import eu.etaxonomy.cdm.service.TypifiedEntityFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -74,8 +75,12 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
         super.handleViewEntered();
 
-        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = pagingProviderFactory.referencePagingProvider();
-        CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
+        TypifiedEntityFilterablePagingProvider<Reference> pagingProvider =
+                pagingProviderFactory.referenceEntityReferencePagingProvider(
+                        new ReferenceLabelProvider(ReferenceLabelProvider.LabelType.BIBLIOGRAPHIC),
+                        ReferenceLabelProvider.INIT_STRATEGY
+                        );
+        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
         pagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
@@ -173,7 +178,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
 
         UUID referenceUuid = null;
-        LazyComboBox<Reference> referenceCombobox = getView().getReferenceCombobox();
+        LazyComboBox<TypedEntityReference<Reference>> referenceCombobox = getView().getReferenceCombobox();
         referenceCombobox.commit();
         if(newReference != null){
             referenceUuid = newReference.getUuid();
