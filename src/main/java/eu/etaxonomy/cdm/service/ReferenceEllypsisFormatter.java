@@ -10,8 +10,6 @@ package eu.etaxonomy.cdm.service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -48,12 +46,10 @@ import eu.etaxonomy.cdm.model.reference.Reference;
  * @since Dec 12, 2018
  *
  */
-public class ReferenceLabelProvider implements ComboboxLabelProvider<Reference> {
-
-    private static final String DELIM = " ";
+public class ReferenceEllypsisFormatter extends AbstractEllypsisFormatter<Reference> {
 
     /**
-     * This init strategy should be used when the ReferenceLabelProvider is being used
+     * This init strategy should be used when the ReferenceEllypsisFormatter is being used
      * outside of a hibernate session
      */
     public static List<String> INIT_STRATEGY = Arrays.asList(
@@ -70,24 +66,10 @@ public class ReferenceLabelProvider implements ComboboxLabelProvider<Reference> 
     private LabelType labelType;
     private int maxAuthorCharsVisible = 20;
     private int maxTitleCharsVisible = 20;
+    private int minNumOfWords = 1;
 
-    private String MORE = "\u2026"; // 'HORIZONTAL ELLIPSIS' (U+2026)
-
-    public ReferenceLabelProvider(LabelType labelType){
+    public ReferenceEllypsisFormatter(LabelType labelType){
         this.labelType = labelType;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String composeLabel(Reference entity, String filterString) {
-
-
-        EllipsisData ed = ellypsis(entity, filterString);
-        String label = ed.truncated;
-
-        return label;
     }
 
     /**
@@ -95,7 +77,8 @@ public class ReferenceLabelProvider implements ComboboxLabelProvider<Reference> 
      * @param filterString
      * @return
      */
-    public EllipsisData ellypsis(Reference entity, String filterString) {
+    @Override
+    protected EllipsisData entityEllypsis(Reference entity, String filterString) {
 
         String label = "";
         String authors = entity.getAuthorship() != null ? entity.getAuthorship().getTitleCache() : "";
@@ -131,84 +114,55 @@ public class ReferenceLabelProvider implements ComboboxLabelProvider<Reference> 
         if(authors != null){
             String authorsEllipsed = authors;
             if(authorsEllipsed.length() > maxAuthorCharsVisible) {
-                authorsEllipsed = applyEllipsis(authors, maxAuthorCharsVisible);
-                authorsEllipsed = preserveFilterstring(filterString, authors, pattern, authorsEllipsed);
+                authorsEllipsed = stringEllypsis(authors, maxAuthorCharsVisible, minNumOfWords);
+                authorsEllipsed = preserveString(filterString, authors, pattern, authorsEllipsed);
             }
             label = titleCache.replace(authors, authorsEllipsed);
         }
 
-
         if(title != null){
             String titleEllipsed = title;
             if(titleEllipsed.length() > maxTitleCharsVisible) {
-                titleEllipsed = applyEllipsis(title, maxTitleCharsVisible);
-                titleEllipsed = preserveFilterstring(filterString, title, pattern, titleEllipsed);
+                titleEllipsed = stringEllypsis(title, maxTitleCharsVisible, minNumOfWords);
+                titleEllipsed = preserveString(filterString, title, pattern, titleEllipsed);
             }
             label = label.replace(title, titleEllipsed);
         }
 
+
         if(entity.getInReference() != null){
-            EllipsisData inRefEd = ellypsis(entity.getInReference(), filterString);
+            EllipsisData inRefEd = entityEllypsis(entity.getInReference(), filterString);
             label = label.replace(inRefEd.original, inRefEd.truncated);
         }
 
         EllipsisData ed = new EllipsisData(titleCache, label);
 
-
         return ed;
     }
 
-    /**
-     * @param authors
-     * @return
-     */
-    public String applyEllipsis(String text, int maxCharsVisible) {
-        String ellipsedText = "";
-        StringTokenizer tokenizer = new StringTokenizer(text, DELIM);
-        while(tokenizer.hasMoreElements()){
-            String token = tokenizer.nextToken();
-            if(ellipsedText.length() + token.length() + DELIM.length() <= maxCharsVisible){
-                ellipsedText = ellipsedText + (ellipsedText.isEmpty() ? "" : DELIM) + token;
-            } else {
-                break;
-            }
-        }
-        return ellipsedText + MORE;
+    public int getMaxAuthorCharsVisible() {
+        return maxAuthorCharsVisible;
     }
 
-    /**
-     * @param filterString
-     * @param authors
-     * @param pattern
-     * @param authorsEllipsed
-     * @return
-     */
-    public String preserveFilterstring(String filterString, String text, Pattern pattern, String textEllipsed) {
-        String matchingSubstring = null;
-        if(!filterString.isEmpty()){
-            Matcher m = pattern.matcher(text);
-            if(m.find()){
-                matchingSubstring = m.group(1);
-            }
-        }
-        if(matchingSubstring != null && !textEllipsed.toLowerCase().contains(filterString)){
-            textEllipsed += matchingSubstring + MORE;
-        }
-        return textEllipsed;
+    public void setMaxAuthorCharsVisible(int maxAuthorCharsVisible) {
+        this.maxAuthorCharsVisible = maxAuthorCharsVisible;
     }
 
-    class EllipsisData {
-        String original;
-        String truncated;
-        /**
-         * @param original
-         * @param truncated
-         */
-        public EllipsisData(String original, String truncated) {
-            super();
-            this.original = original;
-            this.truncated = truncated;
-        }
+    public int getMaxTitleCharsVisible() {
+        return maxTitleCharsVisible;
     }
+
+    public void setMaxTitleCharsVisible(int maxTitleCharsVisible) {
+        this.maxTitleCharsVisible = maxTitleCharsVisible;
+    }
+
+    public int getMinNumOfWords() {
+        return minNumOfWords;
+    }
+
+    public void setMinNumOfWords(int minNumOfWords) {
+        this.minNumOfWords = minNumOfWords;
+    }
+
 
 }

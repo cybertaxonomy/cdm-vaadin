@@ -15,8 +15,8 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
  * @since Dec 12, 2018
  *
  */
-public interface ComboboxLabelProvider<T extends CdmBase> {
+public interface EllypsisFormatter<T extends CdmBase> {
 
-    public String composeLabel(T entity, String filterString);
+    public String ellypsis(T entity, String filterString);
 
 }

@@ -30,9 +30,9 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
 
     private CdmFilterablePagingProvider<T, T> entityPagingProvider;
 
-    private ComboboxLabelProvider<T> labelProvider;
+    private EllypsisFormatter<T> labelProvider;
 
-    public TypifiedEntityFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, ComboboxLabelProvider<T> labelProvider){
+    public TypifiedEntityFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, EllypsisFormatter<T> labelProvider){
         this.labelProvider = labelProvider;
         entityPagingProvider = new CdmFilterablePagingProvider<T, T>(service, matchMode, orderHints);
     }
@@ -54,7 +54,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         List<TypedEntityReference<T>> ters = new ArrayList<>(entities.size());
         for(T e : entities){
             Class<T> type = (Class<T>)e.getClass();
-            String label = labelProvider.composeLabel(e, filter);
+            String label = labelProvider.ellypsis(e, filter);
             TypedEntityReference<T> ter = new TypedEntityReference<T>(type, e.getUuid(), label);
             ters.add(ter);
         }

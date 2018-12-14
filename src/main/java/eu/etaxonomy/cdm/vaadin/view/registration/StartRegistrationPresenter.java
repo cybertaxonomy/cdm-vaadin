@@ -31,7 +31,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
-import eu.etaxonomy.cdm.service.ReferenceLabelProvider;
+import eu.etaxonomy.cdm.service.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.service.TypifiedEntityFilterablePagingProvider;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -79,8 +79,8 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super.handleViewEntered();
 
         referencePagingProvider = pagingProviderFactory.referenceEntityReferencePagingProvider(
-                new ReferenceLabelProvider(ReferenceLabelProvider.LabelType.BIBLIOGRAPHIC),
-                ReferenceLabelProvider.INIT_STRATEGY
+                new ReferenceEllypsisFormatter(ReferenceEllypsisFormatter.LabelType.BIBLIOGRAPHIC),
+                ReferenceEllypsisFormatter.INIT_STRATEGY
                 );
         TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
         referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));

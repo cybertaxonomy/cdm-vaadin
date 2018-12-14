@@ -45,7 +45,7 @@ public class CdmFilterablePagingProviderFactory {
         return pagingProvider;
     }
 
-    public TypifiedEntityFilterablePagingProvider<Reference> referenceEntityReferencePagingProvider(ReferenceLabelProvider labelProvider, List<String> initStrategy){
+    public TypifiedEntityFilterablePagingProvider<Reference> referenceEntityReferencePagingProvider(ReferenceEllypsisFormatter labelProvider, List<String> initStrategy){
         List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
