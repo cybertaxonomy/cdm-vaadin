@@ -109,7 +109,10 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
             continueButton.setEnabled(isValueSelected);
         });
 
-        searchModeOptions.addItems(MatchMode.BEGINNING, MatchMode.ANYWHERE);
+        searchModeOptions.addItem(MatchMode.BEGINNING);
+        searchModeOptions.setItemCaption(MatchMode.BEGINNING, "Begins with");
+        searchModeOptions.addItem(MatchMode.ANYWHERE);
+        searchModeOptions.setItemCaption(MatchMode.ANYWHERE, "Contains");
         searchModeOptions.setValue(MatchMode.BEGINNING);
         searchModeOptions.addStyleName(ValoTheme.OPTIONGROUP_HORIZONTAL);
         searchModeOptions.addStyleName(EditValoTheme.OPTIONGROUP_CAPTION_FIX);
