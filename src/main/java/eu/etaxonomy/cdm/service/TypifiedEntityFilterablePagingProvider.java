@@ -15,6 +15,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
+import eu.etaxonomy.cdm.format.EllypsisFormatter;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
