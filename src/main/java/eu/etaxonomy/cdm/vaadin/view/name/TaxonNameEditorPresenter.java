@@ -567,6 +567,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     .forEach(m -> namePopup.enableMode(m));
                 if(boundPropertyId.matches("orthographicVariant.otherName") && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
                     namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+                    namePopup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
+                    namePopup.getOrthographicVariantToggle().setVisible(false);
                 }
                 namePopup.loadInEditor(event.getEntityUuid());
             }
@@ -613,6 +615,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         .forEach(m -> namePopup.enableMode(m));
                 if(boundPropertyId.matches("orthographicVariant.otherName") && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
                     namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+                    namePopup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
                     Reference nomrefPreset = (Reference)((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter>)getView()).getBean().getNomenclaturalReference();
                     namePopup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
 
@@ -623,6 +626,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                             return newTaxonName;
                         }
                     });
+                    namePopup.getOrthographicVariantToggle().setVisible(false);
                 }
                 namePopup.loadInEditor(null);
             }

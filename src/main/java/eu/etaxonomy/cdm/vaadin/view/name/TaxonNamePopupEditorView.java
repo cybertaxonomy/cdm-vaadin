@@ -118,5 +118,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
 
     public NameRelationField getOrthographicVariantField();
 
+    CheckBox getOrthographicVariantToggle();
+
 
 }

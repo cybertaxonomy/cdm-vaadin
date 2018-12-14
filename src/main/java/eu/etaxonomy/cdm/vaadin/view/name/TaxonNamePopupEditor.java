@@ -1037,5 +1037,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         return infraSpecificEpithetField;
     }
 
+    @Override
+    public CheckBox getOrthographicVariantToggle() {
+        return orthographicVariantToggle;
+    }
+
 
 }
