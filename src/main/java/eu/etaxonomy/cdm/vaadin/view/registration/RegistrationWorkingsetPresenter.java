@@ -66,6 +66,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -120,6 +121,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private IRegistrationMessageService messageService;
+
+    @Autowired
+    private CdmFilterablePagingProviderFactory pagingProviderFactory;
+
 
     /**
      * @return the regWorkingSetService
@@ -271,21 +276,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // updateMessages(); // disabled see  #7908
     }
 
-    /**
-     *
-     */
     protected void activateComboboxes() {
-        CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
-                getRepo().getNameService());
-        pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
         getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
+        CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
-    /**
-     *
-     */
     protected void updateMessages() {
         User user = UserHelperAccess.userHelper().user();
         for (UUID registrationUuid : getView().getRegistrationItemMap().keySet()) {

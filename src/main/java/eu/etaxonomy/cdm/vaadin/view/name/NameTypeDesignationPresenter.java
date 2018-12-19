@@ -154,7 +154,7 @@ public class NameTypeDesignationPresenter
         getView().getCitationCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
         getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getCitationCombobox(), this));
 
-        CdmFilterablePagingProvider<TaxonName,TaxonName> namePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
+        CdmFilterablePagingProvider<TaxonName,TaxonName> namePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         getView().getTypeNameField().loadFrom(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
         getView().getTypeNameField().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(getView().getTypeNameField()));
         getView().getTypeNameField().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getTypeNameField(), this));

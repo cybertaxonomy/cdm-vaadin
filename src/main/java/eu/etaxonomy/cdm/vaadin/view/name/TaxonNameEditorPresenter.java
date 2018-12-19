@@ -150,7 +150,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener( e -> updateOrthographicCorrectionRestriction());
 
 
-        relatedNamePagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(getRepo().getNameService());
+        relatedNamePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         relatedNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
         getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         getView().getBasionymComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
@@ -449,7 +449,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                             } else {
                                 weaklyRelatedEntityCombobox.reload();
                             }
-                            // NOTE: in constrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
                         }
@@ -467,7 +467,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                             } else {
                                 weaklyRelatedEntityCombobox.reload();
                             }
-                            // NOTE: in constrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
                         }
@@ -487,13 +487,15 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 } else
                 if(boundTargetField.matchesPropertyIdPath("validationFor.otherName") || boundTargetField.matchesPropertyIdPath("orthographicVariant.otherName")){
                     ReloadableLazyComboBox<TaxonName> otherNameField = asReloadableLazyComboBox(boundTargetField.getField(TaxonName.class));
+                    TaxonName otherName = (TaxonName) event.getEntity();
                     if(event.isCreateOrModifiedType()){
-                        getCache().load(event.getEntity());
+                        getCache().load(otherName);
                         if(event.isCreatedType()){
-                            otherNameField.setValue((TaxonName) event.getEntity());
+                            otherNameField.setValue(otherName);
                         } else {
                             otherNameField.reload();
                         }
+
                     } else
                     if(event.isRemovedType()){
                         otherNameField.setValue(null);
