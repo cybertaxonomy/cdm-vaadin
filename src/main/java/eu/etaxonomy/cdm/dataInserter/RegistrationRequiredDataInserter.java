@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
 import eu.etaxonomy.cdm.model.common.Group;
-import eu.etaxonomy.cdm.model.common.MarkerType;
 import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
@@ -49,7 +48,6 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationMarkerTypes;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 
 ///*
@@ -190,12 +188,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             if(!termInVocab.contains(t)){
                 kindOfUnitVocabulary.addTerm((DefinedTerm)t);
             }
-        }
-
-        DefinedTermBase incorrectName = repo.getTermService().find(RegistrationMarkerTypes.INCORRECT_NAME().getUuid());
-        if(incorrectName == null){
-            incorrectName = repo.getTermService().save(RegistrationMarkerTypes.INCORRECT_NAME());
-            MarkerType.COMPLETE().getVocabulary().addTerm((MarkerType) incorrectName);
         }
 
         repo.commitTransaction(txStatus);
