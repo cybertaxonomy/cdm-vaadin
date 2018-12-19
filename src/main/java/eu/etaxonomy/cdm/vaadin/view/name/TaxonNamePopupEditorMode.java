@@ -48,7 +48,10 @@ public enum TaxonNamePopupEditorMode {
      * The name relation type {@link eu.etaxonomy.cdm.model.name.NameRelationshipType#ORTHOGRAPHIC_VARIANT} will be treated more
      * strictly if this mode is activated. The related name must have the same nomenclatural reference as the name being edited.
      * see https://dev.e-taxonomy.eu/redmine/issues/7899 for more details.
+     *
+     * @deprecated see https://dev.e-taxonomy.eu/redmine/issues/7961
      */
+    @Deprecated
     ORTHOGRAPHIC_CORRECTION,
 
 }
