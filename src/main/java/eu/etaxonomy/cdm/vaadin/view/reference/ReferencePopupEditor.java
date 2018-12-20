@@ -41,6 +41,7 @@ import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
+import eu.etaxonomy.cdm.vaadin.data.validator.InReferenceTypeValidator;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -291,6 +292,14 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         registerAdvancedModeComponents(authorshipField.getCachFields());
         setAdvancedMode(false);
 
+    }
+
+
+
+    @Override
+    protected void afterItemDataSourceSet() {
+        super.afterItemDataSourceSet();
+        inReferenceCombobox.getSelect().addValidator(new InReferenceTypeValidator(typeSelect));
     }
 
     /**

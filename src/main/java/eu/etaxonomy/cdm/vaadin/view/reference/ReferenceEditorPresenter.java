@@ -30,6 +30,8 @@ import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -61,6 +63,10 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
     ReferencePopupEditor inReferencePopup = null;
 
+    CdmFilterablePagingProvider<Reference, Reference> inReferencePagingProvider;
+
+    Restriction<UUID> includeCurrentInReference;
+
     public ReferenceEditorPresenter() {
 
     }
@@ -73,6 +79,8 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     public void handleViewEntered() {
         super.handleViewEntered();
 
+
+        updateInReferencePageProvider();
         getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new CaptionGenerator<Reference>(){
 
             @Override
@@ -106,8 +114,29 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
     @Override
     protected void adaptDataProviders() {
-        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = pagingProviderFactory.inRereferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue());
-        getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
+//        updateInReferencePageProvider();
+//        getView().getInReferenceCombobox().addValueChangeListener(e -> updateInReferencePageProvider());
+    }
+
+
+    /**
+     * @param inReferencePagingProvider
+     */
+    public void updateInReferencePageProvider() {
+
+        inReferencePagingProvider = pagingProviderFactory.inReferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue());
+        Reference inReference = getView().getInReferenceCombobox().getValue();
+        if(inReference != null){
+            if(includeCurrentInReference == null){
+                includeCurrentInReference = new Restriction<UUID>("uuid", Operator.OR, null, inReference.getUuid());
+            }
+            inReferencePagingProvider.addRestriction(includeCurrentInReference);
+        } else {
+            inReferencePagingProvider.getRestrictions().remove(includeCurrentInReference);
+            includeCurrentInReference = null;
+        }
+        getView().getInReferenceCombobox().reload();
+        getView().getInReferenceCombobox().loadFrom(inReferencePagingProvider, inReferencePagingProvider, inReferencePagingProvider.getPageSize());
     }
 
 

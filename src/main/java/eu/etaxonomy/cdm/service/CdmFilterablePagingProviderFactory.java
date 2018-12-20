@@ -43,10 +43,10 @@ public class CdmFilterablePagingProviderFactory {
 
 
     public CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider(){
-        return inRereferencePagingProvider(null);
+        return inReferencePagingProvider(null);
     }
 
-    public CdmFilterablePagingProvider<Reference,Reference> inRereferencePagingProvider(ReferenceType subReferenceType){
+    public CdmFilterablePagingProvider<Reference,Reference> inReferencePagingProvider(ReferenceType subReferenceType){
         List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
