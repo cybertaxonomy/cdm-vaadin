@@ -21,6 +21,7 @@ import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
@@ -41,12 +42,41 @@ public class CdmFilterablePagingProviderFactory {
 
 
     public CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider(){
+        return inRereferencePagingProvider(null);
+    }
+
+    public CdmFilterablePagingProvider<Reference,Reference> inRereferencePagingProvider(ReferenceType subReferenceType){
         List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
         CdmFilterablePagingProvider<Reference,Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
                 repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
+
+        List<ReferenceType> inRefTypes = new ArrayList<>();
+        if(subReferenceType != null && !subReferenceType.equals(ReferenceType.Generic)){
+            if(subReferenceType.isArticle()){
+                inRefTypes.add(ReferenceType.Journal);
+            } else if (subReferenceType == ReferenceType.BookSection) {
+                inRefTypes.add(ReferenceType.Book);
+            } else if (subReferenceType.isBook()) {
+                inRefTypes.add(ReferenceType.PrintSeries);
+            } else if (subReferenceType == ReferenceType.InProceedings) {
+                inRefTypes.add(ReferenceType.Proceedings);
+            } else if (subReferenceType == ReferenceType.Section) {
+                inRefTypes.add(ReferenceType.Article);
+                inRefTypes.add(ReferenceType.Book);
+                inRefTypes.add(ReferenceType.Thesis);
+                inRefTypes.add(ReferenceType.Patent);
+                inRefTypes.add(ReferenceType.Report);
+                inRefTypes.add(ReferenceType.WebPage);
+            }
+        }
+        if(!inRefTypes.isEmpty()){
+            inRefTypes.add(ReferenceType.Generic); // generic references and those with missing type are always valid
+            inRefTypes.add(null);
+            pagingProvider.addRestriction(new Restriction<ReferenceType>("type", null, inRefTypes.toArray(new ReferenceType[inRefTypes.size()])));
+        }
 
         return pagingProvider;
     }

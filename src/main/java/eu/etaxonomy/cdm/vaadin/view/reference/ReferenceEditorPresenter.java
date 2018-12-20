@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
@@ -102,6 +103,13 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
+
+    @Override
+    protected void adaptDataProviders() {
+        CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = pagingProviderFactory.inRereferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue());
+        getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
+    }
+
 
 
     protected static BeanInstantiator<Reference> defaultBeanInstantiator = new BeanInstantiator<Reference>() {
