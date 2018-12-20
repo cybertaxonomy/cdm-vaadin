@@ -516,6 +516,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 newNameForRegistrationPopupEditor = null;
                 newNameBlockingRegistrations.clear();
                 getView().getAddNewNameRegistrationButton().setEnabled(true);
+            } else {
+                refreshView(true);
             }
         }
     }
