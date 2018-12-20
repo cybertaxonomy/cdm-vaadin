@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -53,25 +54,8 @@ public class CdmFilterablePagingProviderFactory {
         CdmFilterablePagingProvider<Reference,Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
                 repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
 
-        List<ReferenceType> inRefTypes = new ArrayList<>();
-        if(subReferenceType != null && !subReferenceType.equals(ReferenceType.Generic)){
-            if(subReferenceType.isArticle()){
-                inRefTypes.add(ReferenceType.Journal);
-            } else if (subReferenceType == ReferenceType.BookSection) {
-                inRefTypes.add(ReferenceType.Book);
-            } else if (subReferenceType.isBook()) {
-                inRefTypes.add(ReferenceType.PrintSeries);
-            } else if (subReferenceType == ReferenceType.InProceedings) {
-                inRefTypes.add(ReferenceType.Proceedings);
-            } else if (subReferenceType == ReferenceType.Section) {
-                inRefTypes.add(ReferenceType.Article);
-                inRefTypes.add(ReferenceType.Book);
-                inRefTypes.add(ReferenceType.Thesis);
-                inRefTypes.add(ReferenceType.Patent);
-                inRefTypes.add(ReferenceType.Report);
-                inRefTypes.add(ReferenceType.WebPage);
-            }
-        }
+        Set<ReferenceType> inRefTypes = subReferenceType.inReferenceContraints(subReferenceType);
+
         if(!inRefTypes.isEmpty()){
             inRefTypes.add(ReferenceType.Generic); // generic references and those with missing type are always valid
             inRefTypes.add(null);
