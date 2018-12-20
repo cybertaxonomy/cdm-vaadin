@@ -19,12 +19,12 @@
   #{$sibling-selector} .#{$button-style-name} {
         z-index: 10;
         width: $button-width;
-        position: absolute;
+        position: relative;
         @if $button-alignment == 'left' {
-            left: $button-width * $button-index + 1px;
+            left: $button-width + 1px;
         }
         @if $button-alignment == 'right' {
-            right: $button-width * ($button-count - 1 - $button-index) + 1px;
+            right: $button-width * $button-count + 1px;
         }
         @if $button-index < $button-count - 1 {
             $button-index: $button-index + 1;
@@ -35,6 +35,7 @@
 
 
 @mixin icon-button-field($field-stylename, $button-style-name, $button-count: 1, $button-alignment: 'right', $button-width: $v-unit-size) {
+  
     position: relative; // needs to be a positioned element
     height: $v-line-height * 2;
     .v-caption {
@@ -160,7 +161,9 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     
     // ------------ v-related-entity-combobox ------------ //
     .v-related-entity-combobox {
-        @include icon-button-field('v-filterselect', 'v-button', 2, 'right', $v-unit-size);
+        $buttons-count: 2;    
+        @include icon-button-field('v-filterselect', 'v-button', $buttons-count, 'right', $v-unit-size);
+        padding-right: $edit-v-shadow-spread-radius * 2 * $buttons-count;
         .v-filterselect-button {
             right: $v-unit-size * 2 + 1px;
         }
