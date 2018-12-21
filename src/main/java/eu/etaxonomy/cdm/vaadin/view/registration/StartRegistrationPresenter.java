@@ -8,9 +8,14 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -26,13 +31,14 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.TypifiedEntityFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
@@ -83,7 +89,20 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
                 ReferenceEllypsisFormatter.INIT_STRATEGY
                 );
         TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
-        referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
+        // referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
+        Criterion criterion = Restrictions.not(Restrictions.or(Restrictions.in("type", new ReferenceType[]{ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries})));
+
+        if(!UserHelperAccess.userHelper().userIsAdmin()){
+            Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper().findUserPermissions(Reference.class, Operation.UPDATE);
+            boolean generalUpdatePermission = referencePermissions.stream().anyMatch(p -> p.getTargetUUID() == null);
+            if(!generalUpdatePermission){
+                // restrict by allowed reference uuids
+                Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
+                Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
+                criterion = Restrictions.and(criterion, uuidRestriction);
+            }
+        }
+        referencePagingProvider.addCriterion(criterion);
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
         getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
     }

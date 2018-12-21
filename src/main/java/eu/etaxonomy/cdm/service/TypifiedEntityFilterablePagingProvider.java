@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -85,6 +86,22 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
 
     public void setMatchMode(MatchMode matchMode){
         entityPagingProvider.setMatchMode(matchMode);
+    }
+
+    /**
+     * @deprecated criteria should not be used externally from cdmlib-persistence
+     */
+    @Deprecated
+    public List<Criterion> getCriteria() {
+        return entityPagingProvider.getCriteria();
+    }
+
+    /**
+     * @deprecated criteria should not be used externally from cdmlib-persistence
+     */
+    @Deprecated
+    public void addCriterion(Criterion criterion){
+        entityPagingProvider.addCriterion(criterion);
     }
 
 }
