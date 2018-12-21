@@ -38,7 +38,7 @@ public class AccessRestrictedViewControlBean implements ViewInstanceAccessContro
             if(logger.isDebugEnabled()){
                 logger.debug("Access to view " + view.getClass().getSimpleName() + (restricedView.isAccessDenied() ? " denied": " allowed"));
             }
-            return restricedView.isAccessDenied();
+            return !restricedView.isAccessDenied();
         }
         logger.debug("allowing view by fall through, no check performed");
         return true;
