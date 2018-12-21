@@ -8,12 +8,16 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.Collection;
 import java.util.EnumSet;
+
+import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.ui.Layout;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 
 /**
@@ -22,7 +26,9 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
  *
  */
 public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmEditorPresenterBase<CDM, CDM, ? extends ApplicationView>>
-    extends AbstractPopupEditor<CDM, P> implements PerEntityAuthorityGrantingEditor {
+    extends AbstractPopupEditor<CDM, P> implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
+
+    private String accessDeniedMessage;
 
     /**
      * @param layout
@@ -37,6 +43,27 @@ public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmE
     @Override
     public void grantToCurrentUser(EnumSet<CRUD> crud){
         getPresenter().setGrantsForCurrentUser(crud);
+    }
+
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
+
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+
     }
 
 }

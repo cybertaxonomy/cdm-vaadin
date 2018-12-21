@@ -66,6 +66,8 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
 
     private Button continueButton;
 
+    private String accessDeniedMessage;
+
     private static final String ELEMENT_WIDTH = "330px";
 
 
@@ -197,6 +199,17 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
     }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+    }
+
 
     /**
      * {@inheritDoc}

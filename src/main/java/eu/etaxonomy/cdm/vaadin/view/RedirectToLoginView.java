@@ -22,6 +22,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
 
@@ -54,8 +55,8 @@ public class RedirectToLoginView extends VerticalLayout implements View {
     public RedirectToLoginView() {
 
         this.setWidth("100%");
-        Label header = new Label("Access denied");
-        header.setStyleName(ValoTheme.BUTTON_LARGE);
+        Label header = new Label("Access to this content is restricted");
+        header.setStyleName(ValoTheme.LABEL_FAILURE);
         header.setWidthUndefined();
 
         addComponent(header);
@@ -68,9 +69,11 @@ public class RedirectToLoginView extends VerticalLayout implements View {
     @Override
     public void enter(ViewChangeEvent event) {
 
-        String currentState = ((Navigator)navigationManager).getState();
-        // redirect to the login view and pass over the current state
-        uiEventBus.publish(this, new NavigationEvent(LoginViewBean.NAME, currentState));
+        if(!UserHelperAccess.userHelper().userIsAutheticated()){
+            String currentState = ((Navigator)navigationManager).getState();
+            // redirect to the login view and pass over the current state
+            uiEventBus.publish(this, new NavigationEvent(LoginViewBean.NAME, currentState));
+        }
     }
 
 }

@@ -27,4 +27,10 @@ public class AnnotationBasedAccessControlConfiguration {
         return new AnnotationBasedAccessControlBean();
     }
 
+    @Bean
+    @UIScope // TODO move into own @Configuration class?
+    public AccessRestrictedViewControlBean accessRestrictedViewControlBean() {
+        return new AccessRestrictedViewControlBean();
+    }
+
 }

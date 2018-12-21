@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,7 +17,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
@@ -44,7 +42,6 @@ import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.data.validator.InReferenceTypeValidator;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -64,7 +61,7 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  */
 @SpringComponent
 @Scope("prototype")
-public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView, AccessRestrictedView {
+public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 
@@ -449,22 +446,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     @Override
     public boolean isResizable() {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
     }
 
     @Override

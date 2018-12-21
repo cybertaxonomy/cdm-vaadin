@@ -52,6 +52,8 @@ public class RegistrationMessagesPopup extends AbstractPopupView<RegistrationMes
 
     private DelegatingErrorHandler errrorHandler = new DelegatingErrorHandler();
 
+    private String accessDeniedMessage;
+
     public RegistrationMessagesPopup() {
 
         mainLayout = new VerticalLayout();
@@ -153,6 +155,17 @@ public class RegistrationMessagesPopup extends AbstractPopupView<RegistrationMes
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+
     }
 
     /**

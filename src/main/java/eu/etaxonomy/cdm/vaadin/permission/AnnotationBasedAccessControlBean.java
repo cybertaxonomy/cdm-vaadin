@@ -25,10 +25,10 @@ import com.vaadin.ui.UI;
  * @since Apr 24, 2017
  *
  *
- * FIMXE 1. consider renaming this class and its interface, since it is no longer annotation based!!!!
+ * (FIMXE 1. consider renaming this class and its interface, since it is no longer annotation based!!!!)
  *
- * FIMXE 2. this class should implement ViewAccessControl. The view class can be accessed via the application
- * context before the view bean has been created. see #7967
+ * FIMXE 2. this class should implement ViewAccessControl. The view class and annotations can be accessed
+ * via the application context before the view bean has been created. see #7967
  */
 public class AnnotationBasedAccessControlBean implements ViewInstanceAccessControl, Serializable {
 

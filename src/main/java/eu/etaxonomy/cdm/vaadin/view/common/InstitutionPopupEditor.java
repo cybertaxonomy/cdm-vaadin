@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.view.common;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
@@ -19,7 +18,6 @@ import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.common.InstitutionDTO;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -32,7 +30,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<InstitutionDTO, Institution, InstitutionEditorPresenter> implements InstitutionPopupEditorView, AccessRestrictedView {
+public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<InstitutionDTO, Institution, InstitutionEditorPresenter> implements InstitutionPopupEditorView {
 
     private static final long serialVersionUID = 2019724189877425882L;
 
@@ -76,22 +74,6 @@ public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<Institutio
     @Override
     public void focusFirst() {
         codeField.focus();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public java.util.Collection<java.util.Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
     }
 
     /**

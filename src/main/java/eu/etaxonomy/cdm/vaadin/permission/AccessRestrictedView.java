@@ -36,4 +36,26 @@ public interface AccessRestrictedView extends ReleasableResourcesView {
      */
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities();
 
+    public String getAccessDeniedMessage();
+
+    /**
+     * The <code>accessDeniedMessage</code> can be set my the presenter, e.g. in response
+     * to an Exception or during the processing of the bean to be loaded into the view.
+     * <p>
+     * In case an <code>accessDeniedMessage</code> is present access to the view is considered
+     * to be denied.
+     *
+     * @param accessDeniedMessage
+     */
+    public void setAccessDeniedMessage(String accessDeniedMessage);
+
+    /**
+     * Evaluated by the {@link AccessRestrictedViewControlBean}
+     *
+     * @return true if the {@link #getAccessDeniedMessage()} is not <code>null</code>.
+     */
+    default public boolean isAccessDenied(){
+        return getAccessDeniedMessage() != null;
+    }
+
 }

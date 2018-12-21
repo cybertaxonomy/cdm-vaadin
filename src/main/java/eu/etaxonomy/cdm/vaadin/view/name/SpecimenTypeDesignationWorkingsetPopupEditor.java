@@ -48,6 +48,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  * @author a.kohlbecker
  * @since May 15, 2017
  *
+ * TODO as subclass of AbstractCdmPopupEditor?
+ *
  */
 @SpringComponent
 @Scope("prototype")
@@ -87,6 +89,8 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     private GeoLocationField exactLocationField;
 
     private Panel typeDesignationsScrollPanel;
+
+    private String accessDeniedMessage;
 
     /**
      * @return the countrySelectField
@@ -267,20 +271,24 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
     }
 
     /**

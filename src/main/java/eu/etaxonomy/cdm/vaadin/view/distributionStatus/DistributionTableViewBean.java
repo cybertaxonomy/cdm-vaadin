@@ -68,8 +68,7 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  */
 @ViewScope
 @SpringView(name=DistributionTableViewBean.NAME)
-public class DistributionTableViewBean
-            extends AbstractPageView<DistributionTablePresenter>
+public class DistributionTableViewBean extends AbstractPageView<DistributionTablePresenter>
             implements IDistributionTableView, AccessRestrictedView {
 
 	private static final long serialVersionUID = 1L;
@@ -87,6 +86,7 @@ public class DistributionTableViewBean
 	private AreaAndTaxonSettingsConfigWindow areaAndTaxonConfigWindow;;
 	private DistributionStatusSettingsConfigWindow distributionStatusConfigWindow;
 	private HelpWindow helpWindow;
+    private String accessDeniedMessage;
 
 	/**
 	 * Creates a new distribution status editor view.
@@ -421,6 +421,17 @@ public class DistributionTableViewBean
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+
+    }
 
     /**
      * {@inheritDoc}

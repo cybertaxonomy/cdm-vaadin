@@ -48,6 +48,7 @@ import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
 import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
@@ -83,6 +84,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
@@ -329,13 +331,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid, true);
         } catch (RegistrationValidationException error) {
             logger.error(error);
-            Window errorDialog = new Window("Validation Error");
-            errorDialog.setModal(true);
-            VerticalLayout subContent = new VerticalLayout();
-            subContent.setMargin(true);
-            errorDialog.setContent(subContent);
-            subContent.addComponent(new Label(error.getMessage()));
-            UI.getCurrent().addWindow(errorDialog);
+            showErrorDialog("Validation Error", error.getMessage());
+        } catch(PermissionDeniedException e){
+            logger.info(e);
+            ((AccessRestrictedView)getView()).setAccessDeniedMessage(e.getMessage());
         }
         if(workingset == null || workingset.getCitationUuid() == null){
             Reference citation = getRepo().getReferenceService().find(referenceUuid);
@@ -345,6 +344,20 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         for(Registration registration : workingset.getRegistrations()) {
             addRootEntity(registration);
         }
+    }
+
+    /**
+     * @param errorDialogCaption
+     * @param errorMessage
+     */
+    public void showErrorDialog(String errorDialogCaption, String errorMessage) {
+        Window errorDialog = new Window(errorDialogCaption);
+        errorDialog.setModal(true);
+        VerticalLayout subContent = new VerticalLayout();
+        subContent.setMargin(true);
+        errorDialog.setContent(subContent);
+        subContent.addComponent(new Label(errorMessage));
+        UI.getCurrent().addWindow(errorDialog);
     }
 
     private void saveRegistrationStatusChange(UUID uuid, Object value) {

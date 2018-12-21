@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -45,7 +43,6 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
@@ -67,7 +64,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-    implements TaxonNamePopupEditorView, AccessRestrictedView{
+    implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
 
@@ -862,21 +859,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         super.cancel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
-    }
 
     /**
      * {@inheritDoc}

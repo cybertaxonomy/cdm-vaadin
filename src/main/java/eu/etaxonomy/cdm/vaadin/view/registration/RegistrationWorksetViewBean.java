@@ -138,6 +138,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private RegistrationStatusFieldInstantiator statusFieldInstantiator;
 
+    private String accessDeniedMessage;
+
     public RegistrationWorksetViewBean() {
         super();
     }
@@ -592,20 +594,24 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         new Notification(caption, sb.toString(), Notification.Type.HUMANIZED_MESSAGE, true).show(Page.getCurrent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
     }
 
     /**
