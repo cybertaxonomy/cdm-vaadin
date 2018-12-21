@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -96,10 +97,19 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
             Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper().findUserPermissions(Reference.class, Operation.UPDATE);
             boolean generalUpdatePermission = referencePermissions.stream().anyMatch(p -> p.getTargetUUID() == null);
             if(!generalUpdatePermission){
+                // exclude unpublished publications
+                DateTime nowLocal = new DateTime();
+                String dateString = nowLocal.toString("yyyyMMdd");
+                logger.debug("dateString:" + dateString);
+                Criterion pulishedOnly = Restrictions.or(
+                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNull("datePublished.end"), Restrictions.isNull("datePublished.freeText")),
+                        Restrictions.and(Restrictions.isNotNull("datePublished.start"), Restrictions.sqlRestriction("datePublished_start < " + dateString)),
+                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNotNull("datePublished.end"), Restrictions.sqlRestriction("datePublished_end < " + dateString))
+                        );
                 // restrict by allowed reference uuids
                 Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
                 Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
-                criterion = Restrictions.and(criterion, uuidRestriction);
+                criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
             }
         }
         referencePagingProvider.addCriterion(criterion);
