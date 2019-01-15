@@ -293,7 +293,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         grid.addComponent(validationToggle, 2, row);
         grid.setComponentAlignment(validationToggle, Alignment.BOTTOM_LEFT);
 
-        orthographicVariantToggle = new CheckBox("Orthographic variant");
+        orthographicVariantToggle = new CheckBox("Orthographical variant");
         grid.addComponent(orthographicVariantToggle, 3, row);
         grid.setComponentAlignment(orthographicVariantToggle, Alignment.BOTTOM_LEFT);
 
@@ -447,7 +447,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // ------- Orthographic Variant (Correction)
         row++;
-        orthographicVariantField = new NameRelationField("Orthographic variant", "Name variant", Direction.relatedTo, NameRelationshipType.ORTHOGRAPHIC_VARIANT());
+        orthographicVariantField = new NameRelationField("Orthographical variant", "Name variant", Direction.relatedTo, NameRelationshipType.ORTHOGRAPHIC_VARIANT());
         orthographicVariantField.setWidth(100, Unit.PERCENTAGE);
         // corrected name must have same
         ToOneRelatedEntityCombobox<TaxonName> orthographicVariantCombobox = orthographicVariantField.getRelatedNameComboBox();
@@ -808,13 +808,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         }
 
         if(isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
-            orthographicVariantField.setCaption("Orthographic correction");
+            orthographicVariantField.setCaption("Orthographical correction");
             orthographicVariantField.getRelatedNameComboBox().setCaption("Incorrect name");
-            orthographicVariantToggle.setCaption("Orthographic correction");
+            orthographicVariantToggle.setCaption("Orthographical correction");
         } else {
-            orthographicVariantField.setCaption("Orthographic variant");
+            orthographicVariantField.setCaption("Orthographical variant");
             orthographicVariantField.getRelatedNameComboBox().setCaption("Name variant");
-            orthographicVariantToggle.setCaption("Orthographic variant");
+            orthographicVariantToggle.setCaption("Orthographical variant");
         }
 
         genusOrUninomialField.setRequired(true);
