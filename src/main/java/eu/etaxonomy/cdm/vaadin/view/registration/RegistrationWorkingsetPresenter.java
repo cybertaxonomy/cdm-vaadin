@@ -368,7 +368,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
         if(value != null && value instanceof RegistrationStatus){
             if(!Objects.equals(value, reg.getStatus())){
-                reg.setStatus((RegistrationStatus)value);
+                reg.updateStatusAndDate((RegistrationStatus)value);
                 getRegistrationStore().saveBean(reg, (AbstractView)getView());
                 refreshView(true);
             }
