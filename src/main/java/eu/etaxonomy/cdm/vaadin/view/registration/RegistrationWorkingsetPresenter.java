@@ -553,7 +553,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
         if(typifiedName != null){
             boolean doReloadWorkingSet = false;
-            Reference citation = getRepo().getReferenceService().find(workingset.getCitationUuid());
+            Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
             // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
             // to create a typification only registration in the working (publication) set which contains
             // the protologe. This is known from the nomenclatural reference.
