@@ -336,10 +336,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             logger.info(e);
             ((AccessRestrictedView)getView()).setAccessDeniedMessage(e.getMessage());
         }
-        if(workingset == null || workingset.getCitationUuid() == null){
-            Reference citation = getRepo().getReferenceService().find(referenceUuid);
-            workingset = new RegistrationWorkingSet(citation);
-        }
         cache = new CdmTransientEntityAndUuidCacher(this);
         for(Registration registration : workingset.getRegistrations()) {
             addRootEntity(registration);
@@ -553,33 +549,41 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
         if(typifiedName != null){
             boolean doReloadWorkingSet = false;
-            Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
-            // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
-            // to create a typification only registration in the working (publication) set which contains
-            // the protologe. This is known from the nomenclatural reference.
-            if(canCreateNameRegistrationFor(typifiedName)){
-                // the citation which is the base for workingset contains the protologe of the name and the name has not
-                // been registered before:
-                // create a registration for the name and the first typifications
-                Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-                workingset.add(new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation));
-                doReloadWorkingSet = true;
-            } else {
-                if(!checkWokingsetContainsProtologe(typifiedName)){
-                    // create a typification only registration
-                    Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
-                    if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
-                        // oops, yet no registration for this name, so we create it as blocking registration:
-                        Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-                        typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
+            try {
+                // TODO move into a service class --------------
+                TransactionStatus txStatus = getRepo().startTransaction(true);
+                Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
+                // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
+                // to create a typification only registration in the working (publication) set which contains
+                // the protologe. This is known from the nomenclatural reference.
+                if(canCreateNameRegistrationFor(typifiedName)){
+                    // the citation which is the base for workingset contains the protologe of the name and the name has not
+                    // been registered before:
+                    // create a registration for the name and the first typifications
+                    Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
+                    workingset.add(new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation));
+                    doReloadWorkingSet = true;
+                } else {
+                    if(!checkWokingsetContainsProtologe(typifiedName)){
+                        // create a typification only registration
+                        Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
+                        if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
+                            // oops, yet no registration for this name, so we create it as blocking registration:
+                            Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
+                            typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
+                        }
+                        RegistrationDTO regDTO = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
+                        workingset.add(regDTO);
                     }
-                    RegistrationDTO regDTO = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
-                    workingset.add(regDTO);
                 }
+                getRepo().commitTransaction(txStatus);
+                // --------------------------------------------------
+                // tell the view to update the workingset
+            } finally {
+                getRepo().getSession().clear(); // #7702;
+                refreshView(doReloadWorkingSet);
+                getView().getAddExistingNameRegistrationButton().setEnabled(false);
             }
-            // tell the view to update the workingset
-            refreshView(doReloadWorkingSet);
-            getView().getAddExistingNameRegistrationButton().setEnabled(false);
         } else {
             logger.error("Seletced name is NULL");
         }
