@@ -46,6 +46,8 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     private ListSelect statusSelect;
 
+    private DateField registrationDateField;
+
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
     }
@@ -69,7 +71,6 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
         statusSelect.setNullSelectionAllowed(false);
         statusSelect.setRows(1);
-        statusSelect.addValueChangeListener( e -> getBean().updateStatusAndDate((RegistrationStatus) e.getProperty().getValue()));
         addField(statusSelect, "status");
 
         submitterField = new ListSelect("Submitter");
@@ -82,7 +83,7 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
 
-        DateField registrationDateField = new DateField("Registration date");
+        registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
 
@@ -137,5 +138,10 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     @Override
     public ListSelect getStatusSelect() {
         return statusSelect;
+    }
+
+    @Override
+    public DateField getRegistrationDateField() {
+        return this.registrationDateField;
     }
 }

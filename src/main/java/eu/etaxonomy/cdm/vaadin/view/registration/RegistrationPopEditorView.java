@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.ListSelect;
 
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -34,4 +35,9 @@ public interface RegistrationPopEditorView extends ApplicationView<RegistrationE
      * @return
      */
     public ListSelect getStatusSelect();
+
+    /**
+     * @return
+     */
+    public DateField getRegistrationDateField();
 }
