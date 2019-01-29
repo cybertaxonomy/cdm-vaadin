@@ -44,6 +44,8 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     private ListSelect institutionField;
 
+    private ListSelect statusSelect;
+
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
     }
@@ -64,9 +66,10 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         specificIdentifierField = new TextFieldNFix("Specific Identifier");
         addField(specificIdentifierField, "specificIdentifier");
 
-        ListSelect statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
+        statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
         statusSelect.setNullSelectionAllowed(false);
         statusSelect.setRows(1);
+        statusSelect.addValueChangeListener( e -> getBean().updateStatusAndDate((RegistrationStatus) e.getProperty().getValue()));
         addField(statusSelect, "status");
 
         submitterField = new ListSelect("Submitter");
@@ -129,5 +132,10 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     @Override
     public ListSelect getInstitutionField() {
         return institutionField;
+    }
+
+    @Override
+    public ListSelect getStatusSelect() {
+        return statusSelect;
     }
 }

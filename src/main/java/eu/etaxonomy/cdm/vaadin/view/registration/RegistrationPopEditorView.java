@@ -29,4 +29,9 @@ public interface RegistrationPopEditorView extends ApplicationView<RegistrationE
      * @return the institutionField
      */
     public ListSelect getInstitutionField();
+
+    /**
+     * @return
+     */
+    public ListSelect getStatusSelect();
 }
