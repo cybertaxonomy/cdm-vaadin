@@ -93,6 +93,7 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     .v-switch {
         top: round($v-unit-size * 0.75);
         right: round($v-unit-size / 4);
+        position: absolute !important; // this is a temporary fix for the issue https://dev.e-taxonomy.eu/redmine/issues/8035
     }
   }
   
