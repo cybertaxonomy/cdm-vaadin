@@ -148,6 +148,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     private List<Registration> newNameBlockingRegistrations = new ArrayList<>();
 
+    /**
+     * TODO is this still needed? The regitration UUID should be accessible in the popup editor context,
+     * see findRegistrationInContext()
+     */
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
 
