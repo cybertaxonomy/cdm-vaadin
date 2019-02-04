@@ -884,10 +884,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         UUID registrationUuid = event.getIdentifier();
 
-        RegistrationDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
+        RegistrationDTO regDto = workingset.getRegistrationDTO(registrationUuid).get();
         if(event.getProperty().equals(RegistrationItem.BLOCKED_BY)){
 
-            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
+            Set<RegistrationDTO> blockingRegs;
+            if(regDto.registration().isPersited()){
+                blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
+            } else {
+                blockingRegs = new HashSet<RegistrationDTO>(getWorkingSetService().makeDTOs(regDto.registration().getBlockedBy()));
+            }
             getView().setBlockingRegistrations(registrationUuid, blockingRegs);
         } else if(event.getProperty().equals(RegistrationItem.MESSAGES)){
 
