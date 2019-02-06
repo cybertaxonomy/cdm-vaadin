@@ -229,11 +229,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 }
             }
             loadWorkingSet(workingset.getCitationUuid());
-            for(RegistrationDTO regDto : unpersisted){
-                try {
-                    workingset.add(regDto);
-                } catch (RegistrationValidationException e) {
-                    // would never happen here //
+            for(RegistrationDTO regDtoUnpersisted : unpersisted){
+                if(!workingset.getRegistrationDTOs().stream().anyMatch(dto -> dto.getUuid().equals(regDtoUnpersisted.getUuid()))){
+                    // only add if the regDtoUnpersisted has not been persisted meanwhile
+                    try {
+                        workingset.add(regDtoUnpersisted);
+                    } catch (RegistrationValidationException e) {
+                        // would never happen here //
+                    }
                 }
             }
         }
