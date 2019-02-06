@@ -155,9 +155,16 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
-                cache.load(workingSetDto.getOwner());
+                Registration registration = workingSetDto.getOwner();
+                cache.load(registration);
+                if(registration.getName() == null && (registration.getTypeDesignations() == null || registration.getTypeDesignations().isEmpty())){
+                    // need to add the citation to the cache when there is no name or typedesignation in the registry which would bring the citation otherwise.
+                    cache.load(workingSetDto.getCitation());
+                }
                 cache.load(workingSetDto.getTypifiedName());
                 rootEntities.add(workingSetDto.getOwner());
+                rootEntities.add(workingSetDto.getTypifiedName());
+                rootEntities.add(workingSetDto.getCitation());
             }
 
         } else {
@@ -181,6 +188,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
         termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
+        // the ToOneRelatedEntityReloader is added internally in the TeamOrPersonField:
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
