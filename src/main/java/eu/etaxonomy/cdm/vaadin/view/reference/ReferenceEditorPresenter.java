@@ -39,6 +39,7 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
@@ -272,8 +273,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        if(boundTargetField != null){
            if(boundTargetField.matchesPropertyIdPath("inReference")){
                if(event.isCreateOrModifiedType()){
-                   getCache().load(event.getEntity());
+                   Reference inReference = (Reference)getCache().load(event.getEntity());
                    getView().getInReferenceCombobox().reload();
+                   if(event.getType() == Type.CREATED){
+                       getView().getInReferenceCombobox().setValue(inReference);
+                   }
                }
                if(event.isRemovedType()){
                    getView().getInReferenceCombobox().selectNewItem(null);
