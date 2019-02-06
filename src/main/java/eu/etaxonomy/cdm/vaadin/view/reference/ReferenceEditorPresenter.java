@@ -10,7 +10,9 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -212,12 +214,22 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        }
 
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
+           Set<ReferenceType> applicableTypes = ReferenceType.inReferenceContraints((ReferenceType) getView().getTypeSelect().getValue());
            if(editorAction.isAddAction()){
                inReferencePopup = openPopupEditor(ReferencePopupEditor.class, editorAction);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.withReferenceTypes(EnumSet.copyOf(applicableTypes));
+               }
                inReferencePopup.loadInEditor(null);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.getTypeSelect().setValue(applicableTypes.iterator().next());
+               }
            }
            if(editorAction.isEditAction()){
                inReferencePopup = openPopupEditor(ReferencePopupEditor.class, editorAction);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.withReferenceTypes(EnumSet.copyOf(applicableTypes));
+               }
                inReferencePopup.withDeleteButton(true);
                inReferencePopup.loadInEditor(editorAction.getEntityUuid());
            }
