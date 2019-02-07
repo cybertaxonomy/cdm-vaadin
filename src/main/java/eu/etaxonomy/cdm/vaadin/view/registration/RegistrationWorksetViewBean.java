@@ -421,7 +421,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     )
                 );
         }
-        validationProblemsButton.setCaption(Integer.toString(dto.getValidationProblems().size()));
+        int problemCount = dto.getValidationProblems().size();
+        validationProblemsButton.setCaption(problemCount > 0 ? Integer.toString(problemCount) : null);
 
         Component statusComponent;
         if(statusFieldInstantiator != null){

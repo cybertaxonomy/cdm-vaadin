@@ -73,7 +73,11 @@ public class BadgeButton extends Button {
     @Override
     public void setCaption(String caption) {
         setCaptionAsHtml(true);
-        super.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + caption + "</span>");
+        if(caption != null){
+            super.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + caption + "</span>");
+        } else {
+            super.setCaption(null);
+        }
     }
 
 

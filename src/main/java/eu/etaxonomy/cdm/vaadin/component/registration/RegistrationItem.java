@@ -251,7 +251,7 @@ public class RegistrationItem extends GridLayout {
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
 
-        if(validationProblemsCount + 1 > 0){
+        if(validationProblemsCount > 0){
             getValidationProblemsButton().setEnabled(true);
             // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
             getValidationProblemsButton().addClickListener(e -> {
@@ -272,7 +272,7 @@ public class RegistrationItem extends GridLayout {
                 publishEvent(detailsEvent);
                 }
             );
-            getValidationProblemsButton().setCaption(Integer.toString(validationProblemsCount + 1));
+            getValidationProblemsButton().setCaption(Integer.toString(validationProblemsCount));
         }
 
         if(regDto != null && regDto.isBlocked()){
