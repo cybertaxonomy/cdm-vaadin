@@ -27,11 +27,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
-import com.vaadin.server.SystemError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -45,15 +43,11 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
-import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
-import eu.etaxonomy.cdm.ext.common.ExternalServiceException;
-import eu.etaxonomy.cdm.ext.registration.messages.IRegistrationMessageService;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -85,8 +79,6 @@ import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
-import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
-import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -120,9 +112,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private IRegistrationWorkingSetService regWorkingSetService;
-
-    @Autowired
-    private IRegistrationMessageService messageService;
 
     @Autowired
     private CdmFilterablePagingProviderFactory pagingProviderFactory;
@@ -295,8 +284,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
          getView().setWorkingset(workingset);
         // PagingProviders and CacheGenerator for the existingNameCombobox
         activateComboboxes();
-        // update the messages
-        // updateMessages(); // disabled see  #7908
     }
 
     protected void activateComboboxes() {
@@ -305,43 +292,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
-
-    protected void updateMessages() {
-        User user = UserHelperAccess.userHelper().user();
-        for (UUID registrationUuid : getView().getRegistrationItemMap().keySet()) {
-            Button messageButton = getView().getRegistrationItemMap().get(registrationUuid).regItemButtons.getMessagesButton();
-
-            RegistrationDTO regDto = workingset.getRegistrationDTO(registrationUuid).get();
-            try {
-                int messageCount = messageService.countActiveMessagesFor(regDto.registration(), user);
-
-                boolean activeMessages = messageCount > 0;
-                boolean currentUserIsSubmitter = regDto.getSubmitterUserName() != null && regDto.getSubmitterUserName().equals(UserHelperAccess.userHelper().userName());
-                boolean currentUserIsCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
-                messageButton.setEnabled(false);
-                if(currentUserIsCurator){
-                    if(currentUserIsSubmitter){
-                        messageButton.setDescription("No point sending messages to your self.");
-                    } else {
-                        messageButton.setEnabled(true);
-                        messageButton.setDescription("Open the messages dialog.");
-                    }
-                } else {
-                    messageButton.setDescription("Sorry, only a curator can start a conversation.");
-                }
-                if(activeMessages){
-                    messageButton.setEnabled(true);
-                    messageButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
-                    String who = currentUserIsSubmitter ? "curator" : "submitter";
-                    messageButton.setDescription("The " + who + " is looking forward to your reply.");
-
-                }
-            } catch (ExternalServiceException e) {
-                messageButton.setComponentError(new SystemError(e.getMessage(), e));
-            }
-        }
-    }
-
 
     /**
      * @param referenceID
@@ -897,11 +847,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 blockingRegs = new HashSet<RegistrationDTO>(getWorkingSetService().makeDTOs(regDto.registration().getBlockedBy()));
             }
             getView().setBlockingRegistrations(registrationUuid, blockingRegs);
-        } else if(event.getProperty().equals(RegistrationItem.MESSAGES)){
-
-            RegistrationMessagesPopup popup = openPopupEditor(RegistrationMessagesPopup.class, null);
-            popup.loadMessagesFor(regDto.getUuid());
-
         } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
             getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
         }

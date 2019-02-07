@@ -424,18 +424,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         validationProblemsButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
         validationProblemsButton.setCaptionAsHtml(true);
 
-        Button messageButton = regItemButtons.getMessagesButton();
-        messageButton.addClickListener(e -> getViewEventBus().publish(this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
-                        e,
-                        RegistrationDTO.class,
-                        dto.getUuid(),
-                        RegistrationItem.MESSAGES
-                        )
-                    )
-                );
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
-
         Component statusComponent;
         if(statusFieldInstantiator != null){
             statusComponent = statusFieldInstantiator.create(dto);

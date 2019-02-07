@@ -27,8 +27,6 @@ public class RegistrationItemButtons extends CssLayout {
 
     Button validationProblemsButton;
 
-    Button messagesButton;
-
     public RegistrationItemButtons() {
 
           setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -39,10 +37,7 @@ public class RegistrationItemButtons extends CssLayout {
           validationProblemsButton = new Button(FontAwesome.WARNING);
           validationProblemsButton.setEnabled(false);
 
-          messagesButton = new Button(FontAwesome.COMMENT);
-          messagesButton.setEnabled(false);
-
-          addComponents(blockingRegistrationButton, validationProblemsButton, messagesButton);
+          addComponents(blockingRegistrationButton, validationProblemsButton);
     }
 
     /**
@@ -58,17 +53,5 @@ public class RegistrationItemButtons extends CssLayout {
     public Button getValidationProblemsButton() {
         return validationProblemsButton;
     }
-
-    /**
-     * @return the messagesButton
-     */
-    public Button getMessagesButton() {
-        return messagesButton;
-    }
-
-
-
-
-
 
 }

@@ -61,11 +61,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  */
 public class RegistrationItem extends GridLayout {
 
-
-
     public static final String VALIDATION_PROBLEMS = "validationProblems";
-
-    public static final String MESSAGES = "messages";
 
     public static final String BLOCKED_BY = "blockedBy";
 
@@ -93,7 +89,7 @@ public class RegistrationItem extends GridLayout {
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
     private Button blockedByButton = new Button(FontAwesome.WARNING);
-    private Button messageButton;
+    private Button validationProblemsButton;
     private Button openButton = new Button(FontAwesome.COGS);
     private Label submitterLabel = new Label();
     private Label createdLabel = new Label();
@@ -148,12 +144,12 @@ public class RegistrationItem extends GridLayout {
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);
         setColumnExpandRatio(1, 1.0f);
 
-        messageButton = new Button(FontAwesome.COMMENT);
-        CssLayout buttonGroup = new CssLayout(blockedByButton, messageButton, openButton);
+        validationProblemsButton = new Button(FontAwesome.COMMENT);
+        CssLayout buttonGroup = new CssLayout(blockedByButton, validationProblemsButton, openButton);
         blockedByButton.setStyleName(ValoTheme.BUTTON_TINY);
         blockedByButton.setEnabled(false);
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
-        messageButton.setEnabled(false);
+        validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY);
+        validationProblemsButton.setEnabled(false);
 
         openButton.setStyleName(ValoTheme.BUTTON_TINY);
         openButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -228,7 +224,7 @@ public class RegistrationItem extends GridLayout {
             datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
             // submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
         }
-        updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
+        updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.validationProblemsCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
     }
 
@@ -248,16 +244,16 @@ public class RegistrationItem extends GridLayout {
      * @param submitterUserName TODO
      *
      */
-    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount,
+    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int validationProblemsCount,
             Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto, String submitterUserName) {
 
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
 
-        if(messagesCount > 0){
-            getMessageButton().setEnabled(true);
+        if(validationProblemsCount > 0){
+            getValidationProblemsButton().setEnabled(true);
             // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-            getMessageButton().addClickListener(e -> {
+            getValidationProblemsButton().addClickListener(e -> {
                 ShowDetailsEvent detailsEvent;
                 if(regDto != null){
                     detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
@@ -275,8 +271,8 @@ public class RegistrationItem extends GridLayout {
                 publishEvent(detailsEvent);
                 }
             );
-            getMessageButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + messagesCount + "</span>");
-            getMessageButton().setCaptionAsHtml(true);
+            getValidationProblemsButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + validationProblemsCount + "</span>");
+            getValidationProblemsButton().setCaptionAsHtml(true);
         }
 
         if(regDto != null && regDto.isBlocked()){
@@ -400,8 +396,8 @@ public class RegistrationItem extends GridLayout {
     /**
      * @return the validationProblemsButton
      */
-    public Button getMessageButton() {
-        return messageButton;
+    public Button getValidationProblemsButton() {
+        return validationProblemsButton;
     }
 
     /**

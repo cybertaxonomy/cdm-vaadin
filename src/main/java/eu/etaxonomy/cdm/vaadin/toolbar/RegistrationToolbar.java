@@ -61,7 +61,6 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar, Ev
     UserHelper userHelper;
 
     CssLayout buttonGroup = new CssLayout();
-    Button messageButton;
     Button loginButton;
     Button logoutButton;
     Button userButton;
@@ -74,15 +73,12 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar, Ev
 
         setWidth("100%");
         buttonGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-        messageButton = new Button(FontAwesome.COMMENT);
         loginButton = new Button("login");
         userButton = new Button(FontAwesome.USER);
         logoutButton = new Button("logout");
 
-        messageButton.setEnabled(false);
         logoutButton.addClickListener(e -> performLogut());
         loginButton.addClickListener(e -> performLogin());
-        buttonGroup.addComponent(messageButton);
         buttonGroup.addComponent(loginButton);
         buttonGroup.addComponent(logoutButton);
         buttonGroup.addComponent(userButton);
@@ -105,14 +101,12 @@ public class RegistrationToolbar extends HorizontalLayout implements Toolbar, Ev
         if(userHelper.userIsAutheticated() && !userHelper.userIsAnnonymous()){
             userButton.setCaption(userHelper.userName());
             userButton.setVisible(true);
-            messageButton.setVisible(true);
             logoutButton.setVisible(true);
             loginButton.setVisible(false);
 
         } else {
             userButton.setCaption(null);
             userButton.setVisible(false);
-            messageButton.setVisible(false);
             logoutButton.setVisible(false);
             loginButton.setVisible(true);
         }

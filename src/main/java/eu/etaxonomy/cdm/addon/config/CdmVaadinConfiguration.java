@@ -73,8 +73,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
         "eu.etaxonomy.vaadin.ui",
         "eu.etaxonomy.cdm.vaadin",
         "eu.etaxonomy.cdm.service",
-        "org.springframework.context.event",
-        "eu.etaxonomy.cdm.ext.registration.messages.redmine" // FIXME needed???
+        "org.springframework.context.event"
         },
         // exclude UI classes, these are provided via the @Bean annotated methods below
         excludeFilters={@Filter(
