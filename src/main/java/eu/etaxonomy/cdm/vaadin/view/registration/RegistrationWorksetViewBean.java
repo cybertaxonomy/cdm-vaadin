@@ -57,6 +57,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
@@ -64,7 +65,6 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTyp
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
@@ -406,7 +406,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     ));
         }
 
-        Button validationProblemsButton = regItemButtons.getValidationProblemsButton();
+        BadgeButton validationProblemsButton = regItemButtons.getValidationProblemsButton();
         validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
 
         if(!dto.getValidationProblems().isEmpty()){
@@ -421,8 +421,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     )
                 );
         }
-        validationProblemsButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
-        validationProblemsButton.setCaptionAsHtml(true);
+        validationProblemsButton.setCaption(Integer.toString(dto.getValidationProblems().size()));
 
         Component statusComponent;
         if(statusFieldInstantiator != null){

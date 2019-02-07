@@ -198,6 +198,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
+            // TODO move addClickListener into RegistrationItem.updateUI where the clicklistener for the ValidationProblemsButton is set also?
             item.getBlockedByButton().addClickListener(e -> getViewEventBus().publish(
                     this,
                     new ShowDetailsEvent<Registration, UUID>(

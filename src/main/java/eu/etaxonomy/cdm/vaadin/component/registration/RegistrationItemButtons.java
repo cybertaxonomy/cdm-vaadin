@@ -13,6 +13,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
+
 /**
  * @author a.kohlbecker
  * @since Feb 27, 2018
@@ -25,7 +27,7 @@ public class RegistrationItemButtons extends CssLayout {
 
     Button blockingRegistrationButton;
 
-    Button validationProblemsButton;
+    BadgeButton validationProblemsButton;
 
     public RegistrationItemButtons() {
 
@@ -34,7 +36,7 @@ public class RegistrationItemButtons extends CssLayout {
           blockingRegistrationButton = new Button(FontAwesome.BAN);
           blockingRegistrationButton.setEnabled(false);
 
-          validationProblemsButton = new Button(FontAwesome.WARNING);
+          validationProblemsButton = new BadgeButton(FontAwesome.WARNING);
           validationProblemsButton.setEnabled(false);
 
           addComponents(blockingRegistrationButton, validationProblemsButton);
@@ -50,7 +52,7 @@ public class RegistrationItemButtons extends CssLayout {
     /**
      * @return the validationProblemsButton
      */
-    public Button getValidationProblemsButton() {
+    public BadgeButton getValidationProblemsButton() {
         return validationProblemsButton;
     }
 

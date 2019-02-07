@@ -43,6 +43,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
@@ -88,8 +89,8 @@ public class RegistrationItem extends GridLayout {
     private RegistrationStatusLabel stateLabel = new RegistrationStatusLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
-    private Button blockedByButton = new Button(FontAwesome.WARNING);
-    private Button validationProblemsButton;
+    private Button blockedByButton = new Button(FontAwesome.BAN);
+    private BadgeButton validationProblemsButton;
     private Button openButton = new Button(FontAwesome.COGS);
     private Label submitterLabel = new Label();
     private Label createdLabel = new Label();
@@ -144,7 +145,7 @@ public class RegistrationItem extends GridLayout {
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);
         setColumnExpandRatio(1, 1.0f);
 
-        validationProblemsButton = new Button(FontAwesome.COMMENT);
+        validationProblemsButton = new BadgeButton(FontAwesome.WARNING);
         CssLayout buttonGroup = new CssLayout(blockedByButton, validationProblemsButton, openButton);
         blockedByButton.setStyleName(ValoTheme.BUTTON_TINY);
         blockedByButton.setEnabled(false);
@@ -250,7 +251,7 @@ public class RegistrationItem extends GridLayout {
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
 
-        if(validationProblemsCount > 0){
+        if(validationProblemsCount + 1 > 0){
             getValidationProblemsButton().setEnabled(true);
             // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
             getValidationProblemsButton().addClickListener(e -> {
@@ -271,8 +272,7 @@ public class RegistrationItem extends GridLayout {
                 publishEvent(detailsEvent);
                 }
             );
-            getValidationProblemsButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + validationProblemsCount + "</span>");
-            getValidationProblemsButton().setCaptionAsHtml(true);
+            getValidationProblemsButton().setCaption(Integer.toString(validationProblemsCount + 1));
         }
 
         if(regDto != null && regDto.isBlocked()){
@@ -396,7 +396,7 @@ public class RegistrationItem extends GridLayout {
     /**
      * @return the validationProblemsButton
      */
-    public Button getValidationProblemsButton() {
+    public BadgeButton getValidationProblemsButton() {
         return validationProblemsButton;
     }
 
