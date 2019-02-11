@@ -103,6 +103,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     static {
         propertyNameLabelMap.put("inReference", "In reference");
+        propertyNameLabelMap.put("inProceedings", "In proceedings");
         propertyNameLabelMap.put("inJournal", "In journal");
         propertyNameLabelMap.put("inSeries", "In series");
         propertyNameLabelMap.put("inBook", "In book");
@@ -330,7 +331,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             String inRefCaption = fieldPropertyDefinition.get("inReference");
             inReferenceCombobox.setVisible(inRefCaption != null);
             if(inRefCaption != null){
-                inReferenceCombobox.setCaption(propertyNameLabelMap.get(inRefCaption));
+                inReferenceCombobox.setCaption(inReferenceCaption(inRefCaption));
             }
             getField("title").setVisible(fieldPropertyDefinition.containsKey("title"));
 
@@ -345,7 +346,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
                     grid.addComponent(field);
                     String propertyName = fieldPropertyDefinition.get(fieldName);
                     if(propertyName != fieldName){
-                        field.setCaption(propertyNameLabelMap.get(propertyName));
+                        field.setCaption(inReferenceCaption(propertyName));
                     }
                 }
             }
@@ -360,6 +361,16 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
 
         return null;
+    }
+
+    /**
+     * @param inRefCaption
+     * @return
+     */
+    public String inReferenceCaption(String inRefCaption) {
+        String caption = propertyNameLabelMap.get(inRefCaption);
+
+        return caption != null ? caption : inRefCaption;
     }
 
     /**
