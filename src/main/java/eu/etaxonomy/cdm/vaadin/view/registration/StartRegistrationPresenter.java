@@ -8,9 +8,15 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -23,16 +29,21 @@ import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
-import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.hibernate.permission.Operation;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
+import eu.etaxonomy.cdm.service.TypifiedEntityFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -59,6 +70,8 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
     @Autowired
     protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
+    private TypifiedEntityFilterablePagingProvider<Reference> referencePagingProvider;
+
     public StartRegistrationPresenter (){
         super();
     }
@@ -68,14 +81,51 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      * {@inheritDoc}
      */
     @Override
-    public void onPresenterReady() {
+    public void handleViewEntered() {
 
-        super.onPresenterReady();
+        super.handleViewEntered();
 
-        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = pagingProviderFactory.referencePagingProvider();
-        CdmTitleCacheCaptionGenerator<Reference> titleCacheGenrator = new CdmTitleCacheCaptionGenerator<Reference>();
+        referencePagingProvider = pagingProviderFactory.referenceEntityReferencePagingProvider(
+                new ReferenceEllypsisFormatter(ReferenceEllypsisFormatter.LabelType.BIBLIOGRAPHIC),
+                ReferenceEllypsisFormatter.INIT_STRATEGY
+                );
+        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
+        // referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
+        Criterion criterion = Restrictions.not(Restrictions.or(Restrictions.in("type", new ReferenceType[]{ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries})));
+
+        if(!UserHelperAccess.userHelper().userIsAdmin()){
+            Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper().findUserPermissions(Reference.class, Operation.UPDATE);
+            boolean generalUpdatePermission = referencePermissions.stream().anyMatch(p -> p.getTargetUUID() == null);
+            if(!generalUpdatePermission){
+                // exclude unpublished publications
+                DateTime nowLocal = new DateTime();
+                String dateString = nowLocal.toString("yyyyMMdd");
+                logger.debug("dateString:" + dateString);
+                Criterion pulishedOnly = Restrictions.or(
+                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNull("datePublished.end"), Restrictions.isNull("datePublished.freeText")),
+                        Restrictions.and(Restrictions.isNotNull("datePublished.start"), Restrictions.sqlRestriction("datePublished_start < " + dateString)),
+                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNotNull("datePublished.end"), Restrictions.sqlRestriction("datePublished_end < " + dateString))
+                        );
+                // restrict by allowed reference uuids
+                Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
+                Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
+                criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
+            }
+        }
+        referencePagingProvider.addCriterion(criterion);
         getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
-        getView().getReferenceCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+        getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    public void updateReferenceSearchMode(MatchMode value) {
+        if(referencePagingProvider != null && value != null){
+            referencePagingProvider.setMatchMode(value);
+            getView().getReferenceCombobox().refresh();
+        }
     }
 
     /**
@@ -102,9 +152,11 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
         refTypes.remove(ReferenceType.Section);
         newReferencePopup.withReferenceTypes(refTypes);
+
         newReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         newReferencePopup.withDeleteButton(true);
         newReferencePopup.loadInEditor(null);
+        newReferencePopup.getTypeSelect().setValue(ReferenceType.Article);
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Remove.class)
@@ -168,7 +220,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
 
         UUID referenceUuid = null;
-        LazyComboBox<Reference> referenceCombobox = getView().getReferenceCombobox();
+        LazyComboBox<TypedEntityReference<Reference>> referenceCombobox = getView().getReferenceCombobox();
         referenceCombobox.commit();
         if(newReference != null){
             referenceUuid = newReference.getUuid();
@@ -199,8 +251,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      */
     @Override
     protected void saveBean(RegistrationDTO bean) {
-        // TODO Auto-generated method stub
-
+        // not needed //
     }
 
     /**
@@ -208,8 +259,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
      */
     @Override
     protected void deleteBean(RegistrationDTO bean) {
-        // TODO Auto-generated method stub
-
+        // not needed //
     }
 
 }

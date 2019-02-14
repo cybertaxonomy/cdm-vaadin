@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.common.InstitutionDTO;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.mvp.BoundField;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
@@ -42,7 +43,6 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<InstitutionDTO, Institution, InstitutionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
-
 
     /**
      * {@inheritDoc}
@@ -62,7 +62,7 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
         if(identifier != null){
             bean = (Institution) getRepo().getAgentService().load(identifier, initStrategy);
         } else {
-            bean = Institution.NewInstance();
+            bean = createCdmEntity();
         }
         return bean;
     }
@@ -167,6 +167,20 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
     @Override
     protected InstitutionDTO createDTODecorator(Institution cdmEntitiy) {
         return new InstitutionDTO(cdmEntitiy);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected BeanInstantiator<Institution> defaultCdmEntityInstantiator() {
+        return new  BeanInstantiator<Institution>(){
+            @Override
+            public Institution createNewBean() {
+                return Institution.NewInstance();
+            }
+
+        };
     }
 
 

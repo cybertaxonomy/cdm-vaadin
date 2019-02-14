@@ -25,17 +25,24 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
 
     private static final long serialVersionUID = 4472031263172275012L;
 
+    boolean addNewEntityAllowed = true;
+
     ToOneRelatedEntityField<CDM>  toOneRelatedEntityField;
 
     private Class<? extends CDM> type;
 
-
-    public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField){
+    public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField, boolean addNewEntityAllowed){
         this.toOneRelatedEntityField = toOneRelatedEntityField;
+        this.addNewEntityAllowed = addNewEntityAllowed;
         this.type = toOneRelatedEntityField.getType();
         updateButtons(((Field<CDM>)toOneRelatedEntityField).getValue());
         toOneRelatedEntityField.setEditButtonEnabled(false);
     }
+
+    public ToOneRelatedEntityButtonUpdater(ToOneRelatedEntityField<CDM> toOneRelatedEntityField){
+        this(toOneRelatedEntityField, true);
+    }
+
 
     /**
      * {@inheritDoc}
@@ -57,7 +64,7 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
         boolean userIsAllowedToCreate = UserHelperAccess.userHelper().userHasPermission(type, CRUD.CREATE);
         boolean isReadOnlyField = ((Field)toOneRelatedEntityField).isReadOnly();
 
-        toOneRelatedEntityField.setAddButtonEnabled(!isReadOnlyField && userIsAllowedToCreate);
+        toOneRelatedEntityField.setAddButtonEnabled(addNewEntityAllowed && !isReadOnlyField && userIsAllowedToCreate);
         toOneRelatedEntityField.setEditButtonEnabled(!isReadOnlyField && userIsAllowedToUpdate);
 
     }

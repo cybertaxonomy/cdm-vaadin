@@ -356,13 +356,17 @@ public class PersonField extends CompositeCustomField<Person> {
     @Override
     public void commit() throws SourceException, InvalidValueException {
 
+        String lastNomenclaturalTitle = null;
+        if(getValue() != null){
+           lastNomenclaturalTitle = getValue().getNomenclaturalTitle();
+        }
         super.commit();
 
         Person bean =  getValue();
 
-        if(bean != null){
+        if(bean != null && !isReadOnly()){
             String nomTitle = nomenclaturalTitleField.getValue();
-            if(nomTitle != null && nomTitle.equals(titleCacheField.getValue())){
+            if(nomTitle != null && nomTitle != lastNomenclaturalTitle && nomTitle.equals(titleCacheField.getValue())){
                 // no point having a nomenclaturalTitle if it is equal to the titleCache
                 bean.setNomenclaturalTitle(null);
             }

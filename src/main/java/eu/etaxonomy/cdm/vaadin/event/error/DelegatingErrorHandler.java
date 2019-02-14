@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.ServerRpcManager.RpcInvocationException;
 import com.vaadin.ui.Notification;
 
 /**
@@ -41,7 +42,7 @@ public class DelegatingErrorHandler implements ErrorHandler{
     @SuppressWarnings("unchecked")
     public <E extends Throwable> ErrorTypeHandler<E> findHandler(Class<E> errorClass){
         for(ErrorTypeHandler<?> h : handlers){
-            if(h.supports().equals(errorClass)){
+            if(h.supports().isAssignableFrom(errorClass)){
                 return (ErrorTypeHandler<E>) h;
             }
         }
@@ -57,6 +58,11 @@ public class DelegatingErrorHandler implements ErrorHandler{
 
         boolean handlerFound = true;
         Throwable throwable = event.getThrowable();
+        if(throwable != null && RpcInvocationException.class.isAssignableFrom(throwable.getClass())){
+            // we are only interested into the cause and will will remove RpcInvocationException > InvocationTargetException
+            throwable = throwable.getCause().getCause();
+            event.setThrowable(throwable);
+        }
         while(throwable != null){
             if(delegate(event, throwable)){
                 break;

@@ -24,6 +24,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Component;
@@ -32,6 +33,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.debug.EntityCacheDebugger;
+import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.ErrorTypeErrorHandlerWrapper;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
@@ -114,9 +117,13 @@ public class RegistrationUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        setErrorHandler(new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
+        DelegatingErrorHandler delegatingErrorHander = new DelegatingErrorHandler();
+        WindowErrorHandler errorHandler = new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
-                + "You also might want to add a sreenshot of the browser page in error.</i>"));
+                + "You also might want to add a sreenshot of the browser page in error.</i>");
+        delegatingErrorHander.registerHandler(new ErrorTypeErrorHandlerWrapper<Exception>(Exception.class, errorHandler));
+        setErrorHandler(delegatingErrorHander);
+        VaadinSession.getCurrent().setErrorHandler(delegatingErrorHander);
 
         navigator.setViewDisplay(viewDisplay);
         configureAccessDeniedView();
@@ -165,4 +172,5 @@ public class RegistrationUI extends UI {
 //            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 //        }
     }
+
 }

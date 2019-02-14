@@ -145,7 +145,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     public EntityChangeEvent saveBean(T bean, AbstractView view) {
 
         Type changeEventType;
-        if(bean.getId() > 1){
+        if(bean.isPersited()){
             changeEventType = Type.MODIFIED;
         } else {
             changeEventType = Type.CREATED;

@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -17,18 +16,14 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
-import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
@@ -45,9 +40,9 @@ import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
@@ -57,6 +52,7 @@ import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.component.WeaklyRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 
@@ -68,13 +64,13 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-    implements TaxonNamePopupEditorView, AccessRestrictedView{
+    implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 18;
+    private final static int GRID_ROWS = 19;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -104,11 +100,15 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private NameRelationField validationField;
 
+    private NameRelationField orthographicVariantField;
+
     private CheckBox basionymToggle;
 
     private CheckBox replacedSynonymsToggle;
 
     private CheckBox validationToggle;
+
+    private CheckBox orthographicVariantToggle;
 
     private ListSelect rankSelect;
 
@@ -137,6 +137,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
     private int genusOrUninomialRow;
+
+    private OrthographicCorrectionReferenceValidator orthographicCorrectionValidator;
 
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
@@ -276,23 +278,24 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         addField(rankSelect, "rank", 0, row, 1, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
 
+        row++;
         basionymToggle = new CheckBox("With basionym");
         basionymToggle.setValue(HAS_BASIONYM_DEFAULT);
-
         basionymToggle.setStyleName(getDefaultComponentStyles());
-        grid.addComponent(basionymToggle, 2, row, 3, row);
+        grid.addComponent(basionymToggle, 0, row);
         grid.setComponentAlignment(basionymToggle, Alignment.BOTTOM_LEFT);
 
-        row++;
         replacedSynonymsToggle = new CheckBox("With replaced synonym");
-        grid.addComponent(replacedSynonymsToggle, 2, row, 3, row);
+        grid.addComponent(replacedSynonymsToggle, 1, row);
         grid.setComponentAlignment(replacedSynonymsToggle, Alignment.BOTTOM_LEFT);
 
-        row++;
         validationToggle = new CheckBox("Validation");
-
-        grid.addComponent(validationToggle, 2, row, 3, row);
+        grid.addComponent(validationToggle, 2, row);
         grid.setComponentAlignment(validationToggle, Alignment.BOTTOM_LEFT);
+
+        orthographicVariantToggle = new CheckBox("Orthographical variant");
+        grid.addComponent(orthographicVariantToggle, 3, row);
+        grid.setComponentAlignment(orthographicVariantToggle, Alignment.BOTTOM_LEFT);
 
         row++;
         // fullTitleCache
@@ -315,15 +318,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         infraSpecificEpithetField.setWidth(200, Unit.PIXELS);
 
         row++;
-        grid.addComponent(new Label("Hint: <i>Edit nomenclatural authors in the nomenclatural reference.</i>", ContentMode.HTML), 0, row, 3, row);
-
-        row++;
         combinationAuthorshipField = new TeamOrPersonField("Combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
 
         row++;
         nomReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Nomenclatural reference", Reference.class);
+        // nomReferenceCombobox.setImmediate(true);
         nomReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                 this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, nomReferenceCombobox, this)
@@ -404,9 +405,9 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- Validation
         row++;
-        validationField = new NameRelationField("Validation", Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+        validationField = new NameRelationField("Validation", "Validated name", Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
         validationField.setWidth(100, Unit.PERCENTAGE);
-        ToOneRelatedEntityCombobox<TaxonName> validatedNameComboBox = validationField.getValidatedNameComboBox();
+        ToOneRelatedEntityCombobox<TaxonName> validatedNameComboBox = validationField.getRelatedNameComboBox();
         validatedNameComboBox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                 this,
                 new TaxonNameEditorAction(EditorActionType.ADD, null, validatedNameComboBox, this)
@@ -425,6 +426,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         });
         ToOneRelatedEntityCombobox<Reference> validationCitatonComboBox = validationField.getCitatonComboBox();
         validationCitatonComboBox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                // NOTE: adding new references is currently not allowed for name relations, see NameRelationField!!
                 this,
                 new ReferenceEditorAction(EditorActionType.ADD, null, validationCitatonComboBox, this)
                 ));
@@ -442,6 +444,49 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         });
         addField(validationField, "validationFor", 0, row, 3, row);
         grid.setComponentAlignment(validationField, Alignment.TOP_RIGHT);
+
+        // ------- Orthographic Variant (Correction)
+        row++;
+        orthographicVariantField = new NameRelationField("Orthographical variant", "Name variant", Direction.relatedTo, NameRelationshipType.ORTHOGRAPHIC_VARIANT());
+        orthographicVariantField.setWidth(100, Unit.PERCENTAGE);
+        // corrected name must have same
+        ToOneRelatedEntityCombobox<TaxonName> orthographicVariantCombobox = orthographicVariantField.getRelatedNameComboBox();
+        orthographicVariantCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                this,
+                new TaxonNameEditorAction(EditorActionType.ADD, null, orthographicVariantCombobox, this)
+                ));
+        orthographicVariantCombobox.addClickListenerEditEntity(e -> {
+            if(orthographicVariantCombobox.getValue() != null){
+                getViewEventBus().publish(this,
+                    new TaxonNameEditorAction(
+                            EditorActionType.EDIT,
+                            orthographicVariantCombobox.getValue().getUuid(),
+                            e.getButton(),
+                            orthographicVariantCombobox,
+                            this)
+                );
+            }
+        });
+        ToOneRelatedEntityCombobox<Reference> orthographicCorrectionCitatonComboBox = orthographicVariantField.getCitatonComboBox();
+        orthographicCorrectionCitatonComboBox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                // NOTE: adding new references is currently not allowed for name relations, see NameRelationField!!
+                this,
+                new ReferenceEditorAction(EditorActionType.ADD, null, orthographicCorrectionCitatonComboBox, this)
+                ));
+        orthographicCorrectionCitatonComboBox.addClickListenerEditEntity(e -> {
+            if(orthographicCorrectionCitatonComboBox.getValue() != null){
+                getViewEventBus().publish(this,
+                    new ReferenceEditorAction(
+                            EditorActionType.EDIT,
+                            orthographicCorrectionCitatonComboBox.getValue().getUuid(),
+                            e.getButton(),
+                            orthographicCorrectionCitatonComboBox,
+                            this)
+                );
+            }
+        });
+        addField(orthographicVariantField, "orthographicVariant", 0, row, 3, row);
+        grid.setComponentAlignment(orthographicVariantField, Alignment.TOP_RIGHT);
 
         row++;
         exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
@@ -470,6 +515,9 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         registerAdvancedModeComponents(exBasionymAuthorshipField.getCachFields());
 
         setAdvancedMode(false);
+
+        //TODO remove below line once #7858 is fixed
+        withDeleteButton(false);
 
     }
 
@@ -531,7 +579,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
             replacedSynonymsComboboxSelect.setVisible(enable);
         });
-
+        orthographicVariantToggle.addValueChangeListener(e -> {
+            boolean enable = e.getProperty().getValue() != null && (Boolean)e.getProperty().getValue();
+            orthographicVariantField.setVisible(enable);
+        });
 
         TaxonNameDTO taxonNameDTO = getBean();
         boolean showBasionymSection = taxonNameDTO.getBasionyms().size() > 0
@@ -546,30 +597,32 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         replacedSynonymsComboboxSelect.setVisible(showReplacedSynonyms);
 
         boolean showValidationSection = taxonNameDTO.getValidationFor() != null || taxonNameDTO.getExCombinationAuthorship() != null;
-
         validationToggle.setValue(showValidationSection);
         validationToggle.setReadOnly(showValidationSection);
-//        validationField.setVisible(showValidation);
-//        exCombinationAuthorshipField.setVisible(showExAuthors);
+
+        boolean showOrthographicCorrectionSection = taxonNameDTO.getOrthographicVariant() != null;
+        orthographicVariantToggle.setValue(showOrthographicCorrectionSection);
+        orthographicVariantToggle.setReadOnly(showOrthographicCorrectionSection);
 
         if(isModeEnabled(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
             updateAuthorshipFields();
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY) && getBean().getNomenclaturalReference() != null) {
-            nomReferenceCombobox.setCaption("Selection limited to nomenclatural reference and sections");
+            nomReferenceCombobox.setDescription("Selection limited to nomenclatural reference and parts of it.");
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE)) {
             if(combinationAuthorshipField.getValue() == null){
                 nomReferenceCombobox.setRequired(true);
+                nomReferenceCombobox.setImmediate(true);
             } else {
                 combinationAuthorshipField.addValueChangeListener(e -> {
                     if(e.getProperty().getValue() == null){
                         nomReferenceCombobox.setRequired(true);
+                        nomReferenceCombobox.setImmediate(true);
                     }
                 });
             }
         }
-
     }
 
     /**
@@ -620,24 +673,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 taxonName.getExCombinationAuthorship(),
                 inferExCombinationAuthors(),
                 exCombinationAuthorshipField,
-                validationField.getValidatedNameComboBox(),
+                validationField.getRelatedNameComboBox(),
                 isInferredExCombinationAuthorship
                 );
 
         updateFieldVisibility();
-
     }
 
-//    /**
-//     *
-//     */
-//    protected void updateAuthorshipFieldsVisibility() {
-//        combinationAuthorshipField.setVisible(!isInferredCombinationAuthorship);
-//        if(BooleanUtils.isTrue(basionymToggle.getValue())){
-//            basionymAuthorshipField.setVisible(!isInferredBasionymAuthorship);
-//            exBasionymAuthorshipField.setVisible(!isInferredExBasionymAuthorship);
-//        }
-//    }
 
     /**
      *
@@ -701,14 +743,36 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
+        Boolean withOrthographicCorrectionSection = BooleanUtils.isTrue(orthographicVariantToggle.getValue());
 
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(isSpeciesOrBelow) {
                 if(TextField.class.isAssignableFrom(genusOrUninomialField.getClass())){
-                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new LazyComboBox<String>(String.class), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
+                    combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                            this,
+                            new TaxonNameEditorActionStrRep(
+                                    EditorActionType.ADD,
+                                    e.getButton(),
+                                    combobox,
+                                    this)
+                        ));
+                    combobox.addClickListenerEditEntity(e -> {
+                        if(combobox.getValue() != null){
+                            getViewEventBus().publish(this,
+                                new TaxonNameEditorActionStrRep(
+                                        EditorActionType.EDIT,
+                                        combobox.getIdForValue(),
+                                        e.getButton(),
+                                        combobox,
+                                        this)
+                            );
+                        }
+                    });
+                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
-                if(LazyComboBox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
+                if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new TextFieldNFix(), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             }
@@ -717,18 +781,49 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(rank.isInfraSpecific()) {
                 if(TextField.class.isAssignableFrom(specificEpithetField.getClass())) {
-                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new LazyComboBox<String>(String.class), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
+                    specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, combobox, 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                            this,
+                            new TaxonNameEditorActionStrRep(EditorActionType.ADD, e.getButton(), combobox, this)
+                        ));
+                    combobox.addClickListenerEditEntity(e -> {
+                        if(combobox.getValue() != null){
+                            getViewEventBus().publish(this,
+                                new TaxonNameEditorActionStrRep(
+                                        EditorActionType.EDIT,
+                                        combobox.getIdForValue(),
+                                        e.getButton(),
+                                        combobox,
+                                        this)
+                            );
+                        }
+                    });
                 }
             } else {
-                if(LazyComboBox.class.isAssignableFrom(specificEpithetField.getClass())) {
+                if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new TextFieldNFix(), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
                }
             }
         }
 
+        if(isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
+            orthographicVariantField.setCaption("Orthographical correction");
+            orthographicVariantField.getRelatedNameComboBox().setCaption("Incorrect name");
+            orthographicVariantToggle.setCaption("Orthographical correction");
+        } else {
+            orthographicVariantField.setCaption("Orthographical variant");
+            orthographicVariantField.getRelatedNameComboBox().setCaption("Name variant");
+            orthographicVariantToggle.setCaption("Orthographical variant");
+        }
+
+        genusOrUninomialField.setRequired(true);
         specificEpithetField.setVisible(isSpeciesOrBelow);
+        specificEpithetField.setRequired(isSpeciesOrBelow);
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
+        infraSpecificEpithetField.setRequired(rank.isInfraSpecific());
         infraGenericEpithetField.setVisible(rank.isInfraGeneric());
+        infraGenericEpithetField.setRequired(rank.isInfraGeneric());
 
         basionymsComboboxSelect.setVisible(withBasionymSection);
 
@@ -739,11 +834,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         validationField.setVisible(withValidationSection);
         exCombinationAuthorshipField.setVisible(withValidationSection && isInferredExCombinationAuthorship != null && !isInferredExCombinationAuthorship);
 
-
-//        if(taxonName != null){
-//            if(modesActive.contains(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
-//            }
-//        }
+        orthographicVariantField.setVisible(withOrthographicCorrectionSection);
+        if(withOrthographicCorrectionSection){
+            orthographicCorrectionValidator = new OrthographicCorrectionReferenceValidator(nomReferenceCombobox);
+            orthographicVariantField.addValidator(orthographicCorrectionValidator);
+        } else {
+            if(orthographicCorrectionValidator  != null){
+                orthographicVariantField.removeValidator(orthographicCorrectionValidator);
+                orthographicVariantField = null;
+            }
+        }
 
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         specificEpithetField.setVisible(isSpeciesOrBelow);
@@ -759,21 +859,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         super.cancel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
-    }
 
     /**
      * {@inheritDoc}
@@ -853,6 +938,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     }
 
     @Override
+    public NameRelationField getOrthographicVariantField() {
+        return orthographicVariantField;
+    }
+
+    @Override
     public void enableMode(TaxonNamePopupEditorMode mode){
             modesActive.add(mode);
     }
@@ -927,6 +1017,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public AbstractField<String> getInfraSpecificEpithetField() {
         return infraSpecificEpithetField;
+    }
+
+    @Override
+    public CheckBox getOrthographicVariantToggle() {
+        return orthographicVariantToggle;
     }
 
 

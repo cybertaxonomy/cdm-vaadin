@@ -201,9 +201,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         UUID registrationUuid = event.getIdentifier();
 
         RegistrationDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
-        if(event.getProperty().equals("messages")){
+        if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
 
-            getView().openDetailsPopup("Messages", regDto.getValidationProblems());
+            getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
 
         } else if(event.getProperty().equals("blockedBy")){
 

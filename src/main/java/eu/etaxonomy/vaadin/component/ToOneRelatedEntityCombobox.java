@@ -12,8 +12,13 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
@@ -50,11 +55,16 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         this.type = type;
         setCaption(caption);
         lazySelect = new ReloadableLazyComboBox<V>(type);
+        lazySelect.setValidationVisible(false); // validation is to be shown for the ToOneRelatedEntityCombobox
+        lazySelect.setRequiredError("Must be given");
+        setRequiredError("Must be given");
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
+        // lazySelect.setImmediate(true); // should cause immediate validation, however,
+        // it does not work here, therefore we validate in the commitSelect() method during the commit
         lazySelect.addValueChangeListener(e -> {
             // update the itemContainer immediately so that the edit button acts on the chosen item
-            lazySelect.commit();
+            commitSelect();
         });
     }
 
@@ -169,8 +179,24 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
      */
     @Override
     public V getValue() {
-        lazySelect.commit();
+        commitSelect();
         return lazySelect.getValue();
+    }
+
+
+
+
+    /**
+     *
+     */
+    public void commitSelect() {
+        try {
+            setComponentError(null);
+            lazySelect.commit();
+        } catch (InvalidValueException ex){
+            UserError componentError = new UserError(ex.getHtmlMessage(), ContentMode.HTML, ErrorLevel.ERROR);
+            setComponentError(componentError);
+        }
     }
 
 
@@ -220,6 +246,59 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         this.buttonUpdater = buttonUpdater;
         lazySelect.addValueChangeListener(buttonUpdater);
     }
+
+
+    @Override
+    public void validate() throws InvalidValueException {
+        super.validate();
+        lazySelect.validate();
+    }
+
+
+    @Override
+    public ErrorMessage getErrorMessage() {
+        ErrorMessage errorMessage = lazySelect.getErrorMessage();
+        return errorMessage;
+    }
+
+
+    @Override
+    public boolean isValid() {
+        return lazySelect.isValid();
+    }
+
+    @Override
+    public void setRequired(boolean required) {
+        super.setRequired(required);
+        lazySelect.setRequired(required);
+    }
+
+
+    @Override
+    public boolean isRequired() {
+        return lazySelect.isRequired();
+    }
+
+    @Override
+    public void setImmediate(boolean immediate) {
+        super.setImmediate(immediate);
+        lazySelect.setImmediate(immediate);
+    }
+
+
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+        lazySelect.commit(); // we must not use the commitSelect() here to allow InvalidValueException to be handled by the caller
+        super.commit();
+    }
+
+
+    @Override
+    public void setComponentError(ErrorMessage componentError) {
+        lazySelect.setComponentError(componentError);
+        super.setComponentError(componentError);
+    }
+
 
 
 }

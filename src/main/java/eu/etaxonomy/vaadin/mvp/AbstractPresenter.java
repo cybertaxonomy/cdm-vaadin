@@ -171,6 +171,10 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	 * are managed through the {@link NavigationManagerBean}
 	 */
 	public void handleViewEntered() {
+        // fist of all clear the session to wipe out any left overs from previous usage of the session
+        // this can happen if not all operations within a session are cleaned up correctly in
+        // turn of an exception
+        getSession().clear();
 	}
 
     /**
@@ -238,8 +242,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     }
 
     @Override
-    public
-    void destroy() throws Exception {
+    public void destroy() throws Exception {
         unsubscribeFromEventBuses();
         view = null;
     }

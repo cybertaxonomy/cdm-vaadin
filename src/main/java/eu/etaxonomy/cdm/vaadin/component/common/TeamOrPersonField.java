@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -55,6 +56,8 @@ import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>> {
 
     private static final long serialVersionUID = 660806402243118112L;
+
+    private static final Logger logger = Logger.getLogger(TeamOrPersonField.class);
 
     private static final String PRIMARY_STYLE = "v-team-or-person-field";
 
@@ -164,9 +167,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         boolean userCanCreate = UserHelperAccess.userHelper().userHasPermission(Person.class, "CREATE");
 
         teamOrPersonSelect.setVisible(val == null);
-        removeButton.setVisible(val != null);
-        personButton.setEnabled(userCanCreate && val == null);
-        teamButton.setEnabled(userCanCreate && val == null);
+        removeButton.setVisible(!isReadOnly() && val != null);
+        personButton.setEnabled(!isReadOnly() && userCanCreate && val == null);
+        teamButton.setEnabled(!isReadOnly() && userCanCreate && val == null);
     }
 
     /**
@@ -184,7 +187,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         compositeWrapper.addComponent(toolBar);
 
         if(newValue != null) {
-
             if(Person.class.isAssignableFrom(newValue.getClass())){
                 // value is a Person
                 compositeWrapper.addComponent(personField);
@@ -196,29 +198,27 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             else if(Team.class.isAssignableFrom(newValue.getClass())){
                 // otherwise it a Team
                 compositeWrapper.addComponents(titleField, nomenclaturalTitleField, personsListEditor);
-
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
                 nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
                 fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
-                boolean readonlyState = personsListEditor.isReadOnly();
-                fieldGroup.bind(personsListEditor, "teamMembers"); // here personField is set readonly since setTeamMembers does not exist
-                personsListEditor.setReadOnly(readonlyState); // fixing the readonly state
-
+                fieldGroup.bind(personsListEditor, "teamMembers");
                 personsListEditor.registerParentFieldGroup(fieldGroup);
-
             } else {
-                setComponentError(new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName()));
+                UserError usererror = new UserError("TeamOrPersonField Error: Unsupported value type: " + newValue.getClass().getName());
+                setComponentError(usererror);
+                logger.error(usererror.getMessage());
             }
         } else {
+            // new value is null
             if(oldValue != null){
-                // value is null --> clean up all nested fields
+                // value is null --> clean up all nested fields from old value
                 // allow replacing old content in the editor by null
                 setReadOnlyComponents(false);
-                if(oldValue instanceof Person){
+                if(Person.class.isAssignableFrom(oldValue.getClass())){
                     personField.unregisterParentFieldGroup(fieldGroup);
                     personField.setReadOnly(false);
                     personField.setValue((Person) null);
-                } else {
+                } else if(Team.class.isAssignableFrom(oldValue.getClass())){
                     titleField.unbindFrom(fieldGroup);
                     nomenclaturalTitleField.unbindFrom(fieldGroup);
                     fieldGroup.unbind(personsListEditor);
@@ -227,6 +227,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                     personsListEditor.setReadOnly(false);
                     personsListEditor.setValue(null);
                     personsListEditor.registerParentFieldGroup(null);
+                } else {
+                    UserError usererror = new UserError("TeamOrPersonField Error: Unsupported value type in oldValue: " + oldValue.getClass().getName());
+                    setComponentError(usererror);
+                    logger.error(usererror.getMessage());
                 }
             }
         }
@@ -241,6 +245,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
             setReadOnlyComponents(true);
+            fieldGroup.setReadOnly(true); // really needed?
         }
     }
 
@@ -298,7 +303,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
 
         TeamOrPersonBase<?> bean = getValue();
-        if(bean != null && bean instanceof Team){
+        boolean isTeam = bean != null && bean instanceof Team;
+        if(isTeam){
             boolean isUnsaved = bean.getId() == 0;
             if(isUnsaved){
                 UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
@@ -419,7 +425,12 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
      * @param readOnly
      */
     protected void setReadOnlyComponents(boolean readOnly) {
-        setDeepReadOnly(readOnly, getContent(), editorComponents);
+
+        // setDeepReadOnly(readOnly, getContent(), editorComponents);
+        // editorComponents.forEach(c -> c.setEnabled(!readOnly));
+//        personField.setReadOnly(readOnly);
+//        personsListEditor.setReadOnly(readOnly);
+
         updateCaptionReadonlyNotice(readOnly);
     }
 

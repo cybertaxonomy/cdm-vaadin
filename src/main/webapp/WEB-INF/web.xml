@@ -37,11 +37,20 @@
     	<servlet-name>Cdm_vaadin Application</servlet-name>
     	<servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
     	<init-param>
-    		<description>
-    		Legacy mode to return the value of the property as a string from AbstractProperty.toString()</description>
+    		<description>Legacy mode to return the value of the property as a string from AbstractProperty.toString()</description>
     		<param-name>legacyPropertyToString</param-name>
     		<param-value>false</param-value>
     	</init-param>
+        <init-param>
+          <!-- 
+            If the closeIdleSessions parameter for the servlet is
+            enabled (disabled by default), Vaadin closes the UIs and the session after the time specified
+            in the session-timeout parameter expires after the last non-heartbeat request.
+            For session-timeout see <session-config>
+           -->
+          <param-name>closeIdleSessions</param-name>
+          <param-value>true</param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
@@ -87,16 +96,25 @@
       
       There are also productionMode=true settings in the eu.etaxonomy.cdm.vaadin.ui package
       which don't seem to have an effect. 
+      
+      see also the notes at CdmVaadinConfiguration.Servlet
     -->
     <context-param>
-      <description>Vaadin production mode</description>
-      <param-name>productionMode</param-name>
-      <param-value>false</param-value>
-    </context-param>
-    <context-param>
-    	<description>
-    	Vaadin production mode</description>
+    	<description>Vaadin production mode</description>
     	<param-name>productionMode</param-name>
     	<param-value>false</param-value>
     </context-param>
+    <!-- 
+    <context-param>
+      <param-name>heartbeatInterval</param-name>
+      <param-value>300</param-value><!- - default is 300 seconds - ->
+    </context-param> 
+    -->
+    
+    <!-- configuring the session-timeout seems not to have an effect
+    <session-config>
+        <session-timeout>20</session-timeout><!- - jetty session-timeout default is 30 minutes - ->
+    </session-config> 
+    -->
+    
 </web-app>

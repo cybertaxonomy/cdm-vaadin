@@ -33,6 +33,7 @@ import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.mvp.BoundField;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
@@ -47,6 +48,19 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
     private static final long serialVersionUID = -1996365248431425021L;
 
+    protected static BeanInstantiator<Collection> defaultBeanInstantiator = new BeanInstantiator<Collection>() {
+
+        @Override
+        public Collection createNewBean() {
+            return Collection.NewInstance();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<Collection> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
+    }
 
     /**
      * {@inheritDoc}
@@ -66,7 +80,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         if(identifier != null){
             bean = getRepo().getCollectionService().load(identifier, initStrategy);
         } else {
-            bean = Collection.NewInstance();
+            bean = createNewBean();
         }
         return bean;
     }
@@ -171,7 +185,7 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
 
         institutionPopuEditor.grantToCurrentUser(this.crud);
-        institutionPopuEditor.withDeleteButton(true);
+        institutionPopuEditor.withDeleteButton(false);
         institutionPopuEditor.loadInEditor(null);
     }
 

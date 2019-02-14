@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
-import eu.etaxonomy.cdm.model.ICdmCacher;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -48,6 +48,29 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     private static final Logger logger = Logger.getLogger(CdmEditorPresenterBase.class);
 
+    protected BeanInstantiator<DTO> beanInstantiator = null;
+
+
+    /**
+     * @param beanInstantiator the beanInstantiator to set
+     */
+    public void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
+        this.beanInstantiator = beanInstantiator;
+    }
+
+
+    protected DTO createNewBean() {
+        if(this.beanInstantiator != null){
+            return beanInstantiator.createNewBean();
+        }
+        return defaultBeanInstantiator().createNewBean();
+    }
+
+    /**
+     * @return
+     */
+    protected abstract BeanInstantiator<DTO> defaultBeanInstantiator();
+
     /**
      * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.
@@ -55,7 +78,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     protected EnumSet<CRUD> crud = null;
 
 
-    private ICdmCacher cache;
+    private ICdmEntityUuidCacher cache;
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
@@ -94,7 +117,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
         }
-        cache = new CdmTransientEntityCacher(this);
+        cache = new CdmTransientEntityAndUuidCacher(this);
         // need to use load but put see #7214
         cdmEntitiy = cache.load(cdmEntitiy);
         addRootEntity(cdmEntitiy);
@@ -127,11 +150,11 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         if(AbstractCdmPopupEditor.class.isAssignableFrom(getView().getClass())){
             AbstractCdmPopupEditor popupView = ((AbstractCdmPopupEditor)getView());
 
-            if(!canEdit){
+            if(cdmEntitiy.isPersited() && !canEdit){
                 popupView.setReadOnly(true); // never reset true to false here!
                 logger.debug("setting editor to readonly");
             }
-            if(!canDelte){
+            if(!cdmEntitiy.isPersited() || !canDelte){
                 popupView.withDeleteButton(false);
                 logger.debug("removing delete button");
             }
@@ -271,8 +294,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }
-
     }
+
 
     /**
      * @param crud
@@ -286,7 +309,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      * {@inheritDoc}
      */
     @Override
-    public ICdmCacher getCache() {
+    public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 

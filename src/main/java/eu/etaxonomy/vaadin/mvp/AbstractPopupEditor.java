@@ -29,6 +29,7 @@ import com.vaadin.data.fieldgroup.FieldGroup.FieldGroupInvalidValueException;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -37,6 +38,7 @@ import com.vaadin.ui.AbstractLayout;
 import com.vaadin.ui.AbstractOrderedLayout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -53,13 +55,16 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.PopupDateField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormatter;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
@@ -106,6 +111,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private CssLayout toolBarButtonGroup = new CssLayout();
 
+    private Label contextBreadcrumbsLabel = new Label();
+
     private Label statusMessageLabel = new Label();
 
     Set<String> statusMessages = new HashSet<>();
@@ -120,7 +127,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private boolean isAdvancedMode = false;
 
-    private List<Component> advancedModeComponents = new ArrayList<>();
+    protected List<Component> advancedModeComponents = new ArrayList<>();
 
     private Button advancedModeButton;
 
@@ -139,6 +146,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         toolBar.addStyleName(ValoTheme.WINDOW_TOP_TOOLBAR);
         toolBar.setWidth(100, Unit.PERCENTAGE);
+        contextBreadcrumbsLabel.setId("context-breadcrumbs");
+        contextBreadcrumbsLabel.setWidthUndefined();
+        contextBreadcrumbsLabel.setContentMode(com.vaadin.shared.ui.label.ContentMode.HTML);
+        toolBar.addComponent(contextBreadcrumbsLabel);
         toolBarButtonGroup.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         toolBarButtonGroup.setWidthUndefined();
         toolBar.addComponent(toolBarButtonGroup);
@@ -163,7 +174,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         save.addClickListener(e -> save());
 
         cancel = new Button("Cancel", FontAwesome.REMOVE);
-        cancel.addClickListener(e -> cancel());
+        cancel.addClickListener(e -> cancelEditorDialog());
 
         delete = new Button("Delete", FontAwesome.TRASH);
         delete.setStyleName(ValoTheme.BUTTON_DANGER);
@@ -369,6 +380,28 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         fieldGroup.addCommitHandler(commitHandler);
     }
 
+    protected void cancelEditorDialog(){
+
+        if(fieldGroup.isModified()){
+
+            ContinueAlternativeCancelDialog editorModifiedDialog = new ContinueAlternativeCancelDialog(
+                    "Cancel editor",
+                    "<p>The editor has been modified.<br>Do you want to save your changes or discard them?<p>",
+                    "Discard",
+                    "Save");
+            ClickListener saveListener = e -> {editorModifiedDialog.close(); save();};
+            ClickListener discardListener = e -> {editorModifiedDialog.close(); cancel();};
+            ClickListener cancelListener = e -> editorModifiedDialog.close();
+            editorModifiedDialog.addAlternativeClickListener(saveListener);
+            editorModifiedDialog.addContinueClickListener(discardListener);
+            editorModifiedDialog.addCancelClickListener(cancelListener);
+
+            UI.getCurrent().addWindow(editorModifiedDialog);
+        } else {
+            cancel();
+        }
+    }
+
 
     /**
      * Cancel editing and discard all modifications.
@@ -395,18 +428,26 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             fieldGroup.commit();
         } catch (CommitException e) {
             fieldGroup.getFields().forEach(f -> ((AbstractField<?>)f).setValidationVisible(true));
-            if(e.getCause() != null && e.getCause() instanceof FieldGroupInvalidValueException){
-                FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)e.getCause();
-                updateFieldNotifications(invalidValueException.getInvalidFields());
-                Notification.show("The entered data in " + invalidValueException.getInvalidFields().size() + " fields is incomplete or invalid.");
-            } else if(e.getCause() != null && e.getCause().getCause() != null && e.getCause().getCause() instanceof PermissionDeniedException){
-                PermissionDeniedException permissionDeniedException = (PermissionDeniedException)e.getCause().getCause();
-                Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
-            } else {
-//                Logger.getLogger(this.getClass()).error("Error saving", e);
-//                Notification.show("Error saving", Type.ERROR_MESSAGE);
-                throw new RuntimeException("Error saving", e);
+            Throwable cause = e.getCause();
+            while(cause != null) {
+                if(cause instanceof FieldGroupInvalidValueException){
+                    FieldGroupInvalidValueException invalidValueException = (FieldGroupInvalidValueException)cause;
+                    updateFieldNotifications(invalidValueException.getInvalidFields());
+                    int invalidFieldsCount = invalidValueException.getInvalidFields().size();
+                    Notification.show("The entered data in " + invalidFieldsCount + " field" + (invalidFieldsCount > 1 ? "s": "") + " is incomplete or invalid.");
+                    break;
+                } else if(cause instanceof PermissionDeniedException){
+                    PermissionDeniedException permissionDeniedException = (PermissionDeniedException)cause;
+                    Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
+                    break;
+                }
+                cause = cause.getCause();
             }
+            if(cause == null){
+                // no known exception type found
+                throw new PopupEditorException("Error saving popup editor", this, e);
+            }
+
         }
     }
 
@@ -718,6 +759,43 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         statusMessageLabel.addStyleName(ValoTheme.LABEL_COLORED);
     }
 
+    private void updateContextBreadcrumbs() {
+
+        List<EditorActionContext> contextInfo = new ArrayList<>(getEditorActionContext());
+        String breadcrumbs = "";
+        EditorActionContextFormatter formatter = new EditorActionContextFormatter();
+
+        GenericFontIcon operationPrefixIcon = new GenericFontIcon("IcoMoon", 0xe902);
+        GenericFontIcon operationSuffxIcon = new GenericFontIcon("IcoMoon", 0xe901);
+
+        int cnt = 0;
+        for(EditorActionContext cntxt : contextInfo){
+            cnt++;
+            boolean isLast = cnt == contextInfo.size();
+            boolean isFirst = cnt == 1;
+
+            boolean doClass = false; // will be removed in future
+            boolean classNameForMissingPropertyPath = true; // !doClass;
+            boolean doProperties = true;
+            boolean doCreateOrNew = !isFirst;
+            String contextmarkup = formatter.format(
+                    cntxt,
+                    new EditorActionContextFormat(doClass, doProperties, classNameForMissingPropertyPath, doCreateOrNew,
+                            EditorActionContextFormat.TargetInfoType.FIELD_CAPTION, (isLast ? "active" : ""))
+                    );
+//            if(!isLast){
+//                contextmarkup += " " + FontAwesome.ANGLE_RIGHT.getHtml() + " ";
+//            }
+            if(isLast){
+                contextmarkup = "<li><span class=\"crumb active\">" + contextmarkup + "</span></li>";
+            } else {
+                contextmarkup = "<li><span class=\"crumb\">" + contextmarkup + "</span></li>";
+            }
+            breadcrumbs += contextmarkup;
+        }
+        contextBreadcrumbsLabel.setValue("<ul class=\"breadcrumbs\">" + breadcrumbs + "</ul>");
+    }
+
     // ------------------------ data binding ------------------------ //
 
     protected void bindDesign(Component component) {
@@ -732,7 +810,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         DTO beanToEdit = getPresenter().loadBeanById(identifier);
         fieldGroup.setItemDataSource(beanToEdit);
         afterItemDataSourceSet();
-        getPresenter().adaptToUserPermission(beanToEdit);
+        getPresenter().onViewFormReady(beanToEdit);
+        updateContextBreadcrumbs();
         isBeanLoaded = true;
     }
 
@@ -742,7 +821,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @param beanInstantiator
      */
     public final void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
-        getPresenter().setBeanInstantiator(beanInstantiator);
+        if(AbstractCdmEditorPresenter.class.isAssignableFrom(getPresenter().getClass())){
+            ((CdmEditorPresenterBase)getPresenter()).setBeanInstantiator(beanInstantiator);
+        } else {
+            throw new RuntimeException("BeanInstantiator can only be set for popup editors with a peresenter of the type CdmEditorPresenterBase");
+        }
     }
 
     /**
@@ -813,7 +896,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             if(getBean() == null){
                 throw new RuntimeException("getContext() is only possible after the bean is loaded");
             }
-            context.push(new AbstractEditorAction.EditorActionContext(getBean(), this));
+            context.push(new EditorActionContext(getBean(), this));
             isContextUpdated = true;
         }
         return context;
@@ -824,9 +907,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      *
      * @param context the context to set
      */
-    public void setParentEditorActionContext(Stack<EditorActionContext> context) {
+    public void setParentEditorActionContext(Stack<EditorActionContext> context, Field<?> targetField) {
         if(context != null){
             this.context.addAll(context);
+        }
+        if(targetField != null){
+            this.context.get(context.size() - 1).setTargetField(targetField);
         }
     }
 

@@ -8,13 +8,17 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
+import java.util.Collection;
 import java.util.EnumSet;
+
+import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.ui.Layout;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
+import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 
 /**
@@ -23,7 +27,9 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
  *
  */
 public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO, CDM, ? extends ApplicationView>>
-    extends AbstractPopupEditor<DTO, P> implements PerEntityAuthorityGrantingEditor {
+    extends AbstractPopupEditor<DTO, P> implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
+
+    private String accessDeniedMessage;
 
     /**
      * @param layout
@@ -40,6 +46,30 @@ public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<
         getPresenter().setGrantsForCurrentUser(crud);
     }
 
+    public void setCdmEntityInstantiator(BeanInstantiator<CDM> cdmEntityInstantiator) {
+        ((AbstractCdmDTOEditorPresenter)getPresenter()).setCdmEntityInstantiator(cdmEntityInstantiator);
+    }
+
+    @Override
+    public boolean allowAnonymousAccess() {
+        return false;
+    }
+
+    @Override
+    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+
+    }
 
 
 }

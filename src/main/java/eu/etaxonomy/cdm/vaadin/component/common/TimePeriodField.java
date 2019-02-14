@@ -28,6 +28,20 @@ public class TimePeriodField extends AbstractTimePeriodField<TimePeriod> {
     }
 
     /**
+     *
+     */
+    public TimePeriodField() {
+        super();
+    }
+
+    /**
+     * @param string
+     */
+    public TimePeriodField(String string) {
+        super(string);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

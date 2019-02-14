@@ -18,12 +18,9 @@ import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
  * AbstractView is the base class of all MVP views. It takes care of finding
  * appropriate presenter component for the view.
  *
- * @param
- * 			<P>
- *            type of the presenter this view uses.
- *
- * @author Peter / Vaadin
+ * @param <P> type of the presenter this view uses.
  * @param <V>
+ * @author Peter / Vaadin
  */
 @SuppressWarnings("serial")
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
@@ -110,6 +107,5 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
            presenter.destroy();
        }
     }
-
 
 }

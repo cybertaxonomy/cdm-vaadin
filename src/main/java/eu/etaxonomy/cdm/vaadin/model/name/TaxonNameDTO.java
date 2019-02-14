@@ -46,6 +46,8 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private TaxonName persistedValidatedName;
 
+    private TaxonName persistedOrthographicVariant;
+
     /**
      * @param entity
      */
@@ -106,7 +108,7 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     public NameRelationshipDTO getValidationFor() {
         NameRelationshipDTO nameRelDto  = null;
-        NameRelationship validatingRelationship = validatingRelationship();
+        NameRelationship validatingRelationship = uniqueNameRelationship(NameRelationshipType.VALIDATED_BY_NAME(), Direction.relatedTo);
         if(validatingRelationship != null){
             nameRelDto = new NameRelationshipDTO(Direction.relatedTo, validatingRelationship);
             if(persistedValidatedName == null){
@@ -116,52 +118,75 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
         return nameRelDto;
     }
 
-    /**
-     * @return
-     */
-    protected NameRelationship validatingRelationship() {
-        Set<NameRelationship> toRelations = name.getRelationsToThisName();
-        Set<NameRelationship> validatedNameRelations = toRelations.stream().filter(
-                    nr -> nr.getType().equals(NameRelationshipType.VALIDATED_BY_NAME())
-                ).collect(Collectors.toSet());
-        if(validatedNameRelations.size() > 1){
-            // TODO use non RuntimeException
-            throw new RuntimeException("More than one validated name found.");
-        } else if(validatedNameRelations.size() == 0) {
-            return null;
-        }
-        return validatedNameRelations.iterator().next();
+    public void setValidationFor(NameRelationshipDTO nameRelDto) {
+        setUniqeNameRelationDTO(nameRelDto, NameRelationshipType.VALIDATED_BY_NAME(), Direction.relatedTo, persistedValidatedName);
     }
 
-    public void setValidationFor(NameRelationshipDTO nameRelDto) {
 
+    public NameRelationshipDTO getOrthographicVariant() {
+        NameRelationshipDTO nameRelDto  = null;
+        NameRelationship nameRelationship = uniqueNameRelationship(NameRelationshipType.ORTHOGRAPHIC_VARIANT(), Direction.relatedTo);
+        if(nameRelationship != null){
+            nameRelDto = new NameRelationshipDTO(Direction.relatedTo, nameRelationship);
+            if(persistedOrthographicVariant == null){
+               persistedOrthographicVariant = nameRelDto.getOtherName();
+            }
+        }
+        return nameRelDto;
+    }
+
+    public void setOrthographicVariant(NameRelationshipDTO nameRelDto) {
+        setUniqeNameRelationDTO(nameRelDto, NameRelationshipType.ORTHOGRAPHIC_VARIANT(), Direction.relatedTo, persistedOrthographicVariant);
+    }
+
+    /**
+     * @param nameRelDto
+     * @param nameRelationshipType
+     * @param direction
+     * @param persistedRelatedName
+     */
+    public void setUniqeNameRelationDTO(NameRelationshipDTO nameRelDto, NameRelationshipType nameRelationshipType,
+            Direction direction, TaxonName persistedRelatedName) {
         if(nameRelDto != null && nameRelDto.getOtherName() == null){
-            // treat as if there is no validation
+            // treat as if there is no related name
             nameRelDto = null;
         }
 
-        NameRelationship validatingRelationship = validatingRelationship();
+        NameRelationship relationship = uniqueNameRelationship(nameRelationshipType, direction);
 
         if(nameRelDto != null){
             // add or update ...
-            if(validatingRelationship != null && persistedValidatedName != null && validatingRelationship.getFromName().equals(persistedValidatedName)){
-                // validated name has not changed, so we can update the relation
-                validatingRelationship.setCitation(nameRelDto.getCitation());
-                validatingRelationship.setCitationMicroReference(nameRelDto.getCitationMicroReference());
-                validatingRelationship.setRuleConsidered(nameRelDto.getRuleConsidered());
+            boolean currentNameIsTarget = false;
+            if(relationship != null && persistedRelatedName != null){
+                if(direction == Direction.relatedTo){
+                    relationship.getFromName().equals(persistedRelatedName);
+                } else {
+                    relationship.getToName().equals(persistedRelatedName);
+                }
+            }
+            if(relationship != null && currentNameIsTarget){
+                // related name has not changed, so we can update the relation
+                relationship.setCitation(nameRelDto.getCitation());
+                relationship.setCitationMicroReference(nameRelDto.getCitationMicroReference());
+                relationship.setRuleConsidered(nameRelDto.getRuleConsidered());
             } else {
                 // need to remove the old relationship and to create a new one.
                 // the actual removal will take place ....
-                name.addRelationshipFromName(nameRelDto.getOtherName(), NameRelationshipType.VALIDATED_BY_NAME(),
-                        nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
-                if(persistedValidatedName != null){
-                    name.removeRelationWithTaxonName(persistedValidatedName, Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+                if(direction == Direction.relatedTo){
+                    name.addRelationshipFromName(nameRelDto.getOtherName(), nameRelationshipType,
+                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
+                } else {
+                    name.addRelationshipToName(nameRelDto.getOtherName(), nameRelationshipType,
+                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
+                }
+                if(persistedRelatedName != null){
+                    name.removeRelationWithTaxonName(persistedRelatedName, direction, nameRelationshipType);
                 }
             }
         } else {
             // remove ...
-            if(persistedValidatedName != null && validatingRelationship != null){
-                name.removeRelationWithTaxonName(persistedValidatedName, Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+            if(persistedRelatedName != null && relationship != null){
+                name.removeRelationWithTaxonName(persistedRelatedName, direction, nameRelationshipType);
             }
         }
     }
@@ -172,6 +197,30 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     public void setReplacedSynonyms(Set<TaxonName> replacedSynonyms) {
         setRelatedNames(Direction.relatedTo, NameRelationshipType.REPLACED_SYNONYM(), replacedSynonyms);
+    }
+
+    /**
+     * @return
+     */
+    protected NameRelationship uniqueNameRelationship(NameRelationshipType relationShipType, Direction direction) {
+
+        Set<NameRelationship> relations;
+
+        if(direction == Direction.relatedTo){
+            relations = name.getRelationsToThisName();
+        } else {
+            relations = name.getRelationsFromThisName();
+        }
+        Set<NameRelationship> nameRelations = relations.stream().filter(
+                    nr -> nr.getType().equals(relationShipType)
+                ).collect(Collectors.toSet());
+        if(nameRelations.size() > 1){
+            // TODO use non RuntimeException
+            throw new RuntimeException("More than one relationship of type " + relationShipType.getLabel() + " found.");
+        } else if(nameRelations.size() == 0) {
+            return null;
+        }
+        return nameRelations.iterator().next();
     }
 
     /**

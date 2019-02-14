@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.viritin.fields.ElementCollectionField;
 
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.validator.DoubleRangeValidator;
+import com.vaadin.server.ErrorMessage;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
@@ -27,11 +29,11 @@ import com.vaadin.ui.TextArea;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
-import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
@@ -45,6 +47,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 /**
  * @author a.kohlbecker
  * @since May 15, 2017
+ *
+ * TODO as subclass of AbstractCdmPopupEditor?
  *
  */
 @SpringComponent
@@ -81,6 +85,12 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     private FilterableAnnotationsField annotationsListField;
 
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
+
+    private GeoLocationField exactLocationField;
+
+    private Panel typeDesignationsScrollPanel;
+
+    private String accessDeniedMessage;
 
     /**
      * @return the countrySelectField
@@ -123,9 +133,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         //        see https://github.com/vaadin/framework/issues/3617
 
         row++;
-        GeoLocationField exactLocation = new GeoLocationField("Geo location");
-        addField(exactLocation, "exactLocation", 0, row, 2, row);
-        exactLocation.setWidth("100%");
+        exactLocationField = new GeoLocationField("Geo location");
+        addField(exactLocationField, "exactLocation", 0, row, 2, row);
+        exactLocationField.setWidth("100%");
 
         row++;
         MinMaxTextField absElevationMinMax = new MinMaxTextField("Altitude", "m");
@@ -171,8 +181,9 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         addField(collectorField, "collector", 0, row, 2, row);
 
         row++;
-        PartialDateField collectionDateField = new PartialDateField("Collection date");
-        collectionDateField.setInputPrompt("dd.mm.yyyy");
+
+        TimePeriodField collectionDateField = new TimePeriodField("Collection date");
+        // collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
         addTextField("Field number", "fieldNumber", 2, row);
 
@@ -180,33 +191,52 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         row++;
 
         // FIXME: can we use the Grid instead?
-        typeDesignationsCollectionField = new ElementCollectionField<>(
+        typeDesignationsCollectionField = new ElementCollectionField<SpecimenTypeDesignationDTO>(
                 SpecimenTypeDesignationDTO.class,
                 SpecimenTypeDesignationDTORow.class
-                );
+                ){
+
+                    @Override
+                    public void commit() throws SourceException, InvalidValueException {
+                        validate(); // validate always so that empty rows are recognized
+                        super.commit();
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        Collection value = getValue();
+                        return value == null || value.isEmpty() ;
+                    }
+
+                    @Override
+                    public void setComponentError(ErrorMessage componentError) {
+                        typeDesignationsScrollPanel.setComponentError(componentError);
+                    }
+
+        };
         typeDesignationsCollectionField.withCaption("Types");
         typeDesignationsCollectionField.getLayout().setSpacing(false);
         typeDesignationsCollectionField.getLayout().setColumns(3);
-
+        typeDesignationsCollectionField.setRequired(true); // only works with the above overwritten commit()
+        typeDesignationsCollectionField.setRequiredError(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
         typeDesignationsCollectionField.setVisibleProperties(SpecimenTypeDesignationDTORow.visibleFields());
 
         typeDesignationsCollectionField.setPropertyHeader("accessionNumber", "Access. num.");
         typeDesignationsCollectionField.setPropertyHeader("preferredStableUri", "Stable URI");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
-        typeDesignationsCollectionField.addElementAddedListener( e -> updateAllowSave());
-        typeDesignationsCollectionField.addElementRemovedListener( e -> updateAllowSave());
+        typeDesignationsCollectionField.addElementAddedListener( e -> typeDesignationsCollectionField.setComponentError(null));
 
         // typeDesignationsCollectionField.getLayout().setMargin(false);
         // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
         // addField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs", 0, row, 2, row);
 
-        Panel scrollPanel = new Panel(typeDesignationsCollectionField.getLayout());
-        scrollPanel.setCaption("Types");
-        scrollPanel.setWidth(800, Unit.PIXELS);
+        typeDesignationsScrollPanel = new Panel(typeDesignationsCollectionField.getLayout());
+        typeDesignationsScrollPanel.setCaption("Types");
+        typeDesignationsScrollPanel.setWidth(800, Unit.PIXELS);
 
         bindField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs");
-        addComponent(scrollPanel, 0, row, 2, row);
+        addComponent(typeDesignationsScrollPanel, 0, row, 2, row);
 
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
@@ -241,20 +271,24 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
     }
 
     /**
@@ -300,7 +334,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
         updateAllowDelete();
-        updateAllowSave();
     }
 
     /**
@@ -317,16 +350,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         }
     }
 
-    public void updateAllowSave(){
-        boolean hasTypeDesignations = getBean().getSpecimenTypeDesignationDTOs().size() > 0;
-        setSaveButtonEnabled(hasTypeDesignations);
-        if(!hasTypeDesignations){
-            addStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
-        } else {
-            removeStatusMessage(CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING);
-        }
-
-    }
 
     /**
      * {@inheritDoc}
@@ -375,6 +398,11 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     @Override
     public FilterableAnnotationsField getAnnotationsField() {
         return annotationsListField;
+    }
+
+    @Override
+    public GeoLocationField getExactLocationField() {
+        return exactLocationField;
     }
 
 

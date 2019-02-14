@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.ui;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -66,4 +68,6 @@ public class RegistrationUIDefaults {
     public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:editsupport@bgbm.org\">editsupport@bgbm.org</a> for support and more information.";
 
     public static final List<Role> COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION = Arrays.asList(Role.ROLE_ADMIN, RolesAndPermissions.ROLE_CURATION);
+
+    public static NumberFormat NUMBER_FORMAT_OVERRIDE = new DecimalFormat("#");
 }

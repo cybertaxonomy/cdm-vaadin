@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,9 +21,13 @@ import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 
 /**
  * @author a.kohlbecker
@@ -34,6 +39,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration, RegistrationPopEditorView> {
 
     private static final long serialVersionUID = 6930557602995331944L;
+    private RegistrationStatus lastStatus;
 
     /**
      * {@inheritDoc}
@@ -41,6 +47,21 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     @Override
     protected IRegistrationService getService() {
         return getRepo().getRegistrationService();
+    }
+
+
+    protected static BeanInstantiator<Registration> defaultBeanInstantiator = new BeanInstantiator<Registration>() {
+
+        @Override
+        public Registration createNewBean() {
+            return Registration.NewInstance();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<Registration> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
     }
 
     /**
@@ -54,10 +75,12 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
             List<String> initStrategy = Arrays.asList(new String[] {"$", "typeDesignations"});
             reg = getRepo().getRegistrationService().load(identifier, initStrategy );
         } else {
-            reg = Registration.NewInstance();
+            reg = createNewBean();
         }
         return reg;
     }
+
+
 
     /**
      * {@inheritDoc}
@@ -94,6 +117,25 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
 
         getView().getSubmitterField().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
         getView().getSubmitterField().setItemCaptionPropertyId("username");
+
+
+    }
+
+    @Override
+    protected void adaptDataProviders() {
+        getView().getStatusSelect().addValueChangeListener( e -> updateRegStatus((RegistrationStatus) e.getProperty().getValue()) );
+    }
+
+    private void updateRegStatus(RegistrationStatus status){
+        Registration reg = ((AbstractPopupEditor<Registration, RegistrationEditorPresenter>)getView()).getBean();
+        if(lastStatus != null){
+            // set last status again to allow updateStatusAndDate() to the job
+            reg.setStatus(lastStatus);
+        }
+        reg.updateStatusAndDate(status);
+        lastStatus = status;
+        JodaDateTimeConverter converter = new JodaDateTimeConverter();
+        getView().getRegistrationDateField().setValue(converter.convertToPresentation(reg.getRegistrationDate(), Date.class, null));
     }
 
 

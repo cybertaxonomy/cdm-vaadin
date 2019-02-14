@@ -36,11 +36,14 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
@@ -59,11 +62,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  */
 public class RegistrationItem extends GridLayout {
 
-
-
     public static final String VALIDATION_PROBLEMS = "validationProblems";
-
-    public static final String MESSAGES = "messages";
 
     public static final String BLOCKED_BY = "blockedBy";
 
@@ -90,8 +89,8 @@ public class RegistrationItem extends GridLayout {
     private RegistrationStatusLabel stateLabel = new RegistrationStatusLabel();
     private Link identifierLink = new Link();
     private Label citationSummaryLabel = new Label();
-    private Button blockedByButton = new Button(FontAwesome.WARNING);
-    private Button messageButton;
+    private Button blockedByButton = new Button(FontAwesome.BAN);
+    private BadgeButton validationProblemsButton;
     private Button openButton = new Button(FontAwesome.COGS);
     private Label submitterLabel = new Label();
     private Label createdLabel = new Label();
@@ -100,11 +99,14 @@ public class RegistrationItem extends GridLayout {
 
     private Panel blockingRelationsPanel;
 
+    private ICdmEntityUuidCacher cache;
+
     /**
      *
      */
-    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView) {
+    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
+        this.cache = cache;
         init();
         setItem(item, parentView);
     }
@@ -112,8 +114,9 @@ public class RegistrationItem extends GridLayout {
     /**
     *
     */
-   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView) {
+   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
        super(GRID_COLS, GRID_ROWS);
+       this.cache = cache;
        init();
        blockedByButton.setVisible(false);
        setWorkingSet(workingSet, parentView);
@@ -142,12 +145,12 @@ public class RegistrationItem extends GridLayout {
         setComponentAlignment(identifierLink, Alignment.TOP_CENTER);
         setColumnExpandRatio(1, 1.0f);
 
-        messageButton = new Button(FontAwesome.COMMENT);
-        CssLayout buttonGroup = new CssLayout(blockedByButton, messageButton, openButton);
+        validationProblemsButton = new BadgeButton(FontAwesome.WARNING);
+        CssLayout buttonGroup = new CssLayout(blockedByButton, validationProblemsButton, openButton);
         blockedByButton.setStyleName(ValoTheme.BUTTON_TINY);
         blockedByButton.setEnabled(false);
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
-        messageButton.setEnabled(false);
+        validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY);
+        validationProblemsButton.setEnabled(false);
 
         openButton.setStyleName(ValoTheme.BUTTON_TINY);
         openButton.addStyleName(ValoTheme.BUTTON_PRIMARY);
@@ -198,7 +201,7 @@ public class RegistrationItem extends GridLayout {
             setComponentError(new UserError("Citation is missing"));
         }
 
-        updateUI(regDto.getBibliographicCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getValidationProblems().size(),
+        updateUI(regDto.getBibliographicInRefCitationString(), regDto.getCreated(), regDto.getDatePublished(), regDto.getValidationProblems().size(),
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 
@@ -207,7 +210,7 @@ public class RegistrationItem extends GridLayout {
 
         ReferenceEditorAction referenceEditorAction = null;
         if(workingSet.getCitationUuid() != null){
-            if(UserHelperAccess.userHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
+            if(cdmUserHelper().userHasPermission(Reference.class, workingSet.getCitationUuid(), CRUD.UPDATE)){
                 referenceEditorAction = new ReferenceEditorAction(EditorActionType.EDIT, workingSet.getCitationUuid(), null, null, parentView);
             }
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, Reference.class, workingSet.getCitationUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
@@ -222,8 +225,19 @@ public class RegistrationItem extends GridLayout {
             datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
             // submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
         }
-        updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.messagesCount(),
+        updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.validationProblemsCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
+    }
+
+    /**
+     * @return
+     */
+    private UserHelper cdmUserHelper() {
+        if(cache != null){
+            return UserHelperAccess.userHelper().withCache(cache);
+        } else {
+            return UserHelperAccess.userHelper();
+        }
     }
 
 
@@ -231,16 +245,16 @@ public class RegistrationItem extends GridLayout {
      * @param submitterUserName TODO
      *
      */
-    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int messagesCount,
+    private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int validationProblemsCount,
             Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto, String submitterUserName) {
 
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
 
-        if(messagesCount > 0){
-            getMessageButton().setEnabled(true);
+        if(validationProblemsCount > 0){
+            getValidationProblemsButton().setEnabled(true);
             // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
-            getMessageButton().addClickListener(e -> {
+            getValidationProblemsButton().addClickListener(e -> {
                 ShowDetailsEvent detailsEvent;
                 if(regDto != null){
                     detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
@@ -258,8 +272,7 @@ public class RegistrationItem extends GridLayout {
                 publishEvent(detailsEvent);
                 }
             );
-            getMessageButton().setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + messagesCount + "</span>");
-            getMessageButton().setCaptionAsHtml(true);
+            getValidationProblemsButton().setCaption(Integer.toString(validationProblemsCount));
         }
 
         if(regDto != null && regDto.isBlocked()){
@@ -345,7 +358,7 @@ public class RegistrationItem extends GridLayout {
                 throw new RuntimeException("No point showing blocking registrations for an unblocked registration");
             }
 
-            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs);
+            blockingRelationsPanel = new RegistrationItemsPanel(parentView, "blocked by", blockingRegDTOs, cache);
             addComponent(blockingRelationsPanel, 0, 4, GRID_COLS - 1, 4);
         }
 
@@ -383,8 +396,8 @@ public class RegistrationItem extends GridLayout {
     /**
      * @return the validationProblemsButton
      */
-    public Button getMessageButton() {
-        return messageButton;
+    public BadgeButton getValidationProblemsButton() {
+        return validationProblemsButton;
     }
 
     /**

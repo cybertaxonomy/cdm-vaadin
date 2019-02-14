@@ -42,6 +42,16 @@ public enum TaxonNamePopupEditorMode {
      * The next higher name must be in the system or it needs to be entered. For species the next higher name is
      * the genus, for sub-species it is the species, etc.
      */
-    VALIDATE_AGAINST_HIGHER_NAME_PART
+    VALIDATE_AGAINST_HIGHER_NAME_PART,
+
+    /**
+     * The name relation type {@link eu.etaxonomy.cdm.model.name.NameRelationshipType#ORTHOGRAPHIC_VARIANT} will be treated more
+     * strictly if this mode is activated. The related name must have the same nomenclatural reference as the name being edited.
+     * see https://dev.e-taxonomy.eu/redmine/issues/7899 for more details.
+     *
+     * @deprecated see https://dev.e-taxonomy.eu/redmine/issues/7961
+     */
+    @Deprecated
+    ORTHOGRAPHIC_CORRECTION,
 
 }

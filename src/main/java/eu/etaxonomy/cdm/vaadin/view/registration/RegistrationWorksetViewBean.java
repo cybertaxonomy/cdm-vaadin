@@ -31,7 +31,6 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -58,6 +57,7 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
@@ -65,8 +65,7 @@ import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTyp
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles;
-import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction.EditorActionContext;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
@@ -139,6 +138,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private RegistrationStatusFieldInstantiator statusFieldInstantiator;
 
+    private String accessDeniedMessage;
+
     public RegistrationWorksetViewBean() {
         super();
     }
@@ -177,7 +178,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             getLayout().removeComponent(workingsetHeader);
             getLayout().removeComponent(registrationListPanel);
         }
-        workingsetHeader = new RegistrationItem(workingset, this);
+        workingsetHeader = new RegistrationItem(workingset, this, getPresenter().getCache());
         addContentComponent(workingsetHeader, null);
 
         registrationListPanel = createRegistrationsList(workingset);
@@ -201,7 +202,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             }
         }
         if(!blockingRegAdded){
-            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs));
+            regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs, getPresenter().getCache()));
         }
     }
 
@@ -245,8 +246,17 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
         addNewNameRegistrationButton = new Button("new name");
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
+        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        context.push(new EditorActionContext(
+                    new TypedEntityReference<>(Registration.class, null),
+                    this)
+                    );
         addNewNameRegistrationButton.addClickListener(
-                e -> getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this)));
+                e -> {
+                    getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this, context));
+
+                }
+        );
 
         existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
@@ -257,7 +267,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                         RegistrationWorkingsetAction.Action.start
                 )
              )
-                );
+        );
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(
@@ -321,7 +331,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
         typifiedNamesMap.put(dto.getUuid(), typifiedNameReference);
 
-        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto);
+        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto, getPresenter().getCache());
         UUID registrationEntityUuid = dto.getUuid();
 
         RegistrationItemButtons regItemButtons = new RegistrationItemButtons();
@@ -396,7 +406,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     ));
         }
 
-        Button validationProblemsButton = regItemButtons.getValidationProblemsButton();
+        BadgeButton validationProblemsButton = regItemButtons.getValidationProblemsButton();
         validationProblemsButton.setStyleName(ValoTheme.BUTTON_TINY); //  + " " + RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
 
         if(!dto.getValidationProblems().isEmpty()){
@@ -411,26 +421,12 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                     )
                 );
         }
-        validationProblemsButton.setCaption("<span class=\"" + RegistrationStyles.BUTTON_BADGE +"\"> " + dto.getValidationProblems().size() + "</span>");
-        validationProblemsButton.setCaptionAsHtml(true);
-
-        Button messageButton = regItemButtons.getMessagesButton();
-        messageButton.addClickListener(e -> getViewEventBus().publish(this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
-                        e,
-                        RegistrationDTO.class,
-                        dto.getUuid(),
-                        RegistrationItem.MESSAGES
-                        )
-                    )
-                );
-        messageButton.setStyleName(ValoTheme.BUTTON_TINY);
+        int problemCount = dto.getValidationProblems().size();
+        validationProblemsButton.setCaption(problemCount > 0 ? Integer.toString(problemCount) : null);
 
         Component statusComponent;
         if(statusFieldInstantiator != null){
-            AbstractField<Object> statusField = statusFieldInstantiator.create(dto);
-            statusField.setValue(dto.getStatus());
-            statusComponent = statusField;
+            statusComponent = statusFieldInstantiator.create(dto);
         } else {
             statusComponent = new RegistrationStatusLabel().update(dto.getStatus());
         }
@@ -586,20 +582,24 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         new Notification(caption, sb.toString(), Notification.Type.HUMANIZED_MESSAGE, true).show(Page.getCurrent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
     }
 
     /**

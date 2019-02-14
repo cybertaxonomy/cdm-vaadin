@@ -14,6 +14,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -25,7 +26,7 @@ public interface StartRegistrationView extends ApplicationView<StartRegistration
 
     Button getNewPublicationButton();
 
-    LazyComboBox<Reference> getReferenceCombobox();
+    LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox();
 
     /**
      * @return

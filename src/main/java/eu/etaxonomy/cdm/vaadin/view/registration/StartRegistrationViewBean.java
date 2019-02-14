@@ -17,18 +17,24 @@ import org.vaadin.viritin.fields.LazyComboBox;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 
@@ -48,7 +54,9 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
     public static final String SUBHEADER_DEEFAULT = "Any valid nomenclatural act can only be etablished in a publication. "
             + "To start a new registration process, please choose an existing one or create a new publication.";
 
-    private LazyComboBox<Reference> referenceCombobox;
+    private LazyComboBox<TypedEntityReference<Reference>> referenceCombobox;
+
+    private OptionGroup searchModeOptions = new OptionGroup("Search mode");
 
     private Button newPublicationButton;
 
@@ -57,6 +65,8 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
     private Label newPublicationLabel;
 
     private Button continueButton;
+
+    private String accessDeniedMessage;
 
     private static final String ELEMENT_WIDTH = "330px";
 
@@ -80,13 +90,35 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         HorizontalLayout publicationLayout = new HorizontalLayout();
         publicationLayout.setSpacing(true);
 
-        referenceCombobox = new LazyComboBox<Reference>(Reference.class);
+        Class<TypedEntityReference<Reference>> type = (Class<TypedEntityReference<Reference>>) new TypedEntityReference<Reference>(Reference.class, null).getClass();
+        referenceCombobox = new LazyComboBox<TypedEntityReference<Reference>>(type) {
+
+            @Override
+            protected void setSelectInstance(AbstractSelect select) {
+                if(select instanceof ComboBox){
+                    ComboBox combobox = (ComboBox)select;
+                    // uncomment the below line to set a defined width for the ComboBox popup
+                    // combobox.setPopupWidth("200%");
+                }
+                super.setSelectInstance(select);
+            }
+
+        };
         referenceCombobox.setWidth(ELEMENT_WIDTH);
         referenceCombobox.setBuffered(false);
         referenceCombobox.addValueChangeListener( e -> {
             boolean isValueSelected = e.getProperty().getValue() != null;
             continueButton.setEnabled(isValueSelected);
         });
+
+        searchModeOptions.addItem(MatchMode.BEGINNING);
+        searchModeOptions.setItemCaption(MatchMode.BEGINNING, "Begins with");
+        searchModeOptions.addItem(MatchMode.ANYWHERE);
+        searchModeOptions.setItemCaption(MatchMode.ANYWHERE, "Contains");
+        searchModeOptions.setValue(MatchMode.BEGINNING);
+        searchModeOptions.addStyleName(ValoTheme.OPTIONGROUP_HORIZONTAL);
+        searchModeOptions.addStyleName(EditValoTheme.OPTIONGROUP_CAPTION_FIX);
+        searchModeOptions.addValueChangeListener(e -> getPresenter().updateReferenceSearchMode((MatchMode)e.getProperty().getValue()));
 
         newPublicationButton = new Button("New");
         newPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
@@ -102,7 +134,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         removeNewPublicationButton.setStyleName(ValoTheme.BUTTON_DANGER);
         removeNewPublicationButton.setWidth(ELEMENT_WIDTH);
         removeNewPublicationButton.addClickListener( e -> getViewEventBus().publish(this,
-                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, referenceCombobox, this)
+                new ReferenceEditorAction(EditorActionType.REMOVE, removeNewPublicationButton, null, this)
                 ));
 
         removeNewPublicationButton.setVisible(false);
@@ -112,7 +144,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         labelLeft.setWidth(ELEMENT_WIDTH);
         labelRight.setWidth(ELEMENT_WIDTH);
 
-        CssLayout leftContainer = new CssLayout(labelLeft, referenceCombobox);
+        CssLayout leftContainer = new CssLayout(labelLeft, referenceCombobox, searchModeOptions);
         CssLayout rightContainer = new CssLayout(labelRight, newPublicationButton, removeNewPublicationButton, newPublicationLabel);
         leftContainer.setWidth(ELEMENT_WIDTH);
         rightContainer.setWidth(ELEMENT_WIDTH);
@@ -168,6 +200,17 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         return null;
     }
 
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -189,7 +232,8 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
      */
     @Override
     public void enter(ViewChangeEvent event) {
-        // TODO Auto-generated method stub
+
+        getPresenter().handleViewEntered();
 
     }
 
@@ -199,7 +243,7 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
      * @return the referenceCombobox
      */
     @Override
-    public LazyComboBox<Reference> getReferenceCombobox() {
+    public LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox() {
         return referenceCombobox;
     }
 

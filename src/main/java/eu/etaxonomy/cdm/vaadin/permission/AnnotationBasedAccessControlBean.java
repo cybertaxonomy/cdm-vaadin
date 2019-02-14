@@ -25,7 +25,10 @@ import com.vaadin.ui.UI;
  * @since Apr 24, 2017
  *
  *
- * FIMXE consider renaming this class and its interface, since it is no longer annotation based!!!!
+ * (FIMXE 1. consider renaming this class and its interface, since it is no longer annotation based!!!!)
+ *
+ * FIMXE 2. this class should implement ViewAccessControl. The view class and annotations can be accessed
+ * via the application context before the view bean has been created. see #7967
  */
 public class AnnotationBasedAccessControlBean implements ViewInstanceAccessControl, Serializable {
 
@@ -44,24 +47,26 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
 //        }
         // no RequireAuthentication annotation => grant access
 
-        if(AccessRestrictedView.class.isAssignableFrom(view.getClass())){
+        Class<? extends View> viewClass = view.getClass();
+
+        if(AccessRestrictedView.class.isAssignableFrom(viewClass)){
             AccessRestrictedView restricedView = (AccessRestrictedView)view;
             if(restricedView.allowAnonymousAccess()){
                 if(logger.isTraceEnabled()){
-                    logger.trace("anonymous access to " + view.getClass().getName() + " allowed");
+                    logger.trace("anonymous access to " + viewClass.getName() + " allowed");
                 }
                 return true;
             } else {
                 Authentication authentication = currentSecurityContext().getAuthentication();
                 if(authentication != null && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken)) {
                     if(logger.isTraceEnabled()){
-                        logger.trace("allowing authenticated user " + authentication.getName() + " to access " + view.getClass().getName() );
+                        logger.trace("allowing authenticated user " + authentication.getName() + " to access " + viewClass.getName() );
                     }
                     return true;
                 }
 
                 if(logger.isTraceEnabled()){
-                    logger.trace("denying access to " + view.getClass().getName());
+                    logger.trace("denying access to " + viewClass.getName());
                 }
                 restricedView.releaseResourcesOnAccessDenied();
                 return false;

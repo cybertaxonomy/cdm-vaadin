@@ -10,7 +10,9 @@ package eu.etaxonomy.cdm.vaadin.view.reference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -22,21 +24,32 @@ import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
+import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
+import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
+import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
+import eu.etaxonomy.vaadin.mvp.BoundField;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -53,6 +66,10 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
     ReferencePopupEditor inReferencePopup = null;
 
+    CdmFilterablePagingProvider<Reference, Reference> inReferencePagingProvider;
+
+    Restriction<UUID> includeCurrentInReference;
+
     public ReferenceEditorPresenter() {
 
     }
@@ -65,6 +82,8 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     public void handleViewEntered() {
         super.handleViewEntered();
 
+
+        updateInReferencePageProvider();
         getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new CaptionGenerator<Reference>(){
 
             @Override
@@ -85,9 +104,60 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
+        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<AgentBase, Institution>(getRepo().getAgentService(), Institution.class);
+        getView().getInstitutionCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
+        getView().getInstitutionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getInstitutionCombobox(), this));
+
+        getView().getSchoolCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
+        getView().getSchoolCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getSchoolCombobox(), this));
+
         getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
+
+    @Override
+    protected void adaptDataProviders() {
+//        updateInReferencePageProvider();
+//        getView().getInReferenceCombobox().addValueChangeListener(e -> updateInReferencePageProvider());
+    }
+
+
+    /**
+     * @param inReferencePagingProvider
+     */
+    public void updateInReferencePageProvider() {
+
+        inReferencePagingProvider = pagingProviderFactory.inReferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue());
+        Reference inReference = getView().getInReferenceCombobox().getValue();
+        if(inReference != null){
+            if(includeCurrentInReference == null){
+                includeCurrentInReference = new Restriction<UUID>("uuid", Operator.OR, null, inReference.getUuid());
+            }
+            inReferencePagingProvider.addRestriction(includeCurrentInReference);
+        } else {
+            inReferencePagingProvider.getRestrictions().remove(includeCurrentInReference);
+            includeCurrentInReference = null;
+        }
+        getView().getInReferenceCombobox().reload();
+        getView().getInReferenceCombobox().loadFrom(inReferencePagingProvider, inReferencePagingProvider, inReferencePagingProvider.getPageSize());
+    }
+
+
+
+    protected static BeanInstantiator<Reference> defaultBeanInstantiator = new BeanInstantiator<Reference>() {
+
+        @Override
+        public Reference createNewBean() {
+            return ReferenceFactory.newGeneric();
+        }
+    };
+
+
+    @Override
+    protected BeanInstantiator<Reference> defaultBeanInstantiator(){
+       return defaultBeanInstantiator;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -96,7 +166,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     protected Reference loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
-
                 "$",
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 }
@@ -106,22 +175,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         if(identifier != null){
             reference = getRepo().getReferenceService().load(identifier, initStrategy);
         } else {
-            reference = createNewReference();
+            reference = createNewBean();
         }
         return reference;
     }
 
-    /**
-     * TODO this should better go into {@link AbstractCdmEditorPresenter}
-     *
-     * @return
-     */
-    protected Reference createNewReference() {
-        if(this.beanInstantiator != null){
-            return beanInstantiator.createNewBean();
-        }
-        return ReferenceFactory.newGeneric();
-    }
 
     /**
      * {@inheritDoc}
@@ -147,7 +205,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     /**
     *
     * @param editorAction
-     * @throws EditorEntityBeanException
+    * @throws EditorEntityBeanException
     */
    @EventBusListenerMethod
    public void onReferenceEditorAction(ReferenceEditorAction editorAction) {
@@ -157,30 +215,96 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        }
 
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
+           Set<ReferenceType> applicableTypes = ReferenceType.inReferenceContraints((ReferenceType) getView().getTypeSelect().getValue());
            if(editorAction.isAddAction()){
                inReferencePopup = openPopupEditor(ReferencePopupEditor.class, editorAction);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.withReferenceTypes(EnumSet.copyOf(applicableTypes));
+               }
                inReferencePopup.loadInEditor(null);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.getTypeSelect().setValue(applicableTypes.iterator().next());
+               }
            }
            if(editorAction.isEditAction()){
                inReferencePopup = openPopupEditor(ReferencePopupEditor.class, editorAction);
+               if(!applicableTypes.isEmpty()){
+                   inReferencePopup.withReferenceTypes(EnumSet.copyOf(applicableTypes));
+               }
                inReferencePopup.withDeleteButton(true);
                inReferencePopup.loadInEditor(editorAction.getEntityUuid());
            }
        }
    }
 
+   @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+   public void onInstitutionEditorActionEdit(InstitutionEditorAction event) {
+
+       if(!checkFromOwnView(event)){
+           return;
+       }
+
+       InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+       institutionPopuEditor.grantToCurrentUser(this.crud);
+       institutionPopuEditor.withDeleteButton(true);
+       institutionPopuEditor.loadInEditor(event.getEntityUuid());
+   }
+
+   @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+   public void onInstitutionEditorActionAdd(InstitutionEditorAction event) {
+
+       if(!checkFromOwnView(event)){
+           return;
+       }
+
+       InstitutionPopupEditor institutionPopuEditor = openPopupEditor(InstitutionPopupEditor.class, event);
+
+       institutionPopuEditor.grantToCurrentUser(this.crud);
+       institutionPopuEditor.withDeleteButton(false);
+       institutionPopuEditor.loadInEditor(null);
+   }
+
    @EventBusListenerMethod
    public void onEntityChangeEvent(EntityChangeEvent<?> event){
 
-       if(event.getSourceView() == inReferencePopup){
-           if(event.isCreateOrModifiedType()){
-               getCache().load(event.getEntity());
-               getView().getInReferenceCombobox().reload();
+       BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
+
+       if(boundTargetField != null){
+           if(boundTargetField.matchesPropertyIdPath("inReference")){
+               if(event.isCreateOrModifiedType()){
+                   Reference inReference = (Reference)getCache().load(event.getEntity());
+                   getView().getInReferenceCombobox().reload();
+                   if(event.getType() == Type.CREATED){
+                       getView().getInReferenceCombobox().setValue(inReference);
+                   }
+               }
+               if(event.isRemovedType()){
+                   getView().getInReferenceCombobox().selectNewItem(null);
+               }
+               inReferencePopup = null;
            }
-           if(event.isRemovedType()){
-               getView().getInReferenceCombobox().selectNewItem(null);
+           else if(boundTargetField.matchesPropertyIdPath("institute")){
+               if(event.isCreateOrModifiedType()){
+                   Institution newInstitution = (Institution) event.getEntity();
+                   getCache().load(newInstitution);
+                   if(event.isCreatedType()){
+                       getView().getInstitutionCombobox().setValue(newInstitution);
+                   } else {
+                       getView().getInstitutionCombobox().reload();
+                   }
+               }
+           } else if(boundTargetField.matchesPropertyIdPath("school")){
+               if(event.isCreateOrModifiedType()){
+                   Institution newInstitution = (Institution) event.getEntity();
+                   getCache().load(newInstitution);
+                   if(event.isCreatedType()){
+                       getView().getSchoolCombobox().setValue(newInstitution);
+                   } else {
+                       getView().getSchoolCombobox().reload();
+                   }
+               }
            }
-           inReferencePopup = null;
        }
 
    }

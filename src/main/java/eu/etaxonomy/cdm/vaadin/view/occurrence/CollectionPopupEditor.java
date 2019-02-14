@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
@@ -23,7 +22,6 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
@@ -38,7 +36,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, CollectionEditorPresenter> implements CollectionPopupEditorView, AccessRestrictedView {
+public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, CollectionEditorPresenter> implements CollectionPopupEditorView {
 
     private static final long serialVersionUID = 2019724189877425882L;
 
@@ -85,22 +83,6 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
     @Override
     public void focusFirst() {
         codeField.focus();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public java.util.Collection<java.util.Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
     }
 
     /**

@@ -24,5 +24,4 @@ public class RolesAndPermissions {
 
     public static final Role ROLE_CURATION = new Role(UUID.fromString("642d9ea7-f18c-4ac3-b437-ed05ce5461c3"), "ROLE_CURATION");
 
-
 }

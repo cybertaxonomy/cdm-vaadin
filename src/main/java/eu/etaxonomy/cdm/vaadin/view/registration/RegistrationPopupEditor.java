@@ -9,10 +9,8 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import org.springframework.context.annotation.Scope;
-import org.springframework.security.core.GrantedAuthority;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.DateField;
@@ -23,7 +21,6 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 
@@ -35,7 +32,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter>
-    implements RegistrationPopEditorView, AccessRestrictedView {
+    implements RegistrationPopEditorView {
 
     private static final long serialVersionUID = 5418275817834009509L;
 
@@ -46,6 +43,10 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     private ListSelect submitterField;
 
     private ListSelect institutionField;
+
+    private ListSelect statusSelect;
+
+    private DateField registrationDateField;
 
     public RegistrationPopupEditor() {
         super(new FormLayout(), Registration.class);
@@ -67,7 +68,7 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         specificIdentifierField = new TextFieldNFix("Specific Identifier");
         addField(specificIdentifierField, "specificIdentifier");
 
-        ListSelect statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
+        statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
         statusSelect.setNullSelectionAllowed(false);
         statusSelect.setRows(1);
         addField(statusSelect, "status");
@@ -82,7 +83,7 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
 
-        DateField registrationDateField = new DateField("Registration date");
+        registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
 
@@ -119,22 +120,6 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean allowAnonymousAccess() {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
-        return null;
-    }
-
-    /**
      * @return the submitterField
      */
     @Override
@@ -148,5 +133,15 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
     @Override
     public ListSelect getInstitutionField() {
         return institutionField;
+    }
+
+    @Override
+    public ListSelect getStatusSelect() {
+        return statusSelect;
+    }
+
+    @Override
+    public DateField getRegistrationDateField() {
+        return this.registrationDateField;
     }
 }

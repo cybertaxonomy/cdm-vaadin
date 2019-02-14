@@ -24,11 +24,13 @@ $v-font-family: "Open Sans", sans-serif;
 //$v-friendly-color: #2c9720;
 //$v-error-indicator-color: #ed473b;
 
+// $edit-v-shadow-spread-radius: 0px; // default
 // ================== DARK ================ //
 
 // $v-app-loading-text: "Dark Valo";
 /*
 */
+$edit-v-shadow-spread-radius: 3px;
 $v-background-color: #444d50;
 $v-focus-color: #07a9ca;
 $v-focus-style: 0 0 3px 2px $v-focus-color;
@@ -39,7 +41,7 @@ $v-font-family: Roboto, sans-serif;
 $v-font-weight: 400;
 $v-font-weight--header: 400;
 $v-bevel: inset 0 1px 2px v-tint, inset 0 0 1px (v-tint 0.1);
-$v-shadow: 0 0 0 3px rgba(0,0,0,0.32), 0 1px 0 3px rgba(255,255,255,0.14);
+$v-shadow: 0 0 0 $edit-v-shadow-spread-radius rgba(0,0,0,0.32), 0 1px 0 $edit-v-shadow-spread-radius rgba(255,255,255,0.14);
 $v-textfield-bevel: inset 0 2px 2px v-shade;
 $v-textfield-shadow: $v-shadow;
 $v-unit-size: 40px;
@@ -222,6 +224,10 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     .v-panel-padding-left .v-panel-content {
         padding-left: round($v-unit-size / 4);
     }
+    
+     .v-select-optiongroup-optiongroup-caption-fix {
+        margin-left: round($v-unit-size / 4);
+     }
 
     // ===== workflow ==== // 
     
@@ -470,6 +476,75 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
         .v-component-group {
             float: right;
         }
+    }
+    
+    #context-breadcrumbs .breadcrumbs {
+      // for an explanation of how the CSS Triangles to work 
+      // see https://css-tricks.com/triangle-breadcrumbs/
+    
+      $crumb-background-color: $v-app-background-color;
+      $crumb-active-background-color: #3a6972; //TODO calculate using active-color and $v-background-color or $v-app-background-color
+      $crumb-border-color: $v-textfield-background-color--readonly;
+      $crumb-height: 10px; 
+      $triangle-width: 10px; 
+      
+      $crumb-border: valo-border($color: $crumb-border-color);
+      
+      list-style: none; 
+      overflow: hidden;
+      margin: 0; 
+      padding: 0;
+      line-height: $crumb-height;
+      border-radius: $v-border-radius;
+      border: $crumb-border;
+      li {
+          float: left;
+          span.crumb {
+            padding: 10px 10px 10px 20px;
+            background-color: $crumb-background-color;
+            position: relative;
+            display: block;
+            float: left;
+            &::before {
+                  content: " "; 
+                  display: block;
+                  width: 0; 
+                  height: 0;
+                  border-left: $crumb-border;
+                  border-left-width: $triangle-width;
+                  border-top: $crumb-height*2 solid transparent;
+                  border-bottom: $crumb-height*2 solid transparent;
+                  position: absolute;
+                  top: 50%;
+                  margin-top: -$crumb-height*2;
+                  margin-left: 1px;
+                  left: 100%;
+                  z-index: 1; 
+              }
+              &::after {
+                  content: " "; 
+                  display: block;
+                  width: 0; 
+                  height: 0;
+                  border-left: $triangle-width solid $crumb-background-color;
+                  border-top: $crumb-height*2 solid transparent;
+                  border-bottom: $crumb-height*2 solid transparent;
+                  border-right: none;
+                  position: absolute;
+                  top: 50%;
+                  margin-top: -$crumb-height*2;
+                  left: 100%;
+                  z-index: 2; 
+              }
+          }
+          &::first-child span.crumb {
+            padding-left: 10px;
+          }
+          span.active {
+              background-color: $crumb-active-background-color;
+          }
+       }
+       
     }
     
     // ---------- ---------- //

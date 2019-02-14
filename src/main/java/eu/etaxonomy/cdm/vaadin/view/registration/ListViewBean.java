@@ -87,6 +87,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private AbstractSelect statusTypeFilter;
 
+    private String accessDeniedMessage;
+
     public ListViewBean() {
         super();
     }
@@ -193,9 +195,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         listContainer.removeAllComponents();
         boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
-            RegistrationItem item = new RegistrationItem(regDto, this);
+            RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
+            // TODO move addClickListener into RegistrationItem.updateUI where the clicklistener for the ValidationProblemsButton is set also?
             item.getBlockedByButton().addClickListener(e -> getViewEventBus().publish(
                     this,
                     new ShowDetailsEvent<Registration, UUID>(
@@ -254,6 +257,17 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
+    }
+
+    @Override
+    public String getAccessDeniedMessage() {
+        return accessDeniedMessage;
+    }
+
+    @Override
+    public void setAccessDeniedMessage(String accessDeniedMessage) {
+        this.accessDeniedMessage = accessDeniedMessage;
+
     }
 
     /**
