@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import org.vaadin.teemu.switchui.Switch;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -116,8 +118,8 @@ public class SwitchableTextField extends CompositeCustomField<String> {
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**

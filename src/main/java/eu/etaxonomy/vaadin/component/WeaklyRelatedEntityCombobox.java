@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
@@ -102,8 +103,8 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**

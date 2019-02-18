@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
@@ -22,6 +23,7 @@ import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
@@ -445,6 +447,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             }
             if(cause == null){
                 // no known exception type found
+                logger.error("Unhandled exception", e);
                 throw new PopupEditorException("Error saving popup editor", this, e);
             }
 
@@ -594,13 +597,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             while(parentComponent != null){
                 logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
-                    Object propId = ((NestedFieldGroup)parentComponent).getFieldGroup().getPropertyId(parentField);
-                    if(propId != null){
-                        logger.debug("propId: " + propId.toString());
-                        nestedPropertyIds.addParent(propId);
+                    Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
+                    if(parentFieldGroup.isPresent()){
+                        Object propId = parentFieldGroup.get().getPropertyId(parentField);
+                        if(propId != null){
+                            logger.debug("propId: " + propId.toString());
+                            nestedPropertyIds.addParent(propId);
+                        }
+                        logger.debug("parentField: " + parentField.getClass().getSimpleName());
+                        parentField = (Field)parentComponent;
+                    } else {
+                        logger.debug("parentFieldGroup is null, continuing ...");
                     }
-                    logger.debug("parentField: " + parentField.getClass().getSimpleName());
-                    parentField = (Field)parentComponent;
                 } else if(parentComponent == this) {
                     // we reached the editor itself
                     Object propId = fieldGroup.getPropertyId(parentField);

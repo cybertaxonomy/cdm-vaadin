@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -100,8 +102,8 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**

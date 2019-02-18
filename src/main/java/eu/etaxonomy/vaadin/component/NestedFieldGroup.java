@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import com.vaadin.data.fieldgroup.FieldGroup;
 
 /**
@@ -22,7 +24,7 @@ public interface NestedFieldGroup {
      *
      * @return the FieldGroup, may be <code>null</code>.
      */
-    public abstract FieldGroup getFieldGroup();
+    public abstract Optional<FieldGroup> getFieldGroup();
 
     public abstract void registerParentFieldGroup(FieldGroup parent);
 

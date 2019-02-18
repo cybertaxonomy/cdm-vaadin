@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.ui.Button;
@@ -99,8 +101,8 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return fieldGroup;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.of(fieldGroup);
     }
 
     /**
@@ -176,19 +178,19 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         newValue = HibernateProxyHelper.deproxy(newValue);
         if(newValue != null) {
             compositeWrapper.addComponent(grid);
-            getFieldGroup().bind(relatedNameComboBox, "otherName");
-            getFieldGroup().bind(citationMicroReferenceField, "citationMicroReference");
-            getFieldGroup().bind(citatonComboBox, "citation");
-            getFieldGroup().bind(ruleConsideredField, "ruleConsidered");
+            fieldGroup.bind(relatedNameComboBox, "otherName");
+            fieldGroup.bind(citationMicroReferenceField, "citationMicroReference");
+            fieldGroup.bind(citatonComboBox, "citation");
+            fieldGroup.bind(ruleConsideredField, "ruleConsidered");
 
             fieldGroup.setItemDataSource(newValue);
         } else {
             if(oldValue != null){
                 compositeWrapper.removeComponent(grid);
-                getFieldGroup().unbind(relatedNameComboBox);
-                getFieldGroup().unbind(citationMicroReferenceField);
-                getFieldGroup().unbind(citatonComboBox);
-                getFieldGroup().unbind(ruleConsideredField);
+                fieldGroup.unbind(relatedNameComboBox);
+                fieldGroup.unbind(citationMicroReferenceField);
+                fieldGroup.unbind(citatonComboBox);
+                fieldGroup.unbind(ruleConsideredField);
 
                 fieldGroup.setItemDataSource(newValue);
             }

@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.vaadin.addon.leaflet.LCircle;
@@ -220,8 +222,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return fieldGroup;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.of(fieldGroup);
     }
 
     public ListSelect getReferenceSystemSelect() {

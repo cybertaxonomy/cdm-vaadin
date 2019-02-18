@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.vaadin.viritin.FilterableListContainer;
 
@@ -140,9 +141,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        // holds a Container instead // TODO can this cause a NPE?
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        // holds a Container instead
+        return Optional.empty();
     }
 
     @Override
