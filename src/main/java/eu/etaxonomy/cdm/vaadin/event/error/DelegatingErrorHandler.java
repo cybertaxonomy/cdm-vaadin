@@ -26,6 +26,7 @@ import com.vaadin.ui.Notification;
  * see https://dev.e-taxonomy.eu/redmine/issues/7241
  *
  * @author freimeier
+ * @author a.kohlbecker
  *
  */
 public class DelegatingErrorHandler implements ErrorHandler{

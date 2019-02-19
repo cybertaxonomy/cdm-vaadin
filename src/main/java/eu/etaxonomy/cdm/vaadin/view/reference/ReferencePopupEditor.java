@@ -330,6 +330,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             authorshipField.setVisible(fieldPropertyDefinition.containsKey("authorship"));
             String inRefCaption = fieldPropertyDefinition.get("inReference");
             inReferenceCombobox.setVisible(inRefCaption != null);
+            inReferenceCombobox.setRequired(referenceType.isSection());
             if(inRefCaption != null){
                 inReferenceCombobox.setCaption(inReferenceCaption(inRefCaption));
             }
