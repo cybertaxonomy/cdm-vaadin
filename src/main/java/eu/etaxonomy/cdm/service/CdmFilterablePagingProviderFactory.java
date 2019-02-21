@@ -19,12 +19,10 @@ import org.springframework.stereotype.Component;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
-import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.persistence.query.OrderHint.SortOrder;
@@ -82,7 +80,7 @@ public class CdmFilterablePagingProviderFactory {
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 repo.getNameService());
         pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
-        pagingProvider.addRestriction(new Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null, NameRelationshipType.ORTHOGRAPHIC_VARIANT()));
+        //pagingProvider.addRestriction(new Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null, NameRelationshipType.ORTHOGRAPHIC_VARIANT()));
         return pagingProvider;
     }
 
