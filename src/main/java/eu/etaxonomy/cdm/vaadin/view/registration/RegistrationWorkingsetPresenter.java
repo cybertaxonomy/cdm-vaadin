@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
@@ -813,8 +814,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     public Registration findRegistrationInContext(Stack<EditorActionContext> context) {
         EditorActionContext rootCtx = context.get(0);
         TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootCtx.getParentEntity();
-        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
-        Registration registration = registrationDTO.registration();
+        Optional<RegistrationDTO> registrationDTOOptional = workingset.getRegistrationDTO(regReference.getUuid());
+        if(!registrationDTOOptional.isPresent()){
+            logger.error("RegistrationDTO missing in rootCtx.");
+        }
+        Registration registration = registrationDTOOptional.get().registration();
 
         if(registration.isPersited()){
              registration = getRepo().getRegistrationService().load(registration.getUuid());
