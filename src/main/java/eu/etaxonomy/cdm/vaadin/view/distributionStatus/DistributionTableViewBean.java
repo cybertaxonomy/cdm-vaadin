@@ -172,7 +172,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
                     Property<?> itemProperty = item.getItemProperty(CdmQueryFactory.UUID_COLUMN);
                     UUID uuid = UUID.fromString(itemProperty.getValue().toString());
                     final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
-                    		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
+                    		.load(uuid, DistributionEditorUtil.INCLUDE_UNPUBLISHED, Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
                     PresenceAbsenceTerm presenceAbsenceTerm = null;
                     Object statusValue = item.getItemProperty(areaString).getValue();
                     if(statusValue instanceof String){
