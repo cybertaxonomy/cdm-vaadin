@@ -122,7 +122,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        service.save(workingset);
 
-       SpecimenOrObservationBase baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
+       SpecimenOrObservationBase<?> baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
 
 
        printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
