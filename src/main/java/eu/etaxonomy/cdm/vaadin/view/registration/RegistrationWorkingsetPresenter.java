@@ -60,11 +60,11 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusSelect;
@@ -115,6 +115,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private CdmFilterablePagingProviderFactory pagingProviderFactory;
+
+    @Autowired
+    private CdmBeanItemContainerFactory selectFieldFactory;
 
 
     /**
@@ -247,7 +250,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             @Override
             public AbstractField<Object> create(RegistrationDTO regDto) {
 
-                CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
                 // submitters have GrantedAuthorities like REGISTRATION(PREPARATION).[UPDATE]{ab4459eb-3b96-40ba-bfaa-36915107d59e}
                 UserHelper userHelper = UserHelperAccess.userHelper().withCache(getCache());
                 Set<RegistrationStatus> availableStatus = new HashSet<>();

@@ -39,7 +39,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
+import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
@@ -59,9 +59,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
 
-    /**
-     *
-     */
     private static final String REGISTRATION_LIST_PRESENTER_SEARCH_FILTER = "registration.listPresenter.searchFilter";
 
     private static final EnumSet<RegistrationStatus> inProgressStatus = EnumSet.of(
@@ -76,6 +73,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
+
+    @Autowired
+    protected CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
 
     private Integer pageIndex = 0;
     private Integer pageSize = null;
@@ -108,17 +108,15 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             }
         }
 
-        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
-
         if(getView().getSubmitterFilter() != null){
-            getView().getSubmitterFilter().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
+            getView().getSubmitterFilter().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(User.class));
             getView().getSubmitterFilter().setItemCaptionPropertyId("username");
         }
 
         List<UUID> typeDesignationStatusUUIDS = new ArrayList<>();
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.NAME_TYPE_DESIGNATION_STATUS_UUIDS());
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
-        BeanItemContainer<DefinedTermBase> buildTermItemContainer = selectFieldFactory.buildTermItemContainer(typeDesignationStatusUUIDS);
+        BeanItemContainer<DefinedTermBase> buildTermItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(typeDesignationStatusUUIDS);
         buildTermItemContainer.addItem(NULL_TYPE_STATUS);
         getView().getStatusTypeFilter().setContainerDataSource(buildTermItemContainer);
         for(DefinedTermBase dt : buildTermItemContainer.getItemIds()){
