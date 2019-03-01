@@ -50,7 +50,7 @@
     <import resource="classpath:/eu/etaxonomy/cdm/applicationContext-test.common.xml" />
     
     <bean id="termInitializer" class="eu.etaxonomy.cdm.database.TestingTermInitializer">
-        <property name="termsDataSet" value="classpath:/eu/etaxonomy/cdm/database/TermsDataSet-ui-registration-with_auditing_info.xml"/> 
+        <property name="termsDataSet" value="classpath:/eu/etaxonomy/cdm/database/TermsDataSet-with_auditing_info.xml"/> 
         <property name="termsDtd" value="classpath:/eu/etaxonomy/cdm/database/schema/dataset.dtd"/>
     </bean>
     
