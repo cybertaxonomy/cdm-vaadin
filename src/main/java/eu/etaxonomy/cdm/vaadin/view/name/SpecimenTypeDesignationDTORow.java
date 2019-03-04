@@ -16,9 +16,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.term.DefinedTerm;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRow;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;

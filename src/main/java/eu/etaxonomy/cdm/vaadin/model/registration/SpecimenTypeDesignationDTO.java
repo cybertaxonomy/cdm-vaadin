@@ -16,7 +16,6 @@ import org.apache.commons.collections.CollectionUtils;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
 import eu.etaxonomy.cdm.model.media.Media;
 import eu.etaxonomy.cdm.model.media.MediaRepresentation;
@@ -30,6 +29,7 @@ import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.term.DefinedTerm;
 
 /**
  * A DTO which is use in the context of the {@link SpecimenTypeDesignationWorkingSetDTO} which is backed up

@@ -23,8 +23,8 @@ import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 
 import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.model.common.Language;
-import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.term.Representation;
 import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 
 /**

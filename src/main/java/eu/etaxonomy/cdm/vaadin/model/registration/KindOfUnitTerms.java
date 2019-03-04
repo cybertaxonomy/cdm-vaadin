@@ -10,9 +10,9 @@ package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.UUID;
 
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
-import eu.etaxonomy.cdm.model.common.TermType;
-import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.term.DefinedTerm;
+import eu.etaxonomy.cdm.model.term.TermType;
+import eu.etaxonomy.cdm.model.term.TermVocabulary;
 
 /**
  * Terms to be used as kindOfUnit for {@link SpecimenOrObservationBase#setKindOfUnit()}.

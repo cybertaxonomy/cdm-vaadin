@@ -33,8 +33,8 @@ import com.vaadin.ui.TextArea;
 
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
-import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.cdm.vaadin.util.filter.CdmTermFilter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;

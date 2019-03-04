@@ -13,9 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
+import eu.etaxonomy.cdm.model.term.DefinedTerm;
 /**
  * @author a.kohlbecker
  * @since Jun 23, 2017
