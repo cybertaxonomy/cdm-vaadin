@@ -25,4 +25,10 @@ public interface FilterableStringRepresentationPagingProvider<IDTYPE> extends Fi
     public void clearIdCache();
 
 
+    /**
+     * @return
+     */
+    public int getPageSize();
+
+
 }

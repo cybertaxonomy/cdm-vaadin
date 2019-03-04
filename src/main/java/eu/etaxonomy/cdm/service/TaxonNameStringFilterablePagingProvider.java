@@ -16,7 +16,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractField;
@@ -41,7 +44,9 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @since Jun 7, 2017
  *
  */
-public class TaxonNameStringFilterablePagingProvider implements FilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
+@Scope("prototype")
+@Repository
+public class TaxonNameStringFilterablePagingProvider implements ITaxonNameStringFilterablePagingProvider {
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
@@ -49,6 +54,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
 
     private int pageSize = 20;
 
+    @Autowired
     private INameService service;
 
     private MatchMode matchMode = MatchMode.BEGINNING;
@@ -64,23 +70,34 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     private Map<String, UUID> lastPagedEntityUUIDs;
 
 
-    public TaxonNameStringFilterablePagingProvider(INameService service) {
-        this(service, Rank.GENUS(), null);
+    public TaxonNameStringFilterablePagingProvider() {
+        this(Rank.GENUS(), null);
     }
 
+    /**
     public TaxonNameStringFilterablePagingProvider(INameService service, Rank rank) {
         this(service, rank, null);
     }
+     */
 
-    public TaxonNameStringFilterablePagingProvider(INameService service, Rank rank, MatchMode matchMode) {
+    private TaxonNameStringFilterablePagingProvider(Rank rank, MatchMode matchMode) {
         super();
-        this.service = service;
         if(matchMode != null){
             this.matchMode = matchMode;
         }
+        setRankFilter(rank);
+    }
+
+    /**
+     * @param rank
+     */
+    @Override
+    public void setRankFilter(Rank rank) {
         namePartsFilter.setRank(rank);
     }
 
+
+    @Override
     public void listenToFields(AbstractField<String> genusOrUninomialField, AbstractField<String> infraGenericEpithetField,
             AbstractField<String> specificEpithetField, AbstractField<String> infraSpecificEpithetField){
 
@@ -95,6 +112,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     /**
      *
      */
+    @Override
     public void unlistenAllFields() {
         for(AbstractField<String> f : registeredToFields.keySet()){
             f.removeValueChangeListener(registeredToFields.get(f));
@@ -113,6 +131,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         }
     }
 
+    @Override
     public void updateFromFields(){
         for(AbstractField<String> f : registeredToFields.keySet()){
             ValueChangeListener listener = registeredToFields.get(f);
@@ -133,14 +152,14 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     /**
      * @return the matchMode
      */
-    protected MatchMode getMatchMode() {
+    public MatchMode getMatchMode() {
         return matchMode;
     }
 
     /**
      * @param matchMode the matchMode to set
      */
-    protected void setMatchMode(MatchMode matchMode) {
+    public void setMatchMode(MatchMode matchMode) {
         this.matchMode = matchMode;
     }
 
@@ -166,6 +185,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly=true)
     public List<String> findEntities(int firstRow, String filter) {
 
         Integer pageIndex = firstRow / pageSize;
@@ -191,6 +211,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly=true)
     public int size(String filter) {
 
         Pager<TaxonNameParts> taxonNamePager = service.findTaxonNameParts(namePartsFilter, filter,  1, 0, null);
@@ -203,6 +224,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     /**
      * @return the pageSize
      */
+    @Override
     public int getPageSize() {
         return pageSize;
     }
@@ -250,6 +272,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
      * @param asList
      * @return
      */
+    @Override
     public void excludeNames(TaxonName ... excludedTaxonNames) {
         namePartsFilter.getExludedNamesUuids();
         for(TaxonName n : excludedTaxonNames){

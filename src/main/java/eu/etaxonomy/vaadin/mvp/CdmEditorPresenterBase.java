@@ -24,11 +24,13 @@ import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.ITaxonNameStringFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
@@ -350,5 +352,14 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     @Override
     public void disposeCache() {
         cache.dispose();
+    }
+
+
+    protected ITaxonNameStringFilterablePagingProvider taxonNameStringFilterablePagingProvider(Rank rank) {
+        ITaxonNameStringFilterablePagingProvider pagingProvider =  (ITaxonNameStringFilterablePagingProvider) getRepo().getBean("taxonNameStringFilterablePagingProvider");
+        if(rank != null) {
+            pagingProvider.setRankFilter(rank);
+        }
+        return pagingProvider;
     }
 }

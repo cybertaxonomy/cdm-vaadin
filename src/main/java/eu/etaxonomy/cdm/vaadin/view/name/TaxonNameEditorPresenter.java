@@ -41,7 +41,7 @@ import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
-import eu.etaxonomy.cdm.service.TaxonNameStringFilterablePagingProvider;
+import eu.etaxonomy.cdm.service.ITaxonNameStringFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
@@ -97,9 +97,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
-    private TaxonNameStringFilterablePagingProvider genusOrUninomialPartPagingProvider;
+    private ITaxonNameStringFilterablePagingProvider genusOrUninomialPartPagingProvider;
 
-    private TaxonNameStringFilterablePagingProvider specificEpithetPartPagingProvider;
+    private ITaxonNameStringFilterablePagingProvider specificEpithetPartPagingProvider;
 
     private Property.ValueChangeListener refreshSpecificEpithetComboBoxListener;
 
@@ -379,7 +379,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
                 if(event.getNewField() instanceof CompositeCustomField){
                     if(specificEpithetPartPagingProvider == null){
-                        specificEpithetPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService(), Rank.SPECIES());
+                        specificEpithetPartPagingProvider = taxonNameStringFilterablePagingProvider(Rank.SPECIES());
                     }
                     specificEpithetPartPagingProvider.listenToFields(
                             genusOrUninomialField,
@@ -404,7 +404,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             } else if(boundPropertyIdPath.matches("genusOrUninomial")) {
                 if(event.getNewField() instanceof CompositeCustomField){
                     if(genusOrUninomialPartPagingProvider  == null){
-                        genusOrUninomialPartPagingProvider = new TaxonNameStringFilterablePagingProvider(getRepo().getNameService());
+                        genusOrUninomialPartPagingProvider = taxonNameStringFilterablePagingProvider(null);
                     }
                     genusOrUninomialPartPagingProvider.listenToFields(
                                 null,
@@ -697,6 +697,15 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             }
         };
     }
+
+    @Override
+    public void destroy() throws Exception {
+        super.destroy();
+        specificEpithetPartPagingProvider = null;
+        genusOrUninomialPartPagingProvider = null;
+    }
+
+
 
 
 
