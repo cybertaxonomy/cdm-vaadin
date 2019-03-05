@@ -35,7 +35,6 @@ import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
@@ -144,8 +143,7 @@ public class NameTypeDesignationPresenter
     @Override
     public void handleViewEntered() {
 
-        CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
-        getView().getTypeStatusSelect().setContainerDataSource(selectFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
+        getView().getTypeStatusSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
         getView().getTypeStatusSelect().setItemCaptionPropertyId("description");
 
         getView().getCitationCombobox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());

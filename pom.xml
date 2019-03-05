@@ -4,7 +4,7 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>5.5.1</version>
+  <version>5.5.2</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -148,6 +148,10 @@
   <build>
     <resources>
       <resource>
+        <!-- all main resources without filtering -->
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
         <!-- replace the place holders like ${...} in datasources.xml -->
         <filtering>true</filtering>
         <directory>src/test/resources</directory>
@@ -163,10 +167,6 @@
         <excludes>
           <exclude>datasources.xml</exclude>
         </excludes>
-      </resource>
-      <resource>
-        <!-- all main resources without filtering -->
-        <directory>src/main/resources</directory>
       </resource>
     </resources>
     <plugins>
