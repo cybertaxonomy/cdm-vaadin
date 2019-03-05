@@ -44,7 +44,6 @@ import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.TaxonNameStringFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
@@ -120,8 +119,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         super.handleViewEntered();
 
-        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
-        getView().getRankSelect().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(TermType.Rank));
+        getView().getRankSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.Rank));
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
@@ -188,7 +186,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getOrthographicVariantField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getCitatonComboBox(), this));
 
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 

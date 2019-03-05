@@ -41,13 +41,13 @@ import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
@@ -93,6 +93,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Autowired
     private ISpecimenTypeDesignationWorkingSetService specimenTypeDesignationWorkingSetService;
 
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
+
+    @Autowired
+    protected CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
+
     /**
      * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
      * granted to the current use as long this grant is not assigned yet.
@@ -100,9 +106,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     private EnumSet<CRUD> crud = null;
 
     private ICdmEntityUuidCacher cache;
-
-    @Autowired
-    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
@@ -182,8 +185,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     public void handleViewEntered() {
 
-        CdmBeanItemContainerFactory selectFactory = new CdmBeanItemContainerFactory(getRepo());
-        getView().getCountrySelectField().setContainerDataSource(selectFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+        getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
@@ -192,7 +194,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
-        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(selectFactory.buildBeanItemContainer(TermType.ReferenceSystem));
+        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.ReferenceSystem));
         getView().getExactLocationField().getReferenceSystemSelect().setItemCaptionPropertyId("label");
 
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
@@ -211,12 +213,12 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 SpecimenTypeDesignationDTORow row = new SpecimenTypeDesignationDTORow();
 
-                row.kindOfUnit.setContainerDataSource(selectFactory.buildTermItemContainer(
+                row.kindOfUnit.setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(
                         RegistrationTermLists.KIND_OF_UNIT_TERM_UUIDS())
                         );
                 row.kindOfUnit.setNullSelectionAllowed(false);
 
-                row.typeStatus.setContainerDataSource(selectFactory.buildTermItemContainer(
+                row.typeStatus.setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(
                         RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS())
                         );
                 row.typeStatus.setNullSelectionAllowed(false);

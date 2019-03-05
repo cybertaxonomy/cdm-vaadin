@@ -23,7 +23,6 @@ import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.util.converter.JodaDateTimeConverter;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -110,12 +109,10 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     public void handleViewEntered() {
         super.handleViewEntered();
 
-        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
-
-        getView().getInstitutionField().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(Institution.class));
+        getView().getInstitutionField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Institution.class));
         getView().getInstitutionField().setItemCaptionPropertyId("titleCache");
 
-        getView().getSubmitterField().setContainerDataSource(selectFieldFactory.buildBeanItemContainer(User.class));
+        getView().getSubmitterField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(User.class));
         getView().getSubmitterField().setItemCaptionPropertyId("username");
 
 

@@ -26,6 +26,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
+import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -50,6 +51,11 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     protected BeanInstantiator<DTO> beanInstantiator = null;
 
+    @Autowired
+    protected CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
+
+    @Autowired
+    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     /**
      * @param beanInstantiator the beanInstantiator to set
@@ -91,8 +97,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     protected CdmAuthority newAuthorityCreated;
 
-    @Autowired
-    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     protected CdmStore<CDM, IService<CDM>> getStore() {
         if(store == null){

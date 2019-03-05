@@ -21,6 +21,7 @@ public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, V extends 
 
     private static final long serialVersionUID = -6315824180341694825L;
 
+
     @Override
     protected CDM createDTODecorator(CDM cdmEntitiy) {
         return cdmEntitiy;

@@ -36,7 +36,6 @@ import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
-import eu.etaxonomy.cdm.vaadin.component.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
@@ -93,7 +92,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
         });
 
-        CdmBeanItemContainerFactory selectFieldFactory = new CdmBeanItemContainerFactory(getRepo());
         CdmFilterablePagingProvider<Reference, Reference> collectionPagingProvider = pagingProviderFactory.referencePagingProvider();
         getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
@@ -111,7 +109,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getSchoolCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
         getView().getSchoolCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getSchoolCombobox(), this));
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(selectFieldFactory.buildTermItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
