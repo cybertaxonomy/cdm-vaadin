@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,6 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  *
  */
 @Service
-@Transactional(readOnly=true)
 public class CdmBeanItemContainerFactory {
 
     @Autowired
@@ -59,6 +59,8 @@ public class CdmBeanItemContainerFactory {
      */
     @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
+
+        clearSession();
         // TODO use TermCacher?
         List<DefinedTermBase> terms = repo.getTermService().listByTermType(termType, null, null, orderHints, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
@@ -72,6 +74,7 @@ public class CdmBeanItemContainerFactory {
     @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(UUID vocabularyUuid) {
 
+        clearSession();
         TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
         Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
@@ -82,7 +85,6 @@ public class CdmBeanItemContainerFactory {
     /**
      * @param termType
      */
-    @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildTermItemContainer(UUID ... termUuid) {
         return buildTermItemContainer(Arrays.asList(termUuid));
     }
@@ -93,6 +95,7 @@ public class CdmBeanItemContainerFactory {
      */
     @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildTermItemContainer(List<UUID> termsUuids) {
+        clearSession();
         List<DefinedTermBase> terms = repo.getTermService().load(termsUuids, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
         termItemContainer.addAll(terms);
@@ -108,7 +111,7 @@ public class CdmBeanItemContainerFactory {
         if(orderHints == null){
             orderHints = OrderHint.defaultOrderHintsFor(type);
         }
-
+        clearSession();
         List<T> terms = repo.getCommonService().list(type, (Integer)null, (Integer)null,
                 orderHints,
                 Arrays.asList(new String[]{"$"}));
@@ -125,7 +128,6 @@ public class CdmBeanItemContainerFactory {
      * @param values
      * @return
      */
-    @Transactional(readOnly=true)
     public <T extends IEnumTerm<T>> BeanItemContainer<T> buildBeanItemContainer(Class<T> termType, T ... enumTerms) {
         BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termType);
         List<T> termList = Arrays.asList(enumTerms);
@@ -133,5 +135,11 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
+    public void clearSession() {
+        Session session = repo.getSession();
+        if(session.isOpen()){
+            session.clear();
+        }
+    }
 
 }
