@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -136,10 +135,7 @@ public class CdmBeanItemContainerFactory {
     }
 
     public void clearSession() {
-        Session session = repo.getSession();
-        if(session.isOpen()){
-            session.clear();
-        }
+        repo.clearSession();
     }
 
 }

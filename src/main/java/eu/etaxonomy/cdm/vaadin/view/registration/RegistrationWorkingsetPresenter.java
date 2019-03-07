@@ -490,7 +490,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         // reload workingset into current session
                         loadWorkingSet(workingset.getCitationUuid());
                     } finally {
-                        getRepo().getSession().clear(); // #7702
+                        clearSession();
                         refreshView(true);
                         getView().getAddNewNameRegistrationButton().setEnabled(true);
                     }
@@ -554,7 +554,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 // --------------------------------------------------
                 // tell the view to update the workingset
             } finally {
-                getRepo().getSession().clear(); // #7702;
+                clearSession();
                 refreshView(doReloadWorkingSet);
                 getView().getAddExistingNameRegistrationButton().setEnabled(false);
             }
@@ -691,7 +691,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
 
                 try {
-                    getRepo().getSession().clear();
+                    clearSession();
                     // TODO move into a service class --------------
                     TransactionStatus txStatus = getRepo().startTransaction();
                     UUID regUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(event.getPopup());
@@ -703,7 +703,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     getRepo().commitTransaction(txStatus);
                     // TODO move into a service class --------------
                 } finally {
-                    getRepo().getSession().clear();
+                    clearSession();
                     refreshView(true);
                 }
             } else if(event.getReason().equals(Reason.CANCEL)){
@@ -712,6 +712,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         }
         // ignore other editors
+    }
+
+    /**
+     *
+     */
+    public void clearSession() {
+        getRepo().clearSession();
     }
 
 
@@ -756,7 +763,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 if(rootContext.getParentView().equals(getView()) && event.getSourceView() != newNameForRegistrationPopupEditor){
 
                     try {
-                        getRepo().getSession().clear();
+                        clearSession();
                         // TODO move into a service class --------------
                         TransactionStatus txStatus = getRepo().startTransaction();
                         // create a blocking registration, the new Registration will be persisted
@@ -783,7 +790,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                             // TODO move into a service class --------------
                         }
                     } finally {
-                        getRepo().getSession().clear();
+                        clearSession();
                     }
                 } else {
                     // in case of creating a new name for a registration the parent view is the TaxonNamePopupEditor
