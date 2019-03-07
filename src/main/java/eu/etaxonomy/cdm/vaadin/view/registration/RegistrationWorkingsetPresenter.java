@@ -36,8 +36,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-import eu.etaxonomy.cdm.api.service.INameService;
-import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
@@ -120,6 +118,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @Autowired
     private CdmBeanItemContainerFactory selectFieldFactory;
 
+    @Autowired
+    private CdmStore cdmStore;
 
     /**
      * @return the regWorkingSetService
@@ -156,24 +156,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     public RegistrationWorkingsetPresenter() {
-    }
-
-    /**
-     * Always create a new Store
-     *
-     * @return
-     */
-    protected CdmStore<Registration, IRegistrationService> getRegistrationStore(){
-        return new CdmStore<Registration, IRegistrationService>(getRepo(), getRepo().getRegistrationService());
-    }
-
-    /**
-     * Always create a new Store
-     *
-     * @return
-     */
-    protected CdmStore<TaxonName, INameService> getTaxonNameStore(){
-        return new  CdmStore<TaxonName, INameService>(getRepo(), getRepo().getNameService());
     }
 
     /**
@@ -339,7 +321,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(value != null && value instanceof RegistrationStatus){
             if(!Objects.equals(value, reg.getStatus())){
                 reg.updateStatusAndDate((RegistrationStatus)value);
-                getRegistrationStore().saveBean(reg, (AbstractView)getView());
+                cdmStore.saveBean(reg, (AbstractView)getView());
                 refreshView(true);
             }
         } else {
