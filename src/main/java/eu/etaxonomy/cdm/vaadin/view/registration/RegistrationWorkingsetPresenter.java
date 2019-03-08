@@ -768,9 +768,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                                 getRepo().getRegistrationService().saveOrUpdate(registration);
                                 logger.debug("Blocking registration created, added to registion and persited");
                             }
-                            getRepo().commitTransaction(txStatus);
-                            // TODO move into a service class --------------
                         }
+                        getRepo().commitTransaction(txStatus);
+                        // TODO move into a service class --------------
                     } finally {
                         clearSession();
                     }
