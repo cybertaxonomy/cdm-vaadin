@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+    http://www.springframework.org/schema/context   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+    http://www.springframework.org/schema/tx   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+    ">
+
+  <!-- 
+    NOTE: 
+    For a detailed overview on the spring MVC and application context configuration and 
+    bootstrapping of this web application see: 
+    http://dev.e-taxonomy.eu/trac/wiki/cdmlib-remote-webappConfigurationAndBootstrapping
+  -->
+   
+   <context:annotation-config />
+   
+    <!--  
+        find the eu.etaxonomy.cdm.remote.config.CdmVaadinConfiguration
+    -->
+   <context:component-scan base-package="eu/etaxonomy/cdm/addon/config" />
+    
+   <!-- include default application context and customization -->
+   <import resource="classpath:/eu/etaxonomy/cdm/defaultApplicationContext.xml"/>
+   
+   <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean"/>
+   
+   <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
+       <property name="omit" value="true" />
+   </bean>
+   <context:component-scan base-package="eu/etaxonomy/cdm/ext" />
+
+  <import resource="classpath:/eu/etaxonomy/cdm/remote.xml"/>
+  <!--   <context:component-scan base-package="eu/etaxonomy/cdm/io"/> -->
+ 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+      <property name="properties">
+        <props>
+            <prop key="eu.etaxonomy.cdm.base.path">${user.home}/.cdmLibrary/</prop>
+            <prop key="eu.etaxonomy.cdm.search.index.path">${user.home}/.cdmLibrary/index/</prop>
+        </props>
+          </property>
+    </bean>
+
+    <!-- enable the configuration of transactional behavior based on annotations -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <import resource="classpath:/eu/etaxonomy/cdm/applicationContext-test.common.xml" />
+    
+    <bean id="termInitializer" class="eu.etaxonomy.cdm.database.TestingTermInitializer">
+        <property name="termsDataSet" value="classpath:/eu/etaxonomy/cdm/database/TermsDataSet-with_auditing_info.xml"/> 
+        <property name="termsDtd" value="classpath:/eu/etaxonomy/cdm/database/schema/dataset.dtd"/>
+    </bean>
+    
+</beans>
