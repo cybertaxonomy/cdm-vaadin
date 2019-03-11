@@ -113,6 +113,9 @@ public class CdmStore {
         repo.commitTransaction(txStatus);
         return new EntityChangeEvent(mergedBean, changeEventType, view);
 
+                repo.getTransactionManager().rollback(txStatus);
+                throw e;
+            }
     }
 
     /**
@@ -179,7 +182,6 @@ public class CdmStore {
     @SuppressWarnings("unchecked")
     protected <T extends CdmBase> IService<T> serviceFor(T bean){
          Class<? extends CdmBase> cdmType = bean.getClass();
-
          if(Registration.class.isAssignableFrom(cdmType)){
              return (IService<T>) repo.getRegistrationService();
          } else if(TaxonName.class.isAssignableFrom(cdmType)){
