@@ -64,23 +64,29 @@ public class CdmStore {
      */
     public <T extends CdmBase> T mergedBean(T bean) throws IllegalStateException {
 
-        TransactionStatus txStatus = repo.startTransaction();
-        Session session = repo.getSession();
-
-        if (session.contains(bean)) {
-            // evict bean before merge to avoid duplicate beans in same session
-            logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
-            session.evict(bean);
+        try{
+            TransactionStatus txStatus = repo.startTransaction();
+            Session session = repo.getSession();
+            try {
+                if (session.contains(bean)) {
+                    // evict bean before merge to avoid duplicate beans in same session
+                    logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
+                    session.evict(bean);
+                }
+                logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
+                @SuppressWarnings("unchecked")
+                T mergedBean = (T) session.merge(bean);
+                session.flush();
+                repo.commitTransaction(txStatus);
+                logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
+                return mergedBean;
+            } catch(Exception e){
+                repo.getTransactionManager().rollback(txStatus);
+                throw e;
+            }
+        } finally {
+            repo.clearSession(); // #7559
         }
-
-        logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
-        @SuppressWarnings("unchecked")
-        T mergedBean = (T) session.merge(bean);
-        session.flush();
-        repo.commitTransaction(txStatus);
-        logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
-        return mergedBean;
-
     }
 
 
@@ -103,15 +109,24 @@ public class CdmStore {
         } else {
             changeEventType = Type.CREATED;
         }
-
-        TransactionStatus txStatus = repo.startTransaction();
-        Session session = repo.getSession();
-        logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
-        // merge the changes into the session, ...
-        T mergedBean = mergedBean(bean);
-        session.flush();
-        repo.commitTransaction(txStatus);
-        return new EntityChangeEvent(mergedBean, changeEventType, view);
+        
+        try{
+            TransactionStatus txStatus = repo.startTransaction();
+            Session session = repo.getSession();
+            try {
+                logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
+                // merge the changes into the session, ...
+                T mergedBean = mergedBean(bean);
+                session.flush();
+                repo.commitTransaction(txStatus);
+                return new EntityChangeEvent(mergedBean, changeEventType, view);
+            } catch(Exception e){
+                repo.getTransactionManager().rollback(txStatus);
+                throw e;
+            }
+        } finally {
+            repo.clearSession(); // #7559
+        }
 
     }
 
@@ -124,18 +139,18 @@ public class CdmStore {
 
         IService<T> typeSpecificService = serviceFor(bean);
 
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-        TransactionStatus txStatus = repo.startTransaction();
-        Session session = repo.getSession();
-        logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
-        DeleteResult result = typeSpecificService.delete(bean);
-        if (result.isOk()) {
-            session.flush();
-            repo.commitTransaction(txStatus);
-            logger.trace(this._toString() + ".deleteBean - transaction comitted");
-            return new EntityChangeEvent(bean, Type.REMOVED, view);
-        } else {
-            handleDeleteresultInError(result);
+        try{
+            Session session = repo.getSession();     
+            logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
+            DeleteResult result = typeSpecificService.delete(bean);
+            if (result.isOk()) {
+                session.flush();
+                return new EntityChangeEvent(bean, Type.REMOVED, view);
+            } else {
+                handleDeleteresultInError(result);
+            }
+        } finally {
+            repo.clearSession(); // #7559
         }
 
         return null;
