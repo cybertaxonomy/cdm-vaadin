@@ -41,7 +41,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
 
     private S service;
 
-    TransactionStatus txStatus = null;
+    // TransactionStatus txStatus = null;
 
     protected DefaultTransactionDefinition txDefinition = null;
 
@@ -58,36 +58,16 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
     }
 
 
-    /**
-     * @return
-     *
-     */
-    public TransactionStatus startTransaction() {
-        checkExistingTransaction();
-        txStatus = repo.startTransaction();
-        return txStatus;
-    }
+//    /**
+//     * @return
+//     *
+//     */
+//    public TransactionStatus startTransaction() {
+//        checkExistingTransaction();
+//        txStatus = repo.startTransaction();
+//        return txStatus;
+//    }
 
-    /**
-     *
-     */
-    protected void checkExistingTransaction() {
-        if (txStatus != null) {
-            // @formatter:off
-            // holding the TransactionStatus as state is not good design. we
-            // should change the save operation
-            // in the EditorView so that the presenter can process the save in
-            // one method call.
-            // Problems:
-            // 1. the fieldGroup needs a open session and read transaction
-            // during the validation, otherwise
-            // LazyInitialisationExceptions occur.
-            // 2. passing the TransactionState to the view also doesn't seem
-            // like a good idea.
-            // @formatter:on
-            throw new RuntimeException("Opening a second transaction in the same" + this.getClass().getSimpleName() + " is not supported");
-        }
-    }
 
     /**
      * If the bean is contained in the session it is being updated by doing an
@@ -154,18 +134,18 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         Session session = getSession();
         try {
             logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
-
-            if(txStatus == null){
-                // no running transaction, start one ...
-                startTransaction();
-            }
-
-            logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
-            // merge the changes into the session, ...
-            T mergedBean = mergedBean(bean);
-            session.flush();
-            commitTransaction();
+            TransactionStatus txStatus = repo.startTransaction();
+            try {
+                logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
+                // merge the changes into the session, ...
+                T mergedBean = mergedBean(bean);
+                session.flush();
+                repo.commitTransaction(txStatus);
             return new EntityChangeEvent(mergedBean, changeEventType, view);
+            } catch(Exception e){
+                repo.getTransactionManager().rollback(txStatus);
+                throw e;
+            }
         } finally {
             session.clear(); // #7559
         }
@@ -181,17 +161,13 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
         Session session = getSession();
         try {
-            startTransaction();
             logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
             DeleteResult result = service.delete(bean);
             if (result.isOk()) {
                 session.flush();
-                commitTransaction();
-                logger.trace(this._toString() + ".deleteBean - transaction comitted");
                 return new EntityChangeEvent(bean, Type.REMOVED, view);
             } else {
                 handleDeleteresultInError(result, session);
-                txStatus = null;
             }
         } finally {
             session.clear(); // #7559
@@ -238,12 +214,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         Notification notification = new Notification(notificationTitle, messageBody.toString(),
                 com.vaadin.ui.Notification.Type.ERROR_MESSAGE, true);
         notification.show(UI.getCurrent().getPage());
-    }
-
-
-    protected void commitTransaction() {
-        repo.commitTransaction(txStatus);
-        txStatus = null;
     }
 
     /**
