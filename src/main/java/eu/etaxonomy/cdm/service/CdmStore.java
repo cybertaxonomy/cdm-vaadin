@@ -52,44 +52,6 @@ public class CdmStore {
     @Qualifier("cdmRepository")
     private CdmRepository repo;
 
-
-    /**
-     * If the bean is contained in the session it is being updated by doing an
-     * evict and merge. The fieldGroup is updated with the merged bean.
-     *
-     *
-     * @param bean
-     * @return The bean merged to the session or original bean in case a merge
-     *         was not necessary.
-     */
-    public <T extends CdmBase> T mergedBean(T bean) throws IllegalStateException {
-
-        try{
-            TransactionStatus txStatus = repo.startTransaction();
-            Session session = repo.getSession();
-            try {
-                if (session.contains(bean)) {
-                    // evict bean before merge to avoid duplicate beans in same session
-                    logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
-                    session.evict(bean);
-                }
-                logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
-                @SuppressWarnings("unchecked")
-                T mergedBean = (T) session.merge(bean);
-                session.flush();
-                repo.commitTransaction(txStatus);
-                logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
-                return mergedBean;
-            } catch(Exception e){
-                repo.getTransactionManager().rollback(txStatus);
-                throw e;
-            }
-        } finally {
-            repo.clearSession(); // #7559
-        }
-    }
-
-
     protected String _toString() {
         return this.getClass().getSimpleName() + "@" + this.hashCode();
     }
@@ -109,25 +71,41 @@ public class CdmStore {
         } else {
             changeEventType = Type.CREATED;
         }
-        
+
         try{
             TransactionStatus txStatus = repo.startTransaction();
             Session session = repo.getSession();
             try {
                 logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
                 // merge the changes into the session, ...
-                T mergedBean = mergedBean(bean);
-                session.flush();
+                if (session.contains(bean)) {
+                    // evict bean before merge to avoid duplicate beans in same session
+                    logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
+                    session.evict(bean);
+                }
+                logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
+                @SuppressWarnings("unchecked")
+                T mergedBean = (T) session.merge(bean);
                 repo.commitTransaction(txStatus);
                 return new EntityChangeEvent(mergedBean, changeEventType, view);
             } catch(Exception e){
-                repo.getTransactionManager().rollback(txStatus);
+                transactionRollbackIfNotCompleted(txStatus);
                 throw e;
             }
         } finally {
             repo.clearSession(); // #7559
         }
 
+    }
+
+
+    /**
+     * @param txStatus
+     */
+    public void transactionRollbackIfNotCompleted(TransactionStatus txStatus) {
+        if(!txStatus.isCompleted()){
+            repo.getTransactionManager().rollback(txStatus);
+        }
     }
 
     /**
@@ -140,7 +118,7 @@ public class CdmStore {
         IService<T> typeSpecificService = serviceFor(bean);
 
         try{
-            Session session = repo.getSession();     
+            Session session = repo.getSession();
             logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
             DeleteResult result = typeSpecificService.delete(bean);
             if (result.isOk()) {
