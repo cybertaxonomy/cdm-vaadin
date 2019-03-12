@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -196,12 +197,24 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
      */
     @Override
     public void setValue(String newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
-        lazySelect.refresh();
-        if(lazySelect.getOptions().contains(newFieldValue)){
-            lazySelect.setValue(newFieldValue);
+        if(!Objects.equals(newFieldValue, lazySelect.getValue())){
+            lazySelect.refresh();
+            if(contains(newFieldValue)){
+                lazySelect.setValue(newFieldValue);
+            }
+            lazySelect.markAsDirty();
         }
-        lazySelect.markAsDirty();
     }
+
+    /**
+     * @param newFieldValue
+     * @return
+     */
+    private boolean contains(String newFieldValue) {
+        UUID id = filterablePagingProvider.idFor(newFieldValue);
+        return id != null;
+    }
+
 
     @Override
     public boolean isValueInOptions(){
