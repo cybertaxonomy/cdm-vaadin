@@ -198,11 +198,10 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
     @Override
     public void setValue(String newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         if(!Objects.equals(newFieldValue, lazySelect.getValue())){
-            lazySelect.refresh();
             if(contains(newFieldValue)){
                 lazySelect.setValue(newFieldValue);
+                lazySelect.markAsDirty();
             }
-            lazySelect.markAsDirty();
         }
     }
 

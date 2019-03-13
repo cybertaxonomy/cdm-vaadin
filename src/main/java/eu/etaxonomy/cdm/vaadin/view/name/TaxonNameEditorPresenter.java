@@ -441,12 +441,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getCache().load(event.getEntity());
                         if(getView().getGenusOrUninomialField() instanceof WeaklyRelatedEntityCombobox){
                             WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>)getView().getGenusOrUninomialField();
-                            if(event.isCreatedType()){
-                                weaklyRelatedEntityCombobox.setValue(((TaxonName)event.getEntity()).getGenusOrUninomial());
-                                weaklyRelatedEntityCombobox.reload();
-                            } else {
-                                weaklyRelatedEntityCombobox.reload();
-                            }
+                            weaklyRelatedEntityCombobox.setValue(((TaxonName)event.getEntity()).getGenusOrUninomial());
                             // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();

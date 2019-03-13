@@ -15,7 +15,6 @@ import org.vaadin.viritin.fields.TypedSelect;
 
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ComboBox;
 
 public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements ReloadableSelect, EntitySupport<T> {
 
@@ -51,11 +50,6 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
      */
     @Override
     public void reload() {
-        // in the LazyComboBox.initList() scrollToSelectedItem is set to false for better performance
-        // but this breaks the refresh, so we need to set it now so that it can
-        // affect the next component repaint which is triggered in refresh()
-        ComboBox comboBox = (ComboBox)getSelect();
-        comboBox.setScrollToSelectedItem(true);
         refresh(); // reload from persistence
         discard(); // reload from property data source
     }
