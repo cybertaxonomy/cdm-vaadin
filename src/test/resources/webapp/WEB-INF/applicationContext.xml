@@ -12,6 +12,8 @@
     <context:property-override location="classpath:override.properties"/>
     
     <context:component-scan base-package="eu/etaxonomy/cdm/api/config" />
+    
+    <context:component-scan base-package="eu/etaxonomy/cdm/vaadin" />
 
     <context:component-scan base-package="eu/etaxonomy/cdm/api/service">
     </context:component-scan>
@@ -25,7 +27,7 @@
     <!-- enable the configuration of transactional behavior based on annotations -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" 
+    <bean id="dataSource" class="org.unitils.database.UnitilsDataSourceFactoryBean" />
 
     <bean id="persistentTermInitializer" class="eu.etaxonomy.cdm.database.PersistentTermInitializer">
         <property name="omit" value="true"/>
