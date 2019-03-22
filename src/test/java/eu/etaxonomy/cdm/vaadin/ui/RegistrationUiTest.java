@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.vaadin.ui;
 import static com.codeborne.selenide.Selenide.open;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import eu.etaxonomy.cdm.SelenideTestBase;
@@ -20,6 +21,7 @@ import eu.etaxonomy.cdm.SelenideTestBase;
  * @since Mar 21, 2019
  *
  */
+@Ignore
 public class RegistrationUiTest extends SelenideTestBase {
 
     @Test
