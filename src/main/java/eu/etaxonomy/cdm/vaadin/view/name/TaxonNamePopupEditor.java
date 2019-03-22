@@ -24,7 +24,7 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
@@ -110,7 +110,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private CheckBox orthographicVariantToggle;
 
-    private ListSelect rankSelect;
+    private NativeSelect rankSelect;
 
     private TeamOrPersonField combinationAuthorshipField;
 
@@ -271,9 +271,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         int row = 0;
 
-        rankSelect = new ListSelect("Rank");
+        rankSelect = new NativeSelect("Rank");
         rankSelect.setNullSelectionAllowed(false);
-        rankSelect.setRows(1);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
         addField(rankSelect, "rank", 0, row, 1, row);
         grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
@@ -888,7 +887,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      * {@inheritDoc}
      */
     @Override
-    public ListSelect getRankSelect() {
+    public NativeSelect getRankSelect() {
         return rankSelect;
     }
 

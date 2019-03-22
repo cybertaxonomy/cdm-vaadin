@@ -27,7 +27,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.location.Point;
@@ -56,7 +56,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     private TextField latitudeField = new LongLatField("Latitude", Axis.LATITUDE);
     private Label longLatParsed = new Label();
     private TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
-    private ListSelect referenceSystemSelect;
+    private NativeSelect referenceSystemSelect;
 
     private LMap map = new LMap();
     private LMarker mapMarker = new LMarker();
@@ -111,9 +111,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
         errorRadiusField.addValueChangeListener( e -> updateMap());
 
-        referenceSystemSelect = new ListSelect("Reference system");
+        referenceSystemSelect = new NativeSelect("Reference system");
         referenceSystemSelect.setNullSelectionAllowed(false);
-        referenceSystemSelect.setRows(1);
         referenceSystemSelect.setWidth(100, Unit.PERCENTAGE);
 
         GridLayout root = new GridLayout();
@@ -226,7 +225,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         return Optional.of(fieldGroup);
     }
 
-    public ListSelect getReferenceSystemSelect() {
+    public NativeSelect getReferenceSystemSelect() {
         return referenceSystemSelect;
     }
 

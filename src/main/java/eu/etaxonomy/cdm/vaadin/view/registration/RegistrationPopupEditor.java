@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -40,11 +40,11 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
 
     TextField specificIdentifierField;
 
-    private ListSelect submitterField;
+    private NativeSelect submitterField;
 
-    private ListSelect institutionField;
+    private NativeSelect institutionField;
 
-    private ListSelect statusSelect;
+    private NativeSelect statusSelect;
 
     private DateField registrationDateField;
 
@@ -68,17 +68,16 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
         specificIdentifierField = new TextFieldNFix("Specific Identifier");
         addField(specificIdentifierField, "specificIdentifier");
 
-        statusSelect = new ListSelect("Status", Arrays.asList(RegistrationStatus.values()));
+        statusSelect = new NativeSelect("Status", Arrays.asList(RegistrationStatus.values()));
         statusSelect.setNullSelectionAllowed(false);
-        statusSelect.setRows(1);
         addField(statusSelect, "status");
 
-        submitterField = new ListSelect("Submitter");
+        submitterField = new NativeSelect("Submitter");
         submitterField.setEnabled(false);
         submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
-        institutionField = new ListSelect("Institution");
+        institutionField = new NativeSelect("Institution");
         institutionField.setEnabled(false);
         institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
@@ -123,7 +122,7 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
      * @return the submitterField
      */
     @Override
-    public ListSelect getSubmitterField() {
+    public NativeSelect getSubmitterField() {
         return submitterField;
     }
 
@@ -131,12 +130,12 @@ public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration
      * @return the institutionField
      */
     @Override
-    public ListSelect getInstitutionField() {
+    public NativeSelect getInstitutionField() {
         return institutionField;
     }
 
     @Override
-    public ListSelect getStatusSelect() {
+    public NativeSelect getStatusSelect() {
         return statusSelect;
     }
 

@@ -11,7 +11,7 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -27,7 +27,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends ApplicationView<SpecimenTypeDesignationWorkingsetEditorPresenter>,
     AnnotationsEditor {
 
-    public ListSelect getCountrySelectField();
+    public NativeSelect getCountrySelectField();
 
     ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField();
 

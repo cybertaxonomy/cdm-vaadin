@@ -26,7 +26,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextArea;
@@ -110,10 +110,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                     ta.setWidth(100,  Unit.PERCENTAGE);
                     field = ta;
                 } else if(propertyId.equals("annotationType")) {
-                    ListSelect select = new ListSelect();
+                    NativeSelect select = new NativeSelect();
                     select.setContainerDataSource(typeSelectItemContainer);
                     select.setWidth(100, Unit.PIXELS);
-                    select.setRows(1);
                     field = select;
                 }
                 field.setStyleName(table.getStyleName());

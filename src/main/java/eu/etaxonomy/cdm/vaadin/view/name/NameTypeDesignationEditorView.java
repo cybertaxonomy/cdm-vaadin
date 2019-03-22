@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -26,7 +26,7 @@ public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeD
 
     ToOneRelatedEntityCombobox<Reference> getCitationCombobox();
 
-    ListSelect getTypeStatusSelect();
+    NativeSelect getTypeStatusSelect();
 
     ToManyRelatedEntitiesComboboxSelect<TaxonName> getTypifiedNamesComboboxSelect();
 
