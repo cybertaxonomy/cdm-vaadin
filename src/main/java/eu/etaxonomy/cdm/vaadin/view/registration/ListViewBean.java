@@ -86,7 +86,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
     private TextField referenceFilter = new TextFieldNFix("Publication");
 
-    private AbstractSelect statusTypeFilter;
+    private ListSelect statusTypeFilter;
 
     private String accessDeniedMessage;
 
@@ -117,8 +117,8 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
             toolBar.addComponent(registrationStatusFilter);
         }
 
-        statusTypeFilter = new NativeSelect("Type Status");
-        ((ListSelect)statusTypeFilter).setRows(3);
+        statusTypeFilter = new ListSelect("Type Status");
+        statusTypeFilter.setRows(3);
         statusTypeFilter.setMultiSelect(true);
         statusTypeFilter.setNullSelectionAllowed(true);
         statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
