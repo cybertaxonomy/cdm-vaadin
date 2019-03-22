@@ -438,6 +438,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
 
         if(UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin()) {
+
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
             editRegistrationButton.setDescription("Edit registration");
@@ -448,7 +449,19 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 null,
                 this
                 )));
-            regItemButtons.addComponent(editRegistrationButton);
+
+            Button unlockButton = new Button(FontAwesome.LOCK);
+            unlockButton.setStyleName(ValoTheme.BUTTON_TINY);
+            unlockButton.setDescription("Unlock");
+            unlockButton.addClickListener(e -> {
+                regItemButtonGroup.setLockOverride(!regItemButtonGroup.isLockOverride());
+                if(regItemButtonGroup.isRegistrationLocked()){
+                    unlockButton.setIcon(regItemButtonGroup.isLockOverride() ? FontAwesome.UNLOCK_ALT : FontAwesome.LOCK);
+                    unlockButton.setDescription(regItemButtonGroup.isLockOverride() ? "Click to unlock editing" : "Click to lock editing");
+                }
+            });
+            unlockButton.setEnabled(regItemButtonGroup.isRegistrationLocked());
+            regItemButtons.addComponents(unlockButton, editRegistrationButton);
         }
 
         PermissionDebugUtils.addGainPerEntityPermissionButton(regItemButtons, Registration.class, dto.getUuid(),
