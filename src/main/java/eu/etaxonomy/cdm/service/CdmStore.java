@@ -118,11 +118,9 @@ public class CdmStore {
         IService<T> typeSpecificService = serviceFor(bean);
 
         try{
-            Session session = repo.getSession();
             logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
             DeleteResult result = typeSpecificService.delete(bean);
             if (result.isOk()) {
-                session.flush();
                 return new EntityChangeEvent(bean, Type.REMOVED, view);
             } else {
                 handleDeleteresultInError(result);
