@@ -39,31 +39,45 @@ public class CdmFilterablePagingProviderFactory {
     @Qualifier("cdmRepository")
     private CdmRepository repo;
 
-
-    public CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider(){
-        return inReferencePagingProvider(null);
+    public CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider() {
+        return inReferencePagingProvider(null, false);
     }
 
-    public CdmFilterablePagingProvider<Reference,Reference> inReferencePagingProvider(ReferenceType subReferenceType){
+    /**
+     *
+     * @param subReferenceType
+     *            the type of the reference for which to the paging provider is
+     *            to be created
+     * @param includeUnspecificTypes
+     *            Whether to include references with the types
+     *            {@link ReferenceType.Generic Generic} and {@code null},
+     * @return
+     */
+    public CdmFilterablePagingProvider<Reference, Reference> inReferencePagingProvider(ReferenceType subReferenceType,
+            boolean includeUnspecificTypes) {
         List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
-        CdmFilterablePagingProvider<Reference,Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
+        CdmFilterablePagingProvider<Reference, Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
                 repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
 
         Set<ReferenceType> inRefTypes = subReferenceType.inReferenceContraints(subReferenceType);
 
-        if(!inRefTypes.isEmpty()){
-            inRefTypes.add(ReferenceType.Generic); // generic references and those with missing type are always valid
-            inRefTypes.add(null);
-            pagingProvider.addRestriction(new Restriction<ReferenceType>("type", null, inRefTypes.toArray(new ReferenceType[inRefTypes.size()])));
+        if (!inRefTypes.isEmpty()) {
+            if (includeUnspecificTypes) {
+                inRefTypes.add(ReferenceType.Generic);
+                inRefTypes.add(null);
+            }
+            pagingProvider.addRestriction(new Restriction<ReferenceType>("type", null,
+                    inRefTypes.toArray(new ReferenceType[inRefTypes.size()])));
         }
 
         return pagingProvider;
     }
 
-    public TypifiedEntityFilterablePagingProvider<Reference> referenceEntityReferencePagingProvider(ReferenceEllypsisFormatter labelProvider, List<String> initStrategy){
+    public TypifiedEntityFilterablePagingProvider<Reference> referenceEntityReferencePagingProvider(
+            ReferenceEllypsisFormatter labelProvider, List<String> initStrategy) {
         List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
@@ -75,14 +89,16 @@ public class CdmFilterablePagingProviderFactory {
         return pagingProvider;
     }
 
-    public CdmFilterablePagingProvider<TaxonName, TaxonName> taxonNamesWithoutOrthophicIncorrect(){
+    public CdmFilterablePagingProvider<TaxonName, TaxonName> taxonNamesWithoutOrthophicIncorrect() {
 
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 repo.getNameService());
-        pagingProvider.setInitStrategy(Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
-        //pagingProvider.addRestriction(new Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null, NameRelationshipType.ORTHOGRAPHIC_VARIANT()));
+        pagingProvider.setInitStrategy(
+                Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
+        // pagingProvider.addRestriction(new
+        // Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null,
+        // NameRelationshipType.ORTHOGRAPHIC_VARIANT()));
         return pagingProvider;
     }
-
 
 }
