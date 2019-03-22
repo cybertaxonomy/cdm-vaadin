@@ -12,7 +12,7 @@ import java.util.EnumSet;
 
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -40,7 +40,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect();
 
-    public ListSelect getRankSelect();
+    public NativeSelect getRankSelect();
 
     /**
      * @return the exBasionymAuthorshipField

@@ -13,7 +13,7 @@ import java.util.List;
 
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.common.DefinedTerm;
@@ -45,7 +45,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
      */
     TextField associatedTypeDesignationCount = new TextField();
     RowListSelect kindOfUnit = new RowListSelect(); // position is IMPORTANT, see rowListSelectColumn()
-    ListSelect typeStatus = new ListSelect();
+    NativeSelect typeStatus = new NativeSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
     TextField accessionNumber = new TextFieldNFix();
@@ -58,10 +58,9 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
     private ToOneRelatedEntityButtonUpdater<Collection> collectionFieldUpdater;
 
     public SpecimenTypeDesignationDTORow(){
-        kindOfUnit.setRows(1);
+
         kindOfUnit.setRequired(true);
         kindOfUnit.setRow(this);
-        typeStatus.setRows(1);
         typeStatus.setRequired(true);
 
         accessionNumber.setWidth(100, Unit.PIXELS);
@@ -136,7 +135,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         return 0;
     }
 
-    class RowListSelect extends ListSelect implements CollectionRowRepresentative {
+    class RowListSelect extends NativeSelect implements CollectionRowRepresentative {
 
         private static final long serialVersionUID = 3235653923633494213L;
 

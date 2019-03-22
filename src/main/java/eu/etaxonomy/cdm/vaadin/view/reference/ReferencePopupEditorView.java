@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.reference;
 
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -24,7 +24,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface ReferencePopupEditorView extends ApplicationView<ReferenceEditorPresenter> {
 
-    public ListSelect getTypeSelect();
+    public NativeSelect getTypeSelect();
 
     public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox();
 

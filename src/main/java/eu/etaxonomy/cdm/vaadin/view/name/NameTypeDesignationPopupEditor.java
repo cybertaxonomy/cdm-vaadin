@@ -14,7 +14,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.common.AnnotationType;
@@ -52,7 +52,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private ToManyRelatedEntitiesComboboxSelect<TaxonName> typifiedNamesComboboxSelect;
 
-    private ListSelect typeStatusSelect;
+    private NativeSelect typeStatusSelect;
 
     private ToOneRelatedEntityCombobox<Reference> citationCombobox;
 
@@ -135,9 +135,8 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
             row++;
         }
 
-        typeStatusSelect = new ListSelect("Type status");
+        typeStatusSelect = new NativeSelect("Type status");
         typeStatusSelect.setNullSelectionAllowed(false);
-        typeStatusSelect.setRows(1);
         typeStatusSelect.setWidth(100, Unit.PERCENTAGE);
         addField(typeStatusSelect, "typeStatus", 0, row, 1, row);
         grid.setComponentAlignment(typeStatusSelect, Alignment.TOP_RIGHT);
@@ -205,7 +204,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
      * @return the typeStatusSelect
      */
     @Override
-    public ListSelect getTypeStatusSelect() {
+    public NativeSelect getTypeStatusSelect() {
         return typeStatusSelect;
     }
 

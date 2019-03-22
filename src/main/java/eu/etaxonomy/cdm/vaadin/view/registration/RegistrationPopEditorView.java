@@ -9,7 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import com.vaadin.ui.DateField;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
@@ -24,17 +24,17 @@ public interface RegistrationPopEditorView extends ApplicationView<RegistrationE
     /**
      * @return the submitterField
      */
-    public ListSelect getSubmitterField();
+    public NativeSelect getSubmitterField();
 
     /**
      * @return the institutionField
      */
-    public ListSelect getInstitutionField();
+    public NativeSelect getInstitutionField();
 
     /**
      * @return
      */
-    public ListSelect getStatusSelect();
+    public NativeSelect getStatusSelect();
 
     /**
      * @return

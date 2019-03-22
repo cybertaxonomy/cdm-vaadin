@@ -22,7 +22,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 
@@ -74,7 +74,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-    private ListSelect countrySelectField;
+    private NativeSelect countrySelectField;
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
 
@@ -96,7 +96,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
      * @return the countrySelectField
      */
     @Override
-    public ListSelect getCountrySelectField() {
+    public NativeSelect getCountrySelectField() {
         return countrySelectField;
     }
 
@@ -117,12 +117,11 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         // FieldUnit + GatheringEvent
 
         int row = 0;
-        countrySelectField = new ListSelect("Country");
+        countrySelectField = new NativeSelect("Country");
         addField(countrySelectField, "country", 1, row , 2, row);
         countrySelectField.setWidth("100%");
         countrySelectField.setItemCaptionMode(ItemCaptionMode.PROPERTY);
         countrySelectField.setItemCaptionPropertyId("label");
-        countrySelectField.setRows(1);
 
         row++;
         TextArea localityField = new TextArea("Locality");
