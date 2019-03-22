@@ -133,6 +133,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Button advancedModeButton;
 
+    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator;
+
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
         mainLayout = new VerticalLayout();
@@ -874,6 +876,9 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * You can now implement this method if you need to modify the state or value of individual fields.
      */
     protected void afterItemDataSourceSet() {
+        if(editorComponentsConfigurator != null){
+            editorComponentsConfigurator.updateComponentStates(this);
+        }
     }
 
     // ------------------------ issue related temporary solutions --------------------- //
@@ -938,5 +943,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 newField.setValue(value);
                 return newField;
             }
+
+    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> getEditorComponentsConfigurator() {
+        return editorComponentsConfigurator;
+    }
+
+    public void setEditorComponentsConfigurator(
+            EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator) {
+        this.editorComponentsConfigurator = editorComponentsConfigurator;
+    }
 
 }

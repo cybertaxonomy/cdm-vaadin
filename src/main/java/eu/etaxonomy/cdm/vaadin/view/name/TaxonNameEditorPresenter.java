@@ -55,6 +55,7 @@ import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.reference.RegistrationUiReferenceEditorFormConfigurator;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -340,13 +341,15 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
         referenceEditorPopup.loadInEditor(null);
-        if(newReferenceInstantiator != null){
-            // this is a bit clumsy, we actually need to inject something like a view configurer
-            // which can enable, disable fields
-            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-            referenceEditorPopup.getTypeSelect().setEnabled(false);
-        }
+//        if(newReferenceInstantiator != null){
+//            // this is a bit clumsy, we actually need to inject something like a view configurer
+//            // which can enable, disable fields
+//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+//            referenceEditorPopup.getTypeSelect().setEnabled(false);
+//        }
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
@@ -360,13 +363,16 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
         referenceEditorPopup.loadInEditor(event.getEntityUuid());
-        if(newReferenceInstantiator != null){
-            // this is a bit clumsy, we actually need to inject something like a view configurator
-            // which can enable, disable fields
-            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-            referenceEditorPopup.getTypeSelect().setEnabled(false);
-        }
+//        if(newReferenceInstantiator != null){
+//            // this is a bit clumsy, we actually need to inject something like a view configurator
+//            // which can enable, disable fields
+//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+//            referenceEditorPopup.getInReferenceCombobox().setEditButtonEnabled(false); // <-------
+//            referenceEditorPopup.getTypeSelect().setEnabled(false);
+//        }
     }
 
     @EventBusListenerMethod
