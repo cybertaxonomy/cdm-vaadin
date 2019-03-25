@@ -8,10 +8,17 @@
 */
 package eu.etaxonomy.cdm.vaadin.event;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.vaadin.ui.Component;
 
@@ -28,6 +35,8 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  *
  */
 public class EditorActionContextFormatter {
+
+    public static final Logger logger = Logger.getLogger(EditorActionContextFormatter.class);
 
     private static final String NEW = "New";
 
@@ -56,7 +65,8 @@ public class EditorActionContextFormatter {
                 createOrNew = cdmEntity.isPersited() ? EDIT : NEW;
             } else {
                 className = parentEntity.getClass().getSimpleName();
-                // can not decide for createOrNew in this case
+                className = className.replace("DTO", "");
+                createOrNew = beanHasNonEmptyFields(parentEntity) ? EDIT : NEW;
             }
         } else {
             className += "[NULL_CLASS]";
@@ -109,9 +119,9 @@ public class EditorActionContextFormatter {
                 targetInfo = className;
             }
             if(targetInfo != null){
+                targetInfo = normalizeTargetInfo(targetInfo);
                 if(!outStr.isEmpty()){
                     outStr += " ";
-                    targetInfo = normalizeTargetInfo(targetInfo);
                 }
                 if(format.tagName != null){
                     outStr += "<" + format.tagName + " class=\"target " + format.classAttributes + "\">" + targetInfo + "</" + format.tagName + ">";
@@ -128,6 +138,43 @@ public class EditorActionContextFormatter {
             }
         }
         return outStr;
+    }
+
+    /**
+     * @param parentEntity
+     * @return
+     */
+    private boolean beanHasNonEmptyFields(Object parentEntity) {
+        BeanUtilsBean beanUtils = BeanUtilsBean.getInstance();
+        Map<String, Object> description = new HashMap<>();
+        PropertyDescriptor[] descriptors =
+                beanUtils.getPropertyUtils().getPropertyDescriptors(parentEntity);
+        Class<?> clazz = parentEntity.getClass();
+        for (int i = 0; i < descriptors.length; i++) {
+
+                String name = descriptors[i].getName();
+                Method getter = beanUtils.getPropertyUtils().getReadMethod(descriptors[i]);
+                if (getter != null) {
+                    try {
+                        Object value;
+                        value = getter.invoke(parentEntity);
+                        if(value != null){
+                            if(Collection.class.isAssignableFrom(value.getClass())){
+                                return !((Collection)value).isEmpty();
+                            }
+                            if(value instanceof String){
+                                return !((String)value).isEmpty();
+                            }
+                            return true;
+                        }
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        /* IGNORE */
+                    }
+                }
+
+        }
+
+        return false;
     }
 
     public String format(Collection<EditorActionContext> cntxts, EditorActionContextFormat format) {
