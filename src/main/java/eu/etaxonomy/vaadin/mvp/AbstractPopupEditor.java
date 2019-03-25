@@ -29,7 +29,6 @@ import com.vaadin.data.fieldgroup.FieldGroup.FieldGroupInvalidValueException;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -766,9 +765,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         List<EditorActionContext> contextInfo = new ArrayList<>(getEditorActionContext());
         String breadcrumbs = "";
         EditorActionContextFormatter formatter = new EditorActionContextFormatter();
-
-        GenericFontIcon operationPrefixIcon = new GenericFontIcon("IcoMoon", 0xe902);
-        GenericFontIcon operationSuffxIcon = new GenericFontIcon("IcoMoon", 0xe901);
 
         int cnt = 0;
         for(EditorActionContext cntxt : contextInfo){
