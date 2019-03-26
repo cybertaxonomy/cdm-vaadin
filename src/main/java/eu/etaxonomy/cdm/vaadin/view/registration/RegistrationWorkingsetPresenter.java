@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
@@ -56,7 +55,6 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
@@ -64,6 +62,7 @@ import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.CdmStore;
+import eu.etaxonomy.cdm.service.IRegistrationWorkflowService;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
@@ -112,6 +111,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     @Autowired
     private IRegistrationWorkingSetService regWorkingSetService;
+
+    @Autowired
+    private IRegistrationWorkflowService registrationWorkflowService;
 
     @Autowired
     private CdmFilterablePagingProviderFactory pagingProviderFactory;
@@ -175,34 +177,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return new  CdmStore<TaxonName, INameService>(getRepo(), getRepo().getNameService());
     }
 
-    /**
-     * Checks
-     * <ol>
-     * <li>if there is NOT any registration for this name created in the current registration system</li>
-     * <li>Checks if the name belongs to the current workingset</li>
-     * </ol>
-     * If both checks are successful the method returns <code>true</code>.
-     */
-    public boolean canCreateNameRegistrationFor(TaxonName name) {
-        return !getRepo().getRegistrationService().checkRegistrationExistsFor(name) && checkWokingsetContainsProtologe(name);
-    }
 
-    /**
-     * @param name
-     * @return
-     */
-    public boolean checkWokingsetContainsProtologe(TaxonName name) {
-        Reference nomRef = name.getNomenclaturalReference();
-        UUID citationUuid = workingset.getCitationUuid();
-        // @formatter:off
-        return nomRef != null && (
-                // nomref matches
-                nomRef.getUuid().equals(citationUuid) ||
-                // nomref.inreference matches
-                (nomRef.getType() != null && nomRef.getType() == ReferenceType.Section && nomRef.getInReference() != null && nomRef.getInReference().getUuid().equals(citationUuid))
-                );
-        // @formatter:on
-    }
 
     /**
      * @param doReload reload the workingset from the persistent storage.
@@ -468,39 +443,18 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(event.getPopup() instanceof TaxonNamePopupEditor){
             if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
                 if(event.getReason().equals(Reason.SAVE)){
-
                     try {
-                        // TODO move into a service class --------------
-                        TransactionStatus txStatus = getRepo().startTransaction();
-                        try {
-                            UUID taxonNameUuid = newNameForRegistrationPopupEditor.getBean().getUuid();
-                            if(newNameForRegistrationPopupEditor.getBean().cdmEntity().isPersited()){
-                                getRepo().getSession().refresh(newNameForRegistrationPopupEditor.getBean().cdmEntity());
-                            }
-                            Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonNameUuid);
-                            if(!newNameBlockingRegistrations.isEmpty()){
-                                for(Registration blockingReg : newNameBlockingRegistrations){
-                                    blockingReg = getRepo().getRegistrationService().load(blockingReg.getUuid());
-                                    reg.getBlockedBy().add(blockingReg);
-                                }
-                                getRepo().getRegistrationService().saveOrUpdate(reg);
-                                newNameBlockingRegistrations.clear();
-                            }
-                           getRepo().commitTransaction(txStatus);
-                        } catch (Exception e){
-                            getRepo().getTransactionManager().rollback(txStatus);
-                            throw e;
-                        }
-                        // --------------------------------------------------
-                        // reload workingset into current session
+                        TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
+                        registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
                         loadWorkingSet(workingset.getCitationUuid());
+                        refreshView(true);
+                        getView().getAddNewNameRegistrationButton().setEnabled(true);
                     } finally {
                         getRepo().getSession().clear(); // #7702
                         refreshView(true);
                         getView().getAddNewNameRegistrationButton().setEnabled(true);
                     }
                 }
-
                 // nullify and clear the memory on this popup editor in any case (SAVE, CANCEL, DELETE)
                 newNameForRegistrationPopupEditor = null;
                 newNameBlockingRegistrations.clear();
@@ -510,6 +464,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         }
     }
+
+
 
 
     /**
@@ -530,40 +486,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(typifiedName != null){
             boolean doReloadWorkingSet = false;
             try {
-                // TODO move into a service class --------------
-                TransactionStatus txStatus = getRepo().startTransaction(true);
-                try {
-                    Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
-                    // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
-                    // to create a typification only registration in the working (publication) set which contains
-                    // the protologe. This is known from the nomenclatural reference.
-                    if(canCreateNameRegistrationFor(typifiedName)){
-                        // the citation which is the base for workingset contains the protologe of the name and the name has not
-                        // been registered before:
-                        // create a registration for the name and the first typifications
-                        Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-                        workingset.add(new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation));
-                        doReloadWorkingSet = true;
-                    } else {
-                        if(!checkWokingsetContainsProtologe(typifiedName)){
-                            // create a typification only registration
-                            Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
-                            if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
-                                // oops, yet no registration for this name, so we create it as blocking registration:
-                                Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-                                typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
-                            }
-                            RegistrationDTO regDTO = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
-                            workingset.add(regDTO);
-                        }
-                    }
-                    getRepo().commitTransaction(txStatus);
-                } catch (Exception e){
-                    getRepo().getTransactionManager().rollback(txStatus);
-                    throw e;
-                }
-                // --------------------------------------------------
-                // tell the view to update the workingset
+                doReloadWorkingSet = registrationWorkflowService.createRegistrationforExistingName(workingset, typifiedName);
             } finally {
                 getRepo().getSession().clear(); // #7702;
                 refreshView(doReloadWorkingSet);
@@ -574,7 +497,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTypeDesignationsEditorActionEdit(TypeDesignationWorkingsetEditorAction event) {
@@ -702,22 +624,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
 
                 try {
+                    Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
+                    Registration registration = findRegistrationInContext(context);
                     getRepo().getSession().clear();
-                    // TODO move into a service class --------------
-                    TransactionStatus txStatus = getRepo().startTransaction();
-                    try {
-                        UUID regUUID = nameTypeDesignationPopupEditorRegistrationUUIDMap.get(event.getPopup());
-                        Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
-                        Registration registration = findRegistrationInContext(context);
-                        getRepo().getRegistrationService().addTypeDesignation(registration, typeDesignationUuid);
-                        getRepo().getRegistrationService().saveOrUpdate(registration);
-                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
-                        getRepo().commitTransaction(txStatus);
-                    } catch (Exception e){
-                        getRepo().getTransactionManager().rollback(txStatus);
-                        throw e;
-                    }
-                    // TODO move into a service class --------------
+                    registrationWorkflowService.addTypeDesignation(typeDesignationUuid, registration);
+                    nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 } finally {
                     getRepo().getSession().clear();
                     refreshView(true);
@@ -770,39 +681,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getSourceView()).getEditorActionContext();
                 EditorActionContext rootContext = context.get(0);
                 if(rootContext.getParentView().equals(getView()) && event.getSourceView() != newNameForRegistrationPopupEditor){
-
                     try {
                         getRepo().getSession().clear();
-                        // TODO move into a service class --------------
-                        TransactionStatus txStatus = getRepo().startTransaction();
-                        try {
-                            // create a blocking registration, the new Registration will be persisted
-                            UUID taxonNameUUID = event.getEntityUuid();
+                        // create a blocking registration, the new Registration will be persisted
+                        UUID taxonNameUUID = event.getEntityUuid();
+
+                        if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
+                            // Oha!! The event came from a popup editor and the
+                            // first popup in the context is a TaxonNameEditor with un-persisted name
+                            // This is a name for a new registration which has not yet been created.
+                            // It is necessary to store blocking registrations in the newNameBlockingRegistrations
                             Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
-
-                            if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
-                                // Oha!! The event came from a popup editor and the
-                                // first popup in the context is a TaxonNameEditor with un-persisted name
-                                // This is a name for a new registration which has not yet been created.
-                                // It is necessary to store blocking registrations in the newNameBlockingRegistrations
-                                newNameBlockingRegistrations.add(blockingRegistration);
-                                logger.debug("Blocking registration created and memorized");
-                            } else {
-                                // some new name somehow related to an existing registration
-                                Registration registration = findRegistrationInContext(context);
-                                registration.getBlockedBy().add(blockingRegistration);
-
-                                if(registration.isPersited()){
-                                    getRepo().getRegistrationService().saveOrUpdate(registration);
-                                    logger.debug("Blocking registration created, added to registion and persited");
-                                }
-                            }
-                            getRepo().commitTransaction(txStatus);
-                        } catch (Exception e){
-                            getRepo().getTransactionManager().rollback(txStatus);
-                            throw e;
+                            newNameBlockingRegistrations.add(blockingRegistration);
+                            logger.debug("Blocking registration created and memorized");
+                        } else {
+                            Registration registration = findRegistrationInContext(context);
+                            // some new name somehow related to an existing registration
+                            registrationWorkflowService.addBlockingRegistration(taxonNameUUID, registration);
                         }
-                        // TODO move into a service class --------------
                     } finally {
                         getRepo().getSession().clear();
                     }
@@ -832,6 +728,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
     /**
+     * Finds the Registration in the EditorContext stack
+     *
      * @param context
      * @return
      */
@@ -841,16 +739,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         RegistrationDTO registrationDTO = workingset.getRegistrationDTO(regReference.getUuid()).get();
         Registration registration = registrationDTO.registration();
 
-        if(registration.isPersited()){
-             registration = getRepo().getRegistrationService().load(registration.getUuid());
-             if(registration == null){
-                 throw new NullPointerException("Registration not found for " + regReference + " which has been hold in the rootContext");
-             }
-         } else {
-             logger.trace("Registration is not yet persisted.");
-         }
+        // registration = reloadRegistration(registration);
         return registration;
     }
+
+
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
     public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
@@ -915,6 +808,22 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @Override
     public void disposeCache() {
         cache.dispose();
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public boolean canCreateNameRegistrationFor(TaxonName name) {
+        return registrationWorkflowService.canCreateNameRegistrationFor(workingset, name);
+    }
+
+    /**
+     * @param name
+     * @return
+     */
+    public boolean checkWokingsetContainsProtologe(TaxonName name) {
+        return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
     }
 
 }
