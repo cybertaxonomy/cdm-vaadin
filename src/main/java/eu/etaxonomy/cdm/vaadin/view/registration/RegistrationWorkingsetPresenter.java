@@ -453,6 +453,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
             for(TaxonName name : namesToCheck){
                 if(name != null){
+                    clearSession();
                     doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
                 }
             }
@@ -625,7 +626,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                 try {
                     clearSession();
-                    getRepo().getSession().clear();
+                    Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
+                    registration = findRegistrationInContext(context);
                     registrationWorkflowService.addTypeDesignation(typeDesignationUuid, registration);
                     nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 } finally {

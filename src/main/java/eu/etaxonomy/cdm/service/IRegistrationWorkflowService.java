@@ -37,7 +37,7 @@ public interface IRegistrationWorkflowService {
     boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws RegistrationValidationException;
 
     @Transactional(readOnly=true)
-    void reloadRegistration(Registration registration);
+    Registration reloadRegistration(Registration registration);
 
     /**
      * Creates a new registration for the name referenced by the {@code taxonNameUUID} parameter
