@@ -39,8 +39,18 @@ public interface IRegistrationWorkflowService {
     @Transactional(readOnly=true)
     void reloadRegistration(Registration registration);
 
+    /**
+     * Creates a new registration for the name referenced by the {@code taxonNameUUID} parameter
+     * if there isn't one already and adds this new registration as blocking registration to the passed
+     * {@code registration}.
+     *
+     * Already existing registrations must not be added as blocking registration.
+     *
+     * @param taxonNameUUID
+     * @param registration
+     */
     @Transactional
-    void addBlockingRegistration(UUID taxonNameUUID, Registration registration);
+    Registration addBlockingRegistration(UUID nameUUID, Registration registration);
 
     @Transactional
     void addTypeDesignation(UUID typeDesignationUuid, Registration registration);

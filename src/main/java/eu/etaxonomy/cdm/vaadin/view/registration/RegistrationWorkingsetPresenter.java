@@ -94,6 +94,7 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
+import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
  * @author a.kohlbecker
@@ -340,15 +341,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    @EventBusListenerMethod
-    public void onDoneWithSpecimenTypeDesignationWorkingsetPopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
-        if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
-            if(event.getReason().equals(Reason.SAVE)){
-                refreshView(true);
-            }
-        }
-    }
-
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
 
@@ -423,19 +415,19 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @throws RegistrationValidationException
      */
     @EventBusListenerMethod
-    public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
+    public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) {
         if(event.getPopup() instanceof TaxonNamePopupEditor){
+            Registration registration = null;
+            boolean doRefreshView = false;
             if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
                 if(event.getReason().equals(Reason.SAVE)){
                     try {
                         TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
-                        registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
+                        registration = registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
                         loadWorkingSet(workingset.getCitationUuid());
-                        refreshView(true);
-                        getView().getAddNewNameRegistrationButton().setEnabled(true);
                     } finally {
                         clearSession();
-                        refreshView(true);
+                        doRefreshView = true;
                         getView().getAddNewNameRegistrationButton().setEnabled(true);
                     }
                 }
@@ -443,9 +435,29 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 newNameForRegistrationPopupEditor = null;
                 newNameBlockingRegistrations.clear();
                 getView().getAddNewNameRegistrationButton().setEnabled(true);
-            } else {
-                refreshView(true);
             }
+
+            if(registration == null){
+                // no new registration has been created above, so there must be an existing one.
+                registration = findRegistrationInContext(event.getPopup());
+            }
+
+            // Check if the other names used in the context of the name are registered yet.
+            TaxonNamePopupEditor nameEditor = (TaxonNamePopupEditor)event.getPopup();
+            Set<TaxonName> namesToCheck = new HashSet<>();
+
+            namesToCheck.addAll(nameEditor.getBasionymComboboxSelect().getValue());
+            namesToCheck.addAll(nameEditor.getReplacedSynonymsComboboxSelect().getValue());
+            namesToCheck.add(nameEditor.getValidationField().getRelatedNameComboBox().getValue());
+            namesToCheck.add(nameEditor.getOrthographicVariantField().getRelatedNameComboBox().getValue());
+
+            for(TaxonName name : namesToCheck){
+                if(name != null){
+                    doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
+                }
+            }
+
+            refreshView(doRefreshView);
         }
     }
 
@@ -605,19 +617,42 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
+
+                Registration registration = null;
+                boolean doRefreshView = false;
+
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
 
                 try {
                     clearSession();
-                    Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
-                    Registration registration = findRegistrationInContext(context);
                     getRepo().getSession().clear();
                     registrationWorkflowService.addTypeDesignation(typeDesignationUuid, registration);
                     nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 } finally {
                     clearSession();
-                    refreshView(true);
+                    doRefreshView = true;
                 }
+
+                if(registration == null){
+                    // no new registration has been created above, so there must be an existing one.
+                    registration = findRegistrationInContext(event.getPopup());
+                }
+
+                // Check if the other names used in the context of the name are registered yet.
+                NameTypeDesignationPopupEditor nameEditor = (NameTypeDesignationPopupEditor)event.getPopup();
+                Set<TaxonName> namesToCheck = new HashSet<>();
+
+                namesToCheck.add(nameEditor.getTypeNameField().getValue());
+
+                for(TaxonName name : namesToCheck){
+                    if(name != null){
+                        doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
+                    }
+
+                }
+
+                refreshView(doRefreshView);
+
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // noting to do
             }
@@ -719,6 +754,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
+    public Registration findRegistrationInContext(PopupView popupView) {
+        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        return findRegistrationInContext(context);
+    }
     /**
      * Finds the Registration in the EditorContext stack
      *
