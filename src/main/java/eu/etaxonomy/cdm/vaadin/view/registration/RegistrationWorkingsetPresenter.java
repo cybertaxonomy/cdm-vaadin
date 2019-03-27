@@ -468,7 +468,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             namesToCheck.add(nameEditor.getOrthographicVariantField().getRelatedNameComboBox().getValue());
 
             for(TaxonName name : namesToCheck){
-                if(name != null){
+                if(name != null) {
                     doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
                 }
             }
@@ -641,7 +641,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                 try {
                     registration = findRegistrationInContext(event.getPopup());
-                    getRepo().getSession().clear();
+                    Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
+                    registration = findRegistrationInContext(context);
                     registrationWorkflowService.addTypeDesignation(typeDesignationUuid, registration);
                     nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 } finally {

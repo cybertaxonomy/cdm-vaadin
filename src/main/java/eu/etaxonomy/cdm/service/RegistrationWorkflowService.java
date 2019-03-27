@@ -103,7 +103,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
     @Override
     public void addTypeDesignation(UUID typeDesignationUuid, Registration registration) {
-        reloadRegistration(registration);
+        registration = reloadRegistration(registration);
         getRepo().getRegistrationService().addTypeDesignation(registration, typeDesignationUuid);
         getRepo().getRegistrationService().saveOrUpdate(registration);
     }
@@ -127,7 +127,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
         if(!registrationExists){
             Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(nameUUID);
-            reloadRegistration(registration);
+            registration = reloadRegistration(registration);
             registration.getBlockedBy().add(blockingRegistration);
             if(registration.isPersited()){
                 getRepo().getRegistrationService().saveOrUpdate(registration);
@@ -143,7 +143,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
      * @return
      */
     @Override
-    public void reloadRegistration(Registration registration) {
+    public Registration reloadRegistration(Registration registration) {
         if(registration.isPersited()){
              Registration registrationReloaded = getRepo().getRegistrationService().load(registration.getUuid());
              if(registrationReloaded == null){
@@ -153,6 +153,8 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
          } else {
              logger.trace("Registration is not yet persisted.");
          }
+
+        return registration;
     }
 
     /**
