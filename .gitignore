@@ -18,3 +18,4 @@ src/test/resources/eu/etaxonomy/cdm/database/schema/*.xsd
 env.properties
 c3p0.properties
 c3p0.properties
+workbench.xmi
