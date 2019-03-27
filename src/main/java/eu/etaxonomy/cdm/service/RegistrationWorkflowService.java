@@ -21,6 +21,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -39,6 +40,9 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
     @Autowired
     @Qualifier("cdmRepository")
     private CdmRepository repo;
+
+    @Autowired
+    private RegistrationIdentifierMinter minter;
 
     private CdmRepository getRepo() {
         return repo;
@@ -109,14 +113,29 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
      * @param registration
      */
     @Override
-    public void addBlockingRegistration(UUID taxonNameUUID, Registration registration) {
-        Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
-        reloadRegistration(registration);
-        registration.getBlockedBy().add(blockingRegistration);
-        if(registration.isPersited()){
-            getRepo().getRegistrationService().saveOrUpdate(registration);
-            logger.debug("Blocking registration created, added to registion and persited");
+    public Registration addBlockingRegistration(UUID nameUUID, Registration registration) {
+
+        TaxonName name = getRepo().getNameService().load(nameUUID);
+
+        boolean registrationExists = false;
+        for(Registration regForName : name.getRegistrations()){
+            if(minter.identifierPattern().matcher(regForName.getIdentifier()).matches()){
+                registrationExists = true;
+                break;
+            }
         }
+
+        if(!registrationExists){
+            Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(nameUUID);
+            reloadRegistration(registration);
+            registration.getBlockedBy().add(blockingRegistration);
+            if(registration.isPersited()){
+                getRepo().getRegistrationService().saveOrUpdate(registration);
+                logger.debug("Blocking registration created, added to registion and persited");
+            }
+            return blockingRegistration;
+        }
+        return null;
     }
 
     /**
