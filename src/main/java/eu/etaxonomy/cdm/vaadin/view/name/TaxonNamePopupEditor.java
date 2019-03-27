@@ -33,6 +33,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.RankClass;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
@@ -739,7 +740,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         // TODO use getField() instead and remove field references
         Rank rank = (Rank) rankSelect.getValue();
 
-        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES());
+        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES()) && !rank.getRankClass().equals(RankClass.Unknown);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
         Boolean withOrthographicCorrectionSection = BooleanUtils.isTrue(orthographicVariantToggle.getValue());
