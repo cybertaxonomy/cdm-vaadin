@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.data.validator.InReferenceTypeValidator;
+import eu.etaxonomy.cdm.vaadin.data.validator.TimePeriodCompletenesValidator;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -151,6 +152,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
          */
         int row = 0;
         datePublishedField = new VerbatimTimePeriodField("Date published");
+        datePublishedField.addValidator(new TimePeriodCompletenesValidator());
         addField(datePublishedField, "datePublished", 0, row, 1, row);
         typeSelect = new NativeSelect("Reference type");
         typeSelect.addItems(referenceTypes);

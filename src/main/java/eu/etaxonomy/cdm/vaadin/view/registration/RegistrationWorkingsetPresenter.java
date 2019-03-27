@@ -478,8 +478,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
 
-
-
     /**
      * Creates a new Registration for an exiting (previously published) name.
      *
