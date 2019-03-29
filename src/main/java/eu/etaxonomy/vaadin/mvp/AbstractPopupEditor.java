@@ -448,8 +448,17 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             }
             if(cause == null){
                 // no known exception type found
-                logger.error("Unhandled exception", e);
-                throw new PopupEditorException("Error saving popup editor", this, e);
+                logger.error(e);
+                PopupEditorException pee = null;
+                try {
+                    pee  = new PopupEditorException("Error saving popup editor", this, e);
+                } catch (Throwable t) {
+                    /* IGORE errors which happen during the construction of the PopupEditorException */
+                }
+                if(pee != null){
+                    throw pee;
+                }
+                throw new RuntimeException(e);
             }
 
         }
@@ -598,7 +607,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             while(parentComponent != null){
                 logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
-                    Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
+                    try {
                     if(parentFieldGroup.isPresent()){
                         Object propId = parentFieldGroup.get().getPropertyId(parentField);
                         if(propId != null){
@@ -607,8 +616,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                         }
                         logger.debug("parentField: " + parentField.getClass().getSimpleName());
                         parentField = (Field)parentComponent;
-                    } else {
-                        logger.debug("parentFieldGroup is null, continuing ...");
+                    } catch (NullPointerException e){
+                        String causeDetail = "NullPointerException";
+                        if(((NestedFieldGroup)parentComponent).getFieldGroup() == null){
+                            causeDetail = "parentComponent.getFieldGroup() is NULL, this should not happen.";
+                        }
+                        logger.error(causeDetail, e);
                     }
                 } else if(parentComponent == this) {
                     // we reached the editor itself
