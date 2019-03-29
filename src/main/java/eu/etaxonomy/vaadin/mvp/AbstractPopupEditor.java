@@ -607,7 +607,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             while(parentComponent != null){
                 logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
-                    try {
+                    Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
                     if(parentFieldGroup.isPresent()){
                         Object propId = parentFieldGroup.get().getPropertyId(parentField);
                         if(propId != null){
@@ -616,12 +616,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                         }
                         logger.debug("parentField: " + parentField.getClass().getSimpleName());
                         parentField = (Field)parentComponent;
-                    } catch (NullPointerException e){
-                        String causeDetail = "NullPointerException";
-                        if(((NestedFieldGroup)parentComponent).getFieldGroup() == null){
-                            causeDetail = "parentComponent.getFieldGroup() is NULL, this should not happen.";
-                        }
-                        logger.error(causeDetail, e);
+                    } else {
+                        logger.debug("parentFieldGroup is null, continuing ...");
                     }
                 } else if(parentComponent == this) {
                     // we reached the editor itself
@@ -889,6 +885,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             editorComponentsConfigurator.updateComponentStates(this);
         }
     }
+
 
     // ------------------------ issue related temporary solutions --------------------- //
     /**
