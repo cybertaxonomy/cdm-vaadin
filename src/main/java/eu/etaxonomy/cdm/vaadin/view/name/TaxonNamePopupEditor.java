@@ -47,6 +47,7 @@ import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
+import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.NameRelationField;
@@ -767,11 +768,13 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                             );
                         }
                     });
+                    combobox.getSelect().setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
                 if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
                     genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, new TextFieldNFix(), 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                    genusOrUninomialField.setRequiredError(UIMessages.REQUIRED_TEXT_MISSING);
                 }
             }
         }
@@ -781,6 +784,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 if(TextField.class.isAssignableFrom(specificEpithetField.getClass())) {
                     WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, combobox, 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    combobox.getSelect().setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
                     combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                             this,
                             new TaxonNameEditorActionStrRep(EditorActionType.ADD, e.getButton(), combobox, this)
@@ -801,6 +805,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             } else {
                 if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(specificEpithetField.getClass())) {
                     specificEpithetField = replaceComponent("specificEpithet", specificEpithetField, new TextFieldNFix(), 0, specificEpithetFieldRow, 1, specificEpithetFieldRow);
+                    specificEpithetField.setRequiredError(UIMessages.REQUIRED_TEXT_MISSING);
                }
             }
         }
@@ -820,8 +825,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         specificEpithetField.setRequired(isSpeciesOrBelow);
         infraSpecificEpithetField.setVisible(rank.isInfraSpecific());
         infraSpecificEpithetField.setRequired(rank.isInfraSpecific());
+        infraSpecificEpithetField.setRequiredError(UIMessages.REQUIRED_TEXT_MISSING);
         infraGenericEpithetField.setVisible(rank.isInfraGeneric());
         infraGenericEpithetField.setRequired(rank.isInfraGeneric());
+        infraSpecificEpithetField.setRequiredError(UIMessages.REQUIRED_TEXT_MISSING);
 
         basionymsComboboxSelect.setVisible(withBasionymSection);
 

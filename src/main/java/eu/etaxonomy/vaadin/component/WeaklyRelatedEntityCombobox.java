@@ -16,8 +16,12 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.converter.Converter.ConversionException;
+import com.vaadin.server.AbstractErrorMessage.ContentMode;
+import com.vaadin.server.ErrorMessage.ErrorLevel;
+import com.vaadin.server.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Component;
@@ -65,9 +69,16 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         addSizedComponents(lazySelect, container);
         buttonUpdater = new WeaklyRelatedEntityButtonUpdater(this);
         lazySelect.addValueChangeListener(buttonUpdater);
+        lazySelect.setValidationVisible(true);
         lazySelect.addValueChangeListener(e -> {
             // update the itemContainer immediately so that the edit button acts on the chosen item
+            // TODO compare with ToOneRelatedEntityCombobox where getValue() is overwritten to call
+            //  commitSelect();; would this help in this class also?
+            try {
             lazySelect.commit();
+            } catch (InvalidValueException ie){
+                /* Ignore here */
+            }
         });
     }
 
@@ -174,16 +185,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         setValue(bean);
     }
 
-    /**
-     * Returns always currently selected item by
-     *
-     * {@inheritDoc}
-     */
-    @Override
-    public String getValue() {
-        lazySelect.commit();
-        return lazySelect.getValue();
-    }
 
     public UUID getIdForValue(){
         return filterablePagingProvider.idFor(getValue());
@@ -248,10 +249,43 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         }
     }
 
+
+    @Override
+    public void setRequired(boolean required) {
+        super.setRequired(required);
+        lazySelect.setRequired(required);
+    }
+
+    @Override
+    public void setImmediate(boolean immediate){
+        super.setImmediate(immediate);
+        lazySelect.setImmediate(immediate);
+    }
+
     @Override
     public void updateButtons(){
         buttonUpdater.updateButtons(getValue());
     }
+
+    @Override
+    public void commit() throws SourceException, InvalidValueException {
+        lazySelect.commit();
+    }
+
+    /**
+    *
+    */
+   public void commitSelect() {
+       try {
+           setComponentError(null);
+           lazySelect.commit();
+       } catch (InvalidValueException ex){
+           UserError componentError = new UserError(ex.getHtmlMessage(), ContentMode.HTML, ErrorLevel.ERROR);
+           lazySelect.setComponentError(componentError);
+       }
+   }
+
+
 
     /**
      * {@inheritDoc}
@@ -305,7 +339,5 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
             toOneRelatedEntityField.setEditButtonEnabled(!isReadOnlyField && userIsAllowedToUpdate);
         }
     }
-
-
 
 }

@@ -29,6 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
+import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
 
 /**
  * @author a.kohlbecker
@@ -57,8 +58,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         this.type = type;
         setCaption(caption);
         lazySelect = new ReloadableLazyComboBox<V>(type);
-        lazySelect.setRequiredError("Must be given");
-        setRequiredError("Must be given");
+        lazySelect.setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
         // lazySelect.setImmediate(true); // should cause immediate validation, however,
