@@ -32,9 +32,8 @@ public enum TaxonNamePopupEditorMode {
     NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY,
 
     /**
-     * setting the nomenclatural reference is required with the exception
-     * that existing data is considered complete if the combination
-     * authors are set.
+     * setting the nomenclatural reference is required. This also accounts for names realted to the name
+     * being edites in the TaxonNamePopupEditor (basionyms, validation, replaced synonmys, ...).
      */
     REQUIRE_NOMENCLATURALREFERENCE,
 

@@ -57,7 +57,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         this.type = type;
         setCaption(caption);
         lazySelect = new ReloadableLazyComboBox<V>(type);
-        lazySelect.setValidationVisible(false); // validation is to be shown for the ToOneRelatedEntityCombobox
         lazySelect.setRequiredError("Must be given");
         setRequiredError("Must be given");
         addStyledComponents(lazySelect, addButton, editButton);
@@ -197,7 +196,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
             lazySelect.commit();
         } catch (InvalidValueException ex){
             UserError componentError = new UserError(ex.getHtmlMessage(), ContentMode.HTML, ErrorLevel.ERROR);
-            setComponentError(componentError);
+            lazySelect.setComponentError(componentError);
         }
     }
 

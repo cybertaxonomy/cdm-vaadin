@@ -490,9 +490,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(otherName);
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             otherNameField.setValue(otherName);
                         } else {
-                            otherNameField.reload();
+                            otherNameField.reloadWith(otherName);
                         }
 
                     } else
@@ -505,9 +506,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             basionymSourceField .setValue((TaxonName) event.getEntity());
                         } else {
-                            basionymSourceField.reload();
+                            basionymSourceField.reloadWith((TaxonName) event.getEntity());
                         }
                         getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
                         getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
@@ -523,9 +525,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             replacedSynonyms .setValue((TaxonName) event.getEntity());
                         } else {
-                            replacedSynonyms.reload();
+                            replacedSynonyms.reloadWith((TaxonName) event.getEntity());
                         }
                         getView().getExCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();

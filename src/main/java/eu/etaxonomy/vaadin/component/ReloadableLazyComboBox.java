@@ -54,6 +54,23 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
         discard(); // reload from property data source
     }
 
+    /**
+     * Calls {@link #reload()} but checks is the <code>bean</code> passed as
+     * parameter has a different caption than the bean which is currently selected.
+     *
+     * Differences in the captions can occur for the same entity when the entity
+     * has been modified through a popup edior.
+     *
+     * @param bean
+     */
+    public void reloadWith(T bean){
+        boolean reapplyBean = getCaption(bean).equals(getCaption(getValue()));
+        reload();
+        if(reapplyBean){
+            setValue(bean);
+        }
+    }
+
 
     /**
      * This method allows updating the value even if the equals check done
