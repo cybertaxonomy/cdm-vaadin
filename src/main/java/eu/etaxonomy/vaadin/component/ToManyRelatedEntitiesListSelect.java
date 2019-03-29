@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
@@ -87,6 +88,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private boolean creatingFields;
 
+    private List<Validator> fieldValidators = new ArrayList<>();
+
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
         this.itemType = itemType;
@@ -106,6 +109,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
         }
         return row;
+    }
+
+    /**
+     *
+     * @return an unmodifiable List of the data Fields
+     */
+    protected List<F> fields() {
+        Integer row = null;
+        List<F> fields = new ArrayList<>();
+        for(int r = 0; r < grid.getRows(); r++){
+            fields.add((F) grid.getComponent(GRID_X_FIELD, r));
+        }
+        return fields;
     }
 
     /**
@@ -316,6 +332,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            for(Validator validator : fieldValidators) {
+                field.addValidator(validator);
+            }
             ButtonGroup buttonGroup = new ButtonGroup(field);
             updateEditOrCreateButton(buttonGroup, val);
             field.addValueChangeListener(e -> {
@@ -526,6 +545,41 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         // instance by overriding setValue() in future we could improve this by passing a
         // NewInstanceFactory to this class
         return field;
+    }
+
+    /**
+     * Adds the validator to the list of validators which
+     * are applied to new fields and adds the validator to
+     * existing fields
+     *
+     * @param validator
+     */
+    public void addFieldValidator(Validator validator){
+        fieldValidators.add(validator);
+        for(F field : fields()) {
+            field.addValidator(validator);
+        }
+    }
+
+    /**
+     * removes the validator from the list of validators which
+     * are applied to new fields and removes the validator from
+     * existing fields
+     *
+     * @param validator
+     */
+    public void removeFieldValidator(Validator validator){
+        fieldValidators.remove(validator);
+        for(F field : fields()) {
+            field.removeValidator(validator);
+        }
+    }
+
+    /**
+     * @return a unmodifialble List of the fieldValidators
+     */
+    public List<Validator> getFieldValidators() {
+        return Collections.unmodifiableList(fieldValidators);
     }
 
     /**

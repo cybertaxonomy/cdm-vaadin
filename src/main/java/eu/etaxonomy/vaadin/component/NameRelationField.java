@@ -84,6 +84,8 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
         relatedNameComboBox = new ToOneRelatedEntityCombobox<TaxonName>(this.nameFieldCaption, TaxonName.class);
         citatonComboBox = new ToOneRelatedEntityCombobox<Reference>("Reference", Reference.class);
+
+        setValidationVisible(false);
     }
 
     /**

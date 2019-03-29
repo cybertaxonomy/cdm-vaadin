@@ -39,6 +39,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.data.validator.NomenclaturalReferenceExistsValidator;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
@@ -611,17 +612,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
             nomReferenceCombobox.setDescription("Selection limited to nomenclatural reference and parts of it.");
         }
         if(isModeEnabled(TaxonNamePopupEditorMode.REQUIRE_NOMENCLATURALREFERENCE)) {
-            if(combinationAuthorshipField.getValue() == null){
-                nomReferenceCombobox.setRequired(true);
-                nomReferenceCombobox.setImmediate(true);
-            } else {
-                combinationAuthorshipField.addValueChangeListener(e -> {
-                    if(e.getProperty().getValue() == null){
-                        nomReferenceCombobox.setRequired(true);
-                        nomReferenceCombobox.setImmediate(true);
-                    }
-                });
-            }
+            nomReferenceCombobox.setRequired(true);
+            nomReferenceCombobox.setImmediate(true);
+
+            String userHint = "Please use the 'Edit' function to fix the problem in the related name.";
+            validationField.getRelatedNameComboBox().getSelect().addValidator(new NomenclaturalReferenceExistsValidator(userHint));
+            orthographicVariantField.getRelatedNameComboBox().getSelect().addValidator(new NomenclaturalReferenceExistsValidator(userHint));
+            basionymsComboboxSelect.addFieldValidator(new NomenclaturalReferenceExistsValidator(userHint));
+            replacedSynonymsComboboxSelect.addFieldValidator(new NomenclaturalReferenceExistsValidator(userHint));
         }
     }
 
