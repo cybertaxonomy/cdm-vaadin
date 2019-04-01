@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
@@ -170,10 +171,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     protected void refreshView(boolean doReload) {
+        logger.setLevel(Level.DEBUG);
         if(workingset == null){
             return; // nothing to do
         }
         if(doReload){
+            if(logger.isDebugEnabled()){
+                logger.debug("refreshView() - workingset:\n" + workingset.toString());
+            }
             List<RegistrationDTO> unpersisted = new ArrayList<>();
             for(RegistrationDTO regDto : workingset.getRegistrationDTOs()){
                 if(!regDto.registration().isPersited()){
@@ -190,6 +195,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         // would never happen here //
                     }
                 }
+            }
+            if(logger.isDebugEnabled()){
+                logger.debug("refreshView() - workingset reloaded:\n" + workingset.toString());
             }
         }
         applyWorkingset();
@@ -332,15 +340,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityUuid());
     }
 
-    @EventBusListenerMethod
-    public void onDoneWithReferencePopupEditor(DoneWithPopupEvent event) throws RegistrationValidationException{
-        if(event.getPopup() instanceof ReferencePopupEditor){
-            if(event.getReason().equals(Reason.SAVE)){
-                refreshView(true);
-            }
-        }
-    }
-
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onRegistrationEditorAction(RegistrationEditorAction event) {
 
@@ -418,7 +417,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) {
         if(event.getPopup() instanceof TaxonNamePopupEditor){
             Registration registration = null;
-            boolean doRefreshView = false;
             if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
                 if(event.getReason().equals(Reason.SAVE)){
                     try {
@@ -427,7 +425,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         loadWorkingSet(workingset.getCitationUuid());
                     } finally {
                         clearSession();
-                        doRefreshView = true;
                         getView().getAddNewNameRegistrationButton().setEnabled(true);
                     }
                 }
@@ -454,11 +451,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             for(TaxonName name : namesToCheck){
                 if(name != null){
                     clearSession();
-                    doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
+                    registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
                 }
             }
 
-            refreshView(doRefreshView);
+            // always reload if the first editor is closed as the data might have been changed through any other sub-popupeditor
+            refreshView(isAtContextRoot(event.getPopup()));
         }
     }
 
@@ -610,15 +608,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
                 // NOTE: adding the SpecimenTypeDesignations to the registration is done in the
                 // SpecimenTypeDesignationWorkingSetServiceImpl.save(SpecimenTypeDesignationWorkingSetDTO dto) method
-                refreshView(true);
-            } else if(event.getReason().equals(Reason.CANCEL)){
-                // noting to do
             }
+            // always reload if the first editor is closed as the data might have been changed through any other sub-popupeditor
+            refreshView(isAtContextRoot(event.getPopup()));
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
 
                 Registration registration = null;
-                boolean doRefreshView = false;
 
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
 
@@ -630,7 +626,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
                 } finally {
                     clearSession();
-                    doRefreshView = true;
                 }
 
                 if(registration == null){
@@ -646,16 +641,16 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                 for(TaxonName name : namesToCheck){
                     if(name != null){
-                        doRefreshView |= registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration) != null;
+                        registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
                     }
 
                 }
 
-                refreshView(doRefreshView);
-
             } else if(event.getReason().equals(Reason.CANCEL)){
                 // noting to do
             }
+            // always reload if the first editor is closed as the data might have been changed through any other sub-popupeditor
+            refreshView(isAtContextRoot(event.getPopup()));
 
         }
         // ignore other editors
@@ -739,7 +734,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
                 reg.getTypifiedNameRef() != null
                 && reg.getTypifiedNameRef().getUuid().equals(event.getEntityUuid()))){
-                    refreshView(true);
+                    //refreshView(true);
             }
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
@@ -749,9 +744,25 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                             )
                         )
                     ){
-                refreshView(true);
+                //refreshView(true);
             }
         }
+    }
+
+    public boolean isAtContextRoot(PopupView popupView) {
+        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
+        if(popupEditor.getEditorActionContext().size() > 1){
+            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
+            return getView().equals(topContext.getParentView());
+        } else {
+            logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
+            return false;
+        }
+    }
+
+    public EditorActionContext editorActionContextRoot(PopupView popupView) {
+        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        return context.get(0);
     }
 
     public Registration findRegistrationInContext(PopupView popupView) {
