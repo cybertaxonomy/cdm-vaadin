@@ -108,8 +108,12 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
                         );
                 // restrict by allowed reference uuids
                 Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
-                Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
-                criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
+                if(!allowedUuids.isEmpty()){
+                    Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
+                    criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
+                } else {
+                    criterion = Restrictions.and(criterion, pulishedOnly);
+                }
             }
         }
         referencePagingProvider.addCriterion(criterion);
