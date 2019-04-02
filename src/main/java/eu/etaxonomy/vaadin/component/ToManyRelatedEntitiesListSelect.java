@@ -160,7 +160,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         grid.removeRow(row);
         // TODO remove from nested fields
         updateValue();
-        updateButtonStates();
+        updateComponentStates();
     }
 
 
@@ -191,7 +191,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         if(i >= 0 && i + 1 < grid.getRows()){
             grid.replaceComponent(grid.getComponent(GRID_X_FIELD, i), grid.getComponent(GRID_X_FIELD, i + 1));
             grid.replaceComponent(grid.getComponent(GRID_X_FIELD  + 1 , i), grid.getComponent(GRID_X_FIELD + 1, i + 1));
-            updateButtonStates();
+            updateComponentStates();
             updateValue();
         } else {
             throw new RuntimeException("Cannot swap rows out of the grid bounds");
@@ -284,7 +284,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                     newRowNeeded = false;
                     F field = (F)fieldComponent;
                     if(data.get(row) != null && field.getValue() != data.get(row)){
+                        boolean roState = field.isReadOnly();
+                        field.setReadOnly(false);
                         field.setValue(data.get(row));
+                        field.setReadOnly(roState);
                     }
                 }
             }
@@ -360,7 +363,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
             grid.addComponent(field, GRID_X_FIELD, row);
             grid.addComponent(buttonGroup, GRID_X_BUTTON_GROUP, row);
-            updateButtonStates();
+            updateComponentStates();
             nestFieldGroup(field);
             row++;
         } catch (InstantiationException e) {
@@ -458,7 +461,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-    private void updateButtonStates(){
+    private void updateComponentStates(){
 
         boolean isWritable = !getState().readOnly;
         int fieldsCount = getNestedFields().size();
@@ -471,14 +474,16 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             F field = (F) grid.getComponent(GRID_X_FIELD, row);
             CssLayout buttonGroup = (CssLayout) grid.getComponent(GRID_X_FIELD + 1, row);
 
+            boolean isWritableField = isWritableField(field);
+            field.setReadOnly(!isWritableField);
+
             int addButtonIndex = 0;
             if(withEditButton){
                 addButtonIndex++;
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(isWritable && (field.getValue() == null
-                        || field.getValue() != null && testEditButtonPermission(field.getValue())));
+                editCreateButton.setEnabled(isWritableField); // the should button must always be enabled to allow viewing even readonly data. (https://dev.e-taxonomy.eu/redmine/issues/8217)
             }
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isWritable && (isLast || isOrderedCollection));
@@ -492,6 +497,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 buttonGroup.getComponent(addButtonIndex + 3).setEnabled(isWritable && !isLast);
             }
         }
+    }
+
+    /**
+     * @param isWritable
+     * @param field
+     * @return
+     */
+    public boolean isWritableField(F field) {
+        boolean isWritable = !getState().readOnly;
+        return isWritable && (field.getValue() == null
+                || field.getValue() != null && testEditButtonPermission(field.getValue()));
     }
 
     /**
@@ -738,7 +754,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        updateButtonStates();
+        updateComponentStates();
     }
 
 
