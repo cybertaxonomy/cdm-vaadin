@@ -483,7 +483,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(isWritableField); // the should button must always be enabled to allow viewing even readonly data. (https://dev.e-taxonomy.eu/redmine/issues/8217)
             }
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isWritable && (isLast || isOrderedCollection));

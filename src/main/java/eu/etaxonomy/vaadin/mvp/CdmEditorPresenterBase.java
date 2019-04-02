@@ -144,8 +144,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
         User user = userHelper.user();
 
-        if(AbstractCdmPopupEditor.class.isAssignableFrom(getView().getClass())){
-            AbstractCdmPopupEditor popupView = ((AbstractCdmPopupEditor)getView());
+        if(AbstractPopupEditor.class.isAssignableFrom(getView().getClass())){
+            AbstractPopupEditor popupView = ((AbstractPopupEditor)getView());
 
             if(cdmEntitiy.isPersited() && !canEdit){
                 popupView.setReadOnly(true); // never reset true to false here!
