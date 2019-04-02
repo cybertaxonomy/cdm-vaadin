@@ -8,8 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.error;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
@@ -33,7 +33,7 @@ public class DelegatingErrorHandler implements ErrorHandler{
 
     private static final long serialVersionUID = 3378605204517477112L;
 
-    Set<ErrorTypeHandler<? extends Throwable>> handlers = new HashSet<>();
+    List<ErrorTypeHandler<? extends Throwable>> handlers = new ArrayList<>();
 
     public <E extends Throwable> void  registerHandler(ErrorTypeHandler<E> handler) {
         assert findHandler(handler.supports()) == null;

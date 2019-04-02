@@ -44,7 +44,6 @@ import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignati
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -77,7 +76,6 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
-import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -245,6 +243,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
 
         });
+
         loadWorkingSet(getView().getCitationUuid());
         applyWorkingset();
 
@@ -273,9 +272,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } catch (RegistrationValidationException error) {
             logger.error(error);
             showErrorDialog("Validation Error", error.getMessage());
-        } catch(PermissionDeniedException e){
-            logger.info(e);
-            ((AccessRestrictedView)getView()).setAccessDeniedMessage(e.getMessage());
         }
         cache = new CdmTransientEntityAndUuidCacher(this);
         for(Registration registration : workingset.getRegistrations()) {
