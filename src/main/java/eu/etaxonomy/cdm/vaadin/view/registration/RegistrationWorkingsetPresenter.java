@@ -415,6 +415,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     @EventBusListenerMethod
     public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) {
+
+        if(!isFromOwnView(event)){
+            return;
+        }
+
         if(event.getPopup() instanceof TaxonNamePopupEditor){
             Registration registration = null;
             if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
@@ -604,6 +609,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      */
     @EventBusListenerMethod
     public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) {
+
+        if(!isFromOwnView(event)){
+            return;
+        }
+
         if(event.getPopup() instanceof SpecimenTypeDesignationWorkingsetPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
                 // NOTE: adding the SpecimenTypeDesignations to the registration is done in the
@@ -679,6 +689,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent event){
 
+        if(!isFromOwnView(event)){
+            return;
+        }
+
         if(workingset == null){
             return;
         }
@@ -749,26 +763,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    public boolean isAtContextRoot(PopupView popupView) {
-        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
-        if(popupEditor.getEditorActionContext().size() > 1){
-            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
-            return getView().equals(topContext.getParentView());
-        } else {
-            logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
-            return false;
-        }
-    }
 
-    public EditorActionContext editorActionContextRoot(PopupView popupView) {
-        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
-        return context.get(0);
-    }
 
     public Registration findRegistrationInContext(PopupView popupView) {
         Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
         return findRegistrationInContext(context);
     }
+
     /**
      * Finds the Registration in the EditorContext stack
      *

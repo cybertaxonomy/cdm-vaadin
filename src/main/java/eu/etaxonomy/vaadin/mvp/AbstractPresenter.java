@@ -1,6 +1,7 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import java.io.Serializable;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
@@ -14,8 +15,10 @@ import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
@@ -216,6 +219,31 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     protected boolean isFromOwnView(EntityChangeEvent event) {
         return event.getSourceView() != null && event.getSourceView().equals(getView());
     }
+
+    public EditorActionContext editorActionContextRoot(PopupView popupView) {
+        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        return context.get(0);
+    }
+
+    public boolean isAtContextRoot(PopupView popupView) {
+        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
+        if(popupEditor.getEditorActionContext().size() > 1){
+            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
+            return getView().equals(topContext.getParentView());
+        } else {
+            logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
+            return false;
+        }
+    }
+
+    /**
+     * @param event
+     */
+    public boolean isFromOwnView(DoneWithPopupEvent event) {
+        EditorActionContext contextRoot = editorActionContextRoot(event.getPopup());
+        return getView().equals(contextRoot.getParentView());
+    }
+
 
     @Override
     public void destroy() throws Exception {
