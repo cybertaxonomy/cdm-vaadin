@@ -30,6 +30,7 @@ public class LoginDialog extends LoginDialogDesign {
         getMessageLabel().setVisible(false);
         getTab(1).setEnabled(false);
         getTab(2).setEnabled(false);
+        focusFirstElement(this);
     }
 
     /**
