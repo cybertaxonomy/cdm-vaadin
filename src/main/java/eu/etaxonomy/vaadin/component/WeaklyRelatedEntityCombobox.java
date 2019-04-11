@@ -206,6 +206,12 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         }
     }
 
+    @Override
+    public String getValue() {
+        return lazySelect.getValue();
+
+    }
+
     /**
      * @param newFieldValue
      * @return

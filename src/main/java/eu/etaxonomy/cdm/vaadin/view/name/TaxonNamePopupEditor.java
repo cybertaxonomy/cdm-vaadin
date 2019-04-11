@@ -757,6 +757,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                                     this)
                         ));
                     combobox.addClickListenerEditEntity(e -> {
+                        //WeaklyRelatedEntityCombobox<TaxonName> wrcbbx = combobox;
                         if(combobox.getValue() != null){
                             getViewEventBus().publish(this,
                                 new TaxonNameEditorActionStrRep(
