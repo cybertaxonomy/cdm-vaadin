@@ -457,15 +457,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 if(boundTargetField.matchesPropertyIdPath("specificEpithet")){
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
-
                         if(getView().getSpecificEpithetField() instanceof WeaklyRelatedEntityCombobox){
-                            WeaklyRelatedEntityCombobox weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox)getView().getSpecificEpithetField();
-                            if(event.isCreatedType()){
-                                getView().getSpecificEpithetField().setValue(((TaxonName)event.getEntity()).getSpecificEpithet());
-                                weaklyRelatedEntityCombobox.reload();
-                            } else {
-                                weaklyRelatedEntityCombobox.reload();
-                            }
+                            WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>)getView().getSpecificEpithetField();
+                            getView().getSpecificEpithetField().setValue(((TaxonName)event.getEntity()).getSpecificEpithet());
+                            weaklyRelatedEntityCombobox.reload();
                             // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
