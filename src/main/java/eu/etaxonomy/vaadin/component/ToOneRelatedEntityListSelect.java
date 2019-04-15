@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
@@ -83,8 +85,8 @@ public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCus
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**

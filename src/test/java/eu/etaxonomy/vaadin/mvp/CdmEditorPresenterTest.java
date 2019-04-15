@@ -16,7 +16,7 @@ import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByType;
 import org.vaadin.spring.events.EventBus.ViewEventBus;
 
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.agent.Institution;
@@ -64,7 +64,7 @@ public class CdmEditorPresenterTest {
          * {@inheritDoc}
          */
         @Override
-        public ListSelect getTypeSelect() {
+        public NativeSelect getTypeSelect() {
             return null;
         }
 

@@ -11,7 +11,7 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 import java.util.Collection;
 
 import com.vaadin.data.Container;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 
@@ -20,7 +20,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
  * @since Jul 4, 2018
  *
  */
-public class RegistrationStatusSelect extends ListSelect {
+public class RegistrationStatusSelect extends NativeSelect {
 
 
     private static final long serialVersionUID = 2400974680207121417L;
@@ -63,7 +63,6 @@ public class RegistrationStatusSelect extends ListSelect {
      */
     public void init() {
         addStyleName("registration-status");
-        setRows(1);
         setWidth("110px");
 
         addValueChangeListener(e -> updateStyles());

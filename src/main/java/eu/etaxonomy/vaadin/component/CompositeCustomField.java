@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
@@ -60,8 +61,8 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
         @Override
         public void preCommit(CommitEvent commitEvent) throws CommitException {
             // commit the nested bean(s) first
-            if(getFieldGroup() != null){
-                getFieldGroup().commit();
+            if(getFieldGroup().isPresent()){
+                getFieldGroup().get().commit();
             }
         }
 
@@ -181,15 +182,18 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
      * @return
      */
     @Override
-    public abstract FieldGroup getFieldGroup();
+    public abstract Optional<FieldGroup> getFieldGroup();
 
     /**
-     * @return true if all fields having the value <code>null</code>
+     * @return true if all fields having the value <code>null</code> and if there is no fieldgroup at all for this component.
      */
     @SuppressWarnings("rawtypes")
     public boolean hasNullContent() {
         Collection<Field> nullValueCheckIgnore = nullValueCheckIgnoreFields();
-        return getFieldGroup().getFields().stream()
+        if(!getFieldGroup().isPresent()){
+            return true;
+        }
+        return getFieldGroup().get().getFields().stream()
                 .filter(
                         f -> !nullValueCheckIgnore.contains(f)
                 )
@@ -266,6 +270,8 @@ public abstract class CompositeCustomField<T> extends CustomField<T> implements 
         }
         triggerNestedButtonStateUpdaters();
     }
+
+
 
     /**
      *

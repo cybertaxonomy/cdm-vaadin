@@ -11,10 +11,11 @@ package eu.etaxonomy.cdm.vaadin.util.filter;
 import java.util.List;
 
 import com.vaadin.data.Container.Filter;
+
+import eu.etaxonomy.cdm.model.term.TermBase;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-
-import eu.etaxonomy.cdm.model.common.TermBase;
 
 /**
  * @author a.kohlbecker

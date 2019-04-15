@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import java.util.Optional;
+
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
@@ -27,6 +29,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
+import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
 
 /**
  * @author a.kohlbecker
@@ -55,9 +58,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         this.type = type;
         setCaption(caption);
         lazySelect = new ReloadableLazyComboBox<V>(type);
-        lazySelect.setValidationVisible(false); // validation is to be shown for the ToOneRelatedEntityCombobox
-        lazySelect.setRequiredError("Must be given");
-        setRequiredError("Must be given");
+        lazySelect.setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
         addStyledComponents(lazySelect, addButton, editButton);
         addSizedComponents(lazySelect, container);
         // lazySelect.setImmediate(true); // should cause immediate validation, however,
@@ -100,8 +101,8 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**
@@ -195,7 +196,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
             lazySelect.commit();
         } catch (InvalidValueException ex){
             UserError componentError = new UserError(ex.getHtmlMessage(), ContentMode.HTML, ErrorLevel.ERROR);
-            setComponentError(componentError);
+            lazySelect.setComponentError(componentError);
         }
     }
 

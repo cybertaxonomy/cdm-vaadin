@@ -40,11 +40,11 @@ import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
-import eu.etaxonomy.cdm.model.common.Representation;
 import eu.etaxonomy.cdm.model.description.DescriptionElementBase;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
+import eu.etaxonomy.cdm.model.term.Representation;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.AreaAndTaxonSettingsConfigWindow;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DetailWindow;
 import eu.etaxonomy.cdm.vaadin.component.distributionStatus.DistributionStatusSettingsConfigWindow;
@@ -172,7 +172,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
                     Property<?> itemProperty = item.getItemProperty(CdmQueryFactory.UUID_COLUMN);
                     UUID uuid = UUID.fromString(itemProperty.getValue().toString());
                     final Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService()
-                    		.load(uuid,Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
+                    		.load(uuid, DistributionEditorUtil.INCLUDE_UNPUBLISHED, Arrays.asList("descriptions.descriptionElements","name.taxonBases","updatedBy")), Taxon.class);
                     PresenceAbsenceTerm presenceAbsenceTerm = null;
                     Object statusValue = item.getItemProperty(areaString).getValue();
                     if(statusValue instanceof String){

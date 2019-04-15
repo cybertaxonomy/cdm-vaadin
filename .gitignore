@@ -17,4 +17,5 @@ src/test/resources/eu/etaxonomy/cdm/database/schema/*.xsd
 .directory
 env.properties
 c3p0.properties
-c3p0.properties
+/selenium
+workbench.xmi

@@ -8,11 +8,13 @@
 */
 package eu.etaxonomy.cdm.vaadin.event.error;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import com.vaadin.event.ListenerMethod;
 import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.ServerRpcManager.RpcInvocationException;
@@ -26,13 +28,14 @@ import com.vaadin.ui.Notification;
  * see https://dev.e-taxonomy.eu/redmine/issues/7241
  *
  * @author freimeier
+ * @author a.kohlbecker
  *
  */
 public class DelegatingErrorHandler implements ErrorHandler{
 
     private static final long serialVersionUID = 3378605204517477112L;
 
-    Set<ErrorTypeHandler<? extends Throwable>> handlers = new HashSet<>();
+    List<ErrorTypeHandler<? extends Throwable>> handlers = new ArrayList<>();
 
     public <E extends Throwable> void  registerHandler(ErrorTypeHandler<E> handler) {
         assert findHandler(handler.supports()) == null;
@@ -58,8 +61,13 @@ public class DelegatingErrorHandler implements ErrorHandler{
 
         boolean handlerFound = true;
         Throwable throwable = event.getThrowable();
-        if(throwable != null && RpcInvocationException.class.isAssignableFrom(throwable.getClass())){
-            // we are only interested into the cause and will will remove RpcInvocationException > InvocationTargetException
+        while(throwable != null && (
+                RpcInvocationException.class.isAssignableFrom(throwable.getClass()) ||
+                InvocationTargetException.class.isAssignableFrom(throwable.getClass()) ||
+                ListenerMethod.MethodException.class.isAssignableFrom(throwable.getClass())
+                )
+            ){
+            // we are only interested into the cause in these cases
             throwable = throwable.getCause().getCause();
             event.setThrowable(throwable);
         }
@@ -75,6 +83,7 @@ public class DelegatingErrorHandler implements ErrorHandler{
     }
 
     private <E extends Throwable> boolean delegate(ErrorEvent event, E throwable){
+
         Class<E> errorClass = (Class<E>) throwable.getClass();
         Logger.getLogger(this.getClass()).debug(errorClass);
         ErrorTypeHandler<E> handler = findHandler(errorClass);

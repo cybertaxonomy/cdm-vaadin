@@ -34,6 +34,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.vaadin.spring.events.annotation.EnableEventBus;
 
+import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.server.DeploymentConfiguration.LegacyProperyToStringMode;
 import com.vaadin.spring.annotation.EnableVaadin;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.annotation.UIScope;
@@ -56,6 +58,7 @@ import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
+import eu.etaxonomy.cdm.vaadin.ui.CdmBaseUI;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
@@ -127,22 +130,33 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
      * (1) It is necessary to map the URLs starting with /VAADIN/* since none of the
      * @WebServlets is mapped to the root path. It is sufficient to configure one of the
      * servlets with this path see BookOfVaadin 5.9.5. Servlet Mapping with URL Patterns
-     *
-     * (2) @VaadinServletConfiguration is not used here, all DeploymentConfiguration is
-     * configured in the web.xml. This way it it easier to modify the parameters for different
-     * build environments like test and production
      */
-    @WebServlet(value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
-    public static class Servlet extends SpringVaadinServlet {
+    @VaadinServletConfiguration(
+            productionMode = false,    // FIXME get value from application.properties or
+                                       // use two different CdmVaadinServlets for
+                                       // different spring profiles?
+            ui = CdmBaseUI.class,      // TODO better default UI to use?
+            // If the closeIdleSessions parameter for the servlet is
+            // enabled (disabled by default), Vaadin closes the UIs and the session after the time specified
+            // in the session-timeout parameter expires after the last non-heartbeat request.
+            // For session-timeout see <session-config>
+            // Legacy mode to return the value of the property as a string from AbstractProperty.toString()
+            closeIdleSessions=true,
+            legacyPropertyToStringMode=LegacyProperyToStringMode.ENABLED
+            )
+    @WebServlet(name="CdmVaadinServlet", value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
+    public static class CdmVaadinServlet extends SpringVaadinServlet {
 
         private static final long serialVersionUID = -2615042297393028775L;
-
 
         /**
          *
         @SuppressWarnings("serial")
         @Override
         protected void servletInitialized() throws ServletException {
+            logger.debug("SpringVaadinServlet initialized");
+
+        }
             getService().addSessionInitListener(new SessionInitListener() {
 
                 @Override

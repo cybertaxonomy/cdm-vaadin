@@ -232,8 +232,14 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
      */
     @Override
     public UUID idFor(String stringRepresentation) {
-        if(lastPagedEntityUUIDs == null){
-            findEntities(0, stringRepresentation);
+        if(stringRepresentation == null){
+            return null;
+        }
+        if(lastPagedEntityUUIDs == null || !lastPagedEntityUUIDs.containsKey(stringRepresentation)){
+            int pages = Math.max(1, size(stringRepresentation));
+            for(int i = 0; i < pages; i++){
+                findEntities(i, stringRepresentation);
+            }
         }
         return lastPagedEntityUUIDs.get(stringRepresentation);
     }

@@ -8,9 +8,9 @@ import java.util.List;
 import com.vaadin.data.util.BeanItemContainer;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.OrderedTermVocabulary;
-import eu.etaxonomy.cdm.model.common.TermVocabulary;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.term.OrderedTermVocabulary;
+import eu.etaxonomy.cdm.model.term.TermVocabulary;
 
 /**
  * A container containing the {@link NamedArea}s of a specified {@link TermVocabulary}.

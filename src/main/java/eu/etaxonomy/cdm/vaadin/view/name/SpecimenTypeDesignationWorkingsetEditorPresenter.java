@@ -24,19 +24,18 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import com.vaadin.spring.annotation.SpringComponent;
 
-import eu.etaxonomy.cdm.api.service.IRegistrationService;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -44,7 +43,6 @@ import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
-import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
@@ -83,8 +81,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 
-    CdmStore<Registration, IRegistrationService> store;
-
 
     /**
      * This object for this field will either be injected by the {@link PopupEditorFactory} or by a Spring
@@ -117,12 +113,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
-    protected CdmStore<Registration, IRegistrationService> getStore() {
-        if(store == null){
-            store = new CdmStore<>(getRepo(), getRepo().getRegistrationService());
-        }
-        return store;
-    }
 
     /**
      * Loads an existing working set from the database. This process actually involves

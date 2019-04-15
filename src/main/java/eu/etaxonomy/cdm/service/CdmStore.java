@@ -10,18 +10,27 @@ package eu.etaxonomy.cdm.service;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import com.vaadin.spring.annotation.SpringComponent;
+import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
+import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
+import eu.etaxonomy.cdm.model.name.Registration;
+import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
@@ -33,83 +42,15 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * TODO better naming of this class, ServiceWrapper, ServiceOperator, ...?
  *
  */
-public class CdmStore<T extends CdmBase, S extends IService<T>> {
+@SpringComponent
+@ViewScope
+public class CdmStore {
 
     private static final Logger logger = Logger.getLogger(CdmStore.class);
 
+    @Autowired
+    @Qualifier("cdmRepository")
     private CdmRepository repo;
-
-    private S service;
-
-    // TransactionStatus txStatus = null;
-
-    protected DefaultTransactionDefinition txDefinition = null;
-
-    /**
-     *
-     * @param repo
-     * @param service
-     *            may be <code>null</code>, but delete operations will fail with
-     *            a NullPointerException in this case.
-     */
-    public CdmStore(CdmRepository repo, S service) {
-        this.repo = repo;
-        this.service = service;
-    }
-
-
-//    /**
-//     * @return
-//     *
-//     */
-//    public TransactionStatus startTransaction() {
-//        checkExistingTransaction();
-//        txStatus = repo.startTransaction();
-//        return txStatus;
-//    }
-
-
-    /**
-     * If the bean is contained in the session it is being updated by doing an
-     * evict and merge. The fieldGroup is updated with the merged bean.
-     *
-     *
-     * @param bean
-     * @return The bean merged to the session or original bean in case a merge
-     *         was not necessary.
-     */
-    public T mergedBean(T bean) throws IllegalStateException {
-
-        Session session = getSession();
-
-        if (session.contains(bean)) {
-            // evict bean before merge to avoid duplicate beans in same session
-            logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
-            session.evict(bean);
-        }
-
-        logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
-        // to avoid merge problems as described in https://dev.e-taxonomy.eu/redmine/issues/6687
-        // we are set the hibernate property hibernate.event.merge.entity_copy_observer=allow
-        @SuppressWarnings("unchecked")
-        T mergedBean = (T) session.merge(bean);
-        logger.trace(this._toString() + ".mergedBean() - bean after merge " + bean.toString());
-        return mergedBean;
-
-    }
-
-    /**
-     * @return
-     */
-    private Session getSession() {
-
-        Session session = repo.getSession();
-
-        logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() + ", persistenceContext: "
-                + ((SessionImplementor) session).getPersistenceContext() + " - " + session.toString());
-
-        return session;
-    }
 
     protected String _toString() {
         return this.getClass().getSimpleName() + "@" + this.hashCode();
@@ -122,7 +63,7 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @return the merged bean, this bean is <b>not reloaded</b> from the
      *         persistent storage.
      */
-    public EntityChangeEvent saveBean(T bean, AbstractView view) {
+    public <T extends CdmBase> EntityChangeEvent saveBean(T bean, AbstractView view) {
 
         Type changeEventType;
         if(bean.isPersited()){
@@ -131,23 +72,39 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             changeEventType = Type.CREATED;
         }
 
-        Session session = getSession();
-        try {
-            logger.trace(this._toString() + ".onEditorSaveEvent - session: " + session.hashCode());
+        try{
             TransactionStatus txStatus = repo.startTransaction();
+            Session session = repo.getSession();
             try {
                 logger.trace(this._toString() + ".onEditorSaveEvent - merging bean into session");
                 // merge the changes into the session, ...
-                T mergedBean = mergedBean(bean);
-                session.flush();
+                if (session.contains(bean)) {
+                    // evict bean before merge to avoid duplicate beans in same session
+                    logger.trace(this._toString() + ".mergedBean() - evict " + bean.toString());
+                    session.evict(bean);
+                }
+                logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
+                @SuppressWarnings("unchecked")
+                T mergedBean = (T) session.merge(bean);
                 repo.commitTransaction(txStatus);
-            return new EntityChangeEvent(mergedBean, changeEventType, view);
+                return new EntityChangeEvent(mergedBean, changeEventType, view);
             } catch(Exception e){
-                repo.getTransactionManager().rollback(txStatus);
+                transactionRollbackIfNotCompleted(txStatus);
                 throw e;
             }
         } finally {
-            session.clear(); // #7559
+            repo.clearSession(); // #7559
+        }
+
+    }
+
+
+    /**
+     * @param txStatus
+     */
+    public void transactionRollbackIfNotCompleted(TransactionStatus txStatus) {
+        if(!txStatus.isCompleted()){
+            repo.getTransactionManager().rollback(txStatus);
         }
     }
 
@@ -156,29 +113,29 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
      * @param bean
      * @return a EntityChangeEvent in case the deletion was successful otherwise <code>null</code>.
      */
-    public final EntityChangeEvent deleteBean(T bean, AbstractView view) {
+    public final <T extends CdmBase> EntityChangeEvent deleteBean(T bean, AbstractView view) {
 
-        logger.trace(this._toString() + ".onEditorPreSaveEvent - starting transaction");
-        Session session = getSession();
-        try {
+        IService<T> typeSpecificService = serviceFor(bean);
+
+        try{
             logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
-            DeleteResult result = service.delete(bean);
+            DeleteResult result = typeSpecificService.delete(bean);
             if (result.isOk()) {
-                session.flush();
                 return new EntityChangeEvent(bean, Type.REMOVED, view);
             } else {
-                handleDeleteresultInError(result, session);
+                handleDeleteresultInError(result);
             }
         } finally {
-            session.clear(); // #7559
+            repo.clearSession(); // #7559
         }
+
         return null;
     }
 
     /**
      * @param result
      */
-    public static void handleDeleteresultInError(DeleteResult result, Session session) {
+    public static void handleDeleteresultInError(DeleteResult result) {
         String notificationTitle;
         StringBuffer messageBody = new StringBuffer();
         if (result.isAbort()) {
@@ -190,12 +147,6 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
             messageBody.append("<h3>").append("Exceptions:").append("</h3>").append("<ul>");
             result.getExceptions().forEach(e -> messageBody.append("<li>").append(e.getMessage()).append("</li>"));
             messageBody.append("</ul>");
-            /*
-             * not needed since covered by clear() in finally clause
-            if(result.getExceptions().stream().anyMatch(e -> HibernateException.class.isAssignableFrom(e.getClass()))){
-                session.clear(); // #7559
-            }
-            */
         }
         if (!result.getRelatedObjects().isEmpty()) {
             messageBody.append("<h3>").append("Related objects exist:").append("</h3>").append("<ul>");
@@ -216,16 +167,29 @@ public class CdmStore<T extends CdmBase, S extends IService<T>> {
         notification.show(UI.getCurrent().getPage());
     }
 
-    /**
-     * @param entityId
-     */
-    public T loadBean(int entityId) {
-        return service.find(entityId);
-    }
+    @SuppressWarnings("unchecked")
+    protected <T extends CdmBase> IService<T> serviceFor(T bean){
+         Class<? extends CdmBase> cdmType = bean.getClass();
 
-    public S getService() {
-        return service;
+         if(Registration.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getRegistrationService();
+         } else if(TaxonName.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getNameService();
+         } else if(Reference.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getReferenceService();
+         } else if (NameTypeDesignation.class.isAssignableFrom(cdmType)){
+             throw new RuntimeException("no generic sercvice for NameTypeDesignation, use dedicated methods of NameService");
+         } else if (SpecimenOrObservationBase.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getOccurrenceService();
+         } else if (AgentBase.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getAgentService();
+         } else if (Collection.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getCollectionService();
+         } else if (Collection.class.isAssignableFrom(cdmType)){
+             return (IService<T>) repo.getCollectionService();
+         } else {
+             throw new RuntimeException("Implementation to find service for " + cdmType + " still missing.");
+         }
     }
-
 
 }

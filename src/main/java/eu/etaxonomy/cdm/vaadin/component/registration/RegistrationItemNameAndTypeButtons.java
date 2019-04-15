@@ -16,6 +16,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -59,15 +60,21 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private List<Label> labels = new ArrayList<>();
 
+    private List<ButtonWithUserEditPermission> editButtons = new ArrayList<>();
+
     private Button addTypeDesignationButton;
 
     private Label nameLabel = null;
 
     private Link identifierLink;
 
+    private boolean isRegistrationLocked;
+
+    private boolean isLockOverride;
+
     public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto, ICdmEntityUuidCacher entitiyCacher) {
 
-        boolean isRegistrationLocked = EnumSet.of(
+        isRegistrationLocked = EnumSet.of(
                 RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)
                 .contains(regDto.getStatus());
 
@@ -87,7 +94,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             Label nameLabel = new Label(regDto.getNameRef().getLabel());
             nameLabel.setWidthUndefined();
             boolean userHasPermission = userHelper.userHasPermission(regDto.registration().getName(), CRUD.UPDATE);
-            nameButton.setReadOnly(isRegistrationLocked || ! userHasPermission);
+            editButtons.add(new ButtonWithUserEditPermission(nameButton, userHasPermission));
 
             addComponent(nameIdButton.getButton());
             PermissionDebugUtils.addGainPerEntityPermissionButton(this, TaxonName.class, regDto.getNameRef().getUuid(),
@@ -109,7 +116,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
                 boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
-                tdButton.setReadOnly(isRegistrationLocked || !userHasUpdatePermission);
+                editButtons.add(new ButtonWithUserEditPermission(tdButton, userHasUpdatePermission));
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
@@ -149,7 +156,20 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         }
 
         iterator().forEachRemaining(c -> addStyledComponent(c));
+        updateEditorButtonReadonlyStates();
         addDefaultStyles();
+
+    }
+
+
+    private void updateEditorButtonReadonlyStates() {
+        for(ButtonWithUserEditPermission b : editButtons){
+            boolean impossibleToUnlock = !b.userCanEdit && isLockOverride && isRegistrationLocked;
+            b.button.setReadOnly((isRegistrationLocked && !isLockOverride) || !b.userCanEdit);
+            b.button.setEnabled(!impossibleToUnlock);
+            b.button.setDescription(impossibleToUnlock ? "Unlock failed due to missing permissions!" : "");
+            b.button.setIcon(isLockOverride ? FontAwesome.UNLOCK_ALT : null);
+        }
 
     }
 
@@ -248,6 +268,45 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             return entityType;
         }
 
+    }
+
+    public class ButtonWithUserEditPermission {
+
+        Button button;
+        boolean userCanEdit;
+        /**
+         * @param button
+         * @param userCanEdit
+         */
+        public ButtonWithUserEditPermission(Button button, boolean userCanEdit) {
+            super();
+            this.button = button;
+            this.userCanEdit = userCanEdit;
+        }
+
+
+
+    }
+    public boolean isRegistrationLocked() {
+        return isRegistrationLocked;
+    }
+
+
+    /**
+     * @return the isLockOverride
+     */
+    public boolean isLockOverride() {
+        return isLockOverride;
+    }
+
+    /**
+     * @param isLockOverride the isLockOverride to set
+     */
+    public void setLockOverride(boolean isLockOverride) {
+        if(this.isLockOverride != isLockOverride){
+            this.isLockOverride = isLockOverride;
+            updateEditorButtonReadonlyStates();
+        }
     }
 
 }

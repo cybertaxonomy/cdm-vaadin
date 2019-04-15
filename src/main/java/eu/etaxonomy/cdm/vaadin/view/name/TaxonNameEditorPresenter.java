@@ -30,13 +30,13 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
@@ -55,6 +55,7 @@ import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.reference.RegistrationUiReferenceEditorFormConfigurator;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -340,13 +341,15 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
         referenceEditorPopup.loadInEditor(null);
-        if(newReferenceInstantiator != null){
-            // this is a bit clumsy, we actually need to inject something like a view configurer
-            // which can enable, disable fields
-            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-            referenceEditorPopup.getTypeSelect().setEnabled(false);
-        }
+//        if(newReferenceInstantiator != null){
+//            // this is a bit clumsy, we actually need to inject something like a view configurer
+//            // which can enable, disable fields
+//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+//            referenceEditorPopup.getTypeSelect().setEnabled(false);
+//        }
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
@@ -360,13 +363,16 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         referenceEditorPopup.withDeleteButton(true);
         referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
         referenceEditorPopup.loadInEditor(event.getEntityUuid());
-        if(newReferenceInstantiator != null){
-            // this is a bit clumsy, we actually need to inject something like a view configurator
-            // which can enable, disable fields
-            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-            referenceEditorPopup.getTypeSelect().setEnabled(false);
-        }
+//        if(newReferenceInstantiator != null){
+//            // this is a bit clumsy, we actually need to inject something like a view configurator
+//            // which can enable, disable fields
+//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
+//            referenceEditorPopup.getInReferenceCombobox().setEditButtonEnabled(false); // <-------
+//            referenceEditorPopup.getTypeSelect().setEnabled(false);
+//        }
     }
 
     @EventBusListenerMethod
@@ -441,12 +447,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         getCache().load(event.getEntity());
                         if(getView().getGenusOrUninomialField() instanceof WeaklyRelatedEntityCombobox){
                             WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>)getView().getGenusOrUninomialField();
-                            if(event.isCreatedType()){
-                                weaklyRelatedEntityCombobox.setValue(((TaxonName)event.getEntity()).getGenusOrUninomial());
-                                weaklyRelatedEntityCombobox.reload();
-                            } else {
-                                weaklyRelatedEntityCombobox.reload();
-                            }
+                            weaklyRelatedEntityCombobox.setValue(((TaxonName)event.getEntity()).getGenusOrUninomial());
                             // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
@@ -456,15 +457,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 if(boundTargetField.matchesPropertyIdPath("specificEpithet")){
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
-
                         if(getView().getSpecificEpithetField() instanceof WeaklyRelatedEntityCombobox){
-                            WeaklyRelatedEntityCombobox weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox)getView().getSpecificEpithetField();
-                            if(event.isCreatedType()){
-                                getView().getSpecificEpithetField().setValue(((TaxonName)event.getEntity()).getSpecificEpithet());
-                                weaklyRelatedEntityCombobox.reload();
-                            } else {
-                                weaklyRelatedEntityCombobox.reload();
-                            }
+                            WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>)getView().getSpecificEpithetField();
+                            getView().getSpecificEpithetField().setValue(((TaxonName)event.getEntity()).getSpecificEpithet());
+                            weaklyRelatedEntityCombobox.reload();
                             // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
                             // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
@@ -489,9 +485,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(otherName);
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             otherNameField.setValue(otherName);
                         } else {
-                            otherNameField.reload();
+                            otherNameField.reloadWith(otherName);
                         }
 
                     } else
@@ -504,9 +501,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             basionymSourceField .setValue((TaxonName) event.getEntity());
                         } else {
-                            basionymSourceField.reload();
+                            basionymSourceField.reloadWith((TaxonName) event.getEntity());
                         }
                         getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
                         getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
@@ -522,9 +520,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){
+                            // TODO use reloadWith((TaxonName) event.getEntity()); also in this case?
                             replacedSynonyms .setValue((TaxonName) event.getEntity());
                         } else {
-                            replacedSynonyms.reload();
+                            replacedSynonyms.reloadWith((TaxonName) event.getEntity());
                         }
                         getView().getExCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();

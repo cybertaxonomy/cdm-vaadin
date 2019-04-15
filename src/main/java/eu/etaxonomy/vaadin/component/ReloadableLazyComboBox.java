@@ -15,7 +15,6 @@ import org.vaadin.viritin.fields.TypedSelect;
 
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ComboBox;
 
 public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements ReloadableSelect, EntitySupport<T> {
 
@@ -51,13 +50,25 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
      */
     @Override
     public void reload() {
-        // in the LazyComboBox.initList() scrollToSelectedItem is set to false for better performance
-        // but this breaks the refresh, so we need to set it now so that it can
-        // affect the next component repaint which is triggered in refresh()
-        ComboBox comboBox = (ComboBox)getSelect();
-        comboBox.setScrollToSelectedItem(true);
         refresh(); // reload from persistence
         discard(); // reload from property data source
+    }
+
+    /**
+     * Calls {@link #reload()} but checks is the <code>bean</code> passed as
+     * parameter has a different caption than the bean which is currently selected.
+     *
+     * Differences in the captions can occur for the same entity when the entity
+     * has been modified through a popup edior.
+     *
+     * @param bean
+     */
+    public void reloadWith(T bean){
+        boolean reapplyBean = getCaption(bean).equals(getCaption(getValue()));
+        reload();
+        if(reapplyBean){
+            setValue(bean);
+        }
     }
 
 

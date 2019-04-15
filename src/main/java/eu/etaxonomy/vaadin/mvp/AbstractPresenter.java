@@ -1,11 +1,9 @@
 package eu.etaxonomy.vaadin.mvp;
 
 import java.io.Serializable;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.engine.internal.StatefulPersistenceContext;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,8 +15,10 @@ import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 /**
@@ -103,20 +103,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         return SecurityContextHolder.getContext();
     }
 
-    /**
-     * @return
-     */
-    protected Session getSession() {
-        Session session = getRepo().getSession();
-        if(logger.isTraceEnabled()){
-            if(session.isOpen()){
-                logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +", persistenceContext: " + ((SessionImplementor)session).getPersistenceContext() + " - " + session.toString());
-            }  else {
-                logger.trace(this._toString() + ".getSession() - session:" + session.hashCode() +"  is closed ");
-            }
-        }
-        return session;
-    }
 
     protected String _toString(){
         return this.getClass().getSimpleName() + "@" + this.hashCode();
@@ -146,13 +132,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	    logger.trace(String.format("Presenter %s ready", _toString()));
 	}
 
-    /**
-     * @return
-     */
-    private StatefulPersistenceContext getPersitenceContext() {
-        return (StatefulPersistenceContext)((SessionImplementor)getSession()).getPersistenceContext();
-    }
-
     public final void onViewEnter() {
 	    logger.trace(String.format("%s onViewEnter()", _toString()));
 	    handleViewEntered();
@@ -174,7 +153,7 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         // fist of all clear the session to wipe out any left overs from previous usage of the session
         // this can happen if not all operations within a session are cleaned up correctly in
         // turn of an exception
-        getSession().clear();
+	        getRepo().clearSession();
 	}
 
     /**
@@ -240,6 +219,31 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     protected boolean isFromOwnView(EntityChangeEvent event) {
         return event.getSourceView() != null && event.getSourceView().equals(getView());
     }
+
+    public EditorActionContext editorActionContextRoot(PopupView popupView) {
+        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        return context.get(0);
+    }
+
+    public boolean isAtContextRoot(PopupView popupView) {
+        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
+        if(popupEditor.getEditorActionContext().size() > 1){
+            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
+            return getView().equals(topContext.getParentView());
+        } else {
+            logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
+            return false;
+        }
+    }
+
+    /**
+     * @param event
+     */
+    public boolean isFromOwnView(DoneWithPopupEvent event) {
+        EditorActionContext contextRoot = editorActionContextRoot(event.getPopup());
+        return getView().equals(contextRoot.getParentView());
+    }
+
 
     @Override
     public void destroy() throws Exception {

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
@@ -22,6 +23,7 @@ import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitEvent;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitHandler;
@@ -29,7 +31,6 @@ import com.vaadin.data.fieldgroup.FieldGroup.FieldGroupInvalidValueException;
 import com.vaadin.server.AbstractErrorMessage.ContentMode;
 import com.vaadin.server.ErrorMessage.ErrorLevel;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.GenericFontIcon;
 import com.vaadin.server.UserError;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractComponentContainer;
@@ -130,6 +131,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     protected List<Component> advancedModeComponents = new ArrayList<>();
 
     private Button advancedModeButton;
+
+    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator;
 
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
@@ -445,7 +448,17 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             }
             if(cause == null){
                 // no known exception type found
-                throw new PopupEditorException("Error saving popup editor", this, e);
+                logger.error(e);
+                PopupEditorException pee = null;
+                try {
+                    pee  = new PopupEditorException("Error saving popup editor", this, e);
+                } catch (Throwable t) {
+                    /* IGORE errors which happen during the construction of the PopupEditorException */
+                }
+                if(pee != null){
+                    throw pee;
+                }
+                throw new RuntimeException(e);
             }
 
         }
@@ -594,13 +607,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             while(parentComponent != null){
                 logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
-                    Object propId = ((NestedFieldGroup)parentComponent).getFieldGroup().getPropertyId(parentField);
-                    if(propId != null){
-                        logger.debug("propId: " + propId.toString());
-                        nestedPropertyIds.addParent(propId);
+                    Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
+                    if(parentFieldGroup.isPresent()){
+                        Object propId = parentFieldGroup.get().getPropertyId(parentField);
+                        if(propId != null){
+                            logger.debug("propId: " + propId.toString());
+                            nestedPropertyIds.addParent(propId);
+                        }
+                        logger.debug("parentField: " + parentField.getClass().getSimpleName());
+                        parentField = (Field)parentComponent;
+                    } else {
+                        logger.debug("parentFieldGroup is null, continuing ...");
                     }
-                    logger.debug("parentField: " + parentField.getClass().getSimpleName());
-                    parentField = (Field)parentComponent;
                 } else if(parentComponent == this) {
                     // we reached the editor itself
                     Object propId = fieldGroup.getPropertyId(parentField);
@@ -765,9 +783,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         String breadcrumbs = "";
         EditorActionContextFormatter formatter = new EditorActionContextFormatter();
 
-        GenericFontIcon operationPrefixIcon = new GenericFontIcon("IcoMoon", 0xe902);
-        GenericFontIcon operationSuffxIcon = new GenericFontIcon("IcoMoon", 0xe901);
-
         int cnt = 0;
         for(EditorActionContext cntxt : contextInfo){
             cnt++;
@@ -866,7 +881,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * You can now implement this method if you need to modify the state or value of individual fields.
      */
     protected void afterItemDataSourceSet() {
+        if(editorComponentsConfigurator != null){
+            editorComponentsConfigurator.updateComponentStates(this);
+        }
     }
+
 
     // ------------------------ issue related temporary solutions --------------------- //
     /**
@@ -930,5 +949,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 newField.setValue(value);
                 return newField;
             }
+
+    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> getEditorComponentsConfigurator() {
+        return editorComponentsConfigurator;
+    }
+
+    public void setEditorComponentsConfigurator(
+            EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator) {
+        this.editorComponentsConfigurator = editorComponentsConfigurator;
+    }
 
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.vaadin.viritin.FilterableListContainer;
 
@@ -25,15 +26,15 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnHeaderMode;
 import com.vaadin.ui.TextArea;
 
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
-import eu.etaxonomy.cdm.model.common.DefinedTermBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.cdm.vaadin.util.filter.CdmTermFilter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
@@ -109,10 +110,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                     ta.setWidth(100,  Unit.PERCENTAGE);
                     field = ta;
                 } else if(propertyId.equals("annotationType")) {
-                    ListSelect select = new ListSelect();
+                    NativeSelect select = new NativeSelect();
                     select.setContainerDataSource(typeSelectItemContainer);
                     select.setWidth(100, Unit.PIXELS);
-                    select.setRows(1);
                     field = select;
                 }
                 field.setStyleName(table.getStyleName());
@@ -140,9 +140,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        // holds a Container instead // TODO can this cause a NPE?
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        // holds a Container instead
+        return Optional.empty();
     }
 
     @Override

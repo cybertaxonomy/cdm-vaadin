@@ -108,8 +108,12 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
                         );
                 // restrict by allowed reference uuids
                 Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
-                Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
-                criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
+                if(!allowedUuids.isEmpty()){
+                    Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
+                    criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
+                } else {
+                    criterion = Restrictions.and(criterion, pulishedOnly);
+                }
             }
         }
         referencePagingProvider.addCriterion(criterion);
@@ -192,8 +196,8 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
                 newReference = newReferencePopup.getBean();
 
                 // TODO the bean contained in the popup editor is not yet updated at this point.
-                //      so re reload it using the uuid since new beans will not have an Id at this point.
-                newReference = getRepo().getReferenceService().find(newReference.getUuid());
+                //      so we reload it using the uuid since new beans will not have an Id at this point.
+                newReference = getRepo().getReferenceService().load(newReference.getUuid());
 
                 getView().getReferenceCombobox().setValue(null);  // deselect
                 getView().getReferenceCombobox().setEnabled(false);

@@ -13,11 +13,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
@@ -87,6 +89,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private boolean creatingFields;
 
+    private List<Validator> fieldValidators = new ArrayList<>();
+
     public  ToManyRelatedEntitiesListSelect(Class<V> itemType, Class<F> fieldType, String caption){
         this.fieldType = fieldType;
         this.itemType = itemType;
@@ -106,6 +110,19 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
         }
         return row;
+    }
+
+    /**
+     *
+     * @return an unmodifiable List of the data Fields
+     */
+    protected List<F> fields() {
+        Integer row = null;
+        List<F> fields = new ArrayList<>();
+        for(int r = 0; r < grid.getRows(); r++){
+            fields.add((F) grid.getComponent(GRID_X_FIELD, r));
+        }
+        return fields;
     }
 
     /**
@@ -143,7 +160,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         grid.removeRow(row);
         // TODO remove from nested fields
         updateValue();
-        updateButtonStates();
+        updateComponentStates();
     }
 
 
@@ -174,7 +191,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         if(i >= 0 && i + 1 < grid.getRows()){
             grid.replaceComponent(grid.getComponent(GRID_X_FIELD, i), grid.getComponent(GRID_X_FIELD, i + 1));
             grid.replaceComponent(grid.getComponent(GRID_X_FIELD  + 1 , i), grid.getComponent(GRID_X_FIELD + 1, i + 1));
-            updateButtonStates();
+            updateComponentStates();
             updateValue();
         } else {
             throw new RuntimeException("Cannot swap rows out of the grid bounds");
@@ -267,7 +284,10 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                     newRowNeeded = false;
                     F field = (F)fieldComponent;
                     if(data.get(row) != null && field.getValue() != data.get(row)){
+                        boolean roState = field.isReadOnly();
+                        field.setReadOnly(false);
                         field.setValue(data.get(row));
+                        field.setReadOnly(roState);
                     }
                 }
             }
@@ -316,6 +336,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     protected int addNewRow(int row, V val) {
         try {
             F field = newFieldInstance(val);
+            for(Validator validator : fieldValidators) {
+                field.addValidator(validator);
+            }
             ButtonGroup buttonGroup = new ButtonGroup(field);
             updateEditOrCreateButton(buttonGroup, val);
             field.addValueChangeListener(e -> {
@@ -340,7 +363,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             }
             grid.addComponent(field, GRID_X_FIELD, row);
             grid.addComponent(buttonGroup, GRID_X_BUTTON_GROUP, row);
-            updateButtonStates();
+            updateComponentStates();
             nestFieldGroup(field);
             row++;
         } catch (InstantiationException e) {
@@ -438,7 +461,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-    private void updateButtonStates(){
+    private void updateComponentStates(){
 
         boolean isWritable = !getState().readOnly;
         int fieldsCount = getNestedFields().size();
@@ -451,14 +474,15 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
             F field = (F) grid.getComponent(GRID_X_FIELD, row);
             CssLayout buttonGroup = (CssLayout) grid.getComponent(GRID_X_FIELD + 1, row);
 
+            boolean isWritableField = isWritableField(field);
+            field.setReadOnly(!isWritableField);
+
             int addButtonIndex = 0;
             if(withEditButton){
                 addButtonIndex++;
                 // edit
                 Button editCreateButton = ((Button)buttonGroup.getComponent(0));
                 editCreateButton.setDescription(field.getValue() == null ? "New" : "Edit");
-                editCreateButton.setEnabled(isWritable && (field.getValue() == null
-                        || field.getValue() != null && testEditButtonPermission(field.getValue())));
             }
             // add
             buttonGroup.getComponent(addButtonIndex).setEnabled(isWritable && (isLast || isOrderedCollection));
@@ -472,6 +496,17 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
                 buttonGroup.getComponent(addButtonIndex + 3).setEnabled(isWritable && !isLast);
             }
         }
+    }
+
+    /**
+     * @param isWritable
+     * @param field
+     * @return
+     */
+    public boolean isWritableField(F field) {
+        boolean isWritable = !getState().readOnly;
+        return isWritable && (field.getValue() == null
+                || field.getValue() != null && testEditButtonPermission(field.getValue()));
     }
 
     /**
@@ -529,6 +564,41 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
+     * Adds the validator to the list of validators which
+     * are applied to new fields and adds the validator to
+     * existing fields
+     *
+     * @param validator
+     */
+    public void addFieldValidator(Validator validator){
+        fieldValidators.add(validator);
+        for(F field : fields()) {
+            field.addValidator(validator);
+        }
+    }
+
+    /**
+     * removes the validator from the list of validators which
+     * are applied to new fields and removes the validator from
+     * existing fields
+     *
+     * @param validator
+     */
+    public void removeFieldValidator(Validator validator){
+        fieldValidators.remove(validator);
+        for(F field : fields()) {
+            field.removeValidator(validator);
+        }
+    }
+
+    /**
+     * @return a unmodifialble List of the fieldValidators
+     */
+    public List<Validator> getFieldValidators() {
+        return Collections.unmodifiableList(fieldValidators);
+    }
+
+    /**
      * Handle the data binding of the sub fields. Sub-fields can either be composite editor fields
      * or 'simple' fields, usually select fields.
      * <p>
@@ -553,8 +623,8 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
      * <p>
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return null;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.empty();
     }
 
     /**
@@ -683,7 +753,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
-        updateButtonStates();
+        updateComponentStates();
     }
 
 

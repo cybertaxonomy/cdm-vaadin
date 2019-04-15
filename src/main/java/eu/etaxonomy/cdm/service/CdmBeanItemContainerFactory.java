@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -24,10 +23,10 @@ import com.vaadin.data.util.BeanItemContainer;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.DefinedTermBase;
-import eu.etaxonomy.cdm.model.common.IEnumTerm;
-import eu.etaxonomy.cdm.model.common.TermType;
-import eu.etaxonomy.cdm.model.common.TermVocabulary;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
+import eu.etaxonomy.cdm.model.term.IEnumTerm;
+import eu.etaxonomy.cdm.model.term.TermType;
+import eu.etaxonomy.cdm.model.term.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 
 /**
@@ -136,10 +135,7 @@ public class CdmBeanItemContainerFactory {
     }
 
     public void clearSession() {
-        Session session = repo.getSession();
-        if(session.isOpen()){
-            session.clear();
-        }
+        repo.clearSession();
     }
 
 }

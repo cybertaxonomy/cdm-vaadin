@@ -93,17 +93,10 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         logger.trace(this._toString() + " constructor");
     }
 
-    CdmStore<CDM, IService<CDM>> store ;
+    @Autowired
+    protected CdmStore cdmStore;
 
     protected CdmAuthority newAuthorityCreated;
-
-
-    protected CdmStore<CDM, IService<CDM>> getStore() {
-        if(store == null){
-            store = new CdmStore<>(getRepo(), getService());
-        }
-        return store;
-    }
 
     @Override
     protected DTO loadBeanById(Object identifier) {
@@ -151,8 +144,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
         User user = userHelper.user();
 
-        if(AbstractCdmPopupEditor.class.isAssignableFrom(getView().getClass())){
-            AbstractCdmPopupEditor popupView = ((AbstractCdmPopupEditor)getView());
+        if(AbstractPopupEditor.class.isAssignableFrom(getView().getClass())){
+            AbstractPopupEditor popupView = ((AbstractPopupEditor)getView());
 
             if(cdmEntitiy.isPersited() && !canEdit){
                 popupView.setReadOnly(true); // never reset true to false here!
@@ -232,7 +225,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         EntityChangeEvent<?> changeEvent = null;
         try {
             dto = preSaveBean(dto);
-            changeEvent = getStore().saveBean(cdmEntity, (AbstractView<?>) getView());
+            changeEvent = cdmStore.saveBean(cdmEntity, (AbstractView<?>) getView());
 
             if(changeEvent != null){
                 viewEventBus.publish(this, changeEvent);
@@ -294,7 +287,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     @Override
     protected void deleteBean(DTO bean){
         CDM cdmEntity = cdmEntity(bean);
-        EntityChangeEvent changeEvent = getStore().deleteBean(cdmEntity, (AbstractView) getView());
+        EntityChangeEvent changeEvent = cdmStore.deleteBean(cdmEntity, (AbstractView) getView());
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }

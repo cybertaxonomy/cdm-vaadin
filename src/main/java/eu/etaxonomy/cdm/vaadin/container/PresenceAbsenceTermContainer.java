@@ -12,10 +12,10 @@ import java.util.stream.Collectors;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.VaadinSession;
 
-import eu.etaxonomy.cdm.model.common.TermType;
 import eu.etaxonomy.cdm.model.description.PresenceAbsenceTerm;
 import eu.etaxonomy.cdm.model.metadata.CdmPreference;
 import eu.etaxonomy.cdm.model.metadata.PreferencePredicate;
+import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.DistributionEditorUtil;
 

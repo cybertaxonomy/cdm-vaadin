@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.vaadin.teemu.switchui.Switch;
@@ -325,8 +326,8 @@ public class PersonField extends CompositeCustomField<Person> {
      * {@inheritDoc}
      */
     @Override
-    public FieldGroup getFieldGroup() {
-        return fieldGroup;
+    public Optional<FieldGroup> getFieldGroup() {
+        return Optional.of(fieldGroup);
     }
 
 

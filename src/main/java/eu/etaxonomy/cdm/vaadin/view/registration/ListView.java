@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
@@ -60,12 +60,12 @@ public interface ListView extends ApplicationView<ListPresenter>{
     /**
      * @return the statusFilter
      */
-    public ListSelect getRegistrationStatusFilter();
+    public NativeSelect getRegistrationStatusFilter();
 
     /**
      * @return the submitterFilter
      */
-    public ListSelect getSubmitterFilter();
+    public NativeSelect getSubmitterFilter();
 
     /**
      * @param optionInProgress

@@ -88,7 +88,7 @@ public class CdmVaadinBaseTest extends UnitilsJUnit4 {
 
 
     public static void createNewServletEnvironment() {
-		servletContext = new MockServletContext("/webapp");
+		servletContext = new MockServletContext("/mock-webapp");
 
         ServletContextListener listener = new ContextLoaderListener();
         ServletContextEvent event = new ServletContextEvent(servletContext);

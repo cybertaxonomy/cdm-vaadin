@@ -81,8 +81,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     public void handleViewEntered() {
         super.handleViewEntered();
 
-
-        updateInReferencePageProvider();
+        getView().getTypeSelect().addValueChangeListener(e -> updateInReferencePageProvider());
         getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new CaptionGenerator<Reference>(){
 
             @Override
@@ -113,19 +112,13 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
-    @Override
-    protected void adaptDataProviders() {
-//        updateInReferencePageProvider();
-//        getView().getInReferenceCombobox().addValueChangeListener(e -> updateInReferencePageProvider());
-    }
-
 
     /**
      * @param inReferencePagingProvider
      */
     public void updateInReferencePageProvider() {
 
-        inReferencePagingProvider = pagingProviderFactory.inReferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue());
+        inReferencePagingProvider = pagingProviderFactory.inReferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue(), false);
         Reference inReference = getView().getInReferenceCombobox().getValue();
         if(inReference != null){
             if(includeCurrentInReference == null){

@@ -29,7 +29,6 @@ import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.model.agent.Team;
-import eu.etaxonomy.cdm.model.common.DefinedTerm;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
@@ -44,6 +43,7 @@ import eu.etaxonomy.cdm.model.occurrence.MediaSpecimen;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
+import eu.etaxonomy.cdm.model.term.DefinedTerm;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
@@ -122,7 +122,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        service.save(workingset);
 
-       SpecimenOrObservationBase baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
+       SpecimenOrObservationBase<?> baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
 
 
        printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});

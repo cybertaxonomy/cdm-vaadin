@@ -24,7 +24,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.utility.RoleProber;
@@ -40,6 +40,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.VerbatimTimePeriodField;
 import eu.etaxonomy.cdm.vaadin.data.validator.InReferenceTypeValidator;
+import eu.etaxonomy.cdm.vaadin.data.validator.TimePeriodCompletenesValidator;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -73,7 +74,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private final static int GRID_ROWS = 14;
 
-    private ListSelect typeSelect;
+    private NativeSelect typeSelect;
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
@@ -151,11 +152,12 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
          */
         int row = 0;
         datePublishedField = new VerbatimTimePeriodField("Date published");
+        datePublishedField.addValidator(new TimePeriodCompletenesValidator());
         addField(datePublishedField, "datePublished", 0, row, 1, row);
-        typeSelect = new ListSelect("Reference type");
+        typeSelect = new NativeSelect("Reference type");
         typeSelect.addItems(referenceTypes);
         typeSelect.setNullSelectionAllowed(false);
-        typeSelect.setRows(1);
+
         typeSelect.addValueChangeListener(e -> updateFieldVisibility((ReferenceType)e.getProperty().getValue()));
         addField(typeSelect, "type", GRID_COLS - 1, row);
         grid.setComponentAlignment(typeSelect, Alignment.TOP_RIGHT);
@@ -330,6 +332,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             authorshipField.setVisible(fieldPropertyDefinition.containsKey("authorship"));
             String inRefCaption = fieldPropertyDefinition.get("inReference");
             inReferenceCombobox.setVisible(inRefCaption != null);
+            inReferenceCombobox.setRequired(referenceType.isSection());
             if(inRefCaption != null){
                 inReferenceCombobox.setCaption(inReferenceCaption(inRefCaption));
             }
@@ -460,7 +463,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     }
 
     @Override
-    public ListSelect getTypeSelect() {
+    public NativeSelect getTypeSelect() {
         return typeSelect;
     }
 
