@@ -417,47 +417,51 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
 
         if(event.getPopup() instanceof TaxonNamePopupEditor){
-            Registration registration = null;
-            if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
-                if(event.getReason().equals(Reason.SAVE)){
-                    try {
-                        TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
-                        registration = registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
-                        loadWorkingSet(workingset.getCitationUuid());
-                    } finally {
-                        clearSession();
-                        getView().getAddNewNameRegistrationButton().setEnabled(true);
+
+                Registration registration = null;
+                if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
+                    if(event.getReason().equals(Reason.SAVE)){
+                        try {
+                            TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
+                            registration = registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
+                            loadWorkingSet(workingset.getCitationUuid());
+                        } finally {
+                            clearSession();
+                            getView().getAddNewNameRegistrationButton().setEnabled(true);
+                        }
                     }
+                    // nullify and clear the memory on this popup editor in any case (SAVE, DELETE, CANCEL)
+                    newNameForRegistrationPopupEditor = null;
+                    newNameBlockingRegistrations.clear();
+                    getView().getAddNewNameRegistrationButton().setEnabled(true);
                 }
-                // nullify and clear the memory on this popup editor in any case (SAVE, CANCEL, DELETE)
-                newNameForRegistrationPopupEditor = null;
-                newNameBlockingRegistrations.clear();
-                getView().getAddNewNameRegistrationButton().setEnabled(true);
-            }
 
-            if(registration == null){
-                // no new registration has been created above, so there must be an existing one.
-                registration = findRegistrationInContext(event.getPopup());
-            }
+                if(event.getReason().equals(Reason.SAVE)){
+                    if(registration == null){
+                        // no new registration has been created above, so there must be an existing one.
+                        registration = findRegistrationInContext(event.getPopup());
+                    }
 
-            // Check if the other names used in the context of the name are registered yet.
-            TaxonNamePopupEditor nameEditor = (TaxonNamePopupEditor)event.getPopup();
-            Set<TaxonName> namesToCheck = new HashSet<>();
+                    // Check if the other names used in the context of the name are registered yet.
+                    TaxonNamePopupEditor nameEditor = (TaxonNamePopupEditor)event.getPopup();
+                    Set<TaxonName> namesToCheck = new HashSet<>();
 
-            namesToCheck.addAll(nameEditor.getBasionymComboboxSelect().getValue());
-            namesToCheck.addAll(nameEditor.getReplacedSynonymsComboboxSelect().getValue());
-            namesToCheck.add(nameEditor.getValidationField().getRelatedNameComboBox().getValue());
-            namesToCheck.add(nameEditor.getOrthographicVariantField().getRelatedNameComboBox().getValue());
+                    namesToCheck.addAll(nameEditor.getBasionymComboboxSelect().getValue());
+                    namesToCheck.addAll(nameEditor.getReplacedSynonymsComboboxSelect().getValue());
+                    namesToCheck.add(nameEditor.getValidationField().getRelatedNameComboBox().getValue());
+                    namesToCheck.add(nameEditor.getOrthographicVariantField().getRelatedNameComboBox().getValue());
 
-            for(TaxonName name : namesToCheck){
-                if(name != null){
-                    clearSession();
-                    registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
+                    for(TaxonName name : namesToCheck){
+                        if(name != null){
+                            clearSession();
+                            registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
+                        }
+                    }
+                } else if (event.getReason().equals(Reason.DELETE)){
+                    //FIXME handle delete: need to remove blocking registrations?
                 }
-            }
-
-            // always reload if the first editor is closed as the data might have been changed through any other sub-popupeditor
-            refreshView(isAtContextRoot(event.getPopup()));
+                // always reload if the first editor is closed as the data might have been changed through any other sub-popupeditor
+                refreshView(isAtContextRoot(event.getPopup()));
         }
     }
 
