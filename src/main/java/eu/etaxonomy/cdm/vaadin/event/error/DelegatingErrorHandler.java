@@ -68,9 +68,13 @@ public class DelegatingErrorHandler implements ErrorHandler{
             ){
             // we are only interested into the cause in these cases
             throwable = throwable.getCause().getCause();
-            event.setThrowable(throwable);
+        }
+        if(throwable == null){
+            // nothing more specific found, use the original exception
+            throwable = event.getThrowable();
         }
         while(throwable != null){
+            event.setThrowable(throwable);
             if(delegate(event, throwable)){
                 break;
             }
