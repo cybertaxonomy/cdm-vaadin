@@ -18,6 +18,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
@@ -27,6 +28,7 @@ import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
+import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 
 
 /**
@@ -123,6 +125,9 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
             });
         relatedNameComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<TaxonName>(relatedNameComboBox));
         citatonComboBox.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citatonComboBox, false));
+        citatonComboBox.getSelect().setCaptionGenerator(
+                new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, citatonComboBox.getSelect())
+                );
 
         grid = new GridLayout(2, 3);
 

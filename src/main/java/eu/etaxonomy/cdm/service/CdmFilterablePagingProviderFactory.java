@@ -73,6 +73,10 @@ public class CdmFilterablePagingProviderFactory {
                     inRefTypes.toArray(new ReferenceType[inRefTypes.size()])));
         }
 
+        // using the ReferenceEllypsisFormatter initstrategy since using the ReferenceEllypsisCaptionGenerator should be default
+        // for all views and UIs
+        pagingProvider.setInitStrategy(ReferenceEllypsisFormatter.INIT_STRATEGY);
+
         return pagingProvider;
     }
 
