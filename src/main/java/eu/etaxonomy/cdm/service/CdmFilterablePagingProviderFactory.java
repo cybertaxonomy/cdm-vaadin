@@ -60,7 +60,7 @@ public class CdmFilterablePagingProviderFactory {
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
         CdmFilterablePagingProvider<Reference, Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
-                repo.getReferenceService(), MatchMode.ANYWHERE, referenceOrderHints);
+                repo.getReferenceService(), MatchMode.BEGINNING, referenceOrderHints);
 
         Set<ReferenceType> inRefTypes = subReferenceType.inReferenceContraints(subReferenceType);
 
