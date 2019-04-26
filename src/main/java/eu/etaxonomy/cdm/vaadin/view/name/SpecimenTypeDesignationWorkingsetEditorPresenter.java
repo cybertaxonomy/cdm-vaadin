@@ -233,7 +233,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
                         referencePagingProvider,
-                        collectionPagingProvider.getPageSize()
+                        referencePagingProvider.getPageSize()
                         );
 
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.mediaSpecimenReference.getSelect()));

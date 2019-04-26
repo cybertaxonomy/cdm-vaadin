@@ -16,7 +16,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
@@ -26,7 +25,6 @@ import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
-import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 
@@ -76,9 +74,6 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         mediaUri.setConverter(new UriConverter());
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
         mediaSpecimenReference.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference));
-        mediaSpecimenReference.getSelect().setCaptionGenerator(
-                new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, mediaSpecimenReference.getSelect())
-                );
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->
