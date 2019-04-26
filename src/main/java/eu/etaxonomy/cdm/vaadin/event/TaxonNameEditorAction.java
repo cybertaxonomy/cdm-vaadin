@@ -43,7 +43,9 @@ public class TaxonNameEditorAction extends AbstractEditorAction<TaxonName> {
      * @param entityId
      * @param source
      * @param sourceView
+     * @deprecated use the method with {@code Stack<EditorActionContext> context} instead.
      */
+    @Deprecated
     public TaxonNameEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<TaxonName> target, AbstractView sourceView) {
         super(action, entityUuid, source, target, sourceView);
     }
@@ -59,8 +61,5 @@ public class TaxonNameEditorAction extends AbstractEditorAction<TaxonName> {
             Stack<EditorActionContext> context) {
         super(action, entityUuid, source, target, sourceView, context);
     }
-
-
-
 
 }

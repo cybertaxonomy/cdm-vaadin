@@ -982,9 +982,9 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      */
     @Override
     public void setReadOnly(boolean readOnly) {
+        super.setReadOnly(readOnly);
         boolean basionymToggleReadonly = basionymToggle.isReadOnly();
         boolean validationToggleReadonly = validationToggle.isReadOnly();
-        super.setReadOnly(readOnly);
         combinationAuthorshipField.setEditorReadOnly(readOnly);
         exCombinationAuthorshipField.setEditorReadOnly(readOnly);
         basionymAuthorshipField.setEditorReadOnly(readOnly);
@@ -996,6 +996,23 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(validationToggleReadonly){
             validationToggle.setReadOnly(true);
         }
+    }
+
+    /**
+     * Sets the readonly state of all fields in this editor, but leaving the editor itself untouched.
+     *
+     * @param readOnly
+     */
+    public void setAllFieldsReadOnly(boolean readOnly) {
+        recursiveReadonly(readOnly, getMainLayout());
+        // NOTE:We are uUsing the enabled state instead of read only since
+        // setting read only will not affect the members editor.
+        // this seems to be a bug in TeamOrPersonField or in
+        // ToManyRelatedEntitiesListSelect
+        combinationAuthorshipField.setEnabled(!readOnly);
+        exCombinationAuthorshipField.setEnabled(!readOnly);
+        basionymAuthorshipField.setEnabled(!readOnly);
+        exBasionymAuthorshipField.setEnabled(!readOnly);
     }
 
 

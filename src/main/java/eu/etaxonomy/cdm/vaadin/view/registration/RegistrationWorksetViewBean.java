@@ -112,19 +112,19 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     private UUID citationUuid;
 
-    private Button addNewNameRegistrationButton;
-
-    private LazyComboBox<TaxonName> existingNameCombobox;
-
     private GridLayout registrationsGrid;
-
-    private Button addExistingNameButton;
-
-    private Label existingNameRegistrationTypeLabel;
 
     private RegistrationItem workingsetHeader;
 
     private Panel registrationListPanel;
+
+    private Button addNewNameRegistrationButton;
+
+    private Button addExistingNameButton;
+
+    private LazyComboBox<TaxonName> existingNameCombobox;
+
+    private Label existingNameRegistrationTypeLabel;
 
     /**
      * uses the registrationId as key
@@ -139,6 +139,8 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     private RegistrationStatusFieldInstantiator statusFieldInstantiator;
 
     private String accessDeniedMessage;
+
+    private Object existingNameEditor;
 
     public RegistrationWorksetViewBean() {
         super();
@@ -261,13 +263,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         existingNameRegistrationTypeLabel = new Label();
         addExistingNameButton = new Button("existing name:");
         addExistingNameButton.setEnabled(false);
-        addExistingNameButton.addClickListener(
-                e -> getViewEventBus().publish(this, new RegistrationWorkingsetAction(
-                        citationUuid,
-                        RegistrationWorkingsetAction.Action.start
-                )
-             )
-        );
+        addExistingNameButton.addClickListener(e -> reviewExistingName());
 
         existingNameCombobox = new LazyComboBox<TaxonName>(TaxonName.class);
         existingNameCombobox.addValueChangeListener(
@@ -320,6 +316,42 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         Panel namesTypesPanel = new Panel(registrationsGrid);
         namesTypesPanel.setStyleName(EditValoTheme.PANEL_CONTENT_PADDING_LEFT);
         return namesTypesPanel;
+    }
+
+    private void reviewExistingName() {
+        // call commit to make the selection available
+        existingNameCombobox.commit();
+        UUID uuid = existingNameCombobox.getValue().getUuid();
+        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        context.push(new EditorActionContext(
+                    new TypedEntityReference<>(TaxonName.class, uuid),
+                    this)
+                    );
+        getViewEventBus().publish(
+                this,
+                new TaxonNameEditorAction(
+                        EditorActionType.EDIT,
+                        uuid,
+                        addExistingNameButton,
+                        existingNameCombobox,
+                        this,
+                        context)
+        );
+
+    }
+
+    /**
+     * publishes an event to the {@link RegistrationWorkingsetPresenter}
+     * @deprecated no longer used but kept for reference
+     * TODO remove for version 5.8 when not used again.
+     */
+    @Deprecated
+    private void triggerRegistrationForExistingName() {
+        getViewEventBus().publish(this, new RegistrationWorkingsetAction(
+                citationUuid,
+                RegistrationWorkingsetAction.Action.start
+                )
+        );
     }
 
 
