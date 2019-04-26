@@ -41,6 +41,8 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
  */
 public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection implements CollectionRow {
 
+    private static final long serialVersionUID = -5637834800897331072L;
+
     /* CONVENTION!
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
