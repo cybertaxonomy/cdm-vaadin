@@ -355,7 +355,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        boolean isAddExistingNameRegistration = event.getTarget().equals(getView().getAddExistingNameCombobox());
+        boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getAddExistingNameCombobox());
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
         popup.setParentEditorActionContext(event.getContext(), event.getTarget());
