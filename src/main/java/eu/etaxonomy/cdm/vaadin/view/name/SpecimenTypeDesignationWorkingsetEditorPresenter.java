@@ -178,8 +178,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
-        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
         termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
         // the ToOneRelatedEntityReloader is added internally in the TeamOrPersonField:
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);

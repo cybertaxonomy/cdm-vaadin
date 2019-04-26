@@ -125,9 +125,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getRankSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.Rank));
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
         termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
-        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
 
         getView().getCombinationAuthorshipField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
         getView().getCombinationAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);

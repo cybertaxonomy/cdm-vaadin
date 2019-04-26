@@ -99,8 +99,8 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(getView().getInReferenceCombobox(),this));
         getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getInReferenceCombobox().getSelect()));
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
-        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 

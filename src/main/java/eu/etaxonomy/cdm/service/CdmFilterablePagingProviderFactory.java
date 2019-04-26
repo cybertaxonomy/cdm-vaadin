@@ -19,6 +19,9 @@ import org.springframework.stereotype.Component;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
@@ -103,6 +106,14 @@ public class CdmFilterablePagingProviderFactory {
         // Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null,
         // NameRelationshipType.ORTHOGRAPHIC_VARIANT()));
         return pagingProvider;
+    }
+
+    public CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider() {
+        return  new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(repo.getAgentService(), TeamOrPersonBase.class, MatchMode.BEGINNING, OrderHint.ORDER_BY_TITLE_CACHE.asList());
+    }
+
+    public CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider() {
+        return new CdmFilterablePagingProvider<AgentBase, Person>(repo.getAgentService(), Person.class, MatchMode.BEGINNING, OrderHint.ORDER_BY_TITLE_CACHE.asList());
     }
 
 }
