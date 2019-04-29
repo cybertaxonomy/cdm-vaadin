@@ -873,6 +873,15 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         return nomReferenceCombobox;
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TextField getNomenclaturalReferenceDetail() {
+        return nomenclaturalReferenceDetail;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -950,6 +959,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public void enableMode(TaxonNamePopupEditorMode mode){
             modesActive.add(mode);
+            updateFormOnModeChange();
     }
 
     @Override
@@ -960,6 +970,21 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public void disableMode(TaxonNamePopupEditorMode mode){
         modesActive.remove(mode);
+        updateFormOnModeChange();
+    }
+
+    /**
+     * updates UI in turn of mode changes if needed, that is when the bean has been set
+     * already.
+     */
+    private void updateFormOnModeChange() {
+        if(getBean() != null){
+            // need to update the ui
+            afterItemDataSourceSet();
+            if(!isModeEnabled(TaxonNamePopupEditorMode.AUTOFILL_AUTHORSHIP_DATA)){
+                updateFieldVisibility();
+            }
+        }
     }
 
     @Override

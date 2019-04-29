@@ -336,6 +336,24 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         return getRepo().getNameService();
     }
 
+    /**
+     * @param referenceEditorPopup
+     */
+    private void configureReferencePopupEditor(ReferencePopupEditor referenceEditorPopup, UUID referenceUUID) {
+        boolean nomRefSectionEditingOnly = getView().isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+        if(nomRefSectionEditingOnly){
+            referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        }
+
+        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(nomRefSectionEditingOnly && newReferenceInstantiator != null));
+
+        referenceEditorPopup.loadInEditor(referenceUUID);
+        if(!nomRefSectionEditingOnly){
+            referenceEditorPopup.getTypeSelect().setValue(ReferenceType.Article);
+        }
+    }
+
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
 
@@ -347,17 +365,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
-        referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
-        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
-        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
-        referenceEditorPopup.loadInEditor(null);
-//        if(newReferenceInstantiator != null){
-//            // this is a bit clumsy, we actually need to inject something like a view configurer
-//            // which can enable, disable fields
-//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-//            referenceEditorPopup.getTypeSelect().setEnabled(false);
-//        }
+        configureReferencePopupEditor(referenceEditorPopup, null);
     }
+
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
@@ -369,17 +379,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
 
         referenceEditorPopup.withDeleteButton(true);
-        referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
-        // TODO this should be configurable per UI - RegistrationUiReferenceEditorFormConfigurator as spring bean, different spring profiles
-        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
-        referenceEditorPopup.loadInEditor(event.getEntityUuid());
-//        if(newReferenceInstantiator != null){
-//            // this is a bit clumsy, we actually need to inject something like a view configurator
-//            // which can enable, disable fields
-//            referenceEditorPopup.getInReferenceCombobox().setEnabled(false);
-//            referenceEditorPopup.getInReferenceCombobox().setEditButtonEnabled(false); // <-------
-//            referenceEditorPopup.getTypeSelect().setEnabled(false);
-//        }
+        configureReferencePopupEditor(referenceEditorPopup, event.getEntityUuid());
     }
 
     @EventBusListenerMethod

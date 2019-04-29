@@ -380,7 +380,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 // editing need to be done another way.
                 // Otherwise we would need to be prepared for creating blocking registrations
                 // in turn of creation, modification of related taxon names.
+                popup.disableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
                 popup.getNomReferenceCombobox().setReadOnly(false);
+                popup.getNomenclaturalReferenceDetail().setReadOnly(false);
                 popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
                         + "Please add the nomenclatural reference and click on \"Save\" to proceed "
                         + "with entering the typifications for this name.");

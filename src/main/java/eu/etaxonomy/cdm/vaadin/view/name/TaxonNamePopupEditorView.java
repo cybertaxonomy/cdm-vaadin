@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -119,6 +120,11 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
     public NameRelationField getOrthographicVariantField();
 
     CheckBox getOrthographicVariantToggle();
+
+    /**
+     * @return
+     */
+    TextField getNomenclaturalReferenceDetail();
 
 
 }
