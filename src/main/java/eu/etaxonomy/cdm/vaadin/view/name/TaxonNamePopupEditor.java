@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -16,15 +17,22 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.context.annotation.Scope;
+import org.vaadin.viritin.fields.AbstractElementCollection.Instantiator;
+import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.ErrorMessage;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
@@ -32,6 +40,7 @@ import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.RankClass;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -73,7 +82,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 19;
+    private final static int GRID_ROWS = 20;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -104,6 +113,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private NameRelationField validationField;
 
     private NameRelationField orthographicVariantField;
+
+    private ElementCollectionField<NomenclaturalStatus> nomStatusCollectionField;
 
     private CheckBox basionymToggle;
 
@@ -194,8 +205,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      */
     @Override
     public void focusFirst() {
-        // titleField.focus();
+        // none
+    }
 
+    @Override
+    public void applyDefaultComponentStyle(Component ... components){
+        for(int i = 0; i <components.length; i++){
+            components[i].setStyleName(getDefaultComponentStyles());
+        }
     }
 
     /**
@@ -352,6 +369,55 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         row++;
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 2, row);
         nomenclaturalReferenceDetail.setWidth(100, Unit.PERCENTAGE);
+
+        // --------------- nom status
+        row++;
+        nomStatusCollectionField = new ElementCollectionField<NomenclaturalStatus>(
+                NomenclaturalStatus.class,
+                new Instantiator<NomenclaturalStatus>() {
+
+                    @Override
+                    public NomenclaturalStatus create() {
+                        return NomenclaturalStatus.NewInstance(null);
+                    }
+                },
+                NomenclaturalStatusRow.class
+                ){
+
+                    @Override
+                    public void commit() throws SourceException, InvalidValueException {
+                        validate(); // validate always so that empty rows are recognized
+                        super.commit();
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        Collection value = getValue();
+                        return value == null || value.isEmpty() ;
+                    }
+
+                    @Override
+                    public void setComponentError(ErrorMessage componentError) {
+                        nomStatusCollectionField.setComponentError(componentError);
+                    }
+
+        };
+
+        nomStatusCollectionField.getLayout().setSpacing(false);
+        nomStatusCollectionField.setVisibleProperties(NomenclaturalStatusRow.visibleFields());
+        nomStatusCollectionField.setPropertyHeader("type", "Status type");
+        nomStatusCollectionField.setPropertyHeader("citation", "Reference");
+        nomStatusCollectionField.setPropertyHeader("citationMicroReference", "Reference detail");
+        nomStatusCollectionField.setPropertyHeader("ruleConsidered", "Rule considered");
+        nomStatusCollectionField.addElementAddedListener( e -> nomStatusCollectionField.setComponentError(null));
+        nomStatusCollectionField.getLayout().setMargin(new MarginInfo(false, true));
+
+        Panel nomStatusCollectionPanel = new Panel(nomStatusCollectionField.getLayout());
+        nomStatusCollectionPanel.setCaption("Status");
+        nomStatusCollectionPanel.setWidth(800, Unit.PIXELS);
+
+        bindField(nomStatusCollectionField, "status");
+        addComponent(nomStatusCollectionPanel, 0, row, 2, row);
 
         // --------------- Basionyms
         row++;
@@ -1021,6 +1087,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         if(validationToggleReadonly){
             validationToggle.setReadOnly(true);
         }
+        nomStatusCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
     }
 
     /**
@@ -1038,8 +1105,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         exCombinationAuthorshipField.setEnabled(!readOnly);
         basionymAuthorshipField.setEnabled(!readOnly);
         exBasionymAuthorshipField.setEnabled(!readOnly);
+        nomStatusCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
     }
-
 
 
     /**
@@ -1071,5 +1138,9 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         return orthographicVariantToggle;
     }
 
+    @Override
+    public ElementCollectionField<NomenclaturalStatus> getNomStatusCollectionField(){
+        return nomStatusCollectionField;
+    }
 
 }

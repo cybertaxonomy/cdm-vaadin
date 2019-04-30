@@ -10,7 +10,9 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import com.vaadin.data.Property;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -31,6 +34,8 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
@@ -80,6 +85,9 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 @Scope("prototype")
 public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNamePopupEditorView> {
 
+    private static final long serialVersionUID = -3538980627079389221L;
+
+    private static final EnumSet<CRUD> SUB_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 
     private static final List<String> RELATED_NAME_INIT_STRATEGY = Arrays.asList(
             "$",
@@ -90,7 +98,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
     public static final List<String> REFERENCE_INIT_STRATEGY = Arrays.asList("authorship", "inReference.authorship", "inReference.inReference.authorship", "inReference.inReference.inReference.authorship");
 
-    private static final long serialVersionUID = -3538980627079389221L;
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
 
@@ -99,6 +106,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     private Reference publishedUnit;
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
+
+    private Map<ReferencePopupEditor, NomenclaturalStatusRow> statusTypeReferencePopupEditorsRowMap = new HashMap<>();
 
     private TaxonNameStringFilterablePagingProvider genusOrUninomialPartPagingProvider;
 
@@ -117,6 +126,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
 
@@ -153,15 +163,6 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getNomReferenceCombobox(), this));
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener( e -> updateOrthographicCorrectionRestriction());
 
-
-        relatedNamePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
-        relatedNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
-        getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
-        getView().getBasionymComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
-
-        getView().getReplacedSynonymsComboboxSelect().setCaptionGenerator( new CdmTitleCacheCaptionGenerator<TaxonName>());
-        getView().getReplacedSynonymsComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
-
         CdmFilterablePagingProvider<Reference, Reference> icbnCodesPagingProvider = pagingProviderFactory.referencePagingProvider();
         // @formatter:off
         // TODO use markers on references instead of isbn. The marker type MarkerType.NOMENCLATURAL_RELEVANT() has already prepared (#7466)
@@ -174,6 +175,42 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 // ICNB
         }));
         // @formatter:on
+
+        statusTypeReferencePopupEditorsRowMap.clear();
+        getView().getNomStatusCollectionField().addElementAddedListener(e -> addNomenclaturalStatus(e.getElement()));
+        getView().getNomStatusCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<NomenclaturalStatusRow>() {
+
+            @Override
+            public NomenclaturalStatusRow create() {
+                NomenclaturalStatusRow row = new NomenclaturalStatusRow();
+
+                row.type.setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid()));
+                row.type.setNullSelectionAllowed(false);
+
+                row.citation.loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
+                row.citation.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.NOMENCLATURAL, row.citation.getSelect()));
+                row.citation.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.citation.getSelect(),
+                        TaxonNameEditorPresenter.this));
+                row.citation.addClickListenerAddEntity(e -> doReferenceEditorAdd(row));
+                row.citation.addClickListenerEditEntity(e -> {
+                    if(row.citation.getValue() != null){
+                        doReferenceEditorEdit(row);
+                    }
+                });
+
+                getView().applyDefaultComponentStyle(row.components());
+
+                return row;
+            }
+        });
+
+        relatedNamePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
+        relatedNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
+        getView().getBasionymComboboxSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
+        getView().getBasionymComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
+
+        getView().getReplacedSynonymsComboboxSelect().setCaptionGenerator( new CdmTitleCacheCaptionGenerator<TaxonName>());
+        getView().getReplacedSynonymsComboboxSelect().setPagingProviders(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize(), this);
 
         getView().getValidationField().getRelatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         getView().getValidationField().getRelatedNameComboBox().loadFrom(relatedNamePagingProvider, relatedNamePagingProvider, relatedNamePagingProvider.getPageSize());
@@ -193,6 +230,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildTermItemContainer(
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
+    }
+
+    /**
+     * @param element
+     * @return
+     */
+    private void addNomenclaturalStatus(NomenclaturalStatus element) {
+        // Nothing to do
     }
 
     @Override
@@ -239,6 +284,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "nomenclaturalReference.inReference.inReference.inReference.authorship",
 
                 "status.type",
+                "status.citation.authorship.$",
+                "status.citation.inReference.authorship.$",
 
                 "combinationAuthorship",
                 "exCombinationAuthorship",
@@ -336,6 +383,29 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         return getRepo().getNameService();
     }
 
+
+    public void doReferenceEditorAdd(NomenclaturalStatusRow row) {
+
+        ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
+
+        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+        referencePopupEditor.grantToCurrentUser(SUB_EDITOR_CRUD);
+        referencePopupEditor.withDeleteButton(true);
+        referencePopupEditor.loadInEditor(null);
+
+        statusTypeReferencePopupEditorsRowMap.put(referencePopupEditor, row);
+    }
+
+    public void doReferenceEditorEdit(NomenclaturalStatusRow row) {
+
+        ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
+        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+        referencePopupEditor.grantToCurrentUser(SUB_EDITOR_CRUD);
+        referencePopupEditor.withDeleteButton(true);
+        referencePopupEditor.loadInEditor(row.citation.getValue().getUuid());
+
+        statusTypeReferencePopupEditorsRowMap.put(referencePopupEditor, row);
+    }
     /**
      * @param referenceEditorPopup
      */

@@ -18,6 +18,7 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.validator.DoubleRangeValidator;
 import com.vaadin.server.ErrorMessage;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Component;
@@ -225,6 +226,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReference", "Image reference");
         typeDesignationsCollectionField.setPropertyHeader("mediaSpecimenReferenceDetail", "Reference detail");
         typeDesignationsCollectionField.addElementAddedListener( e -> typeDesignationsCollectionField.setComponentError(null));
+        typeDesignationsCollectionField.getLayout().setMargin(new MarginInfo(false, true));
 
         // typeDesignationsCollectionField.getLayout().setMargin(false);
         // typeDesignationsCollectionField.addStyleName("composite-field-wrapper");
@@ -332,14 +334,14 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
             Component item = gridLayout.getComponent(SpecimenTypeDesignationDTORow.rowListSelectColumn(), rowIndex);
             ((CollectionRowRepresentative)item).updateRowItemsEnabledStates();
         }
-        updateAllowDelete();
+        updateAllowDeleteTypeDesignation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateAllowDelete(){
+    public void updateAllowDeleteTypeDesignation(){
         // disable the delete button if there is only one typeDesignation
         // if this typeDesignation is deleted the fieldUnit would become orphan in the
         // TypeDesignationWorkingSet

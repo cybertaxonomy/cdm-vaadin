@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
+import eu.etaxonomy.cdm.model.EntityCollectionSetterAdapter.SetterAdapterException;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Credit;
@@ -325,6 +326,10 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     public Set<NomenclaturalStatus> getStatus() {
         return name.getStatus();
+    }
+
+    public void setStatus(Set<NomenclaturalStatus> status) throws SetterAdapterException {
+        name.setStatus(status);
     }
 
     public boolean isProtectedAuthorshipCache() {

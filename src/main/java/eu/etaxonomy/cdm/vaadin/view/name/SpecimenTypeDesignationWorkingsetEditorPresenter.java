@@ -284,7 +284,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * @return
      */
     private void addTypeDesignation(SpecimenTypeDesignationDTO element) {
-        getView().updateAllowDelete();
+        getView().updateAllowDeleteTypeDesignation();
     }
 
 
@@ -304,7 +304,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         reg.getTypeDesignations().remove(std);
 
-        getView().updateAllowDelete();
+        getView().updateAllowDeleteTypeDesignation();
     }
 
     /**
@@ -369,10 +369,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                        SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
                        ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
                        combobox.setValue((Collection) event.getEntity());
-                   }
-                   for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
-                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
-                       combobox.reload();
+                   } else {
+                       for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+                           ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                           combobox.reload();
+                       }
                    }
                }
             }
@@ -413,13 +414,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             SpecimenTypeDesignationDTORow row = referencePopupEditorsRowMap.get(event.getSourceView());
             ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
             combobox.setValue((Reference) event.getEntity());
-
         } else {
             for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
                 ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
                 combobox.reload();
             }
         }
+
     }
 
     /**

@@ -38,7 +38,7 @@ public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends Applic
      *  if this typeDesignation is deleted the fieldUnit would become orphan in the
      *  TypeDesignationWorkingSet
      */
-    public void updateAllowDelete();
+    public void updateAllowDeleteTypeDesignation();
 
     TeamOrPersonField getCollectorField();
 
