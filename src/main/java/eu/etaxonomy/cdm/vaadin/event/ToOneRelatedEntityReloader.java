@@ -51,7 +51,7 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
         // TODO during the view initialization this method is called twice with the same value.
         // for faster view initialization it might make sense to reduce this to only one call.
         // only one call should be sufficient since the same value object is use in both calls
-        // whereas i observed that it is a hibnerate proxy during the first call,
+        // whereas i observed that it is a hibernate proxy during the first call,
         // the second time it is the de-proxied entity which was during the first call inside the proxy.
         // Since both cdm enties are the same object
         // a reduction to one call should not break anything, but at least one call during the initialization

@@ -59,7 +59,6 @@ public class DelegatingErrorHandler implements ErrorHandler{
     @Override
     public void error(ErrorEvent event) {
 
-        boolean handlerFound = true;
         Throwable throwable = event.getThrowable();
         while(throwable != null && (
                 RpcInvocationException.class.isAssignableFrom(throwable.getClass()) ||
@@ -69,15 +68,19 @@ public class DelegatingErrorHandler implements ErrorHandler{
             ){
             // we are only interested into the cause in these cases
             throwable = throwable.getCause().getCause();
-            event.setThrowable(throwable);
+        }
+        if(throwable == null){
+            // nothing more specific found, use the original exception
+            throwable = event.getThrowable();
         }
         while(throwable != null){
+            event.setThrowable(throwable);
             if(delegate(event, throwable)){
                 break;
             }
             throwable = throwable.getCause();
         }
-        if(!handlerFound){
+        if(event.getThrowable() != null){
             Notification.show(event.getThrowable().getMessage());
           }
     }

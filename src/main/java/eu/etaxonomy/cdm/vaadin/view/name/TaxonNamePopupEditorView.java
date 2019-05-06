@@ -10,10 +10,15 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 
 import java.util.EnumSet;
 
+import org.vaadin.viritin.fields.ElementCollectionField;
+
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
@@ -119,6 +124,18 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
     public NameRelationField getOrthographicVariantField();
 
     CheckBox getOrthographicVariantToggle();
+
+    /**
+     * @return
+     */
+    TextField getNomenclaturalReferenceDetail();
+
+    ElementCollectionField<NomenclaturalStatus> getNomStatusCollectionField();
+
+    /**
+     * @param components
+     */
+    void applyDefaultComponentStyle(Component[] components);
 
 
 }

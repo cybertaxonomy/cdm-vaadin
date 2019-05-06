@@ -191,10 +191,16 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
         buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
 
-        statusMessageLabel.setWidthUndefined();
+        statusMessageLabel.setSizeFull();
+        statusMessageLabel.setContentMode(com.vaadin.shared.ui.label.ContentMode.HTML);
 
-        mainLayout.addComponents(toolBar, fieldLayout, statusMessageLabel, buttonLayout);
-        mainLayout.setComponentAlignment(statusMessageLabel, Alignment.BOTTOM_RIGHT);
+        HorizontalLayout statusMessageLayout = new HorizontalLayout();
+        statusMessageLayout.setSizeFull();
+        statusMessageLayout.addComponent(statusMessageLabel);
+        statusMessageLayout.setMargin(new MarginInfo(false, true, false, true));
+
+        mainLayout.addComponents(toolBar, fieldLayout, statusMessageLayout, buttonLayout);
+        mainLayout.setComponentAlignment(statusMessageLayout, Alignment.BOTTOM_RIGHT);
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
 
         updateToolBarVisibility();
@@ -770,7 +776,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     private void updateStatusLabel() {
         String text = "";
         for(String s : statusMessages){
-            text += s + " ";
+            text += s + "</br>";
         }
         statusMessageLabel.setValue(text);
         statusMessageLabel.setVisible(!text.isEmpty());

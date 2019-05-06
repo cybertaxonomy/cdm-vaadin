@@ -39,6 +39,8 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
  */
 public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection implements CollectionRow {
 
+    private static final long serialVersionUID = -5637834800897331072L;
+
     /* CONVENTION!
      *
      * The fieldname must match the properties of the SpecimenTypeDesignationDTO
@@ -54,24 +56,28 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
     ToOneRelatedEntityCombobox<Reference> mediaSpecimenReference =
             new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
     TextField mediaSpecimenReferenceDetail = new TextFieldNFix(); //"Image reference detail");
-    private ToOneRelatedEntityButtonUpdater<Reference> mediaSpecimenReferenceUpdater;
-    private ToOneRelatedEntityButtonUpdater<Collection> collectionFieldUpdater;
 
     public SpecimenTypeDesignationDTORow(){
 
         kindOfUnit.setRequired(true);
         kindOfUnit.setRow(this);
+
         typeStatus.setRequired(true);
 
         accessionNumber.setWidth(100, Unit.PIXELS);
+
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
+
         collection.setWidth(200, Unit.PIXELS);
         collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(collection));
+
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
+
         mediaSpecimenReference.setWidth(200, Unit.PIXELS);
         mediaSpecimenReference.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference));
+
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
         kindOfUnit.addValueChangeListener(e ->

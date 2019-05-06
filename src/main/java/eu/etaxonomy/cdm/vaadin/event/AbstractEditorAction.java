@@ -37,6 +37,7 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
 
     private Field<V> target = null;
 
+    // DO NOT initialize here, the context should always be set by the view in which the Action object is created
     protected Stack<EditorActionContext> context;
 
     public AbstractEditorAction(EditorActionType action) {

@@ -72,10 +72,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         lazySelect.setValidationVisible(true);
         lazySelect.addValueChangeListener(e -> {
             // update the itemContainer immediately so that the edit button acts on the chosen item
-            // TODO compare with ToOneRelatedEntityCombobox where getValue() is overwritten to call
-            //  commitSelect();; would this help in this class also?
+            // TODO In contrast to ToOneRelatedEntityCombobox where getValue() is overwritten to call
+            // commitSelect() calling this method would most probably remove all strings witch do not have a
+            // weakly related entity. Such behavior would be very unfriendly to users.
             try {
-            lazySelect.commit();
+              lazySelect.commit();
             } catch (InvalidValueException ie){
                 /* Ignore here */
             }
@@ -255,7 +256,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         }
     }
 
-
     @Override
     public void setRequired(boolean required) {
         super.setRequired(required);
@@ -311,7 +311,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
 
         public WeaklyRelatedEntityButtonUpdater(WeaklyRelatedEntityCombobox<V> toOneRelatedEntityField){
             this.toOneRelatedEntityField = toOneRelatedEntityField;
-            String stringValue = toOneRelatedEntityField.getValue();
             updateButtons(toOneRelatedEntityField.getValue());
             toOneRelatedEntityField.setEditButtonEnabled(false);
         }

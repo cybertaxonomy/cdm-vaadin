@@ -9,6 +9,8 @@
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -30,16 +32,15 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.TypeDesignationStatusFilter;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.User;
-import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
-import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
@@ -69,7 +70,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
     private static final long serialVersionUID = 5419947244621450665L;
 
-    protected TypeDesignationStatusBase<?> NULL_TYPE_STATUS = NameTypeDesignationStatus.NewInstance("- none -", "- none -", "- none -");
+//    protected TypeDesignationStatusBase<?> NULL_TYPE_STATUS = NameTypeDesignationStatus.NewInstance("- none -", "- none -", "- none -");
 
     @Autowired
     private IRegistrationWorkingSetService workingSetService;
@@ -116,18 +117,16 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         List<UUID> typeDesignationStatusUUIDS = new ArrayList<>();
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.NAME_TYPE_DESIGNATION_STATUS_UUIDS());
         typeDesignationStatusUUIDS.addAll(RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
-        BeanItemContainer<DefinedTermBase> buildTermItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(typeDesignationStatusUUIDS);
-        buildTermItemContainer.addItem(NULL_TYPE_STATUS);
+        BeanItemContainer<TypeDesignationStatusFilter> buildTermItemContainer = new BeanItemContainer<>(TypeDesignationStatusFilter.class);
+        // TODO use UI.getCurrent().getPage().getWebBrowser().getLocale() or the LocaleContext component to get the preferredLanguage?
+        Collection<TypeDesignationStatusFilter> statusFilterTerms = new ArrayList<>(getRepo().getNameService().getTypeDesignationStatusFilterTerms(Arrays.asList(Language.DEFAULT())));
+        statusFilterTerms.add(TypeDesignationStatusFilter.NULL_ELEMENT);
+        buildTermItemContainer.addAll(statusFilterTerms);
         getView().getStatusTypeFilter().setContainerDataSource(buildTermItemContainer);
-        for(DefinedTermBase dt : buildTermItemContainer.getItemIds()){
-            String caption;
-            if(dt == NULL_TYPE_STATUS){
-                caption = "- NONE -";
-            } else {
-                caption = (dt instanceof SpecimenTypeDesignationStatus ? "ST" : "NT") + " - " + dt.getLabel();
-            }
-            getView().getStatusTypeFilter().setItemCaption(dt, caption);
+        for(TypeDesignationStatusFilter dt : buildTermItemContainer.getItemIds()){
+            getView().getStatusTypeFilter().setItemCaption(dt, dt.toString());
         }
+        buildTermItemContainer.sort(new String[]{"label"}, new boolean[]{true});
 
         loadSearchFilterFromSession();
 
@@ -163,10 +162,10 @@ public class ListPresenter extends AbstractPresenter<ListView> {
        if(filter.typeStatus.isEmpty()){
            filter.typeStatus = null;
         } else {
-            if(filter.typeStatus.contains(NULL_TYPE_STATUS)){
-               Set<TypeDesignationStatusBase> tmpSet = new HashSet<>();
+            if(filter.typeStatus.contains(TypeDesignationStatusFilter.NULL_ELEMENT)){
+               Set<TypeDesignationStatusFilter> tmpSet = new HashSet<>();
                tmpSet.addAll(filter.typeStatus);
-               tmpSet.remove(NULL_TYPE_STATUS);
+               tmpSet.remove(TypeDesignationStatusFilter.NULL_ELEMENT);
                tmpSet.add(null);
                filter.typeStatus = tmpSet;
             }
@@ -176,12 +175,17 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             filter.registrationStatus = inProgressStatus;
         }
 
+        Set<TypeDesignationStatusBase> typeDesignationStatus = null;
+        if(filter.typeStatus != null){
+            typeDesignationStatus = TypeDesignationStatusFilter.toTypeDesignationStatus(filter.typeStatus);
+        }
+
         Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
                 filter.submitter,
                 filter.registrationStatus,
                 StringUtils.trimToNull(filter.identifierPattern),
                 StringUtils.trimToNull(filter.namePattern),
-                filter.typeStatus ,
+                typeDesignationStatus,
                 pageSize,
                 pageIndex,
                 null);
@@ -271,7 +275,7 @@ public class ListPresenter extends AbstractPresenter<ListView> {
                 filter.submitter = (User) authentication.getPrincipal();
             }
         }
-        filter.typeStatus = (Set<TypeDesignationStatusBase>) getView().getStatusTypeFilter().getValue();
+        filter.typeStatus = (Set<TypeDesignationStatusFilter>) getView().getStatusTypeFilter().getValue();
         EnumSet<RegistrationStatus> registrationStatusFilter = null;
         Object o = getView().getRegistrationStatusFilter().getValue();
         if(o != null){

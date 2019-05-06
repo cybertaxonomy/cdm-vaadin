@@ -25,6 +25,7 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -55,8 +56,8 @@ import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
@@ -177,8 +178,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
-        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
         termOrPersonPagingProvider.setInitStrategy(AgentBaseInit.TEAM_OR_PERSON_INIT_STRATEGY);
         // the ToOneRelatedEntityReloader is added internally in the TeamOrPersonField:
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
@@ -232,10 +233,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
                         referencePagingProvider,
-                        collectionPagingProvider.getPageSize()
+                        referencePagingProvider.getPageSize()
                         );
 
-                row.mediaSpecimenReference.getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<Reference>());
+                row.mediaSpecimenReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.mediaSpecimenReference.getSelect()));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
                 row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row));
@@ -283,7 +284,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * @return
      */
     private void addTypeDesignation(SpecimenTypeDesignationDTO element) {
-        getView().updateAllowDelete();
+        getView().updateAllowDeleteTypeDesignation();
     }
 
 
@@ -303,7 +304,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         reg.getTypeDesignations().remove(std);
 
-        getView().updateAllowDelete();
+        getView().updateAllowDeleteTypeDesignation();
     }
 
     /**
@@ -368,10 +369,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                        SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
                        ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
                        combobox.setValue((Collection) event.getEntity());
-                   }
-                   for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
-                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
-                       combobox.reload();
+                   } else {
+                       for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+                           ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                           combobox.reload();
+                       }
                    }
                }
             }
@@ -412,13 +414,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             SpecimenTypeDesignationDTORow row = referencePopupEditorsRowMap.get(event.getSourceView());
             ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
             combobox.setValue((Reference) event.getEntity());
-
         } else {
             for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
                 ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
                 combobox.reload();
             }
         }
+
     }
 
     /**

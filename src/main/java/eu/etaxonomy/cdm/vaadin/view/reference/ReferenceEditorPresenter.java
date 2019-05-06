@@ -23,6 +23,7 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -43,6 +44,7 @@ import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -95,9 +97,10 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getInReferenceCombobox().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
         getView().getInReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getInReferenceCombobox()));
         getView().getInReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(getView().getInReferenceCombobox(),this));
+        getView().getInReferenceCombobox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getInReferenceCombobox().getSelect()));
 
-        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(getRepo().getAgentService(), TeamOrPersonBase.class);
-        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = new CdmFilterablePagingProvider<AgentBase, Person>(getRepo().getAgentService(), Person.class);
+        CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
+        CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
         getView().getAuthorshipField().setFilterableTeamPagingProvider(teamOrPersonPagingProvider, this);
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
