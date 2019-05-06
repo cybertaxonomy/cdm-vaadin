@@ -414,10 +414,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         Panel nomStatusCollectionPanel = new Panel(nomStatusCollectionField.getLayout());
         nomStatusCollectionPanel.setCaption("Status");
-        nomStatusCollectionPanel.setWidth(800, Unit.PIXELS);
+        nomStatusCollectionPanel.setWidth(100, Unit.PERCENTAGE);
 
         bindField(nomStatusCollectionField, "status");
-        addComponent(nomStatusCollectionPanel, 0, row, 2, row);
+        addComponent(nomStatusCollectionPanel, 0, row, 3, row);
 
         // --------------- Basionyms
         row++;
