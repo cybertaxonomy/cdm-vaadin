@@ -23,8 +23,10 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -34,6 +36,7 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -42,6 +45,7 @@ import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
@@ -184,7 +188,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             public NomenclaturalStatusRow create() {
                 NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
-                row.type.setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid()));
+                BeanItemContainer<DefinedTermBase> buildBeanItemContainer = cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
+                row.type.setContainerDataSource(buildBeanItemContainer);
+                row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
+                for(DefinedTermBase term : buildBeanItemContainer.getItemIds()){
+                    row.type.setItemCaption(term, term.getPreferredRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
+                }
                 row.type.setNullSelectionAllowed(false);
 
                 row.citation.loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
