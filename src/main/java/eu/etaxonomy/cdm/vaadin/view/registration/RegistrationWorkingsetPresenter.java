@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
@@ -170,7 +169,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     protected void refreshView(boolean doReload) {
-        logger.setLevel(Level.DEBUG);
+
         if(workingset == null){
             return; // nothing to do
         }
