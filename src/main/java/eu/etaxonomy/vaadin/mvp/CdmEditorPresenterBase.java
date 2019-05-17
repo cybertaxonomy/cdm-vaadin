@@ -23,7 +23,6 @@ import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
@@ -141,8 +140,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         UserHelper userHelper = UserHelperAccess.userHelper();
         boolean canDelte = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
         boolean canEdit = userHelper.userHasPermission(cdmEntitiy, CRUD.UPDATE);
-
-        User user = userHelper.user();
 
         if(AbstractPopupEditor.class.isAssignableFrom(getView().getClass())){
             AbstractPopupEditor popupView = ((AbstractPopupEditor)getView());
