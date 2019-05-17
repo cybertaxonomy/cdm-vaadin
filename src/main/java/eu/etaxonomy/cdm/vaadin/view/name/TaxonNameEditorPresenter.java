@@ -295,6 +295,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "status.type",
                 "status.citation.authorship.$",
                 "status.citation.inReference.authorship.$",
+                "status.citation.inReference.inReference.authorship.$",
 
                 "combinationAuthorship",
                 "exCombinationAuthorship",
@@ -313,6 +314,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "relationsToThisName.fromName.relationsFromThisName",
                 "relationsToThisName.citation.authorship",
                 "relationsToThisName.citation.inReference.authorship",
+                "relationsToThisName.citation.inReference.inReference.authorship",
 
                 "relationsFromThisName",
                 "homotypicalGroup.typifiedNames"

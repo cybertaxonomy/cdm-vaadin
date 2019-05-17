@@ -120,6 +120,8 @@ public class NameTypeDesignationPresenter
                 "typifiedNames.typeDesignations", // important !!
                 "typeName.$",
                 "citation.authorship.$",
+                "citation.inReference.authorship.$",
+                "citation.inReference.inReference.authorship.$"
                 }
         );
 
