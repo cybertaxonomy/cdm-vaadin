@@ -26,12 +26,14 @@ import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
@@ -114,20 +116,19 @@ public class NameTypeDesignationPresenter
      */
     @Override
     protected NameTypeDesignation loadCdmEntity(UUID uuid) {
-        List<String> initStrategy = Arrays.asList(new String []{
+        EntityInitStrategy initStrategy = new EntityInitStrategy(Arrays.asList(new String []{
                 "$",
                 "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
                 "typifiedNames.typeDesignations", // important !!
                 "typeName.$",
-                "citation.authorship.$",
-                "citation.inReference.authorship.$",
-                "citation.inReference.inReference.authorship.$"
+                "citation"
                 }
-        );
+        ));
 
+        initStrategy.extend("citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         NameTypeDesignation typeDesignation;
         if(uuid != null){
-            typeDesignation = (NameTypeDesignation) getRepo().getNameService().loadTypeDesignation(uuid, initStrategy);
+            typeDesignation = (NameTypeDesignation) getRepo().getNameService().loadTypeDesignation(uuid, initStrategy.getPropertyPaths());
         } else {
             typeDesignation = createNewBean();
         }

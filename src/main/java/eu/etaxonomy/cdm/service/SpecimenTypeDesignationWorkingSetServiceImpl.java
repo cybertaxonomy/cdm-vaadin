@@ -70,9 +70,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
             "$",
-            "nomenclaturalReference.authorship",
-            "nomenclaturalReference.inReference.authorship",
-            "nomenclaturalReference.inReference.inReference.authorship",
+            "nomenclaturalReference.authorship.$",
+            "nomenclaturalReference.inReference.authorship.$",
+            "nomenclaturalReference.inReference.inReference.authorship.$",
             "status.type",
             "typeDesignations"
             }
