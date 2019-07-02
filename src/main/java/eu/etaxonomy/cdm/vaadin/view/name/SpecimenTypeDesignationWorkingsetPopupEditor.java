@@ -27,8 +27,10 @@ import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 
+import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.component.common.GeoLocationField;
@@ -38,6 +40,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoubleConverter;
@@ -242,7 +245,13 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
         annotationsListField.setWidth(100, Unit.PERCENTAGE);
-        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean isAdmin = UserHelperAccess.userHelper().userIsAdmin();
+        if(isCurator || isAdmin){
+            annotationsListField.withNewButton(true);
+        } else {
+            annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        }
         addField(annotationsListField, "annotations", 0, row, 2, row);
 
      }

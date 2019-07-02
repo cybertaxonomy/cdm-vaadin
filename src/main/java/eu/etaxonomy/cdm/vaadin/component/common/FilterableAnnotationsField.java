@@ -22,6 +22,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -35,6 +36,7 @@ import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
+import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.cdm.vaadin.util.filter.CdmTermFilter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
@@ -52,13 +54,15 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
 
     private Table table = new Table();
 
-    private List<AnnotationType> typesFilter = null;
+    private Button newButton = ButtonFactory.CREATE_NEW.createButton();
 
-    private Annotation emptyDefaultAnnotation = Annotation.NewInstance(null, Language.DEFAULT());
+    private List<AnnotationType> typesFilter = null;
 
     private BeanItemContainer<DefinedTermBase> typeSelectItemContainer;
 
     private FilterableListContainer<Annotation> container;
+
+    private boolean withNewButton;
 
     public FilterableAnnotationsField() {
         this(null);
@@ -172,11 +176,13 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
 
     @Override
     protected void setInternalValue(List<Annotation> newValue) {
+
         boolean hasIncludeFilter = typesFilter != null && !typesFilter.isEmpty();
         boolean onlyOneType = hasIncludeFilter && typesFilter.size() == 1;
 
         if(newValue.isEmpty()){
-            newValue.add(emptyDefaultAnnotation);
+            Annotation emptyDefaultAnnotation = newInstance();
+            newValue.add(emptyDefaultAnnotation );
             if(onlyOneType){
                 emptyDefaultAnnotation.setAnnotationType(typesFilter.get(0));
             }
@@ -192,6 +198,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
             table.setVisibleColumns("text", "annotationType");
         }
         table.setEditable(true);
+        if(newValue.size() > 1){
+            table.setPageLength(2);
+        }
     }
 
     /**
@@ -199,10 +208,30 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
      */
     @Override
     protected Component initContent() {
-        root.addComponent(table);
+        root.addComponentAsFirst(table);
+
+        newButton.addClickListener(e -> addAnnotation());
+        withNewButton(true);
         return root;
     }
 
+
+    /**
+     * @return
+     */
+    private void addAnnotation() {
+        container.addItem(newInstance());
+        if(container.size() > 1){
+            table.setPageLength(2);
+        }
+    }
+
+    /**
+     * @return
+     */
+    private Annotation newInstance() {
+        return Annotation.NewInstance(null, Language.DEFAULT());
+    }
 
     /**
      * {@inheritDoc}
@@ -227,6 +256,20 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         super.setReadOnly(readOnly);
         setDeepReadOnly(readOnly, table, null);
     }
+
+    public void withNewButton(boolean withNewButton) {
+        if(this.withNewButton != withNewButton){
+            if(!this.withNewButton){
+                root.addComponent(newButton);
+            } else {
+                root.removeComponent(newButton);
+            }
+            this.withNewButton = withNewButton;
+        }
+    }
+
+
+
 
 
 
