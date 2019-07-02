@@ -124,12 +124,13 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
         statusTypeFilter.setDescription("Strg + Click to unselect");
 
-        toolBar.addComponents(identifierFilter, taxonNameFilter, statusTypeFilter);
+        toolBar.addComponents(identifierFilter, taxonNameFilter, referenceFilter, statusTypeFilter);
         int textChangeTimeOut = 200;
         identifierFilter.addTextChangeListener(e -> updateResults(identifierFilter, e.getText()));
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
-        taxonNameFilter.addTextChangeListener(e -> updateResults(taxonNameFilter, e.getText()));
         identifierFilter.setTextChangeTimeout(textChangeTimeOut);
+        taxonNameFilter.addTextChangeListener(e -> updateResults(taxonNameFilter, e.getText()));
+        referenceFilter.addTextChangeListener(e -> updateResults(referenceFilter, e.getText()));
 
         toolBar.setSpacing(true);
         toolBar.iterator().forEachRemaining( c -> c.addStyleName(ValoTheme.LABEL_TINY));

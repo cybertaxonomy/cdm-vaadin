@@ -17,6 +17,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 class RegistrationSearchFilter {
     String identifierPattern;
     String namePattern;
+    String referencePattern;
     User submitter;
     Set<TypeDesignationStatusFilter> typeStatus;
     Set<RegistrationStatus> registrationStatus;

@@ -38,7 +38,6 @@ import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
@@ -158,6 +157,9 @@ public class ListPresenter extends AbstractPresenter<ListView> {
         if(textFieldOverride != null && textFieldOverride == getView().getTaxonNameFilter()){
             filter.namePattern = alternativeText;
         }
+        if(textFieldOverride != null && textFieldOverride == getView().getReferenceFilter()){
+            filter.referencePattern = alternativeText;
+        }
 
        if(filter.typeStatus.isEmpty()){
            filter.typeStatus = null;
@@ -175,16 +177,17 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             filter.registrationStatus = inProgressStatus;
         }
 
-        Set<TypeDesignationStatusBase> typeDesignationStatus = null;
+        List<UUID> typeDesignationStatus = null;
         if(filter.typeStatus != null){
-            typeDesignationStatus = TypeDesignationStatusFilter.toTypeDesignationStatus(filter.typeStatus);
+            typeDesignationStatus = new ArrayList(TypeDesignationStatusFilter.toTypeDesignationStatusUuids(filter.typeStatus));
         }
 
         Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
-                filter.submitter,
-                filter.registrationStatus,
+                filter.submitter != null ? filter.submitter.getUuid() : null,
+                filter.registrationStatus != null ? new ArrayList(filter.registrationStatus): null,
                 StringUtils.trimToNull(filter.identifierPattern),
                 StringUtils.trimToNull(filter.namePattern),
+                StringUtils.trimToNull(filter.referencePattern),
                 typeDesignationStatus,
                 pageSize,
                 pageIndex,
