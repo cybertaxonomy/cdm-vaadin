@@ -70,9 +70,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
             "$",
-            "nomenclaturalReference.authorship",
-            "nomenclaturalReference.inReference.authorship",
-            "nomenclaturalReference.inReference.inReference.authorship",
+            "nomenclaturalReference.authorship.$",
+            "nomenclaturalReference.inReference.authorship.$",
+            "nomenclaturalReference.inReference.inReference.authorship.$",
             "status.type",
             "typeDesignations"
             }
@@ -92,7 +92,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Override
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
-        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY);
+        Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY.getPropertyPaths());
         if(reg == null){
             reg = repo.getRegistrationService().newRegistration();
             reg.setUuid(registrationUuid);

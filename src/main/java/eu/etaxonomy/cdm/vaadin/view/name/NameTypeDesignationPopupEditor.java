@@ -17,13 +17,16 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
+import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -180,7 +183,13 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
         annotationsListField.setWidth(100, Unit.PERCENTAGE);
-        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean isAdmin = UserHelperAccess.userHelper().userIsAdmin();
+        if(isCurator || isAdmin){
+            annotationsListField.withNewButton(true);
+        } else {
+            annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        }
         addField(annotationsListField, "annotations", 0, row, 3, row);
     }
 

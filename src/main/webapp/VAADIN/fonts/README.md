@@ -1,6 +1,6 @@
 ## Sub folders:
 
-*  workspace: svn files for all icons, also those wich are currently not used.
+*  workspace: svg files for all icons, also those wich are currently not used.
 * fontset: the icons which are actually contained in the fontset, contains symlinks to the svg files in ./workspace
  
 ## Licence:

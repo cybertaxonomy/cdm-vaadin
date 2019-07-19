@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
@@ -170,7 +169,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      */
     protected void refreshView(boolean doReload) {
-        logger.setLevel(Level.DEBUG);
+
         if(workingset == null){
             return; // nothing to do
         }
@@ -384,12 +383,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 popup.getNomReferenceCombobox().setReadOnly(false);
                 popup.getNomenclaturalReferenceDetail().setReadOnly(false);
                 popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
-                        + "Please add the nomenclatural reference and click on \"Save\" to proceed "
-                        + "with entering the typifications for this name.");
+                        + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
             } else {
                 popup.addStatusMessage("You are about to create a registration for this name. "
                         + "This editor is for reviewing the name only. Therefore, all fields have been switched to readonly state. "
-                        + "Click \"Save\" to proceed.");
+                        + "Click on \"Save\" to proceed with entering the type of this name.");
             }
         }
     }

@@ -280,7 +280,13 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
         annotationsListField.setWidth(100, Unit.PERCENTAGE);
-        annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean isAdmin = UserHelperAccess.userHelper().userIsAdmin();
+        if(isCurator || isAdmin){
+            annotationsListField.withNewButton(true);
+        } else {
+            annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
+        }
         addField(annotationsListField, "annotations", 0, row, GRID_COLS-1, row);
 
 

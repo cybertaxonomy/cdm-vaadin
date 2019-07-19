@@ -30,6 +30,7 @@ import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -49,6 +50,7 @@ import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
+import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.TaxonNameStringFilterablePagingProvider;
@@ -100,7 +102,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             "homotypicalGroup.typifiedNames"
             );
 
-    public static final List<String> REFERENCE_INIT_STRATEGY = Arrays.asList("authorship", "inReference.authorship", "inReference.inReference.authorship", "inReference.inReference.inReference.authorship");
+    public static List<String> REFERENCE_INIT_STRATEGY = ReferenceEllypsisFormatter.INIT_STRATEGY;
 
 
     private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
@@ -155,15 +157,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getExBasionymAuthorshipField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
         getView().getExBasionymAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
-        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(
-                new ReferenceEllypsisCaptionGenerator(LabelType.NOMENCLATURAL, getView().getNomReferenceCombobox().getSelect())
-                );
         nomReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
         nomReferencePagingProvider.setInitStrategy(REFERENCE_INIT_STRATEGY);
         getView().getNomReferenceCombobox().loadFrom(nomReferencePagingProvider, nomReferencePagingProvider, nomReferencePagingProvider.getPageSize());
         getView().getNomReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getNomReferenceCombobox()));
-        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getNomReferenceCombobox().getSelect())
-                );
+        getView().getNomReferenceCombobox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.NOMENCLATURAL, getView().getNomReferenceCombobox().getSelect()));
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getNomReferenceCombobox(), this));
         getView().getNomReferenceCombobox().getSelect().addValueChangeListener( e -> updateOrthographicCorrectionRestriction());
 
@@ -236,9 +234,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getOrthographicVariantField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getOrthographicVariantField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getCitatonComboBox(), this));
 
-
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildTermItemContainer(
-                AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
+                AnnotationType.EDITORIAL().getVocabulary().getUuid()));
     }
 
     /**
@@ -281,20 +278,17 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
     @Override
     protected TaxonName loadCdmEntity(UUID identifier) {
 
-        List<String> initStrategy = Arrays.asList(
+        EntityInitStrategy initStrategy = new EntityInitStrategy(
+                Arrays.asList(
                 "$",
                 "annotations.type",
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 "rank.vocabulary", // needed for comparing ranks
 
-                "nomenclaturalReference.authorship",
-                "nomenclaturalReference.inReference.authorship",
-                "nomenclaturalReference.inReference.inReference.authorship",
-                "nomenclaturalReference.inReference.inReference.inReference.authorship",
+                "nomenclaturalReference",
 
                 "status.type",
-                "status.citation.authorship.$",
-                "status.citation.inReference.authorship.$",
+                "status.citation",
 
                 "combinationAuthorship",
                 "exCombinationAuthorship",
@@ -311,16 +305,18 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
-                "relationsToThisName.citation.authorship",
-                "relationsToThisName.citation.inReference.authorship",
-
+                "relationsToThisName.citation",
                 "relationsFromThisName",
                 "homotypicalGroup.typifiedNames"
-        );
+                )
+              );
+        initStrategy.extend("nomenclaturalReference", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
+        initStrategy.extend("status.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
+        initStrategy.extend("relationsToThisName.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
 
         TaxonName taxonName;
         if(identifier != null){
-            taxonName = getRepo().getNameService().load(identifier, initStrategy);
+            taxonName = getRepo().getNameService().load(identifier, initStrategy.getPropertyPaths());
         } else {
             taxonName = createCdmEntity();
         }

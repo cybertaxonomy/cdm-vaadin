@@ -23,6 +23,7 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
@@ -35,6 +36,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
+import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
@@ -159,15 +161,16 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
     @Override
     protected Reference loadCdmEntity(UUID identifier) {
 
-        List<String> initStrategy = Arrays.asList(new String []{
+        EntityInitStrategy initStrategy = new EntityInitStrategy(Arrays.asList(new String []{
                 "$",
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 }
-        );
+        ));
+        initStrategy.extend("", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
 
         Reference reference;
         if(identifier != null){
-            reference = getRepo().getReferenceService().load(identifier, initStrategy);
+            reference = getRepo().getReferenceService().load(identifier, initStrategy.getPropertyPaths());
         } else {
             reference = createNewBean();
         }
