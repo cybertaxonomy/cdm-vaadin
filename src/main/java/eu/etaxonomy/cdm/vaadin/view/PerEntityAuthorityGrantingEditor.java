@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import java.util.EnumSet;
 
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.model.permission.CRUD;
+
 
 /**
  * @author a.kohlbecker

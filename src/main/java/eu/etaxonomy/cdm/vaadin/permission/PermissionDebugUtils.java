@@ -23,7 +23,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 
 /**

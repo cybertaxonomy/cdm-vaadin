@@ -29,7 +29,7 @@ import com.vaadin.ui.TextArea;
 
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
+import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowRepresentative;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;

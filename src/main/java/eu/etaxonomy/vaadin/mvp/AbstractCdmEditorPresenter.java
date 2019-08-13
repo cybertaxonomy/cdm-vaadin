@@ -17,7 +17,8 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
  * @since Apr 5, 2017
  *
  */
-public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, V extends ApplicationView<?>> extends CdmEditorPresenterBase<CDM, CDM, V> {
+public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, V extends ApplicationView<?>>
+        extends CdmEditorPresenterBase<CDM, CDM, V> {
 
     private static final long serialVersionUID = -6315824180341694825L;
 

@@ -37,7 +37,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 /**
  * @author a.kohlbecker
  * @since Jan 26, 2018
- *
  */
 @SpringComponent
 @Scope("prototype")
