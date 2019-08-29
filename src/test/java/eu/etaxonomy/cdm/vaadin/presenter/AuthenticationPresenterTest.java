@@ -26,10 +26,10 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationPresenter;
 /**
  * @author cmathew
  * @since 28 Apr 2015
- *
  */
 public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(AuthenticationPresenterTest.class);
 
     private static AuthenticationPresenter ap;

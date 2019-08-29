@@ -66,6 +66,7 @@ import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormatter;
+import eu.etaxonomy.cdm.vaadin.ui.PopupEditorDefaultStatusMessageSource;
 import eu.etaxonomy.vaadin.component.NestedFieldGroup;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.event.FieldReplaceEvent;
@@ -204,6 +205,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         mainLayout.setComponentAlignment(toolBar, Alignment.TOP_RIGHT);
 
         updateToolBarVisibility();
+
+        UI currentUI = UI.getCurrent();
+        if(PopupEditorDefaultStatusMessageSource.class.isAssignableFrom(currentUI.getClass())){
+            String message = ((PopupEditorDefaultStatusMessageSource)currentUI).defaultStatusMarkup(this.getClass());
+            addStatusMessage(message);
+        }
     }
 
     protected VerticalLayout getMainLayout() {

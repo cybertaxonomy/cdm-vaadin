@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.common.User;
+import eu.etaxonomy.cdm.model.permission.User;
 
 /**
  * A DTO for cdm entities which itself implements the

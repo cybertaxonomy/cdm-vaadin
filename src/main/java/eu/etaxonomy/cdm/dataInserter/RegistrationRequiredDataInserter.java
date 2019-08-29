@@ -30,12 +30,14 @@ import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.Institution;
-import eu.etaxonomy.cdm.model.common.GrantedAuthorityImpl;
-import eu.etaxonomy.cdm.model.common.Group;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.permission.CRUD;
+import eu.etaxonomy.cdm.model.permission.GrantedAuthorityImpl;
+import eu.etaxonomy.cdm.model.permission.Group;
+import eu.etaxonomy.cdm.model.permission.PermissionClass;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonBase;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
@@ -43,9 +45,7 @@ import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.dao.hibernate.taxonGraph.AbstractHibernateTaxonGraphProcessor;
 import eu.etaxonomy.cdm.persistence.dao.taxonGraph.TaxonGraphException;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmPermissionClass;
 import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -141,7 +141,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             groupCurator.setUuid(GROUP_CURATOR_UUID);
             groupCurator.setName("Curator");
         }
-        assureGroupHas(groupCurator, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ_UPDATE_DELETE).toString());
+        assureGroupHas(groupCurator, new CdmAuthority(PermissionClass.REGISTRATION, CREATE_READ_UPDATE_DELETE).toString());
         repo.getGroupService().saveOrUpdate(groupCurator);
 
         Group groupSubmitter = repo.getGroupService().load(GROUP_SUBMITTER_UUID, Arrays.asList("grantedAuthorities"));
@@ -150,12 +150,12 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             groupSubmitter.setUuid(GROUP_SUBMITTER_UUID);
             groupSubmitter.setName("Submitter");
         }
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TAXONNAME, CREATE_READ).toString());
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.TEAMORPERSONBASE, CREATE_READ).toString());
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REGISTRATION, CREATE_READ).toString());
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.REFERENCE, CREATE_READ).toString());
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
-        assureGroupHas(groupSubmitter, new CdmAuthority(CdmPermissionClass.COLLECTION, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.TAXONNAME, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.TEAMORPERSONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.REGISTRATION, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.REFERENCE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.SPECIMENOROBSERVATIONBASE, CREATE_READ).toString());
+        assureGroupHas(groupSubmitter, new CdmAuthority(PermissionClass.COLLECTION, CREATE_READ).toString());
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());

@@ -33,9 +33,9 @@ import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CRUD;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -62,6 +62,8 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 @Scope("prototype")
 public class NameTypeDesignationPresenter
         extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
+
+    private static final long serialVersionUID = 896305051895903033L;
 
     @Autowired
     private IRegistrationWorkingSetService registrationWorkingSetService;
@@ -171,10 +173,6 @@ public class NameTypeDesignationPresenter
 
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
@@ -182,18 +180,13 @@ public class NameTypeDesignationPresenter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(NameTypeDesignation bean) {
         // TODO Auto-generated method stub
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected IService<NameTypeDesignation> getService() {
         // No TypeDesignationService :( so I need override the generic save and delete methods

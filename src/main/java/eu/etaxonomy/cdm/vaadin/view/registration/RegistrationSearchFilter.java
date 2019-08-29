@@ -11,8 +11,8 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 import java.util.Set;
 
 import eu.etaxonomy.cdm.api.service.dto.TypeDesignationStatusFilter;
-import eu.etaxonomy.cdm.model.common.User;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.permission.User;
 
 class RegistrationSearchFilter {
     String identifierPattern;

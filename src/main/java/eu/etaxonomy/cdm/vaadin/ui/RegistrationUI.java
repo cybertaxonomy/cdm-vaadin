@@ -39,10 +39,12 @@ import eu.etaxonomy.cdm.vaadin.event.error.ErrorTypeErrorHandlerWrapper;
 import eu.etaxonomy.cdm.vaadin.event.error.PermissionDeniedErrorHandler;
 import eu.etaxonomy.cdm.vaadin.toolbar.Toolbar;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
+import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.registration.DashBoardView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListView;
 import eu.etaxonomy.cdm.vaadin.view.registration.ListViewBean;
 import eu.etaxonomy.cdm.vaadin.view.registration.StartRegistrationViewBean;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.ui.MainMenu;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
@@ -60,7 +62,7 @@ import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 // @PreserveOnRefresh
 // @Push
-public class RegistrationUI extends UI {
+public class RegistrationUI extends UI implements PopupEditorDefaultStatusMessageSource {
 
     private static final long serialVersionUID = -8626236111335323691L;
 
@@ -174,6 +176,14 @@ public class RegistrationUI extends UI {
 //            // the case when state != null is handled in the UI base class
 //            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
 //        }
+    }
+
+    @Override
+    public <T extends AbstractPopupEditor> String defaultStatusMarkup(Class<T> popupEditorClass){
+        if(popupEditorClass.equals(TaxonNamePopupEditor.class)){
+            return "<strong>Check if this name already occurs in the <a href=\"https://www.phycobank.org/index-search\" target=\"index-search\">PhycoBank Index</a> (The link will open in a new window.)</strong>";
+        }
+        return null;
     }
 
 }
