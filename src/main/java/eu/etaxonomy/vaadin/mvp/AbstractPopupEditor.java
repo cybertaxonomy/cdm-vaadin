@@ -135,6 +135,8 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator;
 
+    private boolean withDeleteButton;
+
     public AbstractPopupEditor(Layout layout, Class<DTO> dtoType) {
 
         mainLayout = new VerticalLayout();
@@ -246,7 +248,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         }
         statusMessageLabel.setVisible(readOnly);
         save.setVisible(!readOnly);
-        delete.setVisible(!readOnly);
+        updateDeleteButtonState();
         cancel.setCaption(readOnly ? "Close" : "Cancel");
         recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
     }
@@ -755,14 +757,22 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     public void withDeleteButton(boolean withDelete){
 
-        if(withDelete){
+        this.withDeleteButton = withDelete;
+        if(withDeleteButton){
             buttonLayout.setExpandRatio(save, 0);
             buttonLayout.setExpandRatio(delete, 1);
         } else {
             buttonLayout.setExpandRatio(save, 1);
             buttonLayout.setExpandRatio(delete, 0);
         }
-        delete.setVisible(withDelete);
+        updateDeleteButtonState();
+    }
+
+    /**
+     * @param withDelete
+     */
+    private void updateDeleteButtonState() {
+        delete.setVisible(withDeleteButton && !isReadOnly());
     }
 
     public boolean addStatusMessage(String message){

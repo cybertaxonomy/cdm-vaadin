@@ -608,8 +608,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     typifiedNameUuid
                     );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            popup.withDeleteButton(false);
             popup.loadInEditor(identifierSet);
-            popup.withDeleteButton(true);
             if(event.hasSource()){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -617,7 +617,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else {
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-            popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
             Reference citation = regDto.getCitation();
@@ -634,6 +633,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     return nameTypeDesignation;
                 }
             });
+            popup.withDeleteButton(false);
             popup.loadInEditor(null);
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
