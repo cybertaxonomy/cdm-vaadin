@@ -127,7 +127,7 @@ public class CdmBeanItemContainerFactory {
      * @param values
      * @return
      */
-    public <T extends IEnumTerm<T>> BeanItemContainer<T> buildBeanItemContainer(Class<T> termType, T ... enumTerms) {
+    public <T extends IEnumTerm<T>> BeanItemContainer<T> buildEnumTermItemContainer(Class<T> termType, T ... enumTerms) {
         BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termType);
         List<T> termList = Arrays.asList(enumTerms);
         termItemContainer.addAll(termList);

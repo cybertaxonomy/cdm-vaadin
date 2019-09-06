@@ -70,4 +70,5 @@ public class RegistrationUIDefaults {
     public static final List<Role> COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION = Arrays.asList(Role.ROLE_ADMIN, RolesAndPermissions.ROLE_CURATION);
 
     public static NumberFormat NUMBER_FORMAT_OVERRIDE = new DecimalFormat("#");
+
 }

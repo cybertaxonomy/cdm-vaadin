@@ -230,7 +230,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     }
                 }
 
-                RegistrationStatusSelect select = new RegistrationStatusSelect(null, selectFieldFactory.buildBeanItemContainer(
+                RegistrationStatusSelect select = new RegistrationStatusSelect(null, selectFieldFactory.buildEnumTermItemContainer(
                         RegistrationStatus.class,
                         availableStatus.toArray(new RegistrationStatus[availableStatus.size()]))
                         );

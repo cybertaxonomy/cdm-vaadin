@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.name.NomenclaturalCodeEdition;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -186,10 +187,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             public NomenclaturalStatusRow create() {
                 NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
-                BeanItemContainer<DefinedTermBase> buildBeanItemContainer = cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
-                row.type.setContainerDataSource(buildBeanItemContainer);
+                BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
+                row.type.setContainerDataSource(statusTypeItemContainer);
                 row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
-                for(DefinedTermBase term : buildBeanItemContainer.getItemIds()){
+                for(DefinedTermBase term : statusTypeItemContainer.getItemIds()){
                     row.type.setItemCaption(term, term.getPreferredRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
                 }
                 row.type.setNullSelectionAllowed(false);
@@ -204,6 +205,12 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         doReferenceEditorEdit(row);
                     }
                 });
+
+                List<NomenclaturalCodeEdition> nomCodes = NomenclaturalCodeEdition.forCode(RegistrationUIDefaults.NOMENCLATURAL_CODE);
+                BeanItemContainer<NomenclaturalCodeEdition> codeEditionItemContainer = cdmBeanItemContainerFactory.buildEnumTermItemContainer(
+                        NomenclaturalCodeEdition.class, nomCodes.toArray(new NomenclaturalCodeEdition[nomCodes.size()])
+                        );
+                row.codeEdition.setContainerDataSource(codeEditionItemContainer);
 
                 getView().applyDefaultComponentStyle(row.components());
 
