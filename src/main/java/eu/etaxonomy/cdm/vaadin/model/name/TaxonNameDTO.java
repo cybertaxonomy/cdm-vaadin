@@ -160,9 +160,9 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
             boolean currentNameIsTarget = false;
             if(relationship != null && persistedRelatedName != null){
                 if(direction == Direction.relatedTo){
-                    relationship.getFromName().equals(persistedRelatedName);
+                    currentNameIsTarget = relationship.getFromName().equals(persistedRelatedName);
                 } else {
-                    relationship.getToName().equals(persistedRelatedName);
+                    currentNameIsTarget = relationship.getToName().equals(persistedRelatedName);
                 }
             }
             if(relationship != null && currentNameIsTarget){
