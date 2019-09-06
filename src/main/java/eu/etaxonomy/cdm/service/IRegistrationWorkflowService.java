@@ -41,13 +41,29 @@ public interface IRegistrationWorkflowService {
 
     /**
      * Creates a new registration for the name referenced by the {@code taxonNameUUID} parameter
+     * if there isn't one already. This is done in preparation for adding this new registration as blocking registration to another registration.
+     * A new Registration will be returned, otherwise the return value is <code>null</code>.
+     *
+     * Already existing registrations must not be duplicated.
+     *
+     * @param taxonNameUUID
+     *
+     * @return Returns the newly prepared blocking Registration or <code>null</code> if a new registration has not been created.
+     */
+    @Transactional
+    Registration prepareBlockingRegistration(UUID nameUUID);
+
+    /**
+     * Creates a new registration for the name referenced by the {@code taxonNameUUID} parameter
      * if there isn't one already and adds this new registration as blocking registration to the passed
-     * {@code registration}.
+     * {@code registration}. A new Registration will be returned otherwise the return value is <code>null</code>.
      *
      * Already existing registrations must not be added as blocking registration.
      *
      * @param taxonNameUUID
      * @param registration
+     *
+     * @return Returns the newly created blocking Registration or <code>null</code> if a new registration has not been created.
      */
     @Transactional
     Registration addBlockingRegistration(UUID nameUUID, Registration registration);
@@ -59,5 +75,6 @@ public interface IRegistrationWorkflowService {
     boolean canCreateNameRegistrationFor(RegistrationWorkingSet workingset, TaxonName name);
 
     boolean checkWokingsetContainsProtologe(RegistrationWorkingSet workingset, TaxonName name);
+
 
 }
