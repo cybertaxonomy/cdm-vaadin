@@ -51,9 +51,9 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private CssLayout toolBar= new CssLayout();
 
-    private Button removeButton = ButtonFactory.REMOVE_ITEM.createButton();
+    private Button removeButton = ButtonFactory.REMOVE_ALL_ITEMS.createButton();
 
-    private Button newButton = ButtonFactory.ADD_ITEM.createButton();
+    private Button newButton = ButtonFactory.CREATE_NEW.createButton();
 
     private BeanFieldGroup<NameRelationshipDTO> fieldGroup = new BeanFieldGroup<>(NameRelationshipDTO.class);
 
@@ -87,8 +87,9 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         setPrimaryStyleName(PRIMARY_STYLE);
 
         if(nameFieldCaption == null){
-            this.nameFieldCaption = "Related name";
+            nameFieldCaption = "Related name";
         }
+        this.nameFieldCaption = nameFieldCaption;
 
         relatedNameComboBox = new ToOneRelatedEntityCombobox<TaxonName>(this.nameFieldCaption, TaxonName.class);
         citatonComboBox = new ToOneRelatedEntityCombobox<Reference>("Reference", Reference.class);
@@ -218,8 +219,8 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
    private void updateToolBarButtonStates(){
        boolean hasValue = getValue() != null;
-       removeButton.setEnabled(hasValue);
-       newButton.setEnabled(!hasValue);
+       removeButton.setVisible(hasValue);
+       newButton.setVisible(!hasValue);
    }
 
     /**
