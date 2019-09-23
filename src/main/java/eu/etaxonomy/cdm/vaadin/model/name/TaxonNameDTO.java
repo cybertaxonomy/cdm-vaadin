@@ -160,9 +160,9 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
             boolean currentNameIsTarget = false;
             if(relationship != null && persistedRelatedName != null){
                 if(direction == Direction.relatedTo){
-                    relationship.getFromName().equals(persistedRelatedName);
+                    currentNameIsTarget = relationship.getFromName().equals(persistedRelatedName);
                 } else {
-                    relationship.getToName().equals(persistedRelatedName);
+                    currentNameIsTarget = relationship.getToName().equals(persistedRelatedName);
                 }
             }
             if(relationship != null && currentNameIsTarget){
@@ -170,15 +170,16 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
                 relationship.setCitation(nameRelDto.getCitation());
                 relationship.setCitationMicroReference(nameRelDto.getCitationMicroReference());
                 relationship.setRuleConsidered(nameRelDto.getRuleConsidered());
+                relationship.setCodeEdition(nameRelDto.getCodeEdition());
             } else {
                 // need to remove the old relationship and to create a new one.
                 // the actual removal will take place ....
                 if(direction == Direction.relatedTo){
                     name.addRelationshipFromName(nameRelDto.getOtherName(), nameRelationshipType,
-                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
+                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered(), nameRelDto.getCodeEdition());
                 } else {
                     name.addRelationshipToName(nameRelDto.getOtherName(), nameRelationshipType,
-                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered());
+                            nameRelDto.getCitation(), nameRelDto.getCitationMicroReference(), nameRelDto.getRuleConsidered(), nameRelDto.getCodeEdition());
                 }
                 if(persistedRelatedName != null){
                     name.removeRelationWithTaxonName(persistedRelatedName, direction, nameRelationshipType);
@@ -242,9 +243,9 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
             }
             if(!currentRelatedNames.contains(tn)){
                 if(direction.equals(Direction.relatedTo)){
-                    tn.addRelationshipToName(name, relType, null);
+                    tn.addRelationshipToName(name, relType, null, null);
                 } else {
-                    tn.addRelationshipFromName(name, relType, null);
+                    tn.addRelationshipFromName(name, relType, null, null);
                 }
             }
             namesSeen.add(tn);

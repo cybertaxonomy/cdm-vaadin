@@ -13,6 +13,7 @@ import java.io.Serializable;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationship;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
+import eu.etaxonomy.cdm.model.name.NomenclaturalCodeEdition;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 
@@ -33,6 +34,7 @@ public class NameRelationshipDTO implements Serializable {
     Reference citation;
     String citationMicroReference;
     String ruleConsidered;
+    NomenclaturalCodeEdition codeEdition;
 
     /**
      * @param entity
@@ -49,6 +51,7 @@ public class NameRelationshipDTO implements Serializable {
         citation = nameRel.getCitation();
         citationMicroReference = nameRel.getCitationMicroReference();
         ruleConsidered = nameRel.getRuleConsidered();
+        codeEdition = nameRel.getCodeEdition();
     }
 
     /**
@@ -145,6 +148,16 @@ public class NameRelationshipDTO implements Serializable {
     public void setRuleConsidered(String ruleConsidered) {
         this.ruleConsidered = ruleConsidered;
     }
+
+    public NomenclaturalCodeEdition getCodeEdition() {
+        return codeEdition;
+    }
+
+    public void setCodeEdition(NomenclaturalCodeEdition codeEdition) {
+        this.codeEdition = codeEdition;
+    }
+
+
 
 
 

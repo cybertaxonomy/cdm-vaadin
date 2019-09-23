@@ -108,12 +108,8 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         getRepo().getRegistrationService().saveOrUpdate(registration);
     }
 
-    /**
-     * @param taxonNameUUID
-     * @param registration
-     */
     @Override
-    public Registration addBlockingRegistration(UUID nameUUID, Registration registration) {
+    public Registration prepareBlockingRegistration(UUID nameUUID) {
 
         TaxonName name = getRepo().getNameService().load(nameUUID);
 
@@ -127,9 +123,19 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
         if(!registrationExists){
             Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(nameUUID);
+            return blockingRegistration;
+        }
+        return null;
+    }
+
+    @Override
+    public Registration addBlockingRegistration(UUID nameUUID, Registration registration) {
+
+        Registration blockingRegistration = prepareBlockingRegistration(nameUUID);
+        if(blockingRegistration != null){
             registration = reloadRegistration(registration);
             registration.getBlockedBy().add(blockingRegistration);
-            if(registration.isPersited()){
+            if(registration.isPersited()){ // shoul't this be !registration.isPersited() ? since the saveOrUpdate might have been hit this code could be useless
                 getRepo().getRegistrationService().saveOrUpdate(registration);
                 logger.debug("Blocking registration created, added to registion and persited");
             }

@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.server.ClientConnector.DetachEvent;
+import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
@@ -154,9 +156,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private Collection<CdmBase> rootEntities = new HashSet<>();
 
-    /**
-     *
-     */
+
     public RegistrationWorkingsetPresenter() {
     }
 
@@ -230,7 +230,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     }
                 }
 
-                RegistrationStatusSelect select = new RegistrationStatusSelect(null, selectFieldFactory.buildBeanItemContainer(
+                RegistrationStatusSelect select = new RegistrationStatusSelect(null, selectFieldFactory.buildEnumTermItemContainer(
                         RegistrationStatus.class,
                         availableStatus.toArray(new RegistrationStatus[availableStatus.size()]))
                         );
@@ -357,6 +357,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getAddExistingNameCombobox());
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
+
         popup.setParentEditorActionContext(event.getContext(), event.getTarget());
         popup.withDeleteButton(!isAddExistingNameRegistration);
         TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
@@ -364,6 +365,15 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             // allow saving even if the name parts are not valid
             // the user will need to fix this in a later step
             popup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
+            getView().getAddExistingNameRegistrationButton().setEnabled(false);
+            popup.addDetachListener(new DetachListener() {
+
+                @Override
+                public void detach(DetachEvent event) {
+                    getView().getAddExistingNameRegistrationButton().setEnabled(true);
+
+                }
+            });
         }
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
@@ -455,12 +465,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     }
                     // just ignore on CANCEL
                 } else {
-                    Registration registration = null;
+                    Optional<Registration> registrationOpt = Optional.ofNullable(null);
                     if(newNameForRegistrationPopupEditor != null && event.getPopup().equals(newNameForRegistrationPopupEditor)){
                         if(event.getReason().equals(Reason.SAVE)){
                             try {
                                 TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
-                                registration = registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations);
+                                registrationOpt = Optional.of(registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations));
                                 loadWorkingSet(workingset.getCitationUuid());
                             } finally {
                                 clearSession();
@@ -474,9 +484,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     }
 
                     if(event.getReason().equals(Reason.SAVE)){
-                        if(registration == null){
+                        if(!registrationOpt.isPresent()){
                             // no new registration has been created above, so there must be an existing one.
-                            registration = findRegistrationInContext(event.getPopup());
+                            registrationOpt = findRegistrationInContext(event.getPopup());
                         }
 
                         // Check if the other names used in the context of the name are registered yet.
@@ -487,11 +497,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                         namesToCheck.addAll(nameEditor.getReplacedSynonymsComboboxSelect().getValue());
                         namesToCheck.add(nameEditor.getValidationField().getRelatedNameComboBox().getValue());
                         namesToCheck.add(nameEditor.getOrthographicVariantField().getRelatedNameComboBox().getValue());
+                        // NOTE: according to https://dev.e-taxonomy.eu/redmine/issues/8049#note-2 we will not create blocking
+                        // registrations for names in WeaklyRelatedEntityFields
 
                         for(TaxonName name : namesToCheck){
                             if(name != null){
                                 clearSession();
-                                registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
+                                assocciateOrQueueBlockingRegistration(registrationOpt, name.getUuid());
                             }
                         }
                     } else if (event.getReason().equals(Reason.DELETE)){
@@ -596,8 +608,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     typifiedNameUuid
                     );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+            popup.withDeleteButton(false);
             popup.loadInEditor(identifierSet);
-            popup.withDeleteButton(true);
             if(event.hasSource()){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -605,7 +617,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else {
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-            popup.withDeleteButton(true);
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
             Reference citation = regDto.getCitation();
@@ -622,6 +633,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     return nameTypeDesignation;
                 }
             });
+            popup.withDeleteButton(false);
             popup.loadInEditor(null);
             popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
@@ -662,34 +674,31 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
 
-                Registration registration = null;
+                Optional<Registration> registrationOpt = Optional.ofNullable(null);
 
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
 
                 try {
                     clearSession();
-                    Stack<EditorActionContext>context = ((AbstractPopupEditor)event.getPopup()).getEditorActionContext();
-                    registration = findRegistrationInContext(context);
-                    registrationWorkflowService.addTypeDesignation(typeDesignationUuid, registration);
-                    nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
+                    registrationOpt = findRegistrationInContext(event.getPopup());
+                    registrationOpt.ifPresent(reg -> {
+                        registrationWorkflowService.addTypeDesignation(typeDesignationUuid, reg);
+                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
+                        });
+
                 } finally {
                     clearSession();
                 }
 
-                if(registration == null){
-                    // no new registration has been created above, so there must be an existing one.
-                    registration = findRegistrationInContext(event.getPopup());
-                }
-
-                // Check if the other names used in the context of the name are registered yet.
-                NameTypeDesignationPopupEditor nameEditor = (NameTypeDesignationPopupEditor)event.getPopup();
+                // Check if other names used in the context of the name are registered yet.
+                NameTypeDesignationPopupEditor nameTypeDesignationEditor = (NameTypeDesignationPopupEditor)event.getPopup();
                 Set<TaxonName> namesToCheck = new HashSet<>();
 
-                namesToCheck.add(nameEditor.getTypeNameField().getValue());
+                namesToCheck.add(nameTypeDesignationEditor.getTypeNameField().getValue());
 
                 for(TaxonName name : namesToCheck){
                     if(name != null){
-                        registrationWorkflowService.addBlockingRegistration(name.getUuid(), registration);
+                        assocciateOrQueueBlockingRegistration(registrationOpt, name.getUuid());
                     }
 
                 }
@@ -702,6 +711,22 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         }
         // ignore other editors
+    }
+
+    /**
+     * @param registrationOpt
+     * @param name
+     */
+    private void assocciateOrQueueBlockingRegistration(Optional<Registration> registrationOpt, UUID nameUuid) {
+        registrationOpt.ifPresent(reg -> registrationWorkflowService.addBlockingRegistration(nameUuid, reg));
+        if(!registrationOpt.isPresent()){
+            // not present!
+            Registration blockingRegistration = registrationWorkflowService.prepareBlockingRegistration(nameUuid);
+            if(blockingRegistration != null){
+                newNameBlockingRegistrations.add(blockingRegistration);
+                logger.debug("Blocking registration created and queued for later association with the main registration.");
+            }
+        }
     }
 
     /**
@@ -757,22 +782,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 if(rootContext.getParentView().equals(getView()) && event.getSourceView() != newNameForRegistrationPopupEditor){
                     try {
                         clearSession();
-                        // create a blocking registration, the new Registration will be persisted
+                        // create a blocking registration
                         UUID taxonNameUUID = event.getEntityUuid();
-
-                        if(context.get(1).getParentView() instanceof TaxonNamePopupEditor && !((TaxonNamePopupEditor)context.get(1).getParentView()).getBean().cdmEntity().isPersited()){
-                            // Oha!! The event came from a popup editor and the
-                            // first popup in the context is a TaxonNameEditor with un-persisted name
-                            // This is a name for a new registration which has not yet been created.
-                            // It is necessary to store blocking registrations in the newNameBlockingRegistrations
-                            Registration blockingRegistration = getRepo().getRegistrationService().createRegistrationForName(taxonNameUUID);
-                            newNameBlockingRegistrations.add(blockingRegistration);
-                            logger.debug("Blocking registration created and memorized");
-                        } else {
-                            Registration registration = findRegistrationInContext(context);
-                            // some new name somehow related to an existing registration
-                            registrationWorkflowService.addBlockingRegistration(taxonNameUUID, registration);
-                        }
+                        Optional<Registration> registrationOpt = findRegistrationInContext(context);
+                        assocciateOrQueueBlockingRegistration(registrationOpt, taxonNameUUID);
                     } finally {
                         clearSession();
                     }
@@ -803,7 +816,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
 
 
-    public Registration findRegistrationInContext(PopupView popupView) {
+    public Optional<Registration> findRegistrationInContext(PopupView popupView) {
         Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
         return findRegistrationInContext(context);
     }
@@ -814,17 +827,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * @param context
      * @return
      */
-    public Registration findRegistrationInContext(Stack<EditorActionContext> context) {
+    public Optional<Registration> findRegistrationInContext(Stack<EditorActionContext> context) {
         EditorActionContext rootCtx = context.get(0);
         TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootCtx.getParentEntity();
         Optional<RegistrationDTO> registrationDTOOptional = workingset.getRegistrationDTO(regReference.getUuid());
+        Optional<Registration> registrationOptional;
         if(!registrationDTOOptional.isPresent()){
-            logger.error("RegistrationDTO missing in rootCtx.");
+            logger.debug("No RegistrationDTO in found rootCtx -> user is about to create a registration for a new name.");
+            registrationOptional = Optional.ofNullable(null);
         }
-        Registration registration = registrationDTOOptional.get().registration();
 
-        // registration = reloadRegistration(registration);
-        return registration;
+        Optional<Registration> regOpt;
+        if(registrationDTOOptional.isPresent()){
+            regOpt = Optional.of(registrationDTOOptional.get().registration());
+        } else {
+            regOpt = Optional.ofNullable(null);
+        }
+
+        return regOpt;
     }
 
 

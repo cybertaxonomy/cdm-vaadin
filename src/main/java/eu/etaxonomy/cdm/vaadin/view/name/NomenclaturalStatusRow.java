@@ -42,6 +42,7 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     ToOneRelatedEntityCombobox<Reference> citation = new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
     TextField citationMicroReference = new TextFieldNFix();
     TextField ruleConsidered = new TextFieldNFix();
+    NativeSelect codeEdition = new NativeSelect();
 
     public NomenclaturalStatusRow() {
 
@@ -49,6 +50,7 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
         citation.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citation));
         citationMicroReference.setWidth(200, Unit.PIXELS);
         ruleConsidered.setWidth(200, Unit.PIXELS);
+        codeEdition.setWidth(200, Unit.PIXELS);
     }
 
     /**
@@ -59,7 +61,8 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
                 type,
                 citation,
                 citationMicroReference,
-                ruleConsidered
+                ruleConsidered,
+                codeEdition
             };
         addAll(Arrays.asList(components));
         return components;
@@ -70,7 +73,8 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
             "type",
             "citation",
             "citationMicroReference",
-            "ruleConsidered"
+            "ruleConsidered",
+            "codeEdition"
             });
         return visibleFields;
     }

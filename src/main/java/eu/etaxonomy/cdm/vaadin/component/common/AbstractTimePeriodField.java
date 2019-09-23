@@ -54,7 +54,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
     Label toLabel = null;
 
-    GridLayout grid = new GridLayout(3, 4);
+    GridLayout detailsViewGrid = new GridLayout(3, 4);
 
     CssLayout detailsView = new CssLayout();
 
@@ -97,12 +97,20 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         initSimpleView();
         initDetailsView();
 
+
+        detailsView.setWidth(100, Unit.PERCENTAGE);
+        simpleView.setWidth(100, Unit.PERCENTAGE);
         root.addComponent(simpleView);
         root.addComponent(detailsView);
 
         applyDefaultStyles();
 
         showSimple();
+
+        root.setWidth(100, Unit.PERCENTAGE);
+
+        // fixed size to avoid layout and component expansion problems in the nested grid layouts
+        this.setWidth(300, Unit.PIXELS);
 
         return root;
     }
@@ -114,10 +122,10 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
         Button showDetailsButton = new Button(FontAwesome.CALENDAR);
         showDetailsButton.addClickListener(e -> showDetails());
-        cacheField.setWidth(353, Unit.PIXELS); // FIXME 100% does not work
+        cacheField.setWidth(100, Unit.PERCENTAGE);
+        // showDetailsButton.setWidth(100, Unit.PERCENTAGE);
 
         simpleView.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
-        simpleView.setWidth(100, Unit.PERCENTAGE);
         simpleView.addComponent(showDetailsButton, 0, 0);
         simpleView.addComponent(cacheField, 1, 0);
         simpleView.setColumnExpandRatio(1, 0.9f);
@@ -164,22 +172,30 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         fieldGroup.bind(freeText, "freeText");
 
         toLabel = new Label("\u2014"); // EM DASH : 0x2014
+        startDate.setWidth(100, Unit.PERCENTAGE);
+        endDate.setWidth(100, Unit.PERCENTAGE);
+        toLabel.setWidthUndefined();
 
         int row = 0;
-        grid.addComponent(buttonTextField, 0, row, 2, row);
+        detailsViewGrid.addComponent(buttonTextField, 0, row, 2, row);
         row++;
-        grid.addComponent(startDate, 0, row);
-        grid.addComponent(toLabel, 1, row);
-        grid.setComponentAlignment(toLabel, Alignment.BOTTOM_CENTER);
-        grid.addComponent(endDate, 2, row);
+        detailsViewGrid.addComponent(startDate, 0, row, 0, row);
+        detailsViewGrid.addComponent(toLabel, 1, row);
+        detailsViewGrid.setComponentAlignment(toLabel, Alignment.BOTTOM_CENTER);
+        detailsViewGrid.addComponent(endDate, 2, row, 2, row);
         row++;
-        grid.addComponent(freeText, 0, row, 2, row);
+        detailsViewGrid.addComponent(freeText, 0, row, 2, row);
+        detailsViewGrid.setWidth(100, Unit.PERCENTAGE);
+        detailsViewGrid.setColumnExpandRatio(0,  5);
+        detailsViewGrid.setColumnExpandRatio(1,  1);
+        detailsViewGrid.setColumnExpandRatio(2,  5);
+
 
         // apply the style of the container to all child components. E.g. make all tiny
         addStyleName((getStyleName()));
 
         detailsView.setStyleName("margin-wrapper");
-        detailsView.addComponent(grid);
+        detailsView.addComponent(detailsViewGrid);
 
     }
 
@@ -251,7 +267,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
     @Override
     public void setStyleName(String style) {
         super.setStyleName(style);
-        grid.iterator().forEachRemaining(c -> c.setStyleName(style));
+        detailsViewGrid.iterator().forEachRemaining(c -> c.setStyleName(style));
         buttonTextField.iterator().forEachRemaining(c -> c.setStyleName(style));
         simpleView.iterator().forEachRemaining(c -> c.setStyleName(style));
         applyDefaultStyles();
@@ -260,7 +276,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
     @Override
     public void addStyleName(String style) {
         super.addStyleName(style);
-        grid.iterator().forEachRemaining(c -> c.addStyleName(style));
+        detailsViewGrid.iterator().forEachRemaining(c -> c.addStyleName(style));
         simpleView.iterator().forEachRemaining(c -> {
             c.addStyleName(style);
         });

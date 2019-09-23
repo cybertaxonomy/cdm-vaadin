@@ -454,7 +454,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- ReplacedSynonyms
         row++;
-        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Replaced synonyms");
+        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Replaced synonym");
         replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
         addField(replacedSynonymsComboboxSelect, "replacedSynonyms", 0, row, 3, row);
         replacedSynonymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
@@ -475,7 +475,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- Validation
         row++;
-        validationField = new NameRelationField("Validation", "Validated name", Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
+        validationField = new NameRelationField("Validation of", "Designation", Direction.relatedTo, NameRelationshipType.VALIDATED_BY_NAME());
         validationField.setWidth(100, Unit.PERCENTAGE);
         ToOneRelatedEntityCombobox<TaxonName> validatedNameComboBox = validationField.getRelatedNameComboBox();
         validatedNameComboBox.addClickListenerAddEntity(e -> getViewEventBus().publish(

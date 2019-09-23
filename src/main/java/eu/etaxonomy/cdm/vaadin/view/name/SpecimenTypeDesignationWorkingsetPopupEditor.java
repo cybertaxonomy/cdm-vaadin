@@ -115,6 +115,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         grid.setMargin(true);
         grid.setColumns(3);
         grid.setRows(10);
+        int endColumnIndex = 2;
 
         //TODO typifyingAuthors
 
@@ -122,7 +123,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         int row = 0;
         countrySelectField = new NativeSelect("Country");
-        addField(countrySelectField, "country", 1, row , 2, row);
+        addField(countrySelectField, "country", 1, row , endColumnIndex, row);
         countrySelectField.setWidth("100%");
         countrySelectField.setItemCaptionMode(ItemCaptionMode.PROPERTY);
         countrySelectField.setItemCaptionPropertyId("label");
@@ -130,21 +131,21 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         row++;
         TextArea localityField = new TextArea("Locality");
         localityField.setNullRepresentation("");
-        addField(localityField, "locality", 0, row , 2, row);
+        addField(localityField, "locality", 0, row , endColumnIndex, row);
         localityField.setWidth("100%");
         // NOTE: setRows and SetCold breaks he width setting,
         //        see https://github.com/vaadin/framework/issues/3617
 
         row++;
         exactLocationField = new GeoLocationField("Geo location");
-        addField(exactLocationField, "exactLocation", 0, row, 2, row);
+        addField(exactLocationField, "exactLocation", 0, row, endColumnIndex, row);
         exactLocationField.setWidth("100%");
 
         row++;
         MinMaxTextField absElevationMinMax = new MinMaxTextField("Altitude", "m");
         absElevationMinMax.setWidth("100%");
         absElevationMinMax.addSubComponentsStyleName(getDefaultComponentStyles());
-        grid.addComponent(absElevationMinMax, 0, row, 2, row);
+        grid.addComponent(absElevationMinMax, 0, row, endColumnIndex, row);
 
         bindField(absElevationMinMax.getMinField(), "absoluteElevation");
         bindField(absElevationMinMax.getMaxField(), "absoluteElevationMax");
@@ -157,7 +158,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         MinMaxTextField distanceToWaterSurfaceMinMax = new MinMaxTextField("Distance to water surface", "m");
         distanceToWaterSurfaceMinMax.setWidth("100%");
         distanceToWaterSurfaceMinMax.addSubComponentsStyleName(getDefaultComponentStyles());
-        grid.addComponent(distanceToWaterSurfaceMinMax, 0, row, 2, row);
+        grid.addComponent(distanceToWaterSurfaceMinMax, 0, row, endColumnIndex, row);
 
         bindField(distanceToWaterSurfaceMinMax.getMinField(), "distanceToWaterSurface");
         bindField(distanceToWaterSurfaceMinMax.getMaxField(), "distanceToWaterSurfaceMax");
@@ -171,7 +172,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         MinMaxTextField distanceToGroundMinMax = new MinMaxTextField("Distance to substrate", "m");
         distanceToGroundMinMax.setWidth("100%");
         distanceToGroundMinMax.addSubComponentsStyleName(getDefaultComponentStyles());
-        grid.addComponent(distanceToGroundMinMax, 0, row, 2, row);
+        grid.addComponent(distanceToGroundMinMax, 0, row, endColumnIndex, row);
 
         bindField(distanceToGroundMinMax.getMinField(), "distanceToGround");
         bindField(distanceToGroundMinMax.getMaxField(), "distanceToGroundMax");
@@ -181,14 +182,14 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
         row++;
         collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.COLLECTOR_TITLE);
-        addField(collectorField, "collector", 0, row, 2, row);
+        addField(collectorField, "collector", 0, row, endColumnIndex, row);
 
         row++;
 
         TimePeriodField collectionDateField = new TimePeriodField("Collection date");
         // collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
-        addTextField("Field number", "fieldNumber", 2, row);
+        addTextField("Field number", "fieldNumber", endColumnIndex, row);
 
 
         row++;
@@ -240,7 +241,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         typeDesignationsScrollPanel.setWidth(800, Unit.PIXELS);
 
         bindField(typeDesignationsCollectionField, "specimenTypeDesignationDTOs");
-        addComponent(typeDesignationsScrollPanel, 0, row, 2, row);
+        addComponent(typeDesignationsScrollPanel, 0, row, endColumnIndex, row);
 
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
@@ -252,7 +253,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         } else {
             annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
         }
-        addField(annotationsListField, "annotations", 0, row, 2, row);
+        addField(annotationsListField, "annotations", 0, row, endColumnIndex, row);
 
      }
 

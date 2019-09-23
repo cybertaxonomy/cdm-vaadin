@@ -70,7 +70,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private TextField titleField;
 
-    private final static int GRID_COLS = 4; // 12 would fits for 2,3, and 4 Components per row
+    private final static int GRID_COLS = 4; // 12 would fit for 2,3, and 4 Components per row
 
     private final static int GRID_ROWS = 14;
 

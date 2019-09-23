@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
+import eu.etaxonomy.cdm.model.name.NomenclaturalCodeEdition;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -138,6 +139,11 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
 
         super.handleViewEntered();
 
+        List<NomenclaturalCodeEdition> nomCodes = NomenclaturalCodeEdition.forCode(RegistrationUIDefaults.NOMENCLATURAL_CODE);
+        BeanItemContainer<NomenclaturalCodeEdition> codeEditionItemContainer = cdmBeanItemContainerFactory.buildEnumTermItemContainer(
+                NomenclaturalCodeEdition.class, nomCodes.toArray(new NomenclaturalCodeEdition[nomCodes.size()])
+                );
+
         getView().getRankSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.Rank));
         getView().getRankSelect().setItemCaptionPropertyId("label");
 
@@ -186,10 +192,10 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
             public NomenclaturalStatusRow create() {
                 NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
-                BeanItemContainer<DefinedTermBase> buildBeanItemContainer = cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
-                row.type.setContainerDataSource(buildBeanItemContainer);
+                BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory.buildBeanItemContainer(NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
+                row.type.setContainerDataSource(statusTypeItemContainer);
                 row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
-                for(DefinedTermBase term : buildBeanItemContainer.getItemIds()){
+                for(DefinedTermBase term : statusTypeItemContainer.getItemIds()){
                     row.type.setItemCaption(term, term.getPreferredRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
                 }
                 row.type.setNullSelectionAllowed(false);
@@ -204,12 +210,14 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         doReferenceEditorEdit(row);
                     }
                 });
+                row.codeEdition.setContainerDataSource(codeEditionItemContainer);
 
                 getView().applyDefaultComponentStyle(row.components());
 
                 return row;
             }
         });
+
 
         relatedNamePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         relatedNamePagingProvider.setInitStrategy(RELATED_NAME_INIT_STRATEGY);
@@ -225,6 +233,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getValidationField().getCitatonComboBox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getValidationField().getCitatonComboBox().getSelect()));
         getView().getValidationField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getValidationField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getValidationField().getCitatonComboBox(), this));
+        getView().getValidationField().getCodeEditionSelect().setContainerDataSource(codeEditionItemContainer);
 
         getView().getOrthographicVariantField().getRelatedNameComboBox().getSelect().setCaptionGenerator(new CdmTitleCacheCaptionGenerator<TaxonName>());
         getView().getOrthographicVariantField().getRelatedNameComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getRelatedNameComboBox(), this));
@@ -233,6 +242,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
         getView().getOrthographicVariantField().getCitatonComboBox().getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getOrthographicVariantField().getCitatonComboBox().getSelect()));
         getView().getOrthographicVariantField().getCitatonComboBox().loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider, icbnCodesPagingProvider.getPageSize());
         getView().getOrthographicVariantField().getCitatonComboBox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getOrthographicVariantField().getCitatonComboBox(), this));
+        getView().getOrthographicVariantField().getCodeEditionSelect().setContainerDataSource(codeEditionItemContainer);
 
         getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
