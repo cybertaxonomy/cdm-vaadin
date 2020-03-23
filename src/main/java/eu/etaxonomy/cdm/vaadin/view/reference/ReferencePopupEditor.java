@@ -24,6 +24,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
@@ -74,6 +75,10 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private final static int GRID_ROWS = 14;
 
+    private final static int COL_FIELD_WIDTH_PX = 160;
+
+    private final static String COL_FIELD_WIDTH_STR = COL_FIELD_WIDTH_PX + "px";
+
     private NativeSelect typeSelect;
 
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
@@ -123,6 +128,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
         grid.setMargin(true);
+
 
         /*
         "type",
@@ -249,29 +255,29 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
         variableGridStartRow = row;
 
-        addTextField("Organization", "organization", 0, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Organization", "organization", 0, row).setWidth(COL_FIELD_WIDTH_STR);
         row++;
-        addTextField("Series", "seriesPart", 0, row).setWidth(100, Unit.PERCENTAGE);
-        addTextField("Volume", "volume", 1, row).setWidth(100, Unit.PERCENTAGE);
-        addTextField("Pages", "pages", 2, row).setWidth(100, Unit.PERCENTAGE);
-        addTextField("Edition", "edition", 3, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Series", "seriesPart", 0, row).setWidth(COL_FIELD_WIDTH_STR);
+        addTextField("Volume", "volume", 1, row).setWidth(COL_FIELD_WIDTH_STR);
+        addTextField("Pages", "pages", 2, row).setWidth(COL_FIELD_WIDTH_STR);
+        addTextField("Edition", "edition", 3, row).setWidth(COL_FIELD_WIDTH_STR);
         row++;
 
-        addTextField("Place published", "placePublished", 0, row, 0, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("Place published", "placePublished", 0, row, 0, row).setWidth(COL_FIELD_WIDTH_STR);
         TextField publisherField = addTextField("Publisher", "publisher", 1, row, 1, row);
-        publisherField.setWidth(100, Unit.PERCENTAGE);
-        addTextField("Editor", "editor", 2, row).setWidth(100, Unit.PERCENTAGE);
+        publisherField.setWidth(COL_FIELD_WIDTH_STR);
+        addTextField("Editor", "editor", 2, row).setWidth(COL_FIELD_WIDTH_STR);
         row++;
 
-        addTextField("ISSN", "issn", 0, row).setWidth(100, Unit.PERCENTAGE);
-        addTextField("ISBN", "isbn", 1, row).setWidth(100, Unit.PERCENTAGE);
+        addTextField("ISSN", "issn", 0, row).setWidth(COL_FIELD_WIDTH_STR);
+        addTextField("ISBN", "isbn", 1, row).setWidth(COL_FIELD_WIDTH_STR);
         TextFieldNFix doiField = new TextFieldNFix("DOI");
         doiField.setConverter(new DoiConverter());
-        doiField.setWidth(100, Unit.PERCENTAGE);
+        doiField.setWidth(COL_FIELD_WIDTH_STR);
         addField(doiField, "doi", 2, row);
         TextFieldNFix uriField = new TextFieldNFix("Uri");
         uriField.setConverter(new UriConverter());
-        uriField.setWidth(100, Unit.PERCENTAGE);
+        uriField.setWidth(COL_FIELD_WIDTH_STR);
         addField(uriField, "uri", 3, row);
 
 
@@ -329,7 +335,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         grid.setCursorY(variableGridStartRow);
         grid.setCursorX(0);
 
-        // place the fields which are required for the given referenceType in the variable grid part while
+        // place the fields which are required for the given referenceType in the variable grid part
         // and retain the original order which is recorded in the adaptiveFields
         try {
             Map<String, String> fieldPropertyDefinition = ReferencePropertyDefinitions.fieldPropertyDefinition(referenceType);
@@ -349,15 +355,23 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             institutionCombobox.setVisible(fieldPropertyDefinition.containsKey("institution"));
             schoolCombobox.setVisible(fieldPropertyDefinition.containsKey("school"));
 
+            int componentCount = 0;
             for(String fieldName : adaptiveFields.keySet()){ // iterate over the LinkedHashMap to retain the original order of the fields
                 if(fieldPropertyDefinition.containsKey(fieldName)){
                     Field<?> field = adaptiveFields.get(fieldName);
                     grid.addComponent(field);
+                    componentCount++;
                     String propertyName = fieldPropertyDefinition.get(fieldName);
                     if(propertyName != fieldName){
                         field.setCaption(inReferenceCaption(propertyName));
                     }
                 }
+            }
+            // add placeholders to fill the remaining cells in the row
+            for(int pi = componentCount % 4; pi > 0; pi--){
+                Label placeholder = new Label();
+                placeholder.setWidth(COL_FIELD_WIDTH_STR);
+                grid.addComponent(placeholder);
             }
         } catch (UnimplemetedCaseException e) {
             logger.error(e);
