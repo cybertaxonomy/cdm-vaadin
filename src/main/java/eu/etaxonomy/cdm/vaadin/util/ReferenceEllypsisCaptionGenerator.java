@@ -11,8 +11,8 @@ package eu.etaxonomy.cdm.vaadin.util;
 import org.vaadin.viritin.fields.CaptionGenerator;
 import org.vaadin.viritin.fields.LazyComboBox;
 
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 
 /**
