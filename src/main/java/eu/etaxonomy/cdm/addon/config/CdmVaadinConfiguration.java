@@ -310,6 +310,8 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             if(activatedVaadinUIs == null){
                 // not in environment? Read it from the config file!
                 activatedVaadinUIs = appConfig.getProperty(configFile , CDM_VAADIN_UI_ACTIVATED);
+            } else {
+                logger.warn("Active UIs are defined via system properties -D" + CDM_VAADIN_UI_ACTIVATED + "=" +  activatedVaadinUIs + " ignoring config file." );
             }
 
             if(activatedVaadinUIs != null) {
@@ -320,6 +322,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         if(activeUIpaths.stream().anyMatch(p -> p.trim().equals(path))){
             return true;
         }
+        logger.warn(" UI " + path + " not enabled in " + configFile.getFileName() + ".properties" );
         return false;
 
     }

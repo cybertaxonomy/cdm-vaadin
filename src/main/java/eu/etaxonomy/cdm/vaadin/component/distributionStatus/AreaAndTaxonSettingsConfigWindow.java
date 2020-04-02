@@ -46,6 +46,7 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
+import eu.etaxonomy.cdm.persistence.dto.TaxonNodeDto;
 import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.NamedAreaContainer;
@@ -67,7 +68,7 @@ public class AreaAndTaxonSettingsConfigWindow
             implements ValueChangeListener, ClickListener, ExpandListener{
 
 	/**
-	 * 
+	 *
 	 */
     private static final long serialVersionUID = 1439411115014088780L;
     private ComboBox classificationBox;
@@ -89,9 +90,9 @@ public class AreaAndTaxonSettingsConfigWindow
         super();
         this.distributionTableView = distributionTableView;
     }
-    
+
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -146,7 +147,7 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -243,14 +244,14 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
     public void valueChange(ValueChangeEvent event) {
         Property<?> property = event.getProperty();
         if(property==classificationBox){
-        	UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
+            TaxonNodeDto parent = getTaxonNodeDtoFromRowId(classificationBox.getValue());
         	TaxonNode root = CdmSpringContextHelper.getClassificationService().getRootNode(parent.getUuid());
         	showClassificationTaxa(root);
         }
@@ -263,17 +264,17 @@ public class AreaAndTaxonSettingsConfigWindow
             else{
             	if(CdmUtils.isNotBlank(filterText)){
             		UUID classificationUuid = UUID.fromString((String) uuidProperty.getValue());
-            		List<UuidAndTitleCache<TaxonNode>> taxa = CdmSpringContextHelper.getTaxonNodeService().getUuidAndTitleCache(null, filterText, classificationUuid);
+            		List<TaxonNodeDto> taxonNodeDtos = CdmSpringContextHelper.getTaxonNodeService().getUuidAndTitleCache(null, filterText, classificationUuid);
             		BeanItemContainer<UuidAndTitleCache<TaxonNode>> container = new BeanItemContainer<>(UuidAndTitleCache.class);
             		taxonTree.setContainerDataSource(container);
-            		for (UuidAndTitleCache<TaxonNode> taxon : taxa) {
-            			container.addItem(taxon);
-            			taxonTree.setChildrenAllowed(taxon, false);
+            		for (TaxonNodeDto taxonNodeDTO : taxonNodeDtos) {
+            			container.addItem(taxonNodeDtos);
+            			taxonTree.setChildrenAllowed(taxonNodeDtos, false);
             		}
             		taxonTree.setVisibleColumns("titleCache"); //$NON-NLS-1$
             	}
             	else{
-            		UuidAndTitleCache<TaxonNode> parent = getUuidAndTitleCacheFromRowId(classificationBox.getValue());
+            	    TaxonNodeDto parent = getTaxonNodeDtoFromRowId(classificationBox.getValue());
             		TaxonNode root = CdmSpringContextHelper.getClassificationService().getRootNode(parent.getUuid());
             		showClassificationTaxa(root);
             	}
@@ -288,7 +289,7 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -297,7 +298,7 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
@@ -330,12 +331,12 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
     public void nodeExpand(ExpandEvent event) {
-        UuidAndTitleCache<TaxonNode> parent = (UuidAndTitleCache<TaxonNode>) event.getItemId();
+        TaxonNodeDto parent = (TaxonNodeDto) event.getItemId();
         ((TaxonNodeContainer) taxonTree.getContainerDataSource()).addChildItems(parent);
     }
 
@@ -344,7 +345,7 @@ public class AreaAndTaxonSettingsConfigWindow
      * @param rootNode The root node of the classification whose taxa should be shown in the {@link #taxonTree}.
      */
     private void showClassificationTaxa(TaxonNode rootNode) {
-        final Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(rootNode);
+        final List<TaxonNodeDto> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsTaxonNodeDto(rootNode);
         // Enable polling and set frequency to 0.5 seconds
         UI.getCurrent().setPollInterval(500);
         taxonTree.setEnabled(false);
@@ -354,11 +355,12 @@ public class AreaAndTaxonSettingsConfigWindow
     }
 
     /**
-     * Returns the {@link UuidAndTitleCache} object of the classification specified by the given {@link RowId} of the {@link CdmSQLContainer} used in the {@link #classificationBox}.
+     * Returns the {@link TaxonNodeDto} object of the classification specified by the given {@link RowId}
+     * of the {@link CdmSQLContainer} used in the {@link #classificationBox}.
      * @param classificationSelection
-     * @return {@link UuidAndTitleCache} object of the given classification specified by {@code classificationSelection}
+     * @return {@link TaxonNodeDto} object of the given classification specified by {@code classificationSelection}
      */
-    private UuidAndTitleCache<TaxonNode> getUuidAndTitleCacheFromRowId(Object classificationSelection) {
+    private TaxonNodeDto getTaxonNodeDtoFromRowId(Object classificationSelection) {
         String uuidString = (String) classificationBox.getContainerProperty(classificationSelection, "uuid").getValue(); //$NON-NLS-1$
         Property<Integer> rootNodeContainerProperty = null;
 
@@ -373,7 +375,7 @@ public class AreaAndTaxonSettingsConfigWindow
 		int id = rootNodeContainerProperty.getValue();
         String titleCache = (String) classificationBox.getContainerProperty(classificationSelection, "titleCache").getValue(); //$NON-NLS-1$
         UUID uuid = UUID.fromString(uuidString);
-        UuidAndTitleCache<TaxonNode> parent = new UuidAndTitleCache<>(uuid, id, titleCache);
+        TaxonNodeDto parent = new TaxonNodeDto(uuid, id, titleCache);
         return parent;
     }
 
@@ -391,29 +393,29 @@ public class AreaAndTaxonSettingsConfigWindow
      *
      */
     private class TreeUpdater extends Thread{
-    
+
     	/**
     	 * The taxa to show.
     	 */
-    	private Collection<UuidAndTitleCache<TaxonNode>> children;
+    	private Collection<TaxonNodeDto> children;
 
     	/**
     	 * Creates a thread to show the given collection of taxa in {@link AreaAndTaxonSettingsConfigWindow#taxonTree}.
     	 * @param children {@link UuidAndTitleCache} of the taxa to show.
     	 */
-		public TreeUpdater(Collection<UuidAndTitleCache<TaxonNode>> children) {
+		public TreeUpdater(Collection<TaxonNodeDto> children) {
 			this.children = children;
 		}
 
 		/**
-		 * 
+		 *
 		 * {@inheritDoc}
 		 */
 		@Override
     	public void run() {
 			UI.getCurrent().access(new Runnable() {
 				/**
-				 * 
+				 *
 				 * {@inheritDoc}
 				 */
 				@Override
