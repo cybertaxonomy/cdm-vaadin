@@ -7,8 +7,7 @@ import java.util.Map;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.HierarchicalContainer;
 
-import eu.etaxonomy.cdm.model.taxon.TaxonNode;
-import eu.etaxonomy.cdm.persistence.dto.UuidAndTitleCache;
+import eu.etaxonomy.cdm.persistence.dto.TaxonNodeDto;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 
 public class TaxonNodeContainer extends HierarchicalContainer {
@@ -17,15 +16,15 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 
 	public static final String LABEL = "titleCache";
 
-	private Map<Object, Object> itemCache = new HashMap<>();
+	private Map<Integer, Boolean> itemCache = new HashMap<>();
 
 	/**
      * Creates a new taxon node container
 	 * @param roots the root elements of the table
 	 */
-	public TaxonNodeContainer(Collection<UuidAndTitleCache<TaxonNode>> roots) {
+	public TaxonNodeContainer(Collection<TaxonNodeDto> roots) {
 	    addContainerProperty(LABEL, String.class, "[no taxon]");
-	    for (UuidAndTitleCache<TaxonNode> root: roots) {
+	    for (TaxonNodeDto root: roots) {
 	        addItem(root);
 	        addChildItems(root);
         }
@@ -36,11 +35,11 @@ public class TaxonNodeContainer extends HierarchicalContainer {
 	 */
 	@Override
 	public Item addItem(Object itemId) {
-	    if(itemId instanceof UuidAndTitleCache){
-	        UuidAndTitleCache<TaxonNode> uuidAndTitleCache = (UuidAndTitleCache<TaxonNode>) itemId;
+	    if(itemId instanceof TaxonNodeDto){
+	        TaxonNodeDto dto = (TaxonNodeDto) itemId;
 	        Item item = super.addItem(itemId);
-	        item.getItemProperty(TaxonNodeContainer.LABEL).setValue(uuidAndTitleCache.getTitleCache());
-	        itemCache.put(((UuidAndTitleCache<TaxonNode>) itemId).getId(), false);
+	        item.getItemProperty(TaxonNodeContainer.LABEL).setValue(dto.getTitleCache());
+	        itemCache.put(((TaxonNodeDto) itemId).getId(), false);
 	        return item;
         }
 	    return null;
@@ -49,11 +48,11 @@ public class TaxonNodeContainer extends HierarchicalContainer {
     /**
      * @param parent
      */
-    public void addChildItems(UuidAndTitleCache<TaxonNode> parent) {
+    public void addChildItems(TaxonNodeDto parent) {
         if(itemCache.get(parent.getId()).equals(Boolean.FALSE)){
-            Collection<UuidAndTitleCache<TaxonNode>> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsUuidAndTitleCache(parent);
+            Collection<TaxonNodeDto> children = CdmSpringContextHelper.getTaxonNodeService().listChildNodesAsTaxonNodeDto(parent);
             setChildrenAllowed(parent, !children.isEmpty());
-            for (UuidAndTitleCache<TaxonNode> child : children) {
+            for (TaxonNodeDto child : children) {
                 Item childItem = addItem(child);
                 if(childItem!=null){
                     setParent(child, parent);

@@ -30,8 +30,8 @@ import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.INameService;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;

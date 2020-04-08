@@ -20,7 +20,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;

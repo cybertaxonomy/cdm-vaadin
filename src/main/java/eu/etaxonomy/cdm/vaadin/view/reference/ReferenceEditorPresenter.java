@@ -23,8 +23,8 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.agent.Person;

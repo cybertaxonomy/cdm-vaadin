@@ -25,7 +25,7 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
-import eu.etaxonomy.cdm.format.ReferenceEllypsisFormatter.LabelType;
+import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -36,7 +36,6 @@ import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
-import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.term.TermType;
