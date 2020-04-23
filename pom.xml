@@ -50,6 +50,10 @@
       <url>http://maven.vaadin.com/vaadin-addons</url>
     </repository>
     <repository>
+      <id>OSGeo Repository</id>
+      <url>https://repo.osgeo.org/repository/release/</url>
+    </repository>
+    <repository>
       <id>vaadin-snapshots</id>
       <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
       <releases>
