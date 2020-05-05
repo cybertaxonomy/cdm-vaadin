@@ -152,7 +152,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
-        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
+        if(kindOfUnitVocabulary == null){
             kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
         }
 
