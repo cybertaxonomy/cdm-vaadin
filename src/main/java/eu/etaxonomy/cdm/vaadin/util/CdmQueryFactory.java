@@ -74,7 +74,7 @@ public class CdmQueryFactory {
                 ", tb.uuid as " + UUID_ID +
                 ", n.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
-                ", tn.unplaced as " + unp_id +
+                ", tn.status ='UNP' as " + unp_id +
                 ", dtb.titleCache as " + rank_id +
                 ", (SELECT COUNT(*) FROM TaxonBase syn WHERE tb.id = syn.acceptedTaxon_id) as " + has_syn_id +
                 FROM_QUERY;
