@@ -30,6 +30,7 @@ import com.vaadin.data.util.sqlcontainer.RowId;
 import com.vaadin.data.util.sqlcontainer.RowItem;
 
 import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.taxon.TaxonNodeStatus;
 import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 
 /**
@@ -84,7 +85,7 @@ public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container
 
     private void initFilters() {
         //nrFilter = new Compare.Equal(StatusPresenter.UNR_ID, true);
-        unpFilter = new Compare.Equal("tn.unplaced", true);
+        unpFilter = new Compare.Equal("tn.status", TaxonNodeStatus.UNPLACED.getKey());
         //unfFilter = new Compare.Equal(StatusPresenter.FN_ID, false);
         unpbFilter = new Compare.Equal("tb.publish", false);
         classificationFilter = new Compare.Equal("tn.classification_id", classificationId);

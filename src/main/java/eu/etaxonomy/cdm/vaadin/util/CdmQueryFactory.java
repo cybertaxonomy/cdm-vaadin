@@ -24,6 +24,7 @@ import com.vaadin.data.util.sqlcontainer.query.QueryDelegate;
 import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.location.NamedArea;
+import eu.etaxonomy.cdm.model.taxon.TaxonNodeStatus;
 import eu.etaxonomy.cdm.model.term.Representation;
 import eu.etaxonomy.cdm.vaadin.statement.CdmStatementDelegate;
 
@@ -74,7 +75,7 @@ public class CdmQueryFactory {
                 ", tb.uuid as " + UUID_ID +
                 ", n.titleCache as " + name_id +
                 ", tb.publish as " + pb_id +
-                ", tn.status ='UNP' as " + unp_id +
+                ", tn.status ='"+TaxonNodeStatus.UNPLACED.getKey()+"' as " + unp_id +  //this may be incorrectly fixed
                 ", dtb.titleCache as " + rank_id +
                 ", (SELECT COUNT(*) FROM TaxonBase syn WHERE tb.id = syn.acceptedTaxon_id) as " + has_syn_id +
                 FROM_QUERY;
