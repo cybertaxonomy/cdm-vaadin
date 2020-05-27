@@ -30,7 +30,6 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.StatusPresenter;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
 import eu.etaxonomy.cdm.vaadin.container.LeafNodeTaxonContainer;
 
-
 /**
  * @author cmathew
  * @since 10 Mar 2015
@@ -94,7 +93,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         LeafNodeTaxonContainer container = sp.loadTaxa(11);
         RowId taxonId = new RowId(10);
         Item item = container.getItem(taxonId);
-        Property itemProperty = item.getItemProperty(LeafNodeTaxonContainer.PB_ID);
+        Property<?> itemProperty = item.getItemProperty(LeafNodeTaxonContainer.PB_ID);
         boolean pb = (Boolean) itemProperty.getValue();
         Assert.assertTrue(pb);
         sp.updatePublished(false, taxonId);
@@ -105,7 +104,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     public void testGetClassificationId() throws SQLException {
-        CdmSQLContainer container = sp.loadClassifications();
+        sp.loadClassifications();
         Object classificationId = sp.getClassificationId("Classification1");
         Assert.assertEquals("11", classificationId.toString());
         classificationId = sp.getClassificationId("ClassificationDoesNotExist");
@@ -126,7 +125,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
             String titleCache = (String)item.getItemProperty("TITLECACHE").getValue();
             logger.info("titleCache : " + titleCache);
             count++;
-
         }
     }
 
@@ -135,8 +133,6 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
         @Override
         public void setListener(StatusComponentListener listener) {
             // TODO Auto-generated method stub
-
         }
-
     }
 }
