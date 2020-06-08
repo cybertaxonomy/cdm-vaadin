@@ -10,7 +10,7 @@ package eu.etaxonomy.cdm.vaadin.permission;
 
 import java.util.UUID;
 
-import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
+import eu.etaxonomy.cdm.persistence.permission.Role;
 
 /**
  * Provides the Roles required by the
