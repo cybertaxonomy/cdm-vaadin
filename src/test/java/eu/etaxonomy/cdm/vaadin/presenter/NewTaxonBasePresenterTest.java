@@ -36,7 +36,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 2 Apr 2015
- *
  */
 @DataSets({
     @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
@@ -53,7 +52,6 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
     public static void init() throws SQLException {
         ntbp = new NewTaxonBasePresenter();
     }
-
 
     @Test
     public void testNewTaxonBase(){
@@ -134,21 +132,13 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         } catch (IllegalArgumentException iae) {
 
         }
-
     }
 
     public static class MockNewTaxonBaseComposite implements INewTaxonBaseComposite {
 
-        /* (non-Javadoc)
-         * @see eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComposite#setListener(eu.etaxonomy.cdm.vaadin.view.INewTaxonBaseComponentListener)
-         */
         @Override
         public void setListener(INewTaxonBaseComponentListener listener) {
             // TODO Auto-generated method stub
-
         }
-
-
-
     }
 }

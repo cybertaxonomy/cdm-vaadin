@@ -52,7 +52,6 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
 /**
  * @author a.kohlbecker
  * @since Nov 17, 2017
- *
  */
 @Transactional(TransactionMode.DISABLED)
 // IMPORTANT: test03_deleteTypeDesignationTest executed not as last would cause the other tests to fail due to changes in the db
@@ -89,7 +88,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
             "HIBERNATE_SEQUENCES"
             };
 
-
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
     public void test01_createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
@@ -124,7 +122,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        SpecimenOrObservationBase<?> baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
 
-
        printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
 
        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, baseEntity.getUuid(), baseEntity.getTitleCache());
@@ -148,7 +145,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        workingset = service.load(registrationUuid, baseEntityRef);
        Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
-
 
        //FIXME this fails: Assert.assertEquals("There must only be one FieldUnit and one MediaSpecimen", 2, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
 
@@ -223,7 +219,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 //        UUID typeDesignation1UUID = UUID.fromString("a1896ae2-4396-4243-988e-3d74058b44ab");
 //        UUID typeDesignation2UUID = UUID.fromString("a1896ae2-4396-4243-988e-3d74058b44ab");
 
-
         Assert.assertEquals("All TypeDesignations should have been deleted", 0, cdmRepository.getNameService().getAllTypeDesignations(10, 0).size());
         Assert.assertEquals("All derived units should have been deleted", 0, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
         Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
@@ -260,16 +255,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         reg.setUuid(registrationUuid);
         reg = cdmRepository.getRegistrationService().save(reg);
 
-
         //printDataSetWithNull(System.err, includeTableNames_create);
 
         writeDbUnitDataSetFile(includeTableNames_create);
     }
-
-
-
-
-
-
-
 }

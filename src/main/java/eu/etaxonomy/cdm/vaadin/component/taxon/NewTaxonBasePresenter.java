@@ -33,6 +33,7 @@ import eu.etaxonomy.cdm.model.taxon.Synonym;
 import eu.etaxonomy.cdm.model.taxon.SynonymType;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
+import eu.etaxonomy.cdm.model.taxon.TaxonNodeStatus;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.strategy.parser.NonViralNameParserImpl;
 import eu.etaxonomy.cdm.vaadin.container.CdmSQLContainer;
@@ -42,7 +43,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 2 Apr 2015
- *
  */
 public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
 
@@ -117,7 +117,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         Classification classification = CdmBase.deproxy(classificationService.load(classificationUuid, CLASSIFICATION_INIT_STRATEGY), Classification.class);
         TaxonNode newTaxonNode = classification.addChildTaxon(newTaxon, null, null);
         taxonNodeService.saveOrUpdate(newTaxonNode);
-        newTaxonNode.setUnplaced(true);
+        newTaxonNode.setStatus(TaxonNodeStatus.UNPLACED);
 
         app.commitTransaction(tx);
         return new IdUuidName(newTaxonNode.getTaxon().getId(), newTaxonNode.getTaxon().getUuid(), newTaxonNode.getTaxon().getTitleCache());

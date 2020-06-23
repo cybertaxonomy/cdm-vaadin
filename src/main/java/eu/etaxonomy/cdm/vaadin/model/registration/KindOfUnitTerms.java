@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.UUID;
 
+import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
@@ -66,7 +67,7 @@ public class KindOfUnitTerms {
 
     public static DefinedTerm CULTURE_METABOLIC_INACTIVE() {
         if(cultureMetabolicInactive == null){
-            cultureMetabolicInactive = DefinedTerm.NewInstance(TermType.KindOfUnit, "Metabolic inactive cuture", "Metabolic inactive cuture", "");
+            cultureMetabolicInactive = DefinedTerm.NewInstance(TermType.KindOfUnit, "Metabolic inactive culture", "Metabolic inactive culture", "");
             cultureMetabolicInactive.setUuid(UUID_CULTURE_METABOLIC_INACTIVE);
         }
         return cultureMetabolicInactive;

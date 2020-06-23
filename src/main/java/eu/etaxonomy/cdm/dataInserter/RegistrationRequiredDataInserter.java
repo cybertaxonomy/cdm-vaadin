@@ -45,8 +45,8 @@ import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.dao.hibernate.taxonGraph.AbstractHibernateTaxonGraphProcessor;
 import eu.etaxonomy.cdm.persistence.dao.taxonGraph.TaxonGraphException;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.CdmAuthority;
-import eu.etaxonomy.cdm.persistence.hibernate.permission.Role;
+import eu.etaxonomy.cdm.persistence.permission.CdmAuthority;
+import eu.etaxonomy.cdm.persistence.permission.Role;
 import eu.etaxonomy.cdm.vaadin.model.registration.KindOfUnitTerms;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 
@@ -69,7 +69,6 @@ import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
  *
  * @author a.kohlbecker
  * @since May 9, 2017
- *
  */
 public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
@@ -102,9 +101,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
       this.repo = repo;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
@@ -122,9 +118,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         hasRun = true;
     }
 
-    /**
-     *
-     */
     @Transactional
     private void insertRequiredData() {
 
@@ -159,14 +152,14 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         repo.getGroupService().saveOrUpdate(groupSubmitter);
 
         TermVocabulary<DefinedTerm> kindOfUnitVocabulary = repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid());
-        if(repo.getVocabularyService().find(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY().getUuid()) == null){
+        if(kindOfUnitVocabulary == null){
             kindOfUnitVocabulary = repo.getVocabularyService().save(KindOfUnitTerms.KIND_OF_UNIT_VOCABULARY());
         }
 
-        DefinedTermBase kouSpecimen = repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid());
-        DefinedTermBase kouImage = repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid());
-        DefinedTermBase kouUnpublishedImage = repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid());
-        DefinedTermBase kouCulture = repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid());
+        DefinedTermBase<?> kouSpecimen = repo.getTermService().find(KindOfUnitTerms.SPECIMEN().getUuid());
+        DefinedTermBase<?> kouImage = repo.getTermService().find(KindOfUnitTerms.PUBLISHED_IMAGE().getUuid());
+        DefinedTermBase<?> kouUnpublishedImage = repo.getTermService().find(KindOfUnitTerms.UNPUBLISHED_IMAGE().getUuid());
+        DefinedTermBase<?> kouCulture = repo.getTermService().find(KindOfUnitTerms.CULTURE_METABOLIC_INACTIVE().getUuid());
 
         if(kouSpecimen == null){
             kouSpecimen = repo.getTermService().save(KindOfUnitTerms.SPECIMEN());
@@ -184,7 +177,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         Set<DefinedTerm> termInVocab = kindOfUnitVocabulary.getTerms();
         List<DefinedTermBase> kouTerms = Arrays.asList(kouCulture, kouImage, kouSpecimen, kouUnpublishedImage);
 
-        for(DefinedTermBase t : kouTerms){
+        for(DefinedTermBase<?> t : kouTerms){
             if(!termInVocab.contains(t)){
                 kindOfUnitVocabulary.addTerm((DefinedTerm)t);
             }
