@@ -34,6 +34,8 @@ import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
  */
 public class EntityCacheDebuggerComponent extends CustomComponent {
 
+    private static final long serialVersionUID = 993360128659237814L;
+
     CachingPresenter presenter;
     CdmTransientEntityCacher cacher;
     EntityCacherDebugResult debugResults;
@@ -47,7 +49,7 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
 
         this.presenter = presenter;
         this.cacher = (CdmTransientEntityCacher) presenter.getCache();
-        debugResults = new EntityCacherDebugResult(cacher, presenter.getRootEntities());
+        debugResults = new EntityCacherDebugResult(cacher, presenter.getRootEntities(), true);
         initContent();
     }
 

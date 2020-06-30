@@ -47,7 +47,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
 import eu.etaxonomy.cdm.api.application.IRunAs;
 import eu.etaxonomy.cdm.api.application.RunAsAdmin;
-import eu.etaxonomy.cdm.api.cache.CdmCacher;
+import eu.etaxonomy.cdm.api.cache.CdmCacherBase;
 import eu.etaxonomy.cdm.api.config.ApplicationConfiguration;
 import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
@@ -115,7 +115,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private ITaxonGraphHibernateListener taxonGraphHibernateListener;
 
     @Autowired
-    private void  setTermCacher(CdmCacher termCacher){
+    private void  setTermCacher(CdmCacherBase termCacher){
         CdmTransientEntityCacher.setPermanentCacher(termCacher);
     }
 
