@@ -49,7 +49,9 @@ public class EntityCacheDebuggerComponent extends CustomComponent {
 
         this.presenter = presenter;
         this.cacher = (CdmTransientEntityCacher) presenter.getCache();
-        debugResults = new EntityCacherDebugResult(cacher, presenter.getRootEntities(), true);
+        // TODO implement checkbox for includeIgnored
+        boolean includeIgnored = true;
+        debugResults = new EntityCacherDebugResult(cacher, presenter.getRootEntities(), includeIgnored);
         initContent();
     }
 
