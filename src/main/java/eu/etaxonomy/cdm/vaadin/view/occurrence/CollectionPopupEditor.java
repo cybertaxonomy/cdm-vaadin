@@ -117,22 +117,21 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
 
         int row = 0;
         codeField = addTextField("Code", "code", 0, row, 0, row);
-        codeField.setWidth(100, Unit.PIXELS);
+        codeField.setWidth(100, Unit.PERCENTAGE);
 
         codeStandardField = addTextField("Code standard", "codeStandard", 1, row, 1, row);
-        codeStandardField.setWidth(100, Unit.PIXELS);
+        codeStandardField.setWidth(100, Unit.PERCENTAGE);
 
         townOrLocationField = addTextField("Town or location", "townOrLocation", 2, row, 2, row);
-        townOrLocationField.setWidth(100, Unit.PIXELS);
+        townOrLocationField.setWidth(100, Unit.PERCENTAGE);
 
         row++;
         nameField = addTextField("Name", "name", 0, row, 2, row);
+        nameField.setWidth(100, Unit.PERCENTAGE);
 
         row++;
         superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("In collection", Collection.class);
 
-
-        superCollectionCombobox.setWidth(300, Unit.PIXELS);
         addField(superCollectionCombobox, "superCollection", 0, row, 2, row);
 
         superCollectionCombobox.getSelect().setCaptionGenerator(
