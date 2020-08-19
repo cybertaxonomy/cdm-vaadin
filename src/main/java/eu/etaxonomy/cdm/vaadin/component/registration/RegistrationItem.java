@@ -36,10 +36,12 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -295,7 +297,15 @@ public class RegistrationItem extends GridLayout {
         }
 
         if(regDto != null){
-            labelMarkup.append("</br>").append(regDto.getSummary());
+            String summary = regDto.getSummary();
+            if(regDto.getOrderdTypeDesignationWorkingSets() != null) {
+                for( TypeDesignationWorkingSet workingSet : regDto.getOrderdTypeDesignationWorkingSets().values()) {
+                    for(TypeDesignationStatusBase<?> typeStatus : workingSet.keySet()) {
+                        summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                    }
+                }
+            }
+            labelMarkup.append("</br>").append(summary);
 
             stateLabel.setVisible(true);
             stateLabel.update(regDto.getStatus());

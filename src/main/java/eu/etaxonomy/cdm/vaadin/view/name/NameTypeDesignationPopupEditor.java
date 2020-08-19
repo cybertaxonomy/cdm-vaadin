@@ -43,6 +43,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameTypeDesignation, NameTypeDesignationPresenter>
     implements NameTypeDesignationEditorView {
 
+    private static final long serialVersionUID = 8233876984579344340L;
+
     private static final int GRID_COLS = 4;
     private static final int GRID_ROWS = 7;
 

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
@@ -30,6 +31,7 @@ import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
@@ -129,6 +131,9 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                         );
                 String labelText = typeDesignationWorkingSet.getRepresentation();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
+                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
+                    labelText = labelText.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                }
                 if(typeDesignationWorkingSet.getWorkingsetType().equals(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET)){
                     // remove the citation from the label which looks very redundant in the registration working set editor
                     // TODO when use in other contexts. it might be required to make this configurable.
@@ -136,7 +141,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     String citationString = regDto.getCitation().getCitation();
                     labelText = labelText.replaceFirst(citationString, "");
                 }
-                Label label = new Label(labelText);
+                Label label = new Label(labelText, ContentMode.HTML);
 
                 label.setWidthUndefined();
                 addComponent(label);

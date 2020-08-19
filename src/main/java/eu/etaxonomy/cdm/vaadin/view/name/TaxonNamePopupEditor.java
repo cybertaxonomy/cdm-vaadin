@@ -630,15 +630,25 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     protected TeamOrPersonBase inferExCombinationAuthors() {
         NameRelationshipDTO nameRelationDTO = validationField.getValue();
+
+        TeamOrPersonBase inferredExAuthor = null;
         if(nameRelationDTO != null && nameRelationDTO.getOtherName() != null){
             TaxonName validatedName = nameRelationDTO.getOtherName();
             if(validatedName.getCombinationAuthorship() != null) {
-                return validatedName.getCombinationAuthorship();
+                inferredExAuthor = validatedName.getCombinationAuthorship();
             } else if(validatedName.getNomenclaturalReference() != null){
-                return validatedName.getNomenclaturalReference().getAuthorship();
+                inferredExAuthor = validatedName.getNomenclaturalReference().getAuthorship();
             }
         }
-        return null;
+        TeamOrPersonBase inferredCominationAuthors = inferCombinationAuthors();
+        if(inferredExAuthor != null && inferredCominationAuthors != null
+                // comparing by nomTitle to detect duplicates:
+                && inferredExAuthor.getNomenclaturalTitle().equals(inferredCominationAuthors.getNomenclaturalTitle())) {
+            // If and only if ex author = author the ex author is not included
+            // into the author teams due to the ICN 46.10. (see #8317)
+            inferredExAuthor = null;
+        }
+        return inferredExAuthor;
     }
 
     @Override
