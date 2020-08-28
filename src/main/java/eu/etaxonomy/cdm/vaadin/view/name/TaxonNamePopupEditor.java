@@ -74,7 +74,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 /**
  * @author a.kohlbecker
  * @since May 22, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -170,7 +169,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
      *
-     *
      * @param editableAnotationTypes the editableAnotationTypes to set
      */
     @Override
@@ -178,34 +176,20 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         this.editableAnotationTypes = editableAnotationTypes;
     }
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public TaxonNamePopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), TaxonNameDTO.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Name editor";
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWindowWidth() {
         return 800;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         // none
@@ -218,17 +202,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -378,6 +356,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         nomStatusCollectionField = new ElementCollectionField<NomenclaturalStatus>(
                 NomenclaturalStatus.class,
                 new Instantiator<NomenclaturalStatus>() {
+                    private static final long serialVersionUID = -2427045940046513092L;
 
                     @Override
                     public NomenclaturalStatus create() {
@@ -386,6 +365,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 },
                 NomenclaturalStatusRow.class
                 ){
+                    private static final long serialVersionUID = -3130918034491809593L;
 
                     @Override
                     public void commit() throws SourceException, InvalidValueException {
@@ -395,7 +375,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
                     @Override
                     public boolean isEmpty() {
-                        Collection value = getValue();
+                        Collection<?> value = getValue();
                         return value == null || value.isEmpty() ;
                     }
 
@@ -950,83 +930,51 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         super.cancel();
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox() {
         return nomReferenceCombobox;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TextField getNomenclaturalReferenceDetail() {
         return nomenclaturalReferenceDetail;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect() {
         return basionymsComboboxSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getReplacedSynonymsComboboxSelect() {
         return replacedSynonymsComboboxSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NativeSelect getRankSelect() {
         return rankSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AbstractField<String> getGenusOrUninomialField(){
         return genusOrUninomialField;
     }
 
-    /**
-     * @return the exBasionymAuthorshipField
-     */
     @Override
     public TeamOrPersonField getExBasionymAuthorshipField() {
         return exBasionymAuthorshipField;
     }
 
-    /**
-     * @return the basionymAuthorshipField
-     */
     @Override
     public TeamOrPersonField getBasionymAuthorshipField() {
         return basionymAuthorshipField;
     }
 
-    /**
-     * @return the combinationAuthorshipField
-     */
     @Override
     public TeamOrPersonField getCombinationAuthorshipField() {
         return combinationAuthorshipField;
     }
 
-    /**
-     * @return the exCombinationAuthorshipField
-     */
     @Override
     public TeamOrPersonField getExCombinationAuthorshipField() {
         return exCombinationAuthorshipField;
@@ -1088,9 +1036,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         return annotationsListField;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -1128,26 +1073,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         nomStatusCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
     }
 
-
-    /**
-     * @return the infraGenericEpithetField
-     */
     @Override
     public AbstractField<String> getInfraGenericEpithetField() {
         return infraGenericEpithetField;
     }
 
-    /**
-     * @return the specificEpithetField
-     */
     @Override
     public AbstractField<String> getSpecificEpithetField() {
         return specificEpithetField;
     }
 
-    /**
-     * @return the infraSpecificEpithetField
-     */
     @Override
     public AbstractField<String> getInfraSpecificEpithetField() {
         return infraSpecificEpithetField;
@@ -1162,5 +1097,4 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     public ElementCollectionField<NomenclaturalStatus> getNomStatusCollectionField(){
         return nomStatusCollectionField;
     }
-
 }
