@@ -101,7 +101,7 @@ public class CdmFilterablePagingProviderFactory {
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = new CdmFilterablePagingProvider<TaxonName, TaxonName>(
                 repo.getNameService());
         pagingProvider.setInitStrategy(
-                Arrays.asList("registrations", "nomenclaturalReference", "nomenclaturalReference.inReference"));
+                Arrays.asList("registrations", "nomenclaturalSource.citation", "nomenclaturalSource.citation.inReference"));
         // pagingProvider.addRestriction(new
         // Restriction<>("relationsFromThisName.type", Operator.AND_NOT, null,
         // NameRelationshipType.ORTHOGRAPHIC_VARIANT()));

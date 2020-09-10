@@ -275,7 +275,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 orthographicVariantNamePagingProvider.getRestrictions().remove(orthographicCorrectionRestriction);
             } else {
                 if(orthographicCorrectionRestriction == null){
-                    orthographicCorrectionRestriction = new Restriction<>("nomenclaturalReference", Operator.AND, null, nomReference);
+                    orthographicCorrectionRestriction = new Restriction<>("nomenclaturalSource.citation", Operator.AND, null, nomReference);
                     orthographicVariantNamePagingProvider.addRestriction(orthographicCorrectionRestriction);
                 } else{
                     orthographicCorrectionRestriction.setValues(Arrays.asList(nomReference));
@@ -295,7 +295,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 "rank.vocabulary", // needed for comparing ranks
 
-                "nomenclaturalReference",
+                "nomenclaturalSource.citation",
 
                 "status.type",
                 "status.citation",
@@ -310,9 +310,9 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "relationsToThisName.fromName.rank",
                 "relationsToThisName.fromName.combinationAuthorship",
                 "relationsToThisName.fromName.exCombinationAuthorship",
-                "relationsToThisName.fromName.nomenclaturalReference.authorship",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.authorship",
-                "relationsToThisName.fromName.nomenclaturalReference.inReference.inReference.inReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalSource.citation.authorship",
+                "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
                 "relationsToThisName.citation",
@@ -320,7 +320,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "homotypicalGroup.typifiedNames"
                 )
               );
-        initStrategy.extend("nomenclaturalReference", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
+        initStrategy.extend("nomenclaturalSource.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         initStrategy.extend("status.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         initStrategy.extend("relationsToThisName.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
 
@@ -559,7 +559,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         }
                     }
                 } else
-                if(boundTargetField.matchesPropertyIdPath("nomenclaturalReference")){
+                if(boundTargetField.matchesPropertyIdPath("nomenclaturalSource.citation")){
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){

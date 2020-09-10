@@ -223,7 +223,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
          - nameType: preset, needs to be set in the presenter for new names
          - appendedPhrase: -> TODO field
          - nomenclaturalMicroReference:  -> TODO field
-         - nomenclaturalReference ->  field but disabled for REGISTRY
+         - nomenclaturalSource.citation ->  field but disabled for REGISTRY
          - rank -> SelectField which determines the visiblity of the other fields
 
          - fullTitleCache + protectedFullTitleCache -> SwitchableTextField : ADVANCED_MODE
