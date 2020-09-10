@@ -296,6 +296,8 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalSource.citation",
+                "nomenclaturalSource.annotations", // needed to allow access in AnnotatableEntity.checkEmpty()
+                "nomenclaturalSource.markers",  // needed to allow access in AnnotatableEntity.checkEmpty()
 
                 "status.type",
                 "status.citation",
@@ -559,7 +561,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                         }
                     }
                 } else
-                if(boundTargetField.matchesPropertyIdPath("nomenclaturalSource.citation")){
+                if(boundTargetField.matchesPropertyIdPath("nomenclaturalReference")){
                     if(event.isCreateOrModifiedType()){
                         getCache().load(event.getEntity());
                         if(event.isCreatedType()){

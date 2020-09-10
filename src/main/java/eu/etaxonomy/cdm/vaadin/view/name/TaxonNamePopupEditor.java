@@ -220,6 +220,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         grid.setColumnExpandRatio(3, 0.0f);
 
         /*
+         * TaxonName properties for reference here (NOTE: this editor operates on TaxonNameDTOs!):
          - nameType: preset, needs to be set in the presenter for new names
          - appendedPhrase: -> TODO field
          - nomenclaturalMicroReference:  -> TODO field
