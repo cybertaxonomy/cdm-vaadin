@@ -298,6 +298,7 @@ public class TaxonNameEditorPresenter extends AbstractCdmDTOEditorPresenter<Taxo
                 "nomenclaturalSource.citation",
                 "nomenclaturalSource.annotations", // needed to allow access in AnnotatableEntity.checkEmpty()
                 "nomenclaturalSource.markers",  // needed to allow access in AnnotatableEntity.checkEmpty()
+                "nomenclaturalSource.links",  // needed to allow access in OriginalSourceBase.checkEmpty()
 
                 "status.type",
                 "status.citation",
