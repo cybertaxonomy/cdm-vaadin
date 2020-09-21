@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-    
-<dataset>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../cdm/database/schema/dataset.xsd">
   <REFERENCE ID="1" CREATED="2008-12-10 09:56:07.0" UUID="596b1325-be50-4b0a-9aa2-3ecd610215f2" UPDATED="2008-12-10 09:56:07.253" REFTYPE="BK" TITLECACHE="Proceedings of Testing Vol. 1"   PROTECTEDTITLECACHE="true" PROTECTEDABBREVTITLECACHE="false" ABBREVTITLECACHE="Sp. Pl." ABBREVTITLE="Sp. Pl." NOMENCLATURALLYRELEVANT="false" PARSINGPROBLEM="0" PROBLEMENDS="-1" PROBLEMSTARTS="-1" INREFERENCE_ID="4" />
- </dataset>
+</dataset>

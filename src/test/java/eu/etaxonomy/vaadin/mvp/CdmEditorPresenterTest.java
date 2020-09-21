@@ -8,8 +8,6 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.spring.annotation.SpringBean;
@@ -30,13 +28,13 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 /**
  * @author a.kohlbecker
  * @since Jun 2, 2017
- *
  */
 // @RunWith(SpringJUnit4ClassRunner.class)
 // @ContextConfiguration(classes = { CdmVaadinTestConfiguration.class })
 // @VaadinAppConfiguration
 public class CdmEditorPresenterTest {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(CdmEditorPresenterTest.class);
 
     @SpringBeanByType
@@ -50,66 +48,36 @@ public class CdmEditorPresenterTest {
 
     @DataSet
     // @Test test setup not jet working :(
-    public void testSaveReference() throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-
-
+    public void testSaveReference() throws IllegalArgumentException {
         TestReferenceEditorView testView = new TestReferenceEditorView();
         referencePresenter.init(testView);
-
     }
 
     class TestReferenceEditorView implements ReferencePopupEditorView {
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public NativeSelect getTypeSelect() {
             return null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
             return null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public TeamOrPersonField getAuthorshipField() {
             return null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public FilterableAnnotationsField getAnnotationsField() {
             return null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox() {
             return null;
         }
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public ToOneRelatedEntityCombobox<Institution> getSchoolCombobox() {
             return null;
         }
-
-
-
     }
-
 }

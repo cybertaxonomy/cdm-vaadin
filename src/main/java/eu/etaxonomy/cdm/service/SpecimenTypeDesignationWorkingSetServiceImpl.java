@@ -85,10 +85,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Autowired
     CdmRepository repo;
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
@@ -99,13 +95,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
         Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly=true)
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
@@ -161,9 +154,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         return bean;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly=false)
     public void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto) {
