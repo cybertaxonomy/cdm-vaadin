@@ -41,7 +41,6 @@ import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
-import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.RankClass;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -55,6 +54,7 @@ import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorActionStrRep;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
+import eu.etaxonomy.cdm.vaadin.model.name.NomenclaturalStatusDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -116,7 +116,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private NameRelationField orthographicVariantField;
 
-    private ElementCollectionField<NomenclaturalStatus> nomStatusCollectionField;
+    private ElementCollectionField<NomenclaturalStatusDTO> nomStatusCollectionField;
 
     private CheckBox basionymToggle;
 
@@ -354,14 +354,14 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- nom status
         row++;
-        nomStatusCollectionField = new ElementCollectionField<NomenclaturalStatus>(
-                NomenclaturalStatus.class,
-                new Instantiator<NomenclaturalStatus>() {
+        nomStatusCollectionField = new ElementCollectionField<NomenclaturalStatusDTO>(
+                NomenclaturalStatusDTO.class,
+                new Instantiator<NomenclaturalStatusDTO>() {
                     private static final long serialVersionUID = -2427045940046513092L;
 
                     @Override
-                    public NomenclaturalStatus create() {
-                        return NomenclaturalStatus.NewInstance(null);
+                    public NomenclaturalStatusDTO create() {
+                        return NomenclaturalStatusDTO.newInstance();
                     }
                 },
                 NomenclaturalStatusRow.class
@@ -1095,7 +1095,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     }
 
     @Override
-    public ElementCollectionField<NomenclaturalStatus> getNomStatusCollectionField(){
+    public ElementCollectionField<NomenclaturalStatusDTO> getNomStatusCollectionField(){
         return nomStatusCollectionField;
     }
 }

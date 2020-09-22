@@ -18,14 +18,15 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
+import eu.etaxonomy.cdm.vaadin.model.name.NomenclaturalStatusDTO;
 import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
 import eu.etaxonomy.vaadin.component.NameRelationField;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
+import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -130,7 +131,7 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     TextField getNomenclaturalReferenceDetail();
 
-    ElementCollectionField<NomenclaturalStatus> getNomStatusCollectionField();
+    ElementCollectionField<NomenclaturalStatusDTO> getNomStatusCollectionField();
 
     /**
      * @param components

@@ -168,7 +168,7 @@ public class NameTypeDesignationPresenter
 
         getView().getTypifiedNamesComboboxSelect().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize(), this);
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
     }

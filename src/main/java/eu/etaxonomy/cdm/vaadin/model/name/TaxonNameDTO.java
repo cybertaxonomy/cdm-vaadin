@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import org.joda.time.DateTime;
 
-import eu.etaxonomy.cdm.model.EntityCollectionSetterAdapter.SetterAdapterException;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Credit;
@@ -27,11 +26,13 @@ import eu.etaxonomy.cdm.model.name.HomotypicalGroup;
 import eu.etaxonomy.cdm.model.name.NameRelationship;
 import eu.etaxonomy.cdm.model.name.NameRelationshipType;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
+import eu.etaxonomy.cdm.model.name.NomenclaturalSource;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.User;
 import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
+import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 
 /**
@@ -49,12 +50,17 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private TaxonName persistedOrthographicVariant;
 
+    private Set<NomenclaturalStatusDTO> nomenclaturalStatusDTOs = new HashSet<>();
+
     /**
      * @param entity
      */
     public TaxonNameDTO(TaxonName entity) {
         super(entity);
         name = entity;
+        for(NomenclaturalStatus status : name.getStatus()) {
+            nomenclaturalStatusDTOs.add(NomenclaturalStatusDTO.from(status));
+        }
     }
 
     public String getAcronym() {
@@ -325,12 +331,12 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
         return name.getRank();
     }
 
-    public Set<NomenclaturalStatus> getStatus() {
-        return name.getStatus();
+    public Set<NomenclaturalStatusDTO> getStatus() {
+        return nomenclaturalStatusDTOs;
     }
 
-    public void setStatus(Set<NomenclaturalStatus> status) throws SetterAdapterException {
-        name.setStatus(status);
+    public void setStatus(Set<NomenclaturalStatusDTO> status) {
+        nomenclaturalStatusDTOs = status;
     }
 
     public boolean isProtectedAuthorshipCache() {
@@ -422,11 +428,19 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
     }
 
     public void setNomenclaturalMicroReference(String nomenclaturalMicroReference) {
-        name.setNomenclaturalMicroReference(nomenclaturalMicroReference);
+        assureNomenclaturalSource().setCitationMicroReference(nomenclaturalMicroReference);
     }
 
-    public void setNomenclaturalReference(INomenclaturalReference nomenclaturalReference) {
-        name.setNomenclaturalReference(nomenclaturalReference);
+    public void setNomenclaturalReference(Reference nomenclaturalReference) {
+        assureNomenclaturalSource().setCitation(nomenclaturalReference);
+    }
+
+    protected NomenclaturalSource assureNomenclaturalSource() {
+        NomenclaturalSource nomSource = name.getNomenclaturalSource();
+        if(nomSource == null) {
+            nomSource = NomenclaturalSource.NewNomenclaturalInstance(name);
+        }
+        return nomSource;
     }
 
     public void setProtectedAuthorshipCache(boolean protectedAuthorshipCache) {

@@ -176,7 +176,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     public void handleViewEntered() {
 
-        getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+        getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(Country.uuidCountryVocabulary));
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
@@ -185,13 +185,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
-        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.ReferenceSystem));
+        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(TermType.ReferenceSystem));
         getView().getExactLocationField().getReferenceSystemSelect().setItemCaptionPropertyId("label");
 
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
         popuEditorTypeDesignationSourceRows.clear();
