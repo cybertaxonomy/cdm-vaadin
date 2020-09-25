@@ -329,35 +329,41 @@ public class TaxonNameEditorPresenter
     @Override
     protected TaxonName loadCdmEntity(UUID identifier) {
 
-        EntityInitStrategy initStrategy = new EntityInitStrategy(Arrays.asList("$", "annotations.type", "annotations.*", // needed
-                                                                                                                         // as
-                                                                                                                         // log
-                                                                                                                         // as
-                                                                                                                         // we
-                                                                                                                         // are
-                                                                                                                         // using
-                                                                                                                         // a
-                                                                                                                         // table
-                                                                                                                         // in
-                                                                                                                         // FilterableAnnotationsField
+        EntityInitStrategy initStrategy = new EntityInitStrategy(
+                Arrays.asList(
+                "$",
+                "annotations.type",
+                "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
                 "rank.vocabulary", // needed for comparing ranks
 
                 "nomenclaturalSource.citation",
+                "nomenclaturalSource.annotations", // needed to allow access in AnnotatableEntity.checkEmpty()
+                "nomenclaturalSource.markers",  // needed to allow access in AnnotatableEntity.checkEmpty()
+                "nomenclaturalSource.links",  // needed to allow access in OriginalSourceBase.checkEmpty()
 
-                "status.type", "status.citation",
+                "status.type",
+                "status.citation",
 
-                "combinationAuthorship", "exCombinationAuthorship", "basionymAuthorship", "exBasionymAuthorship",
+                "combinationAuthorship",
+                "exCombinationAuthorship",
+                "basionymAuthorship",
+                "exBasionymAuthorship",
 
                 // basionyms: relationsToThisName.fromName
-                "relationsToThisName.type", "relationsToThisName.fromName.rank",
+                "relationsToThisName.type",
+                "relationsToThisName.fromName.rank",
                 "relationsToThisName.fromName.combinationAuthorship",
                 "relationsToThisName.fromName.exCombinationAuthorship",
                 "relationsToThisName.fromName.nomenclaturalSource.citation.authorship",
                 "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.authorship",
                 "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.inReference.inReference.authorship",
                 "relationsToThisName.fromName.relationsToThisName",
-                "relationsToThisName.fromName.relationsFromThisName", "relationsToThisName.citation",
-                "relationsFromThisName", "homotypicalGroup.typifiedNames"));
+                "relationsToThisName.fromName.relationsFromThisName",
+                "relationsToThisName.citation",
+                "relationsFromThisName",
+                "homotypicalGroup.typifiedNames"
+                )
+              );
         initStrategy.extend("nomenclaturalSource.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         initStrategy.extend("status.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         initStrategy.extend("relationsToThisName.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
@@ -613,11 +619,8 @@ public class TaxonNameEditorPresenter
                             WeaklyRelatedEntityCombobox<TaxonName> weaklyRelatedEntityCombobox = (WeaklyRelatedEntityCombobox<TaxonName>) getView()
                                     .getGenusOrUninomialField();
                             weaklyRelatedEntityCombobox.setValue(((TaxonName) event.getEntity()).getGenusOrUninomial());
-                            // NOTE: in contrast to the
-                            // ToOneRelatedEntityCombobox the .discard() does
-                            // not
-                            // work here since no datasource is bound to the
-                            // field, see weaklyRelatedEntityCombobox.reload()
+                            // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
                         }
                     }
@@ -630,11 +633,8 @@ public class TaxonNameEditorPresenter
                             getView().getSpecificEpithetField()
                                     .setValue(((TaxonName) event.getEntity()).getSpecificEpithet());
                             weaklyRelatedEntityCombobox.reload();
-                            // NOTE: in contrast to the
-                            // ToOneRelatedEntityCombobox the .discard() does
-                            // not
-                            // work here since no datasource is bound to the
-                            // field, see weaklyRelatedEntityCombobox.reload()
+                            // NOTE: in contrast to the ToOneRelatedEntityCombobox the .discard() does not
+                            // work here since no datasource is bound to the field, see weaklyRelatedEntityCombobox.reload()
                             weaklyRelatedEntityCombobox.updateButtons();
                         }
                     }
@@ -646,10 +646,7 @@ public class TaxonNameEditorPresenter
                         } else {
                             getView().getNomReferenceCombobox().reload(); // refreshSelectedValue(modifiedReference);
                         }
-                        getView().getCombinationAuthorshipField().discard(); // refresh
-                                                                             // from
-                                                                             // the
-                                                                             // datasource
+                        getView().getCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
                     }
                 } else if (boundTargetField.matchesPropertyIdPath("validationFor.otherName")
@@ -682,14 +679,8 @@ public class TaxonNameEditorPresenter
                         } else {
                             basionymSourceField.reloadWith((TaxonName) event.getEntity());
                         }
-                        getView().getBasionymAuthorshipField().discard(); // refresh
-                                                                          // from
-                                                                          // the
-                                                                          // datasource
-                        getView().getExBasionymAuthorshipField().discard(); // refresh
-                                                                            // from
-                                                                            // the
-                                                                            // datasource
+                        getView().getBasionymAuthorshipField().discard(); //refresh from the datasource
+                        getView().getExBasionymAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
                     } else if (event.isRemovedType()) {
                         basionymSourceField.setValue(null);
@@ -707,10 +698,7 @@ public class TaxonNameEditorPresenter
                         } else {
                             replacedSynonyms.reloadWith((TaxonName) event.getEntity());
                         }
-                        getView().getExCombinationAuthorshipField().discard(); // refresh
-                                                                               // from
-                                                                               // the
-                                                                               // datasource
+                        getView().getExCombinationAuthorshipField().discard(); //refresh from the datasource
                         getView().updateAuthorshipFields();
                     } else if (event.isRemovedType()) {
                         replacedSynonyms.setValue(null);
