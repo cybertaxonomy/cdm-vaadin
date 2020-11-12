@@ -124,7 +124,9 @@ public class NameTypeDesignationPresenter
                 "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
                 "typifiedNames.typeDesignations", // important !!
                 "typeName.$",
-                "citation"
+                "source.citation",
+                "source.annotations",
+                "source.markers",
                 }
         ));
 
