@@ -301,7 +301,13 @@ public class RegistrationItem extends GridLayout {
             if(regDto.getOrderdTypeDesignationWorkingSets() != null) {
                 for( TypeDesignationWorkingSet workingSet : regDto.getOrderdTypeDesignationWorkingSets().values()) {
                     for(TypeDesignationStatusBase<?> typeStatus : workingSet.keySet()) {
-                        summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                        if(summary.contains(typeStatus.getLabel() + "s")){
+                            // replace plural form
+                            summary = summary.replace(typeStatus.getLabel() + "s", "<strong>" + typeStatus.getLabel() + "s</strong>");
+                        } else {
+                            // replace singular form
+                            summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                        }
                     }
                 }
             }
