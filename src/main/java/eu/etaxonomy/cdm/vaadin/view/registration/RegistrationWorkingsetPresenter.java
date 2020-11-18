@@ -604,7 +604,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
                     event.getRegistrationUuid(),
-                    getView().getCitationUuid(),
+                    getView().getCitationUuid(), // FIXME This may pass the reference (e.g. Article) from RegistrationWorkingsetView
+                    // to the TypeDesignationWorkingset even if the nomenclatural act is a Section !!! --> #9290
                     typifiedNameUuid
                     );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
