@@ -847,8 +847,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return regOpt;
     }
 
-
-
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
     public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
 
@@ -874,27 +872,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addRootEntity(CdmBase entity) {
         rootEntities.add(entity);
         cache.load(entity);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<CdmBase> getRootEntities() {
         return rootEntities;
@@ -906,28 +894,16 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         disposeCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeCache() {
         cache.dispose();
     }
 
-    /**
-     * @param name
-     * @return
-     */
     public boolean canCreateNameRegistrationFor(TaxonName name) {
         return registrationWorkflowService.canCreateNameRegistrationFor(workingset, name);
     }
 
-    /**
-     * @param name
-     * @return
-     */
     public boolean checkWokingsetContainsProtologe(TaxonName name) {
         return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
     }
-
 }

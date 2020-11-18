@@ -179,12 +179,12 @@ public class ListPresenter extends AbstractPresenter<ListView> {
 
         List<UUID> typeDesignationStatus = null;
         if(filter.typeStatus != null){
-            typeDesignationStatus = new ArrayList(TypeDesignationStatusFilter.toTypeDesignationStatusUuids(filter.typeStatus));
+            typeDesignationStatus = new ArrayList<>(TypeDesignationStatusFilter.toTypeDesignationStatusUuids(filter.typeStatus));
         }
 
         Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
                 filter.submitter != null ? filter.submitter.getUuid() : null,
-                filter.registrationStatus != null ? new ArrayList(filter.registrationStatus): null,
+                filter.registrationStatus != null ? new ArrayList<>(filter.registrationStatus): null,
                 StringUtils.trimToNull(filter.identifierPattern),
                 StringUtils.trimToNull(filter.namePattern),
                 StringUtils.trimToNull(filter.referencePattern),
