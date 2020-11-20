@@ -342,7 +342,10 @@ public class TaxonNameEditorPresenter
                 "nomenclaturalSource.links",  // needed to allow access in OriginalSourceBase.checkEmpty()
 
                 "status.type",
-                "status.citation",
+                "status.source.citation",
+                "status.source.annotations", // needed to allow access in AnnotatableEntity.checkEmpty()
+                "status.source.markers", // needed to allow access in AnnotatableEntity.checkEmpty()
+                "status.source.links", // needed to allow access in AnnotatableEntity.checkEmpty()
 
                 "combinationAuthorship",
                 "exCombinationAuthorship",
@@ -357,9 +360,15 @@ public class TaxonNameEditorPresenter
                 "relationsToThisName.fromName.nomenclaturalSource.citation.authorship",
                 "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.authorship",
                 "relationsToThisName.fromName.nomenclaturalSource.citation.inReference.inReference.inReference.authorship",
+                "relationsToThisName.fromName.nomenclaturalSource.annotations", // needed to allow access in OriginalSourceBase.checkEmpty()
+                "relationsToThisName.fromName.nomenclaturalSource.markers", // needed to allow access in OriginalSourceBase.checkEmpty()
+                "relationsToThisName.fromName.nomenclaturalSource.links", // needed to allow access in OriginalSourceBase.checkEmpty()
                 "relationsToThisName.fromName.relationsToThisName",
                 "relationsToThisName.fromName.relationsFromThisName",
-                "relationsToThisName.citation",
+                "relationsToThisName.source.citation",
+                "relationsToThisName.source.annotations", // needed to allow access in OriginalSourceBase.checkEmpty()
+                "relationsToThisName.source.markers", // needed to allow access in OriginalSourceBase.checkEmpty()
+                "relationsToThisName.source.links", // needed to allow access in OriginalSourceBase.checkEmpty()
                 "relationsFromThisName",
                 "homotypicalGroup.typifiedNames"
                 )
