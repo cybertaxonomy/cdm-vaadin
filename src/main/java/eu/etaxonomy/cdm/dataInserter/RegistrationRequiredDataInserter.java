@@ -473,7 +473,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     private NomenclaturalStatusType findILegitimateStatusType(TaxonName name){
         for(NomenclaturalStatus status : name.getStatus()){
-            if(status.getType() != null && !status.getType().isLegitimateType()){
+            if(status.getType() != null && !status.getType().isLegitimate()){
                 return status.getType();
             }
         }
