@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -139,7 +140,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     // TODO when use in other contexts. it might be required to make this configurable.
 
                     String citationString = regDto.getCitation().getCitation();
-                    labelText = labelText.replaceFirst(citationString, "");
+                    labelText = labelText.replaceFirst(Pattern.quote(citationString), "");
                 }
                 Label label = new Label(labelText, ContentMode.HTML);
 
