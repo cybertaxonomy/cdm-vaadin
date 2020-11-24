@@ -25,8 +25,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
@@ -44,7 +44,6 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 /**
  * @author a.kohlbecker
  * @since May 19, 2017
- *
  */
 public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
@@ -130,7 +129,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                         typeDesignationWorkingSet.getBaseEntityReference(),
                         tdButton)
                         );
-                String labelText = typeDesignationWorkingSet.getRepresentation();
+                String labelText = typeDesignationWorkingSet.getLabel();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
                     labelText = labelText.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
