@@ -298,8 +298,8 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null){
             String summary = regDto.getSummary();
-            if(regDto.getOrderdTypeDesignationWorkingSets() != null) {
-                for( TypeDesignationWorkingSet workingSet : regDto.getOrderdTypeDesignationWorkingSets().values()) {
+            if(regDto.getOrderedTypeDesignationWorkingSets() != null) {
+                for( TypeDesignationWorkingSet workingSet : regDto.getOrderedTypeDesignationWorkingSets().values()) {
                     for(TypeDesignationStatusBase<?> typeStatus : workingSet.keySet()) {
                         if(summary.contains(typeStatus.getLabel() + "s")){
                             // replace plural form
