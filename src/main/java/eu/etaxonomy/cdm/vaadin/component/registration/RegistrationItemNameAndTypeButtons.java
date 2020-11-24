@@ -31,7 +31,6 @@ import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
@@ -111,7 +110,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
         if(regDto.getOrderdTypeDesignationWorkingSets() != null){
-            for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
+            for(TypedEntityReference<?> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
                 TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
                 logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
