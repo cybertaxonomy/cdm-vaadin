@@ -439,6 +439,7 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
         NomenclaturalSource nomSource = name.getNomenclaturalSource();
         if(nomSource == null) {
             nomSource = NomenclaturalSource.NewNomenclaturalInstance(name);
+            name.setNomenclaturalSource(nomSource);
         }
         return nomSource;
     }
