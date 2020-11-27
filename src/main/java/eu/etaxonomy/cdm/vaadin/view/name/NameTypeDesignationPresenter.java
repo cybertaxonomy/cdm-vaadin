@@ -99,7 +99,7 @@ public class NameTypeDesignationPresenter
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
-            typifiedNameInContext = regDTO.getTypifiedName();
+            typifiedNameInContext = regDTO.typifiedName();
             // find the working set
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
 

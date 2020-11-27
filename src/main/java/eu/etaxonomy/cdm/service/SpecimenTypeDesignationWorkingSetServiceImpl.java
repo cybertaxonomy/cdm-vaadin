@@ -120,7 +120,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
-                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.getTypifiedName());
+                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.typifiedName());
         return dto;
     }
 
