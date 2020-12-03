@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -212,7 +211,7 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
        }
 
        if(ToOneRelatedEntityField.class.isAssignableFrom(editorAction.getTarget().getClass())){
-           Set<ReferenceType> applicableTypes = ReferenceType.inReferenceContraints((ReferenceType) getView().getTypeSelect().getValue());
+           List<ReferenceType> applicableTypes = ReferenceType.inReferenceContraints((ReferenceType) getView().getTypeSelect().getValue());
            if(editorAction.isAddAction()){
                inReferencePopup = openPopupEditor(ReferencePopupEditor.class, editorAction);
                if(!applicableTypes.isEmpty()){

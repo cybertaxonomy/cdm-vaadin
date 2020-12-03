@@ -8,8 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.data.validator;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import com.vaadin.data.Validator;
 import com.vaadin.ui.AbstractSelect;
@@ -20,10 +20,8 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 /**
  * @author a.kohlbecker
  * @since Dec 20, 2018
- *
  */
 public class InReferenceTypeValidator implements Validator {
-
 
     private static final long serialVersionUID = 5704902636623629859L;
     private AbstractSelect referenceTypeSelect;
@@ -32,14 +30,11 @@ public class InReferenceTypeValidator implements Validator {
         this.referenceTypeSelect = referenceTypeSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Object value) throws InvalidValueException {
         ReferenceType type = (ReferenceType)referenceTypeSelect.getValue();
         if(value != null){
-            Set<ReferenceType> applicableInRefTypes = type.inReferenceContraints(type);
+            List<ReferenceType> applicableInRefTypes = ReferenceType.inReferenceContraints(type);
             Reference inReference = (Reference)value;
             if(!applicableInRefTypes.contains(inReference.getType())){
                 throw new InvalidValueException(Objects.toString(inReference.getType(), "[NULL]") + " is not a suitable in-reference type for " + Objects.toString(type, "[NULL]") );
@@ -47,5 +42,4 @@ public class InReferenceTypeValidator implements Validator {
         }
 
     }
-
 }

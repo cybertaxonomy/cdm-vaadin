@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -58,14 +57,14 @@ public class CdmFilterablePagingProviderFactory {
      */
     public CdmFilterablePagingProvider<Reference, Reference> inReferencePagingProvider(ReferenceType subReferenceType,
             boolean includeUnspecificTypes) {
-        List<OrderHint> referenceOrderHints = new ArrayList<OrderHint>();
+        List<OrderHint> referenceOrderHints = new ArrayList<>();
         referenceOrderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
         referenceOrderHints.add(new OrderHint("issn", SortOrder.ASCENDING));
         referenceOrderHints.add(new OrderHint("isbn", SortOrder.ASCENDING));
         CdmFilterablePagingProvider<Reference, Reference> pagingProvider = new CdmFilterablePagingProvider<Reference, Reference>(
                 repo.getReferenceService(), MatchMode.BEGINNING, referenceOrderHints);
 
-        Set<ReferenceType> inRefTypes = subReferenceType.inReferenceContraints(subReferenceType);
+        List<ReferenceType> inRefTypes = ReferenceType.inReferenceContraints(subReferenceType);
 
         if (!inRefTypes.isEmpty()) {
             if (includeUnspecificTypes) {
