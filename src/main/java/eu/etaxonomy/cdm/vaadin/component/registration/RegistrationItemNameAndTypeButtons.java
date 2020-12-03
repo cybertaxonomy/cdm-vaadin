@@ -10,8 +10,10 @@ package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -24,13 +26,13 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
@@ -43,7 +45,6 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 /**
  * @author a.kohlbecker
  * @since May 19, 2017
- *
  */
 public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
@@ -110,9 +111,10 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        if(regDto.getOrderdTypeDesignationWorkingSets() != null){
-            for(TypedEntityReference<TypeDesignationBase<?>> baseEntityRef : regDto.getOrderdTypeDesignationWorkingSets().keySet()) {
-                TypeDesignationWorkingSet typeDesignationWorkingSet = regDto.getOrderdTypeDesignationWorkingSets().get(baseEntityRef);
+        LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> workingSets = regDto.getOrderedTypeDesignationWorkingSets();
+        if(workingSets != null){
+            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : workingSets.keySet()) {
+                TypeDesignationWorkingSet typeDesignationWorkingSet = workingSets.get(baseEntityRef);
                 logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
@@ -129,7 +131,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                         typeDesignationWorkingSet.getBaseEntityReference(),
                         tdButton)
                         );
-                String labelText = typeDesignationWorkingSet.getRepresentation();
+                String labelText = typeDesignationWorkingSet.getLabel();
                 labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
                     labelText = labelText.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
@@ -139,7 +141,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     // TODO when use in other contexts. it might be required to make this configurable.
 
                     String citationString = regDto.getCitation().getCitation();
-                    labelText = labelText.replaceFirst(citationString, "");
+                    labelText = labelText.replaceFirst(Pattern.quote(citationString), "");
                 }
                 Label label = new Label(labelText, ContentMode.HTML);
 

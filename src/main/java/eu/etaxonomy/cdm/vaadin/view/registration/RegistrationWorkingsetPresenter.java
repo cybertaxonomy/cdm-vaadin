@@ -41,7 +41,7 @@ import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
@@ -604,7 +604,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
             identifierSet = new TypeDesignationWorkingsetEditorIdSet(
                     event.getRegistrationUuid(),
-                    getView().getCitationUuid(),
+                    getView().getCitationUuid(), // FIXME This may pass the reference (e.g. Article) from RegistrationWorkingsetView
+                    // to the TypeDesignationWorkingset even if the nomenclatural act is a Section !!! --> #9290
                     typifiedNameUuid
                     );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
@@ -847,8 +848,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         return regOpt;
     }
 
-
-
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
     public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
 
@@ -874,27 +873,17 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addRootEntity(CdmBase entity) {
         rootEntities.add(entity);
         cache.load(entity);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<CdmBase> getRootEntities() {
         return rootEntities;
@@ -906,28 +895,16 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         disposeCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeCache() {
         cache.dispose();
     }
 
-    /**
-     * @param name
-     * @return
-     */
     public boolean canCreateNameRegistrationFor(TaxonName name) {
         return registrationWorkflowService.canCreateNameRegistrationFor(workingset, name);
     }
 
-    /**
-     * @param name
-     * @return
-     */
     public boolean checkWokingsetContainsProtologe(TaxonName name) {
         return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
     }
-
 }

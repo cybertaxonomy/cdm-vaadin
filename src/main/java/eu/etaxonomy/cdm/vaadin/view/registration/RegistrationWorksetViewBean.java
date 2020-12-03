@@ -48,7 +48,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;

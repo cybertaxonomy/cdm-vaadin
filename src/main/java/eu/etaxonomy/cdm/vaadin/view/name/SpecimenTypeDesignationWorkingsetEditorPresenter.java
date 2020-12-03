@@ -36,6 +36,7 @@ import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
+import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.term.TermType;
@@ -120,8 +121,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * loading the Registration specified by the <code>RegistrationAndWorkingsetId.registrationId</code> and in
      * a second step to find the workingset by the <code>registrationAndWorkingsetId.workingsetId</code>.
      * <p>
-     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetEditorIdSet} whereas the field <code>egistrationId</code>
-     * must be present, the field <code>workingsetId</code>,  however can be null. I this case a new workingset with a new {@link FieldUnit} as
+     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetEditorIdSet} whereas the
+     * field <code>registrationId</code> must be present.
+     * The field <code>workingsetId</code> however can be null.
+     * I this case a new workingset with a new {@link FieldUnit} as
      * base entity is being created.
      *
      * @param identifier a {@link TypeDesignationWorkingsetEditorIdSet}
@@ -176,7 +179,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     @Override
     public void handleViewEntered() {
 
-        getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Country.uuidCountryVocabulary));
+        getView().getCountrySelectField().setContainerDataSource(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(Country.uuidCountryVocabulary));
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory.teamOrPersonPagingProvider();
         CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider = pagingProviderFactory.personPagingProvider();
@@ -185,13 +188,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getCollectorField().setFilterablePersonPagingProvider(personPagingProvider, this);
         getView().getCollectorField().setFilterableTeamPagingProvider(termOrPersonPagingProvider, this);
 
-        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(TermType.ReferenceSystem));
+        getView().getExactLocationField().getReferenceSystemSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(TermType.ReferenceSystem));
         getView().getExactLocationField().getReferenceSystemSelect().setItemCaptionPropertyId("label");
 
         getView().getTypeDesignationsCollectionField().addElementRemovedListener(e -> deleteTypeDesignation(e.getElement()));
         getView().getTypeDesignationsCollectionField().addElementAddedListener(e -> addTypeDesignation(e.getElement()));
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
         popuEditorTypeDesignationSourceRows.clear();

@@ -36,7 +36,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.utility.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
@@ -298,10 +298,16 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null){
             String summary = regDto.getSummary();
-            if(regDto.getOrderdTypeDesignationWorkingSets() != null) {
-                for( TypeDesignationWorkingSet workingSet : regDto.getOrderdTypeDesignationWorkingSets().values()) {
+            if(regDto.getOrderedTypeDesignationWorkingSets() != null) {
+                for( TypeDesignationWorkingSet workingSet : regDto.getOrderedTypeDesignationWorkingSets().values()) {
                     for(TypeDesignationStatusBase<?> typeStatus : workingSet.keySet()) {
-                        summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                        if(summary.contains(typeStatus.getLabel() + "s")){
+                            // replace plural form
+                            summary = summary.replace(typeStatus.getLabel() + "s", "<strong>" + typeStatus.getLabel() + "s</strong>");
+                        } else {
+                            // replace singular form
+                            summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
+                        }
                     }
                 }
             }

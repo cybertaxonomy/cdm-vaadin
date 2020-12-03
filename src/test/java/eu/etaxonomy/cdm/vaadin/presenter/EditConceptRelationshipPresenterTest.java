@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 13 Apr 2015
- *
  */
 @DataSets({
     @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
@@ -42,7 +41,9 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 })
 public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
+    @SuppressWarnings("unused")
     private static final Logger logger = Logger.getLogger(EditConceptRelationshipPresenterTest.class);
+
     public static EditConceptRelationshipPresenter ecrp;
 
     private static List<String> FROM_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
@@ -57,9 +58,8 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testLoadTaxonRelationshipTypeContainer() throws SQLException {
         CdmSQLContainer container = ecrp.loadTaxonRelationshipTypeContainer();
-        Assert.assertEquals(31, container.size());
+        Assert.assertEquals(30, container.size());
     }
-
 
     @Test
     public void testCreateRelationship() {
@@ -126,7 +126,6 @@ public class EditConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         Assert.assertNotNull(tr);
         Assert.assertEquals(newToTaxonUuid, tr.getToTaxon().getUuid());
         Assert.assertEquals(oldRelTypeUuid, tr.getType().getUuid());
-
     }
 
     @Test

@@ -92,10 +92,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
     public void test01_createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
-//        printDataSetWithNull(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
+//        printDataSet(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
 //                , "PERMISSIONGROUP", "PERMISSIONGROUP_GRANTEDAUTHORITYIMPL", "GRANTEDAUTHORITYIMPL"});
 
-       //printDataSetWithNull(System.err, debugTables);
+//        printDataSet(System.err, debugTables);
 //        writeDbUnitDataSetFile(new String[]{"AUDITEVENT", "DEFINEDTERMBASE", "DEFINEDTERMBASE_AUD", "DEFINEDTERMBASE_REPRESENTATION", "DEFINEDTERMBASE_REPRESENTATION_AUD",
 //                "REPRESENTATION", "REPRESENTATION_AUD", "HIBERNATE_SEQUENCES"},
 //                "RegistrationTerms");
@@ -122,9 +122,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        SpecimenOrObservationBase<?> baseEntity = cdmRepository.getOccurrenceService().load(workingset.getFieldUnit().getUuid());
 
-       printDataSetWithNull(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
+//     printDataSet(System.err, new String[]{"TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE"});
 
-       TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, baseEntity.getUuid(), baseEntity.getTitleCache());
+       TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<>(FieldUnit.class, baseEntity.getUuid(), baseEntity.getTitleCache());
 
        workingset = service.load(registrationUuid, baseEntityRef);
 
@@ -150,7 +150,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
        // write test data for delete test
        /*
-       // printDataSetWithNull(System.err, includeTableNames_delete);
+       // printDataSet(System.err, includeTableNames_delete);
         writeDbUnitDataSetFile(includeTableNames_delete, "deleteTest");
         */
        /* The following audit table fix needs also to be added to the test data:
@@ -190,7 +190,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
         service.save(workingset);
 
-        // printDataSetWithNull(System.err, includeTableNames_delete);
+        // printDataSet(System.err, includeTableNames_delete);
 
         workingset = service.load(registrationUuid, baseEntityRef);
         Registration reg = workingset.getOwner();
@@ -203,9 +203,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest-deleteTest.xml")
     public void test02_deleteWorkingset() {
 
-//        printDataSetWithNull(System.err, includeTableNames_delete);
+//        printDataSet(System.err, includeTableNames_delete);
 
-        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, fieldUnitUuid, null);
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<>(FieldUnit.class, fieldUnitUuid, null);
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.load(registrationUuid, baseEntityRef);
         Assert.assertNotNull(workingset.getOwner());
@@ -225,7 +225,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
         // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
 
-        // printDataSetWithNull(System.err, includeTableNames_delete);
+        // printDataSet(System.err, includeTableNames_delete);
     }
 
     // ---------------------- TestData -------------------------------------------
@@ -255,7 +255,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
         reg.setUuid(registrationUuid);
         reg = cdmRepository.getRegistrationService().save(reg);
 
-        //printDataSetWithNull(System.err, includeTableNames_create);
+        //printDataSet(System.err, includeTableNames_create);
 
         writeDbUnitDataSetFile(includeTableNames_create);
     }

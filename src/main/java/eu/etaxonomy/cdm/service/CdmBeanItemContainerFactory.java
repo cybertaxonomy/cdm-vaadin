@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,6 +26,7 @@ import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.IEnumTerm;
+import eu.etaxonomy.cdm.model.term.TermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
@@ -53,11 +55,8 @@ public class CdmBeanItemContainerFactory {
         orderHints.add(OrderHint.ORDER_BY_TITLE_CACHE);
     }
 
-    /**
-     * @param termType
-     */
     @Transactional(readOnly=true)
-    public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(TermType termType) {
+    public BeanItemContainer<DefinedTermBase> buildTermItemContainer(TermType termType) {
 
         clearSession();
         // TODO use TermCacher?
@@ -67,11 +66,8 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
-    /**
-     * @param termType
-     */
     @Transactional(readOnly=true)
-    public BeanItemContainer<DefinedTermBase> buildBeanItemContainer(UUID vocabularyUuid) {
+    public BeanItemContainer<DefinedTermBase> buildVocabularyTermsItemContainer(UUID vocabularyUuid) {
 
         clearSession();
         TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
@@ -81,17 +77,22 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
-    /**
-     * @param termType
-     */
+    @Transactional(readOnly=true)
+    public <DTO extends Object> BeanItemContainer<DTO> buildVocabularyTermsItemContainer(UUID vocabularyUuid, BeanToDTOConverter<TermBase, DTO> converter) {
+
+        clearSession();
+        TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
+        Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
+        BeanItemContainer<DTO> termItemContainer = new BeanItemContainer<>(converter.getDTOType());
+        termItemContainer.addAll(terms.getRecords().stream().map(b -> converter.toDTO(b)).collect(Collectors.toList()));
+        return termItemContainer;
+    }
+
+
     public BeanItemContainer<DefinedTermBase> buildTermItemContainer(UUID ... termUuid) {
         return buildTermItemContainer(Arrays.asList(termUuid));
     }
 
-    /**
-     * @param derivation_EVENT_TYPE_UUIDS
-     * @return
-     */
     @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildTermItemContainer(List<UUID> termsUuids) {
         clearSession();
@@ -101,9 +102,6 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
-    /**
-     * @param termType
-     */
     @Transactional(readOnly=true)
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
 
@@ -123,10 +121,6 @@ public class CdmBeanItemContainerFactory {
         return buildBeanItemContainer(type, null);
     }
 
-    /**
-     * @param values
-     * @return
-     */
     public <T extends IEnumTerm<T>> BeanItemContainer<T> buildEnumTermItemContainer(Class<T> termType, T ... enumTerms) {
         BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termType);
         List<T> termList = Arrays.asList(enumTerms);

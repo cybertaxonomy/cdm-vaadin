@@ -24,7 +24,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
@@ -99,7 +99,7 @@ public class NameTypeDesignationPresenter
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
-            typifiedNameInContext = regDTO.getTypifiedName();
+            typifiedNameInContext = regDTO.typifiedName();
             // find the working set
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
 
@@ -124,7 +124,9 @@ public class NameTypeDesignationPresenter
                 "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
                 "typifiedNames.typeDesignations", // important !!
                 "typeName.$",
-                "citation"
+                "source.citation",
+                "source.annotations",
+                "source.markers",
                 }
         ));
 
@@ -168,7 +170,7 @@ public class NameTypeDesignationPresenter
 
         getView().getTypifiedNamesComboboxSelect().setPagingProviders(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize(), this);
 
-        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildBeanItemContainer(
+        getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
     }

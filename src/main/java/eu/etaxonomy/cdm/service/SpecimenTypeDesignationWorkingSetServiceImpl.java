@@ -28,7 +28,7 @@ import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationComparator;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetManager.TypeDesignationWorkingSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
@@ -70,9 +70,9 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
     public static final List<String> TAXON_NAME_INIT_STRATEGY = Arrays.asList(new String []{
             "$",
-            "nomenclaturalReference.authorship.$",
-            "nomenclaturalReference.inReference.authorship.$",
-            "nomenclaturalReference.inReference.inReference.authorship.$",
+            "nomenclaturalSource.citation.authorship.$",
+            "nomenclaturalSource.citation.inReference.authorship.$",
+            "nomenclaturalSource.citation.inReference.inReference.authorship.$",
             "status.type",
             "typeDesignations"
             }
@@ -85,10 +85,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     @Autowired
     CdmRepository repo;
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
@@ -99,13 +95,10 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
         Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(reg, newfieldUnit, citation, typifiedName);
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<>(reg, newfieldUnit, citation, typifiedName);
         return workingSetDto;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly=true)
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
@@ -117,7 +110,8 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         return workingSetDto;
     }
 
-    protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
+    protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(
+            RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
 
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntityReference);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
@@ -126,7 +120,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
-                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.getTypifiedName());
+                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.typifiedName());
         return dto;
     }
 
@@ -161,9 +155,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         return bean;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly=false)
     public void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto) {
