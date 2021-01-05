@@ -1,8 +1,6 @@
 package eu.etaxonomy.cdm.vaadin.view;
 
-import java.net.URI;
-
-
+import eu.etaxonomy.cdm.common.URI;
 
 public interface IAuthenticationComponent {
 

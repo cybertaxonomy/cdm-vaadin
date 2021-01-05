@@ -8,10 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.util.converter;
 
-import java.net.URI;
 import java.util.Locale;
 
 import com.vaadin.data.util.converter.Converter;
+
+import eu.etaxonomy.cdm.common.URI;
 
 /**
  * Creates a link from the values in the column.

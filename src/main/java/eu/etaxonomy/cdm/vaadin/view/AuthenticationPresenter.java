@@ -1,7 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.view;
 
-import java.net.URI;
-
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -9,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;

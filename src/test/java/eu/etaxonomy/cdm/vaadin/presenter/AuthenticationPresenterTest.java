@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.presenter;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
@@ -19,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 import com.vaadin.server.VaadinSession;
 
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 import eu.etaxonomy.cdm.vaadin.view.AuthenticationPresenter;

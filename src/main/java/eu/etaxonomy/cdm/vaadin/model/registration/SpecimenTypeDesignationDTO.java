@@ -8,13 +8,13 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
-import java.net.URI;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
 import eu.etaxonomy.cdm.model.media.Media;

@@ -8,13 +8,14 @@
  */
 package eu.etaxonomy.cdm.vaadin.util;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import eu.etaxonomy.cdm.common.URI;
 
 /**
  * @author cmathew
