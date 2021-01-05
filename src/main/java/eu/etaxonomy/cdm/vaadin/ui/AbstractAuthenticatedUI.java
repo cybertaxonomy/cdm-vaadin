@@ -23,12 +23,9 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 @Deprecated
 public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4018850353646930682L;
 
-	Navigator navigator;
+    private Navigator navigator;
 
 	private static final String AUTHENTICATION_VIEW = "abstractAuthenticatedUI";
 

@@ -43,9 +43,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 /**
  * @author cmathew
  * @since 9 Apr 2015
- *
  */
 public class ConceptRelationshipView extends CustomComponent implements View, IBasicEventListener {
+
+   private static final long serialVersionUID = -2401649382244738589L;
 
     /*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
 
@@ -60,6 +61,7 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
     private StatusComposite primaryStatusComposite, secondaryStatusComposite;
 
     private Direction direction;
+
     /**
      * The constructor should first build the main layout, set the
      * composition root and then do any custom initialization.
@@ -135,8 +137,9 @@ public class ConceptRelationshipView extends CustomComponent implements View, IB
 
     private class ConceptRelationshipDropHandler implements DropHandler {
 
-        private StatusComposite sourceSc;
+        private static final long serialVersionUID = -47088400019778466L;
 
+        private StatusComposite sourceSc;
 
         public ConceptRelationshipDropHandler(StatusComposite sourceSc) {
             this.sourceSc = sourceSc;

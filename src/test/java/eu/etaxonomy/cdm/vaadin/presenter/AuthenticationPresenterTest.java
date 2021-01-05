@@ -67,7 +67,5 @@ public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
         Assert.assertTrue(isAuthenticated);
 
         Assert.assertTrue(authentication.isAuthenticated(anotherUri, anotherContext));
-
     }
-
 }

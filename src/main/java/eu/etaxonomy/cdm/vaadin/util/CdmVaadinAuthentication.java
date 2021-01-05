@@ -20,14 +20,14 @@ import eu.etaxonomy.cdm.common.URI;
 /**
  * @author cmathew
  * @since 28 Apr 2015
- *
  */
 public class CdmVaadinAuthentication {
+
     private final static Logger logger = Logger.getLogger(CdmVaadinAuthentication.class);
 
     public static final String KEY = "key_authentication";
 
-    Map<String, Authentication> hostAuthenticationMap = new HashMap<String, Authentication>();
+    Map<String, Authentication> hostAuthenticationMap = new HashMap<>();
 
     public void addAuthentication(URI requestSourceUri, String requestSourceContext, Authentication authentication) {
         addAuthentication(getRequestSource(requestSourceUri, requestSourceContext), authentication);
