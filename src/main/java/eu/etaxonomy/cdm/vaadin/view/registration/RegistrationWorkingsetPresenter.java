@@ -567,10 +567,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
-
-            popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
-
             if(event.hasSource()){
                 // propagate readonly state from source button to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -619,8 +616,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-            RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
-            Reference citation = regDto.getCitation();
             nameTypeDesignationPopupEditorRegistrationUUIDMap.put(popup, event.getRegistrationUuid());
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
@@ -629,14 +624,12 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
                     TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
-                    nameTypeDesignation.setCitation(citation);
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);
                     return nameTypeDesignation;
                 }
             });
             popup.withDeleteButton(false);
             popup.loadInEditor(null);
-            popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
             if(event.hasSource()){
                 // propagate readonly state from source component to popup

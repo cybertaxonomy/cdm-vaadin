@@ -26,7 +26,7 @@ public class TypeDesignationWorkingsetEditorIdSet {
      * @param baseEntityRef
      *
      * @param publicationUuid
-     *            Can <code>null</code> if the <code>workingsetID</code> is given.
+     *            Can <code>null</code> if the <code>workingsetId</code> is given.
      * @param typifiedNameUuid
      *            Can <code>null</code> if the <code>workingsetId</code> is given
      */

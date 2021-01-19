@@ -20,6 +20,7 @@ import com.vaadin.ui.TextField;
 import eu.etaxonomy.cdm.api.utility.RoleProber;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
+import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -58,9 +59,9 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private NativeSelect typeStatusSelect;
 
-    private ToOneRelatedEntityCombobox<Reference> citationCombobox;
+    private ToOneRelatedEntityCombobox<Reference> designationReferenceCombobox;
 
-    private TextField citationDetailField;
+    private TextField designationReferenceDetailField;
 
     private boolean showTypeFlags = true;
 
@@ -144,6 +145,9 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         typeStatusSelect.setWidth(100, Unit.PERCENTAGE);
         addField(typeStatusSelect, "typeStatus", 0, row, 1, row);
         grid.setComponentAlignment(typeStatusSelect, Alignment.TOP_RIGHT);
+        typeStatusSelect.addValueChangeListener(e -> {
+            updateDesignationReferenceFields();
+        });
 
         row++;
         typeNameField = new ToOneRelatedEntityCombobox<TaxonName>("Type name", TaxonName.class);
@@ -176,10 +180,10 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
 
         row++;
-        citationCombobox = new ToOneRelatedEntityCombobox<Reference>("Citation", Reference.class);
-        addField(citationCombobox, "citation", 0, row, 2, row);
-        citationCombobox.setWidth(400, Unit.PIXELS);
-        citationDetailField = addTextField("Citation detail", "citationMicroReference", 3, row);
+        designationReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Designation reference", Reference.class);
+        addField(designationReferenceCombobox, "citation", 0, row, 2, row);
+        designationReferenceCombobox.setWidth(400, Unit.PIXELS);
+        designationReferenceDetailField = addTextField("Reference detail", "citationMicroReference", 3, row);
 
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
@@ -192,6 +196,22 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
             annotationsListField.setAnnotationTypesVisible(editableAnotationTypes);
         }
         addField(annotationsListField, "annotations", 0, row, 3, row);
+    }
+
+
+
+    @Override
+    protected void afterItemDataSourceSet() {
+        super.afterItemDataSourceSet();
+        updateDesignationReferenceFields();
+    }
+
+    protected void updateDesignationReferenceFields() {
+        boolean hasDesignationSource = typeStatusSelect.getValue() != null && ((NameTypeDesignationStatus)typeStatusSelect.getValue()).hasDesignationSource();
+        designationReferenceDetailField.setVisible(hasDesignationSource);
+        designationReferenceCombobox.setVisible(hasDesignationSource);
+        // NOTE: For better usability we only hide these fields here,
+        // NameTypeDesignationPresenter.preSaveBean(NameTypeDesignation bean) will empty them in needed
     }
 
     /**
@@ -222,8 +242,8 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
      * @return the citationCombobox
      */
     @Override
-    public ToOneRelatedEntityCombobox<Reference> getCitationCombobox() {
-        return citationCombobox;
+    public ToOneRelatedEntityCombobox<Reference> getDesignationReferenceCombobox() {
+        return designationReferenceCombobox;
     }
 
 

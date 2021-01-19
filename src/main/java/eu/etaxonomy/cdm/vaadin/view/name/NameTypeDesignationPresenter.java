@@ -80,6 +80,8 @@ public class NameTypeDesignationPresenter
         }
     };
 
+    private CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider;
+
 
     @Override
     protected BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator(){
@@ -93,23 +95,19 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadBeanById(Object identifier) {
         if(identifier instanceof Integer || identifier == null){
             return super.loadBeanById(identifier);
-//        } else if(identifier instanceof TypedEntityReference && ((TypedEntityReference)identifier).getType().equals(TaxonName.class)) {
-//            typifiedNameInContext = getRepo().getNameService().find(((TypedEntityReference)identifier).getUuid());
-//            bean = super.loadBeanById(null);
         } else {
             TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
             typifiedNameInContext = regDTO.typifiedName();
             // find the working set
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
-
-            // NameTypeDesignation bameTypeDesignation = regDTO.getNameTypeDesignation(typeDesignationWorkingSet.getBaseEntityReference());
             if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
+            } else {
+                // TypeDesignationWorkingSet for NameTyped only contain one item!!!
+                UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
+                return super.loadBeanById(nameTypeDesignationUuid);
             }
-            // TypeDesignationWorkingSet for NameTyped only contain one item!!!
-            UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
-            return super.loadBeanById(nameTypeDesignationUuid);
         }
     }
 
@@ -127,6 +125,7 @@ public class NameTypeDesignationPresenter
                 "source.citation",
                 "source.annotations",
                 "source.markers",
+                "source.links",
                 }
         ));
 
@@ -144,8 +143,6 @@ public class NameTypeDesignationPresenter
     }
 
 
-
-
     /**
      * {@inheritDoc}
      */
@@ -155,13 +152,13 @@ public class NameTypeDesignationPresenter
         getView().getTypeStatusSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
         getView().getTypeStatusSelect().setItemCaptionPropertyId("description");
 
-        getView().getCitationCombobox().getSelect().setCaptionGenerator(
-                new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getCitationCombobox().getSelect())
+        getView().getDesignationReferenceCombobox().getSelect().setCaptionGenerator(
+                new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getDesignationReferenceCombobox().getSelect())
                 );
-        CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
-        getView().getCitationCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
-        getView().getCitationCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getCitationCombobox()));
-        getView().getCitationCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getCitationCombobox(), this));
+        referencePagingProvider = pagingProviderFactory.referencePagingProvider();
+        getView().getDesignationReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        getView().getDesignationReferenceCombobox().setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(getView().getDesignationReferenceCombobox()));
+        getView().getDesignationReferenceCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<>(getView().getDesignationReferenceCombobox(), this));
 
         CdmFilterablePagingProvider<TaxonName,TaxonName> namePagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
         getView().getTypeNameField().loadFrom(namePagingProvider, namePagingProvider, namePagingProvider.getPageSize());
@@ -213,6 +210,10 @@ public class NameTypeDesignationPresenter
      */
     @Override
     protected NameTypeDesignation preSaveBean(NameTypeDesignation bean) {
+
+        if(!bean.hasDesignationSource()) {
+            bean.setSource(null); // this effectively removes the designation reference and reference detail
+        }
 
         // the typifiedNames can only be set on the name side, so we need to
         // handle changes explicitly here
