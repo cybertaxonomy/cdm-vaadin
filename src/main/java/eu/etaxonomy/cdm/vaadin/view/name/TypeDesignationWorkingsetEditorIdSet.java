@@ -17,7 +17,6 @@ public class TypeDesignationWorkingsetEditorIdSet {
 
     UUID registrationUuid;
     TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
-    UUID publicationUuid;
     UUID typifiedNameUuid;
 
     /**
@@ -25,16 +24,12 @@ public class TypeDesignationWorkingsetEditorIdSet {
      *            must be present
      * @param baseEntityRef
      *
-     * @param publicationUuid
-     *            Can <code>null</code> if the <code>workingsetId</code> is given.
      * @param typifiedNameUuid
      *            Can <code>null</code> if the <code>workingsetId</code> is given
      */
-    protected TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
-            UUID publicationUuid, UUID typifiedNameUuid) {
+    protected TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef, UUID typifiedNameUuid) {
         this.registrationUuid = registrationUuid;
         this.baseEntityRef = baseEntityRef;
-        this.publicationUuid = publicationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
         if(baseEntityRef == null && typifiedNameUuid == null){
             throw new NullPointerException("When workingsetId is null the typifiedNameId must be non null.");
@@ -42,10 +37,10 @@ public class TypeDesignationWorkingsetEditorIdSet {
     }
 
     public TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, TypedEntityReference<IdentifiableEntity<?>> baseEntityRef) {
-        this(registrationUuid, baseEntityRef, null, null);
+        this(registrationUuid, baseEntityRef, null);
     }
 
-    public TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
-        this(registrationUuid, null, publicationUuid, typifiedNameUuid);
+    public TypeDesignationWorkingsetEditorIdSet(UUID registrationUuid, UUID typifiedNameUuid) {
+        this(registrationUuid, null, typifiedNameUuid);
     }
 }

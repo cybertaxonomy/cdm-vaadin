@@ -586,7 +586,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-            TypeDesignationWorkingsetEditorIdSet identifierSet;
             UUID typifiedNameUuid;
 
             RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
@@ -599,14 +598,13 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 typifiedNameUuid = registrationDTO.getNameRef().getUuid();
             }
 
-            identifierSet = new TypeDesignationWorkingsetEditorIdSet(
-                    event.getRegistrationUuid(),
-                    null,
-                    typifiedNameUuid
-                    );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.withDeleteButton(false);
-            popup.loadInEditor(identifierSet);
+            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(
+                    event.getRegistrationUuid(),
+                    typifiedNameUuid
+                    )
+                    );
             if(event.hasSource()){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
