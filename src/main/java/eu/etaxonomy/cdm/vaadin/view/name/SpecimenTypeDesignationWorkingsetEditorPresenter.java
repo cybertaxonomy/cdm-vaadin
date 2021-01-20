@@ -121,13 +121,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * loading the Registration specified by the <code>RegistrationAndWorkingsetId.registrationId</code> and in
      * a second step to find the workingset by the <code>registrationAndWorkingsetId.workingsetId</code>.
      * <p>
-     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetEditorIdSet} whereas the
+     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetIds} whereas the
      * field <code>registrationId</code> must be present.
      * The field <code>workingsetId</code> however can be null.
      * I this case a new workingset with a new {@link FieldUnit} as
      * base entity is being created.
      *
-     * @param identifier a {@link TypeDesignationWorkingsetEditorIdSet}
+     * @param identifier a {@link TypeDesignationWorkingsetIds}
      */
     @Override
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> loadBeanById(Object identifier) {
@@ -135,9 +135,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         cache = new CdmTransientEntityAndUuidCacher(this);
         if(identifier != null){
 
-            TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
+            SpecimenTypeDesignationWorkingsetIds idset = (SpecimenTypeDesignationWorkingsetIds)identifier;
 
             if(idset.baseEntityRef != null){
+                // load existing workingset
                 workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntityRef);
                 if(workingSetDto.getFieldUnit() == null){
                     workingSetDto = specimenTypeDesignationWorkingSetService.fixMissingFieldUnit(workingSetDto);
@@ -150,7 +151,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.typifiedNameUuid);
+                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.getRegistrationUUID(), idset.getTypifiedNameUuid());
                 // need to use load but put see #7214
                 Registration registration = workingSetDto.getOwner();
                 cache.load(registration);

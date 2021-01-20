@@ -96,7 +96,7 @@ public class NameTypeDesignationPresenter
         if(identifier instanceof Integer || identifier == null){
             return super.loadBeanById(identifier);
         } else {
-            TypeDesignationWorkingsetEditorIdSet idset = (TypeDesignationWorkingsetEditorIdSet)identifier;
+            TypeDesignationWorkingsetIds idset = (TypeDesignationWorkingsetIds)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
             typifiedNameInContext = regDTO.typifiedName();
             // find the working set
