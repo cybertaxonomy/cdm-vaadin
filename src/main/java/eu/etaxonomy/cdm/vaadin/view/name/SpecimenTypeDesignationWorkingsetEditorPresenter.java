@@ -150,18 +150,14 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.publicationUuid, idset.typifiedNameUuid);
+                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.registrationUuid, idset.typifiedNameUuid);
                 // need to use load but put see #7214
                 Registration registration = workingSetDto.getOwner();
                 cache.load(registration);
-                if(registration.getName() == null && (registration.getTypeDesignations() == null || registration.getTypeDesignations().isEmpty())){
-                    // need to add the citation to the cache when there is no name or typedesignation in the registry which would bring the citation otherwise.
-                    cache.load(workingSetDto.getCitation());
-                }
                 cache.load(workingSetDto.getTypifiedName());
                 rootEntities.add(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getTypifiedName());
-                rootEntities.add(workingSetDto.getCitation());
+
             }
 
         } else {

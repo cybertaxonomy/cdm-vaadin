@@ -100,7 +100,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 //                "REPRESENTATION", "REPRESENTATION_AUD", "HIBERNATE_SEQUENCES"},
 //                "RegistrationTerms");
 
-       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationUuid, publicationUuid, typifiedNameUuid);
+       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationUuid, typifiedNameUuid);
 
        Assert.assertNotNull(workingset.getOwner());
        Assert.assertEquals(Registration.class, workingset.getOwner().getClass());

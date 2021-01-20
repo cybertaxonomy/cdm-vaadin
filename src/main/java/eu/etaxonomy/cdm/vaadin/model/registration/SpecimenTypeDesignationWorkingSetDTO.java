@@ -25,7 +25,6 @@ import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
-import eu.etaxonomy.cdm.model.reference.Reference;
 
 /**
  * @author a.kohlbecker
@@ -49,8 +48,6 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
 
     OWNER owner;
 
-    private Reference citation;
-
     private TaxonName typifiedName;
 
     /**
@@ -59,17 +56,13 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, Reference citation, TaxonName typifiedName) {
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
-        if(citation == null){
-            throw new NullPointerException("citation must not be null");
-        }
         if(typifiedName == null){
             throw new NullPointerException("typifiedName must not be null");
         }
-        this.citation = citation;
         this.typifiedName = typifiedName;
         if(baseEntity instanceof FieldUnit){
             this.fieldUnit = (FieldUnit) baseEntity;
@@ -89,8 +82,8 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param citationEntityID
      * @param typifiedNameEntityID
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, Reference citation, TaxonName typifiedName) {
-        this(reg, newfieldUnit, null, citation, typifiedName);
+    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, TaxonName typifiedName) {
+        this(reg, newfieldUnit, null, typifiedName);
     }
 
     /**
@@ -295,20 +288,6 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
 
     public void setGatheringDate(TimePeriod gatheringDate){
         fieldUnit.getGatheringEvent().setTimeperiod(gatheringDate);
-    }
-
-    /**
-     * @return the citation
-     */
-    public Reference getCitation() {
-        return citation;
-    }
-
-    /**
-     * @param citation the citation to set
-     */
-    public void setCitation(Reference citation) {
-        this.citation = citation;
     }
 
     /**

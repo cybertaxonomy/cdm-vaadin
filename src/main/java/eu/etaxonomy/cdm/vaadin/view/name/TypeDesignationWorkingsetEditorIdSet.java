@@ -36,8 +36,8 @@ public class TypeDesignationWorkingsetEditorIdSet {
         this.baseEntityRef = baseEntityRef;
         this.publicationUuid = publicationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
-        if(baseEntityRef == null && publicationUuid == null|| baseEntityRef == null && typifiedNameUuid == null){
-            throw new NullPointerException("When workingsetId is null, publicationId and typifiedNameId must be non null.");
+        if(baseEntityRef == null && typifiedNameUuid == null){
+            throw new NullPointerException("When workingsetId is null the typifiedNameId must be non null.");
         }
     }
 
