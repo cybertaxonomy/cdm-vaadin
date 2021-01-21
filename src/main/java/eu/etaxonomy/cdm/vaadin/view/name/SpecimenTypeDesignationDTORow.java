@@ -16,6 +16,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
@@ -47,11 +48,14 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
      */
     TextField associatedTypeDesignationCount = new TextField();
     RowListSelect kindOfUnit = new RowListSelect(); // position is IMPORTANT, see rowListSelectColumn()
-    NativeSelect typeStatus = new NativeSelect();
+    RowListSelect typeStatus = new RowListSelect();
     ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection> collection =
             new ToOneRelatedEntityCombobox<eu.etaxonomy.cdm.model.occurrence.Collection>(null, eu.etaxonomy.cdm.model.occurrence.Collection.class);
     TextField accessionNumber = new TextFieldNFix();
     TextField preferredStableUri = new TextFieldNFix();
+    ToOneRelatedEntityCombobox<Reference> designationReference =
+            new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
+    TextField designationReferenceDetail = new TextFieldNFix(); //"Image reference detail");
     TextField mediaUri = new TextFieldNFix();
     ToOneRelatedEntityCombobox<Reference> mediaSpecimenReference =
             new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
@@ -61,16 +65,27 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
 
         kindOfUnit.setRequired(true);
         kindOfUnit.setRow(this);
+        kindOfUnit.addValueChangeListener(e ->
+            updateRowItemsEnablement()
+            );
 
         typeStatus.setRequired(true);
+        typeStatus.addValueChangeListener(e ->
+            updateRowItemsEnablement()
+            );
 
         accessionNumber.setWidth(100, Unit.PIXELS);
+
+        collection.setWidth(200, Unit.PIXELS);
+        collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(collection));
 
         preferredStableUri.setWidth(150, Unit.PIXELS);
         preferredStableUri.setConverter(new UriConverter());
 
-        collection.setWidth(200, Unit.PIXELS);
-        collection.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Collection>(collection));
+        designationReference.setWidth(200, Unit.PIXELS);
+        designationReference.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(mediaSpecimenReference));
+
+        designationReferenceDetail.setWidth(200, Unit.PIXELS);
 
         mediaUri.setWidth(150, Unit.PIXELS);
         mediaUri.setConverter(new UriConverter());
@@ -80,9 +95,6 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
 
         mediaSpecimenReferenceDetail.setWidth(200, Unit.PIXELS);
 
-        kindOfUnit.addValueChangeListener(e ->
-                updateRowItemsEnablement()
-        );
 
     }
 
@@ -95,6 +107,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
             kindOfUnit, typeStatus,
             collection, accessionNumber,
             preferredStableUri,
+            designationReference, designationReferenceDetail,
             mediaUri, mediaSpecimenReference,
             mediaSpecimenReferenceDetail
             };
@@ -107,6 +120,7 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
             "kindOfUnit", "typeStatus",
             "collection", "accessionNumber",
             "preferredStableUri",
+            "designationReference", "designationReferenceDetail",
             "mediaUri", "mediaSpecimenReference",
             "mediaSpecimenReferenceDetail"
             });
@@ -125,6 +139,11 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         kindOfUnit.setEnabled(!kindOfUnitLocked);
         kindOfUnit.setDescription(kindOfUnitLocked ?
                 "Can not be changed since the type specimen is associated with multiple type designations" : "");
+
+        boolean withDesignationReference = typeStatus.getValue() != null && ((SpecimenTypeDesignationStatus)typeStatus.getValue()).hasDesignationSource();
+
+        designationReference.setEnabled(withDesignationReference);
+        designationReferenceDetail.setEnabled(withDesignationReference);
 
         mediaSpecimenReference.setEnabled(publishedImageType || unPublishedImageType);
         mediaSpecimenReferenceDetail.setEnabled(publishedImageType || unPublishedImageType);

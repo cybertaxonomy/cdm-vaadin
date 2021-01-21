@@ -214,6 +214,22 @@ public class SpecimenTypeDesignationDTO {
         std.getTypeSpecimen().setPreferredStableUri(uri);
     }
 
+    public Reference getDesignationReference() {
+        return std.getCitation();
+    }
+
+    public void setDesignationReference(Reference citation) {
+        std.setCitation(citation);
+    }
+
+    public String getDesignationReferenceDetail() {
+        return std.getCitationMicroReference();
+    }
+
+    public void setDesignationReferenceDetail(String detail) {
+        std.setCitationMicroReference(detail);
+    }
+
     public URI getMediaUri(){
         if(checkMediaSpecimen()){
             MediaRepresentationPart part = findMediaRepresentationPart();

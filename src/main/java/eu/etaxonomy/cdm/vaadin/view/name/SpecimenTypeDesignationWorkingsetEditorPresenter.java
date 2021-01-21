@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -109,7 +110,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private Map<CollectionPopupEditor, SpecimenTypeDesignationDTORow> collectionPopupEditorsRowMap = new HashMap<>();
 
-    private Map<ReferencePopupEditor, SpecimenTypeDesignationDTORow> referencePopupEditorsRowMap = new HashMap<>();
+    private Map<ReferencePopupEditor, ToOneRelatedEntityCombobox<Reference>> referencePopupEditorsCombobox = new HashMap<>();
 
     private Set<CollectionRowItemCollection> popuEditorTypeDesignationSourceRows = new HashSet<>();
 
@@ -234,19 +235,33 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         }
                     });
 
+                row.designationReference.loadFrom(
+                        referencePagingProvider,
+                        referencePagingProvider,
+                        referencePagingProvider.getPageSize()
+                        );
+                row.designationReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.designationReference.getSelect()));
+                row.designationReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.designationReference.getSelect(),
+                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                row.designationReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row.designationReference));
+                row.designationReference.addClickListenerEditEntity(e -> {
+                    if(row.designationReference.getValue() != null){
+                        doReferenceEditorEdit(row.designationReference);
+                    }
+                });
+
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
                         referencePagingProvider,
                         referencePagingProvider.getPageSize()
                         );
-
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.mediaSpecimenReference.getSelect()));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
                         SpecimenTypeDesignationWorkingsetEditorPresenter.this));
-                row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row));
+                row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row.mediaSpecimenReference));
                 row.mediaSpecimenReference.addClickListenerEditEntity(e -> {
                     if(row.mediaSpecimenReference.getValue() != null){
-                        doReferenceEditorEdit(row);
+                        doReferenceEditorEdit(row.mediaSpecimenReference);
                     }
                 });
 
@@ -270,6 +285,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         if(crud != null){
             UserHelperAccess.userHelper().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
+        }
+
+        List<SpecimenTypeDesignationDTO> stdDTOs = dto.getSpecimenTypeDesignationDTOs();
+        for(SpecimenTypeDesignationDTO stddto : stdDTOs) {
+            // clean up
+            if(!stddto.getTypeStatus().hasDesignationSource()) {
+                stddto.setDesignationReference(null);
+                stddto.setDesignationReferenceDetail(null);
+            }
         }
 
         specimenTypeDesignationWorkingSetService.save(dto);
@@ -385,7 +409,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         }
     }
 
-    public void doReferenceEditorAdd(SpecimenTypeDesignationDTORow row) {
+    public void doReferenceEditorAdd(ToOneRelatedEntityCombobox<Reference> referenceComobox) {
 
         ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
 
@@ -394,18 +418,18 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         referencePopupEditor.withDeleteButton(true);
         referencePopupEditor.loadInEditor(null);
 
-        referencePopupEditorsRowMap.put(referencePopupEditor, row);
+        referencePopupEditorsCombobox.put(referencePopupEditor, referenceComobox);
     }
 
-    public void doReferenceEditorEdit(SpecimenTypeDesignationDTORow row) {
+    public void doReferenceEditorEdit(ToOneRelatedEntityCombobox<Reference> referenceComobox) {
 
         ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
         referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
         referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
         referencePopupEditor.withDeleteButton(true);
-        referencePopupEditor.loadInEditor(row.mediaSpecimenReference.getValue().getUuid());
+        referencePopupEditor.loadInEditor(referenceComobox.getValue().getUuid());
 
-        referencePopupEditorsRowMap.put(referencePopupEditor, row);
+        referencePopupEditorsCombobox.put(referencePopupEditor, referenceComobox);
     }
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
@@ -414,13 +438,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         Reference newRef = getRepo().getReferenceService().load(event.getEntityUuid(), Arrays.asList(new String[]{"$"}));
         cache.load(newRef);
 
+        ToOneRelatedEntityCombobox<Reference> combobox = referencePopupEditorsCombobox.get(event.getSourceView());
         if(event.isCreatedType()){
-            SpecimenTypeDesignationDTORow row = referencePopupEditorsRowMap.get(event.getSourceView());
-            ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
             combobox.setValue((Reference) event.getEntity());
         } else {
             for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
-                ToOneRelatedEntityCombobox<Reference> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 7);
                 combobox.reload();
             }
         }
