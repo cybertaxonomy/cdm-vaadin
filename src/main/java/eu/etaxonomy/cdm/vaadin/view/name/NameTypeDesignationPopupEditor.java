@@ -135,14 +135,19 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
         if(showTypeFlags){
             conservedTypeField = addCheckBox("Conserved type", "conservedType", 0, row);
+            conservedTypeField.addValueChangeListener(e -> updateDesignationReferenceFields());
             rejectedTypeField = addCheckBox("Rejected type", "rejectedType", 1, row);
+            rejectedTypeField.addValueChangeListener(e -> updateDesignationReferenceFields());
             notDesignatedField = addCheckBox("Not designated", "notDesignated", 2, row);
+            notDesignatedField.addValueChangeListener(e -> updateDesignationReferenceFields());
             row++;
         }
 
         typeStatusSelect = new NativeSelect("Type status");
         typeStatusSelect.setNullSelectionAllowed(false);
         typeStatusSelect.setWidth(100, Unit.PERCENTAGE);
+        typeStatusSelect.setRequired(true);
+        typeStatusSelect.setRequiredError("Either \"Type status\" must be set or any of the \"Conserved type\", \"Rejected type\" or \"Not designated\" flags must be set.");
         addField(typeStatusSelect, "typeStatus", 0, row, 1, row);
         grid.setComponentAlignment(typeStatusSelect, Alignment.TOP_RIGHT);
         typeStatusSelect.addValueChangeListener(e -> {
@@ -212,6 +217,10 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         designationReferenceCombobox.setVisible(hasDesignationSource);
         // NOTE: For better usability we only hide these fields here,
         // NameTypeDesignationPresenter.preSaveBean(NameTypeDesignation bean) will empty them in needed
+
+        boolean typeStatusRequired = !(conservedTypeField.getValue().booleanValue() || rejectedTypeField.getValue().booleanValue() || notDesignatedField.getValue().booleanValue());
+        typeStatusSelect.setRequired(typeStatusRequired);
+
     }
 
     /**
