@@ -43,7 +43,6 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCodeEdition;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
-import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
@@ -69,6 +68,7 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.name.NomenclaturalStatusDTO;
 import eu.etaxonomy.cdm.vaadin.model.name.TaxonNameDTO;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
@@ -204,9 +204,9 @@ public class TaxonNameEditorPresenter
                     public NomenclaturalStatusRow create() {
                         NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
-                        BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory
-                                .buildVocabularyTermsItemContainer(
-                                        NomenclaturalStatusType.ALTERNATIVE().getVocabulary().getUuid());
+                        BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(
+                                RegistrationTermLists.NOMENCLATURAL_STATUS_TYPE_UUIDS()
+                                );
                         row.type.setContainerDataSource(statusTypeItemContainer);
                         row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
                         for (DefinedTermBase term : statusTypeItemContainer.getItemIds()) {
