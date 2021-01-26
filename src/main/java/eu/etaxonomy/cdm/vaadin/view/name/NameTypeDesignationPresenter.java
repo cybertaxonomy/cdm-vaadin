@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -30,11 +32,13 @@ import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
+import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmStore;
@@ -45,6 +49,7 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -65,12 +70,21 @@ public class NameTypeDesignationPresenter
 
     private static final long serialVersionUID = 896305051895903033L;
 
+    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingsetEditorPresenter.class);
+
     @Autowired
     private IRegistrationWorkingSetService registrationWorkingSetService;
 
     HashSet<TaxonName> typifiedNamesAsLoaded;
 
     private TaxonName typifiedNameInContext;
+
+    /**
+     * The unit of publication in which the type designation has been published.
+     * This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     * but never a {@link ReferenceType#Section}
+     */
+    private DescriptionElementSource publishedUnit;
 
     protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
 
@@ -93,8 +107,9 @@ public class NameTypeDesignationPresenter
      */
     @Override
     protected NameTypeDesignation loadBeanById(Object identifier) {
+        NameTypeDesignation bean;
         if(identifier instanceof Integer || identifier == null){
-            return super.loadBeanById(identifier);
+            bean = super.loadBeanById(identifier);
         } else {
             TypeDesignationWorkingsetIds idset = (TypeDesignationWorkingsetIds)identifier;
             RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
@@ -106,9 +121,30 @@ public class NameTypeDesignationPresenter
             } else {
                 // TypeDesignationWorkingSet for NameTyped only contain one item!!!
                 UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
-                return super.loadBeanById(nameTypeDesignationUuid);
+                bean = super.loadBeanById(nameTypeDesignationUuid);
             }
         }
+
+        try {
+            setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());
+        } catch (Exception e) {
+            // FIXME report error state instead
+            logger.error("Error on finding published unit in " + bean, e);
+        }
+
+        if (getPublishedUnit() != null) {
+            // reduce available references to those which are sections of
+            // the publicationUnit and the publishedUnit itself
+            referencePagingProvider.getCriteria()
+                    .add(Restrictions.or(
+                            Restrictions.and(
+                                    Restrictions.eq("inReference", publishedUnit.getCitation()),
+                                    Restrictions.eq("type", ReferenceType.Section)),
+                            Restrictions.idEq(publishedUnit.getCitation().getId()))
+                         );
+        }
+
+        return bean;
     }
 
 
@@ -121,6 +157,7 @@ public class NameTypeDesignationPresenter
                 "$",
                 "annotations.*", // * is needed as log as we are using a table in FilterableAnnotationsField
                 "typifiedNames.typeDesignations", // important !!
+                "typifiedNames.nomenclaturalSource.citation",
                 "typeName.$",
                 "source.citation",
                 "source.annotations",
@@ -313,6 +350,32 @@ public class NameTypeDesignationPresenter
 
             }
         }
+    }
+
+    /**
+     * @return
+     *  the {@link #publishedUnit}
+     */
+    public DescriptionElementSource getPublishedUnit() {
+        return publishedUnit;
+    }
+
+    /**
+     * @param publishedUnit
+     *  The unit of publication in which the type designation has been published.
+     *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     */
+    protected void setPublishedUnit(DescriptionElementSource publishedUnit) throws Exception {
+        if(publishedUnit == null) {
+            throw new NullPointerException();
+        }
+        if(publishedUnit.getCitation() == null) {
+            throw new NullPointerException("The citation of the published unit must not be null.");
+        }
+        if(!RegistrationUIDefaults.NOMECLATURAL_PUBLICATION_UNIT_TYPES.contains(publishedUnit.getCitation().getType())) {
+            throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
+        }
+        this.publishedUnit = publishedUnit;
     }
 
 }

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     implements CachingPresenter, DisposableBean {
 
     private static final long serialVersionUID = 4255636253714476918L;
+
+    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingsetEditorPresenter.class);
 
     private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 

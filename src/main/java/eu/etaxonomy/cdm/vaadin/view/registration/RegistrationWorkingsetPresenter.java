@@ -626,7 +626,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 @Override
                 public NameTypeDesignation createNewBean() {
 
-                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
+                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{
+                            "typeDesignations",
+                            "homotypicalGroup",
+                            "nomenclaturalSource.citation"
+                            }));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);
                     return nameTypeDesignation;
