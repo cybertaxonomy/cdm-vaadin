@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +26,7 @@ import org.vaadin.viritin.fields.AbstractElementCollection;
 
 import com.vaadin.spring.annotation.SpringComponent;
 
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
@@ -33,6 +35,7 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -40,6 +43,7 @@ import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
@@ -108,6 +112,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
 
+    CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider;
+
+    /**
+     * The unit of publication in which the type designation has been published.
+     * This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     * but never a {@link ReferenceType#Section}
+     */
+    private DescriptionElementSource publishedUnit;
+
     private Map<CollectionPopupEditor, SpecimenTypeDesignationDTORow> collectionPopupEditorsRowMap = new HashMap<>();
 
     private Map<ReferencePopupEditor, ToOneRelatedEntityCombobox<Reference>> referencePopupEditorsCombobox = new HashMap<>();
@@ -147,23 +160,36 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         //       This method must go again into the presenter !!!!
                         logger.info("Basing all typeDesignations on a new fieldUnit");
                 }
-                // need to use load but put see #7214
-                cache.load(workingSetDto.getOwner());
-                rootEntities.add(workingSetDto.getOwner());
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
                 workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.getRegistrationUUID(), idset.getTypifiedNameUuid());
-                // need to use load but put see #7214
-                Registration registration = workingSetDto.getOwner();
-                cache.load(registration);
                 cache.load(workingSetDto.getTypifiedName());
-                rootEntities.add(workingSetDto.getOwner());
                 rootEntities.add(workingSetDto.getTypifiedName());
-
             }
-
+            Registration registration = workingSetDto.getOwner();
+            // need to use load() but put() see #7214
+            cache.load(registration);
+            rootEntities.add(registration);
+            try {
+                setPublishedUnit(RegistrationDTO.findPublishedUnit(registration));
+            } catch (Exception e) {
+                // FIXME report error state instead
+                logger.error("Error on finding published unit in " + registration.toString(), e);
+            }
         } else {
             workingSetDto = null;
+        }
+
+        if (getPublishedUnit() != null) {
+            // reduce available references to those which are sections of
+            // the publicationUnit and the publishedUnit itself
+            referencePagingProvider.getCriteria()
+                    .add(Restrictions.or(
+                            Restrictions.and(
+                                    Restrictions.eq("inReference", publishedUnit.getCitation()),
+                                    Restrictions.eq("type", ReferenceType.Section)),
+                            Restrictions.idEq(publishedUnit.getCitation().getId()))
+                         );
         }
 
         return workingSetDto;
@@ -199,8 +225,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
-        CdmFilterablePagingProvider<Reference, Reference> referencePagingProvider = pagingProviderFactory.referencePagingProvider();
-
+        referencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
@@ -340,7 +365,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      */
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
-
     }
 
     /**
@@ -405,7 +429,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                    }
                }
             }
-
         }
     }
 
@@ -446,7 +469,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 combobox.reload();
             }
         }
-
     }
 
     /**
@@ -472,6 +494,32 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void destroy() throws Exception {
         super.destroy();
         cache.dispose();
+    }
+
+    /**
+     * @return
+     *  the {@link #publishedUnit}
+     */
+    public DescriptionElementSource getPublishedUnit() {
+        return publishedUnit;
+    }
+
+    /**
+     * @param publishedUnit
+     *  The unit of publication in which the type designation has been published.
+     *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     */
+    protected void setPublishedUnit(DescriptionElementSource publishedUnit) throws Exception {
+        if(publishedUnit == null) {
+            throw new NullPointerException();
+        }
+        if(publishedUnit.getCitation() == null) {
+            throw new NullPointerException("The citation of the published unit must not be null.");
+        }
+        if(!RegistrationUIDefaults.NOMECLATURAL_PUBLICATION_UNIT_TYPES.contains(publishedUnit.getCitation().getType())) {
+            throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
+        }
+        this.publishedUnit = publishedUnit;
     }
 
 }

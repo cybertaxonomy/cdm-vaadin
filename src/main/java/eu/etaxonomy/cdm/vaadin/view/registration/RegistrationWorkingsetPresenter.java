@@ -558,7 +558,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(event.getRegistrationUuid(),
+            popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                    event.getRegistrationUuid(),
                     event.getBaseEntityRef().castTo(FieldUnit.class), null));
             if(event.hasSource()){
                 // propagate readonly state from source button to popup
