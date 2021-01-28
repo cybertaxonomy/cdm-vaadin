@@ -38,6 +38,15 @@ public class RegistrationUIDefaults {
             ReferenceType.Section,
             ReferenceType.Thesis);
 
+    public static final EnumSet<ReferenceType> NOMECLATURAL_PUBLICATION_UNIT_TYPES = EnumSet.of(
+            ReferenceType.Article,
+            ReferenceType.Book,
+            ReferenceType.BookSection,
+            ReferenceType.Thesis,
+            ReferenceType.Section
+            );
+
+
     public static final EnumSet<ReferenceType> MEDIA_REFERENCE_TYPES = EnumSet.of(
             // same as for print
             ReferenceType.Article,

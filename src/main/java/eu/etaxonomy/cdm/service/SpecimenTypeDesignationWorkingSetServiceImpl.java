@@ -27,10 +27,10 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationComparator;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
+import eu.etaxonomy.cdm.compare.name.TypeDesignationComparator;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -43,7 +43,6 @@ import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
-import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
@@ -86,7 +85,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
     CdmRepository repo;
 
     @Override
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY.getPropertyPaths());
         if(reg == null){
@@ -94,8 +93,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             reg.setUuid(registrationUuid);
         }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
-        Reference citation = repo.getReferenceService().load(publicationUuid, Arrays.asList("$"));
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<>(reg, newfieldUnit, citation, typifiedName);
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<>(reg, newfieldUnit, typifiedName);
         return workingSetDto;
     }
 
@@ -120,7 +118,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
         VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
 
         SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
-                baseEntity, specimenTypeDesignations, regDTO.getCitation(), regDTO.typifiedName());
+                baseEntity, specimenTypeDesignations, regDTO.typifiedName());
         return dto;
     }
 
@@ -137,7 +135,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             FieldUnit fieldUnit = FieldUnit.NewInstance();
             GatheringEvent gatheringEvent = GatheringEvent.NewInstance();
             fieldUnit.setGatheringEvent(gatheringEvent);
-            fieldUnit = (FieldUnit) repo.getOccurrenceService().save(fieldUnit);
+            fieldUnit = repo.getOccurrenceService().save(fieldUnit);
 
             VersionableEntity baseEntity = bean.getBaseEntity();
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
@@ -172,7 +170,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
-                std.setCitation(dto.getCitation());
                 dto.getTypifiedName().addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }

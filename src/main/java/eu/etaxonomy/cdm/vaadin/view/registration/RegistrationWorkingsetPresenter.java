@@ -54,9 +54,9 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TaxonNameFactory;
 import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
+import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
-import eu.etaxonomy.cdm.ref.EntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -82,11 +82,12 @@ import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationWorkingsetIds;
+import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetIds;
 import eu.etaxonomy.cdm.vaadin.view.name.SpecimenTypeDesignationWorkingsetPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNameEditorPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.TaxonNamePopupEditorMode;
-import eu.etaxonomy.cdm.vaadin.view.name.TypeDesignationWorkingsetEditorIdSet;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
@@ -557,7 +558,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
+            popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                    event.getRegistrationUuid(),
+                    event.getBaseEntityRef().castTo(FieldUnit.class), null));
             if(event.hasSource()){
                 // propagate readonly state from source button to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -566,11 +569,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new TypeDesignationWorkingsetEditorIdSet(event.getRegistrationUuid(), event.getBaseEntityRef()));
-
-            popup.getCitationCombobox().setEnabled(false);
+            popup.loadInEditor(new NameTypeDesignationWorkingsetIds(
+                    event.getRegistrationUuid(),
+                    event.getBaseEntityRef().castTo(NameTypeDesignation.class))
+                    );
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
-
             if(event.hasSource()){
                 // propagate readonly state from source button to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -589,28 +592,26 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-            TypeDesignationWorkingsetEditorIdSet identifierSet;
             UUID typifiedNameUuid;
 
             RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
-            EntityReference typifiedNameRef = registrationDTO.getTypifiedNameRef();
-            if(typifiedNameRef != null){
+            TypedEntityReference<TaxonName> typifiedNameRef;
+            if(registrationDTO.getTypifiedNameRef() != null){
                 // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
-                typifiedNameUuid = typifiedNameRef.getUuid();
+                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationDTO.getTypifiedNameRef().getUuid());
             } else {
                 // case of registrations with a name in the nomenclatural act.
-                typifiedNameUuid = registrationDTO.getNameRef().getUuid();
+                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationDTO.getNameRef().getUuid());
             }
 
-            identifierSet = new TypeDesignationWorkingsetEditorIdSet(
-                    event.getRegistrationUuid(),
-                    getView().getCitationUuid(), // FIXME This may pass the reference (e.g. Article) from RegistrationWorkingsetView
-                    // to the TypeDesignationWorkingset even if the nomenclatural act is a Section !!! --> #9290
-                    typifiedNameUuid
-                    );
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.withDeleteButton(false);
-            popup.loadInEditor(identifierSet);
+            popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                        event.getRegistrationUuid(),
+                        null,
+                        typifiedNameRef.getUuid()
+                        )
+                    );
             if(event.hasSource()){
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -619,24 +620,24 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
-            RegistrationDTO regDto = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
-            Reference citation = regDto.getCitation();
             nameTypeDesignationPopupEditorRegistrationUUIDMap.put(popup, event.getRegistrationUuid());
             popup.setBeanInstantiator(new BeanInstantiator<NameTypeDesignation>() {
 
                 @Override
                 public NameTypeDesignation createNewBean() {
 
-                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{"typeDesignations", "homotypicalGroup"}));
+                    TaxonName typifiedName = getRepo().getNameService().load(event.getTypifiedNameUuid(), Arrays.asList(new String[]{
+                            "typeDesignations",
+                            "homotypicalGroup",
+                            "nomenclaturalSource.citation"
+                            }));
                     NameTypeDesignation nameTypeDesignation  = NameTypeDesignation.NewInstance();
-                    nameTypeDesignation.setCitation(citation);
                     nameTypeDesignation.getTypifiedNames().add(typifiedName);
                     return nameTypeDesignation;
                 }
             });
             popup.withDeleteButton(false);
             popup.loadInEditor(null);
-            popup.getCitationCombobox().setEnabled(false);
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
             if(event.hasSource()){
                 // propagate readonly state from source component to popup

@@ -8,13 +8,13 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
-import java.net.URI;
 import java.util.UUID;
 
 import org.apache.commons.collections.CollectionUtils;
 
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConverter;
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.common.IdentifiableSource;
 import eu.etaxonomy.cdm.model.media.Media;
@@ -212,6 +212,22 @@ public class SpecimenTypeDesignationDTO {
 
     public void setPreferredStableUri(URI uri){
         std.getTypeSpecimen().setPreferredStableUri(uri);
+    }
+
+    public Reference getDesignationReference() {
+        return std.getCitation();
+    }
+
+    public void setDesignationReference(Reference citation) {
+        std.setCitation(citation);
+    }
+
+    public String getDesignationReferenceDetail() {
+        return std.getCitationMicroReference();
+    }
+
+    public void setDesignationReferenceDetail(String detail) {
+        std.setCitationMicroReference(detail);
     }
 
     public URI getMediaUri(){

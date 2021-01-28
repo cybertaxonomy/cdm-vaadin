@@ -1,6 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
-import java.net.URI;
 import java.util.logging.Logger;
 
 import com.vaadin.navigator.Navigator;
@@ -11,6 +10,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinAuthentication;
 import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 
@@ -23,12 +23,9 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationView;
 @Deprecated
 public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 4018850353646930682L;
 
-	Navigator navigator;
+    private Navigator navigator;
 
 	private static final String AUTHENTICATION_VIEW = "abstractAuthenticatedUI";
 
@@ -53,7 +50,7 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
         CdmVaadinAuthentication cvAuthentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
 
         doInit(request);
-        URI uri = Page.getCurrent().getLocation();
+        URI uri = new URI(Page.getCurrent().getLocation());
         String context = VaadinServlet.getCurrent().getServletContext().getContextPath();
         if(ignoreAuthentication || (cvAuthentication != null && cvAuthentication.isAuthenticated(uri, context))) {
             if(cvAuthentication != null) {

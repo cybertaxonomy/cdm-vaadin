@@ -8,7 +8,6 @@
  */
 package eu.etaxonomy.cdm.vaadin.util;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,17 +15,19 @@ import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import eu.etaxonomy.cdm.common.URI;
+
 /**
  * @author cmathew
  * @since 28 Apr 2015
- *
  */
 public class CdmVaadinAuthentication {
+
     private final static Logger logger = Logger.getLogger(CdmVaadinAuthentication.class);
 
     public static final String KEY = "key_authentication";
 
-    Map<String, Authentication> hostAuthenticationMap = new HashMap<String, Authentication>();
+    Map<String, Authentication> hostAuthenticationMap = new HashMap<>();
 
     public void addAuthentication(URI requestSourceUri, String requestSourceContext, Authentication authentication) {
         addAuthentication(getRequestSource(requestSourceUri, requestSourceContext), authentication);

@@ -9,7 +9,6 @@
 package eu.etaxonomy.cdm.service;
 
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
 
@@ -28,6 +27,7 @@ import org.unitils.spring.annotation.SpringBeanByType;
 import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
+import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
@@ -100,7 +100,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 //                "REPRESENTATION", "REPRESENTATION_AUD", "HIBERNATE_SEQUENCES"},
 //                "RegistrationTerms");
 
-       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationUuid, publicationUuid, typifiedNameUuid);
+       SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.create(registrationUuid, typifiedNameUuid);
 
        Assert.assertNotNull(workingset.getOwner());
        Assert.assertEquals(Registration.class, workingset.getOwner().getClass());

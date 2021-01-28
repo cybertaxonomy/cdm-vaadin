@@ -24,7 +24,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeDesignationPresenter>, AnnotationsEditor  {
 
-    ToOneRelatedEntityCombobox<Reference> getCitationCombobox();
+    ToOneRelatedEntityCombobox<Reference> getDesignationReferenceCombobox();
 
     NativeSelect getTypeStatusSelect();
 

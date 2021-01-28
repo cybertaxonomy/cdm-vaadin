@@ -84,7 +84,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private final static int GRID_COLS = 4;
 
-    private final static int GRID_ROWS = 20;
+    private final static int GRID_ROWS = 21;
 
     private static final boolean HAS_BASIONYM_DEFAULT = false;
 
@@ -115,6 +115,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private NameRelationField validationField;
 
     private NameRelationField orthographicVariantField;
+
+    private CheckBox nomStatusCollectionFieldToggle;
 
     private ElementCollectionField<NomenclaturalStatusDTO> nomStatusCollectionField;
 
@@ -353,6 +355,12 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         nomenclaturalReferenceDetail.setWidth(100, Unit.PERCENTAGE);
 
         // --------------- nom status
+        row++;
+        nomStatusCollectionFieldToggle = new CheckBox("Invalid, illegitimate, or other status");
+        nomStatusCollectionFieldToggle.addValueChangeListener(e -> {
+            nomStatusCollectionField.getLayout().getParent().setVisible(nomStatusCollectionFieldToggle.getValue());
+        });
+        addComponent(nomStatusCollectionFieldToggle, 0, row, 0, row);
         row++;
         nomStatusCollectionField = new ElementCollectionField<NomenclaturalStatusDTO>(
                 NomenclaturalStatusDTO.class,
@@ -921,8 +929,21 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         specificEpithetField.setVisible(isSpeciesOrBelow);
         infraGenericEpithetField.setVisible(rank.isInfraGenericButNotSpeciesGroup());
         genusOrUninomialField.setCaption(isSpeciesOrBelow ? "Genus" : "Uninomial");
+
+        updateNomStatusCollectionFieldVisibility();
+
     }
 
+    public void updateNomStatusCollectionFieldVisibility() {
+        boolean nameHasStatus = false;
+        if(nomStatusCollectionField.getLayout().getRows() > 1) {
+            // fist row holds the lables
+            NativeSelect fistStatusSelect = (NativeSelect)nomStatusCollectionField.getLayout().getComponent(0, 1);
+            nameHasStatus = fistStatusSelect.getValue() != null;
+        }
+        nomStatusCollectionField.getLayout().getParent().setVisible(nameHasStatus);
+        nomStatusCollectionFieldToggle.setValue(Boolean.valueOf(nameHasStatus));
+    }
 
     @Override
     public void cancel() {

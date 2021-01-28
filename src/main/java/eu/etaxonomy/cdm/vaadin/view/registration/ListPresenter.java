@@ -45,7 +45,6 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.PagingEvent;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.UpdateResultsEvent;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -113,9 +112,6 @@ public class ListPresenter extends AbstractPresenter<ListView> {
             getView().getSubmitterFilter().setItemCaptionPropertyId("username");
         }
 
-        List<UUID> typeDesignationStatusUUIDS = new ArrayList<>();
-        typeDesignationStatusUUIDS.addAll(RegistrationTermLists.NAME_TYPE_DESIGNATION_STATUS_UUIDS());
-        typeDesignationStatusUUIDS.addAll(RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
         BeanItemContainer<TypeDesignationStatusFilter> buildTermItemContainer = new BeanItemContainer<>(TypeDesignationStatusFilter.class);
         // TODO use UI.getCurrent().getPage().getWebBrowser().getLocale() or the LocaleContext component to get the preferredLanguage?
         Collection<TypeDesignationStatusFilter> statusFilterTerms = new ArrayList<>(getRepo().getNameService().getTypeDesignationStatusFilterTerms(Arrays.asList(Language.DEFAULT())));

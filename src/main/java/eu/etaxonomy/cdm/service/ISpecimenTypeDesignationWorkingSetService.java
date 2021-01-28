@@ -23,7 +23,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  */
 public interface ISpecimenTypeDesignationWorkingSetService {
 
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID publicationUuid, UUID typifiedNameUuid);
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid);
 
     /**
      * @param id the CDM Entity id

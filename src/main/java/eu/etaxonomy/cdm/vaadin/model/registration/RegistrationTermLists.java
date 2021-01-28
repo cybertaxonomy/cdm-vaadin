@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
+import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 /**
@@ -59,7 +60,19 @@ public class RegistrationTermLists {
             // TODO add more see https://dev.e-taxonomy.eu/redmine/issues/6193
     });
 
-
+    public static final List<NomenclaturalStatusType> NOMENCLATURAL_STATUS_TYPES = Arrays.asList(new NomenclaturalStatusType[]{
+            NomenclaturalStatusType.CONSERVED(),
+            NomenclaturalStatusType.CONSERVED_PROP(),
+            NomenclaturalStatusType.ILLEGITIMATE(),
+            NomenclaturalStatusType.INVALID(),
+            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED(),
+            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED_PROP(),
+            NomenclaturalStatusType.REJECTED(),
+            NomenclaturalStatusType.REJECTED_PROP(),
+            NomenclaturalStatusType.UTIQUE_REJECTED(),
+            NomenclaturalStatusType.UTIQUE_REJECTED_PROP(),
+            NomenclaturalStatusType.ORTHOGRAPHY_REJECTED()
+    });
 
 
     public static List<UUID> KIND_OF_UNIT_TERM_UUIDS(){
@@ -76,6 +89,11 @@ public class RegistrationTermLists {
     public static List<UUID> NAME_TYPE_DESIGNATION_STATUS_UUIDS(){
         List<UUID> uuids = new ArrayList<>();
         NAME_TYPE_DESIGNATION_STATUS.forEach(t -> uuids.add(t.getUuid()));
+        return uuids;
+    }
+    public static List<UUID> NOMENCLATURAL_STATUS_TYPE_UUIDS(){
+        List<UUID> uuids = new ArrayList<>();
+        NOMENCLATURAL_STATUS_TYPES.forEach(t -> uuids.add(t.getUuid()));
         return uuids;
     }
 
