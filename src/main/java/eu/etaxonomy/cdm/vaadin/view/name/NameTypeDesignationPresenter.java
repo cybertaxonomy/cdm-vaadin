@@ -38,6 +38,7 @@ import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -46,12 +47,15 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.reference.RegistrationUiReferenceEditorFormConfigurator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
@@ -95,6 +99,8 @@ public class NameTypeDesignationPresenter
     };
 
     private CdmFilterablePagingProvider<Reference,Reference> referencePagingProvider;
+
+    private BeanInstantiator<Reference> newReferenceInstantiator;
 
 
     @Override
@@ -142,6 +148,16 @@ public class NameTypeDesignationPresenter
                                     Restrictions.eq("type", ReferenceType.Section)),
                             Restrictions.idEq(publishedUnit.getCitation().getId()))
                          );
+
+            // new Reference only a sub sections of the publishedUnit
+            newReferenceInstantiator = new BeanInstantiator<Reference>() {
+                @Override
+                public Reference createNewBean() {
+                    Reference newRef = ReferenceFactory.newSection();
+                    newRef.setInReference(publishedUnit.getCitation());
+                    return newRef;
+                }
+            };
         }
 
         return bean;
@@ -329,6 +345,32 @@ public class NameTypeDesignationPresenter
 
     }
 
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
+    public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
+
+        if (getView() == null || event.getSourceView() != getView()) {
+            return;
+        }
+
+        ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
+
+        referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+        referenceEditorPopup.withDeleteButton(true);
+        configureReferencePopupEditor(referenceEditorPopup, null);
+    }
+
+    @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
+    public void onReferenceEditorActionEdit(ReferenceEditorAction event) {
+
+        if (!isFromOwnView(event)) {
+            return;
+        }
+        ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
+
+        referenceEditorPopup.withDeleteButton(true);
+        configureReferencePopupEditor(referenceEditorPopup, event.getEntityUuid());
+    }
+
     @EventBusListenerMethod
     public void onEntityChangeEvent(EntityChangeEvent<?>event){
 
@@ -376,6 +418,26 @@ public class NameTypeDesignationPresenter
             throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
         }
         this.publishedUnit = publishedUnit;
+    }
+
+    /**
+     * @param referenceEditorPopup
+     */
+    private void configureReferencePopupEditor(ReferencePopupEditor referenceEditorPopup, UUID referenceUUID) {
+
+        if (newReferenceInstantiator != null) {
+            referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
+        }
+
+        // TODO this should be configurable per UI -
+        // RegistrationUiReferenceEditorFormConfigurator as spring bean,
+        // different spring profiles
+        // see also similar methods in TaxonName and SpecimenTypeDesigationEditors
+        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
+
+        referenceEditorPopup.loadInEditor(referenceUUID);
+        // TODO limit ??? referenceEditorPopup.getTypeSelect().setValue(ReferenceType.Article);
+
     }
 
 }
