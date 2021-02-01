@@ -240,6 +240,7 @@ public class NameTypeDesignationPresenter
 
         getView().getTypeStatusSelect().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class));
         getView().getTypeStatusSelect().setItemCaptionPropertyId("description");
+        getView().getTypeStatusSelect().setNullSelectionAllowed(true);
 
         getView().getDesignationReferenceCombobox().getSelect().setCaptionGenerator(
                 new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, getView().getDesignationReferenceCombobox().getSelect())
