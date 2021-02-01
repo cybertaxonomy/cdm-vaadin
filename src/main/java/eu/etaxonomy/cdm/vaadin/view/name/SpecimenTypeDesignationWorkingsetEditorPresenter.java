@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -42,6 +43,7 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
@@ -49,6 +51,7 @@ import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
@@ -331,11 +334,21 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     }
 
-    protected BeanItemContainer<TypeDesignationStatusBase> provideTypeStatusTermItemContainer() {
-        return cdmBeanItemContainerFactory.buildTypeDesignationStatusBaseItemContainer(
-                RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS(),
-                isInTypedesignationOnlyAct
-                );
+    protected BeanItemContainer<DefinedTermBase> provideTypeStatusTermItemContainer() {
+        BeanItemContainer<DefinedTermBase> container = cdmBeanItemContainerFactory.buildTermItemContainer(
+                RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
+        List<TypeDesignationStatusBase> filteredItems = container.getItemIds().stream()
+                .filter(t -> t instanceof SpecimenTypeDesignationStatus)
+                .map(t -> (SpecimenTypeDesignationStatus)t)
+                .filter(tsb ->
+                    !isInTypedesignationOnlyAct.isPresent()
+                    || isInTypedesignationOnlyAct.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList());
+        container.removeAllItems();
+        container.addAll(filteredItems);
+        return container;
     }
 
     /**

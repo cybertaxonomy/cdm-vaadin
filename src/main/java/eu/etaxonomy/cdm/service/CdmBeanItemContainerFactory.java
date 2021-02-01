@@ -122,6 +122,22 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
+    public BeanItemContainer<TypeDesignationStatusBase> buildTypeDesignationStatusBaseItemItemContainer(Class<TypeDesignationStatusBase> type,
+            List<OrderHint> orderHints, Optional<Boolean> withHasDesignationSource) {
+
+        BeanItemContainer<TypeDesignationStatusBase> container = buildBeanItemContainer(type, null);
+        List<TypeDesignationStatusBase> filteredItems = container.getItemIds().stream().filter(tsb ->
+                    !withHasDesignationSource.isPresent()
+                    || withHasDesignationSource.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList());
+        container.removeAllItems();
+        container.addAll(filteredItems);
+        return container;
+    }
+
+
     @Transactional(readOnly=true)
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
 

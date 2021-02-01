@@ -13,7 +13,9 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -21,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
@@ -36,6 +39,7 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -90,6 +94,20 @@ public class NameTypeDesignationPresenter
      */
     private DescriptionElementSource publishedUnit;
 
+    /**
+     * possible values:
+     *
+     * <ul>
+     * <li>NULL: undecided, should be treaded like <code>false</code></li>
+     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
+     * The available {@link TypeDesignationStatusBase} should be limited to those with
+     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
+     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
+     * </ul>
+     */
+    private Optional<Boolean> isInTypedesignationOnlyAct = Optional.empty();
+
+
     protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
 
         @Override
@@ -114,13 +132,12 @@ public class NameTypeDesignationPresenter
     @Override
     protected NameTypeDesignation loadBeanById(Object identifier) {
         NameTypeDesignation bean;
-        if(identifier instanceof Integer || identifier == null){
-            bean = super.loadBeanById(identifier);
-        } else {
-            TypeDesignationWorkingsetIds idset = (TypeDesignationWorkingsetIds)identifier;
-            RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
-            typifiedNameInContext = regDTO.typifiedName();
-            // find the working set
+
+        NameTypeDesignationWorkingsetIds idset = (NameTypeDesignationWorkingsetIds)identifier;
+        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
+        typifiedNameInContext = regDTO.typifiedName();
+        // find the working set
+        if(idset.baseEntityRef != null) {
             TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
             if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
                 throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
@@ -129,7 +146,10 @@ public class NameTypeDesignationPresenter
                 UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
                 bean = super.loadBeanById(nameTypeDesignationUuid);
             }
+        } else {
+           bean = super.loadBeanById(null);
         }
+        isInTypedesignationOnlyAct = Optional.of(Boolean.valueOf(regDTO.getNameRef() == null));
 
         try {
             setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());
@@ -159,6 +179,8 @@ public class NameTypeDesignationPresenter
                 }
             };
         }
+
+        getView().getTypeStatusSelect().setContainerDataSource(provideTypeStatusTermItemContainer());
 
         return bean;
     }
@@ -195,6 +217,20 @@ public class NameTypeDesignationPresenter
         return typeDesignation;
     }
 
+    protected BeanItemContainer<NameTypeDesignationStatus> provideTypeStatusTermItemContainer() {
+
+        BeanItemContainer<NameTypeDesignationStatus> container = cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class);
+        List<NameTypeDesignationStatus> filteredItems = container.getItemIds().stream().filter(tsb ->
+                    !isInTypedesignationOnlyAct.isPresent()
+                    || isInTypedesignationOnlyAct.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList());
+        container.removeAllItems();
+        container.addAll(filteredItems);
+        return container;
+
+    }
 
     /**
      * {@inheritDoc}
