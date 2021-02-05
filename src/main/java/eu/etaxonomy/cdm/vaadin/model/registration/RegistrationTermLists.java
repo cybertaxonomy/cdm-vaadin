@@ -65,12 +65,12 @@ public class RegistrationTermLists {
             NomenclaturalStatusType.CONSERVED_PROP(),
             NomenclaturalStatusType.ILLEGITIMATE(),
             NomenclaturalStatusType.INVALID(),
-            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED(),
-            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED_PROP(),
             NomenclaturalStatusType.REJECTED(),
             NomenclaturalStatusType.REJECTED_PROP(),
             NomenclaturalStatusType.UTIQUE_REJECTED(),
             NomenclaturalStatusType.UTIQUE_REJECTED_PROP(),
+            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED(),
+            NomenclaturalStatusType.ORTHOGRAPHY_CONSERVED_PROP(),
             NomenclaturalStatusType.ORTHOGRAPHY_REJECTED()
     });
 
