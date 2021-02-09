@@ -58,19 +58,15 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
 import eu.etaxonomy.cdm.vaadin.view.distributionStatus.settings.AreaAndTaxonSettingsPresenter;
 
 /**
- *
  * @author pplitzner
  * A Configuration window for choosing distribution areas and taxa to work with.
- *
  */
 public class AreaAndTaxonSettingsConfigWindow
             extends SettingsDialogWindowBase<AreaAndTaxonSettingsPresenter>
             implements ValueChangeListener, ClickListener, ExpandListener{
 
-	/**
-	 *
-	 */
     private static final long serialVersionUID = 1439411115014088780L;
+
     private ComboBox classificationBox;
     private TextField taxonFilter;
     private ComboBox distAreaBox;
@@ -91,10 +87,6 @@ public class AreaAndTaxonSettingsConfigWindow
         this.distributionTableView = distributionTableView;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     protected void init() {
         //init classification
@@ -146,10 +138,6 @@ public class AreaAndTaxonSettingsConfigWindow
         updateButtons();
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     protected AbstractLayout buildMainLayout() {
 
@@ -243,10 +231,6 @@ public class AreaAndTaxonSettingsConfigWindow
         return leftAndRightContainer;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public void valueChange(ValueChangeEvent event) {
         Property<?> property = event.getProperty();
@@ -288,19 +272,11 @@ public class AreaAndTaxonSettingsConfigWindow
         updateButtons();
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isValid() {
         return classificationBox.getValue()!=null && distAreaBox.getValue()!=null;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public void buttonClick(ClickEvent event) {
         Object source = event.getSource();
@@ -330,10 +306,6 @@ public class AreaAndTaxonSettingsConfigWindow
         }
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public void nodeExpand(ExpandEvent event) {
         TaxonNodeDto parent = (TaxonNodeDto) event.getItemId();
@@ -379,10 +351,6 @@ public class AreaAndTaxonSettingsConfigWindow
         return parent;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected AreaAndTaxonSettingsPresenter getPresenter() {
         return new AreaAndTaxonSettingsPresenter();
@@ -407,17 +375,10 @@ public class AreaAndTaxonSettingsConfigWindow
 			this.children = children;
 		}
 
-		/**
-		 *
-		 * {@inheritDoc}
-		 */
 		@Override
     	public void run() {
 			UI.getCurrent().access(new Runnable() {
-				/**
-				 *
-				 * {@inheritDoc}
-				 */
+
 				@Override
 				public void run() {
 					taxonTree.setContainerDataSource(new TaxonNodeContainer(children));
@@ -435,5 +396,4 @@ public class AreaAndTaxonSettingsConfigWindow
 			});
     	}
     }
-
 }
