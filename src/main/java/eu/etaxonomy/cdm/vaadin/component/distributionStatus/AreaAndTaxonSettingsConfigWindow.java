@@ -252,8 +252,8 @@ public class AreaAndTaxonSettingsConfigWindow
             		BeanItemContainer<UuidAndTitleCache<TaxonNode>> container = new BeanItemContainer<>(UuidAndTitleCache.class);
             		taxonTree.setContainerDataSource(container);
             		for (TaxonNodeDto taxonNodeDTO : taxonNodeDtos) {
-            			container.addItem(taxonNodeDtos);
-            			taxonTree.setChildrenAllowed(taxonNodeDtos, false);
+            			container.addItem(taxonNodeDTO);
+            			taxonTree.setChildrenAllowed(taxonNodeDTO, false);
             		}
             		taxonTree.setVisibleColumns("titleCache"); //$NON-NLS-1$
             	}
