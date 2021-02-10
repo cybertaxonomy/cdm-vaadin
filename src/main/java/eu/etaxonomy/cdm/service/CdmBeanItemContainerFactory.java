@@ -11,6 +11,7 @@ package eu.etaxonomy.cdm.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.CdmBase;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.IEnumTerm;
 import eu.etaxonomy.cdm.model.term.TermBase;
@@ -101,6 +103,40 @@ public class CdmBeanItemContainerFactory {
         termItemContainer.addAll(terms);
         return termItemContainer;
     }
+
+    public BeanItemContainer<TypeDesignationStatusBase> buildTypeDesignationStatusBaseItemContainer(List<UUID> termsUuids,
+            Optional<Boolean> withHasDesignationSource) {
+        clearSession();
+        List<DefinedTermBase> terms = repo.getTermService().load(termsUuids, INIT_STRATEGY);
+        BeanItemContainer<TypeDesignationStatusBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
+        termItemContainer.addAll(terms.stream()
+                .filter(t -> t instanceof TypeDesignationStatusBase)
+                .map(t -> (TypeDesignationStatusBase)t)
+                .filter(tsb ->
+                    !withHasDesignationSource.isPresent()
+                    || withHasDesignationSource.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList())
+        );
+        return termItemContainer;
+    }
+
+    public BeanItemContainer<TypeDesignationStatusBase> buildTypeDesignationStatusBaseItemItemContainer(Class<TypeDesignationStatusBase> type,
+            List<OrderHint> orderHints, Optional<Boolean> withHasDesignationSource) {
+
+        BeanItemContainer<TypeDesignationStatusBase> container = buildBeanItemContainer(type, null);
+        List<TypeDesignationStatusBase> filteredItems = container.getItemIds().stream().filter(tsb ->
+                    !withHasDesignationSource.isPresent()
+                    || withHasDesignationSource.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList());
+        container.removeAllItems();
+        container.addAll(filteredItems);
+        return container;
+    }
+
 
     @Transactional(readOnly=true)
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {

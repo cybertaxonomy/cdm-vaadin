@@ -637,7 +637,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 }
             });
             popup.withDeleteButton(false);
-            popup.loadInEditor(null);
+            popup.loadInEditor(new NameTypeDesignationWorkingsetIds(
+                    event.getRegistrationUuid(),
+                    event.getTypifiedNameUuid()
+                    )
+                );
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
             if(event.hasSource()){
                 // propagate readonly state from source component to popup

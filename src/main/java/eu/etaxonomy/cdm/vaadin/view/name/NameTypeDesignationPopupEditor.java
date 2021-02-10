@@ -25,6 +25,7 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
+import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -189,6 +190,22 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         addField(designationReferenceCombobox, "citation", 0, row, 2, row);
         designationReferenceCombobox.setWidth(400, Unit.PIXELS);
         designationReferenceDetailField = addTextField("Reference detail", "citationMicroReference", 3, row);
+        designationReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                this,
+                new ReferenceEditorAction(EditorActionType.ADD, null, designationReferenceCombobox, this)
+                ));
+        designationReferenceCombobox.addClickListenerEditEntity(e -> {
+            if(designationReferenceCombobox.getValue() != null){
+                getViewEventBus().publish(this,
+                    new ReferenceEditorAction(
+                            EditorActionType.EDIT,
+                            designationReferenceCombobox.getValue().getUuid(),
+                            e.getButton(),
+                            designationReferenceCombobox,
+                            this)
+                );
+            }
+            });
 
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");

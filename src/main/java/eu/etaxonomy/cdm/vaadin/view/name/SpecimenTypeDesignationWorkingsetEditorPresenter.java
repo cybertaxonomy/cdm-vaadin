@@ -14,8 +14,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
@@ -40,11 +43,15 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
+import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
+import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
@@ -72,6 +79,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 /**
  * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
@@ -132,6 +140,21 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
+    private BeanInstantiator<Reference> newReferenceInstantiator;
+
+    /**
+     * possible values:
+     *
+     * <ul>
+     * <li>NULL: undecided, should be treaded like <code>false</code></li>
+     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
+     * The available {@link TypeDesignationStatusBase} should be limited to those with
+     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
+     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
+     * </ul>
+     */
+    private Optional<Boolean> isInTypedesignationOnlyAct = Optional.empty();
+
 
     /**
      * Loads an existing working set from the database. This process actually involves
@@ -173,6 +196,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             // need to use load() but put() see #7214
             cache.load(registration);
             rootEntities.add(registration);
+            isInTypedesignationOnlyAct = Optional.of(Boolean.valueOf(registration.getName() == null));
             try {
                 setPublishedUnit(RegistrationDTO.findPublishedUnit(registration));
             } catch (Exception e) {
@@ -193,6 +217,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                                     Restrictions.eq("type", ReferenceType.Section)),
                             Restrictions.idEq(publishedUnit.getCitation().getId()))
                          );
+            // new Reference only a sub sections of the publishedUnit
+            newReferenceInstantiator = new BeanInstantiator<Reference>() {
+                @Override
+                public Reference createNewBean() {
+                    Reference newRef = ReferenceFactory.newSection();
+                    newRef.setInReference(publishedUnit.getCitation());
+                    return newRef;
+                }
+            };
         }
 
         return workingSetDto;
@@ -242,9 +275,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.kindOfUnit.setNullSelectionAllowed(false);
 
-                row.typeStatus.setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(
-                        RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS())
-                        );
+                row.typeStatus.setContainerDataSource(provideTypeStatusTermItemContainer());
                 row.typeStatus.setNullSelectionAllowed(false);
 
 
@@ -299,11 +330,26 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 return row;
             }
-
         });
 
     }
 
+    protected BeanItemContainer<DefinedTermBase> provideTypeStatusTermItemContainer() {
+        BeanItemContainer<DefinedTermBase> container = cdmBeanItemContainerFactory.buildTermItemContainer(
+                RegistrationTermLists.SPECIMEN_TYPE_DESIGNATION_STATUS_UUIDS());
+        List<TypeDesignationStatusBase> filteredItems = container.getItemIds().stream()
+                .filter(t -> t instanceof SpecimenTypeDesignationStatus)
+                .map(t -> (SpecimenTypeDesignationStatus)t)
+                .filter(tsb ->
+                    !isInTypedesignationOnlyAct.isPresent()
+                    || isInTypedesignationOnlyAct.get().equals(false)
+                    || tsb.hasDesignationSource() == true
+                )
+                .collect(Collectors.toList());
+        container.removeAllItems();
+        container.addAll(filteredItems);
+        return container;
+    }
 
     /**
      * {@inheritDoc}
