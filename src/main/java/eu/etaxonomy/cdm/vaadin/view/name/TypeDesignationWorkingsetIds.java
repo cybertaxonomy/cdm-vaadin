@@ -18,6 +18,12 @@ public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEnt
     protected UUID registrationUuid;
     protected TypedEntityReference<BASE_T> baseEntityRef;
     protected UUID typifiedNameUuid;
+    /**
+     * The UUID of the article, book, book section in which the type designation is being published.
+     * Never a section. This information is only relevant for type designation to be initially created.
+     */
+    protected UUID publishedUnitUuid;
+
 
     public TypeDesignationWorkingsetIds(UUID registrationUuid, TypedEntityReference<BASE_T> baseEntityRef, UUID typifiedNameUuid) {
         this.registrationUuid = registrationUuid;
@@ -36,5 +42,10 @@ public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEnt
     public TypedEntityReference<BASE_T> getBaseEntityRef() {
         return baseEntityRef;
     }
+
+    public UUID getPublishedUnitUuid() {
+        return publishedUnitUuid;
+    }
+
 
 }

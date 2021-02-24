@@ -945,6 +945,21 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     /**
+     * Attempts to find an item in the context of editor actions for this editor,
+     * having a parentView matching the <code>viewType</code> by {@link Class#isAssignableFrom(Class)}.
+     */
+    @SuppressWarnings("unchecked")
+    public <VIEW extends AbstractView> Optional<VIEW> findViewInEditorActionContext(Class<VIEW> viewType) {
+        Stack<EditorActionContext> ctxt = getEditorActionContext();
+        for(int i = ctxt.size(); i > 0; --i) {
+            if(viewType.isAssignableFrom(ctxt.get(i).getParentView().getClass())){
+                return Optional.of((VIEW) ctxt.get(i).getParentView());
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
      * Set the context of editor actions parent to this editor
      *
      * @param context the context to set

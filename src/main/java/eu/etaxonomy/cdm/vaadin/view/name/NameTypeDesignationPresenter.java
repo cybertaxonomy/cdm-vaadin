@@ -28,9 +28,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
+import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.common.Annotation;
@@ -39,7 +38,6 @@ import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
-import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
@@ -83,6 +81,7 @@ public class NameTypeDesignationPresenter
     @Autowired
     private IRegistrationWorkingSetService registrationWorkingSetService;
 
+
     HashSet<TaxonName> typifiedNamesAsLoaded;
 
     private TaxonName typifiedNameInContext;
@@ -93,20 +92,6 @@ public class NameTypeDesignationPresenter
      * but never a {@link ReferenceType#Section}
      */
     private DescriptionElementSource publishedUnit;
-
-    /**
-     * possible values:
-     *
-     * <ul>
-     * <li>NULL: undecided, should be treaded like <code>false</code></li>
-     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
-     * The available {@link TypeDesignationStatusBase} should be limited to those with
-     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
-     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
-     * </ul>
-     */
-    private Optional<Boolean> isInTypedesignationOnlyAct = Optional.empty();
-
 
     protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
 
@@ -126,37 +111,46 @@ public class NameTypeDesignationPresenter
        return defaultBeanInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     protected NameTypeDesignation loadBeanById(Object identifier) {
         NameTypeDesignation bean;
 
         NameTypeDesignationWorkingsetIds idset = (NameTypeDesignationWorkingsetIds)identifier;
-        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(idset.registrationUuid);
-        typifiedNameInContext = regDTO.typifiedName();
-        // find the working set
-        if(idset.baseEntityRef != null) {
-            TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(idset.baseEntityRef);
-            if(!typeDesignationWorkingSet.getBaseEntityReference().getType().equals(NameTypeDesignation.class)){
-                throw new RuntimeException("TypeDesignationWorkingsetEditorIdSet references not a NameTypeDesignation");
-            } else {
-                // TypeDesignationWorkingSet for NameTyped only contain one item!!!
-                UUID nameTypeDesignationUuid = typeDesignationWorkingSet.getTypeDesignations().get(0).getUuid();
-                bean = super.loadBeanById(nameTypeDesignationUuid);
-            }
-        } else {
-           bean = super.loadBeanById(null);
-        }
-        isInTypedesignationOnlyAct = Optional.of(Boolean.valueOf(regDTO.getNameRef() == null));
 
-        try {
-            setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());
-        } catch (Exception e) {
-            // FIXME report error state instead
-            logger.error("Error on finding published unit in " + bean, e);
+        if(idset.isForNewTypeDesignation()) {
+            Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
+            try {
+                setPublishedUnit(DescriptionElementSource.NewPrimarySourceInstance(reference, null));
+            } catch(Exception e) {
+                throw new RuntimeException("Refernce of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
+            }
+            EntityInitStrategy initstrategy = RegistrationWorkingSetService.NAME_INIT_STRATEGY
+                    .clone()
+                    .extend("typeDesignations", RegistrationWorkingSetService.TYPEDESIGNATION_INIT_STRATEGY, true);
+            typifiedNameInContext = getRepo().getNameService().load(idset.getTypifiedNameUuid(), initstrategy.getPropertyPaths());
+            bean = super.loadBeanById(null);
+        } else {
+            bean = super.loadBeanById(idset.getBaseEntityRef().getUuid());
+            // TODO prevent from errors due to inconsistent data, two options:
+            // 1. handle error condition here
+            // 2. always set typifiedNameUuid in NameTypeDesignationWorkingsetIds
+            typifiedNameInContext = bean.getTypifiedNames().iterator().next();
+            try {
+                setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());
+            } catch (Exception e) {
+                // FIXME report error state instead
+                logger.error("Error on finding published unit in " + bean, e);
+            }
         }
+
+        Reference typifiedNameNomRef = typifiedNameInContext.getNomenclaturalReference();
+        while(typifiedNameNomRef.getType().equals(ReferenceType.Section)
+                || typifiedNameNomRef.getInReference() == null) {
+            typifiedNameNomRef = typifiedNameNomRef.getInReference();
+        }
+        getView().setInTypedesignationOnlyAct(Optional.of(typifiedNameNomRef != null && !typifiedNameNomRef.equals(getPublishedUnit().getCitation())));
+
 
         if (getPublishedUnit() != null) {
             // reduce available references to those which are sections of
@@ -164,7 +158,7 @@ public class NameTypeDesignationPresenter
             referencePagingProvider.getCriteria()
                     .add(Restrictions.or(
                             Restrictions.and(
-                                    Restrictions.eq("inReference", publishedUnit.getCitation()),
+                                    Restrictions.eq("inReference", getPublishedUnit().getCitation()),
                                     Restrictions.eq("type", ReferenceType.Section)),
                             Restrictions.idEq(publishedUnit.getCitation().getId()))
                          );
@@ -174,7 +168,7 @@ public class NameTypeDesignationPresenter
                 @Override
                 public Reference createNewBean() {
                     Reference newRef = ReferenceFactory.newSection();
-                    newRef.setInReference(publishedUnit.getCitation());
+                    newRef.setInReference(getPublishedUnit().getCitation());
                     return newRef;
                 }
             };
@@ -186,9 +180,6 @@ public class NameTypeDesignationPresenter
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NameTypeDesignation loadCdmEntity(UUID uuid) {
         EntityInitStrategy initStrategy = new EntityInitStrategy(Arrays.asList(new String []{
@@ -219,6 +210,7 @@ public class NameTypeDesignationPresenter
 
     protected BeanItemContainer<NameTypeDesignationStatus> provideTypeStatusTermItemContainer() {
 
+        Optional<Boolean> isInTypedesignationOnlyAct = getView().isInTypedesignationOnlyAct();
         BeanItemContainer<NameTypeDesignationStatus> container = cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class);
         List<NameTypeDesignationStatus> filteredItems = container.getItemIds().stream().filter(tsb ->
                     !isInTypedesignationOnlyAct.isPresent()

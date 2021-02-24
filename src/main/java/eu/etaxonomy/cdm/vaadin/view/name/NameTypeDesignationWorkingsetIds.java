@@ -19,11 +19,30 @@ import eu.etaxonomy.cdm.ref.TypedEntityReference;
  */
 public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetIds<NameTypeDesignation> {
 
-    public NameTypeDesignationWorkingsetIds(UUID registrationUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
-        super(registrationUuid, baseEntityRef, null);
+    public static NameTypeDesignationWorkingsetIds forNewTypeDesignation(UUID publishedUnitUuid, UUID typifiedNameUuid) {
+        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, typifiedNameUuid);
     }
 
-    public NameTypeDesignationWorkingsetIds(UUID registrationUuid, UUID typifiedNameUuid) {
-        super(registrationUuid, null, typifiedNameUuid);
+    public static Object forExistingTypeDesignation(UUID publishedUnitUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
+        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, baseEntityRef);
     }
+
+
+    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
+        super(null, baseEntityRef, null);
+        this.publishedUnitUuid = publishedUnitUuid;
+    }
+
+    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID typifiedNameUuid) {
+        super(null, null, typifiedNameUuid);
+        this.publishedUnitUuid = publishedUnitUuid;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isForNewTypeDesignation() {
+        return getBaseEntityRef() == null;
+    }
+
 }

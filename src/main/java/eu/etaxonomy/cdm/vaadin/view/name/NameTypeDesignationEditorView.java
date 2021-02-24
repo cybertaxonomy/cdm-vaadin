@@ -8,9 +8,12 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Optional;
+
 import com.vaadin.ui.NativeSelect;
 
 import eu.etaxonomy.cdm.model.name.TaxonName;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.view.AnnotationsEditor;
 import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesComboboxSelect;
@@ -35,5 +38,32 @@ public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeD
     void setShowTypeFlags(boolean showTypeFlags);
 
     boolean isShowTypeFlags();
+
+
+    /**
+     * possible values:
+     *
+     * <ul>
+     * <li>NULL: undecided, should be treated like <code>false</code>. This can happen in cases when the typified name is missing the nomref</li>
+     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
+     * The available {@link TypeDesignationStatusBase} should be limited to those with
+     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
+     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
+     * </ul>
+     */
+    public void setInTypedesignationOnlyAct(Optional<Boolean> isInTypedesignationOnlyAct);
+
+    /**
+     * possible values:
+     *
+     * <ul>
+     * <li>NULL: undecided, should be treated like <code>false</code>. This can happen in cases when the typified name is missing the nomref</li>
+     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
+     * The available {@link TypeDesignationStatusBase} should be limited to those with
+     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
+     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
+     * </ul>
+     */
+    public Optional<Boolean> isInTypedesignationOnlyAct();
 
 }

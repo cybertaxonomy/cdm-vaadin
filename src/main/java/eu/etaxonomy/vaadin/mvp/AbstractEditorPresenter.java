@@ -44,7 +44,7 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
 
     /**
      * Load the bean to be edited in the editor freshly from the persistent storage.
-     * Ore create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
+     * Or create an new empty instance in case the supplied <code>identifier</code> is <code>null</code>.
      *
      * @param identifier
      * @return

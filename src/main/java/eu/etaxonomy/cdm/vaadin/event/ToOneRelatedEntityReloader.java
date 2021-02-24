@@ -87,7 +87,7 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
                     onSettingReloadedEntity = false;
             }
         } else {
-            throw new RuntimeException("The cache must not be null. See loadBeanById() in AbstractCdmEditorPresenter");
+            throw new RuntimeException("The cache must not be null. See loadBeanById() in CdmEditorPresenterBase");
         }
     }
 

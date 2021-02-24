@@ -78,19 +78,10 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
         this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationUuid), sourceView));
     }
 
-
-
-    /**
-     *
-     * @return
-     */
     public TypeDesignationWorkingSetType getWorkingSetType() {
         return workingSetType;
     }
 
-    /**
-     * @return the registrationUuid
-     */
     public UUID getRegistrationUuid() {
         return registrationUuid;
     }
@@ -99,19 +90,12 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
         return getEntityUuid();
     }
 
-    /**
-     * @return the baseEntityRef
-     */
     public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityRef() {
         return baseEntityRef;
     }
 
-    /**
-     * @return the typifiedNameUuid
-     */
     public UUID getTypifiedNameUuid() {
         return typifiedNameUuid;
     }
-
 
 }
