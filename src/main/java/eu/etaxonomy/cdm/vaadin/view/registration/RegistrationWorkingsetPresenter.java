@@ -162,12 +162,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
     /**
-
-
-    /**
      * @param doReload reload the workingset from the persistent storage.
      *  Workingsets which are not yet persisted are preserved.
-     *
      */
     protected void refreshView(boolean doReload) {
 
@@ -202,9 +198,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         applyWorkingset();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
@@ -682,9 +675,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
 
                 Optional<Registration> registrationOpt = Optional.ofNullable(null);
-
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
-
                 try {
                     clearSession();
                     registrationOpt = findRegistrationInContext(event.getPopup());
@@ -720,10 +711,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // ignore other editors
     }
 
-    /**
-     * @param registrationOpt
-     * @param name
-     */
     private void assocciateOrQueueBlockingRegistration(Optional<Registration> registrationOpt, UUID nameUuid) {
         registrationOpt.ifPresent(reg -> registrationWorkflowService.addBlockingRegistration(nameUuid, reg));
         if(!registrationOpt.isPresent()){
@@ -736,13 +723,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     *
-     */
+
     public void clearSession() {
         getRepo().clearSession();
     }
-
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationWorkingSet.class)
     public void onShowDetailsEventForRegistrationWorkingSet(ShowDetailsEvent<RegistrationWorkingSet,?> event) {
@@ -821,8 +805,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-
-
     public Optional<Registration> findRegistrationInContext(PopupView popupView) {
         Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
         return findRegistrationInContext(context);
@@ -830,9 +812,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     /**
      * Finds the Registration in the EditorContext stack
-     *
-     * @param context
-     * @return
      */
     public Optional<Registration> findRegistrationInContext(Stack<EditorActionContext> context) {
         EditorActionContext rootCtx = context.get(0);
