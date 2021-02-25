@@ -60,9 +60,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 public class SpecimenTypeDesignationWorkingsetPopupEditor
     extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
     implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
-    /**
-     *
-     */
+
     private static final String CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING = "Can't save as long as type designations are missing.";
 
     /**
@@ -96,17 +94,12 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     private String accessDeniedMessage;
 
-    /**
-     * @return the countrySelectField
-     */
+
     @Override
     public NativeSelect getCountrySelectField() {
         return countrySelectField;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -257,26 +250,16 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
      }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Specimen typedesignations editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         // none
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
@@ -302,9 +285,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         this.accessDeniedMessage = accessDeniedMessage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isResizable() {
         return true;
@@ -324,18 +304,12 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void grantToCurrentUser(EnumSet<CRUD> crud) {
         getPresenter().setGrantsForCurrentUser(crud);
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void afterItemDataSourceSet() {
         super.afterItemDataSourceSet();
@@ -347,9 +321,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         updateAllowDeleteTypeDesignation();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateAllowDeleteTypeDesignation(){
         // disable the delete button if there is only one typeDesignation
@@ -361,10 +332,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -374,9 +341,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     }
 
-    /**
-     * @return the collectorField
-     */
     @Override
     public TeamOrPersonField getCollectorField() {
         return collectorField;
@@ -384,8 +348,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
 
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
-     *
-     * @return the editableAnotationTypes
      */
     @Override
     public AnnotationType[] getEditableAnotationTypes() {
@@ -395,7 +357,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
      *
-     *
      * @param editableAnotationTypes the editableAnotationTypes to set
      */
     @Override
@@ -403,9 +364,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
         this.editableAnotationTypes = editableAnotationTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public FilterableAnnotationsField getAnnotationsField() {
         return annotationsListField;
@@ -415,7 +374,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     public GeoLocationField getExactLocationField() {
         return exactLocationField;
     }
-
 
 
 }
