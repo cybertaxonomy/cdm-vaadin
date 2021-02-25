@@ -120,7 +120,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         addButton.setEnabled(enabled);
     }
 
-
     @Override
     public void addClickListenerAddEntity(ClickListener listener) {
         addButton.addClickListener(listener);
@@ -136,6 +135,15 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         editButton.addClickListener(listener);
     }
 
+    @Override
+    public void addValueChangeListener(ValueChangeListener listener) {
+        lazySelect.addValueChangeListener(listener);
+    }
+
+    @Override
+    public void removeValueChangeListener(ValueChangeListener listener) {
+        lazySelect.removeValueChangeListener(listener);
+    }
 
     @Override
     public void replaceEntityValue(V bean){
