@@ -24,8 +24,8 @@ public class SpecimenTypeDesignationWorkingsetIds extends TypeDesignationWorking
      * @param baseEntityRef
      * @param typifiedNameUuid
      */
-    public SpecimenTypeDesignationWorkingsetIds(UUID registrationUuid, TypedEntityReference<FieldUnit> baseEntityRef, UUID typifiedNameUuid) {
-        super(registrationUuid, baseEntityRef, typifiedNameUuid);
+    public SpecimenTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid, TypedEntityReference<FieldUnit> baseEntityRef, UUID typifiedNameUuid) {
+        super(publishedUnitUuid, registrationUuid, baseEntityRef, typifiedNameUuid);
     }
 
 }

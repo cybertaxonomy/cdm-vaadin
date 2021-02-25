@@ -554,6 +554,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                    workingset.getCitationUuid(),
                     event.getRegistrationUuid(),
                     event.getBaseEntityRef().castTo(FieldUnit.class), null));
             if(event.hasSource()){
@@ -601,6 +602,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.withDeleteButton(false);
             popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                        workingset.getCitationUuid(),
                         event.getRegistrationUuid(),
                         null,
                         typifiedNameRef.getUuid()

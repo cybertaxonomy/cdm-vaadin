@@ -27,15 +27,12 @@ public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetI
         return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, baseEntityRef);
     }
 
-
     private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
-        super(null, baseEntityRef, null);
-        this.publishedUnitUuid = publishedUnitUuid;
+        super(publishedUnitUuid, null, baseEntityRef, null);
     }
 
     private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID typifiedNameUuid) {
-        super(null, null, typifiedNameUuid);
-        this.publishedUnitUuid = publishedUnitUuid;
+        super(publishedUnitUuid, null, null, typifiedNameUuid);
     }
 
     /**

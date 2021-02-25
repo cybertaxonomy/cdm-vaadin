@@ -24,8 +24,8 @@ public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEnt
      */
     protected UUID publishedUnitUuid;
 
-
-    public TypeDesignationWorkingsetIds(UUID registrationUuid, TypedEntityReference<BASE_T> baseEntityRef, UUID typifiedNameUuid) {
+    protected TypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid, TypedEntityReference<BASE_T> baseEntityRef, UUID typifiedNameUuid) {
+        this.publishedUnitUuid = publishedUnitUuid;
         this.registrationUuid = registrationUuid;
         this.baseEntityRef = baseEntityRef;
         this.typifiedNameUuid = typifiedNameUuid;
