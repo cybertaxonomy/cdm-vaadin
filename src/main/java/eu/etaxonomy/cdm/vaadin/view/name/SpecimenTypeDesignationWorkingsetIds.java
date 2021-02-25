@@ -19,11 +19,6 @@ import eu.etaxonomy.cdm.ref.TypedEntityReference;
  */
 public class SpecimenTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetIds<FieldUnit> {
 
-    /**
-     * @param registrationUuid
-     * @param baseEntityRef
-     * @param typifiedNameUuid
-     */
     public SpecimenTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid, TypedEntityReference<FieldUnit> baseEntityRef, UUID typifiedNameUuid) {
         super(publishedUnitUuid, registrationUuid, baseEntityRef, typifiedNameUuid);
     }

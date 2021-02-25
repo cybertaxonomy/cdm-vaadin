@@ -210,11 +210,9 @@ public class NameTypeDesignationPresenter
 
     protected BeanItemContainer<NameTypeDesignationStatus> provideTypeStatusTermItemContainer() {
 
-        Optional<Boolean> isInTypedesignationOnlyAct = getView().isInTypedesignationOnlyAct();
         BeanItemContainer<NameTypeDesignationStatus> container = cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class);
         List<NameTypeDesignationStatus> filteredItems = container.getItemIds().stream().filter(tsb ->
-                    !isInTypedesignationOnlyAct.isPresent()
-                    || isInTypedesignationOnlyAct.get().equals(false)
+                    getView().checkInTypeDesignationOnlyAct()
                     || tsb.hasDesignationSource() == true
                 )
                 .collect(Collectors.toList());
@@ -224,9 +222,6 @@ public class NameTypeDesignationPresenter
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
 

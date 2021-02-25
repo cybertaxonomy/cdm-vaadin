@@ -142,7 +142,12 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
 
         boolean withDesignationReference = typeStatus.getValue() != null && ((SpecimenTypeDesignationStatus)typeStatus.getValue()).hasDesignationSource();
 
-        designationReference.setEnabled(withDesignationReference);
+        designationReference.setEnabled(withDesignationReference || designationReference.isRequired());
+        designationReference.setImmediate(designationReference.isRequired());
+//        if(designationReference.isRequired() && designationReference.isEmpty()) {
+//            designationReference.selectFirst();
+//            designationReference.commitSelect();
+//        }
         designationReferenceDetail.setEnabled(withDesignationReference);
 
         mediaSpecimenReference.setEnabled(publishedImageType || unPublishedImageType);
@@ -152,7 +157,6 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
     }
 
     /**
-     *
      * @return the 0-based position index of the <code>kindOfUnit</code> field in this class
      * which are visible according to {@link #visibleFields())
      */
@@ -173,7 +177,6 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         @Override
         public void updateRowItemsEnabledStates() {
             row.updateRowItemsEnablement();
-
         }
 
     }

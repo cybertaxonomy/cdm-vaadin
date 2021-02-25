@@ -72,7 +72,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private boolean showTypeFlags = true;
 
-    Optional<Boolean> inTypedesignationOnlyAct = Optional.empty();
+    private Optional<Boolean> inTypedesignationOnlyAct = Optional.empty();
 
     private FilterableAnnotationsField annotationsListField;
 
@@ -250,8 +250,8 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         // need to check for isInTypedesignationOnlyAct also, otherwise the reference field will not show up
         // and the type designation might not be associated with the registration
         // TODO discuss with Henning
-        typeStatusSelect.setRequired(typeStatusRequired || isInTypedesignationOnlyAct);
-        if(typeStatusRequired && isInTypedesignationOnlyAct) {
+        typeStatusSelect.setRequired(typeStatusRequired || checkInTypeDesignationOnlyAct());
+        if(typeStatusRequired && checkInTypeDesignationOnlyAct()) {
             designationReferenceCombobox.setRequiredError(TYPE_STATUS_MUST_BE_SET);
         } else {
             designationReferenceCombobox.setRequiredError(TYPE_STATUS_OR_FLAG_MUST_BE_SET);

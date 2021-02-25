@@ -91,7 +91,7 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 @Scope("prototype")
 public class SpecimenTypeDesignationWorkingsetEditorPresenter
     extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView>
-    implements CachingPresenter, DisposableBean {
+    implements CachingPresenter, NomenclaturalActContext, DisposableBean {
 
     private static final long serialVersionUID = 4255636253714476918L;
 
@@ -142,19 +142,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
-    /**
-     * possible values:
-     *
-     * <ul>
-     * <li>NULL: undecided, should be treaded like <code>false</code></li>
-     * <li>false: the typification is published in an nomenclatural act in which no new name or new combination is being published.
-     * The available {@link TypeDesignationStatusBase} should be limited to those with
-     * <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</code></li>
-     * <li>true: only status with <code>{@link TypeDesignationStatusBase#hasDesignationSource() hasDesignationSource} == true</li>
-     * </ul>
-     */
     private Optional<Boolean> isInTypedesignationOnlyAct = Optional.empty();
-
 
     /**
      * Loads an existing working set from the database. This process actually involves
@@ -196,7 +184,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             // need to use load() but put() see #7214
             cache.load(registration);
             rootEntities.add(registration);
-            isInTypedesignationOnlyAct = Optional.of(Boolean.valueOf(registration.getName() == null));
+            setInTypedesignationOnlyAct(Optional.of(Boolean.valueOf(registration.getName() == null)));
             try {
                 DescriptionElementSource pubUnitSource = RegistrationDTO.findPublishedUnit(registration);
                 if(pubUnitSource == null) {
@@ -313,6 +301,8 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         doReferenceEditorEdit(row.designationReference);
                     }
                 });
+                row.designationReference.setRequired(checkInTypeDesignationOnlyAct());
+                row.designationReference.getSelect().setNullSelectionAllowed(!checkInTypeDesignationOnlyAct());
 
                 row.mediaSpecimenReference.loadFrom(
                         referencePagingProvider,
@@ -346,8 +336,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 .filter(t -> t instanceof SpecimenTypeDesignationStatus)
                 .map(t -> (SpecimenTypeDesignationStatus)t)
                 .filter(tsb ->
-                    !isInTypedesignationOnlyAct.isPresent()
-                    || isInTypedesignationOnlyAct.get().equals(false)
+                    !checkInTypeDesignationOnlyAct()
                     || tsb.hasDesignationSource() == true
                 )
                 .collect(Collectors.toList());
@@ -541,9 +530,6 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         return rootEntities ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() throws Exception {
         super.destroy();
@@ -574,6 +560,16 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
         }
         this.publishedUnit = publishedUnit;
+    }
+
+    @Override
+    public void setInTypedesignationOnlyAct(Optional<Boolean> isInTypedesignationOnlyAct) {
+        this.isInTypedesignationOnlyAct = isInTypedesignationOnlyAct;
+    }
+
+    @Override
+    public Optional<Boolean> isInTypedesignationOnlyAct() {
+        return isInTypedesignationOnlyAct;
     }
 
 }

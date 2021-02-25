@@ -170,6 +170,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
+                // here the TypeDesignation.typifiedName is also set internally
                 dto.getTypifiedName().addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }
@@ -182,7 +183,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             Session session = repo.getSession();
 
-            session.merge(dto.getOwner());
+            session.merge(regPremerge);
             session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
