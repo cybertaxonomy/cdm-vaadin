@@ -251,7 +251,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     @Override
     public void validate() throws InvalidValueException {
-        super.validate();
         lazySelect.validate();
     }
 
