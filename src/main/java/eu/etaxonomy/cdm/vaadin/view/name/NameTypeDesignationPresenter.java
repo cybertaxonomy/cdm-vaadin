@@ -166,7 +166,11 @@ public class NameTypeDesignationPresenter
                 @Override
                 public Reference createNewBean() {
                     Reference newRef = ReferenceFactory.newSection();
-                    newRef.setInReference(getPublishedUnit().getCitation());
+                    Reference reference = getRepo().getReferenceService().load(
+                            getPublishedUnit().getCitation().getUuid(),
+                            ReferenceEllypsisFormatter.INIT_STRATEGY
+                            );
+                    newRef.setInReference(reference);
                     return newRef;
                 }
             };
@@ -364,7 +368,10 @@ public class NameTypeDesignationPresenter
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         referenceEditorPopup.withDeleteButton(true);
-        configureReferencePopupEditor(referenceEditorPopup, null);
+        RegistrationUiReferenceEditorFormConfigurator
+            .create(newReferenceInstantiator != null)
+            .configure(referenceEditorPopup, newReferenceInstantiator);
+        referenceEditorPopup.loadInEditor(null);
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
@@ -376,7 +383,14 @@ public class NameTypeDesignationPresenter
         ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
 
         referenceEditorPopup.withDeleteButton(true);
-        configureReferencePopupEditor(referenceEditorPopup, event.getEntityUuid());
+        // TODO this should be configurable per UI -
+        // RegistrationUiReferenceEditorFormConfigurator as spring bean,
+        // different spring profiles
+        // see also similar methods in TaxonName and SpecimenTypeDesigationEditors
+        RegistrationUiReferenceEditorFormConfigurator
+            .create(newReferenceInstantiator != null)
+            .configure(referenceEditorPopup, newReferenceInstantiator);
+        referenceEditorPopup.loadInEditor(event.getEntityUuid());
     }
 
     @EventBusListenerMethod
@@ -426,23 +440,6 @@ public class NameTypeDesignationPresenter
             throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
         }
         this.publishedUnit = publishedUnit;
-    }
-
-    /**
-     * @param referenceEditorPopup
-     */
-    private void configureReferencePopupEditor(ReferencePopupEditor referenceEditorPopup, UUID referenceUUID) {
-
-        // TODO this should be configurable per UI -
-        // RegistrationUiReferenceEditorFormConfigurator as spring bean,
-        // different spring profiles
-        // see also similar methods in TaxonName and SpecimenTypeDesigationEditors
-        RegistrationUiReferenceEditorFormConfigurator
-            .create(newReferenceInstantiator != null)
-            .configure(referenceEditorPopup, newReferenceInstantiator);
-
-        referenceEditorPopup.loadInEditor(referenceUUID);
-        // TODO limit ??? referenceEditorPopup.getTypeSelect().setValue(ReferenceType.Article);
     }
 
 }

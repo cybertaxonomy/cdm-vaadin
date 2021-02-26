@@ -163,9 +163,11 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         EntityInitStrategy initStrategy = new EntityInitStrategy(Arrays.asList(new String []{
                 "$",
                 "annotations.*", // needed as log as we are using a table in FilterableAnnotationsField
+                "inReference"
                 }
         ));
         initStrategy.extend("", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
+        initStrategy.extend("inReference", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
 
         Reference reference;
         if(identifier != null){
