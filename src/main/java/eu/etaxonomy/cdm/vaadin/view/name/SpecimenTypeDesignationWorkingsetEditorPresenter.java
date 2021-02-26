@@ -139,7 +139,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private Map<ReferencePopupEditor, ToOneRelatedEntityCombobox<Reference>> referencePopupEditorsCombobox = new HashMap<>();
 
-    private ElementCollectionHelper<ElementCollectionField> typeDesignationsCollectionFieldHelper;
+    private ElementCollectionHelper<ElementCollectionField<?>> typeDesignationsCollectionFieldHelper;
 
     private Set<CollectionRowItemCollection> typeDesignationEditorRows = new HashSet<>();
 
