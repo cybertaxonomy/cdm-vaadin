@@ -449,19 +449,16 @@ public class NameTypeDesignationPresenter
      */
     private void configureReferencePopupEditor(ReferencePopupEditor referenceEditorPopup, UUID referenceUUID) {
 
-        if (newReferenceInstantiator != null) {
-            referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
-        }
-
         // TODO this should be configurable per UI -
         // RegistrationUiReferenceEditorFormConfigurator as spring bean,
         // different spring profiles
         // see also similar methods in TaxonName and SpecimenTypeDesigationEditors
-        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(newReferenceInstantiator != null));
+        RegistrationUiReferenceEditorFormConfigurator
+            .create(newReferenceInstantiator != null)
+            .configure(referenceEditorPopup, newReferenceInstantiator);
 
         referenceEditorPopup.loadInEditor(referenceUUID);
         // TODO limit ??? referenceEditorPopup.getTypeSelect().setValue(ReferenceType.Article);
-
     }
 
 }

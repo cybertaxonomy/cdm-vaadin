@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
+import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -73,8 +74,10 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.fields.ElementCollectionHelper;
 import eu.etaxonomy.cdm.vaadin.view.occurrence.CollectionPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
+import eu.etaxonomy.cdm.vaadin.view.reference.RegistrationUiReferenceEditorFormConfigurator;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.AbstractEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
@@ -136,7 +139,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private Map<ReferencePopupEditor, ToOneRelatedEntityCombobox<Reference>> referencePopupEditorsCombobox = new HashMap<>();
 
-    private Set<CollectionRowItemCollection> popuEditorTypeDesignationSourceRows = new HashSet<>();
+    private ElementCollectionHelper<ElementCollectionField> typeDesignationsCollectionFieldHelper;
+
+    private Set<CollectionRowItemCollection> typeDesignationEditorRows = new HashSet<>();
 
     private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
@@ -221,6 +226,16 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             };
         }
 
+        // new Reference only a sub sections of the publishedUnit
+        newReferenceInstantiator = new BeanInstantiator<Reference>() {
+            @Override
+            public Reference createNewBean() {
+                Reference newRef = ReferenceFactory.newSection();
+                newRef.setInReference(publishedUnit.getCitation());
+                return newRef;
+            }
+        };
+
         return workingSetDto;
     }
 
@@ -250,12 +265,13 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildVocabularyTermsItemContainer(
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
-        popuEditorTypeDesignationSourceRows.clear();
+        typeDesignationEditorRows.clear();
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
         referencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
+        typeDesignationsCollectionFieldHelper = new ElementCollectionHelper(getView().getTypeDesignationsCollectionField());
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             @Override
@@ -321,12 +337,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
                 getView().applyDefaultComponentStyle(row.components());
 
-                popuEditorTypeDesignationSourceRows.add(row);
+                typeDesignationEditorRows.add(row);
 
                 return row;
             }
         });
-
     }
 
     protected BeanItemContainer<DefinedTermBase> provideTypeStatusTermItemContainer() {
@@ -461,12 +476,14 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                    cache.load(newCollection);
 
                    if(event.isCreatedType()){
+                       //TODO use typeDesignationsCollectionFieldHelper instead to get component
                        SpecimenTypeDesignationDTORow row = collectionPopupEditorsRowMap.get(event.getSourceView());
-                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                       ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, SpecimenTypeDesignationDTORow.FIELD_INDEX_COLLECTION);
                        combobox.setValue((Collection) event.getEntity());
                    } else {
-                       for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
-                           ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class, 3);
+                       //TODO use typeDesignationsCollectionFieldHelper instead to get component
+                       for( CollectionRowItemCollection row : typeDesignationEditorRows) {
+                           ToOneRelatedEntityCombobox<Collection> combobox = row.getComponent(ToOneRelatedEntityCombobox.class,  SpecimenTypeDesignationDTORow.FIELD_INDEX_COLLECTION);
                            combobox.reload();
                        }
                    }
@@ -479,10 +496,21 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
         ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
 
-        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
-        referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
-        referencePopupEditor.withDeleteButton(true);
-        referencePopupEditor.loadInEditor(null);
+        String property = typeDesignationsCollectionFieldHelper.properyFor(referenceComobox);
+        if(property.equals(SpecimenTypeDesignationDTORow.FIELD_NAME_DESIGNATION_REFERENCE)){
+            referencePopupEditor.withReferenceTypes(EnumSet.of(ReferenceType.Section));
+            referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+            referencePopupEditor.withDeleteButton(true);
+            RegistrationUiReferenceEditorFormConfigurator
+                .create(true).configure(referencePopupEditor, newReferenceInstantiator);
+            referencePopupEditor.loadInEditor(null);
+        } else {
+            // only other option by now
+            referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+            referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+            referencePopupEditor.withDeleteButton(true);
+            referencePopupEditor.loadInEditor(null);
+        }
 
         referencePopupEditorsCombobox.put(referencePopupEditor, referenceComobox);
     }
@@ -490,13 +518,27 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
     public void doReferenceEditorEdit(ToOneRelatedEntityCombobox<Reference> referenceComobox) {
 
         ReferencePopupEditor referencePopupEditor = openPopupEditor(ReferencePopupEditor.class, null);
-        referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
-        referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
-        referencePopupEditor.withDeleteButton(true);
-        referencePopupEditor.loadInEditor(referenceComobox.getValue().getUuid());
+
+        String property = typeDesignationsCollectionFieldHelper.properyFor(referenceComobox);
+
+        if(property.equals(SpecimenTypeDesignationDTORow.FIELD_NAME_DESIGNATION_REFERENCE)){
+            referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+            referencePopupEditor.withDeleteButton(true);
+            RegistrationUiReferenceEditorFormConfigurator
+                .create(false).typeSelectReadonly(true).configure(referencePopupEditor, newReferenceInstantiator);
+            referencePopupEditor.loadInEditor(referenceComobox.getValue().getUuid());
+        } else {
+            // only other option by now
+            referencePopupEditor.withReferenceTypes(RegistrationUIDefaults.MEDIA_REFERENCE_TYPES);
+            referencePopupEditor.grantToCurrentUser(COLLECTION_EDITOR_CRUD);
+            referencePopupEditor.withDeleteButton(true);
+            referencePopupEditor.loadInEditor(referenceComobox.getValue().getUuid());
+        }
 
         referencePopupEditorsCombobox.put(referencePopupEditor, referenceComobox);
     }
+
+
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
     public void onReferenceEvent(EntityChangeEvent event){
@@ -508,7 +550,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
         if(event.isCreatedType()){
             combobox.setValue((Reference) event.getEntity());
         } else {
-            for( CollectionRowItemCollection row : popuEditorTypeDesignationSourceRows) {
+            for( CollectionRowItemCollection row : typeDesignationEditorRows) {
                 combobox.reload();
             }
         }

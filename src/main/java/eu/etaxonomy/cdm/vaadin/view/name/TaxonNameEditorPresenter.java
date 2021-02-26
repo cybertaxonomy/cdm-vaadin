@@ -502,21 +502,17 @@ public class TaxonNameEditorPresenter
         statusTypeReferencePopupEditorsRowMap.put(referencePopupEditor, row);
     }
 
-    /**
-     * @param referenceEditorPopup
-     */
     private void configureReferencePopupEditor(ReferencePopupEditor referenceEditorPopup, UUID referenceUUID) {
+
         boolean nomRefSectionEditingOnly = getView()
                 .isModeEnabled(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-        if (nomRefSectionEditingOnly) {
-            referenceEditorPopup.setBeanInstantiator(newReferenceInstantiator);
-        }
 
         // TODO this should be configurable per UI -
         // RegistrationUiReferenceEditorFormConfigurator as spring bean,
         // different spring profiles
-        referenceEditorPopup.setEditorComponentsConfigurator(new RegistrationUiReferenceEditorFormConfigurator(
-                nomRefSectionEditingOnly && newReferenceInstantiator != null));
+        boolean limitToSectionEditing = nomRefSectionEditingOnly && newReferenceInstantiator != null;
+        RegistrationUiReferenceEditorFormConfigurator
+                .create(limitToSectionEditing).configure(referenceEditorPopup, nomRefSectionEditingOnly ? newReferenceInstantiator : null);
 
         referenceEditorPopup.loadInEditor(referenceUUID);
         if (!nomRefSectionEditingOnly) {

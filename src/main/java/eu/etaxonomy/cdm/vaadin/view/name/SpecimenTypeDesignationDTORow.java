@@ -40,6 +40,15 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
  */
 public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection implements CollectionRow {
 
+    public static final String FIELD_NAME_TYPE_STATUS = "typeStatus";
+    public static final String FIELD_NAME_KIND_OF_UNIT = "kindOfUnit";
+    public static final String FIELD_NAME_DESIGNATION_REFERENCE = "designationReference";
+
+    public static final int FIELD_INDEX_TYPE_STATUS = 0;
+    public static final int FIELD_INDEX_KIND_OF_UNIT = 1;
+    public static final int FIELD_INDEX_COLLECTION = 3;
+    public static final int FIELD_INDEX_DESIGNATION_REFERENCE = 5;
+
     private static final long serialVersionUID = -5637834800897331072L;
 
     /* CONVENTION!
@@ -115,12 +124,16 @@ public class SpecimenTypeDesignationDTORow extends CollectionRowItemCollection i
         return components;
     }
 
+    /**
+     * IMPORTANT!!!
+     * When changing the field order FIELD_INDEX_* must be adapted
+     */
     public static List<String> visibleFields() {
         List<String> visibleFields = Arrays.asList(new String[]{
-            "kindOfUnit", "typeStatus",
+            FIELD_NAME_KIND_OF_UNIT, FIELD_NAME_TYPE_STATUS,
             "collection", "accessionNumber",
             "preferredStableUri",
-            "designationReference", "designationReferenceDetail",
+            FIELD_NAME_DESIGNATION_REFERENCE, "designationReferenceDetail",
             "mediaUri", "mediaSpecimenReference",
             "mediaSpecimenReferenceDetail"
             });
