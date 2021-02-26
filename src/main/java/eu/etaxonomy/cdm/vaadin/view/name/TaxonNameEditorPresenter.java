@@ -130,9 +130,6 @@ public class TaxonNameEditorPresenter
 
     private Integer taxonNameId;
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
@@ -283,10 +280,6 @@ public class TaxonNameEditorPresenter
                 .buildVocabularyTermsItemContainer(AnnotationType.EDITORIAL().getVocabulary().getUuid()));
     }
 
-    /**
-     * @param element
-     * @return
-     */
     @Deprecated
     private void addNomenclaturalStatus(NomenclaturalStatusDTO element) {
         // Nothing to do
@@ -449,9 +442,6 @@ public class TaxonNameEditorPresenter
         return super.preSaveBean(bean);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if (crud != null) {
@@ -461,9 +451,6 @@ public class TaxonNameEditorPresenter
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(TaxonName bean) {
         if (crud != null) {
@@ -471,9 +458,6 @@ public class TaxonNameEditorPresenter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected INameService getService() {
         return getRepo().getNameService();
@@ -860,17 +844,11 @@ public class TaxonNameEditorPresenter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected TaxonNameDTO createDTODecorator(TaxonName cdmEntitiy) {
         return new TaxonNameDTO(cdmEntitiy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BeanInstantiator<TaxonName> defaultCdmEntityInstantiator() {
         return new BeanInstantiator<TaxonName>() {
