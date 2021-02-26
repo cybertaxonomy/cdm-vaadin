@@ -35,9 +35,6 @@ public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetI
         super(publishedUnitUuid, null, null, typifiedNameUuid);
     }
 
-    /**
-     * @return
-     */
     public boolean isForNewTypeDesignation() {
         return getBaseEntityRef() == null;
     }

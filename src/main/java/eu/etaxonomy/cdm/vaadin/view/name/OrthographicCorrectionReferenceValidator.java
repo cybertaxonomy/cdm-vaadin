@@ -29,9 +29,6 @@ public class OrthographicCorrectionReferenceValidator implements Validator {
         this.nomenclaturalReferenceField = nomenclaturalReferenceField;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Object value) throws InvalidValueException {
         if(value != null){

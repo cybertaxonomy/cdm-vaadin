@@ -105,12 +105,10 @@ public class NameTypeDesignationPresenter
 
     private BeanInstantiator<Reference> newReferenceInstantiator;
 
-
     @Override
     protected BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator(){
        return defaultBeanInstantiator;
     }
-
 
     @Override
     protected NameTypeDesignation loadBeanById(Object identifier) {
@@ -178,7 +176,6 @@ public class NameTypeDesignationPresenter
 
         return bean;
     }
-
 
     @Override
     protected NameTypeDesignation loadCdmEntity(UUID uuid) {
@@ -262,7 +259,6 @@ public class NameTypeDesignationPresenter
 
     }
 
-
     @Override
     protected IService<NameTypeDesignation> getService() {
         // No TypeDesignationService :( so I need override the generic save and delete methods
@@ -281,10 +277,6 @@ public class NameTypeDesignationPresenter
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NameTypeDesignation preSaveBean(NameTypeDesignation bean) {
 
@@ -331,12 +323,8 @@ public class NameTypeDesignationPresenter
                 bean.removeAnnotation(a);
             }
         }
-
-
         return bean;
     }
-
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction action){
@@ -344,15 +332,12 @@ public class NameTypeDesignationPresenter
         if(!isFromOwnView(action)){
             return;
         }
-
         TaxonNamePopupEditor typeNamePopup = openPopupEditor(TaxonNamePopupEditor.class, action);
         typeNamePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
         typeNamePopup.withDeleteButton(true);
         TaxonNamePopupEditorConfig.configure(typeNamePopup);
         typeNamePopup.loadInEditor(null);
-
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Edit.class)
     public void onTaxonNameEditorActionEdit(TaxonNameEditorAction action){
@@ -375,7 +360,6 @@ public class NameTypeDesignationPresenter
         if (getView() == null || event.getSourceView() != getView()) {
             return;
         }
-
         ReferencePopupEditor referenceEditorPopup = openPopupEditor(ReferencePopupEditor.class, event);
 
         referenceEditorPopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
