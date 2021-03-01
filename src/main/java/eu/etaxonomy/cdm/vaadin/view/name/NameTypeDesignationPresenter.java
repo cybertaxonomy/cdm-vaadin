@@ -144,7 +144,7 @@ public class NameTypeDesignationPresenter
 
         Reference typifiedNameNomRef = typifiedNameInContext.getNomenclaturalReference();
         while(typifiedNameNomRef.getType().equals(ReferenceType.Section)
-                || typifiedNameNomRef.getInReference() == null) {
+                && typifiedNameNomRef.getInReference() != null) {
             typifiedNameNomRef = typifiedNameNomRef.getInReference();
         }
         getView().setInTypedesignationOnlyAct(Optional.of(typifiedNameNomRef != null && !typifiedNameNomRef.equals(getPublishedUnit().getCitation())));
