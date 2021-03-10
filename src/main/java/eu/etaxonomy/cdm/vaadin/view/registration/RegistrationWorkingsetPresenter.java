@@ -147,7 +147,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     private List<Registration> newNameBlockingRegistrations = new ArrayList<>();
 
     /**
-     * TODO is this still needed? The regitration UUID should be accessible in the popup editor context,
+     * TODO is this still needed? The registration UUID should be accessible in the popup editor context,
      * see findRegistrationInContext()
      */
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
@@ -162,12 +162,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
     }
 
     /**
-
-
-    /**
      * @param doReload reload the workingset from the persistent storage.
      *  Workingsets which are not yet persisted are preserved.
-     *
      */
     protected void refreshView(boolean doReload) {
 
@@ -202,9 +198,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         applyWorkingset();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
@@ -554,11 +547,14 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
+        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET ){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                    workingset.getCitationUuid(),
                     event.getRegistrationUuid(),
                     event.getBaseEntityRef().castTo(FieldUnit.class), null));
             if(event.hasSource()){
@@ -569,8 +565,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
-            popup.loadInEditor(new NameTypeDesignationWorkingsetIds(
-                    event.getRegistrationUuid(),
+            popup.loadInEditor(NameTypeDesignationWorkingsetIds.forExistingTypeDesignation(
+                    registrationDTO.getCitationUuid(),
                     event.getBaseEntityRef().castTo(NameTypeDesignation.class))
                     );
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
@@ -589,12 +585,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
+        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+
         if(event.getWorkingSetType() == TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET){
             SpecimenTypeDesignationWorkingsetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationWorkingsetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-            UUID typifiedNameUuid;
-
-            RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
             TypedEntityReference<TaxonName> typifiedNameRef;
             if(registrationDTO.getTypifiedNameRef() != null){
                 // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
@@ -607,6 +602,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.withDeleteButton(false);
             popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
+                        workingset.getCitationUuid(),
                         event.getRegistrationUuid(),
                         null,
                         typifiedNameRef.getUuid()
@@ -637,8 +633,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                 }
             });
             popup.withDeleteButton(false);
-            popup.loadInEditor(new NameTypeDesignationWorkingsetIds(
-                    event.getRegistrationUuid(),
+            popup.loadInEditor(NameTypeDesignationWorkingsetIds.forNewTypeDesignation(
+                    registrationDTO.getCitationUuid(),
                     event.getTypifiedNameUuid()
                     )
                 );
@@ -681,9 +677,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             if(event.getReason().equals(Reason.SAVE)){
 
                 Optional<Registration> registrationOpt = Optional.ofNullable(null);
-
                 UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
-
                 try {
                     clearSession();
                     registrationOpt = findRegistrationInContext(event.getPopup());
@@ -719,10 +713,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         // ignore other editors
     }
 
-    /**
-     * @param registrationOpt
-     * @param name
-     */
     private void assocciateOrQueueBlockingRegistration(Optional<Registration> registrationOpt, UUID nameUuid) {
         registrationOpt.ifPresent(reg -> registrationWorkflowService.addBlockingRegistration(nameUuid, reg));
         if(!registrationOpt.isPresent()){
@@ -735,13 +725,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     *
-     */
+
     public void clearSession() {
         getRepo().clearSession();
     }
-
 
     @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationWorkingSet.class)
     public void onShowDetailsEventForRegistrationWorkingSet(ShowDetailsEvent<RegistrationWorkingSet,?> event) {
@@ -820,8 +807,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-
-
     public Optional<Registration> findRegistrationInContext(PopupView popupView) {
         Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
         return findRegistrationInContext(context);
@@ -829,9 +814,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     /**
      * Finds the Registration in the EditorContext stack
-     *
-     * @param context
-     * @return
      */
     public Optional<Registration> findRegistrationInContext(Stack<EditorActionContext> context) {
         EditorActionContext rootCtx = context.get(0);

@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
 /**
  * @author a.kohlbecker
  * @since May 24, 2017
- *
  */
 public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V>
     implements ToOneRelatedEntityField<V>, ReloadableSelect, EntitySupport<V> {
@@ -69,10 +68,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         });
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
         container.addComponents(lazySelect, addButton, editButton);
@@ -81,25 +76,16 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         return container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<? extends V> getType() {
         return type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         container.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         return Optional.empty();
@@ -112,9 +98,10 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         return lazySelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public void selectFirst() {
+        lazySelect.selectFirst();
+    }
+
     public void loadFrom(FilterablePagingProvider<V> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength) {
         lazySelect.loadFrom(filterablePagingProvider, filterableCountProvider, pageLength);
 
@@ -128,40 +115,35 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         getSelect().reload();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setAddButtonEnabled(boolean enabled) {
         addButton.setEnabled(enabled);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addClickListenerAddEntity(ClickListener listener) {
         addButton.addClickListener(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setEditButtonEnabled(boolean enabled) {
         editButton.setEnabled(enabled);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
     }
 
+    @Override
+    public void addValueChangeListener(ValueChangeListener listener) {
+        lazySelect.addValueChangeListener(listener);
+    }
+
+    @Override
+    public void removeValueChangeListener(ValueChangeListener listener) {
+        lazySelect.removeValueChangeListener(listener);
+    }
 
     @Override
     public void replaceEntityValue(V bean){
@@ -175,8 +157,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     /**
      * Returns always currently selected item by
-     *
-     * {@inheritDoc}
      */
     @Override
     public V getValue() {
@@ -184,12 +164,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         return lazySelect.getValue();
     }
 
-
-
-
-    /**
-     *
-     */
     public void commitSelect() {
         try {
             setComponentError(null);
@@ -200,10 +174,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setValue(V newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         lazySelect.refresh();
@@ -219,17 +189,11 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Property getPropertyDataSource() {
         return lazySelect.getPropertyDataSource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -239,29 +203,22 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setNestedButtonStateUpdater(NestedButtonStateUpdater<V> buttonUpdater) {
         this.buttonUpdater = buttonUpdater;
         lazySelect.addValueChangeListener(buttonUpdater);
     }
 
-
     @Override
     public void validate() throws InvalidValueException {
-        super.validate();
         lazySelect.validate();
     }
-
 
     @Override
     public ErrorMessage getErrorMessage() {
         ErrorMessage errorMessage = lazySelect.getErrorMessage();
         return errorMessage;
     }
-
 
     @Override
     public boolean isValid() {
@@ -274,7 +231,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         lazySelect.setRequired(required);
     }
 
-
     @Override
     public boolean isRequired() {
         return lazySelect.isRequired();
@@ -286,20 +242,16 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         lazySelect.setImmediate(immediate);
     }
 
-
     @Override
     public void commit() throws SourceException, InvalidValueException {
         lazySelect.commit(); // we must not use the commitSelect() here to allow InvalidValueException to be handled by the caller
         super.commit();
     }
 
-
     @Override
     public void setComponentError(ErrorMessage componentError) {
         lazySelect.setComponentError(componentError);
         super.setComponentError(componentError);
     }
-
-
 
 }

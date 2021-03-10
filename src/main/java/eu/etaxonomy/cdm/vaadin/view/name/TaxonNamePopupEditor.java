@@ -23,7 +23,6 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.server.ErrorMessage;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
@@ -386,11 +385,6 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                     public boolean isEmpty() {
                         Collection<?> value = getValue();
                         return value == null || value.isEmpty() ;
-                    }
-
-                    @Override
-                    public void setComponentError(ErrorMessage componentError) {
-                        nomStatusCollectionField.setComponentError(componentError);
                     }
 
         };

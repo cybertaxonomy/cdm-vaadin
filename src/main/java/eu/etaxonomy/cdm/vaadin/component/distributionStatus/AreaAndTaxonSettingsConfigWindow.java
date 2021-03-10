@@ -265,7 +265,8 @@ public class AreaAndTaxonSettingsConfigWindow
             }
         }
         else if(property==distAreaBox){
-            TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) event.getProperty().getValue();
+            @SuppressWarnings("unchecked")
+            TermVocabulary<NamedArea> vocabulary = (TermVocabulary<NamedArea>) property.getValue();
             NamedAreaContainer container = new NamedAreaContainer(vocabulary);
             namedAreaList.setContainerDataSource(container);
         }
@@ -285,6 +286,7 @@ public class AreaAndTaxonSettingsConfigWindow
             TermVocabulary<NamedArea> areaVoc = null;
             String uuidString = (String) classificationBox.getContainerProperty(classificationBox.getValue(),"uuid").getValue(); //$NON-NLS-1$
             UUID classificationUuid = UUID.fromString(uuidString);
+            @SuppressWarnings("unchecked")
             Set<UuidAndTitleCache<TaxonNode>> treeSelection = (Set<UuidAndTitleCache<TaxonNode>>) taxonTree.getValue();
 			if(!treeSelection.isEmpty()){
 				for (UuidAndTitleCache<TaxonNode> uuidAndTitleCache : treeSelection) {
@@ -297,6 +299,7 @@ public class AreaAndTaxonSettingsConfigWindow
                 }
 			}
             areaVoc = (TermVocabulary<NamedArea>) distAreaBox.getValue();
+            @SuppressWarnings("unchecked")
             List<NamedArea> selectedAreas = new ArrayList<>((Set<NamedArea>)namedAreaList.getValue()); //getValue is LinkedHashSet and therefore sorted
             DistributionEditorUtil.updateDistributionView(distributionTableView, taxonNodes, areaVoc, selectedAreas, classificationUuid);
             window.close();

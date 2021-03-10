@@ -113,13 +113,22 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
                 guaranteePerEntityCRUDPermissions(cdmEntitiy);
             }
         }
+        DTO dto = initializeCache(cdmEntitiy);
+
+        return dto;
+    }
+
+
+    /**
+     * @param cdmEntitiy the CDM entity to initialize the cache with.
+     */
+    protected final DTO initializeCache(CDM cdmEntitiy) {
         cache = new CdmTransientEntityAndUuidCacher(this);
         // need to use load but put see #7214
         cdmEntitiy = cache.load(cdmEntitiy);
         addRootEntity(cdmEntitiy);
 
         DTO dto = createDTODecorator(cdmEntitiy);
-
         return dto;
     }
 

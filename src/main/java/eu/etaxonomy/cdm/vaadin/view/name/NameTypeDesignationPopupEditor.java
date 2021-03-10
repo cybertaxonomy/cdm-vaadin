@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Optional;
+
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.spring.annotation.SpringComponent;
@@ -45,6 +47,10 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameTypeDesignation, NameTypeDesignationPresenter>
     implements NameTypeDesignationEditorView {
 
+    private static final String TYPE_STATUS_OR_FLAG_MUST_BE_SET = "Either \"Type status\" must be set or any of the \"Conserved type\", \"Rejected type\" or \"Not designated\" flags must be set.";
+
+    private static final String TYPE_STATUS_MUST_BE_SET = "\"Type status\" must be set.";
+
     private static final long serialVersionUID = 8233876984579344340L;
 
     private static final int GRID_COLS = 4;
@@ -66,6 +72,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
     private boolean showTypeFlags = true;
 
+    private Optional<Boolean> inTypedesignationOnlyAct = Optional.empty();
 
     private FilterableAnnotationsField annotationsListField;
 
@@ -148,7 +155,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         typeStatusSelect.setNullSelectionAllowed(false);
         typeStatusSelect.setWidth(100, Unit.PERCENTAGE);
         typeStatusSelect.setRequired(true);
-        typeStatusSelect.setRequiredError("Either \"Type status\" must be set or any of the \"Conserved type\", \"Rejected type\" or \"Not designated\" flags must be set.");
+        typeStatusSelect.setRequiredError(TYPE_STATUS_OR_FLAG_MUST_BE_SET);
         addField(typeStatusSelect, "typeStatus", 0, row, 1, row);
         grid.setComponentAlignment(typeStatusSelect, Alignment.TOP_RIGHT);
         typeStatusSelect.addValueChangeListener(e -> {
@@ -232,84 +239,81 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         boolean hasDesignationSource = typeStatusSelect.getValue() != null && ((NameTypeDesignationStatus)typeStatusSelect.getValue()).hasDesignationSource();
         designationReferenceDetailField.setVisible(hasDesignationSource);
         designationReferenceCombobox.setVisible(hasDesignationSource);
+        designationReferenceCombobox.setRequired(hasDesignationSource);
         // NOTE: For better usability we only hide these fields here,
         // NameTypeDesignationPresenter.preSaveBean(NameTypeDesignation bean) will empty them in needed
 
-        boolean typeStatusRequired = !(conservedTypeField.getValue().booleanValue() || rejectedTypeField.getValue().booleanValue() || notDesignatedField.getValue().booleanValue());
-        typeStatusSelect.setRequired(typeStatusRequired);
+        boolean isInTypedesignationOnlyAct = !isInTypedesignationOnlyAct().isPresent() || isInTypedesignationOnlyAct().get();
+        boolean typeStatusRequired = !(conservedTypeField.getValue().booleanValue()
+                || rejectedTypeField.getValue().booleanValue()
+                || notDesignatedField.getValue().booleanValue());
+        // need to check for isInTypedesignationOnlyAct also, otherwise the reference field will not show up
+        // and the type designation might not be associated with the registration
+        // TODO discuss with Henning
+        typeStatusSelect.setRequired(typeStatusRequired || checkInTypeDesignationOnlyAct());
+        if(typeStatusRequired && checkInTypeDesignationOnlyAct()) {
+            designationReferenceCombobox.setRequiredError(TYPE_STATUS_MUST_BE_SET);
+        } else {
+            designationReferenceCombobox.setRequiredError(TYPE_STATUS_OR_FLAG_MUST_BE_SET);
+        }
+
 
     }
 
-    /**
-     * @return the typeNameField
-     */
     @Override
     public ToOneRelatedEntityCombobox<TaxonName> getTypeNameField() {
         return typeNameField;
     }
 
-    /**
-     * @return the typifiedNamesComboboxSelect
-     */
     @Override
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getTypifiedNamesComboboxSelect() {
         return typifiedNamesComboboxSelect;
     }
 
-    /**
-     * @return the typeStatusSelect
-     */
     @Override
     public NativeSelect getTypeStatusSelect() {
         return typeStatusSelect;
     }
 
-    /**
-     * @return the citationCombobox
-     */
     @Override
     public ToOneRelatedEntityCombobox<Reference> getDesignationReferenceCombobox() {
         return designationReferenceCombobox;
     }
 
-
-    /**
-     * @return the showTypeFlags
-     */
     @Override
     public boolean isShowTypeFlags() {
         return showTypeFlags;
     }
 
-    /**
-     * @param showTypeFlags the showTypeFlags to set
-     */
     @Override
     public void setShowTypeFlags(boolean showTypeFlags) {
         this.showTypeFlags = showTypeFlags;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public AnnotationType[] getEditableAnotationTypes() {
         return editableAnotationTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void setEditableAnotationTypes(AnnotationType... editableAnotationTypes) {
         this.editableAnotationTypes = editableAnotationTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public FilterableAnnotationsField getAnnotationsField() {
         return annotationsListField;
+    }
+
+    @Override
+    public void setInTypedesignationOnlyAct(Optional<Boolean> isInTypedesignationOnlyAct) {
+        this.inTypedesignationOnlyAct = isInTypedesignationOnlyAct;
+    }
+
+    @Override
+    public Optional<Boolean> isInTypedesignationOnlyAct() {
+        return inTypedesignationOnlyAct;
     }
 }
