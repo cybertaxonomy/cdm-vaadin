@@ -34,7 +34,7 @@ import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.api.utility.RoleProber;
+import eu.etaxonomy.cdm.api.utility.RoleProberImpl;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -549,7 +549,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         row++;
         annotationsListField = new FilterableAnnotationsField("Editorial notes");
         annotationsListField.setWidth(100, Unit.PERCENTAGE);
-        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION));
         boolean isAdmin = UserHelperAccess.userHelper().userIsAdmin();
         if(isCurator || isAdmin){
             annotationsListField.withNewButton(true);
