@@ -19,7 +19,7 @@ import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.api.utility.RoleProberImpl;
+import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
