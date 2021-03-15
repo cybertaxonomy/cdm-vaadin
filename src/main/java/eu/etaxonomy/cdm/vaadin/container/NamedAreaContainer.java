@@ -22,7 +22,7 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
     private static final long serialVersionUID = 9150424479597481361L;
 
     /**
-     * Creates a NamedAreaContainer containing all {@link NamedArea}s of the given {@code vocabulary} 
+     * Creates a NamedAreaContainer containing all {@link NamedArea}s of the given {@code vocabulary}
      * in alphabetically ascending order.
      * @param vocabulary The vocabulary containing the {@link NamedArea}s to populate the container with.
      * @throws IllegalArgumentException
@@ -32,7 +32,7 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 	    super(NamedArea.class);
 	    List<NamedArea> namedAreas;
 	    if (vocabulary.isInstanceOf(OrderedTermVocabulary.class)) {
-	        OrderedTermVocabulary orderedVoc = CdmBase.deproxy(vocabulary, OrderedTermVocabulary.class);
+	        OrderedTermVocabulary<NamedArea> orderedVoc = CdmBase.deproxy(vocabulary, OrderedTermVocabulary.class);
 	        namedAreas = new ArrayList<>(orderedVoc.getOrderedTerms());
 	        Collections.reverse(namedAreas);
 	    }else {
@@ -52,7 +52,7 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 	private class AlphabeticallyAscendingNamedAreaComparator implements Comparator<NamedArea>{
 
 		/**
-		 * 
+		 *
 		 * {@inheritDoc}
 		 */
         @Override
