@@ -32,7 +32,7 @@ public class CdmSQLContainerTest extends CdmVaadinBaseTest {
 		CdmSQLContainer csc = CdmSQLContainer.newInstance("TaxonBase");
 		Collection<?> propIds = csc.getContainerPropertyIds();
 		Collection<?> itemIds = csc.getItemIds();
-		Assert.assertEquals(38, itemIds.size());
+		Assert.assertEquals(5, itemIds.size());
 	}
 
 

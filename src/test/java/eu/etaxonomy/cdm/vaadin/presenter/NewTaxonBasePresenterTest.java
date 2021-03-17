@@ -54,12 +54,14 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
     }
 
     @Test
+    //NOTE by AM: I fixed property path sec=>secSource.citation (#9327), not sure if this is correct
+    //            but as the test does not say what is meant to be tested I can't proof it
     public void testNewTaxonBase(){
         RowId refId20 = new RowId(20);
         RowId refId21 = new RowId(21);
         UUID newTaxonUuid = newTaxonBasePresenter.newTaxon("Taxon  h", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
-                "sec",
+                "secSource.citation",
                 "synonyms"
         });
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
@@ -70,8 +72,10 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         Set<Synonym> synonyms = taxon.getSynonyms();
         Assert.assertEquals(1,synonyms.size());
         Synonym synonymOfTaxon = synonyms.iterator().next();
-
-        Synonym synonym = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newSynonymUuid),Synonym.class);
+        List<String> SYN_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
+                "secSource.citation"
+        });
+        Synonym synonym = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newSynonymUuid, SYN_TAXON_INIT_STRATEGY),Synonym.class);
         Assert.assertEquals(synonym, synonymOfTaxon);
 
         Assert.assertEquals(synonym.getSec().getId(), 20);
