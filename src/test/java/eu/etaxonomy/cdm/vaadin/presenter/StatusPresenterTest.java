@@ -42,31 +42,31 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     private static final Logger logger = Logger.getLogger(StatusPresenterTest.class);
 
-    private static StatusPresenter sp;
+    private static StatusPresenter statusPresenter;
 
     @BeforeClass
     public static void init() {
-        sp = new StatusPresenter();
+        statusPresenter = new StatusPresenter();
     }
 
     @Test
     public void testLoadTaxa() throws SQLException {
 
-        LeafNodeTaxonContainer container = sp.loadTaxa(11);
+        LeafNodeTaxonContainer container = statusPresenter.loadTaxa(11);
 
         Collection<?> itemIds = container.rootItemIds();
 
         Assert.assertEquals(3, itemIds.size());
 
-        sp.setUnplacedFilter();
+        statusPresenter.setUnplacedFilter();
         itemIds = container.getItemIds();
         Assert.assertEquals(1, itemIds.size());
 
-        sp.removeUnplacedFilter();
+        statusPresenter.removeUnplacedFilter();
         itemIds = container.getItemIds();
         Assert.assertEquals(3, itemIds.size());
 
-        sp.setNameFilter("Taxon A");
+        statusPresenter.setNameFilter("Taxon A");
         itemIds = container.getItemIds();
         Assert.assertEquals(1, itemIds.size());
 
@@ -75,7 +75,7 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @Test
     public void testSynonyms() throws SQLException {
 
-        LeafNodeTaxonContainer container = sp.loadTaxa(11);
+        LeafNodeTaxonContainer container = statusPresenter.loadTaxa(11);
 
         RowId taxonId10 = new RowId(10);
         RowId taxonId11 = new RowId(11);
@@ -90,13 +90,13 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
     @Ignore
     public void updatePublishFlag() throws SQLException {
 
-        LeafNodeTaxonContainer container = sp.loadTaxa(11);
+        LeafNodeTaxonContainer container = statusPresenter.loadTaxa(11);
         RowId taxonId = new RowId(10);
         Item item = container.getItem(taxonId);
         Property<?> itemProperty = item.getItemProperty(LeafNodeTaxonContainer.PB_ID);
         boolean pb = (Boolean) itemProperty.getValue();
         Assert.assertTrue(pb);
-        sp.updatePublished(false, taxonId);
+        statusPresenter.updatePublished(false, taxonId);
         container.refresh();
         pb = (Boolean) itemProperty.getValue();
         Assert.assertFalse(pb);
@@ -104,16 +104,16 @@ public class StatusPresenterTest extends CdmVaadinBaseTest {
 
     @Test
     public void testGetClassificationId() throws SQLException {
-        sp.loadClassifications();
-        Object classificationId = sp.getClassificationId("Classification1");
+        statusPresenter.loadClassifications();
+        Object classificationId = statusPresenter.getClassificationId("Classification1");
         Assert.assertEquals("11", classificationId.toString());
-        classificationId = sp.getClassificationId("ClassificationDoesNotExist");
+        classificationId = statusPresenter.getClassificationId("ClassificationDoesNotExist");
         Assert.assertNull(classificationId);
     }
 
     @Test
     public void testLoadClassifications() throws SQLException {
-        CdmSQLContainer container = sp.loadClassifications();
+        CdmSQLContainer container = statusPresenter.loadClassifications();
         Collection<?> itemIds = container.getItemIds();
         String[] uuids = {"6595638e-4993-421a-9fe5-76b09d94f36a", "1ef8aada-de72-4023-bbe1-14465b6bc60d"};
         int count = 0;
