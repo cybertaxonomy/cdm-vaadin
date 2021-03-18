@@ -286,7 +286,7 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation preSaveBean(NameTypeDesignation bean) {
 
         if(!bean.hasDesignationSource()) {
-            bean.setSource(null); // this effectively removes the designation reference and reference detail
+            bean.setDesignationSource(null); // this effectively removes the designation reference and reference detail
         }
 
         // the typifiedNames can only be set on the name side, so we need to
