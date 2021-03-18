@@ -175,7 +175,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     public void test03_deleteTypeDesignationTest() {
 
         // FieldUnit" ID="5001
-        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, fieldUnitUuid, "Somewhere, FieldNumber.");
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<>(FieldUnit.class, fieldUnitUuid, "Somewhere, FieldNumber.");
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.load(registrationUuid, baseEntityRef);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 
