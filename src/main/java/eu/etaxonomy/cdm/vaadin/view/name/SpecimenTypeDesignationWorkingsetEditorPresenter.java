@@ -40,7 +40,6 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
-import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.location.Country;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignation;
@@ -49,6 +48,8 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
+import eu.etaxonomy.cdm.model.reference.NamedSource;
+import eu.etaxonomy.cdm.model.reference.NamedSourceBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
@@ -133,7 +134,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      * but never a {@link ReferenceType#Section}
      */
-    private DescriptionElementSource publishedUnit;
+    private NamedSourceBase publishedUnit;
 
     private Map<CollectionPopupEditor, SpecimenTypeDesignationDTORow> collectionPopupEditorsRowMap = new HashMap<>();
 
@@ -191,10 +192,10 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             rootEntities.add(registration);
             setInTypedesignationOnlyAct(Optional.of(Boolean.valueOf(registration.getName() == null)));
             try {
-                DescriptionElementSource pubUnitSource = RegistrationDTO.findPublishedUnit(registration);
+                NamedSourceBase pubUnitSource = RegistrationDTO.findPublishedUnit(registration);
                 if(pubUnitSource == null) {
                     Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
-                    pubUnitSource = DescriptionElementSource.NewPrimarySourceInstance(reference, null);
+                    pubUnitSource = NamedSource.NewPrimarySourceInstance(reference, null);
                 }
                 setPublishedUnit(pubUnitSource);
             } catch (Exception e) {
@@ -582,7 +583,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * @return
      *  the {@link #publishedUnit}
      */
-    public DescriptionElementSource getPublishedUnit() {
+    public NamedSourceBase getPublishedUnit() {
         return publishedUnit;
     }
 
@@ -591,7 +592,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      *  The unit of publication in which the type designation has been published.
      *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      */
-    protected void setPublishedUnit(DescriptionElementSource publishedUnit) throws Exception {
+    protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
         if(publishedUnit == null) {
             throw new NullPointerException();
         }

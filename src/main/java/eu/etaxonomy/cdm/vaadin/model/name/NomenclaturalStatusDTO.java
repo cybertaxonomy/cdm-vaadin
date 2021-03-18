@@ -10,10 +10,10 @@ package eu.etaxonomy.cdm.vaadin.model.name;
 
 import java.io.Serializable;
 
-import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCodeEdition;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
+import eu.etaxonomy.cdm.model.reference.NamedSource;
 import eu.etaxonomy.cdm.model.reference.OriginalSourceType;
 import eu.etaxonomy.cdm.model.reference.Reference;
 
@@ -68,7 +68,7 @@ public class NomenclaturalStatusDTO implements Serializable {
             if (nomStatus.getSource() == null) {
                 // below line as in
                 // DescriptionElementSource.NewInstance(OriginalSourceType.PrimaryTaxonomicSource)
-                nomStatus.setSource(DescriptionElementSource.NewInstance(OriginalSourceType.PrimaryTaxonomicSource));
+                nomStatus.setSource(NamedSource.NewInstance(OriginalSourceType.PrimaryTaxonomicSource));
             }
             nomStatus.getSource().setCitation(citation);
             nomStatus.getSource().setCitationMicroReference(citationMicroReference);

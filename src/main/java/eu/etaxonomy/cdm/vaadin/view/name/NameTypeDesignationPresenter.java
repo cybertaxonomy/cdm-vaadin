@@ -34,11 +34,12 @@ import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
-import eu.etaxonomy.cdm.model.description.DescriptionElementSource;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
+import eu.etaxonomy.cdm.model.reference.NamedSource;
+import eu.etaxonomy.cdm.model.reference.NamedSourceBase;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
@@ -91,7 +92,7 @@ public class NameTypeDesignationPresenter
      * This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      * but never a {@link ReferenceType#Section}
      */
-    private DescriptionElementSource publishedUnit;
+    private NamedSourceBase publishedUnit;
 
     protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
 
@@ -119,7 +120,7 @@ public class NameTypeDesignationPresenter
         if(idset.isForNewTypeDesignation()) {
             Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
             try {
-                setPublishedUnit(DescriptionElementSource.NewPrimarySourceInstance(reference, null));
+                setPublishedUnit(NamedSource.NewPrimarySourceInstance(reference, null));
             } catch(Exception e) {
                 throw new RuntimeException("Refernce of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
             }
@@ -420,7 +421,7 @@ public class NameTypeDesignationPresenter
      * @return
      *  the {@link #publishedUnit}
      */
-    public DescriptionElementSource getPublishedUnit() {
+    public NamedSourceBase getPublishedUnit() {
         return publishedUnit;
     }
 
@@ -429,7 +430,7 @@ public class NameTypeDesignationPresenter
      *  The unit of publication in which the type designation has been published.
      *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      */
-    protected void setPublishedUnit(DescriptionElementSource publishedUnit) throws Exception {
+    protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
         if(publishedUnit == null) {
             throw new NullPointerException();
         }
