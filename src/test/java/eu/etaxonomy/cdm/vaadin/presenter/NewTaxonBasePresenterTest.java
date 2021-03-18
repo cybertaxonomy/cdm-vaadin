@@ -113,7 +113,7 @@ public class NewTaxonBasePresenterTest extends CdmVaadinBaseTest {
         RowId refId21 = new RowId(21);
         UUID newTaxonUuid = newTaxonBasePresenter.newTaxon("Taxon  h", refId20, UUID.fromString("6595638e-4993-421a-9fe5-76b09d94f36a")).getUuid();
         List<String> ACC_TAXON_INIT_STRATEGY = Arrays.asList(new String []{
-                "sec",
+                "secSource.citation",
                 "synonymRelations"
         });
         Taxon taxon = CdmBase.deproxy(CdmSpringContextHelper.getTaxonService().load(newTaxonUuid,ACC_TAXON_INIT_STRATEGY),Taxon.class);
