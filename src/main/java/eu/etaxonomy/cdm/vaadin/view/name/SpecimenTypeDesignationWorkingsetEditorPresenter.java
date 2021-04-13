@@ -325,9 +325,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                 row.designationReference.getSelect().setNullSelectionAllowed(!checkInTypeDesignationOnlyAct());
 
                 row.mediaSpecimenReference.loadFrom(
-                        designationReferencePagingProvider,
-                        designationReferencePagingProvider,
-                        designationReferencePagingProvider.getPageSize()
+                        mediaReferencePagingProvider,
+                        mediaReferencePagingProvider,
+                        mediaReferencePagingProvider.getPageSize()
                         );
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.mediaSpecimenReference.getSelect()));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
