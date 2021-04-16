@@ -14,8 +14,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.api.utility.RoleProber;
-import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.api.util.RoleProberImpl;
+import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -161,7 +161,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
             });
 
         UserHelper userHelper = UserHelperAccess.userHelper();
-        superCollectionCombobox.setVisible(RegistrationUIDefaults.COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION.stream().anyMatch( role -> userHelper.userIs(new RoleProber(role))));
+        superCollectionCombobox.setVisible(RegistrationUIDefaults.COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION.stream().anyMatch( role -> userHelper.userIs(new RoleProberImpl(role))));
 
         row++;
         institutionCombobox  = new ToOneRelatedEntityCombobox<Institution>("Institute", Institution.class);

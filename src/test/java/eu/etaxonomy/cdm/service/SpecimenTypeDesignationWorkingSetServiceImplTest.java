@@ -26,7 +26,7 @@ import org.unitils.spring.annotation.SpringBeanByType;
 
 import eu.etaxonomy.cdm.CdmVaadinIntegrationTest;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.utility.DerivedUnitConversionException;
+import eu.etaxonomy.cdm.api.util.DerivedUnitConversionException;
 import eu.etaxonomy.cdm.common.URI;
 import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -84,6 +84,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
             "DERIVATIONEVENT", "GATHERINGEVENT", "LANGUAGESTRING", "SPECIMENOROBSERVATIONBASE", "TYPEDESIGNATIONBASE",
             "REGISTRATION_TYPEDESIGNATIONBASE", "TAXONNAME_TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT",
             "MEDIA", "MEDIA_REPRESENTATION", "MEDIAREPRESENTATION", "MEDIAREPRESENTATIONPART",
+            "ORIGINALSOURCEBASE",
             "AUDITEVENT",
             "HIBERNATE_SEQUENCES"
             };
@@ -175,7 +176,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
     public void test03_deleteTypeDesignationTest() {
 
         // FieldUnit" ID="5001
-        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<FieldUnit>(FieldUnit.class, fieldUnitUuid, "Somewhere, FieldNumber.");
+        TypedEntityReference<FieldUnit> baseEntityRef = new TypedEntityReference<>(FieldUnit.class, fieldUnitUuid, "Somewhere, FieldNumber.");
         SpecimenTypeDesignationWorkingSetDTO<Registration> workingset = service.load(registrationUuid, baseEntityRef);
         Assert.assertTrue(workingset.getSpecimenTypeDesignationDTOs().size() == 2);
 

@@ -64,6 +64,6 @@
     </bean>
     
     <!-- find the implementation of UserHelper which is not covered by a component scan  -->
-    <bean name="cdmUserHelper" class="eu.etaxonomy.cdm.api.utility.CdmUserHelper"/>
+    <bean name="cdmUserHelper" class="eu.etaxonomy.cdm.api.util.CdmUserHelper"/>
     
 </beans>

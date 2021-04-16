@@ -19,7 +19,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;

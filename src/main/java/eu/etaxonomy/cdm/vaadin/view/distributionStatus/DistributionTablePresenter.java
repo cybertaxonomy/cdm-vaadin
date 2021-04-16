@@ -34,7 +34,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.Notification;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.i18n.Messages;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;

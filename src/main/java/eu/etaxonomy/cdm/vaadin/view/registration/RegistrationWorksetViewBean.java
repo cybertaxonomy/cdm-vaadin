@@ -49,7 +49,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
-import eu.etaxonomy.cdm.api.utility.RoleProber;
+import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -469,7 +469,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         CssLayout stateAndSubmitter = new CssLayout(statusComponent, submitterLabel);
 
 
-        if(UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin()) {
+        if(UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin()) {
 
             Button editRegistrationButton = new Button(FontAwesome.COG);
             editRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);

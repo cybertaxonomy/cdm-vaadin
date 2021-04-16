@@ -39,7 +39,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
-import eu.etaxonomy.cdm.api.utility.RoleProber;
+import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -102,7 +102,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
 
         toolBar.addComponent(filterInstructionLabel);
 
-        boolean userIsCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION));
+        boolean userIsCurator = UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION));
         boolean userIsAdmin = UserHelperAccess.userHelper().userIsAdmin();
         if(userIsCurator || userIsAdmin){
             submitterFilter = new NativeSelect("Submitter");
@@ -193,7 +193,7 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
     public void populateList(Collection<RegistrationDTO> registrations) {
 
         listContainer.removeAllComponents();
-        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProber(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
+        boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
         for(RegistrationDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);

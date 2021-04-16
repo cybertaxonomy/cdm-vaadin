@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
-import eu.etaxonomy.cdm.api.utility.UserHelper;
+import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormat.TargetInfoType;
