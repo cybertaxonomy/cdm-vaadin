@@ -188,7 +188,7 @@ public class TaxonNameEditorPresenter
                 "978-3-87429-425-6", // Melbourne Code
                 "978-3-946583-16-5", // Shenzhen Code
                 "0-85301-006-4"      // ICZN 1999
-                                     // ICNB
+                                     // ICNP
         }));
         // @formatter:on
 
