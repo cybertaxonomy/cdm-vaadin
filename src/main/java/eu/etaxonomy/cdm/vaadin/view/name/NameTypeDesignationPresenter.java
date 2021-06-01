@@ -197,6 +197,7 @@ public class NameTypeDesignationPresenter
                 }
         ));
 
+        initStrategy.extend("typifiedNames.nomenclaturalSource.citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         initStrategy.extend("citation", ReferenceEllypsisFormatter.INIT_STRATEGY, false);
         NameTypeDesignation typeDesignation;
         if(uuid != null){
