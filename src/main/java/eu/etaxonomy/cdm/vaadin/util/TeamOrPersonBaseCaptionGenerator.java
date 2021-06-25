@@ -44,9 +44,9 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> 
     protected String chooseTitle(T option) {
         switch(cacheType){
             case NOMENCLATURAL_TITLE:
-                return option.getNomenclaturalTitle();
+                return option.getNomenclaturalTitleCache();
             case COLLECTOR_TITLE:
-                // return option.getCollectorTitle(); // enable once #4311 is solved
+                return option.getCollectorTitleCache();
             case BIBLIOGRAPHIC_TITLE:
             default:
                 return null;
