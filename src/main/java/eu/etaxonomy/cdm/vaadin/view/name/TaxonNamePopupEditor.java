@@ -623,7 +623,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 inferredExAuthor = validatedName.getNomenclaturalReference().getAuthorship();
             }
         }
-        TeamOrPersonBase inferredCominationAuthors = inferCombinationAuthors();
+        TeamOrPersonBase<?> inferredCominationAuthors = inferCombinationAuthors();
         if(inferredExAuthor != null && inferredCominationAuthors != null
                 // comparing by nomTitle to detect duplicates:
                 && inferredExAuthor.getNomenclaturalTitle().equals(inferredCominationAuthors.getNomenclaturalTitle())) {
