@@ -15,7 +15,6 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.unitils.database.annotations.Transactional;
@@ -92,7 +91,6 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     @Test
     @DataSet("SpecimenTypeDesignationWorkingSetServiceImplTest.xml")
-    @Ignore
     public void test01_createAndEditTest() throws DerivedUnitConversionException, URISyntaxException, FileNotFoundException {
 
 //        printDataSet(System.err, new String[]{"USERACCOUNT", "GROUPS", "USERACCOUNT_GRANTEDAUTHORITYIMPL", "USERACCOUNT_PERMISSIONGROUP"
