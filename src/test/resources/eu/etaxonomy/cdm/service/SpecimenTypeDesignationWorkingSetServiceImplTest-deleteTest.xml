@@ -51,6 +51,7 @@
   <!--<HIBERNATE_SEQUENCES SEQUENCE_NAME="UserAccount" NEXT_VAL="5002"/>  must not be contained !!!! -->
   <!-- Test data is being used by more than one test - need to reset a couple of *_AUD tables -->
   <AUDITEVENT />
+  <AGENTBASE_AUD />
   <TAXONNAME_AUD />
   <DERIVATIONEVENT_AUD />
   <GATHERINGEVENT_AUD />
