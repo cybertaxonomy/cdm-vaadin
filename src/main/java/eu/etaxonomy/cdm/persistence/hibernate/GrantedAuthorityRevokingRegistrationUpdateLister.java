@@ -167,10 +167,6 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         }
     }
 
-    /**
-     * @param deleteCandidates
-     * @param typeSpecimen
-     */
     private void addDeleteCandidates(Set<CdmAuthority> deleteCandidates, DerivedUnit deriveUnit) {
         if(deriveUnit == null){
             return;
@@ -180,7 +176,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         if(deriveUnit.getCollection() != null){
             deleteCandidates.add(new CdmAuthority(deriveUnit.getCollection(), UPDATE_DELETE));
         }
-        for(SpecimenOrObservationBase sob : deriveUnit.getOriginals()){
+        for(SpecimenOrObservationBase<?> sob : deriveUnit.getOriginals()){
             if(sob == null){
                 continue;
             }
@@ -203,10 +199,6 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         }
     }
 
-    /**
-     * @param deleteCandidates
-     * @param nomenclaturalReference
-     */
     private void addDeleteCandidates(Set<CdmAuthority> deleteCandidates, Reference reference) {
         if(reference == null){
             return;
@@ -235,22 +227,15 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
                 }
             }
         }
-
     }
 
-
-
-
-    /**
-     * @param deleteCandidates
-     */
     private void deleteAuthorities(EventSource session, Set<CdmAuthority> deleteCandidates) {
 
         if(deleteCandidates.isEmpty()){
             return;
         }
 
-        Collection<String> authorityStrings = new ArrayList<String>(deleteCandidates.size());
+        Collection<String> authorityStrings = new ArrayList<>(deleteCandidates.size());
         deleteCandidates.forEach( dc -> authorityStrings.add(dc.toString()));
 
         // -----------------------------------------------------------------------------------------
@@ -262,6 +247,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
 
             Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
             userQuery.setParameterList("authorities", authorityStrings);
+            @SuppressWarnings("unchecked")
             List<User> users = userQuery.list();
             for(User user : users){
                 List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
@@ -273,6 +259,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
 
             Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
             groupQuery.setParameterList("authorities", authorityStrings);
+            @SuppressWarnings("unchecked")
             List<Group> groups = groupQuery.list();
             for(Group group : groups){
                 List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(

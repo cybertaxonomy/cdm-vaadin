@@ -15,7 +15,6 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 /**
  * @author a.kohlbecker
  * @since Jun 7, 2017
- *
  */
 public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> implements CaptionGenerator<T> {
 
@@ -25,7 +24,7 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> 
         BIBLIOGRAPHIC_TITLE;
     }
 
-    CacheType cacheType;
+    private CacheType cacheType;
 
     private static final long serialVersionUID = 116448502301429773L;
 
@@ -42,16 +41,12 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase> 
         return caption;
     }
 
-    /**
-     * @param option
-     * @return
-     */
     protected String chooseTitle(T option) {
         switch(cacheType){
             case NOMENCLATURAL_TITLE:
-                return option.getNomenclaturalTitle();
+                return option.getNomenclaturalTitleCache();
             case COLLECTOR_TITLE:
-                // return option.getCollectorTitle(); // enable once #4311 is solved
+                return option.getCollectorTitleCache();
             case BIBLIOGRAPHIC_TITLE:
             default:
                 return null;

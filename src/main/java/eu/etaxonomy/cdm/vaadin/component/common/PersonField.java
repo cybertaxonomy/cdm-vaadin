@@ -351,9 +351,6 @@ public class PersonField extends CompositeCustomField<Person> {
         return ignoreFields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void commit() throws SourceException, InvalidValueException {
 

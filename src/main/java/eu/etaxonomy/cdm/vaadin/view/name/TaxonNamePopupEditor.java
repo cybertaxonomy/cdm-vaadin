@@ -623,10 +623,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
                 inferredExAuthor = validatedName.getNomenclaturalReference().getAuthorship();
             }
         }
-        TeamOrPersonBase inferredCominationAuthors = inferCombinationAuthors();
+        TeamOrPersonBase<?> inferredCominationAuthors = inferCombinationAuthors();
         if(inferredExAuthor != null && inferredCominationAuthors != null
                 // comparing by nomTitle to detect duplicates:
-                && inferredExAuthor.getNomenclaturalTitle().equals(inferredCominationAuthors.getNomenclaturalTitle())) {
+                && inferredExAuthor.getNomenclaturalTitleCache().equals(inferredCominationAuthors.getNomenclaturalTitleCache())) {
             // If and only if ex author = author the ex author is not included
             // into the author teams due to the ICN 46.10. (see #8317)
             inferredExAuthor = null;
