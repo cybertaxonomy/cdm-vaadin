@@ -77,7 +77,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     // Fields for case when value is a Team
     private SwitchableTextField titleField = new SwitchableTextField("Team (bibliographic)");
-    private SwitchableTextField nomenclaturalTitleField = new SwitchableTextField("Team (nomenclatural)");
+    private SwitchableTextField nomenclaturalTitleCacheField = new SwitchableTextField("Team (nomenclatural)");
     private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<Person, PersonField>(Person.class, PersonField.class, "Team members");
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
@@ -97,7 +97,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addStyledComponent(teamOrPersonSelect);
         addStyledComponent(personField);
         addStyledComponent(titleField);
-        addStyledComponent(nomenclaturalTitleField);
+        addStyledComponent(nomenclaturalTitleCacheField);
         addStyledComponent(personsListEditor);
         addStyledComponents(removeButton, personButton, teamButton);
 
@@ -106,7 +106,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addSizedComponent(compositeWrapper);
         addSizedComponent(personField);
         addSizedComponent(titleField);
-        addSizedComponent(nomenclaturalTitleField);
+        addSizedComponent(nomenclaturalTitleCacheField);
         addSizedComponent(personsListEditor);
 
         setConverter(new CdmBaseDeproxyConverter<TeamOrPersonBase<?>>());
@@ -198,9 +198,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
             }
             else if(Team.class.isAssignableFrom(newValue.getClass())){
                 // otherwise it a Team
-                compositeWrapper.addComponents(titleField, nomenclaturalTitleField, personsListEditor);
+                compositeWrapper.addComponents(titleField, nomenclaturalTitleCacheField, personsListEditor);
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
-                nomenclaturalTitleField.bindTo(fieldGroup, "nomenclaturalTitle", "protectedNomenclaturalTitleCache");
+                nomenclaturalTitleCacheField.bindTo(fieldGroup, "nomenclaturalTitleCache", "protectedNomenclaturalTitleCache");
                 fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
                 fieldGroup.bind(personsListEditor, "teamMembers");
                 personsListEditor.registerParentFieldGroup(fieldGroup);
@@ -221,7 +221,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                     personField.setValue((Person) null);
                 } else if(Team.class.isAssignableFrom(oldValue.getClass())){
                     titleField.unbindFrom(fieldGroup);
-                    nomenclaturalTitleField.unbindFrom(fieldGroup);
+                    nomenclaturalTitleCacheField.unbindFrom(fieldGroup);
                     fieldGroup.unbind(personsListEditor);
                     fieldGroup.setItemDataSource((Team)null);
                     personsListEditor.registerParentFieldGroup(null);
@@ -268,7 +268,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     }
 
     public Component[] getCachFields(){
-        return new Component[]{titleField, nomenclaturalTitleField};
+        return new Component[]{titleField, nomenclaturalTitleCacheField};
     }
 
     /**
@@ -321,9 +321,9 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         List<Field> ignoreFields =  super.nullValueCheckIgnoreFields();
         ignoreFields.add(personField);
-        ignoreFields.add(nomenclaturalTitleField.getUnlockSwitch());
-        if(nomenclaturalTitleField.getUnlockSwitch().getValue().booleanValue() == false){
-            ignoreFields.add(nomenclaturalTitleField.getTextField());
+        ignoreFields.add(nomenclaturalTitleCacheField.getUnlockSwitch());
+        if(nomenclaturalTitleCacheField.getUnlockSwitch().getValue().booleanValue() == false){
+            ignoreFields.add(nomenclaturalTitleCacheField.getTextField());
         }
         ignoreFields.add(titleField.getUnlockSwitch());
         if(titleField.getUnlockSwitch().getValue().booleanValue() == false){
