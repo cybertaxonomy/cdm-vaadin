@@ -12,6 +12,7 @@ import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,15 +37,15 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.strategy.cache.TagEnum;
+import eu.etaxonomy.cdm.strategy.cache.TaggedText;
 import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
@@ -297,21 +298,30 @@ public class RegistrationItem extends GridLayout {
         }
 
         if(regDto != null){
-            String summary = regDto.getSummary();
-            if(regDto.getOrderedTypeDesignationWorkingSets() != null) {
-                for( TypeDesignationWorkingSet workingSet : regDto.getOrderedTypeDesignationWorkingSets().values()) {
-                    for(TypeDesignationStatusBase<?> typeStatus : workingSet.keySet()) {
-                        if(summary.contains(typeStatus.getLabel() + "s")){
-                            // replace plural form
-                            summary = summary.replace(typeStatus.getLabel() + "s", "<strong>" + typeStatus.getLabel() + "s</strong>");
-                        } else {
-                            // replace singular form
-                            summary = summary.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
-                        }
+            List<TaggedText> summaryTaggedText = regDto.getSummaryTaggedText();
+            StringBuilder summaryBuilder = new StringBuilder();
+            // needed to add missing blank after "Types:"
+            // here we covert tow cases, label tagged text with following separator tagged text
+            // and label taggedText with colon included
+            boolean lastTTwasTypes = false;
+            for(TaggedText tt : summaryTaggedText) {
+                if(tt.getType() == TagEnum.label) {
+                    String tttext = tt.getText();
+                    if(tttext.endsWith(":")) {
+                        tttext += " ";
                     }
+                    summaryBuilder.append("<strong>").append(tttext ).append("</strong>");
+                } else {
+                    summaryBuilder.append(tt.getText());
                 }
+                if(tt.getType() == TagEnum.separator && lastTTwasTypes) {
+                    // add missing blank after "Types:"
+                    summaryBuilder.append(" ");
+                }
+                lastTTwasTypes = tt.getText().equals("Types");
             }
-            labelMarkup.append("</br>").append(summary);
+
+            labelMarkup.append("</br>").append(summaryBuilder.toString());
 
             stateLabel.setVisible(true);
             stateLabel.update(regDto.getStatus());
