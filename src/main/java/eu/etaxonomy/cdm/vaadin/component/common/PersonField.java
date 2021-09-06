@@ -165,21 +165,27 @@ public class PersonField extends CompositeCustomField<Person> {
         root.addComponent(selectOrNewContainer);
 
         titleCacheField.setWidth(100, Unit.PERCENTAGE);
+        titleCacheField.setDescription("Bibliographic title");
 
         prefixField.setWidth(baseWidth, Unit.PERCENTAGE);
         prefixField.setInputPrompt("Prefix");
+        prefixField.setDescription("Prefix");
 
         initialsField.setWidth(baseWidth, Unit.PERCENTAGE);
         initialsField.setInputPrompt("Initials");
+        initialsField.setDescription("Initials");
 
         givenNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
         givenNameField.setInputPrompt("Other/given names");
+        givenNameField.setDescription("Other/given names");
 
         familyNameField.setWidth(baseWidth * 3, Unit.PERCENTAGE);
         familyNameField.setInputPrompt("Family name");
+        familyNameField.setDescription("Family name");
 
         suffixField.setWidth(baseWidth, Unit.PERCENTAGE);
         suffixField.setInputPrompt("Suffix");
+        suffixField.setDescription("Suffix");
 
         detailsContainer.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         detailsContainer.addComponent(prefixField);
@@ -199,6 +205,7 @@ public class PersonField extends CompositeCustomField<Person> {
             }
         });
         // nomenclaturalTitleField.setCaption("Nomenclatural title");
+        nomenclaturalTitleField.setDescription("Nomenclatural title");
         nomenclaturalTitleField.setWidth(100, Unit.PERCENTAGE);
 //        nomenclaturalTitleField.addValueChangeListener( e -> {
 //            if(e.getProperty().getValue() != null && ((String)e.getProperty().getValue()).isEmpty()){
@@ -207,7 +214,6 @@ public class PersonField extends CompositeCustomField<Person> {
 //        });
 
         root.addComponent(nomenclaturalTitleField);
-        root.addComponent(nomenclaturalTitleButton);
 
         unlockSwitch.addValueChangeListener(e -> {
             if(refreshMode()){
