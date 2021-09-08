@@ -314,6 +314,9 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
             .registration-list .item-footer {
                 border-bottom: valo-border($border: $v-border, $color: $v-background-color, $strength: 1.4);
             }
+            .field-unit-label {
+                color: scale-color(darken($v-font-color, 40%), $green: 40%);
+            }
     }
 
     // --------------------------------------------------- //
