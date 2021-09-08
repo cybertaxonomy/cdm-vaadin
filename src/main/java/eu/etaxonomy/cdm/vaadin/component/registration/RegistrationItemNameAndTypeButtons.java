@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.TypeDesignationStatusBaseComparator;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -114,8 +116,19 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
         LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
+
+
         if(typeDesignationworkingSets != null){
+            // order the typeDesignationworkingSet keys so that holotypes come first, etc
+            List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
             for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationworkingSets.keySet()) {
+                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationworkingSets.get(baseEntityRef).highestTypeStatus(new TypeDesignationStatusBaseComparator())));
+            }
+
+            Collections.sort(baseRefsByHighestStatus);
+
+            for(TypedEntityRefWithStatus typedEntityRefWithStatus : baseRefsByHighestStatus) {
+                TypedEntityReference<? extends VersionableEntity> baseEntityRef = typedEntityRefWithStatus.typedEntityRef;
                 TypeDesignationWorkingSet typeDesignationWorkingSet = typeDesignationworkingSets.get(baseEntityRef);
                 logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
@@ -315,6 +328,28 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             this.isLockOverride = isLockOverride;
             updateEditorButtonReadonlyStates();
         }
+    }
+
+    private class TypedEntityRefWithStatus implements Comparable<TypedEntityRefWithStatus> {
+
+        public TypedEntityReference<? extends VersionableEntity> typedEntityRef;
+        public TypeDesignationStatusBase<?> status;
+        private TypeDesignationStatusBaseComparator comparator = new TypeDesignationStatusBaseComparator();
+
+
+        public TypedEntityRefWithStatus(TypedEntityReference<? extends VersionableEntity> typedEntityRef,
+                TypeDesignationStatusBase<?> status) {
+            this.typedEntityRef = typedEntityRef;
+            this.status = status;
+        }
+
+        @Override
+        public int compareTo(TypedEntityRefWithStatus o) {
+            // TODO Auto-generated method stub
+            return comparator.compare(this.status, o.status);
+        }
+
+
     }
 
 }
