@@ -294,6 +294,11 @@ public class NameTypeDesignationPresenter
             bean.setDesignationSource(null); // this effectively removes the designation reference and reference detail
         }
 
+        if(bean.isNotDesignated()) {
+            // having a type name makes no sense in this case, therefore we now remove it now
+            bean.setTypeName(null);
+        }
+
         // the typifiedNames can only be set on the name side, so we need to
         // handle changes explicitly here
         HashSet<TaxonName> typifiedNames = new HashSet<>(bean.getTypifiedNames());

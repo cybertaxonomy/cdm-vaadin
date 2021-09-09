@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.name;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Scope;
@@ -56,9 +58,11 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     private static final int GRID_COLS = 4;
     private static final int GRID_ROWS = 7;
 
+
     private CheckBox conservedTypeField;
     private CheckBox rejectedTypeField;
     private CheckBox notDesignatedField;
+    List<CheckBox> typeStatusFlagFields;
 
     private ToOneRelatedEntityCombobox<TaxonName> typeNameField;
 
@@ -144,10 +148,15 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         if(showTypeFlags){
             conservedTypeField = addCheckBox("Conserved type", "conservedType", 0, row);
             conservedTypeField.addValueChangeListener(e -> updateDesignationReferenceFields());
+            conservedTypeField.addValueChangeListener(e -> handleTypeStatusFlagChange(conservedTypeField));
             rejectedTypeField = addCheckBox("Rejected type", "rejectedType", 1, row);
             rejectedTypeField.addValueChangeListener(e -> updateDesignationReferenceFields());
+            rejectedTypeField.addValueChangeListener(e -> handleTypeStatusFlagChange(rejectedTypeField));
             notDesignatedField = addCheckBox("Not designated", "notDesignated", 2, row);
             notDesignatedField.addValueChangeListener(e -> updateDesignationReferenceFields());
+            notDesignatedField.addValueChangeListener(e -> handleTypeStatusFlagChange(notDesignatedField));
+            notDesignatedField.addValueChangeListener(e -> updateTypeNameField());
+            typeStatusFlagFields = Arrays.asList(conservedTypeField, rejectedTypeField, notDesignatedField);
             row++;
         }
 
@@ -244,9 +253,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         // NameTypeDesignationPresenter.preSaveBean(NameTypeDesignation bean) will empty them in needed
 
         boolean isInTypedesignationOnlyAct = !isInTypedesignationOnlyAct().isPresent() || isInTypedesignationOnlyAct().get();
-        boolean typeStatusRequired = !(conservedTypeField.getValue().booleanValue()
-                || rejectedTypeField.getValue().booleanValue()
-                || notDesignatedField.getValue().booleanValue());
+        boolean typeStatusRequired = !(typeStatusFlagFields.stream().anyMatch(cb -> cb.getValue().booleanValue()));
         // need to check for isInTypedesignationOnlyAct also, otherwise the reference field will not show up
         // and the type designation might not be associated with the registration
         // TODO discuss with Henning
@@ -256,8 +263,16 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         } else {
             designationReferenceCombobox.setRequiredError(TYPE_STATUS_OR_FLAG_MUST_BE_SET);
         }
+    }
 
+    protected void updateTypeNameField() {
+        typeNameField.setVisible(!notDesignatedField.getValue().booleanValue());
+    }
 
+    protected void handleTypeStatusFlagChange(CheckBox typeStatusFlagField) {
+        if(typeStatusFlagField.getValue().booleanValue()) {
+            typeStatusFlagFields.stream().filter(cb -> !cb.equals(typeStatusFlagField)).forEach(cb -> cb.setValue(false));
+        }
     }
 
     @Override
