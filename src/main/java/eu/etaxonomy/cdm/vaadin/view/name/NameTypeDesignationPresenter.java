@@ -194,6 +194,10 @@ public class NameTypeDesignationPresenter
                 "source.annotations",
                 "source.markers",
                 "source.links",
+                "designationSource.citation",
+                "designationSource.annotations",
+                "designationSource.markers",
+                "designationSource.links",
                 }
         ));
 
