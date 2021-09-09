@@ -122,7 +122,7 @@ public class NameTypeDesignationPresenter
             try {
                 setPublishedUnit(NamedSource.NewPrimarySourceInstance(reference, null));
             } catch(Exception e) {
-                throw new RuntimeException("Refernce of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
+                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
             }
             EntityInitStrategy initstrategy = RegistrationWorkingSetService.NAME_INIT_STRATEGY
                     .clone()
