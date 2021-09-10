@@ -23,16 +23,20 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
@@ -129,6 +133,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     private NativeSelect rankSelect;
 
+    private Button rankSelectFullListToggle;
+
     private TeamOrPersonField combinationAuthorshipField;
 
     private TeamOrPersonField exCombinationAuthorshipField;
@@ -156,6 +162,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     private int genusOrUninomialRow;
 
     private OrthographicCorrectionReferenceValidator orthographicCorrectionValidator;
+
+    private boolean isRanksFullList = false;
 
     /**
      * By default  AnnotationType.EDITORIAL() is enabled.
@@ -277,8 +285,22 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         rankSelect = new NativeSelect("Rank");
         rankSelect.setNullSelectionAllowed(false);
         rankSelect.setWidth(100, Unit.PERCENTAGE);
-        addField(rankSelect, "rank", 0, row, 1, row);
-        grid.setComponentAlignment(rankSelect, Alignment.TOP_RIGHT);
+        rankSelectFullListToggle = new Button();
+        updateRankSelectFullListToggleButton();
+        rankSelectFullListToggle.addClickListener(e -> {
+            isRanksFullList = !isRanksFullList;
+            updateRankSelectFullListToggleButton();
+        });
+        CssLayout rankSelectGroup = new CssLayout();
+        rankSelectGroup.setWidth(100,  Unit.PERCENTAGE);
+        rankSelectGroup.addComponents(rankSelect, rankSelectFullListToggle);
+        bindField(rankSelect, "rank");
+        applyDefaultComponentStyles(rankSelect);
+        applyDefaultComponentStyles(rankSelectFullListToggle);
+        applyDefaultComponentStyle(rankSelectGroup);
+        addComponent(rankSelectGroup, 0, row, 1, row);
+        rankSelectGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
+        grid.setComponentAlignment(rankSelectGroup, Alignment.TOP_RIGHT);
 
         row++;
         basionymToggle = new CheckBox("With basionym");
@@ -581,6 +603,16 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
     }
 
+    private void updateRankSelectFullListToggleButton() {
+        if(isRanksFullList) {
+            rankSelectFullListToggle.setIcon(FontAwesome.COMPRESS);
+            rankSelectFullListToggle.setDescription("Show short list of ranks");
+        } else {
+            rankSelectFullListToggle.setIcon(FontAwesome.EXPAND);
+            rankSelectFullListToggle.setDescription("Show full list of ranks");
+        }
+    }
+
     protected TeamOrPersonBase inferBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
         if(!basionyms.isEmpty() && basionyms.get(0) != null){
@@ -807,6 +839,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
         // TODO use getField() instead and remove field references
         Rank rank = (Rank) rankSelect.getValue();
 
+        @SuppressWarnings("deprecation")
         boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES()) && !rank.getRankClass().equals(RankClass.Unknown);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
@@ -972,6 +1005,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     }
 
     @Override
+    public Button getRankSelectFullListToggle() {
+        return rankSelectFullListToggle;
+    }
+
+    @Override
     public AbstractField<String> getGenusOrUninomialField(){
         return genusOrUninomialField;
     }
@@ -1015,6 +1053,11 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     @Override
     public boolean isModeEnabled(TaxonNamePopupEditorMode mode){
         return modesActive.contains(mode);
+    }
+
+    @Override
+    public boolean isRanksFullList() {
+        return isRanksFullList;
     }
 
     @Override

@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
 
+import com.vaadin.data.Container.Filter;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -130,6 +132,16 @@ public class TaxonNameEditorPresenter
 
     private Integer taxonNameId;
 
+    private BeanItemContainer<DefinedTermBase> rankTermItemContainer;
+
+    private Filter rankListFilter;
+
+    /**
+     * the taxon names rank as loaded from the persistence layer
+     */
+    private Rank initialRank;
+
+
     @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
@@ -142,9 +154,23 @@ public class TaxonNameEditorPresenter
                 .buildEnumTermItemContainer(NomenclaturalCodeEdition.class,
                         nomCodes.toArray(new NomenclaturalCodeEdition[nomCodes.size()]));
 
+        rankTermItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(TermType.Rank);
+        rankListFilter = new Filter() {
+            @Override
+            public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
+                return getView().isRanksFullList() || RegistrationUIDefaults.RANK_SET_COMPACT.contains(itemId) || itemId.equals(initialRank);
+            }
+            @Override
+            public boolean appliesToProperty(Object propertyId) {
+                return false;
+            }};
+        rankTermItemContainer.addContainerFilter(rankListFilter);
         getView().getRankSelect()
-                .setContainerDataSource(cdmBeanItemContainerFactory.buildTermItemContainer(TermType.Rank));
+                .setContainerDataSource(rankTermItemContainer);
         getView().getRankSelect().setItemCaptionPropertyId("label");
+        getView().getRankSelectFullListToggle().addClickListener(e -> {
+            updateRankTermItemContainer();
+        });
 
         CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> termOrPersonPagingProvider = pagingProviderFactory
                 .teamOrPersonPagingProvider();
@@ -280,6 +306,13 @@ public class TaxonNameEditorPresenter
                 .buildVocabularyTermsItemContainer(AnnotationType.EDITORIAL().getVocabulary().getUuid()));
     }
 
+    public void updateRankTermItemContainer() {
+        // add and remove the filter to update the list of rank terms
+        // the filter itself will behave accordingly to the isRanksFullList in the view
+        rankTermItemContainer.removeContainerFilter(rankListFilter);
+        rankTermItemContainer.addContainerFilter(rankListFilter);
+    }
+
     @Deprecated
     private void addNomenclaturalStatus(NomenclaturalStatusDTO element) {
         // Nothing to do
@@ -288,6 +321,7 @@ public class TaxonNameEditorPresenter
     @Override
     protected void adaptDataProviders() {
         updateOrthographicCorrectionRestriction();
+        updateRankTermItemContainer();
     }
 
     private void updateOrthographicCorrectionRestriction() {
@@ -411,6 +445,7 @@ public class TaxonNameEditorPresenter
         }
 
         taxonNameId = Integer.valueOf(taxonName.getId());
+        initialRank = taxonName.getRank();
         relatedNamePagingProvider.addRestriction(new Restriction<>("id", Operator.AND_NOT, null, taxonNameId));
 
         return taxonName;
