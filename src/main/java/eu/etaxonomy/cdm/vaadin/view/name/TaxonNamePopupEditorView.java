@@ -13,6 +13,7 @@ import java.util.EnumSet;
 import org.vaadin.viritin.fields.ElementCollectionField;
 
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.NativeSelect;
@@ -36,36 +37,20 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  */
 public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEditorPresenter>, AnnotationsEditor {
 
-    /**
-     * @return
-     */
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox();
 
-    /**
-     * @return
-     */
     public ToManyRelatedEntitiesComboboxSelect<TaxonName> getBasionymComboboxSelect();
 
     public NativeSelect getRankSelect();
 
-    /**
-     * @return the exBasionymAuthorshipField
-     */
+    public Button getRankSelectFullListToggle();
+
     public TeamOrPersonField getExBasionymAuthorshipField();
 
-    /**
-     * @return the basionymAuthorshipField
-     */
     public TeamOrPersonField getBasionymAuthorshipField();
 
-    /**
-     * @return the combinationAuthorshipField
-     */
     public TeamOrPersonField getCombinationAuthorshipField();
 
-    /**
-     * @return the exCombinationAuthorshipField
-     */
     public TeamOrPersonField getExCombinationAuthorshipField();
 
     void disableMode(TaxonNamePopupEditorMode mode);
@@ -77,66 +62,39 @@ public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEdito
      */
     void enableMode(TaxonNamePopupEditorMode mode);
 
-    /**
-     * @param mode
-     * @return
-     */
     boolean isModeEnabled(TaxonNamePopupEditorMode mode);
 
     public EnumSet<TaxonNamePopupEditorMode> getModesActive();
 
-    /**
-     * @return
-     */
     CheckBox getBasionymToggle();
 
     void updateAuthorshipFields();
 
-    /**
-     * @return
-     */
     ToManyRelatedEntitiesComboboxSelect<TaxonName> getReplacedSynonymsComboboxSelect();
 
-    /**
-     * @return
-     */
     NameRelationField getValidationField();
 
-    /**
-     * @return
-     */
     AbstractField<String> getGenusOrUninomialField();
 
-    /**
-     * @return the infraGenericEpithetField
-     */
     public AbstractField<String> getInfraGenericEpithetField();
 
-    /**
-     * @return the specificEpithetField
-     */
     public AbstractField<String> getSpecificEpithetField();
 
-    /**
-     * @return the infraSpecificEpithetField
-     */
     public AbstractField<String> getInfraSpecificEpithetField();
 
     public NameRelationField getOrthographicVariantField();
 
     CheckBox getOrthographicVariantToggle();
 
-    /**
-     * @return
-     */
     TextField getNomenclaturalReferenceDetail();
 
     ElementCollectionField<NomenclaturalStatusDTO> getNomStatusCollectionField();
 
-    /**
-     * @param components
-     */
     void applyDefaultComponentStyle(Component[] components);
 
+    /**
+     * @return a flag indicating if the rank select should offer the full list of ranks or a compact list
+     */
+    public boolean isRanksFullList();
 
 }

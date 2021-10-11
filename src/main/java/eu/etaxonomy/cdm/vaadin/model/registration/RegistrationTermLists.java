@@ -10,12 +10,14 @@ package eu.etaxonomy.cdm.vaadin.model.registration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.name.NameTypeDesignationStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
 import eu.etaxonomy.cdm.model.name.SpecimenTypeDesignationStatus;
+import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 /**
  * @author a.kohlbecker
@@ -97,5 +99,23 @@ public class RegistrationTermLists {
         return uuids;
     }
 
+    public static class TypeDesignationStatusBaseComparator implements Comparator<TypeDesignationStatusBase<?>> {
 
+        @Override
+        public int compare(TypeDesignationStatusBase<?> o1, TypeDesignationStatusBase<?> o2) {
+
+            int pos1 = getPos(o1);
+            int pos2 = getPos(o2);
+            return Integer.compare(pos1, pos2);
+
+        }
+
+        public int getPos(TypeDesignationStatusBase<?> o) {
+            if(o instanceof SpecimenTypeDesignationStatus) {
+                return SPECIMEN_TYPE_DESIGNATION_STATUS.contains(o) ? SPECIMEN_TYPE_DESIGNATION_STATUS.indexOf(o) : SPECIMEN_TYPE_DESIGNATION_STATUS.size() + 1 ;
+            } else {
+                return NAME_TYPE_DESIGNATION_STATUS.contains(o) ? NAME_TYPE_DESIGNATION_STATUS.indexOf(o) : NAME_TYPE_DESIGNATION_STATUS.size() + 1;
+            }
+        }
+    }
 }

@@ -12,10 +12,13 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
+import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.permission.Role;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -63,6 +66,15 @@ public class RegistrationUIDefaults {
             ReferenceType.CdDvd,
             ReferenceType.Report
             );
+
+    public static final Set<Rank> RANK_SET_COMPACT = new HashSet<>(Arrays.asList(
+            // see https://dev.e-taxonomy.eu/redmine/issues/6732
+            Rank.GENUS(),
+            Rank.SPECIES(),
+            Rank.SUBSPECIES(),
+            Rank.VARIETY(),
+            Rank.FORM()
+            ));
 
     /**
      *  TODO make configurable as preset and in TaxonNameEditor

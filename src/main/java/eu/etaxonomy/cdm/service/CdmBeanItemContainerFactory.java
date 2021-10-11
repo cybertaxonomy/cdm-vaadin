@@ -69,6 +69,18 @@ public class CdmBeanItemContainerFactory {
     }
 
     @Transactional(readOnly=true)
+    public <T extends DefinedTermBase> BeanItemContainer<T> buildTermItemContainer(Class<T> type, TermType termType) {
+
+        clearSession();
+        // TODO use TermCacher?
+        List<T> terms = repo.getTermService().listByTermType(termType, null, null, orderHints, INIT_STRATEGY);
+        BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
+        termItemContainer.addAll(terms);
+        return termItemContainer;
+    }
+
+
+    @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildVocabularyTermsItemContainer(UUID vocabularyUuid) {
 
         clearSession();

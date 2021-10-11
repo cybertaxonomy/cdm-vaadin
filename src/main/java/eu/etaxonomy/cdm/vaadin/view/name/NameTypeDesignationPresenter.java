@@ -122,7 +122,7 @@ public class NameTypeDesignationPresenter
             try {
                 setPublishedUnit(NamedSource.NewPrimarySourceInstance(reference, null));
             } catch(Exception e) {
-                throw new RuntimeException("Refernce of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
+                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
             }
             EntityInitStrategy initstrategy = RegistrationWorkingSetService.NAME_INIT_STRATEGY
                     .clone()
@@ -194,6 +194,10 @@ public class NameTypeDesignationPresenter
                 "source.annotations",
                 "source.markers",
                 "source.links",
+                "designationSource.citation",
+                "designationSource.annotations",
+                "designationSource.markers",
+                "designationSource.links",
                 }
         ));
 
@@ -288,6 +292,11 @@ public class NameTypeDesignationPresenter
 
         if(!bean.hasDesignationSource()) {
             bean.setDesignationSource(null); // this effectively removes the designation reference and reference detail
+        }
+
+        if(bean.isNotDesignated()) {
+            // having a type name makes no sense in this case, therefore we now remove it now
+            bean.setTypeName(null);
         }
 
         // the typifiedNames can only be set on the name side, so we need to

@@ -19,3 +19,18 @@
 .v-filterselect-suggestpopup-small {
   font-size: $v-font-size--small;
 }
+
+// -------------------------------------------
+// add missing shadows
+.v-select-select {   
+    @include box-shadow(valo-bevel-and-shadow($bevel: $v-bevel, $shadow: $v-shadow, $background-color: $v-app-background-color, $gradient: $v-gradient));
+}
+// and component group border 
+.v-caption:first-child + .v-widget > .v-select-select {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+// tiny size
+.v-select-tiny .v-select-select {   
+    height: $v-unit-size--tiny
+}

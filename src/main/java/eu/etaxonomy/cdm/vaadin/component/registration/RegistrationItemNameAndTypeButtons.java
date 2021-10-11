@@ -9,11 +9,11 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -26,6 +26,7 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.util.UserHelper;
@@ -38,7 +39,10 @@ import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
+import eu.etaxonomy.cdm.strategy.cache.TagEnum;
+import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.TypeDesignationStatusBaseComparator;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -111,10 +115,21 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> workingSets = regDto.getOrderedTypeDesignationWorkingSets();
-        if(workingSets != null){
-            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : workingSets.keySet()) {
-                TypeDesignationWorkingSet typeDesignationWorkingSet = workingSets.get(baseEntityRef);
+        LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
+
+
+        if(typeDesignationworkingSets != null){
+            // order the typeDesignationworkingSet keys so that holotypes come first, etc
+            List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
+            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationworkingSets.keySet()) {
+                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationworkingSets.get(baseEntityRef).highestTypeStatus(new TypeDesignationStatusBaseComparator())));
+            }
+
+            Collections.sort(baseRefsByHighestStatus);
+
+            for(TypedEntityRefWithStatus typedEntityRefWithStatus : baseRefsByHighestStatus) {
+                TypedEntityReference<? extends VersionableEntity> baseEntityRef = typedEntityRefWithStatus.typedEntityRef;
+                TypeDesignationWorkingSet typeDesignationWorkingSet = typeDesignationworkingSets.get(baseEntityRef);
                 logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
@@ -131,20 +146,19 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                         typeDesignationWorkingSet.getBaseEntityReference(),
                         tdButton)
                         );
-                String labelText = typeDesignationWorkingSet.getLabel();
-                labelText = labelText.replaceAll("^[^:]+:", ""); // remove "Type:", "NameType:" from the beginning
+
+                String labelText = "<span class=\"field-unit-label\">" + baseEntityRef.getLabel() + "</span>"; // renders the FieldUnit label
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
-                    labelText = labelText.replace(typeStatus.getLabel(), "<strong>" + typeStatus.getLabel() + "</strong>");
-                }
-                if(typeDesignationWorkingSet.getWorkingsetType().equals(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET)){
-                    // remove the citation from the label which looks very redundant in the registration working set editor
-                    // TODO when use in other contexts. it might be required to make this configurable.
+                    labelText += " <strong>" + typeStatus.getLabel() +  (typeDesignationWorkingSet.getTypeDesignations().size() > 1 ? "s":"" ) + "</strong>: ";
+                    boolean isFirst = true;
+                    for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.getTypeDesignations()) {
+                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(dtDTO.getTaggedText(), EnumSet.of(TagEnum.reference, TagEnum.separator)); // TagEnum.separator removes "designated By"
+                        isFirst = false;
+                    }
 
-                    String citationString = regDto.getCitation().getCitation();
-                    labelText = labelText.replaceFirst(Pattern.quote(citationString), "");
                 }
+
                 Label label = new Label(labelText, ContentMode.HTML);
-
                 label.setWidthUndefined();
                 addComponent(label);
                 labels.add(label);
@@ -314,6 +328,28 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             this.isLockOverride = isLockOverride;
             updateEditorButtonReadonlyStates();
         }
+    }
+
+    private class TypedEntityRefWithStatus implements Comparable<TypedEntityRefWithStatus> {
+
+        public TypedEntityReference<? extends VersionableEntity> typedEntityRef;
+        public TypeDesignationStatusBase<?> status;
+        private TypeDesignationStatusBaseComparator comparator = new TypeDesignationStatusBaseComparator();
+
+
+        public TypedEntityRefWithStatus(TypedEntityReference<? extends VersionableEntity> typedEntityRef,
+                TypeDesignationStatusBase<?> status) {
+            this.typedEntityRef = typedEntityRef;
+            this.status = status;
+        }
+
+        @Override
+        public int compareTo(TypedEntityRefWithStatus o) {
+            // TODO Auto-generated method stub
+            return comparator.compare(this.status, o.status);
+        }
+
+
     }
 
 }

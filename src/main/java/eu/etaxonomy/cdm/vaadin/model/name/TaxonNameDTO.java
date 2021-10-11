@@ -272,7 +272,7 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
     }
 
     public String getCultivarName() {
-        return name.getCultivarName();
+        return name.getCultivarEpithet();
     }
 
     public TeamOrPersonBase<?> getExBasionymAuthorship() {
@@ -380,7 +380,7 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
     }
 
     public void setCultivarName(String cultivarName) {
-        name.setCultivarName(cultivarName);
+        name.setCultivarEpithet(cultivarName);
     }
 
     public void setExBasionymAuthorship(TeamOrPersonBase<?> exBasionymAuthorship) {
