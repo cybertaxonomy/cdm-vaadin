@@ -12,7 +12,7 @@
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
-    <cdmlib.version>5.27.0-SNAPSHOT</cdmlib.version>
+    <cdmlib.version>5.28.0-SNAPSHOT</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring-boot.version>1.3.1.RELEASE</spring-boot.version>
     <!-- has spring 4.2.4-RELEASE as dependency --> 
@@ -101,6 +101,7 @@
         <artifactId>json</artifactId>
         <version>20151123</version>
       </dependency>
+    
     
     
     
@@ -424,7 +425,7 @@
               <fail>false</fail>
               <skip>false</skip>
               <rules>
-                <dependencyConvergence />
+                <dependencyConvergence/>
                 <requireMavenVersion>
                   <version>[3.6.0,)</version>
                 </requireMavenVersion>
@@ -432,6 +433,7 @@
             </configuration>
             <goals>
               <goal>enforce</goal>
+            
             
             
             
@@ -521,7 +523,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore />
+                    <ignore/>
                   </action>
                 </pluginExecution>
               </pluginExecutions>
