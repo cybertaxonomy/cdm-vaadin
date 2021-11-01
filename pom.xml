@@ -101,14 +101,15 @@
         <artifactId>json</artifactId>
         <version>20151123</version>
       </dependency>
-      <dependency>
         <!-- 
+      <dependency>
             updating to same version as in vaadin-server 7.7.28 due to https://vaadin.com/security/2021-10-27 
-        -->
+            is not possible due to code incompatibility
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>1.14.3</version>
       </dependency>
+        -->
       <!-- 
       <dependency>
         < ! - - FIXME move to cdmlib-test - - >
