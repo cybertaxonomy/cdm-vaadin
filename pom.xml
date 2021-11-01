@@ -8,7 +8,7 @@
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.7.13</vaadin.version>
+    <vaadin.version>7.7.17</vaadin.version><!-- LAST PUBLIC OPEN-SOURCE VERSION OF THE VAADIN 7 FRAMEWORK !!!   -->
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
@@ -101,23 +101,14 @@
         <artifactId>json</artifactId>
         <version>20151123</version>
       </dependency>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+      <dependency>
+        <!-- 
+            updating to same version as in vaadin-server 7.7.28 due to https://vaadin.com/security/2021-10-27 
+        -->
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>1.14.3</version>
+      </dependency>
       <!-- 
       <dependency>
         < ! - - FIXME move to cdmlib-test - - >
@@ -532,7 +523,10 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-      <version>7.7.28</version><!-- Manually upgraded due to https://vaadin.com/security/2021-10-27, TODO remove version once vaadin core is upgraded -->
+      <!-- 
+        vaadin-server dependency jsoup upgraded due to https://vaadin.com/security/2021-10-27
+        further updating of vaadin 7 is no longer possible without purchasing the pro license 
+       -->
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
