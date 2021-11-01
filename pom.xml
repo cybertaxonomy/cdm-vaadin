@@ -433,22 +433,6 @@
             </configuration>
             <goals>
               <goal>enforce</goal>
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
               <!-- Binds by default to the lifecycle phase: validate -->
             </goals>
           </execution>
@@ -548,6 +532,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
+      <version>7.7.28</version><!-- Manually upgraded due to https://vaadin.com/security/2021-10-27, TODO remove version once vaadin core is upgraded -->
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
