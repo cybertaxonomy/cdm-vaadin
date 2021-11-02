@@ -198,7 +198,7 @@ public class PersonField extends CompositeCustomField<Person> {
         nomenclaturalTitleButton.setHeight(22, Unit.PIXELS);
         nomenclaturalTitleButton.setDescription("Show the nomenclatural title cache.");
         nomenclaturalTitleButton.addClickListener( e -> {
-            nomenclaturalTitleField.setVisible(true || !nomenclaturalTitleField.isVisible());
+            nomenclaturalTitleField.setVisible(!nomenclaturalTitleField.isVisible());
             nomenclaturalTitleButtonChooseIcon();
             if(nomenclaturalTitleField.isVisible()){
                 nomenclaturalTitleField.focus();
@@ -215,6 +215,7 @@ public class PersonField extends CompositeCustomField<Person> {
 //        });
 
         root.addComponent(nomenclaturalTitleField);
+        root.addComponent(nomenclaturalTitleButton);
 
         unlockSwitch.addValueChangeListener(e -> {
             if(refreshMode()){
@@ -257,7 +258,7 @@ public class PersonField extends CompositeCustomField<Person> {
      *
      */
     protected void nomenclaturalTitleButtonChooseIcon() {
-        nomenclaturalTitleButton.setIcon(true || nomenclaturalTitleField.isVisible() ? FontAwesome.ANGLE_UP : FontAwesome.ELLIPSIS_H);
+        nomenclaturalTitleButton.setIcon(nomenclaturalTitleField.isVisible() ? FontAwesome.ANGLE_UP : FontAwesome.ELLIPSIS_H);
     }
 
     /**
