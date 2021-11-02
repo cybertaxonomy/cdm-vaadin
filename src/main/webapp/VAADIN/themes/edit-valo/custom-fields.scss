@@ -111,6 +111,7 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
   // ------------ v-person-field ------------ //
   .v-person-field {
     position: relative;
+    margin-bottom: $edit-v-shadow-spread-radius ;
     .v-caption {
         display: block;
     }
@@ -120,9 +121,12 @@ body .edit-valo { // increasing specifity to allow overriding the valo default f
     .v-switch {
         z-index: 10;
         position: absolute;
-        right: 3px; // boxshadow width (3px) from $v-shadow, TODO extract value from variable?
-        top: 4px; // boxshadow width (3px) + 1 
-    } 
+        right: $edit-v-shadow-spread-radius; // boxshadow width (3px) from $v-shadow,
+        top: $edit-v-shadow-spread-radius + 1px; // boxshadow width (3px) + 1 
+    }
+    .nomenclatural-title {
+        margin-top: $edit-v-shadow-spread-radius;
+    }
   }
   .v-person-field-cache-mode {
         .cache-field {

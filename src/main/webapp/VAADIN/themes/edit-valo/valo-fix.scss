@@ -20,6 +20,16 @@
   font-size: $v-font-size--small;
 }
 
+// ------------------------------------------- 
+
+.edit-valo .v-layout .v-component-group {
+    .v-textfield, .v-switch, .v-button {
+        margin-top: $edit-v-shadow-spread-radius;
+        margin-bottom: $edit-v-shadow-spread-radius;
+    }
+} 
+    
+
 // -------------------------------------------
 // add missing shadows
 .v-select-select {   
