@@ -206,6 +206,7 @@ public class PersonField extends CompositeCustomField<Person> {
         });
         // nomenclaturalTitleField.setCaption("Nomenclatural title");
         nomenclaturalTitleField.setDescription("Nomenclatural title");
+        nomenclaturalTitleField.addStyleName("nomenclatural-title");
         nomenclaturalTitleField.setWidth(100, Unit.PERCENTAGE);
 //        nomenclaturalTitleField.addValueChangeListener( e -> {
 //            if(e.getProperty().getValue() != null && ((String)e.getProperty().getValue()).isEmpty()){
@@ -214,6 +215,7 @@ public class PersonField extends CompositeCustomField<Person> {
 //        });
 
         root.addComponent(nomenclaturalTitleField);
+        root.addComponent(nomenclaturalTitleButton);
 
         unlockSwitch.addValueChangeListener(e -> {
             if(refreshMode()){

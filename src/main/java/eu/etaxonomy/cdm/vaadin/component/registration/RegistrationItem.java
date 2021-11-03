@@ -301,7 +301,7 @@ public class RegistrationItem extends GridLayout {
             List<TaggedText> summaryTaggedText = regDto.getSummaryTaggedText();
             StringBuilder summaryBuilder = new StringBuilder();
             // needed to add missing blank after "Types:"
-            // here we covert tow cases, label tagged text with following separator tagged text
+            // here we cover two cases, label tagged text with following separator tagged text
             // and label taggedText with colon included
             boolean lastTTwasTypes = false;
             for(TaggedText tt : summaryTaggedText) {
@@ -312,7 +312,7 @@ public class RegistrationItem extends GridLayout {
                     }
                     summaryBuilder.append("<strong>").append(tttext ).append("</strong>");
                 } else {
-                    summaryBuilder.append(tt.getText());
+                    summaryBuilder.append(tt.getText()).append(" ");
                 }
                 if(tt.getType() == TagEnum.separator && lastTTwasTypes) {
                     // add missing blank after "Types:"
