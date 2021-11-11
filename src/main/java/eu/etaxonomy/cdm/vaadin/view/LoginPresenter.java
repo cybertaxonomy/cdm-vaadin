@@ -8,25 +8,37 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.concurrent.ListenableFuture;
 import org.vaadin.spring.events.Event;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBus.ViewEventBus;
 import org.vaadin.spring.events.EventBusListener;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
+import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
+import eu.etaxonomy.cdm.vaadin.event.PasswordRevoveryEvent;
+import eu.etaxonomy.cdm.vaadin.util.VaadinServletUtilities;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
@@ -63,13 +75,14 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
     protected EventBus.UIEventBus uiEventBus;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
-        // not listening to view scope events
-    }
+    @Autowired
+    @Qualifier("cdmRepository")
+    private ICdmRepository repo;
+
+//    @Override
+//    protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
+//        viewEventBus.subscribe(this);
+//    }
 
     @Autowired
     protected void setUIEventBus(EventBus.UIEventBus uiEventBus){
@@ -100,11 +113,6 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         return false;
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
 
@@ -137,5 +145,51 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
     }
 
+    @EventBusListenerMethod
+    public void onPasswordRevoveryEvent(PasswordRevoveryEvent event) throws MalformedURLException, ExecutionException {
+        String userNameOrEmail = getView().getLoginDialog().getUserNameOrEmail().getValue();
+        URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
+        logger.debug("PasswordRevoveryEvent for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
+        // Implementation note: UI modifications allied in the below callback methods will not affect the UI
+        // immediately, therefore we use a CountDownLatch
+        CountDownLatch finshedSignal = new CountDownLatch(1);
+        List<Throwable> asyncException = new ArrayList<>(1);
+        ListenableFuture<Boolean> futureResult = repo.getPasswordResetService().emailResetToken(userNameOrEmail, servletBaseUrl.toString());
+        futureResult.addCallback(
+                    successFuture -> {
+                        finshedSignal.countDown();
+                    },
+                    exception -> {
+                        // possible MailException
+                        asyncException.add(exception);
+                        finshedSignal.countDown();
+                    }
+                );
+        boolean asyncTimeout = false;
+        Boolean result = false;
+        try {
+            finshedSignal.await(2, TimeUnit.SECONDS);
+            result = futureResult.get();
+        } catch (InterruptedException e) {
+            asyncTimeout = true;
+        }
+        if(!asyncException.isEmpty()) {
+            getView().getLoginDialog().getMessageSendRecoveryEmailLabel()
+            .setValue("Sending an password reset email to you has failed. Please try again later or contect the support in case this error persists.");
+            getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_FAILURE);
+        } else {
+            if(!asyncTimeout && result) {
+                getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setValue("An email with a password reset link has been sent to you.");
+                getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_SUCCESS);
+                getView().getLoginDialog().getSendOnetimeLogin().setEnabled(false);
+                getView().getLoginDialog().getUserNameOrEmail().setEnabled(false);
+                getView().getLoginDialog().getUserNameOrEmail().setReadOnly(true);
+
+            } else {
+                getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setValue("A timeout has occured, please try again.");
+                getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_FAILURE);
+            }
+        }
+    }
 
 }

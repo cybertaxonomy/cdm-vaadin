@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import org.vaadin.spring.events.EventScope;
 
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
@@ -56,15 +57,23 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         loginDialog.getLoginButton().addClickListener(e -> handleLoginClick(e));
         loginDialog.getLoginButton().setClickShortcut(KeyCode.ENTER);
         loginDialog.getRegisterButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new RegisterNewUserEvent(e)));
-        loginDialog.getSendOnetimeLogin().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new PasswordRevoveryEvent(e)));
+        loginDialog.getSendOnetimeLogin().addClickListener(e -> {
+            getViewEventBus().publish(this, new PasswordRevoveryEvent(e));
+        });
         // NOTE: null viewName will be replaced by the default view name in NavigationManagerBean
         loginDialog.getCancelLoginButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new NavigationEvent(null)));
+
         loginDialog.getCancelRegistrationButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new NavigationEvent(null)));
+
+        StringLengthValidator nameOrEmailValidator = new StringLengthValidator("Please enter your username or email address.");
+        loginDialog.getUserNameOrEmail().addValidator(nameOrEmailValidator);
+        loginDialog.getUserNameOrEmail().addTextChangeListener(e -> {
+            String text = e.getText();
+            logger.debug("text: " + text);
+            loginDialog.getSendOnetimeLogin().setEnabled(text != null && text.length() > 1);
+        });
     }
 
-    /**
-     * @param e
-     */
     private void handleLoginClick(ClickEvent e) {
         getViewEventBus().publish(EventScope.UI, this, new AuthenticationAttemptEvent(e, loginDialog.getUserName().getValue()));
     }
@@ -74,9 +83,6 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         return loginDialog;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     // TODO pull up to AbstractView and let AbstractView implement View?
     public void enter(ViewChangeEvent event) {
@@ -85,16 +91,15 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
 
     @Override
     public void showErrorMessage(String text){
-        loginDialog.getMessageLabel().setVisible(true);
-        loginDialog.getMessageLabel().setStyleName(ValoTheme.BUTTON_TINY + " " +  ValoTheme.LABEL_FAILURE);
-        loginDialog.getMessageLabel().setValue(text);
+        loginDialog.getLoginMessageLabel().setVisible(true);
+        loginDialog.getLoginMessageLabel().setStyleName(ValoTheme.BUTTON_TINY + " " +  ValoTheme.LABEL_FAILURE);
+        loginDialog.getLoginMessageLabel().setValue(text);
     }
-
 
     @Override
     public void clearMessage(){
-        loginDialog.getMessageLabel().setVisible(false);
-        loginDialog.getMessageLabel().setStyleName("");
-        loginDialog.getMessageLabel().setValue("");
+        loginDialog.getLoginMessageLabel().setVisible(false);
+        loginDialog.getLoginMessageLabel().setStyleName("");
+        loginDialog.getLoginMessageLabel().setValue("");
     }
 }

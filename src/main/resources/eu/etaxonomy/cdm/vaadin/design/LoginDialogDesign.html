@@ -14,7 +14,7 @@
      </vaadin-label>
      <vaadin-text-field caption="Username" _id="userName"></vaadin-text-field>
      <vaadin-password-field caption="Password" _id="password"></vaadin-password-field>
-     <vaadin-label style-name="tiny" width="190px" _id="message"></vaadin-label>
+     <vaadin-label style-name="tiny" width="190px" _id="messageLogin"></vaadin-label>
      <vaadin-label style-name="tiny" width="190px">
        Lost your password? Please use the 
       <b>Password Recovery</b> tab. 
@@ -57,10 +57,10 @@
        Please enter your username or email adress. 
      </vaadin-label>
      <vaadin-text-field caption="Username / email address" _id="userNameOrEmail"></vaadin-text-field>
-     <vaadin-button enabled="false" style-name="primary" plain-text _id="sendOnetimeLogin">
-       E-mail new password 
+     <vaadin-button enabled="false" style-name="primary" plain-text _id="sendRecoveryEmail">
+       Send recovery email
      </vaadin-button>
-     <vaadin-label style-name="tiny" width="190px">
+     <vaadin-label style-name="tiny" width="190px" _id="messageRecoveryEmail">
        After clicking the above button you will receive an E-mail with further instructions. 
      </vaadin-label>
     </vaadin-form-layout>

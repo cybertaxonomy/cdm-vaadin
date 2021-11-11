@@ -27,9 +27,9 @@ public class LoginDialog extends LoginDialogDesign {
 
     public LoginDialog() {
         addSelectedTabChangeListener(e -> focusFirstElement(e.getTabSheet()));
-        getMessageLabel().setVisible(false);
-        getTab(1).setEnabled(false);
-        getTab(2).setEnabled(false);
+        getLoginMessageLabel().setVisible(false);
+//        getTab(1).setEnabled(false);
+//        getTab(2).setEnabled(false);
         focusFirstElement(this);
     }
 
@@ -122,11 +122,15 @@ public class LoginDialog extends LoginDialogDesign {
      * @return the sendOnetimeLogin
      */
     public Button getSendOnetimeLogin() {
-        return sendOnetimeLogin;
+        return sendRecoveryEmail;
     }
 
-    public Label getMessageLabel() {
-        return message;
+    public Label getLoginMessageLabel() {
+        return messageLogin;
+    }
+
+    public Label getMessageSendRecoveryEmailLabel() {
+        return messageRecoveryEmail;
     }
 
 
