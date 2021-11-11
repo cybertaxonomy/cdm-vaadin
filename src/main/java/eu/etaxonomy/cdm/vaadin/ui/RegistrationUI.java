@@ -59,7 +59,7 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
     @Qualifier("viewAreaBean")
     private ViewDisplay viewDisplay;
 
-    //---- pull into abstract super class ? ---------
+    //---- pull into abstract super class AbstractApplicationUI ? ---------
 
     @Autowired
     private MainMenu mainMenu;
@@ -77,11 +77,10 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
 
     public static final String INITIAL_VIEW =  DashBoardView.NAME;
 
-
-    //---------------------------------------------
+    protected static final String UI_STYLE_NAME = ValoTheme.UI_WITH_MENU;
 
     public RegistrationUI() {
-
+        super();
     }
 
     @Override
@@ -89,17 +88,10 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
 
         super.init(request);
 
+        addStyleName(UI_STYLE_NAME);
         if(entityCacheDebugger != null){
             addShortcutListener(entityCacheDebugger.getShortcutListener());
         }
-        //navigate to initial view
-//        String state = pageFragmentAsState();
-
-
-//        if(state == null){
-//            // the case when state != null is handled in the UI base class
-//            eventBus.publishEvent(new NavigationEvent(INITIAL_VIEW));
-//        }
     }
 
     @Override
@@ -112,6 +104,7 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
         Label phycoBankLogo = new Label("PhycoBank");
         phycoBankLogo.addStyleName("phycobank-green");
         phycoBankLogo.addStyleName(ValoTheme.LABEL_HUGE);
+
         mainMenu.addMenuComponent(phycoBankLogo);
 
         mainMenu.addMenuItem("New", FontAwesome.EDIT, StartRegistrationViewBean.NAME );
@@ -141,6 +134,11 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
             return "<strong>Check if this name already occurs in the <a href=\"https://www.phycobank.org/index-search\" target=\"index-search\">PhycoBank Index</a> (The link will open in a new window.)</strong>";
         }
         return null;
+    }
+
+    @Override
+    protected String getInitialViewName() {
+        return INITIAL_VIEW;
     }
 
 }
