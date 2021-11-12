@@ -78,16 +78,18 @@ public abstract class AbstractUI extends UI {
     @Override
     protected void init(VaadinRequest request) {
 
-        logger.debug("init()");
+        logger.debug(this.getClass().getSimpleName() + ".init()");
         registerErrorHandlers();
 
         configureAccessDeniedView();
 
-        setContent((Component) getViewDisplay());
-        initContent();
+        assert getInitialViewName() != null;
+        assert getViewDisplay() != null;
+
+        logger.debug(this.getClass().getSimpleName() + ".init() ViewDisplay: " + getViewDisplay().getClass().getSimpleName() + ", initialViewName: " + getInitialViewName());
+        initAdditionalContent();
 
         getNavigationManagerBean().setViewDisplay(getViewDisplay());
-        assert getInitialViewName() != null;
         getNavigationManagerBean().setDefaultViewName(getInitialViewName());
 
         Responsive.makeResponsive(this);
@@ -115,13 +117,11 @@ public abstract class AbstractUI extends UI {
             Page.getCurrent().getStyles().add(registryCssFile);
         }
 
-
         uiEventBus.publish(this, new UIInitializedEvent());
-
     }
 
     /**
-     * @return The name of the initial view to
+     * @return The name of the initial view to show
      */
     abstract protected String getInitialViewName();
 
@@ -144,7 +144,7 @@ public abstract class AbstractUI extends UI {
      * will for example be interesting when using the {@link ValoTheme.UI_WITH_MENU}
      * style.
      */
-    abstract protected void initContent();
+    abstract protected void initAdditionalContent();
 
     protected void registerErrorHandlers() {
         DelegatingErrorHandler delegatingErrorHander = new DelegatingErrorHandler();
@@ -161,7 +161,6 @@ public abstract class AbstractUI extends UI {
         viewProvider.setAccessDeniedViewClass(RedirectToLoginView.class);
     }
 
-
     private String pageFragmentAsState() {
         Page page = Page.getCurrent();
         String fragment = page.getUriFragment();
@@ -171,8 +170,5 @@ public abstract class AbstractUI extends UI {
         }
         return state;
     }
-
-
-
 
 }

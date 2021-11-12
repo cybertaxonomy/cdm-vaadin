@@ -61,6 +61,7 @@ import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccess
 import eu.etaxonomy.cdm.vaadin.ui.CdmBaseUI;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
+import eu.etaxonomy.cdm.vaadin.ui.PasswordResetUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
@@ -198,6 +199,16 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         if(isUIEnabled(RegistrationUI.class)){
             registerRegistrationUiHibernateEventListeners();
             return new RegistrationUI();
+        }
+        return null;
+    }
+
+    @Bean
+    @UIScope
+    public PasswordResetUI passwordResetUI() {
+        if(isUIEnabled(PasswordResetUI.class)){
+            registerRegistrationUiHibernateEventListeners();
+            return new PasswordResetUI();
         }
         return null;
     }
