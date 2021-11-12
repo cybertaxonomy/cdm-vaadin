@@ -37,7 +37,7 @@ public class PasswordsPolicyValidator implements Validator {
         if(password != null && !password.isEmpty()) {
             List<String> violationMessages = validator.validateUserPassword(password);
             if(!violationMessages.isEmpty()) {
-                throw new InvalidValueException(violationMessages.stream().collect(Collectors.joining(", ")));
+                throw new InvalidValueException(violationMessages.stream().collect(Collectors.joining(" ")));
             }
         }
     }

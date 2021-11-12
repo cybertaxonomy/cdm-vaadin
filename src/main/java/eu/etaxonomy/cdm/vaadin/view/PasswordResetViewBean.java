@@ -8,6 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.vaadin.spring.events.EventBus;
@@ -47,7 +48,7 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
 
     private Label header = new Label();
 
-    private PasswordField password1Field = new PasswordField("New password");
+    private PasswordField password1Field = new PasswordField ("New password");
 
     private PasswordField password2Field = new PasswordField("Repeat password");
 
@@ -70,6 +71,7 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
         header.setValue("Reset your password ...");
         header.setStyleName(ValoTheme.LABEL_H3);
         resetButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
+        resetButton.setEnabled(false);
         resetButton.setWidth(100, Unit.PERCENTAGE);
         messageLabel.setCaptionAsHtml(true);
         messageLabel.setVisible(false);
@@ -82,6 +84,12 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
 
         password1Field.addValidator(new PasswordsPolicyValidator());
         password2Field.addValidator(new PasswordsMatchValidator("The passwords are not identical.", password1Field, password2Field));
+        password1Field.addValueChangeListener(e -> updateResetButtonState());
+        password2Field.addValueChangeListener(e -> updateResetButtonState());
+    }
+
+    private void updateResetButtonState() {
+        resetButton.setEnabled(StringUtils.isNoneBlank(password1Field.getValue()) && password1Field.getErrorMessage() == null && password2Field.getErrorMessage() == null);
     }
 
     @Override
@@ -122,5 +130,6 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
         String dataSourceID = env.getProperty(CdmConfigurationKeys.CDM_DATA_SOURCE_ID);
         header.setValue("Reset the Password for " + userName + " at " + dataSourceID);
     }
+
 
 }
