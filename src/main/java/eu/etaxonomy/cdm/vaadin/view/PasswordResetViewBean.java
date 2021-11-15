@@ -27,6 +27,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.config.CdmConfigurationKeys;
 import eu.etaxonomy.cdm.vaadin.data.validator.PasswordsMatchValidator;
 import eu.etaxonomy.cdm.vaadin.data.validator.PasswordsPolicyValidator;
+import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
 /**
@@ -73,6 +74,9 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
         resetButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         resetButton.setEnabled(false);
         resetButton.setWidth(100, Unit.PERCENTAGE);
+        resetButton.addClickListener(e -> {
+            getViewEventBus().publish(this, new UserAccountEvent(UserAccountEvent.UserAccountAction.RESET_PASSWORD,e));
+        });
         messageLabel.setCaptionAsHtml(true);
         messageLabel.setVisible(false);
 
@@ -128,8 +132,15 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
     public void setUserName(String userName) {
         this.userName = userName;
         String dataSourceID = env.getProperty(CdmConfigurationKeys.CDM_DATA_SOURCE_ID);
-        header.setValue("Reset the Password for " + userName + " at " + dataSourceID);
+        header.setValue("Reset your password for " + userName + " at " + dataSourceID);
     }
+
+    @Override
+    public PasswordField getPassword1Field() {
+        return password1Field;
+    }
+
+
 
 
 }

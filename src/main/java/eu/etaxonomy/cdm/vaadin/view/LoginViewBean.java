@@ -22,8 +22,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.vaadin.component.LoginDialog;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
-import eu.etaxonomy.cdm.vaadin.event.PasswordRevoveryEvent;
 import eu.etaxonomy.cdm.vaadin.event.RegisterNewUserEvent;
+import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 
@@ -58,7 +58,7 @@ public class LoginViewBean  extends AbstractView<LoginPresenter> implements Logi
         loginDialog.getLoginButton().setClickShortcut(KeyCode.ENTER);
         loginDialog.getRegisterButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new RegisterNewUserEvent(e)));
         loginDialog.getSendOnetimeLogin().addClickListener(e -> {
-            getViewEventBus().publish(this, new PasswordRevoveryEvent(e));
+            getViewEventBus().publish(this, new UserAccountEvent(UserAccountEvent.UserAccountAction.REQUEST_PASSWORD_RESET,e));
         });
         // NOTE: null viewName will be replaced by the default view name in NavigationManagerBean
         loginDialog.getCancelLoginButton().addClickListener(e -> getViewEventBus().publish(EventScope.UI, this, new NavigationEvent(null)));

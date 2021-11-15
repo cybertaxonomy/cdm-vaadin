@@ -15,15 +15,28 @@ import com.vaadin.ui.Button.ClickEvent;
  * @since Apr 25, 2017
  *
  */
-public class PasswordRevoveryEvent {
+public class UserAccountEvent {
+
+    public enum UserAccountAction {
+        REQUEST_PASSWORD_RESET,
+        RESET_PASSWORD,
+        REGISTER_ACCOUNT
+    }
 
     ClickEvent e;
+
+    private UserAccountAction action;
 
     /**
      * @param e
      */
-    public PasswordRevoveryEvent(ClickEvent e) {
+    public UserAccountEvent(UserAccountAction action, ClickEvent e) {
+        this.action = action;
         this.e = e;
+    }
+
+    public UserAccountAction getAction() {
+        return action;
     }
 
 }

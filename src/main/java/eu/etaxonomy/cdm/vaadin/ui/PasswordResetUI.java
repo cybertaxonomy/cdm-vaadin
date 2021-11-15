@@ -24,12 +24,14 @@ import eu.etaxonomy.cdm.vaadin.view.PasswordResetViewBean;
  */
 @Theme("edit-valo")
 @Title("Password Reset")
-@SpringUI(path="passwordReset")
+@SpringUI(path=PasswordResetUI.PATH)
 @Viewport("width=device-width, initial-scale=1")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class PasswordResetUI extends AbstractUI {
 
     private static final long serialVersionUID = 8553850288038649061L;
+
+    public static final String PATH = "passwordReset";
 
     private ViewDisplay viewDisplay = null;
 

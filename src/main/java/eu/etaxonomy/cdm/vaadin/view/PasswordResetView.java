@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
+import com.vaadin.ui.PasswordField;
+
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 
@@ -18,6 +20,8 @@ public interface PasswordResetView extends ApplicationView<PasswordResetPresente
     public void showErrorMessage(String text);
 
     void setUserName(String userName);
+
+    PasswordField getPassword1Field();
 
 
 }

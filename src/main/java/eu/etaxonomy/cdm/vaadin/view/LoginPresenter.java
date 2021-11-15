@@ -37,7 +37,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
-import eu.etaxonomy.cdm.vaadin.event.PasswordRevoveryEvent;
+import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
+import eu.etaxonomy.cdm.vaadin.ui.PasswordResetUI;
 import eu.etaxonomy.cdm.vaadin.util.VaadinServletUtilities;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -146,7 +147,14 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
     }
 
     @EventBusListenerMethod
-    public void onPasswordRevoveryEvent(PasswordRevoveryEvent event) throws MalformedURLException, ExecutionException {
+    public void onPasswordRevoveryEvent(UserAccountEvent event) throws MalformedURLException, ExecutionException {
+
+        if(event.getAction().equals(UserAccountEvent.UserAccountAction.REQUEST_PASSWORD_RESET)) {
+            requestPasswordReset();
+        }
+    }
+
+    private void requestPasswordReset() throws MalformedURLException, ExecutionException {
         String userNameOrEmail = getView().getLoginDialog().getUserNameOrEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
         logger.debug("PasswordRevoveryEvent for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
@@ -154,7 +162,9 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         // immediately, therefore we use a CountDownLatch
         CountDownLatch finshedSignal = new CountDownLatch(1);
         List<Throwable> asyncException = new ArrayList<>(1);
-        ListenableFuture<Boolean> futureResult = repo.getPasswordResetService().emailResetToken(userNameOrEmail, servletBaseUrl.toString());
+        ListenableFuture<Boolean> futureResult = repo.getPasswordResetService().emailResetToken(
+                userNameOrEmail,
+                servletBaseUrl.toString() + "/app/" + PasswordResetUI.PATH + "#!" + PasswordResetViewBean.NAME + "/%s");
         futureResult.addCallback(
                     successFuture -> {
                         finshedSignal.countDown();
