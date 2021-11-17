@@ -61,9 +61,9 @@ import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccess
 import eu.etaxonomy.cdm.vaadin.ui.CdmBaseUI;
 import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
-import eu.etaxonomy.cdm.vaadin.ui.PasswordResetUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
+import eu.etaxonomy.cdm.vaadin.ui.UserAccountSelfManagementUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
@@ -205,10 +205,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Bean
     @UIScope
-    public PasswordResetUI passwordResetUI() {
-        if(isUIEnabled(PasswordResetUI.class)){
+    public UserAccountSelfManagementUI passwordResetUI() {
+        if(isUIEnabled(UserAccountSelfManagementUI.class)){
             registerRegistrationUiHibernateEventListeners();
-            return new PasswordResetUI();
+            return new UserAccountSelfManagementUI();
         }
         return null;
     }
@@ -289,19 +289,19 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     //@formatter:off
     private static final String APP_FILE_CONTENT=
-            "########################################################\n"+
-            "#                                                       \n"+
-            "# Vaadin application specific configurations            \n"+
-            "#                                                       \n"+
-            "########################################################\n"+
-            "                                                        \n"+
-            "# Enablement of vaadin uis.                             \n"+
-            "#                                                       \n"+
-            "# Multiple uis can be defined as comma separated list.  \n"+
-            "# Whitespace before and after the comma will be ignored.\n"+
-            "# Valid values are the path properties of the @SpringUI \n"+
-            "# annotation which is used for UI classes.              \n"+
-            "cdm-vaadin.ui.activated=concept,distribution,editstatus \n";
+            "################################################################\n"+
+            "#                                                               \n"+
+            "# Vaadin application specific configurations                    \n"+
+            "#                                                               \n"+
+            "################################################################\n"+
+            "                                                                \n"+
+            "# Enablement of vaadin uis.                                     \n"+
+            "#                                                               \n"+
+            "# Multiple uis can be defined as comma separated list.          \n"+
+            "# Whitespace before and after the comma will be ignored.        \n"+
+            "# Valid values are the path properties of the @SpringUI         \n"+
+            "# annotation which is used for UI classes.                      \n"+
+            "cdm-vaadin.ui.activated=account,concept,distribution,editstatus \n";
     //@formatter:on
 
     /**

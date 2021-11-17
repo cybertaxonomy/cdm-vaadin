@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
-import eu.etaxonomy.cdm.vaadin.ui.PasswordResetUI;
+import eu.etaxonomy.cdm.vaadin.ui.UserAccountSelfManagementUI;
 import eu.etaxonomy.cdm.vaadin.util.VaadinServletUtilities;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -164,7 +164,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         List<Throwable> asyncException = new ArrayList<>(1);
         ListenableFuture<Boolean> futureResult = repo.getPasswordResetService().emailResetToken(
                 userNameOrEmail,
-                servletBaseUrl.toString() + "/app/" + PasswordResetUI.PATH + "#!" + PasswordResetViewBean.NAME + "/%s");
+                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.PATH + "#!" + PasswordResetViewBean.NAME + "/%s");
         futureResult.addCallback(
                     successFuture -> {
                         finshedSignal.countDown();
