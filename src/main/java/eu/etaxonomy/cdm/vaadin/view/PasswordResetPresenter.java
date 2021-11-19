@@ -26,9 +26,9 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
-import eu.etaxonomy.cdm.api.security.IPasswordResetTokenStore;
+import eu.etaxonomy.cdm.api.security.IAbstractRequestTokenStore;
 import eu.etaxonomy.cdm.api.security.PasswordResetRequest;
-import eu.etaxonomy.cdm.api.service.security.PasswordResetException;
+import eu.etaxonomy.cdm.api.service.security.AccountSelfManagementException;
 import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
@@ -47,7 +47,7 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
     private ICdmRepository repo;
 
     @Autowired
-    private IPasswordResetTokenStore tokenStore;
+    private IAbstractRequestTokenStore tokenStore;
 
     protected EventBus.UIEventBus uiEventBus;
 
@@ -80,7 +80,7 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
     }
 
     @EventBusListenerMethod
-    public void onPasswordRevoveryEvent(UserAccountEvent event) throws PasswordResetException, ExecutionException {
+    public void onPasswordRevoveryEvent(UserAccountEvent event) throws AccountSelfManagementException, ExecutionException {
 
         if(event.getAction().equals(UserAccountEvent.UserAccountAction.RESET_PASSWORD)) {
             String newPassword = getView().getPassword1Field().getValue();
@@ -106,7 +106,7 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
             if(!asyncException.isEmpty()) {
                 if(asyncException.get(0) instanceof MailException) {
                     getView().showSuccessMessage("Your password has been changed but sending the confirmation email has failed.");
-                } else if(asyncException.get(0) instanceof PasswordResetException) {
+                } else if(asyncException.get(0) instanceof AccountSelfManagementException) {
                     getView().showErrorMessage("The password reset token has beceome invalid. Please request gain for a password reset.");
                 }
            } else {
