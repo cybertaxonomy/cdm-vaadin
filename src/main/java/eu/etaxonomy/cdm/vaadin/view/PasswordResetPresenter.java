@@ -71,7 +71,7 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
                 // invalid token show error
                 getView().showErrorMessage("Invalid token");
             }
-            Optional<PasswordResetRequest> resetRequestOpt = tokenStore.findResetRequest(viewParameters.get(0));
+            Optional<PasswordResetRequest> resetRequestOpt = tokenStore.findRequest(viewParameters.get(0));
             if(resetRequestOpt.isPresent()) {
                 resetRequest = resetRequestOpt.get();
                 getView().setUserName(resetRequest.getUserName());

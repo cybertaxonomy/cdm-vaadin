@@ -16,10 +16,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import javax.mail.internet.AddressException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,11 +33,13 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListener;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
+import eu.etaxonomy.cdm.api.service.security.AccountSelfManagementException;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
@@ -135,6 +140,14 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
             authenticate(System.getProperty(PROPNAME_USER), System.getProperty(PROPNAME_PASSWORD));
         }
+
+        getView().getLoginDialog().getEmail().addValidator(new AbstractStringValidator("An account for this email address already exits. You may want to use the \"Password Revovery\" tab intsead?") {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected boolean isValidValue(String value) {
+                return !repo.getAccountRegistrationService().emailAddressExists(value);
+            }
+        });
     }
 
     @Override
@@ -147,17 +160,19 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
     }
 
     @EventBusListenerMethod
-    public void onPasswordRevoveryEvent(UserAccountEvent event) throws MalformedURLException, ExecutionException {
+    public void onPasswordRevoveryEvent(UserAccountEvent event) throws MalformedURLException, ExecutionException, MailException, AddressException, AccountSelfManagementException {
 
         if(event.getAction().equals(UserAccountEvent.UserAccountAction.REQUEST_PASSWORD_RESET)) {
             requestPasswordReset();
+        } else if(event.getAction().equals(UserAccountEvent.UserAccountAction.REGISTER_ACCOUNT)) {
+            requestAccountCreation();
         }
     }
 
     private void requestPasswordReset() throws MalformedURLException, ExecutionException {
         String userNameOrEmail = getView().getLoginDialog().getUserNameOrEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
-        logger.debug("PasswordRevoveryEvent for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
+        logger.debug("UserAccountAction.REQUEST_PASSWORD_RESET for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
         // Implementation note: UI modifications allied in the below callback methods will not affect the UI
         // immediately, therefore we use a CountDownLatch
         CountDownLatch finshedSignal = new CountDownLatch(1);
@@ -185,7 +200,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
         if(!asyncException.isEmpty()) {
             getView().getLoginDialog().getMessageSendRecoveryEmailLabel()
-            .setValue("Sending an password reset email to you has failed. Please try again later or contect the support in case this error persists.");
+            .setValue("Sending the password reset email to you has failed. Please try again later or contect the support in case this error persists.");
             getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_FAILURE);
         } else {
             if(!asyncTimeout && result) {
@@ -198,6 +213,52 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             } else {
                 getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setValue("A timeout has occured, please try again.");
                 getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_FAILURE);
+            }
+        }
+    }
+
+    private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException, ExecutionException {
+        String emailAddress = getView().getLoginDialog().getEmail().getValue();
+        URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
+
+        logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);
+
+        CountDownLatch finshedSignal = new CountDownLatch(1);
+        List<Throwable> asyncException = new ArrayList<>(1);
+        ListenableFuture<Boolean> futureResult = repo.getAccountRegistrationService().emailAccountRegistrationRequest(emailAddress,
+                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.PATH + "#!" + AccountRegistrationViewBean.NAME + "/%s");
+        futureResult.addCallback(
+                    successFuture -> {
+                        finshedSignal.countDown();
+                    },
+                    exception -> {
+                        // possible MailException
+                        asyncException.add(exception);
+                        finshedSignal.countDown();
+                    }
+                );
+        boolean asyncTimeout = false;
+        Boolean result = false;
+        try {
+            finshedSignal.await(2, TimeUnit.SECONDS);
+            result = futureResult.get();
+        } catch (InterruptedException e) {
+            asyncTimeout = true;
+        }
+        if(!asyncException.isEmpty()) {
+            getView().getLoginDialog().getRegisterMessageLabel()
+            .setValue("Sending the account resitration email to you has failed. Please try again later or contect the support in case this error persists.");
+            getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
+        } else {
+            if(!asyncTimeout && result) {
+                getView().getLoginDialog().getRegisterMessageLabel().setValue("An email with with further instructions has been sent to you.");
+                getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_SUCCESS);
+                getView().getLoginDialog().getEmail().setEnabled(false);
+                getView().getLoginDialog().getRegisterButton().setEnabled(false);
+
+            } else {
+                getView().getLoginDialog().getRegisterMessageLabel().setValue("A timeout has occured, please try again.");
+                getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
             }
         }
     }

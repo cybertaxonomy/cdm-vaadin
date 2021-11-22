@@ -26,9 +26,9 @@ public class LoginDialogDesign extends TabSheet {
     protected Label messageLogin;
     protected Button loginButton;
     protected Button cancelLoginButton;
-    protected TextField userNameSuggestion;
     protected TextField email;
     protected Button registerButton;
+    protected Label registerMessage;
     protected Button cancelRegistrationButton;
     protected TextField userNameOrEmail;
     protected Button sendRecoveryEmail;
