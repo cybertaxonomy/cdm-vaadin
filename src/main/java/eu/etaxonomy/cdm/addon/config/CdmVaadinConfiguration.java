@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.addon.config;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -67,10 +66,8 @@ import eu.etaxonomy.cdm.vaadin.ui.UserAccountSelfManagementUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
- *
  * @author a.kohlbecker
  * @since Feb 8, 2017
- *
  */
 @Configuration
 @ComponentScan(basePackages={
@@ -284,8 +281,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     static final String PROPERTIES_FILE_NAME = "vaadin-apps";
 
-    private Properties appProps = null;
-
     private ApplicationContext applicationContext;
 
     private List<String> activeUIpaths;
@@ -309,11 +304,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     /**
      * Checks if the ui class supplied is activated by listing it in the properties by its {@link SpringUI#path()} value.
-     *
-     * TODO see https://dev.e-taxonomy.eu/redmine/issues/7139 (consider using spring profiles to enable vaadin UI contexts)
-     *
-     * @param type
-     * @return
      */
     private boolean isUIEnabled(Class<? extends UI>uiClass) {
 
