@@ -26,11 +26,13 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
  *
  */
 @Theme("valo")
-@SpringUI(path="concept")
+@SpringUI(path=ConceptRelationshipUI.NAME)
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     Navigator navigator;
+
+    public static final String NAME = "concept";
 
     private static final String FIRST_VIEW = "editcr";
 

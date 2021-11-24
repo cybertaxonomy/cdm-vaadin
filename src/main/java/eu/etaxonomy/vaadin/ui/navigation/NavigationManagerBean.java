@@ -57,6 +57,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	protected EventBus.UIEventBus uiEventBus;
 
+	/**
+	 * if set the navigator will block all other views
+	 * and exclusively navigates to the error view to indicate that the
+	 * UI is disabled.
+	 */
+	private String uiDisabledErrorViewName = null;
+
     @Autowired
     protected void setViewEventBus(EventBus.UIEventBus uiEventBus){
         this.uiEventBus = uiEventBus;
@@ -125,6 +132,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
+	    if(getUiDisabledErrorView() != null) {
+	        super.navigateTo(getUiDisabledErrorView());
+	    }
 	    if(StringUtils.isEmpty(navigationState)){
             navigationState = defaultViewName;
         }
@@ -137,6 +147,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public void navigateTo(String navigationState) {
+	    if(getUiDisabledErrorView() != null) {
+            super.navigateTo(getUiDisabledErrorView());
+        }
 	    if(StringUtils.isEmpty(navigationState)){
 	        navigationState = defaultViewName;
 	    }
@@ -293,5 +306,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         // which could be expensive
         // by navigating to the default view
         navigateTo(defaultViewName);
+    }
+
+    public String getUiDisabledErrorView() {
+        return uiDisabledErrorViewName;
+    }
+
+    public void setUiDisabledErrorView(String uiDisabledErrorViewName) {
+        this.uiDisabledErrorViewName = uiDisabledErrorViewName;
     }
 }

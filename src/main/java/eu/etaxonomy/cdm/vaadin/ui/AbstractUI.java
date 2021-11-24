@@ -27,10 +27,12 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.addon.config.UIDisabledException;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
 import eu.etaxonomy.cdm.vaadin.event.error.ErrorTypeErrorHandlerWrapper;
 import eu.etaxonomy.cdm.vaadin.event.error.PermissionDeniedErrorHandler;
+import eu.etaxonomy.cdm.vaadin.event.error.UIDisabledErrorHandler;
 import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
 import eu.etaxonomy.cdm.vaadin.view.RedirectToLoginView;
 import eu.etaxonomy.vaadin.ui.UIInitializedEvent;
@@ -67,6 +69,8 @@ public abstract class AbstractUI extends UI {
     @Autowired
     protected UIEventBus uiEventBus;
 
+//    private boolean enabled;
+
     public AbstractUI() {
         super();
     }
@@ -87,6 +91,11 @@ public abstract class AbstractUI extends UI {
         assert getViewDisplay() != null;
 
         logger.debug(this.getClass().getSimpleName() + ".init() ViewDisplay: " + getViewDisplay().getClass().getSimpleName() + ", initialViewName: " + getInitialViewName());
+
+        if(!isEnabled()) {
+            throw new UIDisabledException(getClass().getSimpleName());
+        }
+
         initAdditionalContent();
 
         getNavigationManagerBean().setViewDisplay(getViewDisplay());
@@ -120,6 +129,12 @@ public abstract class AbstractUI extends UI {
         uiEventBus.publish(this, new UIInitializedEvent());
     }
 
+//    /**
+//     * @return
+//     */
+//    @Override
+//    protected abstract String getUIName();
+
     /**
      * @return The name of the initial view to show
      */
@@ -148,11 +163,20 @@ public abstract class AbstractUI extends UI {
 
     protected void registerErrorHandlers() {
         DelegatingErrorHandler delegatingErrorHander = new DelegatingErrorHandler();
-        WindowErrorHandler errorHandler = new WindowErrorHandler(this, RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
+        WindowErrorHandler errorHandler = new WindowErrorHandler(
+                this,
+                RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
                 + "You also might want to add a sreenshot of the browser page in error.</i>");
-        delegatingErrorHander.registerHandler(new ErrorTypeErrorHandlerWrapper<PermissionDeniedException>(PermissionDeniedException.class, new PermissionDeniedErrorHandler(this)));
-        delegatingErrorHander.registerHandler(new ErrorTypeErrorHandlerWrapper<Exception>(Exception.class, errorHandler));
+        delegatingErrorHander.registerHandler(
+                new ErrorTypeErrorHandlerWrapper<PermissionDeniedException>(PermissionDeniedException.class, new PermissionDeniedErrorHandler(this))
+                );
+        delegatingErrorHander.registerHandler(
+                new ErrorTypeErrorHandlerWrapper<UIDisabledException>(UIDisabledException.class, new UIDisabledErrorHandler(this))
+                );
+        delegatingErrorHander.registerHandler(
+                new ErrorTypeErrorHandlerWrapper<Exception>(Exception.class, errorHandler)
+                );
         setErrorHandler(delegatingErrorHander);
         VaadinSession.getCurrent().setErrorHandler(delegatingErrorHander);
     }
@@ -170,5 +194,16 @@ public abstract class AbstractUI extends UI {
         }
         return state;
     }
+
+//    @Override
+//   public void setEnabled(boolean state) {
+//        this.enabled = state;
+//    }
+//
+//    @Override
+//   public boolean isEnabled() {
+//        return enabled;
+//    }
+
 
 }

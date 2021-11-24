@@ -24,14 +24,14 @@ import eu.etaxonomy.cdm.vaadin.view.PasswordResetViewBean;
  */
 @Theme("edit-valo")
 @Title("User Account Self Management")
-@SpringUI(path=UserAccountSelfManagementUI.PATH)
+@SpringUI(path=UserAccountSelfManagementUI.NAME)
 @Viewport("width=device-width, initial-scale=1")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class UserAccountSelfManagementUI extends AbstractUI {
 
     private static final long serialVersionUID = 8553850288038649061L;
 
-    public static final String PATH = "account";
+    public static final String NAME = "account";
 
     private ViewDisplay viewDisplay = null;
 

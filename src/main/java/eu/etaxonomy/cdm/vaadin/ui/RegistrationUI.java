@@ -41,7 +41,7 @@ import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
  */
 @Theme("edit-valo")
 @Title("Registration")
-@SpringUI(path="registration")
+@SpringUI(path=RegistrationUI.NAME)
 @Viewport("width=device-width, initial-scale=1")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 // @PreserveOnRefresh
@@ -49,6 +49,8 @@ import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStatusMessageSource {
 
     private static final long serialVersionUID = -8626236111335323691L;
+
+    public static final String NAME = "registration";
 
     @Autowired
     @Qualifier("viewAreaBean")

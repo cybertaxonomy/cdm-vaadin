@@ -148,36 +148,56 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @WebServlet(name="CdmVaadinServlet", value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class CdmVaadinServlet extends SpringVaadinServlet {
 
-        private static final long serialVersionUID = -2615042297393028775L;
+        private static final long serialVersionUID = 1L;
 
-        /**
-         *
-        @SuppressWarnings("serial")
+        /*
         @Override
         protected void servletInitialized() throws ServletException {
-            logger.debug("SpringVaadinServlet initialized");
 
-        }
+            super.servletInitialized();
+
             getService().addSessionInitListener(new SessionInitListener() {
+
+                private static final long serialVersionUID = 1L;
 
                 @Override
                 public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
                     VaadinSession session = sessionInitEvent.getSession();
                     session.setErrorHandler(new DefaultErrorHandler(){
 
+                        private static final long serialVersionUID = 1L;
+
                         @Override
                         public void error(ErrorEvent errorEvent) {
-                            // ...
+                            UIDisabledException uiDisbledException = findUIDisabledException(errorEvent.getThrowable());
+                            if(uiDisbledException != null) {
+                                logger.error("################## > UIDisabledException");
+                                //throw uiDisbledException ;
+                                doDefault(errorEvent);
+                            } else {
+                                doDefault(errorEvent);
+                            }
+                        }
+
+                        private UIDisabledException findUIDisabledException(Throwable throwable) {
+                            if(throwable instanceof UIDisabledException) {
+                                return (UIDisabledException)throwable;
+                            } else {
+                                if(throwable.getCause() == null) {
+                                    return null;
+                                } else {
+                                    return findUIDisabledException(throwable.getCause());
+                                }
+                            }
                         }
 
                     });
-                    ).getServiceRegistry().getService
 
                 }});
 
+                logger.debug("SpringVaadinServlet initialized");
         }
-         */
-
+        */
     }
 
     public CdmVaadinConfiguration() {
@@ -187,30 +207,31 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @Bean
     @UIScope
     public ConceptRelationshipUI conceptRelationshipUI() {
-        if(isUIEnabled(ConceptRelationshipUI.class)){
-            return new ConceptRelationshipUI();
-        }
-        return null;
+        return applyEnableConfig(new ConceptRelationshipUI());
     }
 
     @Bean
     @UIScope
     public RegistrationUI registrationUI() {
-        if(isUIEnabled(RegistrationUI.class)){
-            registerRegistrationUiHibernateEventListeners();
-            return new RegistrationUI();
-        }
-        return null;
+        return applyEnableConfig(new RegistrationUI());
     }
 
     @Bean
     @UIScope
-    public UserAccountSelfManagementUI passwordResetUI() {
-        if(isUIEnabled(UserAccountSelfManagementUI.class)){
-            registerRegistrationUiHibernateEventListeners();
-            return new UserAccountSelfManagementUI();
-        }
-        return null;
+    public UserAccountSelfManagementUI userAccountSelfManagementUI() {
+        return applyEnableConfig(new UserAccountSelfManagementUI());
+    }
+
+    @Bean
+    @UIScope
+    public DistributionStatusUI distributionStatusUI() {
+        return applyEnableConfig( new DistributionStatusUI());
+    }
+
+    @Bean
+    @UIScope
+    public StatusEditorUI statusEditorUI() {
+        return applyEnableConfig(new StatusEditorUI());
     }
 
     /**
@@ -259,24 +280,6 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         minter.setMaxLocalId(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_MAXID));
         minter.setIdentifierFormatString(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
         return minter;
-    }
-
-    @Bean
-    @UIScope
-    public DistributionStatusUI distributionStatusUI() {
-        if(isUIEnabled(DistributionStatusUI.class)){
-            return new DistributionStatusUI();
-        }
-        return null;
-    }
-
-    @Bean
-    @UIScope
-    public StatusEditorUI statusEditorUI() {
-        if(isUIEnabled(StatusEditorUI.class)){
-            return new StatusEditorUI();
-        }
-        return null;
     }
 
     static final String PROPERTIES_FILE_NAME = "vaadin-apps";
@@ -338,11 +341,11 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     }
 
+    private <T extends UI> T applyEnableConfig(T ui) {
+        ui.setEnabled(isUIEnabled(ui.getClass()));
+        return ui;
+    }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;

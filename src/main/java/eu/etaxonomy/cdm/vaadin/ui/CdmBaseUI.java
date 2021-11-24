@@ -12,6 +12,7 @@ import com.vaadin.data.util.sqlcontainer.query.generator.filter.QueryBuilder;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.UI;
 
+import eu.etaxonomy.cdm.addon.config.UIDisabledException;
 import eu.etaxonomy.cdm.vaadin.util.CdmSQLStringDecorator;
 import eu.etaxonomy.cdm.vaadin.util.CdmVaadinSessionUtilities;
 
@@ -29,6 +30,10 @@ public class CdmBaseUI extends UI {
     protected void init(VaadinRequest request) {
         // TODO: Need to evaluate the various sql dialects and make sure that these
         // queries are compatible with all
+
+        if(!isEnabled()) {
+            throw new UIDisabledException(getClass().getSimpleName());
+        }
         QueryBuilder.setStringDecorator(new CdmSQLStringDecorator());
 
         CdmVaadinSessionUtilities.initCdmDataChangeService();
@@ -37,5 +42,6 @@ public class CdmBaseUI extends UI {
 
         CdmVaadinSessionUtilities.initBasicEventService();
     }
+
 
 }

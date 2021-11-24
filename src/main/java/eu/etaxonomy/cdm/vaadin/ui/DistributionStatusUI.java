@@ -25,12 +25,14 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 
 @Theme("macosx")
 @Title("Distribution Editor")
-@SpringUI(path="distribution")
+@SpringUI(path=DistributionStatusUI.NAME)
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class DistributionStatusUI extends UI{
 
     private final static Logger logger = Logger.getLogger(DistributionStatusUI.class);
+
+    public static final String NAME = "distribution";
 
     private ViewDisplay viewDisplay;
 
@@ -80,7 +82,7 @@ public class DistributionStatusUI extends UI{
     }
 
     /**
-     * 
+     *
      * {@inheritDoc}
      */
 	@Override
