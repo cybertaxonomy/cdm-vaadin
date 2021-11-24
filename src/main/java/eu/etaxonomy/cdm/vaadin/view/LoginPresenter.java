@@ -179,7 +179,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         List<Throwable> asyncException = new ArrayList<>(1);
         ListenableFuture<Boolean> futureResult = repo.getPasswordResetService().emailResetToken(
                 userNameOrEmail,
-                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.PATH + "#!" + PasswordResetViewBean.NAME + "/%s");
+                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.NAME + "#!" + PasswordResetViewBean.NAME + "/%s");
         futureResult.addCallback(
                     successFuture -> {
                         finshedSignal.countDown();
@@ -226,7 +226,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         CountDownLatch finshedSignal = new CountDownLatch(1);
         List<Throwable> asyncException = new ArrayList<>(1);
         ListenableFuture<Boolean> futureResult = repo.getAccountRegistrationService().emailAccountRegistrationRequest(emailAddress,
-                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.PATH + "#!" + AccountRegistrationViewBean.NAME + "/%s");
+                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.NAME + "#!" + AccountRegistrationViewBean.NAME + "/%s");
         futureResult.addCallback(
                     successFuture -> {
                         finshedSignal.countDown();
