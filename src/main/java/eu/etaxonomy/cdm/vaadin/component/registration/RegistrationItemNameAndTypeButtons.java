@@ -153,7 +153,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     boolean isFirst = true;
                     for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.getTypeDesignations()) {
                         labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(
-                                TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\s+[bB]y"));
+                                TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\\s+[bB]y"));
                         isFirst = false;
                     }
                 }
