@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.security.IAbstractRequestTokenStore;
 import eu.etaxonomy.cdm.api.security.PasswordResetRequest;
 import eu.etaxonomy.cdm.api.service.security.AccountSelfManagementException;
+import eu.etaxonomy.cdm.model.permission.User;
 import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
@@ -47,7 +48,8 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
     private ICdmRepository repo;
 
     @Autowired
-    private IAbstractRequestTokenStore tokenStore;
+    @Qualifier("passwordResetTokenStore")
+    private IAbstractRequestTokenStore<PasswordResetRequest, User> tokenStore;
 
     protected EventBus.UIEventBus uiEventBus;
 
