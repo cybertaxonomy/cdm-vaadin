@@ -152,10 +152,10 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     labelText += " <strong>" + typeStatus.getLabel() +  (typeDesignationWorkingSet.getTypeDesignations().size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
                     for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.getTypeDesignations()) {
-                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(dtDTO.getTaggedText(), EnumSet.of(TagEnum.reference, TagEnum.separator)); // TagEnum.separator removes "designated By"
+                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(
+                                TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\s+[bB]y"));
                         isFirst = false;
                     }
-
                 }
 
                 Label label = new Label(labelText, ContentMode.HTML);

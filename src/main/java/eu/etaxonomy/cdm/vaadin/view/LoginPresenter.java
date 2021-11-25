@@ -135,12 +135,6 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             redirectToState = String.join("/", redirectToStateTokens);
         }
 
-        // attempt to auto login
-        if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
-            log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
-            authenticate(System.getProperty(PROPNAME_USER), System.getProperty(PROPNAME_PASSWORD));
-        }
-
         getView().getLoginDialog().getEmail().addValidator(new AbstractStringValidator("An account for this email address already exits. You may want to use the \"Password Revovery\" tab intsead?") {
             private static final long serialVersionUID = 1L;
             @Override
@@ -148,6 +142,13 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
                 return !repo.getAccountRegistrationService().emailAddressExists(value);
             }
         });
+
+        // attempt to auto login
+        if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
+            log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
+            authenticate(System.getProperty(PROPNAME_USER), System.getProperty(PROPNAME_PASSWORD));
+        }
+
     }
 
     @Override
