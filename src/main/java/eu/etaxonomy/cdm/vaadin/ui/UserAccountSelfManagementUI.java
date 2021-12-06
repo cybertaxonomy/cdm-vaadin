@@ -8,12 +8,18 @@
 */
 package eu.etaxonomy.cdm.vaadin.ui;
 
+import java.io.IOException;
+
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
 import com.vaadin.annotations.Viewport;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator.SingleComponentContainerViewDisplay;
 import com.vaadin.navigator.ViewDisplay;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringUI;
 
 import eu.etaxonomy.cdm.vaadin.view.PasswordResetViewBean;
@@ -52,5 +58,24 @@ public class UserAccountSelfManagementUI extends AbstractUI {
     protected void initAdditionalContent() {
         // no additional content
     }
+
+    @Override
+    protected void init(VaadinRequest request) {
+        super.init(request);
+        VaadinSession.getCurrent().addRequestHandler(new RequestHandler() {
+
+            @Override
+            public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
+                    throws IOException {
+                // protect from Cross-domain Referer leakage in this UI
+                // see https://portswigger.net/kb/issues/00500400_cross-domain-referer-leakage
+                // and https://cheatsheetseries.owasp.org/cheatsheets/Forgot_Password_Cheat_Sheet.html
+                response.setHeader("Referrer-Policy", "no-referrer");
+                return false;
+            }
+        });
+    }
+
+
 
 }
