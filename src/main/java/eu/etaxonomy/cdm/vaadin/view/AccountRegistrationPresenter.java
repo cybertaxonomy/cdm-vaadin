@@ -77,7 +77,9 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             Optional<AccountCreationRequest> resetRequestOpt = tokenStore.findRequest(viewParameters.get(0));
             if(resetRequestOpt.isPresent()) {
                 accountCreationRequest = resetRequestOpt.get();
+                getView().getEmailAddress().setReadOnly(false);
                 getView().getEmailAddress().setValue(accountCreationRequest.getUserEmail());
+                getView().getEmailAddress().setReadOnly(true);
             }
         }
     }
