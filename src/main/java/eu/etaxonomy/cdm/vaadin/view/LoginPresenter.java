@@ -40,6 +40,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.security.AccountSelfManagementException;
+import eu.etaxonomy.cdm.api.service.security.EmailAddressNotFoundException;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationSuccessEvent;
 import eu.etaxonomy.cdm.vaadin.event.UserAccountEvent;
@@ -198,10 +199,22 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             result = futureResult.get();
         } catch (InterruptedException e) {
             asyncTimeout = true;
+        } catch (Exception e) {
+            // in case executing getUserNameOrEmail() causes an exeption faster
+            // than futureResult.addCallback( can be processed, the execption
+            // can not be caught asynchronously
+            // so we are adding all these exceptions here
+            asyncException.add(e);
         }
         if(!asyncException.isEmpty()) {
-            getView().getLoginDialog().getMessageSendRecoveryEmailLabel()
-            .setValue("Sending the password reset email to you has failed. Please try again later or contect the support in case this error persists.");
+            String messageText = "An unknown error has occurred.";
+            if(asyncException.get(0) instanceof MailException) {
+                messageText = "Sending the password reset email to you has failed. Please try again later or contect the support in case this error persists.";
+            }
+            if(asyncException.get(0) instanceof EmailAddressNotFoundException) {
+                messageText = "There is no user accout for this email address.";
+            }
+            getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setValue(messageText);
             getView().getLoginDialog().getMessageSendRecoveryEmailLabel().setStyleName(ValoTheme.LABEL_FAILURE);
         } else {
             if(!asyncTimeout && result) {
