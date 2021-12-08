@@ -81,5 +81,4 @@ public interface ListView extends ApplicationView<ListPresenter>{
 
     AbstractSelect getStatusTypeFilter();
 
-
 }

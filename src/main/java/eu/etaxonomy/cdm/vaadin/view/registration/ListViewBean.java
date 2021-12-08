@@ -118,9 +118,10 @@ public class ListViewBean extends AbstractPageView<ListPresenter> implements Lis
         }
 
         statusTypeFilter = new ListSelect("Type Status");
-        statusTypeFilter.setRows(3);
+        statusTypeFilter.setRows(5);
         statusTypeFilter.setMultiSelect(true);
         statusTypeFilter.setNullSelectionAllowed(true);
+        statusTypeFilter.addStyleName("select-multi");
         statusTypeFilter.addValueChangeListener(e -> updateResults(null, null));
         statusTypeFilter.setDescription("Strg + Click to unselect");
 
