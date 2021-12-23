@@ -44,8 +44,6 @@ public class MenuBeanDiscoveryBean {
     MenuBeanDiscoveryBean menuBeanDiscoveryBean;
 
 	public MenuBeanDiscoveryBean() {
-
-	    System.out.println("###########");
 	}
 
 	@Autowired
