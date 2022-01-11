@@ -21,7 +21,7 @@ class RegistrationSearchFilter {
     private String referencePattern;
     private User submitter;
     private Set<TypeDesignationStatusFilter> typeStatus = new HashSet<>();
-    private Set<RegistrationStatus> registrationStatus;
+    private Set<RegistrationStatus> registrationStatus = new HashSet<>();
 
     public String getIdentifierPattern() {
         return identifierPattern;
