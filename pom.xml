@@ -31,7 +31,7 @@
     <!-- the cdm internal repository -->
     <repository>
       <id>EditRepository</id>
-      <url>http://cybertaxonomy.eu/mavenrepo/</url>
+      <url>https://cybertaxonomy.eu/mavenrepo/</url>
     </repository>
     <!-- current spring source repositories -->
     <repository>
