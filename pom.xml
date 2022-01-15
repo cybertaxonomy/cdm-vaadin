@@ -100,7 +100,7 @@
         <!-- Try updating in cdmlib to 20090211 -->
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20151123</version>
+        <version>20211205</version>
       </dependency>
     
         <!-- 
