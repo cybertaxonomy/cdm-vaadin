@@ -151,7 +151,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
                     labelText += " <strong>" + typeStatus.getLabel() +  (typeDesignationWorkingSet.getTypeDesignations().size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
-                    for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.getTypeDesignations()) {
+                    for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.get(typeStatus)) {
                         labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(
                                 TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\\s+[bB]y"));
                         isFirst = false;
