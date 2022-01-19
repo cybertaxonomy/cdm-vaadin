@@ -30,6 +30,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 @SuppressWarnings("serial")
 public class DistributionStatusUI extends UI{
 
+    @SuppressWarnings("unused")
     private final static Logger logger = Logger.getLogger(DistributionStatusUI.class);
 
     public static final String NAME = "distribution";
@@ -81,10 +82,6 @@ public class DistributionStatusUI extends UI{
 
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
 	@Override
 	protected void init(VaadinRequest request) {
 

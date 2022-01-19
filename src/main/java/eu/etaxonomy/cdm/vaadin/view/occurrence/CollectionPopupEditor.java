@@ -32,7 +32,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -44,59 +43,37 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
 
     private static final int GRID_ROWS = 4;
 
-    TextField nameField;
-    TextField codeField;
-    TextField codeStandardField;
-    TextField townOrLocationField;
-    ToOneRelatedEntityCombobox<Collection> superCollectionCombobox;
-    ToOneRelatedEntityCombobox<Institution> institutionCombobox;
+    private TextField nameField;
+    private TextField codeField;
+    private TextField codeStandardField;
+    private TextField townOrLocationField;
+    private ToOneRelatedEntityCombobox<Collection> superCollectionCombobox;
+    private ToOneRelatedEntityCombobox<Institution> institutionCombobox;
 
-
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public CollectionPopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), Collection.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Collection editor";
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWindowWidth() {
         return 500;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         codeField.focus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
         /*
@@ -192,7 +169,6 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
                     );
                 }
             });
-
     }
 
     /* ------------------ View Interface methods -------------------- */

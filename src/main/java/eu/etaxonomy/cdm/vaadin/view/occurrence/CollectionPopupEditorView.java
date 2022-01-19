@@ -16,12 +16,11 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 public interface CollectionPopupEditorView extends ApplicationView<CollectionEditorPresenter> {
 
-    ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox();
+    public ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox();
 
-    ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox();
+    public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox();
 
 }

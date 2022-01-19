@@ -37,7 +37,6 @@ import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 /**
  * @author a.kohlbecker
  * @since Feb 24, 2017
- *
  */
 @Theme("edit-valo")
 @Title("Registration")
