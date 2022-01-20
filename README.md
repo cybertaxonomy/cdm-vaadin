@@ -26,10 +26,16 @@ For working the the UI designs it is recommendet to install the Vaddin Designer 
 ### Project setup with maven
 
 ~~~
-mvn install 
+mvn clean install
+~~~
+
+other useful [vaadin plugin commands](https://gwt-maven-plugin.github.io/gwt-maven-plugin/plugin-info.html)
+
+~~~ 
 mvn vaadin:clean
 mvn vaadin:update-theme
 mvn vaadin:update-widgetset
+mvn vaadin:compile
 mvn vaadin:compile-theme
 ~~~
 
