@@ -23,6 +23,16 @@ In addition you will need the **Vaadin Eclipse Plugin** which can be installed v
 
 For working the the UI designs it is recommendet to install the Vaddin Designer for Vaadin 7.
 
+### Project setup with maven
+
+~~~
+mvn install 
+mvn vaadin:clean
+mvn vaadin:update-theme
+mvn vaadin:update-widgetset
+mvn vaadin:compile-theme
+~~~
+
 
 ### Configure vaadin UIs for a specific cdm data source
 
