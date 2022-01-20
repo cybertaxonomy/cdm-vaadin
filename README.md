@@ -30,10 +30,18 @@ For example to enable the `RegistrationUI` you will need to add the name defined
 cdm-vaadin.ui.activated=account,concept,distribution,editstatus,registration 
 ~~~
 
+### Auto login into the vaadin application
+
+For development it can be convenient to enable the automatic login. 
+To enable this feature you will need to supply the following system properties:
+
+~~~
+-Dcdm-vaadin.login.usr=username      
+-Dcdm-vaadin.login.pwd=password
+~~~
 
 #### Setup Selenium based UI tests 
 
 **NOTE**: 
 
-* Run a `clean install` goal to download the Selenium drivers 
-
+* Run a `clean install` goal to download the Selenium drivers
