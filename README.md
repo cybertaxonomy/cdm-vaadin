@@ -5,6 +5,10 @@
 * http://localhost:8080/app/account
 * http://localhost:8080/app/registration
 
+## Architecture of this Vaadin project 
+
+see [Model-View-Presenter-MVP-Pattern](https://dev.e-taxonomy.eu/redmine/projects/edit/wiki/VaadinNotes#Model-View-Presenter-MVP-Pattern)
+
 ## Developer
 
 ### Eclipse IDE
