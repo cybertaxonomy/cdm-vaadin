@@ -33,5 +33,7 @@ cdm-vaadin.ui.activated=account,concept,distribution,editstatus,registration
 
 #### Setup Selenium based UI tests 
 
+**NOTE**: 
+
 * Run a `clean install` goal to download the Selenium drivers 
 
