@@ -81,6 +81,6 @@ To enable this feature you will need to supply the following system properties:
 
 #### Setup Selenium based UI tests 
 
-**NOTE**: 
+**NOTE**: The framework to run Selenium tests on vaadin apps is not yet ready for use. 
 
 * Run a `clean install` goal to download the Selenium drivers
