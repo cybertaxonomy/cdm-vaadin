@@ -1,5 +1,24 @@
+## Available UIs
+
+* http://localhost:8080/app/concept
+* http://localhost:8080/app/distribution
+* http://localhost:8080/app/account
+* http://localhost:8080/app/registration
 
 ## Developer
+
+### Eclipse IDE
+
+It is recommended to use the [Spring Tool Suite](https://spring.io/tools).
+
+Make sure you have the **Maven2Eclipse** plugin installed.
+
+In addition you will need the **Vaadin Eclipse Plugin** which can be installed via the Marketplace:
+
+![](images/Vaadin-Plugin-for-Eclipse.png)
+
+For working the the UI designs it is recommendet to install the Vaddin Designer for Vaadin 7.
+
 
 ### Configure vaadin UIs for a specific cdm data source
 
