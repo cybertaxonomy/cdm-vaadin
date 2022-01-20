@@ -404,14 +404,14 @@
           <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.53</version>
+            <version>0.1.55</version>
           </dependency>
         </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -470,7 +470,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.10</version>
           <configuration>
             <wtpversion>2.0</wtpversion>
             <additionalProjectnatures>
