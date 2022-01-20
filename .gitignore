@@ -19,3 +19,5 @@ env.properties
 c3p0.properties
 /selenium
 workbench.xmi
+*.scss.cache
+
