@@ -94,14 +94,19 @@ public class AccountRegistrationViewBean extends AbstractView<AccountRegistratio
 
         root.setSizeFull();
 
-        // value will be set by presenter and user must not change it here
-        emailAddress.setEnabled(false);
-        emailAddress.setReadOnly(true);
+        userName.setRequired(true);
+        password1Field.setRequired(true);
+        password2Field.setRequired(true);
 
         password1Field.addValidator(new PasswordsPolicyValidator());
         password2Field.addValidator(new PasswordsMatchValidator("The passwords are not identical.", password1Field, password2Field));
         password1Field.addValueChangeListener(e -> updateResetButtonState());
         password2Field.addValueChangeListener(e -> updateResetButtonState());
+
+        // value will be set by presenter and user must not change it here
+        emailAddress.setEnabled(false);
+        emailAddress.setReadOnly(true);
+
 
         prefix.setInputPrompt("Dr., Prof, ...");
     }
