@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import com.vaadin.data.Validator;
 import com.vaadin.ui.PasswordField;
 
-import eu.etaxonomy.cdm.validation.constraint.PasswordConstraintValidator;
-import eu.etaxonomy.cdm.validation.constraint.PasswordConstraintValidator.PasswordRulesValidator;
+import eu.etaxonomy.cdm.validation.constraint.ValidPasswordValidator;
+import eu.etaxonomy.cdm.validation.constraint.ValidPasswordValidator.PasswordRulesValidator;
 
 /**
  * Checks that the passwords entered in two password fields match.
@@ -29,7 +29,7 @@ public class PasswordsPolicyValidator implements Validator {
 
     private static final long serialVersionUID = -9048318480638222817L;
 
-    private PasswordRulesValidator validator = new PasswordConstraintValidator.PasswordRulesValidator();
+    private PasswordRulesValidator validator = new ValidPasswordValidator.PasswordRulesValidator();
 
     @Override
     public void validate(Object value) throws InvalidValueException {
