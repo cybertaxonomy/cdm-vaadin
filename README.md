@@ -9,36 +9,7 @@
 
 see [Model-View-Presenter-MVP-Pattern](https://dev.e-taxonomy.eu/redmine/projects/edit/wiki/VaadinNotes#Model-View-Presenter-MVP-Pattern)
 
-## Developer
-
-### Eclipse IDE
-
-It is recommended to use the [Spring Tool Suite](https://spring.io/tools).
-
-Make sure you have the **Maven2Eclipse** plugin installed.
-
-In addition you will need the **Vaadin Eclipse Plugin** which can be installed via the Marketplace:
-
-![](images/Vaadin-Plugin-for-Eclipse.png)
-
-For working the the UI designs it is recommendet to install the Vaddin Designer for Vaadin 7.
-
-### Project setup with maven
-
-~~~
-mvn clean install
-~~~
-
-other useful [vaadin plugin commands](https://gwt-maven-plugin.github.io/gwt-maven-plugin/plugin-info.html)
-
-~~~ 
-mvn vaadin:clean
-mvn vaadin:update-theme
-mvn vaadin:update-widgetset
-mvn vaadin:compile
-mvn vaadin:compile-theme
-~~~
-
+## Setup
 
 ### Configure vaadin UIs for a specific cdm data source
 
@@ -69,6 +40,39 @@ For example to enable the `RegistrationUI` you will need to add the name defined
 cdm-vaadin.ui.activated=account,concept,distribution,editstatus,registration 
 ~~~
 
+**Developers**: You can activate an UI also via jvm option, e.g.: `-Dcdm-vaadin.ui.activated=registration`
+
+
+## Developer
+
+### Eclipse IDE
+
+It is recommended to use the [Spring Tool Suite](https://spring.io/tools).
+
+Make sure you have the **Maven2Eclipse** plugin installed.
+
+In addition you will need the **Vaadin Eclipse Plugin** which can be installed via the Marketplace:
+
+![](images/Vaadin-Plugin-for-Eclipse.png)
+
+For working the the UI designs it is recommendet to install the Vaddin Designer for Vaadin 7.
+
+### Project setup with maven
+
+~~~
+mvn clean install
+~~~
+
+other useful [vaadin plugin commands](https://gwt-maven-plugin.github.io/gwt-maven-plugin/plugin-info.html) (the vaadin plugin is based on the gwt-maven-plugin, therefore they share the same goals):
+
+~~~ 
+mvn vaadin:clean
+mvn vaadin:update-theme
+mvn vaadin:update-widgetset
+mvn vaadin:compile
+mvn vaadin:compile-theme
+~~~
+
 ### Auto login into the vaadin application
 
 For development it can be convenient to enable the automatic login. 
@@ -79,7 +83,7 @@ To enable this feature you will need to supply the following system properties:
 -Dcdm-vaadin.login.pwd=password
 ~~~
 
-#### Setup Selenium based UI tests 
+### Setup Selenium based UI tests 
 
 **NOTE**: The framework to run Selenium tests on vaadin apps is not yet ready for use. 
 
