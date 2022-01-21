@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,6 +40,7 @@ import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
+import eu.etaxonomy.cdm.api.config.CdmConfigurationKeys;
 import eu.etaxonomy.cdm.api.service.security.AccountSelfManagementException;
 import eu.etaxonomy.cdm.api.service.security.EmailAddressNotFoundException;
 import eu.etaxonomy.cdm.vaadin.event.AuthenticationAttemptEvent;
@@ -85,6 +87,9 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
     @Autowired
     @Qualifier("cdmRepository")
     private ICdmRepository repo;
+
+    @Autowired
+    protected Environment env;
 
 //    @Override
 //    protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
@@ -209,7 +214,12 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         if(!asyncException.isEmpty()) {
             String messageText = "An unknown error has occurred.";
             if(asyncException.get(0) instanceof MailException) {
-                messageText = "Sending the password reset email to you has failed. Please try again later or contect the support in case this error persists.";
+                String supportText = "the support";
+                String supportEmail = env.getProperty(CdmConfigurationKeys.MAIL_ADDRESS_SUPPORT);
+                if(supportEmail != null) {
+                    supportText = "<a href=\"mailto:" + supportEmail +"\">" + supportEmail + "</a>";
+                }
+                messageText = "Sending the password reset email to you has failed. Please try again later or contact " + supportText + " in case this error persists.";
             }
             if(asyncException.get(0) instanceof EmailAddressNotFoundException) {
                 messageText = "There is no user accout for this email address.";
