@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.vaadin.spring.events.EventBus;
 
+import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.spring.annotation.SpringView;
@@ -98,6 +99,7 @@ public class AccountRegistrationViewBean extends AbstractView<AccountRegistratio
         password1Field.setRequired(true);
         password2Field.setRequired(true);
 
+        userName.addValidator(new RegexpValidator("[A-Za-z0-9_\\.\\-]{3,}", true, "User names may contain the characters \"A-Z a-z 0-9 _ . -\", and must be at least 3 characters long."));
         password1Field.addValidator(new PasswordsPolicyValidator());
         password2Field.addValidator(new PasswordsMatchValidator("The passwords are not identical.", password1Field, password2Field));
         password1Field.addValueChangeListener(e -> updateResetButtonState());
