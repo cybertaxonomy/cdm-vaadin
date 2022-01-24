@@ -55,7 +55,25 @@ In addition you will need the **Vaadin Eclipse Plugin** which can be installed v
 
 ![](images/Vaadin-Plugin-for-Eclipse.png)
 
-For working the the UI designs it is recommendet to install the Vaddin Designer for Vaadin 7.
+For working the the UI designs it is recommended to install the Vaddin Designer for Vaadin 7.
+
+For using the launch configurations in `./ide/eclipse/Jetty Launcher` you need to install the [eclipse jetty plugin](https://marketplace.eclipse.org/content/eclipse-jetty) (see also next section for details.
+
+#### JRE
+
+The latest **Spring Tool Suite** (see above) comes bungled with jdk 14. For running the cdm-vaadin project jdk 8 is required though:
+
+1. Install a java 8 JDK from Oracle or Open JDK.
+2. Configure this JDK for your eclipse workspace: Window > Preferences > Java > Installed JREs
+
+#### Eclipse launch configuration
+
+Details on important settings in the eclipse jetty plugin launch congigurations:
+
+![](images/Launch-config-options.png)
+
+![](images/Launch-config-dependencies.png)
+
 
 ### Project setup with maven
 
