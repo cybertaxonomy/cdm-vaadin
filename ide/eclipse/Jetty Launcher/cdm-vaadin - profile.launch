@@ -26,7 +26,7 @@
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.version" value="JETTY_EMBEDDED"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jmx.enabled" value="false"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jndi.enabled" value="false"/>
-    <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jsp.enabled" value="true"/>
+    <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jsp.enabled" value="false"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.launcher.excludeGenericIds" value=""/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.launcher.excludeLibs" value=""/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.launcher.globalGenericIds" value=""/>
