@@ -23,6 +23,7 @@
     <lucene.version>5.4.1</lucene.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <doclint>none</doclint>
   </properties>
   <prerequisites>
     <maven>3.6.3</maven>
@@ -226,7 +227,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.19.1</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <argLine>-Xms256m -Xmx512m</argLine>
         </configuration>
@@ -235,7 +236,7 @@
       <!-- directory is cleaned properly -->
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>2.4.1</version>
+        <version>3.1.0</version>
         <configuration>
           <filesets>
             <fileset>
@@ -247,9 +248,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.3.1</version>
         <configuration>
-          <additionalparam>${javadoc.opts}</additionalparam>
+          <doclint>${doclint}</doclint>
         </configuration>
       </plugin>
       <plugin>
@@ -354,7 +355,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.17</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <!-- Remove the skipTests line below to run TestBench tests -->
           <!-- <skipTests>true</skipTests> -->
