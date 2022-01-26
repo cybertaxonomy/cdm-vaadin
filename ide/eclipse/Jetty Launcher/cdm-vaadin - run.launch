@@ -22,7 +22,7 @@
     <booleanAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.embedded" value="true"/>
     <intAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.microVersion" value="25"/>
     <intAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.minorVersion" value="3"/>
-    <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.path" value="${jetty-runtime-9}"/>
+    <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.path" value="/home/andreas/opt/jetty/jetty-distribution-9.4.44.v20210927"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jetty.version" value="JETTY_EMBEDDED"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jmx.enabled" value="false"/>
     <stringAttribute key="net.sourceforge.eclipsejetty.launcher.jndi.enabled" value="false"/>
