@@ -373,7 +373,7 @@
       <plugin>
         <groupId>com.lazerycode.selenium</groupId>
         <artifactId>driver-binary-downloader-maven-plugin</artifactId>
-        <version>1.0.14</version>
+        <version>1.0.18</version>
         <!-- has a bug -->
         <configuration>
           <rootStandaloneServerDirectory>selenium/bin</rootStandaloneServerDirectory>
