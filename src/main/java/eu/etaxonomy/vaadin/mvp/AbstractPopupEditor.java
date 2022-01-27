@@ -88,9 +88,6 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
 
-    /**
-     *
-     */
     private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
 
     public static final Logger logger = Logger.getLogger(AbstractPopupEditor.class);
