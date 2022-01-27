@@ -44,16 +44,10 @@ public class EditorActionContext {
         return parentEntity;
     }
 
-    /**
-     * @return the parentView
-     */
     public AbstractView getParentView() {
         return parentView;
     }
 
-    /**
-     * @param targetField
-     */
     public void setTargetField(Field<?> targetField) {
         this.targetField = targetField;
     }

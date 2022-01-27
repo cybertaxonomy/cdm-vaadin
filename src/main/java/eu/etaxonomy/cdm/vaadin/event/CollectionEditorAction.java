@@ -23,27 +23,15 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public class CollectionEditorAction extends AbstractEditorAction<Collection> {
 
-    /**
-     * @param eventType
-     */
+
     public CollectionEditorAction(EditorActionType type) {
         super(type);
     }
 
-    /**
-     * @param action
-     * @param source
-     */
     public CollectionEditorAction(EditorActionType action, Button source, Field<Collection> target, AbstractView sourceView) {
         super(action, source, target, sourceView);
     }
 
-    /**
-     * @param action
-     * @param entityId
-     * @param source
-     * @param sourceView
-     */
     public CollectionEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<Collection> target, AbstractView sourceView) {
         super(action, entityUuid, source, target, sourceView);
     }
