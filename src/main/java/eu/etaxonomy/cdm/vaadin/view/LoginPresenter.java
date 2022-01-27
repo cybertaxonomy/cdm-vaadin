@@ -205,8 +205,8 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         } catch (InterruptedException e) {
             asyncTimeout = true;
         } catch (Exception e) {
-            // in case executing getUserNameOrEmail() causes an exeption faster
-            // than futureResult.addCallback( can be processed, the execption
+            // in case executing getUserNameOrEmail() causes an exception faster
+            // than futureResult.addCallback( can be processed, the exception
             // can not be caught asynchronously
             // so we are adding all these exceptions here
             asyncException.add(e);
@@ -268,6 +268,12 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             result = futureResult.get();
         } catch (InterruptedException e) {
             asyncTimeout = true;
+        } catch (Exception e) {
+            // in case executing emailAccountRegistrationRequest() causes an exception faster
+            // than futureResult.addCallback( can be processed, the exception
+            // can not be caught asynchronously
+            // so we are adding all these exceptions here
+            asyncException.add(e);
         }
         if(!asyncException.isEmpty()) {
             getView().getLoginDialog().getRegisterMessageLabel()
