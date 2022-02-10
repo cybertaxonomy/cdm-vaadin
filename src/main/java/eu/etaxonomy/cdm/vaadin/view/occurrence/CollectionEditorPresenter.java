@@ -40,7 +40,6 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")

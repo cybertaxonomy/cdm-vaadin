@@ -107,7 +107,7 @@ public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, Co
         nameField.setWidth(100, Unit.PERCENTAGE);
 
         row++;
-        superCollectionCombobox = new ToOneRelatedEntityCombobox<Collection>("In collection", Collection.class);
+        superCollectionCombobox = new ToOneRelatedEntityCombobox<>("In collection", Collection.class);
 
         addField(superCollectionCombobox, "superCollection", 0, row, 2, row);
 

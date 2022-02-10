@@ -26,7 +26,6 @@ import com.vaadin.ui.TextField;
  *
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 public class TextFieldNFix extends TextField {
 
