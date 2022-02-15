@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.Query;
@@ -45,6 +47,9 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
  * @since 16.11.2017
  */
 public class DistributionStatusQuery implements Query{
+
+    protected static final Logger logger = LoggerFactory.getLogger(DistributionStatusQuery.class);
+
     public static final String DTYPE_COLUMN = "DTYPE";
     public static final String ID_COLUMN = "ID";
     public static final String UUID_COLUMN = "UUID";
@@ -125,7 +130,7 @@ public class DistributionStatusQuery implements Query{
      */
     @Override
     public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
-        System.out.println("Save requested!");
+        logger.debug("Save requested!");
         for(Item item : modifiedItems) {
             final UUID taxonUuid = (UUID) item.getItemProperty(UUID_COLUMN).getValue();
             final Taxon taxon = (Taxon) CdmSpringContextHelper.getTaxonService().find(taxonUuid);

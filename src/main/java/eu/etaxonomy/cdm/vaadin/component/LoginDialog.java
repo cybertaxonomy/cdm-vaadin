@@ -27,9 +27,7 @@ public class LoginDialog extends LoginDialogDesign {
 
     public LoginDialog() {
         addSelectedTabChangeListener(e -> focusFirstElement(e.getTabSheet()));
-        getMessageLabel().setVisible(false);
-        getTab(1).setEnabled(false);
-        getTab(2).setEnabled(false);
+        getLoginMessageLabel().setVisible(false);
         focusFirstElement(this);
     }
 
@@ -43,7 +41,7 @@ public class LoginDialog extends LoginDialogDesign {
             getUserName().focus();
             break;
         case 1: // Register
-            getUserNameSuggestion().focus();
+            getEmail().focus();
             break;
         case 2: // Password Recovery
             getUserNameOrEmail().focus();
@@ -84,13 +82,6 @@ public class LoginDialog extends LoginDialogDesign {
     }
 
     /**
-     * @return the userNameSuggestion
-     */
-    public TextField getUserNameSuggestion() {
-        return userNameSuggestion;
-    }
-
-    /**
      * @return the email
      */
     public TextField getEmail() {
@@ -122,11 +113,19 @@ public class LoginDialog extends LoginDialogDesign {
      * @return the sendOnetimeLogin
      */
     public Button getSendOnetimeLogin() {
-        return sendOnetimeLogin;
+        return sendRecoveryEmail;
     }
 
-    public Label getMessageLabel() {
-        return message;
+    public Label getLoginMessageLabel() {
+        return messageLogin;
+    }
+
+    public Label getRegisterMessageLabel() {
+        return registerMessage;
+    }
+
+    public Label getMessageSendRecoveryEmailLabel() {
+        return messageRecoveryEmail;
     }
 
 

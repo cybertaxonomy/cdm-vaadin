@@ -41,6 +41,13 @@
     border-bottom-right-radius: 0;
 }
 // tiny size
-.v-select-tiny .v-select-select {   
+.v-select-tiny .v-select-select { 
     height: $v-unit-size--tiny
 }
+// causes problem with multiselect --> need to fix reset these:
+.v-widget .v-select-select { 
+    height: initial;
+}
+
+
+

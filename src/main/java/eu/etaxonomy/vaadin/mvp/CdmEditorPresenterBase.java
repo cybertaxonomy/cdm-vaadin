@@ -39,7 +39,6 @@ import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
 public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V>
     implements CachingPresenter {
@@ -293,59 +292,38 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     @Override
     protected void deleteBean(DTO bean){
         CDM cdmEntity = cdmEntity(bean);
-        EntityChangeEvent changeEvent = cdmStore.deleteBean(cdmEntity, (AbstractView) getView());
+        EntityChangeEvent<?> changeEvent = cdmStore.deleteBean(cdmEntity, (AbstractView) getView());
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }
     }
 
-
-    /**
-     * @param crud
-     */
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICdmEntityUuidCacher getCache() {
         return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addRootEntity(CdmBase entity) {
         rootEntities.add(entity);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<CdmBase> getRootEntities() {
         return rootEntities;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() throws Exception {
         super.destroy();
         disposeCache();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disposeCache() {
         cache.dispose();

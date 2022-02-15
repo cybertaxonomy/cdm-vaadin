@@ -10,6 +10,7 @@ package eu.etaxonomy.cdm.vaadin.util;
 
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.vaadin.viritin.fields.CaptionGenerator;
 
 import eu.etaxonomy.cdm.model.occurrence.Collection;
@@ -28,9 +29,11 @@ public final class CollectionCaptionGenerator implements CaptionGenerator<Collec
     @Override
     public String getCaption(Collection option) {
         String caption = Objects.toString(option.getCode(), "");
-        option.getTitleCache();
         if(option.getInstitute() != null){
             caption += (caption.isEmpty() ? "" : " - ") + option.getInstitute().getTitleCache();
+        }
+        if(StringUtils.isBlank(caption)) {
+            caption = option.getTitleCache();
         }
         return caption;
     }

@@ -1,3 +1,11 @@
+/**
+* Copyright (C) 2017 EDIT
+* European Distributed Institute of Taxonomy
+* http://www.e-taxonomy.eu
+*
+* The contents of this file are subject to the Mozilla Public License Version 1.1
+* See LICENSE.TXT at the top of this package for the full license terms.
+*/
 package eu.etaxonomy.vaadin.ui.navigation;
 
 import java.util.Arrays;
@@ -56,6 +64,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	protected ApplicationContext applicationContext;
 
 	protected EventBus.UIEventBus uiEventBus;
+
+	/**
+	 * if set the navigator will block all other views
+	 * and exclusively navigates to the error view to indicate that the
+	 * UI is disabled.
+	 */
+	private String uiDisabledErrorViewName = null;
 
     @Autowired
     protected void setViewEventBus(EventBus.UIEventBus uiEventBus){
@@ -125,6 +140,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 	}
 
 	public void navigateTo(String navigationState, boolean fireNavigationEvent) {
+	    if(getUiDisabledErrorView() != null) {
+	        super.navigateTo(getUiDisabledErrorView());
+	    }
 	    if(StringUtils.isEmpty(navigationState)){
             navigationState = defaultViewName;
         }
@@ -137,6 +155,9 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	@Override
 	public void navigateTo(String navigationState) {
+	    if(getUiDisabledErrorView() != null) {
+            super.navigateTo(getUiDisabledErrorView());
+        }
 	    if(StringUtils.isEmpty(navigationState)){
 	        navigationState = defaultViewName;
 	    }
@@ -293,5 +314,13 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         // which could be expensive
         // by navigating to the default view
         navigateTo(defaultViewName);
+    }
+
+    public String getUiDisabledErrorView() {
+        return uiDisabledErrorViewName;
+    }
+
+    public void setUiDisabledErrorView(String uiDisabledErrorViewName) {
+        this.uiDisabledErrorViewName = uiDisabledErrorViewName;
     }
 }

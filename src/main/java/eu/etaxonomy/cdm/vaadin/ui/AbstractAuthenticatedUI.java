@@ -31,6 +31,8 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
 	private boolean ignoreAuthentication = false;
 
+    private boolean enabled;
+
 	private final static Logger logger =
 			Logger.getLogger(AbstractAuthenticatedUI.class.getName());
 
@@ -43,8 +45,6 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 
         AuthenticationView av = new AuthenticationView();
         navigator.addView(AUTHENTICATION_VIEW, av);
-
-
 
         // Create and register the views
         CdmVaadinAuthentication cvAuthentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
@@ -69,5 +69,15 @@ public abstract class AbstractAuthenticatedUI extends CdmBaseUI {
 	public void setIgnoreAuthentication(boolean ignoreAuthentication) {
 	    this.ignoreAuthentication = ignoreAuthentication;
 	}
+
+	 @Override
+    public void setEnabled(boolean state) {
+	     this.enabled = state;
+	 }
+
+	 @Override
+    public boolean isEnabled() {
+	     return enabled;
+	 }
 
 }

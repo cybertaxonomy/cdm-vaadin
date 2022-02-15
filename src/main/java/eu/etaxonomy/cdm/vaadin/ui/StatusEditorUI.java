@@ -26,11 +26,13 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.StatusComposite;
  *
  */
 @Theme("edit")
-@SpringUI(path="editstatus")
+@SpringUI(path=StatusEditorUI.NAME)
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class StatusEditorUI extends AbstractAuthenticatedUI {
 
     Navigator navigator;
+
+    public static final String NAME = "status";
 
     private static final String FIRST_VIEW = "editstatus";
 

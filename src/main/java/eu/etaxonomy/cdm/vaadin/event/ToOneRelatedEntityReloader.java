@@ -42,9 +42,6 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
         this.cachingPresenter = entityCache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void valueChange(ValueChangeEvent event) {
 

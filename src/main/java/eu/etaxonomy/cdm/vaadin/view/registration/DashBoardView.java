@@ -22,7 +22,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
- *
  */
 @SpringView(name=DashBoardView.NAME)
 public class DashBoardView extends DashBoardDesign implements View {

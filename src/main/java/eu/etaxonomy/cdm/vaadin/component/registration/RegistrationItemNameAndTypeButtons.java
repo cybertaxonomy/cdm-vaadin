@@ -9,6 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -149,13 +150,14 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
                 String labelText = "<span class=\"field-unit-label\">" + baseEntityRef.getLabel() + "</span>"; // renders the FieldUnit label
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
-                    labelText += " <strong>" + typeStatus.getLabel() +  (typeDesignationWorkingSet.getTypeDesignations().size() > 1 ? "s":"" ) + "</strong>: ";
+                    Collection<TypeDesignationDTO> tdPerStatus = typeDesignationWorkingSet.get(typeStatus);
+                    labelText += " <strong>" + typeStatus.getLabel() +  (tdPerStatus.size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
-                    for(TypeDesignationDTO<?> dtDTO : typeDesignationWorkingSet.getTypeDesignations()) {
-                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(dtDTO.getTaggedText(), EnumSet.of(TagEnum.reference, TagEnum.separator)); // TagEnum.separator removes "designated By"
+                    for(TypeDesignationDTO<?> dtDTO : tdPerStatus) {
+                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(
+                                TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\\s+[bB]y"));
                         isFirst = false;
                     }
-
                 }
 
                 Label label = new Label(labelText, ContentMode.HTML);

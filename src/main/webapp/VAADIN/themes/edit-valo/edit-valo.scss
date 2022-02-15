@@ -409,7 +409,7 @@ $status-ready-color: adjust-color($plain-red, $hue: 180deg);
     
    @include registration-status-colors();
    @include registration-status-bg-colors(); // TODO still needed?
-   @include registration-status-colors(.v-select-select);
+   @include registration-status-colors('.v-select-select');
    
     // ----------------------------------------------- //
     

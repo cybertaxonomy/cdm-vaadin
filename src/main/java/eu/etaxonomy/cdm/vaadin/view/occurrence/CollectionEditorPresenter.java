@@ -40,7 +40,6 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -62,14 +61,10 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
        return defaultBeanInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Collection loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
-
                 "$",
                 "institute.$",
                 "superCollection.$",
@@ -85,9 +80,6 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
         return bean;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
@@ -96,29 +88,19 @@ public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collec
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(Collection bean) {
         if(crud != null){
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, crud, null);
         }
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IService<Collection> getService() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();

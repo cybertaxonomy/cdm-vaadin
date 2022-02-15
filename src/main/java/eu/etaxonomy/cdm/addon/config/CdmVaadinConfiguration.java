@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.addon.config;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -63,13 +62,12 @@ import eu.etaxonomy.cdm.vaadin.ui.ConceptRelationshipUI;
 import eu.etaxonomy.cdm.vaadin.ui.DistributionStatusUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.StatusEditorUI;
+import eu.etaxonomy.cdm.vaadin.ui.UserAccountSelfManagementUI;
 import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 
 /**
- *
  * @author a.kohlbecker
  * @since Feb 8, 2017
- *
  */
 @Configuration
 @ComponentScan(basePackages={
@@ -147,36 +145,56 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @WebServlet(name="CdmVaadinServlet", value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class CdmVaadinServlet extends SpringVaadinServlet {
 
-        private static final long serialVersionUID = -2615042297393028775L;
+        private static final long serialVersionUID = 1L;
 
-        /**
-         *
-        @SuppressWarnings("serial")
+        /*
         @Override
         protected void servletInitialized() throws ServletException {
-            logger.debug("SpringVaadinServlet initialized");
 
-        }
+            super.servletInitialized();
+
             getService().addSessionInitListener(new SessionInitListener() {
+
+                private static final long serialVersionUID = 1L;
 
                 @Override
                 public void sessionInit(SessionInitEvent sessionInitEvent) throws ServiceException {
                     VaadinSession session = sessionInitEvent.getSession();
                     session.setErrorHandler(new DefaultErrorHandler(){
 
+                        private static final long serialVersionUID = 1L;
+
                         @Override
                         public void error(ErrorEvent errorEvent) {
-                            // ...
+                            UIDisabledException uiDisbledException = findUIDisabledException(errorEvent.getThrowable());
+                            if(uiDisbledException != null) {
+                                logger.error("################## > UIDisabledException");
+                                //throw uiDisbledException ;
+                                doDefault(errorEvent);
+                            } else {
+                                doDefault(errorEvent);
+                            }
+                        }
+
+                        private UIDisabledException findUIDisabledException(Throwable throwable) {
+                            if(throwable instanceof UIDisabledException) {
+                                return (UIDisabledException)throwable;
+                            } else {
+                                if(throwable.getCause() == null) {
+                                    return null;
+                                } else {
+                                    return findUIDisabledException(throwable.getCause());
+                                }
+                            }
                         }
 
                     });
-                    ).getServiceRegistry().getService
 
                 }});
 
+                logger.debug("SpringVaadinServlet initialized");
         }
-         */
-
+        */
     }
 
     public CdmVaadinConfiguration() {
@@ -186,20 +204,31 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     @Bean
     @UIScope
     public ConceptRelationshipUI conceptRelationshipUI() {
-        if(isUIEnabled(ConceptRelationshipUI.class)){
-            return new ConceptRelationshipUI();
-        }
-        return null;
+        return applyEnableConfig(new ConceptRelationshipUI());
     }
 
     @Bean
     @UIScope
     public RegistrationUI registrationUI() {
-        if(isUIEnabled(RegistrationUI.class)){
-            registerRegistrationUiHibernateEventListeners();
-            return new RegistrationUI();
-        }
-        return null;
+        return applyEnableConfig(new RegistrationUI());
+    }
+
+    @Bean
+    @UIScope
+    public UserAccountSelfManagementUI userAccountSelfManagementUI() {
+        return applyEnableConfig(new UserAccountSelfManagementUI());
+    }
+
+    @Bean
+    @UIScope
+    public DistributionStatusUI distributionStatusUI() {
+        return applyEnableConfig( new DistributionStatusUI());
+    }
+
+    @Bean
+    @UIScope
+    public StatusEditorUI statusEditorUI() {
+        return applyEnableConfig(new StatusEditorUI());
     }
 
     /**
@@ -250,27 +279,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
         return minter;
     }
 
-    @Bean
-    @UIScope
-    public DistributionStatusUI distributionStatusUI() {
-        if(isUIEnabled(DistributionStatusUI.class)){
-            return new DistributionStatusUI();
-        }
-        return null;
-    }
-
-    @Bean
-    @UIScope
-    public StatusEditorUI statusEditorUI() {
-        if(isUIEnabled(StatusEditorUI.class)){
-            return new StatusEditorUI();
-        }
-        return null;
-    }
-
     static final String PROPERTIES_FILE_NAME = "vaadin-apps";
-
-    private Properties appProps = null;
 
     private ApplicationContext applicationContext;
 
@@ -278,28 +287,23 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     //@formatter:off
     private static final String APP_FILE_CONTENT=
-            "########################################################\n"+
-            "#                                                       \n"+
-            "# Vaadin application specific configurations            \n"+
-            "#                                                       \n"+
-            "########################################################\n"+
-            "                                                        \n"+
-            "# Enablement of vaadin uis.                             \n"+
-            "#                                                       \n"+
-            "# Multiple uis can be defined as comma separated list.  \n"+
-            "# Whitespace before and after the comma will be ignored.\n"+
-            "# Valid values are the path properties of the @SpringUI \n"+
-            "# annotation which is used for UI classes.              \n"+
-            "cdm-vaadin.ui.activated=concept,distribution,editstatus \n";
+            "################################################################\n"+
+            "#                                                               \n"+
+            "# Vaadin application specific configurations                    \n"+
+            "#                                                               \n"+
+            "################################################################\n"+
+            "                                                                \n"+
+            "# Enablement of vaadin uis.                                     \n"+
+            "#                                                               \n"+
+            "# Multiple uis can be defined as comma separated list.          \n"+
+            "# Whitespace before and after the comma will be ignored.        \n"+
+            "# Valid values are the path properties of the @SpringUI         \n"+
+            "# annotation which is used for UI classes.                      \n"+
+            "cdm-vaadin.ui.activated=account,concept,distribution,editstatus \n";
     //@formatter:on
 
     /**
      * Checks if the ui class supplied is activated by listing it in the properties by its {@link SpringUI#path()} value.
-     *
-     * TODO see https://dev.e-taxonomy.eu/redmine/issues/7139 (consider using spring profiles to enable vaadin UI contexts)
-     *
-     * @param type
-     * @return
      */
     private boolean isUIEnabled(Class<? extends UI>uiClass) {
 
@@ -327,11 +331,11 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     }
 
+    private <T extends UI> T applyEnableConfig(T ui) {
+        ui.setEnabled(isUIEnabled(ui.getClass()));
+        return ui;
+    }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
