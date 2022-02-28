@@ -32,7 +32,7 @@
     <!-- the cdm internal repository -->
     <repository>
       <id>EditRepository</id>
-      <url>https://cybertaxonomy.eu/mavenrepo/</url>
+      <url>https://cybertaxonomy.org/mavenrepo/</url>
     </repository>
     <!-- current spring source repositories -->
     <repository>
@@ -141,7 +141,7 @@
       <uniqueVersion>false</uniqueVersion>
       <id>cybertaxonomy.eu</id>
       <name>Edit Maven Repository</name>
-      <url>scpexe://cybertaxonomy.eu/var/www/wp5.e-taxonomy.eu/mavenrepo/</url>
+      <url>scpexe://cybertaxonomy.org/var/www/wp5.e-taxonomy.eu/mavenrepo/</url>
       <layout>default</layout>
     </repository>
   </distributionManagement>
