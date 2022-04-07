@@ -50,21 +50,21 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
 
     @Override
-    public Registration createRegistration(TaxonName taxonName, List<Registration> preparedBlockingResitrations) {
+    public Registration createRegistration(TaxonName taxonName, List<Registration> preparedBlockingRegistrations) {
 
         if(taxonName.isPersited()){
             getRepo().getSession().refresh(taxonName);
         }
 
         Registration reg = getRepo().getRegistrationService().createRegistrationForName(taxonName.getUuid());
-        if(!preparedBlockingResitrations.isEmpty()){
-            for(Registration blockingReg : preparedBlockingResitrations){
+        if(!preparedBlockingRegistrations.isEmpty()){
+            for(Registration blockingReg : preparedBlockingRegistrations){
                 blockingReg = getRepo().getRegistrationService().load(blockingReg.getUuid());
                 reg.getBlockedBy().add(blockingReg);
             }
             // save again
             getRepo().getRegistrationService().saveOrUpdate(reg);
-            preparedBlockingResitrations.clear();
+            preparedBlockingRegistrations.clear();
         }
         return reg;
     }
