@@ -277,7 +277,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
         if(!asyncException.isEmpty()) {
             getView().getLoginDialog().getRegisterMessageLabel()
-            .setValue("Sending the account resitration email to you has failed. Please try again later or contect the support in case this error persists.");
+            .setValue("Sending the account registration email to you has failed. Please try again later or contect the support in case this error persists.");
             getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
         } else {
             if(!asyncTimeout && result) {
