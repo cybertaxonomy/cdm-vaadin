@@ -43,6 +43,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonBase;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
+import eu.etaxonomy.cdm.persistence.dao.common.IPreferenceDao;
 import eu.etaxonomy.cdm.persistence.dao.hibernate.taxonGraph.AbstractHibernateTaxonGraphProcessor;
 import eu.etaxonomy.cdm.persistence.dao.taxonGraph.TaxonGraphException;
 import eu.etaxonomy.cdm.persistence.permission.CdmAuthority;
@@ -221,8 +222,9 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         String taxonGraphCreate = System.getProperty(TAXON_GRAPH_CREATE);
 
         if(taxonGraphCreate != null){
-            AbstractHibernateTaxonGraphProcessor processor = new AbstractHibernateTaxonGraphProcessor() {
+            IPreferenceDao prefDao = (IPreferenceDao) repo.getBean("preferenceDao");
 
+            AbstractHibernateTaxonGraphProcessor processor = new AbstractHibernateTaxonGraphProcessor(prefDao) {
                 @Override
                 public Session getSession() {
                     return repo.getSession();

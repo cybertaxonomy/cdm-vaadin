@@ -54,6 +54,7 @@ import eu.etaxonomy.cdm.api.service.taxonGraph.TaxonGraphBeforeTransactionComple
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.config.CdmHibernateListener;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
+import eu.etaxonomy.cdm.persistence.dao.common.IPreferenceDao;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
@@ -111,6 +112,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
     @Autowired
     private ITaxonGraphHibernateListener taxonGraphHibernateListener;
+
+    @Autowired
+    private IPreferenceDao preferenceDao;
+
 
     @Autowired
     private void  setTermCacher(CdmCacherBase termCacher){
@@ -244,7 +249,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
 
             try {
-                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin(runAsAuthenticationProvider)}, new Class[]{IRunAs.class});
+                taxonGraphHibernateListener.registerProcessClass(
+                        TaxonGraphBeforeTransactionCompleteProcess.class,
+                        new Object[]{new RunAsAdmin(runAsAuthenticationProvider), preferenceDao},
+                        new Class[]{IRunAs.class, IPreferenceDao.class});
             } catch (NoSuchMethodException | SecurityException e) {
                 // re-throw as RuntimeException as the context can not be created correctly
                 throw new RuntimeException(e);
