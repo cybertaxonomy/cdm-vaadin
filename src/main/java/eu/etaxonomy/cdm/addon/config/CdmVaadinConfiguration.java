@@ -97,7 +97,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
     @Autowired
-    Environment env;
+    private Environment env;
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -120,7 +120,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private boolean registrationUiHibernateEventListenersDone = false;
 
 
-    ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
+    private ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
 
     /*
      * NOTES:

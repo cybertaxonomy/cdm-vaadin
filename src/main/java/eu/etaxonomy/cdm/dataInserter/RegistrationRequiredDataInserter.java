@@ -89,7 +89,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
 //    private ExtensionType extensionTypeIAPTRegData;
 
-    Map<String, Institution> instituteMap = new HashMap<>();
+    private Map<String, Institution> instituteMap = new HashMap<>();
 
     public static boolean commandsExecuted = false;
 
@@ -103,18 +103,13 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-
         if(hasRun){
             return;
         }
-
         runAsAuthentication(Role.ROLE_ADMIN);
-
         insertRequiredData();
         executeSuppliedCommands();
-
         restoreAuthentication();
-
         hasRun = true;
     }
 
@@ -214,9 +209,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         return ga;
     }
 
-    /**
-     *
-     */
     private void executeSuppliedCommands() {
 
         if(commandsExecuted){
