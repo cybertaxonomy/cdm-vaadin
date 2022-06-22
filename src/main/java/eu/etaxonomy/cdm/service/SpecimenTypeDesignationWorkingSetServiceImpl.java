@@ -139,13 +139,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
             VersionableEntity baseEntity = bean.getBaseEntity();
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
-                    new TypedEntityReference(baseEntity.getClass(), baseEntity.getUuid(), baseEntity.toString())
+                    new TypedEntityReference<>(baseEntity.getClass(), baseEntity.getUuid(), baseEntity.toString())
                     );
-            for(TypeDesignationBase td : typeDesignations){
-                DerivationEvent de = DerivationEvent.NewInstance();//
+            for(TypeDesignationBase<?> td : typeDesignations){
+                DerivationEvent de = DerivationEvent.NewInstance(DerivationEventType.GATHERING_IN_SITU());
                 de.addOriginal(fieldUnit);
                 de.addDerivative(((SpecimenTypeDesignation)td).getTypeSpecimen());
-                de.setType(DerivationEventType.GATHERING_IN_SITU());
             }
 
             repo.getRegistrationService().saveOrUpdate(reg);
