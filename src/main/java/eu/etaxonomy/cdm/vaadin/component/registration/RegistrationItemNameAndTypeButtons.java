@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -116,8 +116,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
-
+        Map<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
 
         if(typeDesignationworkingSets != null){
             // order the typeDesignationworkingSet keys so that holotypes come first, etc
