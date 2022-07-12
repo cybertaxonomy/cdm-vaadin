@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 public class RegistrationWorkingSetTest {
 
     @Test
-    public void test_2_names() throws RegistrationValidationException {
+    public void test_2_names() throws TypeDesignationSetException {
 
         Reference article = ReferenceFactory.newArticle();
         article.setTitleCache("Article", true);
@@ -65,7 +65,7 @@ public class RegistrationWorkingSetTest {
 
 
     @Test
-    public void test_name_and_type() throws RegistrationValidationException {
+    public void test_name_and_type() throws TypeDesignationSetException {
 
         Reference article = ReferenceFactory.newArticle();
         article.setTitleCache("Article", true);

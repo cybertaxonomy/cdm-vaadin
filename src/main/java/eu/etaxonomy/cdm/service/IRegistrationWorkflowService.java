@@ -14,7 +14,7 @@ import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 
@@ -34,7 +34,7 @@ public interface IRegistrationWorkflowService {
     Registration createRegistration(TaxonName taxonName, List<Registration> relatedBlockingRegistrations);
 
     @Transactional
-    boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws RegistrationValidationException;
+    boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws TypeDesignationSetException;
 
     @Transactional(readOnly=true)
     Registration reloadRegistration(Registration registration);

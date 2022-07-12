@@ -40,7 +40,7 @@ import com.vaadin.ui.Window;
 import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.util.UserHelper;
@@ -186,7 +186,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
                     // only add if the regDtoUnpersisted has not been persisted meanwhile
                     try {
                         workingset.add(regDtoUnpersisted);
-                    } catch (RegistrationValidationException e) {
+                    } catch (TypeDesignationSetException e) {
                         // would never happen here //
                     }
                 }
@@ -263,7 +263,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
         try {
             workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid, true);
-        } catch (RegistrationValidationException error) {
+        } catch (TypeDesignationSetException error) {
             logger.error(error);
             showErrorDialog("Validation Error", error.getMessage());
         }
@@ -437,11 +437,11 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * See also {@link #onTaxonNameEditorActionAdd(TaxonNameEditorAction)}).
      *
      * @param event
-     * @throws RegistrationValidationException
+     * @throws TypeDesignationSetException
      *      passes on the Exception which may come from onRegistrationWorkflowEventActionStart()
      */
     @EventBusListenerMethod
-    public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws RegistrationValidationException {
+    public void onDoneWithTaxonnameEditor(DoneWithPopupEvent event) throws TypeDesignationSetException {
 
         if(!isFromOwnView(event)){
             return;
@@ -514,10 +514,10 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      * Creates a new Registration for an exiting (previously published) name.
      *
      * @param event
-     * @throws RegistrationValidationException
+     * @throws TypeDesignationSetException
      */
     @EventBusListenerMethod
-    public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws RegistrationValidationException {
+    public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws TypeDesignationSetException {
 
         if(!event.isStart()){
             return;
@@ -657,7 +657,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
      *
      *
      * @param event
-     * @throws RegistrationValidationException
+     * @throws TypeDesignationSetException
      */
     @EventBusListenerMethod
     public void onDoneWithTypeDesignationEditor(DoneWithPopupEvent event) {

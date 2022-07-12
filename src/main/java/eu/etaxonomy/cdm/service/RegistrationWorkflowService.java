@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.exception.RegistrationValidationException;
+import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -71,7 +71,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
 
     @Override
-    public boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws RegistrationValidationException {
+    public boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws TypeDesignationSetException {
 
         boolean doReloadWorkingSet = false;
         Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
