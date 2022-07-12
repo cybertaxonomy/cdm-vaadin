@@ -43,7 +43,7 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.TypeDesignationStatusBaseComparator;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.RegistrationTypeDesignationStatusComparator;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -122,7 +122,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             // order the typeDesignationSet keys so that holotypes come first, etc
             List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
             for(VersionableEntity baseEntityRef : typeDesignationSets.keySet()) {
-                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationSets.get(baseEntityRef).highestTypeStatus(new TypeDesignationStatusBaseComparator())));
+                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationSets.get(baseEntityRef).highestTypeStatus(new RegistrationTypeDesignationStatusComparator())));
             }
 
             Collections.sort(baseRefsByHighestStatus);
@@ -296,7 +296,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
         public VersionableEntity typedEntity;
         public TypeDesignationStatusBase<?> status;
-        private TypeDesignationStatusBaseComparator comparator = new TypeDesignationStatusBaseComparator();
+        private RegistrationTypeDesignationStatusComparator comparator = new RegistrationTypeDesignationStatusComparator();
 
         public TypedEntityRefWithStatus(VersionableEntity typedEntity,
                 TypeDesignationStatusBase<?> status) {

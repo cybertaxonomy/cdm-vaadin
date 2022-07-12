@@ -98,7 +98,7 @@ public class RegistrationTermLists {
         return uuids;
     }
 
-    public static class TypeDesignationStatusBaseComparator implements Comparator<TypeDesignationStatusBase<?>> {
+    public static class RegistrationTypeDesignationStatusComparator implements Comparator<TypeDesignationStatusBase<?>> {
 
         @Override
         public int compare(TypeDesignationStatusBase<?> o1, TypeDesignationStatusBase<?> o2) {
