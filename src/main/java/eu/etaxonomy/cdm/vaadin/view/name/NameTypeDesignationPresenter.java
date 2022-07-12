@@ -75,7 +75,7 @@ public class NameTypeDesignationPresenter
 
     private static final long serialVersionUID = 896305051895903033L;
 
-    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingsetEditorPresenter.class);
+    public static final Logger logger = Logger.getLogger(NameTypeDesignationPresenter.class);
 
     private HashSet<TaxonName> typifiedNamesAsLoaded;
 
@@ -109,14 +109,14 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadBeanById(Object identifier) {
         NameTypeDesignation bean;
 
-        NameTypeDesignationWorkingsetIds idset = (NameTypeDesignationWorkingsetIds)identifier;
+        NameTypeDesignationSetIds idset = (NameTypeDesignationSetIds)identifier;
 
         if(idset.isForNewTypeDesignation()) {
             Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
             try {
                 setPublishedUnit(NamedSource.NewPrimarySourceInstance(reference, null));
             } catch(Exception e) {
-                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
+                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationSetIds as publishedUnitUuid ", e);
             }
             EntityInitStrategy initstrategy = RegistrationWorkingSetService.NAME_INIT_STRATEGY
                     .clone()
@@ -127,7 +127,7 @@ public class NameTypeDesignationPresenter
             bean = super.loadBeanById(idset.getBaseEntity().getUuid());
             // TODO prevent from errors due to inconsistent data, two options:
             // 1. handle error condition here
-            // 2. always set typifiedNameUuid in NameTypeDesignationWorkingsetIds
+            // 2. always set typifiedNameUuid in NameTypeDesignationSetIds
             typifiedNameInContext = bean.getTypifiedNames().iterator().next();
             try {
                 setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());

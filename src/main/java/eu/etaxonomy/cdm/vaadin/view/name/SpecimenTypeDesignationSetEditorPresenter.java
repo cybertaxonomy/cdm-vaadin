@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -61,7 +60,7 @@ import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
-import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationWorkingSetService;
+import eu.etaxonomy.cdm.service.ISpecimenTypeDesignationSetService;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.service.initstrategies.AgentBaseInit;
 import eu.etaxonomy.cdm.vaadin.component.CollectionRowItemCollection;
@@ -71,7 +70,7 @@ import eu.etaxonomy.cdm.vaadin.event.EntityChangeEventFilter;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
-import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.util.CollectionCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
@@ -85,7 +84,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 /**
- * SpecimenTypeDesignationWorkingsetPopupEditorView implementation must override the showInEditor() method,
+ * SpecimenTypeDesignationSetPopupEditorView implementation must override the showInEditor() method,
  * see {@link #prepareAsFieldGroupDataSource()} for details.
  *
  * @author a.kohlbecker
@@ -93,29 +92,28 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
  */
 @SpringComponent
 @Scope("prototype")
-public class SpecimenTypeDesignationWorkingsetEditorPresenter
-    extends AbstractEditorPresenter<SpecimenTypeDesignationWorkingSetDTO , SpecimenTypeDesignationWorkingsetPopupEditorView>
-    implements CachingPresenter, NomenclaturalActContext, DisposableBean {
+public class SpecimenTypeDesignationSetEditorPresenter
+    extends AbstractEditorPresenter<SpecimenTypeDesignationSetDTO,SpecimenTypeDesignationSetPopupEditorView>
+    implements CachingPresenter, NomenclaturalActContext {
 
     private static final long serialVersionUID = 4255636253714476918L;
 
-    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingsetEditorPresenter.class);
+    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationSetEditorPresenter.class);
 
     private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
-
 
     /**
      * This object for this field will either be injected by the {@link PopupEditorFactory} or by a Spring
      * {@link BeanFactory}
      */
     @Autowired
-    private ISpecimenTypeDesignationWorkingSetService specimenTypeDesignationWorkingSetService;
+    private ISpecimenTypeDesignationSetService specimenTypeDesignationSetService;
 
     @Autowired
-    protected CdmFilterablePagingProviderFactory pagingProviderFactory;
+    private CdmFilterablePagingProviderFactory pagingProviderFactory;
 
     @Autowired
-    protected CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
+    private CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
 
     /**
      * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
@@ -125,11 +123,11 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     private ICdmEntityUuidCacher cache;
 
-    SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto;
+    private SpecimenTypeDesignationSetDTO<Registration> workingSetDto;
 
-    CdmFilterablePagingProvider<Reference, Reference> designationReferencePagingProvider;
+    private CdmFilterablePagingProvider<Reference, Reference> designationReferencePagingProvider;
 
-    CdmFilterablePagingProvider<Reference, Reference> mediaReferencePagingProvider;
+    private CdmFilterablePagingProvider<Reference, Reference> mediaReferencePagingProvider;
 
     /**
      * The unit of publication in which the type designation has been published.
@@ -157,34 +155,34 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * loading the Registration specified by the <code>RegistrationAndWorkingsetId.registrationId</code> and in
      * a second step to find the workingset by the <code>registrationAndWorkingsetId.workingsetId</code>.
      * <p>
-     * The <code>identifier</code> must be of the type {@link TypeDesignationWorkingsetIds} whereas the
+     * The <code>identifier</code> must be of the type {@link TypeDesignationSetIds} whereas the
      * field <code>registrationId</code> must be present.
      * The field <code>workingsetId</code> however can be null.
      * I this case a new workingset with a new {@link FieldUnit} as
      * base entity is being created.
      *
-     * @param identifier a {@link TypeDesignationWorkingsetIds}
+     * @param identifier a {@link TypeDesignationSetIds}
      */
     @Override
-    protected SpecimenTypeDesignationWorkingSetDTO<Registration> loadBeanById(Object identifier) {
+    protected SpecimenTypeDesignationSetDTO<Registration> loadBeanById(Object identifier) {
 
         cache = new CdmTransientEntityAndUuidCacher(this);
         if(identifier != null){
 
-            SpecimenTypeDesignationWorkingsetIds idset = (SpecimenTypeDesignationWorkingsetIds)identifier;
+            SpecimenTypeDesignationSetIds idset = (SpecimenTypeDesignationSetIds)identifier;
 
             if(idset.baseEntity != null){
                 // load existing workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntity);
+                workingSetDto = specimenTypeDesignationSetService.load(idset.registrationUuid, idset.baseEntity);
                 if(workingSetDto.getFieldUnit() == null){
-                    workingSetDto = specimenTypeDesignationWorkingSetService.fixMissingFieldUnit(workingSetDto);
+                    workingSetDto = specimenTypeDesignationSetService.fixMissingFieldUnit(workingSetDto);
                         // FIXME open Dialog to warn user about adding an empty fieldUnit to the typeDesignations
                         //       This method must go again into the presenter !!!!
                         logger.info("Basing all typeDesignations on a new fieldUnit");
                 }
             } else {
                 // create a new workingset, for a new fieldunit which is the base for the workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.create(idset.getRegistrationUUID(), idset.getTypifiedNameUuid());
+                workingSetDto = specimenTypeDesignationSetService.create(idset.getRegistrationUUID(), idset.getTypifiedNameUuid());
                 cache.load(workingSetDto.getTypifiedName());
                 rootEntities.add(workingSetDto.getTypifiedName());
             }
@@ -299,7 +297,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.collection.getSelect().setCaptionGenerator(new CollectionCaptionGenerator());
                 row.collection.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(row.collection.getSelect(),
-                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                        SpecimenTypeDesignationSetEditorPresenter.this));
                 row.collection.addClickListenerAddEntity(e -> doCollectionEditorAdd(row));
                 row.collection.addClickListenerEditEntity(e -> {
                         if(row.collection.getValue() != null){
@@ -314,7 +312,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.designationReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.designationReference.getSelect()));
                 row.designationReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.designationReference.getSelect(),
-                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                        SpecimenTypeDesignationSetEditorPresenter.this));
                 row.designationReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row.designationReference));
                 row.designationReference.addClickListenerEditEntity(e -> {
                     if(row.designationReference.getValue() != null){
@@ -331,7 +329,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
                         );
                 row.mediaSpecimenReference.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(LabelType.BIBLIOGRAPHIC, row.mediaSpecimenReference.getSelect()));
                 row.mediaSpecimenReference.getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Reference>(row.mediaSpecimenReference.getSelect(),
-                        SpecimenTypeDesignationWorkingsetEditorPresenter.this));
+                        SpecimenTypeDesignationSetEditorPresenter.this));
                 row.mediaSpecimenReference.addClickListenerAddEntity(e -> doReferenceEditorAdd(row.mediaSpecimenReference));
                 row.mediaSpecimenReference.addClickListenerEditEntity(e -> {
                     if(row.mediaSpecimenReference.getValue() != null){
@@ -368,7 +366,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
      * {@inheritDoc}
      */
     @Override
-    protected void saveBean(SpecimenTypeDesignationWorkingSetDTO dto) {
+    protected void saveBean(SpecimenTypeDesignationSetDTO dto) {
 
         if(crud != null){
             UserHelperAccess.userHelper().createAuthorityForCurrentUser(dto.getFieldUnit(), crud, null);
@@ -383,15 +381,15 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
             }
         }
 
-        specimenTypeDesignationWorkingSetService.save(dto);
+        specimenTypeDesignationSetService.save(dto);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void deleteBean(SpecimenTypeDesignationWorkingSetDTO bean) {
-        specimenTypeDesignationWorkingSetService.delete(bean, true);
+    protected void deleteBean(SpecimenTypeDesignationSetDTO bean) {
+        specimenTypeDesignationSetService.delete(bean, true);
     }
 
     /**
@@ -405,7 +403,7 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
     /**
      * In this method the SpecimenTypeDesignation is dissociated from the Registration.
-     * The actual deletion of the SpecimenTypeDesignation and DerivedUnit will take place in {@link #saveBean(SpecimenTypeDesignationWorkingSetDTO)}
+     * The actual deletion of the SpecimenTypeDesignation and DerivedUnit will take place in {@link #saveBean(SpecimenTypeDesignationSetDTO)}
      *
      * TODO once https://dev.e-taxonomy.eu/redmine/issues/7077 is fixed dissociating from the Registration could be removed here
      *

@@ -14,8 +14,8 @@ import java.util.UUID;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Field;
 
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
@@ -25,11 +25,10 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
  */
-public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<TypeDesignationWorkingSet> {
+public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDesignationSet> {
 
-    private TypeDesignationWorkingSetType workingSetType;
+    private TypeDesignationSetType workingSetType;
 
     private UUID registrationUuid;
 
@@ -40,10 +39,10 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
     /**
      * Constructor for {@link EditorActionType#EDIT EDIT} actions
      */
-    public TypeDesignationWorkingsetEditorAction(VersionableEntity baseEntity,
-            TypeDesignationWorkingSetType workingSetType,
+    public TypeDesignationSetEditorAction(VersionableEntity baseEntity,
+            TypeDesignationSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
+            Button source, Field<TypeDesignationSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
 
         super(EditorActionType.EDIT, null, source, target, sourceView);
         this.baseEntity = baseEntity;
@@ -61,9 +60,9 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
      * @param source
      * @param sourceView
      */
-    public TypeDesignationWorkingsetEditorAction(TypeDesignationWorkingSetType workingSetType,
+    public TypeDesignationSetEditorAction(TypeDesignationSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView) {
+            Button source, Field<TypeDesignationSet> target, AbstractView sourceView) {
 
         super(EditorActionType.ADD, null, source, target, sourceView);
         this.workingSetType = workingSetType;
@@ -73,7 +72,7 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
         this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationUuid), sourceView));
     }
 
-    public TypeDesignationWorkingSetType getWorkingSetType() {
+    public TypeDesignationSetType getWorkingSetType() {
         return workingSetType;
     }
 
@@ -81,7 +80,7 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
         return registrationUuid;
     }
 
-    public UUID getTypeDesignationWorkingsetUuid(){
+    public UUID getTypeDesignationSetUuid(){
         return getEntityUuid();
     }
 

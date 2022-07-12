@@ -16,9 +16,9 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
  * @author a.kohlbecker
  * @since Jan 20, 2021
  */
-public class SpecimenTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetIds<FieldUnit> {
+public class SpecimenTypeDesignationSetIds extends TypeDesignationSetIds<FieldUnit> {
 
-    public SpecimenTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid,
+    public SpecimenTypeDesignationSetIds(UUID publishedUnitUuid, UUID registrationUuid,
             FieldUnit baseEntity, UUID typifiedNameUuid) {
 
         super(publishedUnitUuid, registrationUuid, baseEntity, typifiedNameUuid);

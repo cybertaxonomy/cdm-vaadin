@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 
-public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEntity> {
+public abstract class TypeDesignationSetIds<BASE_T extends VersionableEntity> {
 
     protected UUID registrationUuid;
     protected BASE_T baseEntity;
@@ -23,7 +23,7 @@ public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEnt
      */
     protected UUID publishedUnitUuid;
 
-    protected TypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid, BASE_T baseEntity, UUID typifiedNameUuid) {
+    protected TypeDesignationSetIds(UUID publishedUnitUuid, UUID registrationUuid, BASE_T baseEntity, UUID typifiedNameUuid) {
         this.publishedUnitUuid = publishedUnitUuid;
         this.registrationUuid = registrationUuid;
         this.baseEntity = baseEntity;

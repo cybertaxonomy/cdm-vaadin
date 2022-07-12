@@ -24,8 +24,9 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Jun 13, 2017
  *
  */
-public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends ApplicationView<SpecimenTypeDesignationWorkingsetEditorPresenter>,
-    AnnotationsEditor {
+public interface SpecimenTypeDesignationSetPopupEditorView
+        extends ApplicationView<SpecimenTypeDesignationSetEditorPresenter>,
+                AnnotationsEditor {
 
     public NativeSelect getCountrySelectField();
 
@@ -36,7 +37,7 @@ public interface SpecimenTypeDesignationWorkingsetPopupEditorView extends Applic
     /**
      *  Disable the delete button if there is only one typeDesignation
      *  if this typeDesignation is deleted the fieldUnit would become orphan in the
-     *  TypeDesignationWorkingSet
+     *  TypeDesignationSet
      */
     public void updateAllowDeleteTypeDesignation();
 

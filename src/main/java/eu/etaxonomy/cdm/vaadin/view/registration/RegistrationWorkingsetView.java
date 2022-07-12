@@ -88,7 +88,7 @@ public interface RegistrationWorkingsetView extends ApplicationView{
     UUID getCitationUuid();
 
     /**
-     * selecting a type will cause a {@link TypeDesignationWorkingsetEditorAction} to be emitted.
+     * selecting a type will cause a {@link TypeDesignationSetEditorAction} to be emitted.
      * On Cancel .. TODO
      * @param registrationEntityUuid
      */

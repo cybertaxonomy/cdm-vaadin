@@ -16,21 +16,21 @@ import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
  * @author a.kohlbecker
  * @since Jan 20, 2021
  */
-public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetIds<NameTypeDesignation> {
+public class NameTypeDesignationSetIds extends TypeDesignationSetIds<NameTypeDesignation> {
 
-    public static NameTypeDesignationWorkingsetIds forNewTypeDesignation(UUID publishedUnitUuid, UUID typifiedNameUuid) {
-        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, typifiedNameUuid);
+    public static NameTypeDesignationSetIds forNewTypeDesignation(UUID publishedUnitUuid, UUID typifiedNameUuid) {
+        return new NameTypeDesignationSetIds(publishedUnitUuid, typifiedNameUuid);
     }
 
     public static Object forExistingTypeDesignation(UUID publishedUnitUuid, NameTypeDesignation baseEntity) {
-        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, baseEntity);
+        return new NameTypeDesignationSetIds(publishedUnitUuid, baseEntity);
     }
 
-    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, NameTypeDesignation baseEntity) {
+    private NameTypeDesignationSetIds(UUID publishedUnitUuid, NameTypeDesignation baseEntity) {
         super(publishedUnitUuid, null, baseEntity, null);
     }
 
-    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID typifiedNameUuid) {
+    private NameTypeDesignationSetIds(UUID publishedUnitUuid, UUID typifiedNameUuid) {
         super(publishedUnitUuid, null, null, typifiedNameUuid);
     }
 

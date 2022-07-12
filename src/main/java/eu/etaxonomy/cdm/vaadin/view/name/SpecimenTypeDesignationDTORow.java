@@ -32,7 +32,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 /**
  * CollectionRow for {@link SpecimenTypeDesignationDTO}
  * SpecimenTypeDesignationDTORow needs to be instantiated by a EditorInstantiator which can only be provided by the presenter
- *  {@link SpecimenTypeDesignationWorkingsetEditorPresenter#handleViewEntered()}
+ *  {@link SpecimenTypeDesignationSetEditorPresenter#handleViewEntered()}
  *
  * @author a.kohlbecker
  * @since Jun 22, 2017

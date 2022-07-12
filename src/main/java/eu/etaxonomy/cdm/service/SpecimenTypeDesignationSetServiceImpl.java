@@ -43,18 +43,18 @@ import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
-import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 
 /**
  * @author a.kohlbecker
  * @since Nov 13, 2017
  */
-@Service("specimenTypeDesignationWorkingSetService")
+@Service("specimenTypeDesignationSetService")
 @Transactional(readOnly=true)
-public class SpecimenTypeDesignationWorkingSetServiceImpl
-        implements ISpecimenTypeDesignationWorkingSetService {
+public class SpecimenTypeDesignationSetServiceImpl
+        implements ISpecimenTypeDesignationSetService {
 
-    private final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingSetServiceImpl.class);
+    private final Logger logger = Logger.getLogger(SpecimenTypeDesignationSetServiceImpl.class);
 
     static SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
     static {
@@ -83,7 +83,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
     CdmRepository repo;
 
     @Override
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
+    public SpecimenTypeDesignationSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
         FieldUnit newfieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY.getPropertyPaths());
         if(reg == null){
@@ -91,21 +91,21 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
             reg.setUuid(registrationUuid);
         }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationWorkingSetDTO<>(reg, newfieldUnit, typifiedName);
+        SpecimenTypeDesignationSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationSetDTO<>(reg, newfieldUnit, typifiedName);
         return workingSetDto;
     }
 
     @Override
     @Transactional(readOnly=true)
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, IdentifiableEntity<?> baseEntity) {
+    public SpecimenTypeDesignationSetDTO<Registration> load(UUID registrationUuid, IdentifiableEntity<?> baseEntity) {
 
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = specimenTypeDesignationWorkingSetDTO(regDTO, baseEntity);
+        SpecimenTypeDesignationSetDTO<Registration> workingSetDto = specimenTypeDesignationSetDTO(regDTO, baseEntity);
         return workingSetDto;
     }
 
-    protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(
+    protected SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
             RegistrationDTO regDTO, VersionableEntity baseEntity) {
 
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
@@ -113,15 +113,15 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
         specimenTypeDesignations.sort(new TypeDesignationComparator());
         //TODO is this needed?
-        baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntity).getBaseEntity();
+        baseEntity = regDTO.getTypeDesignationSet(baseEntity).getBaseEntity();
 
-        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<>(regDTO.registration(),
+        SpecimenTypeDesignationSetDTO<Registration> dto = new SpecimenTypeDesignationSetDTO<>(regDTO.registration(),
                 baseEntity, specimenTypeDesignations, regDTO.typifiedName());
         return dto;
     }
 
     @Override
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO<Registration> bean) {
+    public SpecimenTypeDesignationSetDTO<Registration> fixMissingFieldUnit(SpecimenTypeDesignationSetDTO<Registration> bean) {
 
         if(bean.getFieldUnit() == null){
             // in case the base unit of the working set is not a FieldUnit all contained TypeDesignations must be modified
@@ -150,7 +150,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
 
     @Override
     @Transactional(readOnly=false)
-    public void save(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto) {
+    public void save(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto) {
 
         if(dto.getOwner() instanceof Registration){
             Registration regPremerge = (Registration) dto.getOwner();
@@ -158,7 +158,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
             regPremerge = repo.getRegistrationService().assureIsPersisted(regPremerge);
 
             // find the newly created type designations
-            Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationWorkingSetDTO<Registration>) dto);
+            Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationSetDTO<Registration>) dto);
 
             FieldUnit fieldUnit = (FieldUnit) dto.getBaseEntity();
 
@@ -197,7 +197,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
      * @param specimenDeleteConfigurer
      * @param std
      */
-    protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationWorkingSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
+    protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
 
 //        if(dto.getOwner() instanceof Registration){
 //            Registration registration = (Registration) dto.getOwner();
@@ -267,7 +267,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
         return original;
     }
 
-    private Set<SpecimenTypeDesignation> findNewTypeDesignations(SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto) {
+    private Set<SpecimenTypeDesignation> findNewTypeDesignations(SpecimenTypeDesignationSetDTO<Registration> workingSetDto) {
 
         Registration reg = workingSetDto.getOwner();
         Set<SpecimenTypeDesignation> addCandidates = new HashSet<>();
@@ -285,7 +285,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl
      */
     @Override
     @Transactional(readOnly=false)
-    public void delete(SpecimenTypeDesignationWorkingSetDTO bean, boolean deleteFieldUnit) {
+    public void delete(SpecimenTypeDesignationSetDTO bean, boolean deleteFieldUnit) {
 
         @SuppressWarnings("unchecked")
         List<SpecimenTypeDesignationDTO> specimenTypeDesignationDTOs = bean.getSpecimenTypeDesignationDTOs();

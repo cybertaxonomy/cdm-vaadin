@@ -110,7 +110,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
      *  <li><code>ReferenceEditorPresenter.guaranteePerEntityCRUDPermissions(...)</code></li>
      *  <li><code>PersonField.commit()</code></li>
      *  <li><code>TeamOrPersonField.commit()</code></li>
-     *  <li><code>SpecimenTypeDesignationWorkingsetEditorPresenter.saveBean(SpecimenTypeDesignationWorkingSetDTO dto)</code></li>
+     *  <li><code>SpecimenTypeDesignationSetEditorPresenter.saveBean(SpecimenTypeDesignationSetDTO dto)</code></li>
      * </ul>
      *
      * @param reg the Registration

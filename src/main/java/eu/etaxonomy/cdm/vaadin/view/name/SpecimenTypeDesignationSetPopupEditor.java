@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.vaadin.component.common.MinMaxTextField;
 import eu.etaxonomy.cdm.vaadin.component.common.TeamOrPersonField;
 import eu.etaxonomy.cdm.vaadin.component.common.TimePeriodField;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
-import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
+import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
@@ -53,22 +53,17 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
  * @since May 15, 2017
  *
  * TODO as subclass of AbstractCdmPopupEditor?
- *
  */
 @SpringComponent
 @Scope("prototype")
-public class SpecimenTypeDesignationWorkingsetPopupEditor
-    extends AbstractPopupEditor<SpecimenTypeDesignationWorkingSetDTO, SpecimenTypeDesignationWorkingsetEditorPresenter>
-    implements SpecimenTypeDesignationWorkingsetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
+public class SpecimenTypeDesignationSetPopupEditor
+    extends AbstractPopupEditor<SpecimenTypeDesignationSetDTO, SpecimenTypeDesignationSetEditorPresenter>
+    implements SpecimenTypeDesignationSetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
 
     private static final String CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING = "Can't save as long as type designations are missing.";
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
-    public SpecimenTypeDesignationWorkingsetPopupEditor() {
-        super(new GridLayout(), SpecimenTypeDesignationWorkingSetDTO.class);
+    public SpecimenTypeDesignationSetPopupEditor() {
+        super(new GridLayout(), SpecimenTypeDesignationSetDTO.class);
         GridLayout grid = (GridLayout) getFieldLayout();
         grid.setMargin(true);
         grid.setSpacing(true);
@@ -79,8 +74,6 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     private NativeSelect countrySelectField;
 
     private ElementCollectionField<SpecimenTypeDesignationDTO> typeDesignationsCollectionField;
-
-    private EnumSet<CRUD> crud;
 
     private TeamOrPersonField collectorField;
 
@@ -291,7 +284,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     }
 
 
-    // ------- SpecimenTypeDesignationWorkingsetPopupEditorView methods ---- //
+    // ------- SpecimenTypeDesignationSetPopupEditorView methods ---- //
     @Override
     public ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField() {
         return typeDesignationsCollectionField;
@@ -325,7 +318,7 @@ public class SpecimenTypeDesignationWorkingsetPopupEditor
     public void updateAllowDeleteTypeDesignation(){
         // disable the delete button if there is only one typeDesignation
         // if this typeDesignation is deleted the fieldUnit would become orphan in the
-        // TypeDesignationWorkingSet
+        // TypeDesignationSet
         GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
         if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
             gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);

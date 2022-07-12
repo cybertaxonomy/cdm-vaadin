@@ -31,7 +31,7 @@ import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
  * @since Jun 16, 2017
  *
  */
-public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntity> {
+public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
 
     FieldUnit fieldUnit;
 
@@ -56,7 +56,7 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
+    public SpecimenTypeDesignationSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
         super();
         this.owner = owner;
         this.baseEntity = baseEntity;
@@ -82,7 +82,7 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
      * @param citationEntityID
      * @param typifiedNameEntityID
      */
-    public SpecimenTypeDesignationWorkingSetDTO(OWNER reg, FieldUnit newfieldUnit, TaxonName typifiedName) {
+    public SpecimenTypeDesignationSetDTO(OWNER reg, FieldUnit newfieldUnit, TaxonName typifiedName) {
         this(reg, newfieldUnit, null, typifiedName);
     }
 
@@ -306,7 +306,7 @@ public class SpecimenTypeDesignationWorkingSetDTO<OWNER extends VersionableEntit
 
     /**
      *
-     * @return the set of SpecimenTypeDesignation that haven been deleted from the <code>SpecimenTypeDesignationWorkingSetDTO</code>.
+     * @return the set of SpecimenTypeDesignation that haven been deleted from the {@link SpecimenTypeDesignationSetDTO}.
      */
     public Set<SpecimenTypeDesignation> deletedSpecimenTypeDesignations() {
         Set<SpecimenTypeDesignation> deletedEntities = new HashSet<>(specimenTypeDesignationsLoaded);
