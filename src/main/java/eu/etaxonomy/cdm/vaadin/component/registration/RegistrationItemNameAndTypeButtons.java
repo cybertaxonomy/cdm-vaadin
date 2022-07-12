@@ -181,9 +181,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         iterator().forEachRemaining(c -> addStyledComponent(c));
         updateEditorButtonReadonlyStates();
         addDefaultStyles();
-
     }
-
 
     private void updateEditorButtonReadonlyStates() {
         for(ButtonWithUserEditPermission b : editButtons){
@@ -193,7 +191,6 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             b.button.setDescription(impossibleToUnlock ? "Unlock failed due to missing permissions!" : "");
             b.button.setIcon(isLockOverride ? FontAwesome.UNLOCK_ALT : null);
         }
-
     }
 
     public IdButton<TaxonName> getNameButton() {
@@ -208,9 +205,6 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         return addTypeDesignationButton;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         addStyleName(STYLE_NAMES);
@@ -226,7 +220,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     public class TypeDesignationWorkingSetButton {
 
-        private TypedEntityReference baseEntityRef;
+        private TypedEntityReference<?> baseEntityRef;
         private TypeDesignationWorkingSetType type;
         private Button button;
 
@@ -236,27 +230,17 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             this.button = button;
         }
 
-        /**
-         * @return the id
-         */
         public TypedEntityReference getBaseEntity() {
             return baseEntityRef;
         }
 
-        /**
-         * @return the button
-         */
         public Button getButton() {
             return button;
         }
 
-        /**
-         * @return the type
-         */
         public TypeDesignationWorkingSetType getType() {
             return type;
         }
-
     }
 
     public class IdButton<T> {
@@ -270,61 +254,38 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             this.button = button;
         }
 
-        /**
-         * @return the id
-         */
         public UUID getUuid() {
             return uuid;
         }
 
-        /**
-         * @return the button
-         */
         public Button getButton() {
             return button;
         }
 
-        /**
-         * @return the type
-         */
         public Class<T> getType() {
             return entityType;
         }
-
     }
 
     public class ButtonWithUserEditPermission {
 
         Button button;
         boolean userCanEdit;
-        /**
-         * @param button
-         * @param userCanEdit
-         */
         public ButtonWithUserEditPermission(Button button, boolean userCanEdit) {
             super();
             this.button = button;
             this.userCanEdit = userCanEdit;
         }
-
-
-
     }
+
     public boolean isRegistrationLocked() {
         return isRegistrationLocked;
     }
 
-
-    /**
-     * @return the isLockOverride
-     */
     public boolean isLockOverride() {
         return isLockOverride;
     }
 
-    /**
-     * @param isLockOverride the isLockOverride to set
-     */
     public void setLockOverride(boolean isLockOverride) {
         if(this.isLockOverride != isLockOverride){
             this.isLockOverride = isLockOverride;
@@ -350,8 +311,5 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             // TODO Auto-generated method stub
             return comparator.compare(this.status, o.status);
         }
-
-
     }
-
 }
