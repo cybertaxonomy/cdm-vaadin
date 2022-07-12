@@ -173,9 +173,9 @@ public class SpecimenTypeDesignationWorkingsetEditorPresenter
 
             SpecimenTypeDesignationWorkingsetIds idset = (SpecimenTypeDesignationWorkingsetIds)identifier;
 
-            if(idset.baseEntityRef != null){
+            if(idset.baseEntity != null){
                 // load existing workingset
-                workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntityRef);
+                workingSetDto = specimenTypeDesignationWorkingSetService.load(idset.registrationUuid, idset.baseEntity);
                 if(workingSetDto.getFieldUnit() == null){
                     workingSetDto = specimenTypeDesignationWorkingSetService.fixMissingFieldUnit(workingSetDto);
                         // FIXME open Dialog to warn user about adding an empty fieldUnit to the typeDesignations

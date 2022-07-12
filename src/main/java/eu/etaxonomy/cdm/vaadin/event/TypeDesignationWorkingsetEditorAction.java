@@ -16,7 +16,7 @@ import com.vaadin.ui.Field;
 
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
-import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -35,18 +35,18 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
 
     private UUID typifiedNameUuid;
 
-    private TypedEntityReference<IdentifiableEntity<?>> baseEntityRef;
+    private VersionableEntity baseEntity;
 
     /**
      * Constructor for {@link EditorActionType#EDIT EDIT} actions
      */
-    public TypeDesignationWorkingsetEditorAction(TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
+    public TypeDesignationWorkingsetEditorAction(VersionableEntity baseEntity,
             TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
             Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
 
         super(EditorActionType.EDIT, null, source, target, sourceView);
-        this.baseEntityRef = baseEntityRef;
+        this.baseEntity = baseEntity;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
         this.workingSetType = workingSetType;
@@ -85,8 +85,8 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
         return getEntityUuid();
     }
 
-    public TypedEntityReference<IdentifiableEntity<?>> getBaseEntityRef() {
-        return baseEntityRef;
+    public VersionableEntity getBaseEntity() {
+        return baseEntity;
     }
 
     public UUID getTypifiedNameUuid() {

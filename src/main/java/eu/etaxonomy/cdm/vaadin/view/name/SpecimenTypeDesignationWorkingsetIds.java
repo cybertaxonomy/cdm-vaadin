@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
 
 /**
  * @author a.kohlbecker
@@ -19,8 +18,9 @@ import eu.etaxonomy.cdm.ref.TypedEntityReference;
  */
 public class SpecimenTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetIds<FieldUnit> {
 
-    public SpecimenTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid, TypedEntityReference<FieldUnit> baseEntityRef, UUID typifiedNameUuid) {
-        super(publishedUnitUuid, registrationUuid, baseEntityRef, typifiedNameUuid);
-    }
+    public SpecimenTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID registrationUuid,
+            FieldUnit baseEntity, UUID typifiedNameUuid) {
 
+        super(publishedUnitUuid, registrationUuid, baseEntity, typifiedNameUuid);
+    }
 }

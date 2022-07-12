@@ -13,7 +13,6 @@ import java.util.UUID;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 
 /**
@@ -30,10 +29,9 @@ public interface ISpecimenTypeDesignationWorkingSetService {
      * @return
      */
     public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid,
-            TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef);
+            IdentifiableEntity<?> baseEntityRef);
 
-    SpecimenTypeDesignationWorkingSetDTO<Registration> fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO<Registration> bean);
-
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> fixMissingFieldUnit(SpecimenTypeDesignationWorkingSetDTO<Registration> bean);
 
     /**
      * Saves the SpecimenTypeDesignationWorkingSetDTO and takes care for consistency in the working set:

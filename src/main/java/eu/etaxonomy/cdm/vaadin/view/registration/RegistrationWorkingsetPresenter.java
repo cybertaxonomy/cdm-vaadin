@@ -556,7 +556,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.loadInEditor(new SpecimenTypeDesignationWorkingsetIds(
                     workingset.getCitationUuid(),
                     event.getRegistrationUuid(),
-                    event.getBaseEntityRef().castTo(FieldUnit.class), null));
+                    CdmBase.deproxy(event.getBaseEntity(), FieldUnit.class), null));
             if(event.hasSource()){
                 // propagate readonly state from source button to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
@@ -567,7 +567,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             popup.withDeleteButton(true);
             popup.loadInEditor(NameTypeDesignationWorkingsetIds.forExistingTypeDesignation(
                     registrationDTO.getCitationUuid(),
-                    event.getBaseEntityRef().castTo(NameTypeDesignation.class))
+                    CdmBase.deproxy(event.getBaseEntity(), NameTypeDesignation.class))
                     );
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
             if(event.hasSource()){

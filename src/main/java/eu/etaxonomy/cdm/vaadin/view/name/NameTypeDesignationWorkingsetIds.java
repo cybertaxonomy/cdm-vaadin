@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.view.name;
 import java.util.UUID;
 
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
 
 /**
  * @author a.kohlbecker
@@ -23,12 +22,12 @@ public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetI
         return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, typifiedNameUuid);
     }
 
-    public static Object forExistingTypeDesignation(UUID publishedUnitUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
-        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, baseEntityRef);
+    public static Object forExistingTypeDesignation(UUID publishedUnitUuid, NameTypeDesignation baseEntity) {
+        return new NameTypeDesignationWorkingsetIds(publishedUnitUuid, baseEntity);
     }
 
-    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, TypedEntityReference<NameTypeDesignation> baseEntityRef) {
-        super(publishedUnitUuid, null, baseEntityRef, null);
+    private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, NameTypeDesignation baseEntity) {
+        super(publishedUnitUuid, null, baseEntity, null);
     }
 
     private NameTypeDesignationWorkingsetIds(UUID publishedUnitUuid, UUID typifiedNameUuid) {
@@ -36,7 +35,7 @@ public class NameTypeDesignationWorkingsetIds extends TypeDesignationWorkingsetI
     }
 
     public boolean isForNewTypeDesignation() {
-        return getBaseEntityRef() == null;
+        return getBaseEntity() == null;
     }
 
 }

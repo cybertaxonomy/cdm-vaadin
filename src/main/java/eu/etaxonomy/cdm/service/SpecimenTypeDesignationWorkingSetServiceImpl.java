@@ -27,7 +27,6 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.compare.name.TypeDesignationComparator;
@@ -43,7 +42,6 @@ import eu.etaxonomy.cdm.model.occurrence.DerivedUnit;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationDTO;
 import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorkingSetDTO;
 
@@ -53,7 +51,8 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
  */
 @Service("specimenTypeDesignationWorkingSetService")
 @Transactional(readOnly=true)
-public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTypeDesignationWorkingSetService {
+public class SpecimenTypeDesignationWorkingSetServiceImpl
+        implements ISpecimenTypeDesignationWorkingSetService {
 
     private final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingSetServiceImpl.class);
 
@@ -98,25 +97,25 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
 
     @Override
     @Transactional(readOnly=true)
-    public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, TypedEntityReference<? extends IdentifiableEntity<?>> baseEntityRef) {
+    public SpecimenTypeDesignationWorkingSetDTO<Registration> load(UUID registrationUuid, IdentifiableEntity<?> baseEntity) {
 
         RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
-        TypeDesignationWorkingSet typeDesignationWorkingSet = regDTO.getTypeDesignationWorkingSet(baseEntityRef);
-        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = specimenTypeDesignationWorkingSetDTO(regDTO, typeDesignationWorkingSet.getBaseEntityReference());
+        SpecimenTypeDesignationWorkingSetDTO<Registration> workingSetDto = specimenTypeDesignationWorkingSetDTO(regDTO, baseEntity);
         return workingSetDto;
     }
 
     protected SpecimenTypeDesignationWorkingSetDTO<Registration> specimenTypeDesignationWorkingSetDTO(
-            RegistrationDTO regDTO, TypedEntityReference baseEntityReference) {
+            RegistrationDTO regDTO, VersionableEntity baseEntity) {
 
-        Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntityReference);
+        Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
         specimenTypeDesignations.sort(new TypeDesignationComparator());
-        VersionableEntity baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntityReference).getBaseEntity();
+        //TODO is this needed?
+        baseEntity = regDTO.getTypeDesignationWorkingSet(baseEntity).getBaseEntity();
 
-        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<Registration>(regDTO.registration(),
+        SpecimenTypeDesignationWorkingSetDTO<Registration> dto = new SpecimenTypeDesignationWorkingSetDTO<>(regDTO.registration(),
                 baseEntity, specimenTypeDesignations, regDTO.typifiedName());
         return dto;
     }
@@ -137,9 +136,7 @@ public class SpecimenTypeDesignationWorkingSetServiceImpl implements ISpecimenTy
             fieldUnit = repo.getOccurrenceService().save(fieldUnit);
 
             VersionableEntity baseEntity = bean.getBaseEntity();
-            Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(
-                    new TypedEntityReference<>(baseEntity.getClass(), baseEntity.getUuid(), baseEntity.toString())
-                    );
+            Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
             for(TypeDesignationBase<?> td : typeDesignations){
                 DerivationEvent de = DerivationEvent.NewInstance(DerivationEventType.GATHERING_IN_SITU());
                 de.addOriginal(fieldUnit);

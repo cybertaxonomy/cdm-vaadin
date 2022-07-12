@@ -28,6 +28,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationDTO;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSetFormatter;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
 import eu.etaxonomy.cdm.api.util.UserHelper;
@@ -38,7 +39,6 @@ import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.name.TypeDesignationStatusBase;
 import eu.etaxonomy.cdm.model.occurrence.SpecimenOrObservationBase;
 import eu.etaxonomy.cdm.model.permission.CRUD;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
@@ -116,38 +116,38 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        Map<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
+        Map<VersionableEntity,TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
 
         if(typeDesignationworkingSets != null){
             // order the typeDesignationworkingSet keys so that holotypes come first, etc
             List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
-            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationworkingSets.keySet()) {
+            for(VersionableEntity baseEntityRef : typeDesignationworkingSets.keySet()) {
                 baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationworkingSets.get(baseEntityRef).highestTypeStatus(new TypeDesignationStatusBaseComparator())));
             }
 
             Collections.sort(baseRefsByHighestStatus);
 
             for(TypedEntityRefWithStatus typedEntityRefWithStatus : baseRefsByHighestStatus) {
-                TypedEntityReference<? extends VersionableEntity> baseEntityRef = typedEntityRefWithStatus.typedEntityRef;
-                TypeDesignationWorkingSet typeDesignationWorkingSet = typeDesignationworkingSets.get(baseEntityRef);
-                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
-                String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
+                VersionableEntity baseEntity = typedEntityRefWithStatus.typedEntity;
+                TypeDesignationWorkingSet typeDesignationWorkingSet = typeDesignationworkingSets.get(baseEntity);
+                if (logger.isDebugEnabled()) {logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntity().toString());}
+                String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntity.getClass()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntity.getClass(), baseEntity.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 editButtons.add(new ButtonWithUserEditPermission(tdButton, userHasUpdatePermission));
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
-                        baseEntityRef.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
+                        baseEntity.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
                 typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
                         typeDesignationWorkingSet.getWorkingsetType(),
-                        typeDesignationWorkingSet.getBaseEntityReference(),
+                        typeDesignationWorkingSet.getBaseEntity(),
                         tdButton)
                         );
 
-                String labelText = "<span class=\"field-unit-label\">" + baseEntityRef.getLabel() + "</span>"; // renders the FieldUnit label
+                String labelText = "<span class=\"field-unit-label\">" + TypeDesignationSetFormatter.entityLabel(baseEntity) + "</span>"; // renders the FieldUnit label
                 for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
                     Collection<TypeDesignationDTO> tdPerStatus = typeDesignationWorkingSet.get(typeStatus);
                     labelText += " <strong>" + typeStatus.getLabel() +  (tdPerStatus.size() > 1 ? "s":"" ) + "</strong>: ";
@@ -219,18 +219,18 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     public class TypeDesignationWorkingSetButton {
 
-        private TypedEntityReference<?> baseEntityRef;
+        private VersionableEntity baseEntity;
         private TypeDesignationWorkingSetType type;
         private Button button;
 
-        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, TypedEntityReference baseEntityRef, Button button){
+        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, VersionableEntity baseEntity, Button button){
             this.type = type;
-            this.baseEntityRef = baseEntityRef;
+            this.baseEntity = baseEntity;
             this.button = button;
         }
 
-        public TypedEntityReference getBaseEntity() {
-            return baseEntityRef;
+        public VersionableEntity getBaseEntity() {
+            return baseEntity;
         }
 
         public Button getButton() {
@@ -294,14 +294,13 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private class TypedEntityRefWithStatus implements Comparable<TypedEntityRefWithStatus> {
 
-        public TypedEntityReference<? extends VersionableEntity> typedEntityRef;
+        public VersionableEntity typedEntity;
         public TypeDesignationStatusBase<?> status;
         private TypeDesignationStatusBaseComparator comparator = new TypeDesignationStatusBaseComparator();
 
-
-        public TypedEntityRefWithStatus(TypedEntityReference<? extends VersionableEntity> typedEntityRef,
+        public TypedEntityRefWithStatus(VersionableEntity typedEntity,
                 TypeDesignationStatusBase<?> status) {
-            this.typedEntityRef = typedEntityRef;
+            this.typedEntity = typedEntity;
             this.status = status;
         }
 
