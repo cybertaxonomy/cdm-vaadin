@@ -39,24 +39,18 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
 
     /**
      * Constructor for {@link EditorActionType#EDIT EDIT} actions
-     *
-     * @param baseEntityRef
-     * @param workingSetType
-     * @param registrationId
-     * @param source
-     * @param sourceView
      */
     public TypeDesignationWorkingsetEditorAction(TypedEntityReference<IdentifiableEntity<?>> baseEntityRef,
             TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
             Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
+
         super(EditorActionType.EDIT, null, source, target, sourceView);
         this.baseEntityRef = baseEntityRef;
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
         this.workingSetType = workingSetType;
         this.context = context;
-
     }
 
     /**
@@ -70,6 +64,7 @@ public class TypeDesignationWorkingsetEditorAction extends AbstractEditorAction<
     public TypeDesignationWorkingsetEditorAction(TypeDesignationWorkingSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
             Button source, Field<TypeDesignationWorkingSet> target, AbstractView sourceView) {
+
         super(EditorActionType.ADD, null, source, target, sourceView);
         this.workingSetType = workingSetType;
         this.registrationUuid = registrationUuid;

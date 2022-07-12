@@ -50,7 +50,6 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationWorking
 /**
  * @author a.kohlbecker
  * @since Nov 13, 2017
- *
  */
 @Service("specimenTypeDesignationWorkingSetService")
 @Transactional(readOnly=true)

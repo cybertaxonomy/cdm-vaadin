@@ -50,7 +50,7 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
 
     /**
      *
-     * @deprecated Consider using the constructor with Stack<EditorActionContext> context, so that the context is set for all popupeditors!!!
+     * @deprecated Consider using the constructor with Stack<EditorActionContext> context, so that the context is set for all popup editors!!!
      */
     @Deprecated
     public AbstractEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<V> target, AbstractView sourceView) {

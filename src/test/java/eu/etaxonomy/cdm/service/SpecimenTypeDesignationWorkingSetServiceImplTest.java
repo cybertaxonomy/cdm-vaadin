@@ -75,11 +75,12 @@ public class SpecimenTypeDesignationWorkingSetServiceImplTest extends CdmVaadinI
 
     private UUID typifiedNameUuid = UUID.fromString("47d9263e-b32a-42af-98ea-5528f154384f"); //  5000;
 
-    UUID fieldUnitUuid = UUID.fromString("22be718a-6f21-4b74-aae3-bb7d7d659e1c"); // 5001
+    private UUID fieldUnitUuid = UUID.fromString("22be718a-6f21-4b74-aae3-bb7d7d659e1c"); // 5001
 
     private final String[] includeTableNames_create = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
             "HIBERNATE_SEQUENCES"};
 
+    @SuppressWarnings("unused")
     private final String[] includeTableNames_delete = new String[]{"TAXONNAME", "REFERENCE", "AGENTBASE", "HOMOTYPICALGROUP", "REGISTRATION",
             "DERIVATIONEVENT", "GATHERINGEVENT", "LANGUAGESTRING", "SPECIMENOROBSERVATIONBASE", "TYPEDESIGNATIONBASE",
             "REGISTRATION_TYPEDESIGNATIONBASE", "TAXONNAME_TYPEDESIGNATIONBASE", "SPECIMENOROBSERVATIONBASE_DERIVATIONEVENT",

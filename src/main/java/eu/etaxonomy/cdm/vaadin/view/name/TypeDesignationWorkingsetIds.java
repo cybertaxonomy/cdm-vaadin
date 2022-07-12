@@ -46,6 +46,4 @@ public abstract class TypeDesignationWorkingsetIds<BASE_T extends VersionableEnt
     public UUID getPublishedUnitUuid() {
         return publishedUnitUuid;
     }
-
-
 }

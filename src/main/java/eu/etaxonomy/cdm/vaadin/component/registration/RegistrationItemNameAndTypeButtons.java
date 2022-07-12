@@ -307,7 +307,6 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
         @Override
         public int compareTo(TypedEntityRefWithStatus o) {
-            // TODO Auto-generated method stub
             return comparator.compare(this.status, o.status);
         }
     }
