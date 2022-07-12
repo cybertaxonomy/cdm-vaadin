@@ -22,7 +22,6 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 /**
  * @author a.kohlbecker
  * @since Jun 13, 2017
- *
  */
 public interface SpecimenTypeDesignationSetPopupEditorView
         extends ApplicationView<SpecimenTypeDesignationSetEditorPresenter>,
@@ -30,9 +29,9 @@ public interface SpecimenTypeDesignationSetPopupEditorView
 
     public NativeSelect getCountrySelectField();
 
-    ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField();
+    public ElementCollectionField<SpecimenTypeDesignationDTO> getTypeDesignationsCollectionField();
 
-    void applyDefaultComponentStyle(Component ... components);
+    public void applyDefaultComponentStyle(Component ... components);
 
     /**
      *  Disable the delete button if there is only one typeDesignation
@@ -41,7 +40,7 @@ public interface SpecimenTypeDesignationSetPopupEditorView
      */
     public void updateAllowDeleteTypeDesignation();
 
-    TeamOrPersonField getCollectorField();
+    public TeamOrPersonField getCollectorField();
 
-    GeoLocationField getExactLocationField();
+    public GeoLocationField getExactLocationField();
 }
