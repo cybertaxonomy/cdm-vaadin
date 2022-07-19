@@ -8,7 +8,8 @@
 */
 package eu.etaxonomy.cdm.service;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,7 +47,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 @ViewScope
 public class CdmStore {
 
-    private static final Logger logger = Logger.getLogger(CdmStore.class);
+    private final static Logger logger = LogManager.getLogger();
 
     @Autowired
     @Qualifier("cdmRepository")

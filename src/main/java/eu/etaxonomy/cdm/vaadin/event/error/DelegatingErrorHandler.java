@@ -12,7 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.event.ListenerMethod;
 import com.vaadin.server.ErrorEvent;
@@ -34,6 +35,8 @@ import com.vaadin.ui.Notification;
 public class DelegatingErrorHandler implements ErrorHandler{
 
     private static final long serialVersionUID = 3378605204517477112L;
+
+    private final static Logger logger = LogManager.getLogger();
 
     List<ErrorTypeHandler<? extends Throwable>> handlers = new ArrayList<>();
 
@@ -88,7 +91,7 @@ public class DelegatingErrorHandler implements ErrorHandler{
     private <E extends Throwable> boolean delegate(ErrorEvent event, E throwable){
 
         Class<E> errorClass = (Class<E>) throwable.getClass();
-        Logger.getLogger(this.getClass()).debug(errorClass);
+        logger.debug(errorClass);
         ErrorTypeHandler<E> handler = findHandler(errorClass);
         if(handler != null){
             handler.handleError(event, throwable);

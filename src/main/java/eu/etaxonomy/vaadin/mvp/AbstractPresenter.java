@@ -3,7 +3,8 @@ package eu.etaxonomy.vaadin.mvp;
 import java.io.Serializable;
 import java.util.Stack;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,6 +19,7 @@ import eu.etaxonomy.cdm.vaadin.event.AbstractEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
+import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
@@ -33,16 +35,15 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, DisposableBean {
 
+    private final static Logger logger = LogManager.getLogger();
 
     private static final long serialVersionUID = 5260910510283481832L;
-
-    public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
 
 	private V view;
 
 	protected V getView() {
 	    if(view == null){
-            Logger.getLogger(this.getClass()).warn("CDM-VAADIN#6562: presenter " + toString() + " without view.");
+            logger.warn("CDM-VAADIN#6562: presenter " + toString() + " without view.");
         }
 		return view;
 	}

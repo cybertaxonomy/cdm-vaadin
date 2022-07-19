@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
@@ -74,7 +75,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
     private static final long serialVersionUID = 4020699735656994791L;
 
-    private static final Logger log = Logger.getLogger(LoginPresenter.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private final static String PROPNAME_USER = "cdm-vaadin.login.usr";
 
@@ -111,11 +112,11 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         try {
             Authentication authentication = authenticationManager.authenticate(token);
             if(authentication != null && authentication.isAuthenticated()) {
-                log.debug("user '" + userName + "' authenticated");
+                logger.debug("user '" + userName + "' authenticated");
                 currentSecurityContext().setAuthentication(authentication);
                 if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
                     uiEventBus.publish(this, new AuthenticationSuccessEvent(userName));
-                    log.debug("redirecting to " + redirectToState);
+                    logger.debug("redirecting to " + redirectToState);
                     uiEventBus.publish(this, new NavigationEvent(redirectToState));
                 }
             }
@@ -151,7 +152,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
         // attempt to auto login
         if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
-            log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
+            logger.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
             authenticate(System.getProperty(PROPNAME_USER), System.getProperty(PROPNAME_PASSWORD));
         }
 
@@ -162,7 +163,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         if(getView()!= null){
             authenticate(event.getPayload().getUserName(), getView().getLoginDialog().getPassword().getValue());
         } else {
-            log.info("view is NULL, not yet disposed LoginPresenter?");
+            logger.info("view is NULL, not yet disposed LoginPresenter?");
         }
     }
 

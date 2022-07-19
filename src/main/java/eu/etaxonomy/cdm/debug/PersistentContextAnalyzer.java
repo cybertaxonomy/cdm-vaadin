@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.debug;
 
 import java.io.PrintStream;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 
 import eu.etaxonomy.cdm.cache.CdmEntityCache;
@@ -19,25 +20,20 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 /**
  * @author a.kohlbecker
  * @since 08.11.2017
- *
  */
 public class PersistentContextAnalyzer extends CdmEntityCache {
 
+    @SuppressWarnings("unused")
+    private final static Logger logger = LogManager.getLogger();
 
     private static final char HASH_SEPARATOR = '.';
 
     private static final String IN_PERSITENT_CONTEXT = "*";
 
-    private final static Logger logger = Logger.getLogger(PersistentContextAnalyzer.class);
-
     private Session session;
 
     private boolean showHashCodes = false;
 
-    /**
-     * @param entity
-     * @param session
-     */
     public PersistentContextAnalyzer(CdmBase entity, Session session){
         this.session = session;
         this.entities.add(entity);

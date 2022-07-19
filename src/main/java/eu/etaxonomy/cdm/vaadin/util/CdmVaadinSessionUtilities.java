@@ -10,8 +10,6 @@ package eu.etaxonomy.cdm.vaadin.util;
 
 import java.util.concurrent.locks.Lock;
 
-import org.apache.log4j.Logger;
-
 import com.vaadin.server.VaadinSession;
 
 import eu.etaxonomy.cdm.vaadin.session.BasicEventService;
@@ -21,11 +19,8 @@ import eu.etaxonomy.cdm.vaadin.session.SelectionService;
 /**
  * @author cmathew
  * @since 7 Apr 2015
- *
  */
 public class CdmVaadinSessionUtilities {
-
-    private static final Logger logger = Logger.getLogger(CdmVaadinSessionUtilities.class);
 
     public static void setCurrentAttribute(String name, Object value) {
         Lock sessionLock = VaadinSession.getCurrent().getLockInstance();

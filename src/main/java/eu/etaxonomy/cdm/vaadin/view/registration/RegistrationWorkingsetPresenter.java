@@ -22,7 +22,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -101,15 +102,14 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
- *
  */
 @SpringComponent
 @ViewScope
 public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> implements CachingPresenter {
 
-    private static final Logger logger = Logger.getLogger(RegistrationWorkingsetPresenter.class);
+    private static final long serialVersionUID = 2618456456539802265L;
 
-    private static final long serialVersionUID = 1L;
+    private final static Logger logger = LogManager.getLogger();
 
     @Autowired
     private IRegistrationWorkingSetService regWorkingSetService;

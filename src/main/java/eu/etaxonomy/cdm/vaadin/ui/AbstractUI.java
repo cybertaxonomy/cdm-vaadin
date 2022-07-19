@@ -9,7 +9,8 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventBus.UIEventBus;
 
@@ -46,7 +47,7 @@ public abstract class AbstractUI extends UI {
 
     private static final long serialVersionUID = 7430086500775997281L;
 
-    private static Logger logger = Logger.getLogger(AbstractUI.class);
+    private final static Logger logger = LogManager.getLogger();
 
     abstract protected ViewDisplay getViewDisplay();
 

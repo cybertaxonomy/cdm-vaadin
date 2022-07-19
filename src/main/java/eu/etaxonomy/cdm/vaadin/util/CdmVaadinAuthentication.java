@@ -11,7 +11,8 @@ package eu.etaxonomy.cdm.vaadin.util;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -23,7 +24,7 @@ import eu.etaxonomy.cdm.common.URI;
  */
 public class CdmVaadinAuthentication {
 
-    private final static Logger logger = Logger.getLogger(CdmVaadinAuthentication.class);
+    private final static Logger logger = LogManager.getLogger();
 
     public static final String KEY = "key_authentication";
 

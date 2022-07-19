@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.permission;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,11 +35,9 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
 
     private static final long serialVersionUID = -4232241572782673248L;
 
-    private final static Logger logger = Logger.getLogger(AnnotationBasedAccessControlBean.class);
+    private final static Logger logger = LogManager.getLogger();
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public boolean isAccessGranted(UI ui, String beanName, View view) {
 

@@ -15,7 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,13 +38,13 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipComposite;
 /**
  * @author cmathew
  * @since 8 Apr 2015
- *
  */
 @StyleSheet({"css/d3.conceptrelationshiptree.css"})
 @JavaScript({"extlib/d3.min.js", "lib/d3.conceptrelationshiptree_connector.js"})
 public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
 
-    private static final Logger logger = Logger.getLogger(D3ConceptRelationshipTree.class);
+    private static final long serialVersionUID = 8355509734431610167L;
+    private final static Logger logger = LogManager.getLogger();
 
     public enum Mode {
         OneToOne,

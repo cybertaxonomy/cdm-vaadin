@@ -2,7 +2,8 @@ package eu.etaxonomy.vaadin.mvp;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
 		implements ApplicationContextAware, ReleasableResourcesView, DisposableBean {
 
-
-    public static final Logger logger = Logger.getLogger(AbstractView.class);
+    private final static Logger logger = LogManager.getLogger();
 
 	private P presenter;
 
@@ -39,7 +39,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	@SuppressWarnings("unchecked")
     @PostConstruct
 	protected final void init() {
-		Logger.getLogger(getClass().getSimpleName()).info("View init");
+		LogManager.getLogger(getClass().getSimpleName()).info("View init");
 		if(!ApplicationView.class.isAssignableFrom(this.getClass())){
 		    throw new RuntimeException("Any view bean must implement the ApplicationView interface: ViewBean ---> ViewInterface ---> ApplicationView");
 		}
@@ -98,9 +98,6 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
         getPresenter().onViewExit();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void destroy() throws Exception {
        if(presenter != null){

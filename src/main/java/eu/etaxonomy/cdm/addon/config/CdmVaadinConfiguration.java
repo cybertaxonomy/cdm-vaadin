@@ -14,7 +14,8 @@ import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
@@ -90,12 +91,13 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
+    private final static Logger logger = LogManager.getLogger();
+
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MAXID = "cdm.service.minter.registration.maxLocalId";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT = "cdm.service.minter.registration.identifierFormatString";
 
-    public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
     @Autowired
     private Environment env;

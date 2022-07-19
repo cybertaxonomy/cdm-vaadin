@@ -13,7 +13,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -52,13 +53,12 @@ import eu.etaxonomy.vaadin.component.ToManyRelatedEntitiesListSelect;
 /**
  * @author a.kohlbecker
  * @since May 11, 2017
- *
  */
 public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>> {
 
     private static final long serialVersionUID = 660806402243118112L;
 
-    private static final Logger logger = Logger.getLogger(TeamOrPersonField.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String PRIMARY_STYLE = "v-team-or-person-field";
 

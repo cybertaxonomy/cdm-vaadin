@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
@@ -36,12 +34,10 @@ import eu.etaxonomy.cdm.vaadin.util.CdmQueryFactory;
 /**
  * @author cmathew
  * @since 10 Mar 2015
- *
  */
 public class LeafNodeTaxonContainer extends CdmSQLContainer implements Container.Hierarchical  {
 
-    private static final Logger logger = Logger.getLogger(LeafNodeTaxonContainer.class);
-
+    private static final long serialVersionUID = -1339368783995155526L;
 
     public static final String NAME_ID = "NAME";
     public static final String ACCTAXON_ID = "ACCTAXON";

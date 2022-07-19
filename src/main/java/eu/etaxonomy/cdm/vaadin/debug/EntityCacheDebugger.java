@@ -12,7 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -40,14 +41,13 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Jan 22, 2018
- *
  */
 @Component
 @UIScope
 @Profile("debug")
 public class EntityCacheDebugger implements ViewChangeListener, EventBusListener<PopEditorOpenedEvent> {
 
-    Logger logger = Logger.getLogger(EntityCacheDebugger.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private UIEventBus uiEventBus;
 
@@ -71,10 +71,10 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
         if(view != null){
 
                 try {
-                    AbstractPresenter presenter;
+                    AbstractPresenter<?> presenter;
                     Method getPresenterMethod = AbstractView.class.getDeclaredMethod("getPresenter");
                     getPresenterMethod.setAccessible(true);
-                    presenter = (AbstractPresenter) getPresenterMethod.invoke(view);
+                    presenter = (AbstractPresenter<?>) getPresenterMethod.invoke(view);
                     if(CachingPresenter.class.isAssignableFrom(presenter.getClass())){
                         open(view, (CachingPresenter)presenter);
                     } else {
@@ -91,10 +91,6 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
 
    }
 
-    /**
-     * @param view
-     * @param presenter
-     */
     private void open(AbstractView view, CachingPresenter presenter) {
 
         EntityCacheDebuggerComponent content = new EntityCacheDebuggerComponent(presenter);

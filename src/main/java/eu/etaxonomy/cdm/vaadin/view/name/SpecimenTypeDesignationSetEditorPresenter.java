@@ -19,7 +19,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -98,7 +99,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
     private static final long serialVersionUID = 4255636253714476918L;
 
-    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationSetEditorPresenter.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 

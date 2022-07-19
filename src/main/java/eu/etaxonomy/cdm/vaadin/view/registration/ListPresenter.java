@@ -18,6 +18,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.vaadin.spring.events.EventScope;
@@ -57,6 +59,8 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 @SpringComponent
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
+
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String REGISTRATION_LIST_PRESENTER_SEARCH_FILTER = "registration.listPresenter.searchFilter";
 

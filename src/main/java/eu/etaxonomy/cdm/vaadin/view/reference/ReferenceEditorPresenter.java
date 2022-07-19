@@ -14,7 +14,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.CaptionGenerator;
@@ -56,15 +55,12 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
 public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Reference, ReferencePopupEditorView> {
 
     private static final long serialVersionUID = -7926116447719010837L;
-
-    private static final Logger logger = Logger.getLogger(ReferenceEditorPresenter.class);
 
     ReferencePopupEditor inReferencePopup = null;
 
@@ -76,10 +72,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
 
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
@@ -116,10 +108,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                 AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
     }
 
-
-    /**
-     * @param inReferencePagingProvider
-     */
     public void updateInReferencePageProvider() {
 
         inReferencePagingProvider = pagingProviderFactory.inReferencePagingProvider((ReferenceType) getView().getTypeSelect().getValue(), false);
@@ -136,8 +124,6 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
         getView().getInReferenceCombobox().reload();
         getView().getInReferenceCombobox().loadFrom(inReferencePagingProvider, inReferencePagingProvider, inReferencePagingProvider.getPageSize());
     }
-
-
 
     protected static BeanInstantiator<Reference> defaultBeanInstantiator = new BeanInstantiator<Reference>() {
 

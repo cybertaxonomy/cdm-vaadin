@@ -17,8 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.spring.events.EventScope;
 
 import com.vaadin.data.Validator.InvalidValueException;
@@ -60,6 +61,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import eu.etaxonomy.cdm.common.LogUtils;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
@@ -88,9 +90,9 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
 
-    private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
+    private final static Logger logger = LogManager.getLogger();
 
-    public static final Logger logger = Logger.getLogger(AbstractPopupEditor.class);
+    private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
 
     private BeanFieldGroup<DTO> fieldGroup;
 
@@ -611,7 +613,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         if(propertyId == null){
             // not found in the editor field group. Maybe the field is bound to a nested fieldgroup?
             // 1. find the NestedFieldGroup implementations from the field up to the editor
-            logger.setLevel(Level.DEBUG);
+            LogUtils.setLevel(logger, Level.DEBUG);
             PropertyIdPath nestedPropertyIds = new PropertyIdPath();
             Field parentField = field;
             HasComponents parentComponent = parentField.getParent();

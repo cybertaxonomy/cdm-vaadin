@@ -13,7 +13,8 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,7 +46,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     private static final long serialVersionUID = 2218185546277084261L;
 
-    private static final Logger logger = Logger.getLogger(CdmEditorPresenterBase.class);
+    private final static Logger logger = LogManager.getLogger();
 
     protected BeanInstantiator<DTO> beanInstantiator = null;
 

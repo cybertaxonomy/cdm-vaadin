@@ -11,7 +11,8 @@ package eu.etaxonomy.vaadin.ui.navigation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ClientConnector.DetachEvent;
@@ -25,13 +26,12 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since May 16, 2018
- *
  */
 public class PopupViewRegistration implements DetachListener {
 
     private static final long serialVersionUID = -5946913287379095637L;
 
-    private static final Logger logger = Logger.getLogger(PopupViewRegistration.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private Map<PopupView, Window> popupWindowMap = new HashMap<>();
 

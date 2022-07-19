@@ -17,8 +17,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.common.LogUtils;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
@@ -73,6 +75,8 @@ import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
  */
 public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
+    private final static Logger logger = LogManager.getLogger();
+
 //    protected static final String PARAM_NAME_CREATE = "registrationCreate";
 //
 //    protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
@@ -86,7 +90,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     private static final EnumSet<CRUD> CREATE_READ = EnumSet.of(CRUD.CREATE, CRUD.READ);
     private static final EnumSet<CRUD> CREATE_READ_UPDATE_DELETE = EnumSet.of(CRUD.CREATE, CRUD.READ, CRUD.UPDATE, CRUD.DELETE);
 
-    private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
 //    private ExtensionType extensionTypeIAPTRegData;
 
@@ -230,7 +233,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                     return repo.getSession();
                 }
             };
-            logger.setLevel(Level.DEBUG);
+            LogUtils.setLevel(logger, Level.DEBUG);
             int chunksize = 1000;
             int pageIndex = 0;
             TransactionStatus tx;

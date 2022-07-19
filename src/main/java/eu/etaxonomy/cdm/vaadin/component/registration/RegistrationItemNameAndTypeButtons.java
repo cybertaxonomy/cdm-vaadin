@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -53,8 +54,7 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  */
 public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
-    private final static Logger logger = Logger.getLogger(RegistrationItemNameAndTypeButtons.class);
-
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String DEFAULT_BUTTON_STYLES = "";
 

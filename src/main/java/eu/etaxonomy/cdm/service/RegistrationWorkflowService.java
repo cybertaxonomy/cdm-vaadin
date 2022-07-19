@@ -12,7 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -30,12 +31,11 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 /**
  * @author a.kohlbecker
  * @since Mar 25, 2019
- *
  */
 @Service("registrationWorkflowService")
 public class RegistrationWorkflowService implements IRegistrationWorkflowService {
 
-    private static Logger logger = Logger.getLogger(RegistrationWorkflowService.class);
+    private final static Logger logger = LogManager.getLogger();
 
     @Autowired
     @Qualifier("cdmRepository")
