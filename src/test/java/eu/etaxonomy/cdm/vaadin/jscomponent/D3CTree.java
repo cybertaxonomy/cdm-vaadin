@@ -8,7 +8,8 @@
  */
 package eu.etaxonomy.cdm.vaadin.jscomponent;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +31,8 @@ import elemental.json.JsonArray;
 @JavaScript({"extlib/d3.min.js", "lib/d3ctree_connector.js"})
 public class D3CTree extends AbstractJavaScriptComponent {
 
-    private static final Logger logger = Logger.getLogger(D3CTree.class);
+    private static final long serialVersionUID = 910149189854426279L;
+    private static final Logger logger = LogManager.getLogger();
 
     public D3CTree() {
         addFunction("select", new JavaScriptFunction() {

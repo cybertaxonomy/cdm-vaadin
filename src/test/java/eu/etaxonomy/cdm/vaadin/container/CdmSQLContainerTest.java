@@ -11,7 +11,8 @@ package eu.etaxonomy.cdm.vaadin.container;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.unitils.dbunit.annotation.DataSet;
@@ -23,7 +24,7 @@ import eu.etaxonomy.cdm.vaadin.CdmVaadinBaseTest;
 public class CdmSQLContainerTest extends CdmVaadinBaseTest {
 
 	@SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(CdmSQLContainerTest.class);
+    private static final Logger logger = LogManager.getLogger();
 
 	@Test
 	@DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class, value="CdmSQLContainerTest.xml")
