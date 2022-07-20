@@ -34,11 +34,10 @@ public class D3CTree extends AbstractJavaScriptComponent {
 
     public D3CTree() {
         addFunction("select", new JavaScriptFunction() {
-
+            private static final long serialVersionUID = 3021677255132798998L;
             @Override
 			public void call(JsonArray arguments) {
 				Notification.show("JS Rpc call : click on " + arguments.getString(0));
-				
 			}
         });
 
@@ -79,16 +78,14 @@ public class D3CTree extends AbstractJavaScriptComponent {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
     }
 
     public void setConceptRelationshipTree(String conceptRelationshipTree) {
-        getState().setConceptRelationshipTree(conceptRelationshipTree);;
+        getState().setConceptRelationshipTree(conceptRelationshipTree);
     }
 
     @Override
     public D3CTreeState getState() {
         return (D3CTreeState) super.getState();
     }
-
 }

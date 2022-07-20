@@ -27,7 +27,6 @@ import org.springframework.web.servlet.DispatcherServlet;
  *
  * @author a.kohlbecker
  * @since Mar 18, 2019
- *
  */
 public class CdmVaadinWebAppInitializer implements WebApplicationInitializer {
 
@@ -62,7 +61,5 @@ public class CdmVaadinWebAppInitializer implements WebApplicationInitializer {
                 );
         dispatcher.setLoadOnStartup(1);
         dispatcher.addMapping("/");
-
-
     }
 }

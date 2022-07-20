@@ -34,7 +34,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 9 Apr 2015
- *
  */
 @DataSets({
     @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
@@ -59,7 +58,6 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         nameService = CdmSpringContextHelper.getNameService();
         app = CdmSpringContextHelper.getApplicationConfiguration();
     }
-
 
     @Test
     @Ignore
@@ -90,6 +88,4 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         // app.commitTransaction(tx);
 
     }
-
-
 }
