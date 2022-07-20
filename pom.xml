@@ -660,7 +660,7 @@
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>
-    <dependency>
+<!--    <dependency>
       <groupId>org.springmodules</groupId>
       <artifactId>spring-modules-cache</artifactId>
       <version>0.7</version>
@@ -675,7 +675,7 @@
         </exclusion>
       </exclusions>
       <scope>test</scope>
-    </dependency>
+    </dependency>  -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
