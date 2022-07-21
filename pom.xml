@@ -425,18 +425,13 @@
               <rules>
                 <dependencyConvergence />
                 <requireMavenVersion>
-                  <version>[3.6.0,)</version>
+                  <version>[3.6.3,)</version>
                 </requireMavenVersion>
               </rules>
             </configuration>
             <goals>
               <goal>enforce</goal>
-            
-            
-            
-            
-            
-            
+ 
               <!-- Binds by default to the lifecycle phase: validate -->
             </goals>
           </execution>
@@ -538,11 +533,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-    
-    
-    
-    
-    
     
       <!-- 
         vaadin-server dependency jsoup upgraded due to https://vaadin.com/security/2021-10-27
