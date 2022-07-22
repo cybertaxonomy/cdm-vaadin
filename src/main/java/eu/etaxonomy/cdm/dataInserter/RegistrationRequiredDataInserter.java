@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -233,13 +232,13 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                     return repo.getSession();
                 }
             };
-            LogUtils.setLevel(logger, Level.DEBUG);
+
             int chunksize = 1000;
             int pageIndex = 0;
             TransactionStatus tx;
             Pager<Taxon> taxonPage;
             List<TaxonBase> taxa = new ArrayList<>();
-            logger.debug("======= fixing sec refrences =========");
+            LogUtils.logAsDebug(logger, "======= fixing sec refrences =========");
             while(true){
                 tx = repo.startTransaction(false);
                 taxonPage = repo.getTaxonService().page(Taxon.class, chunksize, pageIndex++, null, null);
@@ -254,7 +253,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                 repo.commitTransaction(tx);
             }
 
-            logger.debug("======= creating taxon graph =========");
+            LogUtils.logAsDebug(logger, "======= creating taxon graph =========");
             pageIndex = 0;
             Pager<TaxonName> page;
             while(true){
@@ -264,7 +263,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                    repo.commitTransaction(tx);
                    break;
                }
-               logger.debug(TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
+               LogUtils.logAsDebug(logger, TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
                taxa = new ArrayList<>();
 
                for(TaxonName name : page.getRecords()){
@@ -273,7 +272,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                        if(illegitimType == null){
                            Taxon taxon;
                            try {
-                               logger.debug("Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
+                               LogUtils.logAsDebug(logger, "Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
                                taxon = processor.assureSingleTaxon(name);
                                processor.updateEdges(taxon);
                                taxa.add(taxon);
@@ -281,10 +280,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                                logger.error(e.getMessage());
                            }
                        } else {
-                           logger.debug("Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
+                           LogUtils.logAsDebug(logger, "Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
                        }
                    } else {
-                       logger.debug("Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
+                       LogUtils.logAsDebug(logger, "Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
                    }
                }
                repo.getTaxonService().saveOrUpdate(taxa);

@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.vaadin.spring.events.EventScope;
@@ -429,9 +428,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.CANCEL));
     }
 
-    /**
-     * @return
-     */
     private void delete() {
         viewEventBus.publish(this, new EditorDeleteEvent<DTO>(this, fieldGroup.getItemDataSource().getBean()));
         viewEventBus.publish(EventScope.UI, this, new DoneWithPopupEvent(this, Reason.DELETE));
@@ -478,17 +474,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         }
     }
 
-    /**
-     * @param invalidFields
-     */
     private void updateFieldNotifications(Map<Field<?>, InvalidValueException> invalidFields) {
         for(Field<?> f : invalidFields.keySet()){
             if(f instanceof AbstractField){
                 String message = invalidFields.get(f).getHtmlMessage();
-                ((AbstractField)f).setComponentError(new UserError(message, ContentMode.HTML, ErrorLevel.ERROR));
+                ((AbstractField<?>)f).setComponentError(new UserError(message, ContentMode.HTML, ErrorLevel.ERROR));
             }
         }
-
     }
 
     // ------------------------ field adding methods ------------------------ //
@@ -613,31 +605,30 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         if(propertyId == null){
             // not found in the editor field group. Maybe the field is bound to a nested fieldgroup?
             // 1. find the NestedFieldGroup implementations from the field up to the editor
-            LogUtils.setLevel(logger, Level.DEBUG);
             PropertyIdPath nestedPropertyIds = new PropertyIdPath();
-            Field parentField = field;
+            Field<?> parentField = field;
             HasComponents parentComponent = parentField.getParent();
-            logger.debug("field: " + parentField.getClass().getSimpleName());
+            LogUtils.logAsDebug(logger, "field: " + parentField.getClass().getSimpleName());
             while(parentComponent != null){
-                logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());
+                LogUtils.logAsDebug(logger, "parentComponent: " + parentComponent.getClass().getSimpleName());
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
                     Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
                     if(parentFieldGroup.isPresent()){
                         Object propId = parentFieldGroup.get().getPropertyId(parentField);
                         if(propId != null){
-                            logger.debug("propId: " + propId.toString());
+                            LogUtils.logAsDebug(logger, "propId: " + propId.toString());
                             nestedPropertyIds.addParent(propId);
                         }
-                        logger.debug("parentField: " + parentField.getClass().getSimpleName());
-                        parentField = (Field)parentComponent;
+                        LogUtils.logAsDebug(logger, "parentField: " + parentField.getClass().getSimpleName());
+                        parentField = (Field<?>)parentComponent;
                     } else {
-                        logger.debug("parentFieldGroup is null, continuing ...");
+                        LogUtils.logAsDebug(logger, "parentFieldGroup is null, continuing ...");
                     }
                 } else if(parentComponent == this) {
                     // we reached the editor itself
                     Object propId = fieldGroup.getPropertyId(parentField);
                     if(propId != null){
-                        logger.debug("propId: " + propId.toString());
+                        LogUtils.logAsDebug(logger, "propId: " + propId.toString());
                         nestedPropertyIds.addParent(propId);
                     }
                     propertyIdPath = nestedPropertyIds;
