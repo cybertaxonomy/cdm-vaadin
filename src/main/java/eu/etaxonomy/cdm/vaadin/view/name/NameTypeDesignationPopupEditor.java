@@ -116,7 +116,7 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
 
             citation : Reference
             citationMicroReference : String
-            originalNameString : String
+            originalInfo : String
          */
 
         GridLayout grid = (GridLayout)getFieldLayout();

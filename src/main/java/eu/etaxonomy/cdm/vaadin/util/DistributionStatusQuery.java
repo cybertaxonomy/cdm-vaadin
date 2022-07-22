@@ -241,7 +241,7 @@ public class DistributionStatusQuery implements Query{
             "$",
             "elements.*",
             "elements.sources.citation.authorship.$",
-            "elements.sources.nameUsedInSource.originalNameString",
+            "elements.sources.nameUsedInSource.originalInfo",
             "elements.area.level",
             "elements.modifyingText",
             "elements.states.*",
