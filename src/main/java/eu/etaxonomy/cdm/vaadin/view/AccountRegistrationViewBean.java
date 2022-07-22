@@ -38,13 +38,13 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 @SpringView(name=AccountRegistrationViewBean.NAME)
 public class AccountRegistrationViewBean extends AbstractView<AccountRegistrationPresenter> implements AccountRegistrationView, View  {
 
-    private static final long serialVersionUID = -1857662031516326300L;
+    private static final long serialVersionUID = 2066153054170511405L;
 
     @Autowired
-    protected EventBus.UIEventBus uiEventBus;
+    private EventBus.UIEventBus uiEventBus;
 
     @Autowired
-    protected Environment env;
+    private Environment env;
 
     public static final String NAME = "accountCreation";
 
