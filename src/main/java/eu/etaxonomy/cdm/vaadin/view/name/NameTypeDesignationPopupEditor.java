@@ -83,41 +83,25 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public NameTypeDesignationPopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), NameTypeDesignation.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Name type designation editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         // none
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
         /*
@@ -235,8 +219,6 @@ public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameT
         }
         addField(annotationsListField, "annotations", 0, row, 3, row);
     }
-
-
 
     @Override
     protected void afterItemDataSourceSet() {
