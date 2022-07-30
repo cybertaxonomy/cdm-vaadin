@@ -26,11 +26,10 @@ import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 /**
  * @author a.kohlbecker
  * @since May 24, 2017
- *
  */
 public class ToOneRelatedEntityListSelect<V extends Object> extends CompositeCustomField<V> implements ToOneRelatedEntityField<V> {
 
-    private static final long serialVersionUID = 6277565876657520311L;
+    private static final long serialVersionUID = -4810659766613627044L;
 
     public static final String PRIMARY_STYLE = "v-related-entity-list-select";
 

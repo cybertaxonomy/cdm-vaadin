@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
+import eu.etaxonomy.cdm.common.LogUtils;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
@@ -43,6 +44,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonBase;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
+import eu.etaxonomy.cdm.persistence.dao.common.IPreferenceDao;
 import eu.etaxonomy.cdm.persistence.dao.hibernate.taxonGraph.AbstractHibernateTaxonGraphProcessor;
 import eu.etaxonomy.cdm.persistence.dao.taxonGraph.TaxonGraphException;
 import eu.etaxonomy.cdm.persistence.permission.CdmAuthority;
@@ -72,6 +74,8 @@ import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
  */
 public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
+    private final static Logger logger = LogManager.getLogger();
+
 //    protected static final String PARAM_NAME_CREATE = "registrationCreate";
 //
 //    protected static final String PARAM_NAME_WIPEOUT = "registrationWipeout";
@@ -85,11 +89,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
     private static final EnumSet<CRUD> CREATE_READ = EnumSet.of(CRUD.CREATE, CRUD.READ);
     private static final EnumSet<CRUD> CREATE_READ_UPDATE_DELETE = EnumSet.of(CRUD.CREATE, CRUD.READ, CRUD.UPDATE, CRUD.DELETE);
 
-    private static final Logger logger = Logger.getLogger(RegistrationRequiredDataInserter.class);
 
 //    private ExtensionType extensionTypeIAPTRegData;
 
-    Map<String, Institution> instituteMap = new HashMap<>();
+    private Map<String, Institution> instituteMap = new HashMap<>();
 
     public static boolean commandsExecuted = false;
 
@@ -103,18 +106,13 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-
         if(hasRun){
             return;
         }
-
         runAsAuthentication(Role.ROLE_ADMIN);
-
         insertRequiredData();
         executeSuppliedCommands();
-
         restoreAuthentication();
-
         hasRun = true;
     }
 
@@ -214,9 +212,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         return ga;
     }
 
-    /**
-     *
-     */
     private void executeSuppliedCommands() {
 
         if(commandsExecuted){
@@ -229,20 +224,21 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
         String taxonGraphCreate = System.getProperty(TAXON_GRAPH_CREATE);
 
         if(taxonGraphCreate != null){
-            AbstractHibernateTaxonGraphProcessor processor = new AbstractHibernateTaxonGraphProcessor() {
+            IPreferenceDao prefDao = (IPreferenceDao) repo.getBean("preferenceDao");
 
+            AbstractHibernateTaxonGraphProcessor processor = new AbstractHibernateTaxonGraphProcessor(prefDao) {
                 @Override
                 public Session getSession() {
                     return repo.getSession();
                 }
             };
-            logger.setLevel(Level.DEBUG);
+
             int chunksize = 1000;
             int pageIndex = 0;
             TransactionStatus tx;
             Pager<Taxon> taxonPage;
             List<TaxonBase> taxa = new ArrayList<>();
-            logger.debug("======= fixing sec refrences =========");
+            LogUtils.logAsDebug(logger, "======= fixing sec refrences =========");
             while(true){
                 tx = repo.startTransaction(false);
                 taxonPage = repo.getTaxonService().page(Taxon.class, chunksize, pageIndex++, null, null);
@@ -257,7 +253,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                 repo.commitTransaction(tx);
             }
 
-            logger.debug("======= creating taxon graph =========");
+            LogUtils.logAsDebug(logger, "======= creating taxon graph =========");
             pageIndex = 0;
             Pager<TaxonName> page;
             while(true){
@@ -267,7 +263,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                    repo.commitTransaction(tx);
                    break;
                }
-               logger.debug(TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
+               LogUtils.logAsDebug(logger, TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
                taxa = new ArrayList<>();
 
                for(TaxonName name : page.getRecords()){
@@ -276,7 +272,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                        if(illegitimType == null){
                            Taxon taxon;
                            try {
-                               logger.debug("Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
+                               LogUtils.logAsDebug(logger, "Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
                                taxon = processor.assureSingleTaxon(name);
                                processor.updateEdges(taxon);
                                taxa.add(taxon);
@@ -284,10 +280,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                                logger.error(e.getMessage());
                            }
                        } else {
-                           logger.debug("Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
+                           LogUtils.logAsDebug(logger, "Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
                        }
                    } else {
-                       logger.debug("Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
+                       LogUtils.logAsDebug(logger, "Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
                    }
                }
                repo.getTaxonService().saveOrUpdate(taxa);

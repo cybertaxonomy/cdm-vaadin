@@ -8,7 +8,8 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.unitils.dbunit.annotation.DataSet;
 import org.unitils.spring.annotation.SpringBean;
 import org.unitils.spring.annotation.SpringBeanByType;
@@ -35,7 +36,7 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 public class CdmEditorPresenterTest {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(CdmEditorPresenterTest.class);
+    private static final Logger logger = LogManager.getLogger();
 
     @SpringBeanByType
     protected ViewEventBus viewEventBus;

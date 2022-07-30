@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -45,7 +46,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	private static final long serialVersionUID = 6599898650948333853L;
 
-	private final static Logger logger = Logger.getLogger(NavigationManagerBean.class);
+    private final static Logger logger = LogManager.getLogger();
 
 	// injecting the viewDisplay as spring bean causes problems with older cdm vaadin code
 	// SingleComponentContainerViewDisplay for example can't be used

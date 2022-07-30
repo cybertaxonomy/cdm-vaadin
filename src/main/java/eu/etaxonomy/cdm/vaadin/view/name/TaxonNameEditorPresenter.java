@@ -19,7 +19,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -92,7 +93,6 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 /**
  * @author a.kohlbecker
  * @since May 22, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -101,14 +101,14 @@ public class TaxonNameEditorPresenter
 
     private static final long serialVersionUID = -3538980627079389221L;
 
+    private final static Logger logger = LogManager.getLogger();
+
     private static final EnumSet<CRUD> SUB_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 
     private static final List<String> RELATED_NAME_INIT_STRATEGY = Arrays.asList("$", "nomenclaturalSource.annotations",
             "relationsFromThisName", "relationsToThisName.type", "homotypicalGroup.typifiedNames");
 
     public static List<String> REFERENCE_INIT_STRATEGY = ReferenceEllypsisFormatter.INIT_STRATEGY;
-
-    private static final Logger logger = Logger.getLogger(TaxonNameEditorPresenter.class);
 
     private CdmFilterablePagingProvider<Reference, Reference> nomReferencePagingProvider;
 

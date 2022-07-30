@@ -9,7 +9,8 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -30,13 +31,15 @@ import eu.etaxonomy.cdm.vaadin.view.ConceptRelationshipView;
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
-    Navigator navigator;
+    private static final long serialVersionUID = 7356721273326682601L;
+
+    private final static Logger logger = LogManager.getLogger();
 
     public static final String NAME = "concept";
 
     private static final String FIRST_VIEW = "editcr";
 
-    private final static Logger logger = Logger.getLogger(ConceptRelationshipUI.class);
+    Navigator navigator;
 
     @Override
     protected void doInit(VaadinRequest request) {

@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.viritin.fields.AbstractElementCollection.Instantiator;
 import org.vaadin.viritin.fields.ElementCollectionField;
@@ -84,6 +86,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
     implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
+
+    private final static Logger logger = LogManager.getLogger();
 
     private final static int GRID_COLS = 4;
 

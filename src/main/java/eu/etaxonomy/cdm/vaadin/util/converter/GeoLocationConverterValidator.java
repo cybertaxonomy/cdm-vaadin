@@ -11,7 +11,7 @@ package eu.etaxonomy.cdm.vaadin.util.converter;
 import java.text.ParseException;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.converter.Converter;
@@ -55,7 +55,7 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
                 return Point.parseLatitude(value);
             }
         } catch (ParseException e) {
-            Logger.getLogger(GeoLocationConverterValidator.class).error(e);
+            LogManager.getLogger(getClass()).error(e);
             throw new ConversionException(e);
         }
     }

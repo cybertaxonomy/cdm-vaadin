@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.permission;
 
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.navigator.View;
 import com.vaadin.spring.access.ViewInstanceAccessControl;
@@ -25,11 +26,8 @@ public class AccessRestrictedViewControlBean implements ViewInstanceAccessContro
 
     private static final long serialVersionUID = -5192116600545639108L;
 
-    private final static Logger logger = Logger.getLogger(AccessRestrictedViewControlBean.class);
+    private final static Logger logger = LogManager.getLogger();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isAccessGranted(UI ui, String beanName, View view) {
 

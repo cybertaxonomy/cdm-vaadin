@@ -22,9 +22,6 @@ public class TaxonNodeUuidTitleStringConverter extends UuidTitleStringConverter 
 
     private static final long serialVersionUID = 2372327533920312233L;
 
-    /* (non-Javadoc)
-     * @see com.vaadin.data.util.converter.Converter#convertToPresentation(java.lang.Object, java.lang.Class, java.util.Locale)
-     */
     @Override
     public String convertToPresentation(UUID value, Class<? extends String> targetType, Locale locale) throws ConversionException {
         if(value != null) {

@@ -23,11 +23,11 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
  */
 public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements NestedButtonStateUpdater<CDM> {
 
-    private static final long serialVersionUID = 4472031263172275012L;
+    private static final long serialVersionUID = -915308421870173706L;
 
-    boolean addNewEntityAllowed = true;
+    private boolean addNewEntityAllowed = true;
 
-    ToOneRelatedEntityField<CDM>  toOneRelatedEntityField;
+    private ToOneRelatedEntityField<CDM>  toOneRelatedEntityField;
 
     private Class<? extends CDM> type;
 

@@ -48,8 +48,9 @@ import com.vaadin.ui.themes.ValoTheme;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
+import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
@@ -61,7 +62,7 @@ import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemButtons;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons;
-import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationWorkingSetButton;
+import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemNameAndTypeButtons.TypeDesignationSetButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItemsPanel;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusLabel;
@@ -69,7 +70,7 @@ import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
 import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.TypeDesignationWorkingsetEditorAction;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
@@ -396,13 +397,13 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
             });
         }
 
-        for(TypeDesignationWorkingSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
+        for(TypeDesignationSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
-                TypedEntityReference baseEntityRef = workingsetButton.getBaseEntity();
+                VersionableEntity baseEntity = workingsetButton.getBaseEntity();
                 EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
-                TypeDesignationWorkingSetType workingsetType = workingsetButton.getType();
-                getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
-                        baseEntityRef,
+                TypeDesignationSetType workingsetType = workingsetButton.getType();
+                getViewEventBus().publish(this, new TypeDesignationSetEditorAction(
+                        baseEntity,
                         workingsetType,
                         registrationEntityUuid,
                         typifiedNameRef.getUuid(),
@@ -525,9 +526,9 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         typeDesignationTypeCooser.setCaption("Add new type designation");
         Label label = new Label("Please select kind of type designation to be created.");
         Button newSpecimenTypeDesignationButton = new Button("Specimen type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.SPECIMEN_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
+                e -> addNewTypeDesignationSet(TypeDesignationSetType.SPECIMEN_TYPE_DESIGNATION_SET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
         Button newNameTypeDesignationButton = new Button("Name type designation",
-                e -> addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType.NAME_TYPE_DESIGNATION_WORKINGSET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
+                e -> addNewTypeDesignationSet(TypeDesignationSetType.NAME_TYPE_DESIGNATION_SET, registrationEntityUuid, typeDesignationTypeCooser, e.getButton()));
 
         VerticalLayout layout = new VerticalLayout(label, newSpecimenTypeDesignationButton, newNameTypeDesignationButton);
         layout.setMargin(true);
@@ -542,10 +543,10 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
      * @param button
      *
      */
-    protected void addNewTypeDesignationWorkingset(TypeDesignationWorkingSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser, Button sourceButton) {
+    protected void addNewTypeDesignationSet(TypeDesignationSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser, Button sourceButton) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
-        getViewEventBus().publish(this, new TypeDesignationWorkingsetEditorAction(
+        getViewEventBus().publish(this, new TypeDesignationSetEditorAction(
                 newWorkingsetType,
                 registrationEntityUuid,
                 typifiedNameRef.getUuid(),

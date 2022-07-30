@@ -18,7 +18,8 @@ import java.util.Stack;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.ui.Component;
 
@@ -32,11 +33,10 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 /**
  * @author a.kohlbecker
  * @since Oct 29, 2018
- *
  */
 public class EditorActionContextFormatter {
 
-    public static final Logger logger = Logger.getLogger(EditorActionContextFormatter.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String NEW = "New";
 

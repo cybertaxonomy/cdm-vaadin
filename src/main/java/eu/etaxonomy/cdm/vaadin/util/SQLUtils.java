@@ -12,8 +12,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
-
 /**
  *
  * The methods correctCase and isEscaped have been inspired from the
@@ -24,9 +22,6 @@ import org.apache.log4j.Logger;
  *
  */
 public class SQLUtils {
-
-    @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(SQLUtils.class);
 
     public static String correctCase(final String databaseIdentifier, DatabaseMetaData databaseMetaData) throws SQLException
     {

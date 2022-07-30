@@ -38,7 +38,7 @@ import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
 public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCustomField<V>
     implements ToOneRelatedEntityField<V>, ReloadableSelect, EntitySupport<V> {
 
-    private static final long serialVersionUID = 6277565876657520311L;
+    private static final long serialVersionUID = 1477855047187199796L;
 
     public static final String PRIMARY_STYLE = "v-related-entity-combobox";
 

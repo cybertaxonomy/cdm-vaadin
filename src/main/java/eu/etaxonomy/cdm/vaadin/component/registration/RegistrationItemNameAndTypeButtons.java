@@ -12,11 +12,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -28,8 +29,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationWorkingSet.TypeDesignationWorkingSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -43,7 +44,7 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
 import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
-import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.TypeDesignationStatusBaseComparator;
+import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.RegistrationTypeDesignationStatusComparator;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
 
@@ -53,8 +54,7 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  */
 public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
-    private final static Logger logger = Logger.getLogger(RegistrationItemNameAndTypeButtons.class);
-
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String DEFAULT_BUTTON_STYLES = "";
 
@@ -64,7 +64,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private IdButton<TaxonName> nameIdButton = null;
 
-    private List<TypeDesignationWorkingSetButton> typeDesignationButtons = new ArrayList<>();
+    private List<TypeDesignationSetButton> typeDesignationButtons = new ArrayList<>();
 
     private List<Label> labels = new ArrayList<>();
 
@@ -116,41 +116,40 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             }
         }
         boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        LinkedHashMap<TypedEntityReference<? extends VersionableEntity>, TypeDesignationWorkingSet> typeDesignationworkingSets = regDto.getOrderedTypeDesignationWorkingSets();
+        Map<TypedEntityReference<? extends VersionableEntity>,TypeDesignationSet> typeDesignationSets = regDto.getOrderedTypeDesignationSets();
 
-
-        if(typeDesignationworkingSets != null){
-            // order the typeDesignationworkingSet keys so that holotypes come first, etc
+        if(typeDesignationSets != null){
+            // order the typeDesignationSet keys so that holotypes come first, etc
             List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
-            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationworkingSets.keySet()) {
-                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationworkingSets.get(baseEntityRef).highestTypeStatus(new TypeDesignationStatusBaseComparator())));
+            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationSets.keySet()) {
+                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationSets.get(baseEntityRef).highestTypeStatus(new RegistrationTypeDesignationStatusComparator())));
             }
 
             Collections.sort(baseRefsByHighestStatus);
 
             for(TypedEntityRefWithStatus typedEntityRefWithStatus : baseRefsByHighestStatus) {
-                TypedEntityReference<? extends VersionableEntity> baseEntityRef = typedEntityRefWithStatus.typedEntityRef;
-                TypeDesignationWorkingSet typeDesignationWorkingSet = typeDesignationworkingSets.get(baseEntityRef);
-                logger.debug("WorkingSet:" + typeDesignationWorkingSet.getWorkingsetType() + ">" + typeDesignationWorkingSet.getBaseEntityReference());
-                String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntityRef.getType()) ? "Type": "NameType";
+                TypedEntityReference<? extends VersionableEntity> baseEntity = typedEntityRefWithStatus.typedEntity;
+                TypeDesignationSet typeDesignationSet = typeDesignationSets.get(baseEntity);
+                if (logger.isDebugEnabled()) {logger.debug("WorkingSet:" + typeDesignationSet.getWorkingsetType() + ">" + typeDesignationSet.getBaseEntity().toString());}
+                String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntity.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
-                boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntityRef.getType(), baseEntityRef.getUuid(), CRUD.UPDATE, CRUD.DELETE);
+                boolean userHasUpdatePermission = userHelper.userHasPermission(baseEntity.getType(), baseEntity.getUuid(), CRUD.UPDATE, CRUD.DELETE);
                 editButtons.add(new ButtonWithUserEditPermission(tdButton, userHasUpdatePermission));
                 addComponent(tdButton);
 
                 PermissionDebugUtils.addGainPerEntityPermissionButton(this, SpecimenOrObservationBase.class,
-                        baseEntityRef.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
+                        baseEntity.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
-                typeDesignationButtons.add(new TypeDesignationWorkingSetButton(
-                        typeDesignationWorkingSet.getWorkingsetType(),
-                        typeDesignationWorkingSet.getBaseEntityReference(),
+                typeDesignationButtons.add(new TypeDesignationSetButton(
+                        typeDesignationSet.getWorkingsetType(),
+                        typeDesignationSet.getBaseEntity(),
                         tdButton)
                         );
 
-                String labelText = "<span class=\"field-unit-label\">" + baseEntityRef.getLabel() + "</span>"; // renders the FieldUnit label
-                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationWorkingSet.keySet()){
-                    Collection<TypeDesignationDTO> tdPerStatus = typeDesignationWorkingSet.get(typeStatus);
+                String labelText = "<span class=\"field-unit-label\">" + baseEntity.getLabel() + "</span>"; // renders the FieldUnit label
+                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationSet.keySet()){
+                    Collection<TypeDesignationDTO> tdPerStatus = typeDesignationSet.get(typeStatus);
                     labelText += " <strong>" + typeStatus.getLabel() +  (tdPerStatus.size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
                     for(TypeDesignationDTO<?> dtDTO : tdPerStatus) {
@@ -181,9 +180,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         iterator().forEachRemaining(c -> addStyledComponent(c));
         updateEditorButtonReadonlyStates();
         addDefaultStyles();
-
     }
-
 
     private void updateEditorButtonReadonlyStates() {
         for(ButtonWithUserEditPermission b : editButtons){
@@ -193,14 +190,13 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             b.button.setDescription(impossibleToUnlock ? "Unlock failed due to missing permissions!" : "");
             b.button.setIcon(isLockOverride ? FontAwesome.UNLOCK_ALT : null);
         }
-
     }
 
     public IdButton<TaxonName> getNameButton() {
         return nameIdButton;
     }
 
-    public List<TypeDesignationWorkingSetButton> getTypeDesignationButtons() {
+    public List<TypeDesignationSetButton> getTypeDesignationButtons() {
         return typeDesignationButtons;
     }
 
@@ -208,9 +204,6 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         return addTypeDesignationButton;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         addStyleName(STYLE_NAMES);
@@ -224,39 +217,29 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         addTypeDesignationButton.addStyleName(DEFAULT_BUTTON_STYLES);
     }
 
-    public class TypeDesignationWorkingSetButton {
+    public class TypeDesignationSetButton {
 
-        private TypedEntityReference baseEntityRef;
-        private TypeDesignationWorkingSetType type;
+        private VersionableEntity baseEntity;
+        private TypeDesignationSetType type;
         private Button button;
 
-        public TypeDesignationWorkingSetButton(TypeDesignationWorkingSetType type, TypedEntityReference baseEntityRef, Button button){
+        public TypeDesignationSetButton(TypeDesignationSetType type, VersionableEntity baseEntity, Button button){
             this.type = type;
-            this.baseEntityRef = baseEntityRef;
+            this.baseEntity = baseEntity;
             this.button = button;
         }
 
-        /**
-         * @return the id
-         */
-        public TypedEntityReference getBaseEntity() {
-            return baseEntityRef;
+        public VersionableEntity getBaseEntity() {
+            return baseEntity;
         }
 
-        /**
-         * @return the button
-         */
         public Button getButton() {
             return button;
         }
 
-        /**
-         * @return the type
-         */
-        public TypeDesignationWorkingSetType getType() {
+        public TypeDesignationSetType getType() {
             return type;
         }
-
     }
 
     public class IdButton<T> {
@@ -270,61 +253,38 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             this.button = button;
         }
 
-        /**
-         * @return the id
-         */
         public UUID getUuid() {
             return uuid;
         }
 
-        /**
-         * @return the button
-         */
         public Button getButton() {
             return button;
         }
 
-        /**
-         * @return the type
-         */
         public Class<T> getType() {
             return entityType;
         }
-
     }
 
     public class ButtonWithUserEditPermission {
 
         Button button;
         boolean userCanEdit;
-        /**
-         * @param button
-         * @param userCanEdit
-         */
         public ButtonWithUserEditPermission(Button button, boolean userCanEdit) {
             super();
             this.button = button;
             this.userCanEdit = userCanEdit;
         }
-
-
-
     }
+
     public boolean isRegistrationLocked() {
         return isRegistrationLocked;
     }
 
-
-    /**
-     * @return the isLockOverride
-     */
     public boolean isLockOverride() {
         return isLockOverride;
     }
 
-    /**
-     * @param isLockOverride the isLockOverride to set
-     */
     public void setLockOverride(boolean isLockOverride) {
         if(this.isLockOverride != isLockOverride){
             this.isLockOverride = isLockOverride;
@@ -334,24 +294,19 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private class TypedEntityRefWithStatus implements Comparable<TypedEntityRefWithStatus> {
 
-        public TypedEntityReference<? extends VersionableEntity> typedEntityRef;
+        public TypedEntityReference<? extends VersionableEntity> typedEntity;
         public TypeDesignationStatusBase<?> status;
-        private TypeDesignationStatusBaseComparator comparator = new TypeDesignationStatusBaseComparator();
+        private RegistrationTypeDesignationStatusComparator comparator = new RegistrationTypeDesignationStatusComparator();
 
-
-        public TypedEntityRefWithStatus(TypedEntityReference<? extends VersionableEntity> typedEntityRef,
+        public TypedEntityRefWithStatus(TypedEntityReference<? extends VersionableEntity> typedEntity,
                 TypeDesignationStatusBase<?> status) {
-            this.typedEntityRef = typedEntityRef;
+            this.typedEntity = typedEntity;
             this.status = status;
         }
 
         @Override
         public int compareTo(TypedEntityRefWithStatus o) {
-            // TODO Auto-generated method stub
             return comparator.compare(this.status, o.status);
         }
-
-
     }
-
 }

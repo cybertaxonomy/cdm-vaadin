@@ -23,7 +23,8 @@ import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.AbstractPersistentCollection;
 import org.hibernate.envers.internal.entities.mapper.relation.lazy.proxy.CollectionProxy;
@@ -39,12 +40,11 @@ import eu.etaxonomy.cdm.persistence.dao.initializer.AbstractBeanInitializer;
 /**
  * @author a.kohlbecker
  * @since 08.11.2017
- *
  */
 public class CdmEntityCache implements EntityCache {
 
+    private final static Logger logger = LogManager.getLogger();
 
-    private final static Logger logger = Logger.getLogger(CdmEntityCache.class);
 
     protected static final String COPY_ENTITY = "!";
 

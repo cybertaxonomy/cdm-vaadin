@@ -14,7 +14,8 @@ import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
@@ -54,6 +55,7 @@ import eu.etaxonomy.cdm.api.service.taxonGraph.TaxonGraphBeforeTransactionComple
 import eu.etaxonomy.cdm.cache.CdmTransientEntityCacher;
 import eu.etaxonomy.cdm.config.CdmHibernateListener;
 import eu.etaxonomy.cdm.dataInserter.RegistrationRequiredDataInserter;
+import eu.etaxonomy.cdm.persistence.dao.common.IPreferenceDao;
 import eu.etaxonomy.cdm.persistence.hibernate.GrantedAuthorityRevokingRegistrationUpdateLister;
 import eu.etaxonomy.cdm.persistence.hibernate.ITaxonGraphHibernateListener;
 import eu.etaxonomy.cdm.vaadin.permission.annotation.EnableAnnotationBasedAccessControl;
@@ -89,15 +91,16 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
+    private final static Logger logger = LogManager.getLogger();
+
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MAXID = "cdm.service.minter.registration.maxLocalId";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT = "cdm.service.minter.registration.identifierFormatString";
 
-    public static final Logger logger = Logger.getLogger(CdmVaadinConfiguration.class);
 
     @Autowired
-    Environment env;
+    private Environment env;
 
     @Autowired
     private SessionFactory sessionFactory;
@@ -113,6 +116,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private ITaxonGraphHibernateListener taxonGraphHibernateListener;
 
     @Autowired
+    private IPreferenceDao preferenceDao;
+
+
+    @Autowired
     private void  setTermCacher(CdmCacherBase termCacher){
         CdmTransientEntityCacher.setPermanentCacher(termCacher);
     }
@@ -120,7 +127,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     private boolean registrationUiHibernateEventListenersDone = false;
 
 
-    ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
+    private ApplicationConfigurationFile configFile = new ApplicationConfigurationFile(PROPERTIES_FILE_NAME, APP_FILE_CONTENT);
 
     /*
      * NOTES:
@@ -244,7 +251,10 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             // TODO also POST_DELETE needed for GrantedAuthorityRevokingRegistrationUpdateLister?
 
             try {
-                taxonGraphHibernateListener.registerProcessClass(TaxonGraphBeforeTransactionCompleteProcess.class, new Object[]{new RunAsAdmin(runAsAuthenticationProvider)}, new Class[]{IRunAs.class});
+                taxonGraphHibernateListener.registerProcessClass(
+                        TaxonGraphBeforeTransactionCompleteProcess.class,
+                        new Object[]{new RunAsAdmin(runAsAuthenticationProvider), preferenceDao},
+                        new Class[]{IRunAs.class, IPreferenceDao.class});
             } catch (NoSuchMethodException | SecurityException e) {
                 // re-throw as RuntimeException as the context can not be created correctly
                 throw new RuntimeException(e);

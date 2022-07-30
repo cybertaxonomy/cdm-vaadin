@@ -17,9 +17,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
@@ -28,7 +28,6 @@ import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
@@ -68,7 +67,6 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Jan 26, 2018
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -77,13 +75,9 @@ public class NameTypeDesignationPresenter
 
     private static final long serialVersionUID = 896305051895903033L;
 
-    public static final Logger logger = Logger.getLogger(SpecimenTypeDesignationWorkingsetEditorPresenter.class);
+    private final static Logger logger = LogManager.getLogger();
 
-    @Autowired
-    private IRegistrationWorkingSetService registrationWorkingSetService;
-
-
-    HashSet<TaxonName> typifiedNamesAsLoaded;
+    private HashSet<TaxonName> typifiedNamesAsLoaded;
 
     private TaxonName typifiedNameInContext;
 
@@ -115,14 +109,14 @@ public class NameTypeDesignationPresenter
     protected NameTypeDesignation loadBeanById(Object identifier) {
         NameTypeDesignation bean;
 
-        NameTypeDesignationWorkingsetIds idset = (NameTypeDesignationWorkingsetIds)identifier;
+        NameTypeDesignationSetIds idset = (NameTypeDesignationSetIds)identifier;
 
         if(idset.isForNewTypeDesignation()) {
             Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
             try {
                 setPublishedUnit(NamedSource.NewPrimarySourceInstance(reference, null));
             } catch(Exception e) {
-                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationWorkingsetIds as publishedUnitUuid ", e);
+                throw new RuntimeException("Reference of invalid type passed via NameTypeDesignationSetIds as publishedUnitUuid ", e);
             }
             EntityInitStrategy initstrategy = RegistrationWorkingSetService.NAME_INIT_STRATEGY
                     .clone()
@@ -130,10 +124,10 @@ public class NameTypeDesignationPresenter
             typifiedNameInContext = getRepo().getNameService().load(idset.getTypifiedNameUuid(), initstrategy.getPropertyPaths());
             bean = super.loadBeanById(null);
         } else {
-            bean = super.loadBeanById(idset.getBaseEntityRef().getUuid());
+            bean = super.loadBeanById(idset.getBaseEntity().getUuid());
             // TODO prevent from errors due to inconsistent data, two options:
             // 1. handle error condition here
-            // 2. always set typifiedNameUuid in NameTypeDesignationWorkingsetIds
+            // 2. always set typifiedNameUuid in NameTypeDesignationSetIds
             typifiedNameInContext = bean.getTypifiedNames().iterator().next();
             try {
                 setPublishedUnit(bean.getTypifiedNames().iterator().next().getNomenclaturalSource());
@@ -148,7 +142,7 @@ public class NameTypeDesignationPresenter
                 && typifiedNameNomRef.getInReference() != null) {
             typifiedNameNomRef = typifiedNameNomRef.getInReference();
         }
-        getView().setInTypedesignationOnlyAct(Optional.of(typifiedNameNomRef != null && !typifiedNameNomRef.equals(getPublishedUnit().getCitation())));
+        getView().setInTypedesignationOnlyAct(Optional.of(!typifiedNameNomRef.equals(getPublishedUnit().getCitation())));
 
 
         if (getPublishedUnit() != null) {
@@ -280,7 +274,7 @@ public class NameTypeDesignationPresenter
         // deleteTypedesignation(uuid, uuid) needs to be called so the name is loaded in the transaction of the method and is saved.
         DeleteResult deletResult = getRepo().getNameService().deleteTypeDesignation(typifiedNameInContext.getUuid(), bean.getUuid());
         if(deletResult.isOk()){
-            EntityChangeEvent changeEvent = new EntityChangeEvent(bean, Type.REMOVED, (AbstractView) getView());
+            EntityChangeEvent<?> changeEvent = new EntityChangeEvent<>(bean, Type.REMOVED, (AbstractView<?>) getView());
             viewEventBus.publish(this, changeEvent);
         } else {
             CdmStore.handleDeleteresultInError(deletResult);

@@ -338,7 +338,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
             "$", //$NON-NLS-1$
 "elements.*", //$NON-NLS-1$
 "elements.sources.citation.authorship.$", //$NON-NLS-1$
-"elements.sources.nameUsedInSource.originalNameString", //$NON-NLS-1$
+"elements.sources.nameUsedInSource.originalInfo", //$NON-NLS-1$
 "elements.area.level", //$NON-NLS-1$
 "elements.modifyingText", //$NON-NLS-1$
 "elements.states.*", //$NON-NLS-1$

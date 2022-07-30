@@ -4,7 +4,7 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>5.31.0</version>
+  <version>5.32.0</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -13,7 +13,7 @@
     <vaadin-spring.version>1.2.0</vaadin-spring.version>
     <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
     <vaadin-spring-addon-eventbus.version>2.0.0.RELEASE</vaadin-spring-addon-eventbus.version>
-    <cdmlib.version>5.31.0</cdmlib.version>
+    <cdmlib.version>5.32.0</cdmlib.version>
     <unitils.version>3.4.2</unitils.version>
     <spring-boot.version>1.3.1.RELEASE</spring-boot.version>
     <!-- has spring 4.2.4-RELEASE as dependency --> 
@@ -101,12 +101,8 @@
         <!-- Try updating in cdmlib to 20090211 -->
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
-        <version>20211205</version>
+        <version>20220320</version>
       </dependency>
-    
-    
-    
-    
     
     
     
@@ -234,7 +230,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
+        <version>3.0.0-M7</version>
         <configuration>
           <argLine>-Xms256m -Xmx512m</argLine>
         </configuration>
@@ -422,7 +418,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>enforce</id>
@@ -432,7 +428,7 @@
               <rules>
                 <dependencyConvergence />
                 <requireMavenVersion>
-                  <version>[3.6.0,)</version>
+                  <version>[3.6.3,)</version>
                 </requireMavenVersion>
               </rules>
             </configuration>
@@ -441,11 +437,7 @@
             
             
             
-            
-            
-            
-            
-            
+ 
               <!-- Binds by default to the lifecycle phase: validate -->
             </goals>
           </execution>
@@ -547,10 +539,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-    
-    
-    
-    
     
     
     
@@ -671,7 +659,7 @@
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>
-    <dependency>
+    <!--    <dependency>
       <groupId>org.springmodules</groupId>
       <artifactId>spring-modules-cache</artifactId>
       <version>0.7</version>
@@ -686,7 +674,7 @@
         </exclusion>
       </exclusions>
       <scope>test</scope>
-    </dependency>
+    </dependency>  -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>

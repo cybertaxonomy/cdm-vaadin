@@ -22,7 +22,6 @@ import eu.etaxonomy.cdm.model.term.DefinedTerm;
 /**
  * @author a.kohlbecker
  * @since Jun 23, 2017
- *
  */
 public class RegistrationTermLists {
 
@@ -53,7 +52,7 @@ public class RegistrationTermLists {
             SpecimenTypeDesignationStatus.TYPE(), // Unknown type category
             SpecimenTypeDesignationStatus.UNSPECIFIC(),
 
-            // TODO add Typus consservandus
+            // TODO add Typus conservandus
             // TODO add Typ. cons. prop.
     });
 
@@ -99,7 +98,7 @@ public class RegistrationTermLists {
         return uuids;
     }
 
-    public static class TypeDesignationStatusBaseComparator implements Comparator<TypeDesignationStatusBase<?>> {
+    public static class RegistrationTypeDesignationStatusComparator implements Comparator<TypeDesignationStatusBase<?>> {
 
         @Override
         public int compare(TypeDesignationStatusBase<?> o1, TypeDesignationStatusBase<?> o2) {
@@ -107,7 +106,6 @@ public class RegistrationTermLists {
             int pos1 = getPos(o1);
             int pos2 = getPos(o2);
             return Integer.compare(pos1, pos2);
-
         }
 
         public int getPos(TypeDesignationStatusBase<?> o) {

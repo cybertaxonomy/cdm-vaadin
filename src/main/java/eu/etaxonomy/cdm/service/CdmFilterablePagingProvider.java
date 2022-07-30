@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
@@ -28,16 +29,15 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
 /**
  * @author a.kohlbecker
  * @since Jun 7, 2017
- *
  */
 public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
+    private final static Logger logger = LogManager.getLogger();
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
     public static final String QUERY_STRING_PLACEHOLDER = "{query-string}";
 
-    private static final Logger logger = Logger.getLogger(CdmFilterablePagingProvider.class);
 
     private int pageSize = 20;
 

@@ -32,7 +32,7 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.term.DefinedTerm;
 
 /**
- * A DTO which is use in the context of the {@link SpecimenTypeDesignationWorkingSetDTO} which is backed up
+ * A DTO which is use in the context of the {@link SpecimenTypeDesignationSetDTO} which is backed up
  * <code>SpecimenTypeDesignation.typeSpecimen.derivedFrom.type</code> object graph.
  * <p>
  * The contained {@link DerivedUnit} either is a {@link MediaSpecimen} with or a {@link DerivedUnit}, depending on the

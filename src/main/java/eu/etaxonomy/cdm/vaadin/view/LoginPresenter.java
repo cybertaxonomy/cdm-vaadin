@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import javax.mail.internet.AddressException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
@@ -66,7 +67,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  *
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 @SpringComponent
 @ViewScope
@@ -74,7 +74,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
     private static final long serialVersionUID = 4020699735656994791L;
 
-    private static final Logger log = Logger.getLogger(LoginPresenter.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private final static String PROPNAME_USER = "cdm-vaadin.login.usr";
 
@@ -111,11 +111,11 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         try {
             Authentication authentication = authenticationManager.authenticate(token);
             if(authentication != null && authentication.isAuthenticated()) {
-                log.debug("user '" + userName + "' authenticated");
+                logger.debug("user '" + userName + "' authenticated");
                 currentSecurityContext().setAuthentication(authentication);
                 if(NavigationManager.class.isAssignableFrom(getNavigationManager().getClass())){
                     uiEventBus.publish(this, new AuthenticationSuccessEvent(userName));
-                    log.debug("redirecting to " + redirectToState);
+                    logger.debug("redirecting to " + redirectToState);
                     uiEventBus.publish(this, new NavigationEvent(redirectToState));
                 }
             }
@@ -151,7 +151,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
         // attempt to auto login
         if(StringUtils.isNotEmpty(System.getProperty(PROPNAME_USER)) && StringUtils.isNotEmpty(System.getProperty(PROPNAME_PASSWORD))){
-            log.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
+            logger.warn("Performing autologin with user " + System.getProperty(PROPNAME_USER));
             authenticate(System.getProperty(PROPNAME_USER), System.getProperty(PROPNAME_PASSWORD));
         }
 
@@ -162,7 +162,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         if(getView()!= null){
             authenticate(event.getPayload().getUserName(), getView().getLoginDialog().getPassword().getValue());
         } else {
-            log.info("view is NULL, not yet disposed LoginPresenter?");
+            logger.info("view is NULL, not yet disposed LoginPresenter?");
         }
     }
 
@@ -264,7 +264,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         boolean asyncTimeout = false;
         Boolean result = false;
         try {
-            finshedSignal.await(2, TimeUnit.SECONDS);
+            finshedSignal.await(4, TimeUnit.SECONDS);
             result = futureResult.get();
         } catch (InterruptedException e) {
             asyncTimeout = true;
@@ -277,9 +277,10 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
         if(!asyncException.isEmpty()) {
             getView().getLoginDialog().getRegisterMessageLabel()
-            .setValue("Sending the account resitration email to you has failed. Please try again later or contect the support in case this error persists.");
+                .setValue("Sending the account registration email to you has failed. Please try again later or contect the support in case this error persists.");
             getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
-        } else {
+            asyncException.stream().forEach(e->{e.printStackTrace(); logger.error("Error when sending mail: ", e.getMessage());});
+         } else {
             if(!asyncTimeout && result) {
                 getView().getLoginDialog().getRegisterMessageLabel().setValue("An email with with further instructions has been sent to you.");
                 getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_SUCCESS);

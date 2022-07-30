@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.presenter;
 
 import java.net.URISyntaxException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,7 +31,7 @@ import eu.etaxonomy.cdm.vaadin.view.AuthenticationPresenter;
 public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
 
     @SuppressWarnings("unused")
-    private static final Logger logger = Logger.getLogger(AuthenticationPresenterTest.class);
+    private static final Logger logger = LogManager.getLogger();
 
     private static AuthenticationPresenter ap;
 

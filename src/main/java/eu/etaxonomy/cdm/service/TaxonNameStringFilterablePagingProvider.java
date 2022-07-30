@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 
 import com.vaadin.data.Property.ValueChangeListener;
@@ -43,9 +44,9 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  */
 public class TaxonNameStringFilterablePagingProvider implements FilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
 
-    private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
+    private final static Logger logger = LogManager.getLogger();
 
-    private static final Logger logger = Logger.getLogger(TaxonNameStringFilterablePagingProvider.class);
+    private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
     private int pageSize = 20;
 

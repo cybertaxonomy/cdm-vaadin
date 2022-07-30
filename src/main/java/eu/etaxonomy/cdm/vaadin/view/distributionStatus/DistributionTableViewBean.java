@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
@@ -64,14 +66,16 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  *
  * @author freimeier
  * @since 18.10.2017
- *
  */
 @ViewScope
 @SpringView(name=DistributionTableViewBean.NAME)
 public class DistributionTableViewBean extends AbstractPageView<DistributionTablePresenter>
             implements IDistributionTableView, AccessRestrictedView {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3495626893961744083L;
+
+    private final static Logger logger = LogManager.getLogger();
+
     public static final String NAME = "distGrid"; //$NON-NLS-1$
 
     @Autowired

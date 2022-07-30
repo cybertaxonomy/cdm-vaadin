@@ -15,7 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 
 import com.vaadin.spring.annotation.SpringComponent;
@@ -67,7 +68,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private static final long serialVersionUID = -4347633563800758815L;
 
-    private static final Logger logger = Logger.getLogger(ReferencePopupEditor.class);
+    private final static Logger logger = LogManager.getLogger();
 
     private TextField titleField;
 

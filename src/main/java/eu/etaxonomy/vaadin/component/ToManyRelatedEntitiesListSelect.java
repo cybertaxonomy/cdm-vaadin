@@ -16,7 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.osgi.dto.DTO;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
@@ -35,6 +37,7 @@ import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.event.EntityEditorActionEvent;
 import eu.etaxonomy.vaadin.event.EntityEditorActionListener;
+import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.permission.EditPermissionTester;
 
 /**
@@ -51,7 +54,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private static final long serialVersionUID = 4670707714503199599L;
 
-    private static final Logger logger = Logger.getLogger(ToManyRelatedEntitiesListSelect.class);
+    private final static Logger logger = LogManager.getLogger();
 
     protected Class<F> fieldType;
 

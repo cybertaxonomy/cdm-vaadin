@@ -15,7 +15,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -27,8 +28,6 @@ import org.springframework.util.ReflectionUtils;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.UIScope;
 
-import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
-
 /**
  * The DefaultPojoEventListenerManager helps sending events to  event listener methods defined in beans
  * which are not manages by the Spring {@link ApplicationEventMulticaster}. The {@link ApplicationEventMulticaster}
@@ -36,7 +35,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  *
  * @author a.kohlbecker
  * @since May 29, 2017
- *
  */
 @SpringComponent
 @UIScope
@@ -44,7 +42,7 @@ public class DefaultPojoEventListenerManager implements PojoEventListenerManager
 
     private static final long serialVersionUID = -6814417168274166953L;
 
-    public static final Logger logger = Logger.getLogger(AbstractPresenter.class);
+    private final static Logger logger = LogManager.getLogger();
 
     @Autowired
     private ApplicationEventMulticaster applicationEventMulticaster;

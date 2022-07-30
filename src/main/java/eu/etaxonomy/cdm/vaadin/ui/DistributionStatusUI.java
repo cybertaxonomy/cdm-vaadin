@@ -1,6 +1,5 @@
 package eu.etaxonomy.cdm.vaadin.ui;
 
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventBus.UIEventBus;
 
@@ -29,9 +28,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManagerBean;
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 @SuppressWarnings("serial")
 public class DistributionStatusUI extends UI{
-
-    @SuppressWarnings("unused")
-    private final static Logger logger = Logger.getLogger(DistributionStatusUI.class);
 
     public static final String NAME = "distribution";
 

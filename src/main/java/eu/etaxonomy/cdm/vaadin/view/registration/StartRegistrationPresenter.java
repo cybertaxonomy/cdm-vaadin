@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
@@ -61,6 +63,8 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
     private static final long serialVersionUID = 2283189121081612574L;
 
+    private final static Logger logger = LogManager.getLogger();
+
     private ReferencePopupEditor newReferencePopup;
 
     private Reference newReference;
@@ -76,10 +80,6 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         super();
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
 
@@ -121,10 +121,6 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
     }
 
-    /**
-     * @param value
-     * @return
-     */
     public void updateReferenceSearchMode(MatchMode value) {
         if(referencePagingProvider != null && value != null){
             referencePagingProvider.setMatchMode(value);
@@ -132,9 +128,6 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewExit() {
         if(!registrationInProgress && newReference != null){

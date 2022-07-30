@@ -10,7 +10,8 @@ package eu.etaxonomy.cdm.vaadin.presenter;
 
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -34,7 +35,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 9 Apr 2015
- *
  */
 @DataSets({
     @DataSet(loadStrategy=CleanSweepInsertLoadStrategy.class),
@@ -42,7 +42,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 })
 public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
 
-    private static final Logger logger = Logger.getLogger(ConceptRelationshipPresenterTest.class);
+    private static final Logger logger = LogManager.getLogger();
 
     private static ConceptRelationshipPresenter crp;
     private static D3ConceptRelationshipTree crTree;
@@ -59,7 +59,6 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         nameService = CdmSpringContextHelper.getNameService();
         app = CdmSpringContextHelper.getApplicationConfiguration();
     }
-
 
     @Test
     @Ignore
@@ -90,6 +89,4 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         // app.commitTransaction(tx);
 
     }
-
-
 }

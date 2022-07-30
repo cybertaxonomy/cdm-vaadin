@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -25,10 +23,8 @@ import eu.etaxonomy.cdm.vaadin.session.CdmChangeEvent;
 /**
  * @author cmathew
  * @since 14 Apr 2015
- *
  */
 public abstract class CdmVaadinOperation implements Runnable {
-    private static final Logger logger = Logger.getLogger(CdmVaadinOperation.class);
 
     private int pollInterval = -1;
     private CdmProgressComponent progressComponent;

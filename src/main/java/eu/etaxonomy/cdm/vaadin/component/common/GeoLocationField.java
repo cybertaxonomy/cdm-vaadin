@@ -11,7 +11,8 @@ package eu.etaxonomy.cdm.vaadin.component.common;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.addon.leaflet.LCircle;
 import org.vaadin.addon.leaflet.LMap;
 import org.vaadin.addon.leaflet.LMarker;
@@ -40,13 +41,11 @@ import eu.etaxonomy.vaadin.component.CompositeCustomField;
 /**
  * @author a.kohlbecker
  * @since Jun 22, 2017
- *
  */
 public class GeoLocationField extends CompositeCustomField<Point> {
 
-    private static final Logger logger = Logger.getLogger(GeoLocationField.class);
-
     private static final long serialVersionUID = 1122123034547920390L;
+    private final static Logger logger = LogManager.getLogger();
 
     private static final String PRIMARY_STYLE = "v-geolocation-field";
 
@@ -65,9 +64,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     private CssLayout mapWrapper;
 
 
-    /**
-     *
-     */
     public GeoLocationField() {
         super();
     }
@@ -77,9 +73,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         setCaption(caption);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
         super.setPrimaryStyleName(PRIMARY_STYLE);
@@ -139,9 +132,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         return root;
     }
 
-    /**
-     *
-     */
     protected void updateMap() {
 
         Double longitude  = null;
