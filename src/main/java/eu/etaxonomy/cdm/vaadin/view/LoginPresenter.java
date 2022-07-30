@@ -67,7 +67,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  *
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 @SpringComponent
 @ViewScope
@@ -265,7 +264,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         boolean asyncTimeout = false;
         Boolean result = false;
         try {
-            finshedSignal.await(2, TimeUnit.SECONDS);
+            finshedSignal.await(4, TimeUnit.SECONDS);
             result = futureResult.get();
         } catch (InterruptedException e) {
             asyncTimeout = true;
@@ -278,9 +277,10 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
         if(!asyncException.isEmpty()) {
             getView().getLoginDialog().getRegisterMessageLabel()
-            .setValue("Sending the account registration email to you has failed. Please try again later or contect the support in case this error persists.");
+                .setValue("Sending the account registration email to you has failed. Please try again later or contect the support in case this error persists.");
             getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
-        } else {
+            asyncException.stream().forEach(e->{e.printStackTrace(); logger.error("Error when sending mail: ", e.getMessage());});
+         } else {
             if(!asyncTimeout && result) {
                 getView().getLoginDialog().getRegisterMessageLabel().setValue("An email with with further instructions has been sent to you.");
                 getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_SUCCESS);
