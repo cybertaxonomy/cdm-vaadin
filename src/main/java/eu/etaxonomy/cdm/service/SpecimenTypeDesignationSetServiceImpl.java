@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -54,7 +55,7 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 public class SpecimenTypeDesignationSetServiceImpl
         implements ISpecimenTypeDesignationSetService {
 
-    private final Logger logger = Logger.getLogger(SpecimenTypeDesignationSetServiceImpl.class);
+    private final Logger logger = LogManager.getLogger();
 
     static SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
     static {

@@ -8,7 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.ui;
 
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -22,15 +23,16 @@ import eu.etaxonomy.cdm.vaadin.jscomponent.D3CTree;
 /**
  * @author cmathew
  * @since 8 Apr 2015
- *
  */
 @Theme("edit")
 @SpringUI(path="d3ctree")
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class D3CTreeUI extends UI {
 
-    private final static Logger logger =
-            Logger.getLogger(D3CTreeUI.class.getName());
+    private static final long serialVersionUID = 3370416837565654213L;
+
+    @SuppressWarnings("unused")
+    private final static Logger logger = LogManager.getLogger();
 
     final VerticalLayout layout = new VerticalLayout();
     final D3CTree d3ctree = new D3CTree();
@@ -41,6 +43,4 @@ public class D3CTreeUI extends UI {
         layout.addComponent(d3ctree);     //add the diagram like any other vaadin component, cool!
         setContent(layout);
     }
-
-
 }

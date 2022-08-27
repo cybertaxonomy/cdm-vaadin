@@ -8,12 +8,11 @@
 */
 package eu.etaxonomy.cdm.vaadin.ui;
 
-
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
-import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
@@ -23,21 +22,18 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.StatusComposite;
 /**
  * @author cmathew
  * @since 11 Mar 2015
- *
  */
 @Theme("edit")
 @SpringUI(path=StatusEditorUI.NAME)
 @Widgetset("eu.etaxonomy.cdm.vaadin.AppWidgetSet")
 public class StatusEditorUI extends AbstractAuthenticatedUI {
 
-    Navigator navigator;
+    private static final long serialVersionUID = 7979880076776241573L;
+    @SuppressWarnings("unused")
+    private final Logger logger = LogManager.getLogger();
 
     public static final String NAME = "status";
-
     private static final String FIRST_VIEW = "editstatus";
-
-    private final static Logger logger =
-            Logger.getLogger(StatusEditorUI.class.getName());
 
     @Override
     protected void doInit(VaadinRequest request) {
@@ -47,12 +43,10 @@ public class StatusEditorUI extends AbstractAuthenticatedUI {
         getPage().setTitle("Status Editor");
         StatusComposite statusEditor = new StatusComposite();
         UI.getCurrent().getNavigator().addView(FIRST_VIEW, statusEditor);
-
     }
 
     @Override
     public String getFirstViewName() {
         return FIRST_VIEW;
     }
-
 }

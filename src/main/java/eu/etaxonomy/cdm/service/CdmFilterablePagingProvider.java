@@ -101,9 +101,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         this.type = type;
         this.service = service;
 
-        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
+        // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
     }
-
 
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
         this(service, null, matchMode, orderHints);
@@ -116,13 +115,9 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         this.matchMode = matchMode;
         this.orderHints = orderHints;
 
-        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
+        // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
     public List<V> findEntities(int firstRow, String filter) {
 
@@ -160,14 +155,10 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
             logger.trace("findEntities() - page: " + page.getCurrentIndex() + "/" + page.getPagesAvailable() + " totalRecords: " + page.getCount() + "\n" + page.getRecords());
         }
 
-        // Logger.getLogger("org.hibernate.SQL").setLevel(Level.WARN);
+        // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
         return page.getRecords();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
     @Override
     public int size(String filter) {
 
@@ -177,7 +168,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         clearSession(); // clear the session from remains of previous service calls, see issue #7559
         if(!restrictions.isEmpty()){
-            // Logger.getLogger("org.hibernate.SQL").setLevel(Level.TRACE);
+            // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             page = service.findByTitleWithRestrictions(
                     type,
