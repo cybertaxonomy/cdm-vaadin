@@ -57,10 +57,8 @@ import eu.etaxonomy.cdm.persistence.permission.CdmAuthority;
  * by a database update. The RegistrationStatus causing this are contained in the constant
  * {@link GrantedAuthorityRevokingRegistrationUpdateLister#MODIFICATION_STOP_STATES MODIFICATION_STOP_STATES}
  *
- *
  * @author a.kohlbecker
  * @since Dec 18, 2017
- *
  */
 public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpdateEventListener {
 
@@ -80,9 +78,6 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
 
     private static final EnumSet<CRUD> UPDATE = EnumSet.of(CRUD.UPDATE);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onPostUpdate(PostUpdateEvent event) {
         if( event.getEntity() instanceof Registration){
@@ -118,18 +113,17 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
      * individual users.
      */
     private Set<CdmAuthority> collectDeleteCandidates(Registration reg){
-        Set<CdmAuthority> deleteCandidates = new HashSet<CdmAuthority>();
+        Set<CdmAuthority> deleteCandidates = new HashSet<>();
         // add authority for Registration
         deleteCandidates.add(new CdmAuthority(reg,  RegistrationStatus.PREPARATION.name(), UPDATE));
         if(reg.getName() != null){
             addDeleteCandidates(deleteCandidates, reg.getName());
         }
-        for(TypeDesignationBase td : reg.getTypeDesignations()){
+        for(TypeDesignationBase<?> td : reg.getTypeDesignations()){
             addDeleteCandidates(deleteCandidates, td);
         }
 
         return deleteCandidates;
-
     }
 
     /**
@@ -149,12 +143,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         addDeleteCandidates(deleteCandidates, name.getExBasionymAuthorship());
     }
 
-
-    /**
-     * @param deleteCandidates
-     * @param td
-     */
-    private void addDeleteCandidates(Set<CdmAuthority> deleteCandidates, TypeDesignationBase td) {
+    private void addDeleteCandidates(Set<CdmAuthority> deleteCandidates, TypeDesignationBase<?> td) {
         if(td == null){
             return;
         }
@@ -282,12 +271,10 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         deleteQuery.setParameterList("authorities", authorityStrings);
         deleteQuery.setFlushMode(FlushMode.MANUAL); // workaround for  HHH-11822 (https://hibernate.atlassian.net/browse/HHH-11822)
         deleteQuery.executeUpdate();
-
     }
 
     @Override
     public boolean requiresPostCommitHanding(EntityPersister persister) {
         return false;
     }
-
 }
