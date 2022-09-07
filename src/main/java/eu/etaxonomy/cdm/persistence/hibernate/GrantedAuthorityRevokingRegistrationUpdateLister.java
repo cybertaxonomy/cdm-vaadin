@@ -267,7 +267,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         String hql = "delete from GrantedAuthorityImpl as ga where ga.authority in (:authorities)";
         Query<?> deleteQuery = session.createQuery(hql);
         deleteQuery.setParameterList("authorities", authorityStrings);
-        deleteQuery.setFlushMode(FlushMode.MANUAL); // workaround for  HHH-11822 (https://hibernate.atlassian.net/browse/HHH-11822)
+        deleteQuery.setHibernateFlushMode(FlushMode.MANUAL); // workaround for  HHH-11822 (https://hibernate.atlassian.net/browse/HHH-11822)
         deleteQuery.executeUpdate();
     }
 
