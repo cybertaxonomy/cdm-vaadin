@@ -17,13 +17,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.FlushMode;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.event.spi.EventSource;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.query.Query;
 import org.springframework.security.core.GrantedAuthority;
 
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
@@ -234,9 +234,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         try {
             Transaction txState = newSession.beginTransaction();
 
-            Query userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)");
+            Query<User> userQuery = newSession.createQuery("select u from User u join u.grantedAuthorities ga where ga.authority in (:authorities)", User.class);
             userQuery.setParameterList("authorities", authorityStrings);
-            @SuppressWarnings("unchecked")
             List<User> users = userQuery.list();
             for(User user : users){
                 List<GrantedAuthority> deleteFromUser = user.getGrantedAuthorities().stream().filter(
@@ -246,9 +245,8 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
                 user.getGrantedAuthorities().removeAll(deleteFromUser);
             }
 
-            Query groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)");
+            Query<Group> groupQuery = newSession.createQuery("select g from Group g join g.grantedAuthorities ga where ga.authority in (:authorities)", Group.class);
             groupQuery.setParameterList("authorities", authorityStrings);
-            @SuppressWarnings("unchecked")
             List<Group> groups = groupQuery.list();
             for(Group group : groups){
                 List<GrantedAuthority> deleteFromUser = group.getGrantedAuthorities().stream().filter(
@@ -267,7 +265,7 @@ public class GrantedAuthorityRevokingRegistrationUpdateLister implements PostUpd
         // -----------------------------------------------------------------------------------------
 
         String hql = "delete from GrantedAuthorityImpl as ga where ga.authority in (:authorities)";
-        Query deleteQuery = session.createQuery(hql);
+        Query<?> deleteQuery = session.createQuery(hql);
         deleteQuery.setParameterList("authorities", authorityStrings);
         deleteQuery.setFlushMode(FlushMode.MANUAL); // workaround for  HHH-11822 (https://hibernate.atlassian.net/browse/HHH-11822)
         deleteQuery.executeUpdate();
