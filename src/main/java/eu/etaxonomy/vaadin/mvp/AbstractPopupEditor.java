@@ -60,7 +60,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.common.LogUtils;
 import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
@@ -608,27 +607,27 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             PropertyIdPath nestedPropertyIds = new PropertyIdPath();
             Field<?> parentField = field;
             HasComponents parentComponent = parentField.getParent();
-            LogUtils.logAsDebug(logger, "field: " + parentField.getClass().getSimpleName());
+            logger.debug("field: " + parentField.getClass().getSimpleName());
             while(parentComponent != null){
-                LogUtils.logAsDebug(logger, "parentComponent: " + parentComponent.getClass().getSimpleName());
+                if (logger.isDebugEnabled()){logger.debug("parentComponent: " + parentComponent.getClass().getSimpleName());}
                 if(NestedFieldGroup.class.isAssignableFrom(parentComponent.getClass()) && AbstractField.class.isAssignableFrom(parentComponent.getClass())){
                     Optional<FieldGroup> parentFieldGroup = ((NestedFieldGroup)parentComponent).getFieldGroup();
                     if(parentFieldGroup.isPresent()){
                         Object propId = parentFieldGroup.get().getPropertyId(parentField);
                         if(propId != null){
-                            LogUtils.logAsDebug(logger, "propId: " + propId.toString());
+                            if (logger.isDebugEnabled()){logger.debug("propId: " + propId.toString());}
                             nestedPropertyIds.addParent(propId);
                         }
-                        LogUtils.logAsDebug(logger, "parentField: " + parentField.getClass().getSimpleName());
+                        if (logger.isDebugEnabled()){logger.debug("parentField: " + parentField.getClass().getSimpleName());}
                         parentField = (Field<?>)parentComponent;
                     } else {
-                        LogUtils.logAsDebug(logger, "parentFieldGroup is null, continuing ...");
+                        if (logger.isDebugEnabled()){logger.debug("parentFieldGroup is null, continuing ...");}
                     }
                 } else if(parentComponent == this) {
                     // we reached the editor itself
                     Object propId = fieldGroup.getPropertyId(parentField);
                     if(propId != null){
-                        LogUtils.logAsDebug(logger, "propId: " + propId.toString());
+                        if (logger.isDebugEnabled()){logger.debug("propId: " + propId.toString());}
                         nestedPropertyIds.addParent(propId);
                     }
                     propertyIdPath = nestedPropertyIds;

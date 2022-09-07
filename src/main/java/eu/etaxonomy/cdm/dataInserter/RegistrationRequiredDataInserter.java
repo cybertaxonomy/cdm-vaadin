@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.AbstractDataInserter;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
-import eu.etaxonomy.cdm.common.LogUtils;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
@@ -238,7 +237,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
             TransactionStatus tx;
             Pager<Taxon> taxonPage;
             List<TaxonBase> taxa = new ArrayList<>();
-            LogUtils.logAsDebug(logger, "======= fixing sec refrences =========");
+            logger.debug("======= fixing sec refrences =========");
             while(true){
                 tx = repo.startTransaction(false);
                 taxonPage = repo.getTaxonService().page(Taxon.class, chunksize, pageIndex++, null, null);
@@ -253,7 +252,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                 repo.commitTransaction(tx);
             }
 
-            LogUtils.logAsDebug(logger, "======= creating taxon graph =========");
+            logger.debug("======= creating taxon graph =========");
             pageIndex = 0;
             Pager<TaxonName> page;
             while(true){
@@ -263,7 +262,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                    repo.commitTransaction(tx);
                    break;
                }
-               LogUtils.logAsDebug(logger, TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));
+               if (logger.isDebugEnabled()){logger.debug( TAXON_GRAPH_CREATE + ": chunk " + pageIndex + "/" + Math.ceil(page.getCount() / chunksize));}
                taxa = new ArrayList<>();
 
                for(TaxonName name : page.getRecords()){
@@ -272,7 +271,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                        if(illegitimType == null){
                            Taxon taxon;
                            try {
-                               LogUtils.logAsDebug(logger, "Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");
+                               if (logger.isDebugEnabled()){logger.debug("Processing name: " + name.getTitleCache() + " [" + name.getRank().getLabel() + "]");}
                                taxon = processor.assureSingleTaxon(name);
                                processor.updateEdges(taxon);
                                taxa.add(taxon);
@@ -280,10 +279,10 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                                logger.error(e.getMessage());
                            }
                        } else {
-                           LogUtils.logAsDebug(logger, "Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");
+                           if (logger.isDebugEnabled()){logger.debug("Skipping illegitimate name: " + name.getTitleCache() + " " + illegitimType.getLabel() + " [" + name.getRank().getLabel() + "]");}
                        }
                    } else {
-                       LogUtils.logAsDebug(logger, "Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");
+                       if (logger.isDebugEnabled()){logger.debug("Skipping name: " + name.getTitleCache() + " [" + (name.getRank() != null ? name.getRank().getLabel() : "NULL") + "]");}
                    }
                }
                repo.getTaxonService().saveOrUpdate(taxa);
