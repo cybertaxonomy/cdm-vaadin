@@ -463,8 +463,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- ReplacedSynonyms
         row++;
-        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Replaced synonym");
-        replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<>(TaxonName.class, "Replaced synonym");
+        replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<>());
         addField(replacedSynonymsComboboxSelect, "replacedSynonyms", 0, row, 3, row);
         replacedSynonymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
         replacedSynonymsComboboxSelect.withEditButton(true);
@@ -1125,7 +1125,7 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      */
     public void setAllFieldsReadOnly(boolean readOnly) {
         recursiveReadonly(readOnly, getMainLayout());
-        // NOTE:We are uUsing the enabled state instead of read only since
+        // NOTE:We are using the enabled state instead of read only since
         // setting read only will not affect the members editor.
         // this seems to be a bug in TeamOrPersonField or in
         // ToManyRelatedEntitiesListSelect
