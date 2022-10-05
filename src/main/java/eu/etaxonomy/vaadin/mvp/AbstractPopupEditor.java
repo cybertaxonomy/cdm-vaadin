@@ -78,16 +78,15 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
- *
  * Optional with a delete button which can be enabled with {@link #withDeleteButton(boolean)}
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
 public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
     extends AbstractPopupView<P> {
 
+    private static final long serialVersionUID = 5944874629527570061L;
     private final static Logger logger = LogManager.getLogger();
 
     private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
@@ -114,13 +113,13 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Label statusMessageLabel = new Label();
 
-    Set<String> statusMessages = new HashSet<>();
+    private Set<String> statusMessages = new HashSet<>();
 
     private GridLayout _gridLayoutCache;
 
     private boolean isBeanLoaded;
 
-    private Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+    private Stack<EditorActionContext> context = new Stack<>();
 
     private boolean isContextUpdated;
 
@@ -220,9 +219,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return fieldLayout;
     }
 
-    /**
-     * @return
-     */
     private GridLayout gridLayout() {
         if(_gridLayoutCache == null){
             if(fieldLayout instanceof GridLayout){
@@ -417,7 +413,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         }
     }
 
-
     /**
      * Cancel editing and discard all modifications.
      */
@@ -568,16 +563,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     /**
      * Can only be used if the <code>fieldlayout</code> is a GridLayout.
-     *
-     * @param field
-     * @param propertyId
-     * @param column1
-     * @param row1
-     * @param column2
-     * @param row2
-     * @return
-     * @throws OverlapsException
-     * @throws OutOfBoundsException
      */
     protected <T extends Field> T addField(T field, String propertyId, int column1, int row1,
             int column2, int row2)
@@ -664,9 +649,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         fieldGroup.unbind(field);
     }
 
-    /**
-     * @param component
-     */
     public void applyDefaultComponentStyles(Component component) {
         component.addStyleName(getDefaultComponentStyles());
     }
@@ -776,9 +758,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return returnVal;
     }
 
-    /**
-     *
-     */
     private void updateStatusLabel() {
         String text = "";
         for(String s : statusMessages){
@@ -962,20 +941,21 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         }
     }
 
-    protected AbstractField<String> replaceComponent(String propertyId, AbstractField<String> oldField, AbstractField<String> newField, int column1, int row1, int column2,
-            int row2) {
-                String value = oldField.getValue();
-                newField.setCaption(oldField.getCaption());
-                GridLayout grid = (GridLayout)getFieldLayout();
-                grid.removeComponent(oldField);
+    protected AbstractField<String> replaceComponent(String propertyId, AbstractField<String> oldField,
+            AbstractField<String> newField, int column1, int row1, int column2, int row2) {
 
-                unbindField(oldField);
-                addField(newField, propertyId, column1, row1, column2, row2);
-                getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
-                // important: set newField value at last!
-                newField.setValue(value);
-                return newField;
-            }
+        String value = oldField.getValue();
+        newField.setCaption(oldField.getCaption());
+        GridLayout grid = (GridLayout)getFieldLayout();
+        grid.removeComponent(oldField);
+
+        unbindField(oldField);
+        addField(newField, propertyId, column1, row1, column2, row2);
+        getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+        // important: set newField value at last!
+        newField.setValue(value);
+        return newField;
+    }
 
     public EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> getEditorComponentsConfigurator() {
         return editorComponentsConfigurator;
@@ -985,5 +965,4 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator) {
         this.editorComponentsConfigurator = editorComponentsConfigurator;
     }
-
 }

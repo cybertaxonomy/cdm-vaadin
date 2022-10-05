@@ -1,9 +1,16 @@
+/**
+* Copyright (C) 2017 EDIT
+* European Distributed Institute of Taxonomy
+* http://www.e-taxonomy.eu
+*
+* The contents of this file are subject to the Mozilla Public License Version 1.1
+* See LICENSE.TXT at the top of this package for the full license terms.
+*/
 package eu.etaxonomy.vaadin.mvp;
 
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.vaadin.ui.view.PopupView;
-
 
 /**
  * @author a.kohlbecker
@@ -12,7 +19,9 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @param <P>
  */
 @SuppressWarnings("serial")
-public abstract class AbstractPopupView<P extends AbstractPresenter> extends AbstractView<P> implements PopupView  {
+public abstract class AbstractPopupView<P extends AbstractPresenter>
+        extends AbstractView<P>
+        implements PopupView  {
 
 	private Window window;
 
@@ -20,9 +29,6 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
 	    window.setCaption(caption);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isResizable() {
         return false;
@@ -33,17 +39,11 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWindowWidth() {
         return -1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Unit getWindowWidthUnit() {
         return Unit.PIXELS;
@@ -65,26 +65,16 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
         return 100;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Unit getWindowHeightUnit() {
         return Unit.PERCENTAGE;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isModal() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isWindowCaptionAsHtml() {
         return false;
@@ -114,8 +104,4 @@ public abstract class AbstractPopupView<P extends AbstractPresenter> extends Abs
 	    window.close();
 	}
 	*/
-
-
-
-
 }
