@@ -373,6 +373,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
             // avoid resetting readonly to false
+            logger.error("Set popup to readonly as event source is read only");
             popup.setReadOnly(true);
         }
 

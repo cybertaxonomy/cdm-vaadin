@@ -1124,6 +1124,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      * @param readOnly
      */
     public void setAllFieldsReadOnly(boolean readOnly) {
+        logger.error("Set all fields to readonly");
+
         recursiveReadonly(readOnly, getMainLayout());
         // NOTE:We are using the enabled state instead of read only since
         // setting read only will not affect the members editor.
