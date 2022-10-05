@@ -88,6 +88,7 @@ public class RegistrationWorksetViewBean
         extends AbstractPageView<RegistrationWorkingsetPresenter>
         implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
+    private static final long serialVersionUID = -213040114015958970L;
 
     private static final int COL_INDEX_STATE_LABEL = 0;
 
@@ -100,11 +101,7 @@ public class RegistrationWorksetViewBean
     public static final String TEXT_NAME_TYPIFICATION = "covering the name and typifications";
     public static final String TEXT_TYPIFICATION_ONLY = "covering typifications only";
 
-    private static final long serialVersionUID = -213040114015958970L;
-
     public static final String NAME = "workingset";
-
-    public RegistrationType regType = null;
 
     private List<CssLayout> registrations = new ArrayList<>();
 
