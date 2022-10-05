@@ -78,7 +78,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 import eu.etaxonomy.vaadin.util.PropertyIdPath;
 
 /**
- * Optional with a delete button which can be enabled with {@link #withDeleteButton(boolean)}
+ * Optional with a deleteBtn button which can be enabled with {@link #withDeleteButton(boolean)}
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
@@ -99,11 +99,11 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private HorizontalLayout buttonLayout;
 
-    private Button save;
+    private Button saveBtn;
 
-    private Button cancel;
+    private Button cancelBtn;
 
-    private Button delete;
+    private Button deleteBtn;
 
     private CssLayout toolBar = new CssLayout();
 
@@ -171,24 +171,24 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         buttonLayout.setWidth(100, Unit.PERCENTAGE);
         buttonLayout.setSpacing(true);
 
-        save = new Button("Save", FontAwesome.SAVE);
-        save.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        save.addClickListener(e -> save());
+        saveBtn = new Button("Save", FontAwesome.SAVE);
+        saveBtn.setStyleName(ValoTheme.BUTTON_PRIMARY);
+        saveBtn.addClickListener(e -> save());
 
-        cancel = new Button("Cancel", FontAwesome.REMOVE);
-        cancel.addClickListener(e -> cancelEditorDialog());
+        cancelBtn = new Button("Cancel", FontAwesome.REMOVE);
+        cancelBtn.addClickListener(e -> cancelEditorDialog());
 
-        delete = new Button("Delete", FontAwesome.TRASH);
-        delete.setStyleName(ValoTheme.BUTTON_DANGER);
-        delete.addClickListener(e -> delete());
-        delete.setVisible(false);
+        deleteBtn = new Button("Delete", FontAwesome.TRASH);
+        deleteBtn.setStyleName(ValoTheme.BUTTON_DANGER);
+        deleteBtn.addClickListener(e -> delete());
+        deleteBtn.setVisible(false);
 
-        buttonLayout.addComponents(delete, save, cancel);
-        // delete is initially invisible, let save take all space
-        buttonLayout.setExpandRatio(save, 1);
-        buttonLayout.setComponentAlignment(delete, Alignment.TOP_RIGHT);
-        buttonLayout.setComponentAlignment(save, Alignment.TOP_RIGHT);
-        buttonLayout.setComponentAlignment(cancel, Alignment.TOP_RIGHT);
+        buttonLayout.addComponents(deleteBtn, saveBtn, cancelBtn);
+        // deleteBtn is initially invisible, let saveBtn take all space
+        buttonLayout.setExpandRatio(saveBtn, 1);
+        buttonLayout.setComponentAlignment(deleteBtn, Alignment.TOP_RIGHT);
+        buttonLayout.setComponentAlignment(saveBtn, Alignment.TOP_RIGHT);
+        buttonLayout.setComponentAlignment(cancelBtn, Alignment.TOP_RIGHT);
 
         statusMessageLabel.setSizeFull();
         statusMessageLabel.setContentMode(com.vaadin.shared.ui.label.ContentMode.HTML);
@@ -240,10 +240,10 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             statusMessageLabel.setValue(null);
         }
         statusMessageLabel.setVisible(readOnly);
-        logger.error("Set save.visible to " + !readOnly);
-        save.setVisible(!readOnly);
+        logger.error("Set saveBtn.visible to " + !readOnly);
+        saveBtn.setVisible(!readOnly);
         updateDeleteButtonState();
-        cancel.setCaption(readOnly ? "Close" : "Cancel");
+        cancelBtn.setCaption(readOnly ? "Close" : "Cancel");
         recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
     }
 
@@ -366,7 +366,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
             ContinueAlternativeCancelDialog editorModifiedDialog = new ContinueAlternativeCancelDialog(
                     "Cancel editor",
-                    "<p>The editor has been modified.<br>Do you want to save your changes or discard them?<p>",
+                    "<p>The editor has been modified.<br>Do you want to saveBtn your changes or discard them?<p>",
                     "Discard",
                     "Save");
             ClickListener saveListener = e -> {editorModifiedDialog.close(); save();};
@@ -691,18 +691,18 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     public void setSaveButtonEnabled(boolean enabled){
-        save.setEnabled(enabled);
+        saveBtn.setEnabled(enabled);
     }
 
     public void withDeleteButton(boolean withDelete){
 
         this.withDeleteButton = withDelete;
         if(withDeleteButton){
-            buttonLayout.setExpandRatio(save, 0);
-            buttonLayout.setExpandRatio(delete, 1);
+            buttonLayout.setExpandRatio(saveBtn, 0);
+            buttonLayout.setExpandRatio(deleteBtn, 1);
         } else {
-            buttonLayout.setExpandRatio(save, 1);
-            buttonLayout.setExpandRatio(delete, 0);
+            buttonLayout.setExpandRatio(saveBtn, 1);
+            buttonLayout.setExpandRatio(deleteBtn, 0);
         }
         updateDeleteButtonState();
     }
@@ -711,7 +711,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * @param withDelete
      */
     private void updateDeleteButtonState() {
-        delete.setVisible(withDeleteButton && !isReadOnly());
+        deleteBtn.setVisible(withDeleteButton && !isReadOnly());
     }
 
     public boolean addStatusMessage(String message){
