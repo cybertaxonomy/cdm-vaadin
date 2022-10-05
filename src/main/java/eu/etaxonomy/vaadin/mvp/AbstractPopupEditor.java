@@ -240,6 +240,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             statusMessageLabel.setValue(null);
         }
         statusMessageLabel.setVisible(readOnly);
+        logger.error("Set save.visible to " + !readOnly);
         save.setVisible(!readOnly);
         updateDeleteButtonState();
         cancel.setCaption(readOnly ? "Close" : "Cancel");
