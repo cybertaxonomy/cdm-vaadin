@@ -251,9 +251,9 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     protected void activateComboboxes() {
         CdmTitleCacheCaptionGenerator<TaxonName> titleCacheGenerator = new CdmTitleCacheCaptionGenerator<TaxonName>();
-        getView().getAddExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
+        getView().getExistingNameCombobox().setCaptionGenerator(titleCacheGenerator);
         CdmFilterablePagingProvider<TaxonName, TaxonName> pagingProvider = pagingProviderFactory.taxonNamesWithoutOrthophicIncorrect();
-        getView().getAddExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
+        getView().getExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
     /**
@@ -348,7 +348,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getAddExistingNameCombobox());
+        boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getExistingNameCombobox());
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
 
@@ -451,7 +451,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         if(event.getPopup() instanceof TaxonNamePopupEditor){
 
             EditorActionContext rootContext = editorActionContextRoot(event.getPopup());
-            boolean isAddExistingNameRegistration = rootContext.getTargetField() != null && rootContext.getTargetField().equals(getView().getAddExistingNameCombobox());
+            boolean isAddExistingNameRegistration = rootContext.getTargetField() != null && rootContext.getTargetField().equals(getView().getExistingNameCombobox());
 
             if(isAddExistingNameRegistration){
                 if(event.getReason().equals(Reason.SAVE)){
@@ -523,8 +523,8 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        getView().getAddExistingNameCombobox().commit(); // update the chosen value in the datasource
-        TaxonName typifiedName = getView().getAddExistingNameCombobox().getValue();
+        getView().getExistingNameCombobox().commit(); // update the chosen value in the datasource
+        TaxonName typifiedName = getView().getExistingNameCombobox().getValue();
         if(typifiedName != null){
             boolean doReloadWorkingSet = false;
             try {

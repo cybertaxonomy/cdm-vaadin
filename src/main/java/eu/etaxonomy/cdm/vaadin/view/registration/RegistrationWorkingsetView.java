@@ -21,6 +21,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
+import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
@@ -80,7 +81,7 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      */
     Button getAddExistingNameRegistrationButton();
 
-    public LazyComboBox<TaxonName> getAddExistingNameCombobox();
+    public LazyComboBox<TaxonName> getExistingNameCombobox();
 
     /**
      * @return

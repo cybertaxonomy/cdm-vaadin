@@ -84,7 +84,7 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  * @since Apr 5, 2017
  */
 public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
-    extends AbstractPopupView<P> {
+        extends AbstractPopupView<P> {
 
     private static final long serialVersionUID = 5944874629527570061L;
     private final static Logger logger = LogManager.getLogger();
@@ -115,7 +115,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Set<String> statusMessages = new HashSet<>();
 
-    private GridLayout _gridLayoutCache;
+    private GridLayout gridLayoutCache;
 
     private boolean isBeanLoaded;
 
@@ -220,14 +220,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     private GridLayout gridLayout() {
-        if(_gridLayoutCache == null){
+        if(gridLayoutCache == null){
             if(fieldLayout instanceof GridLayout){
-                _gridLayoutCache = (GridLayout)fieldLayout;
+                gridLayoutCache = (GridLayout)fieldLayout;
             } else {
                 throw new RuntimeException("The fieldlayout of this editor is not a GridLayout");
             }
         }
-        return _gridLayoutCache;
+        return gridLayoutCache;
     }
 
     @Override
@@ -246,10 +246,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         recursiveReadonly(readOnly, (AbstractComponentContainer)getFieldLayout());
     }
 
-    /**
-     * @param readOnly
-     * @param layout
-     */
     protected void recursiveReadonly(boolean readOnly, AbstractComponentContainer layout) {
         for(Component c : layout){
             c.setReadOnly(readOnly);
@@ -259,44 +255,25 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         }
     }
 
-    /**
-     * @return
-     * @return
-     */
     protected AbstractLayout getToolBar() {
         return toolBar;
     }
 
-    /**
-     * @return
-     * @return
-     */
     protected void toolBarAdd(Component c) {
         toolBar.addComponent(c, toolBar.getComponentIndex(toolBarButtonGroup) - 1);
         updateToolBarVisibility();
     }
 
-    /**
-     * @return
-     * @return
-     */
     protected void toolBarButtonGroupAdd(Component c) {
         toolBarButtonGroup.addComponent(c);
         updateToolBarVisibility();
     }
 
-    /**
-     * @return
-     * @return
-     */
     protected void toolBarButtonGroupRemove(Component c) {
         toolBarButtonGroup.removeComponent(c);
         updateToolBarVisibility();
     }
 
-    /**
-     *
-     */
     private void updateToolBarVisibility() {
         boolean showToolbar = toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1;
         toolBar.setVisible(toolBarButtonGroup.getComponentCount() + toolBar.getComponentCount() > 1);
@@ -305,28 +282,19 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         } else {
             mainLayout.setMargin(false);
         }
-
     }
 
     /**
      * The top tool-bar is initially invisible.
-     *
-     * @param visible
      */
     protected void setToolBarVisible(boolean visible){
         toolBar.setVisible(true);
     }
 
-    /**
-     * @return the isAdvancedMode
-     */
     public boolean isAdvancedMode() {
         return isAdvancedMode;
     }
 
-    /**
-     * @param isAdvancedMode the isAdvancedMode to set
-     */
     public void setAdvancedMode(boolean isAdvancedMode) {
         this.isAdvancedMode = isAdvancedMode;
         advancedModeComponents.forEach(c -> c.setVisible(isAdvancedMode));
@@ -478,7 +446,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     }
 
     // ------------------------ field adding methods ------------------------ //
-
 
     protected TextField addTextField(String caption, String propertyId) {
         return addField(new TextFieldNFix(caption), propertyId);
