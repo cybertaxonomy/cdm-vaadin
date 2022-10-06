@@ -82,11 +82,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-    implements TaxonNamePopupEditorView{
+public class TaxonNamePopupEditor
+        extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
+        implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
-
     private final static Logger logger = LogManager.getLogger();
 
     private final static int GRID_COLS = 4;

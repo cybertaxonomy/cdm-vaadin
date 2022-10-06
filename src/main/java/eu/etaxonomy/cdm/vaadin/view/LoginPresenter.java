@@ -248,16 +248,17 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);
 
         CountDownLatch finshedSignal = new CountDownLatch(1);
-        List<Throwable> asyncException = new ArrayList<>(1);
-        ListenableFuture<Boolean> futureResult = repo.getAccountRegistrationService().emailAccountRegistrationRequest(emailAddress,
-                servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.NAME + "#!" + AccountRegistrationViewBean.NAME + "/%s");
+        List<Throwable> asyncExceptions = new ArrayList<>(1);
+        String passwordRequestFormUrlTemplate = servletBaseUrl.toString() + "/app/" + UserAccountSelfManagementUI.NAME + "#!" + AccountRegistrationViewBean.NAME + "/%s";
+        ListenableFuture<Boolean> futureResult = repo.getAccountRegistrationService()
+                .emailAccountRegistrationRequest(emailAddress, passwordRequestFormUrlTemplate);
         futureResult.addCallback(
                     successFuture -> {
                         finshedSignal.countDown();
                     },
                     exception -> {
                         // possible MailException
-                        asyncException.add(exception);
+                        asyncExceptions.add(exception);
                         finshedSignal.countDown();
                     }
                 );
@@ -273,13 +274,13 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             // than futureResult.addCallback( can be processed, the exception
             // can not be caught asynchronously
             // so we are adding all these exceptions here
-            asyncException.add(e);
+            asyncExceptions.add(e);
         }
-        if(!asyncException.isEmpty()) {
+        if(!asyncExceptions.isEmpty()) {
             getView().getLoginDialog().getRegisterMessageLabel()
-                .setValue("Sending the account registration email to you has failed. Please try again later or contect the support in case this error persists.");
+                .setValue("Sending the account registration email to you has failed. Please try again later or contact the support in case this error persists.");
             getView().getLoginDialog().getRegisterMessageLabel().setStyleName(ValoTheme.LABEL_FAILURE);
-            asyncException.stream().forEach(e->{e.printStackTrace(); logger.error("Error when sending mail: ", e.getMessage());});
+            asyncExceptions.stream().forEach(e->{e.printStackTrace(); logger.error("Error when sending mail: ", e.getMessage());});
          } else {
             if(!asyncTimeout && result) {
                 getView().getLoginDialog().getRegisterMessageLabel().setValue("An email with with further instructions has been sent to you.");
@@ -293,5 +294,4 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
             }
         }
     }
-
 }

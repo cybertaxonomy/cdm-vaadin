@@ -75,7 +75,4 @@ public class UserAccountSelfManagementUI extends AbstractUI {
             }
         });
     }
-
-
-
 }

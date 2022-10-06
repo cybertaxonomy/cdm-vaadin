@@ -433,7 +433,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                 }
                 throw new RuntimeException(e);
             }
-
         }
     }
 
