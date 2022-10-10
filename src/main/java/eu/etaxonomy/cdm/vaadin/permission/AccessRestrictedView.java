@@ -15,13 +15,9 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 public interface AccessRestrictedView extends ReleasableResourcesView {
 
-    /**
-     * @return
-     */
     public boolean allowAnonymousAccess();
 
     /**

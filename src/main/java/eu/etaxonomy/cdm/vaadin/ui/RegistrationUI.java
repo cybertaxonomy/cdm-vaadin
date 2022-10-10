@@ -120,5 +120,4 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
     protected String getInitialViewName() {
         return INITIAL_VIEW;
     }
-
 }

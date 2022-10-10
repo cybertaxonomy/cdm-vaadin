@@ -24,22 +24,18 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 /**
  * @author a.kohlbecker
  * @since May 5, 2017
- *
  */
 public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO, CDM, ? extends ApplicationView>>
-    extends AbstractPopupEditor<DTO, P> implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
+        extends AbstractPopupEditor<DTO, P>
+        implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
+
+    private static final long serialVersionUID = -5025937489746256070L;
 
     private String accessDeniedMessage;
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public AbstractCdmDTOPopupEditor(Layout layout, Class<DTO> dtoType) {
         super(layout, dtoType);
     }
-
-    private static final long serialVersionUID = -5025937489746256070L;
 
     @Override
     public void grantToCurrentUser(EnumSet<CRUD> crud){
@@ -70,6 +66,4 @@ public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<
         this.accessDeniedMessage = accessDeniedMessage;
 
     }
-
-
 }

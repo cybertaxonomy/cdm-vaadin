@@ -82,11 +82,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-    implements TaxonNamePopupEditorView{
+public class TaxonNamePopupEditor
+        extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
+        implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
-
     private final static Logger logger = LogManager.getLogger();
 
     private final static int GRID_COLS = 4;
@@ -463,8 +463,8 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
 
         // --------------- ReplacedSynonyms
         row++;
-        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Replaced synonym");
-        replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        replacedSynonymsComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<>(TaxonName.class, "Replaced synonym");
+        replacedSynonymsComboboxSelect.setConverter(new SetToListConverter<>());
         addField(replacedSynonymsComboboxSelect, "replacedSynonyms", 0, row, 3, row);
         replacedSynonymsComboboxSelect.setWidth(100, Unit.PERCENTAGE);
         replacedSynonymsComboboxSelect.withEditButton(true);
@@ -1124,8 +1124,10 @@ public class TaxonNamePopupEditor extends AbstractCdmDTOPopupEditor<TaxonNameDTO
      * @param readOnly
      */
     public void setAllFieldsReadOnly(boolean readOnly) {
+        logger.error("Set all fields to readonly");
+
         recursiveReadonly(readOnly, getMainLayout());
-        // NOTE:We are uUsing the enabled state instead of read only since
+        // NOTE:We are using the enabled state instead of read only since
         // setting read only will not affect the members editor.
         // this seems to be a bug in TeamOrPersonField or in
         // ToManyRelatedEntitiesListSelect

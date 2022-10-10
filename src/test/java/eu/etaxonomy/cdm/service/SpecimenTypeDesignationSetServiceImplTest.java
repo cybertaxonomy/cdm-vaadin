@@ -69,7 +69,7 @@ public class SpecimenTypeDesignationSetServiceImplTest extends CdmVaadinIntegrat
 
     @BeforeClass
     public static void setupLoggers()  {
-       // Logger.getLogger("org.dbunit").setLevel(Level.DEBUG);
+       // LogUtils.setLevel("org.dbunit", Level.DEBUG);
     }
 
     UUID registrationUuid = UUID.fromString("c8bb4e70-ca85-43c3-ae81-c90a2b41a93f"); // 5000;

@@ -41,8 +41,9 @@ import eu.etaxonomy.vaadin.mvp.event.EditorSaveEvent;
  * @author a.kohlbecker
  * @since Apr 5, 2017
  */
-public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends ApplicationView<?>> extends AbstractEditorPresenter<DTO, V>
-    implements CachingPresenter {
+public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends ApplicationView<?>>
+        extends AbstractEditorPresenter<DTO, V>
+        implements CachingPresenter {
 
     private static final long serialVersionUID = 2218185546277084261L;
 
@@ -147,17 +148,17 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         CDM cdmEntitiy = cdmEntity(dto);
 
         UserHelper userHelper = UserHelperAccess.userHelper();
-        boolean canDelte = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
+        boolean canDelete = userHelper.userHasPermission(cdmEntitiy, CRUD.DELETE);
         boolean canEdit = userHelper.userHasPermission(cdmEntitiy, CRUD.UPDATE);
 
         if(AbstractPopupEditor.class.isAssignableFrom(getView().getClass())){
-            AbstractPopupEditor popupView = ((AbstractPopupEditor)getView());
+            AbstractPopupEditor<?,?> popupView = ((AbstractPopupEditor<?,?>)getView());
 
             if(cdmEntitiy.isPersited() && !canEdit){
                 popupView.setReadOnly(true); // never reset true to false here!
                 logger.debug("setting editor to readonly");
             }
-            if(!cdmEntitiy.isPersited() || !canDelte){
+            if(!cdmEntitiy.isPersited() || !canDelete){
                 popupView.withDeleteButton(false);
                 logger.debug("removing delete button");
             }
@@ -194,11 +195,9 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      */
     protected abstract IService<CDM> getService();
 
-    @SuppressWarnings("unchecked")
     @Override
     // @EventBusListenerMethod // already annotated at super class
-    public void onEditorPreSaveEvent(EditorPreSaveEvent preSaveEvent){
-
+    public void onEditorPreSaveEvent(EditorPreSaveEvent<DTO> preSaveEvent){
         if(!isFromOwnView(preSaveEvent)){
             return;
         }
@@ -286,14 +285,14 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      *
      * @param changeEvent may be null in case of errors during the save operation
      */
-    protected void postSaveBean(EntityChangeEvent changeEvent) {
+    protected void postSaveBean(EntityChangeEvent<?> changeEvent) {
         // blank implementation, to be implemented by sub classes if needed
     }
 
     @Override
     protected void deleteBean(DTO bean){
         CDM cdmEntity = cdmEntity(bean);
-        EntityChangeEvent<?> changeEvent = cdmStore.deleteBean(cdmEntity, (AbstractView) getView());
+        EntityChangeEvent<?> changeEvent = cdmStore.deleteBean(cdmEntity, (AbstractView<?>) getView());
         if(changeEvent != null){
             viewEventBus.publish(this, changeEvent);
         }

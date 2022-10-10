@@ -323,7 +323,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             String activatedVaadinUIs = env.getProperty(CDM_VAADIN_UI_ACTIVATED);
             if(activatedVaadinUIs == null){
                 // not in environment? Read it from the config file!
-                activatedVaadinUIs = appConfig.getProperty(configFile , CDM_VAADIN_UI_ACTIVATED);
+                activatedVaadinUIs = appConfig.getProperty(configFile, CDM_VAADIN_UI_ACTIVATED);
             } else {
                 logger.warn("Active UIs are defined via system properties -D" + CDM_VAADIN_UI_ACTIVATED + "=" +  activatedVaadinUIs + " ignoring config file." );
             }

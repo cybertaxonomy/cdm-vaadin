@@ -82,12 +82,13 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
- *
  */
 @SpringView(name=RegistrationWorksetViewBean.NAME)
-public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWorkingsetPresenter>
-    implements RegistrationWorkingsetView, View, AccessRestrictedView {
+public class RegistrationWorksetViewBean
+        extends AbstractPageView<RegistrationWorkingsetPresenter>
+        implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
+    private static final long serialVersionUID = -213040114015958970L;
 
     private static final int COL_INDEX_STATE_LABEL = 0;
 
@@ -100,11 +101,7 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     public static final String TEXT_NAME_TYPIFICATION = "covering the name and typifications";
     public static final String TEXT_TYPIFICATION_ONLY = "covering typifications only";
 
-    private static final long serialVersionUID = -213040114015958970L;
-
     public static final String NAME = "workingset";
-
-    public RegistrationType regType = null;
 
     private List<CssLayout> registrations = new ArrayList<>();
 
@@ -147,10 +144,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         super();
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
         getLayout().setId(NAME);
@@ -158,10 +151,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         // all content is added in createRegistrationsList()
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enter(ViewChangeEvent event) {
         if(event.getParameters() != null){
@@ -171,9 +160,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setWorkingset(RegistrationWorkingSet workingset) {
 
@@ -189,7 +175,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         registrationListPanel.setStyleName("registration-list");
         registrationListPanel.setCaption("Registrations");
         addContentComponent(registrationListPanel, 1.0f);
-
     }
 
     @Override
@@ -209,9 +194,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Deprecated // no longer needed
     public void addBlockingRegistration(RegistrationDTO blocking) {
@@ -222,10 +204,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
 
     }
 
-    /**
-     * @param workingset
-     * @return
-     */
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
 
         registrationsGrid = new GridLayout(3, 1);
@@ -355,7 +333,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         );
     }
 
-
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
         EntityReference typifiedNameReference = dto.getTypifiedNameRef();
@@ -419,7 +396,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         regItemButtonGroup.getAddTypeDesignationButton().addClickListener(
                 e -> chooseNewTypeRegistrationWorkingset(dto.getUuid())
                 );
-
 
         Button blockingRegistrationButton = regItemButtons.getBlockingRegistrationButton();
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
@@ -513,11 +489,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         return row;
     }
 
-    /**
-     * @param button
-     * @param registrationEntityId
-     *
-     */
     @Override
     public void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid){
         Window typeDesignationTypeCooser = new Window();
@@ -539,10 +510,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         UI.getCurrent().addWindow(typeDesignationTypeCooser);
     }
 
-    /**
-     * @param button
-     *
-     */
     protected void addNewTypeDesignationSet(TypeDesignationSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser, Button sourceButton) {
         UI.getCurrent().removeWindow(typeDesignationTypeCooser);
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
@@ -556,69 +523,42 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
                 ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void openReferenceEditor(UUID referenceUuid) {
         // TODO Auto-generated method stub
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void openNameEditor(UUID nameUuid) {
         // TODO Auto-generated method stub
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getHeaderText() {
         return headerText;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setHeaderText(String text) {
         this.headerText = text;
         updateHeader();
-
     }
 
-    /**
-     * @return the subheaderText
-     */
     public String getSubheaderText() {
         return subheaderText;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setSubheaderText(String text) {
         subheaderText = text;
         updateHeader();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSubHeaderText() {
         return subheaderText;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void openDetailsPopup(String caption, List<String> messages) {
         StringBuffer sb = new StringBuffer();
@@ -662,13 +602,10 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     }
 
     @Override
-    public LazyComboBox<TaxonName> getAddExistingNameCombobox() {
+    public LazyComboBox<TaxonName> getExistingNameCombobox() {
         return existingNameCombobox;
     }
 
-    /**
-     * @return the citationID
-     */
     @Override
     public UUID getCitationUuid() {
         return citationUuid;
@@ -679,7 +616,6 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
         return Collections.unmodifiableMap(registrationItemMap);
     }
 
-
     /**
      * @param statusFieldInstantiator the statusFieldInstantiator to set
      */
@@ -687,6 +623,4 @@ public class RegistrationWorksetViewBean extends AbstractPageView<RegistrationWo
     public void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator) {
         this.statusFieldInstantiator = statusComponentInstantiator;
     }
-
-
 }
