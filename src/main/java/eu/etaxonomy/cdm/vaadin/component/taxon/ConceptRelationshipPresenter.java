@@ -23,16 +23,13 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 9 Apr 2015
- *
  */
 public class ConceptRelationshipPresenter implements IConceptRelationshipComponentListener {
-
 
     private final D3ConceptRelationshipTree crTree;
     private final ITaxonService taxonService;
 
     private final ICdmApplication app;
-
 
     public ConceptRelationshipPresenter(D3ConceptRelationshipTree crTree) {
         this.crTree = crTree;
@@ -53,7 +50,4 @@ public class ConceptRelationshipPresenter implements IConceptRelationshipCompone
     public void clearRelationshipView() {
         crTree.clear();
     }
-
-
-
 }

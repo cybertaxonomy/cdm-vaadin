@@ -55,9 +55,7 @@ public class CdmSpringContextHelper {
                 getRequiredWebApplicationContext(servletContext);
         dataSource = (DataSource)getBean("dataSource");
         connPool = new J2EEConnectionPool(dataSource);
-
     }
-
 
     public static CdmSpringContextHelper getCurrent() {
         if(VaadinServlet.getCurrent() == null || VaadinServlet.getCurrent().getServletContext() == null) {

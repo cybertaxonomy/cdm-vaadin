@@ -32,7 +32,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 13 Apr 2015
- *
  */
 public class EditConceptRelationshipPresenter {
 
@@ -83,7 +82,6 @@ public class EditConceptRelationshipPresenter {
         return new IdUuidName(tr.getId(), tr.getUuid(), tr.getType().getTitleCache());
     }
 
-
     public void updateRelationship(UUID fromTaxonUuid, UUID taxonRelUuid, UUID newRelTypeUuid , UUID newToTaxonUuid) {
         TransactionStatus tx = app.startTransaction();
         Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
@@ -102,7 +100,6 @@ public class EditConceptRelationshipPresenter {
         app.commitTransaction(tx);
     }
 
-
     public void deleteRelationship(UUID fromTaxonUuid, UUID taxonRelUuid) {
         TransactionStatus tx = app.startTransaction();
         Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
@@ -118,7 +115,6 @@ public class EditConceptRelationshipPresenter {
         }
         app.commitTransaction(tx);
     }
-
 
 
     public Map<String, IdUuidName> getRelTypeToTaxonIunMap(UUID fromTaxonUuid, UUID taxonRelUuid) {
@@ -151,5 +147,4 @@ public class EditConceptRelationshipPresenter {
         app.commitTransaction(tx);
         return canCreateRelationship;
     }
-
 }
