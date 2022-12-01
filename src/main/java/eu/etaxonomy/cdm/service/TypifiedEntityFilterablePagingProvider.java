@@ -16,7 +16,7 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
-import eu.etaxonomy.cdm.format.EllypsisFormatter;
+import eu.etaxonomy.cdm.format.IEllypsisFormatter;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
@@ -32,9 +32,9 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
 
     private CdmFilterablePagingProvider<T, T> entityPagingProvider;
 
-    private EllypsisFormatter<T> labelProvider;
+    private IEllypsisFormatter<T> labelProvider;
 
-    public TypifiedEntityFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, EllypsisFormatter<T> labelProvider){
+    public TypifiedEntityFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, IEllypsisFormatter<T> labelProvider){
         this.labelProvider = labelProvider;
         entityPagingProvider = new CdmFilterablePagingProvider<T, T>(service, matchMode, orderHints);
     }
