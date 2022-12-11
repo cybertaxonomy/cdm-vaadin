@@ -834,10 +834,6 @@ public class TaxonNamePopupEditor
         return lastInferredAuthorshipState;
     }
 
-    /**
-     * @param rank
-     * @return
-     */
     private void updateFieldVisibility() {
 
         // TODO use getField() instead and remove field references

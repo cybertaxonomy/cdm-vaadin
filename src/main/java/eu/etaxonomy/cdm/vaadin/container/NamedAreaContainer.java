@@ -47,19 +47,12 @@ public class NamedAreaContainer extends BeanItemContainer<NamedArea> {
 
 	/**
 	 * Comparator to sort the {@link NamedArea}s contained in {@link NamedAreaContainer}s.
-	 *
 	 */
 	private class AlphabeticallyAscendingNamedAreaComparator implements Comparator<NamedArea>{
 
-		/**
-		 *
-		 * {@inheritDoc}
-		 */
         @Override
         public int compare(NamedArea o1, NamedArea o2) {
             return o2.compareTo(o1);
         }
-
 	}
-
 }
