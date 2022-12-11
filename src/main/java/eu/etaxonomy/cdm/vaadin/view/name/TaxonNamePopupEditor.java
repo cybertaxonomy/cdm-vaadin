@@ -844,7 +844,7 @@ public class TaxonNamePopupEditor
         Rank rank = (Rank) rankSelect.getValue();
 
         @SuppressWarnings("deprecation")
-        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES()) && !rank.getRankClass().equals(RankClass.Unknown);
+        boolean isSpeciesOrBelow =  rank.isLowerOrEqualTo(RankClass.Species);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
         Boolean withOrthographicCorrectionSection = BooleanUtils.isTrue(orthographicVariantToggle.getValue());

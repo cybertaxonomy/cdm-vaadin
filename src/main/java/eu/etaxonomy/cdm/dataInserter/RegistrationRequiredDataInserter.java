@@ -32,7 +32,7 @@ import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.NomenclaturalStatusType;
-import eu.etaxonomy.cdm.model.name.Rank;
+import eu.etaxonomy.cdm.model.name.RankClass;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.permission.GrantedAuthorityImpl;
@@ -266,7 +266,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
                taxa = new ArrayList<>();
 
                for(TaxonName name : page.getRecords()){
-                   if(name.getRank() != null && name.getRank().isLower(Rank.GENUS())){
+                   if(name.getRank() != null && name.getRank().isLowerThan(RankClass.Genus)){
                        NomenclaturalStatusType illegitimType = findILegitimateStatusType(name);
                        if(illegitimType == null){
                            Taxon taxon;
