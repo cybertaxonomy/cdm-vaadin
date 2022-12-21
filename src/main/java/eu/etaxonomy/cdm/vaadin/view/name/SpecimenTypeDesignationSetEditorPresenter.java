@@ -32,7 +32,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
@@ -167,7 +167,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
     @Override
     protected SpecimenTypeDesignationSetDTO<Registration> loadBeanById(Object identifier) {
 
-        cache = new CdmTransientEntityAndUuidCacher(this);
+        cache = new CdmTransientEntityWithUuidCacher(this);
         if(identifier != null){
 
             SpecimenTypeDesignationSetIds idset = (SpecimenTypeDesignationSetIds)identifier;

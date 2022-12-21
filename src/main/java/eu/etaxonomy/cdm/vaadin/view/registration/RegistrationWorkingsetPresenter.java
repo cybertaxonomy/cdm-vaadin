@@ -45,7 +45,7 @@ import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.util.UserHelper;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -267,7 +267,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             logger.error(error);
             showErrorDialog("Validation Error", error.getMessage());
         }
-        cache = new CdmTransientEntityAndUuidCacher(this);
+        cache = new CdmTransientEntityWithUuidCacher(this);
         for(Registration registration : workingset.getRegistrations()) {
             addRootEntity(registration);
         }
