@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.common.URI;
  */
 public class CdmVaadinAuthentication {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String KEY = "key_authentication";
 

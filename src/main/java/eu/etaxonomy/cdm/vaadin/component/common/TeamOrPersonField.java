@@ -58,7 +58,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private static final long serialVersionUID = 660806402243118112L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String PRIMARY_STYLE = "v-team-or-person-field";
 

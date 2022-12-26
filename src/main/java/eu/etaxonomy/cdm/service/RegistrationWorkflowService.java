@@ -35,7 +35,7 @@ import eu.etaxonomy.cdm.model.reference.ReferenceType;
 @Service("registrationWorkflowService")
 public class RegistrationWorkflowService implements IRegistrationWorkflowService {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @Autowired
     @Qualifier("cdmRepository")

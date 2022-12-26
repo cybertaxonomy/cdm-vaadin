@@ -91,7 +91,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";

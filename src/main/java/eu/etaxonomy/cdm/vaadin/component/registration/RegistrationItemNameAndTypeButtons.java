@@ -54,7 +54,7 @@ import eu.etaxonomy.vaadin.component.CompositeStyledComponent;
  */
 public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String DEFAULT_BUTTON_STYLES = "";
 

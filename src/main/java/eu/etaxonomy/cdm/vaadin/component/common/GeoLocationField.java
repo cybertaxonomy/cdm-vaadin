@@ -45,7 +45,7 @@ import eu.etaxonomy.vaadin.component.CompositeCustomField;
 public class GeoLocationField extends CompositeCustomField<Point> {
 
     private static final long serialVersionUID = 1122123034547920390L;
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String PRIMARY_STYLE = "v-geolocation-field";
 

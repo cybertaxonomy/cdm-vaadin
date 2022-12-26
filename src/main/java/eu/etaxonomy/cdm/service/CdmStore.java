@@ -47,7 +47,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 @ViewScope
 public class CdmStore {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @Autowired
     @Qualifier("cdmRepository")

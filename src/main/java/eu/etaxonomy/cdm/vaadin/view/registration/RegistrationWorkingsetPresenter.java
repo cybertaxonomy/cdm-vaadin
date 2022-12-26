@@ -109,7 +109,7 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     private static final long serialVersionUID = 2618456456539802265L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @Autowired
     private IRegistrationWorkingSetService regWorkingSetService;

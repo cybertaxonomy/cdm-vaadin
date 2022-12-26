@@ -63,7 +63,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
     private static final long serialVersionUID = 2283189121081612574L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private ReferencePopupEditor newReferencePopup;
 

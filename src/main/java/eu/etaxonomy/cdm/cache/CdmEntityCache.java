@@ -43,7 +43,7 @@ import eu.etaxonomy.cdm.persistence.dao.initializer.AbstractBeanInitializer;
  */
 public class CdmEntityCache implements EntityCache {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
 
     protected static final String COPY_ENTITY = "!";

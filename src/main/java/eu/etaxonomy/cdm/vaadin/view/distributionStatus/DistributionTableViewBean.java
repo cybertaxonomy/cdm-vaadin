@@ -74,7 +74,7 @@ public class DistributionTableViewBean extends AbstractPageView<DistributionTabl
 
     private static final long serialVersionUID = 3495626893961744083L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String NAME = "distGrid"; //$NON-NLS-1$
 

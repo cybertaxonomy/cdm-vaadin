@@ -87,7 +87,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         extends AbstractPopupView<P> {
 
     private static final long serialVersionUID = 5944874629527570061L;
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
 

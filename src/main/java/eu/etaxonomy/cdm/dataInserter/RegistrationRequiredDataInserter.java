@@ -73,7 +73,7 @@ import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
  */
 public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
 //    protected static final String PARAM_NAME_CREATE = "registrationCreate";
 //

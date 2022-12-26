@@ -32,7 +32,7 @@ public class ConceptRelationshipUIRedirect extends AbstractAuthenticatedUI {
 
     private static final long serialVersionUID = -3709422890864662383L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String FIRST_VIEW = "editcr";
 

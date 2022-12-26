@@ -47,7 +47,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     private static final long serialVersionUID = 2218185546277084261L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     protected BeanInstantiator<DTO> beanInstantiator = null;
 

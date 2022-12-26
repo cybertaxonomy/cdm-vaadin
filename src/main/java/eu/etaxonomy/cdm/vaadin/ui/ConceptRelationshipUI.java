@@ -33,7 +33,7 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
     private static final long serialVersionUID = 7356721273326682601L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String NAME = "concept";
 

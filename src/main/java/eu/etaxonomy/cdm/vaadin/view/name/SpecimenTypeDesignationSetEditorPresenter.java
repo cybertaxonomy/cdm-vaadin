@@ -99,7 +99,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
     private static final long serialVersionUID = 4255636253714476918L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final EnumSet<CRUD> COLLECTION_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 

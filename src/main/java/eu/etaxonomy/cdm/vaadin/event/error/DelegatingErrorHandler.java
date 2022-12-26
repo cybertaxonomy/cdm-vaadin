@@ -36,7 +36,7 @@ public class DelegatingErrorHandler implements ErrorHandler{
 
     private static final long serialVersionUID = 3378605204517477112L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     List<ErrorTypeHandler<? extends Throwable>> handlers = new ArrayList<>();
 

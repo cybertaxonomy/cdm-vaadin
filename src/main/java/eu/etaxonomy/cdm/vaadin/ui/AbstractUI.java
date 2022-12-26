@@ -46,7 +46,7 @@ public abstract class AbstractUI extends UI {
 
     private static final long serialVersionUID = 7430086500775997281L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     abstract protected ViewDisplay getViewDisplay();
 

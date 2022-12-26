@@ -42,7 +42,7 @@ public class DefaultPojoEventListenerManager implements PojoEventListenerManager
 
     private static final long serialVersionUID = -6814417168274166953L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @Autowired
     private ApplicationEventMulticaster applicationEventMulticaster;

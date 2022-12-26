@@ -26,7 +26,7 @@ public class NavigatorTestUI extends AbstractAuthenticatedUI {
 
 	private static final long serialVersionUID = 4959469489638235995L;
 	@SuppressWarnings("unused")
-	private final static Logger logger = LogManager.getLogger();
+	private static final Logger logger = LogManager.getLogger();
 
 	private static final String FIRST_VIEW = "firstView";
 	public static final String SECOND_VIEW = "secondView";

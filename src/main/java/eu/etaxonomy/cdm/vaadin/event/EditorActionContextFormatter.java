@@ -36,7 +36,7 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  */
 public class EditorActionContextFormatter {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String NEW = "New";
 

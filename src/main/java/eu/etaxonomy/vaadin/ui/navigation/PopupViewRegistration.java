@@ -31,7 +31,7 @@ public class PopupViewRegistration implements DetachListener {
 
     private static final long serialVersionUID = -5946913287379095637L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private Map<PopupView, Window> popupWindowMap = new HashMap<>();
 

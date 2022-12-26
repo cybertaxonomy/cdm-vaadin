@@ -32,7 +32,7 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  */
 public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 
