@@ -53,20 +53,7 @@
     
     <!-- bootstrap the Web Configuration -->
   	<bean class="eu.etaxonomy.cdm.remote.config.MultiWebSecurityConfiguration" />
-
-    <bean class="eu.etaxonomy.cdm.opt.config.EhCacheDiskStoreConfiguration" />
  
-    <bean id="serializableFactory" class="org.springmodules.cache.serializable.XStreamSerializableFactory" />
-
-    <bean id="cacheProviderFacade" class="org.springmodules.cache.provider.ehcache.EhCacheFacade">
-        <!-- 
-            the cacheManager is provided by the eu.etaxonomy.cdm.api.config.EhCacheConfiguration
-            in cdmlib-services
-        -->
-        <property name="cacheManager" ref="cacheManager" />
-        <property name="serializableFactory" ref="serializableFactory"/>
-    </bean>
-    
     <!--  for cdmTermCacher see CdmVaadinConfiguration.setTermCacher() -->
     <bean id="cdmTermCacher" class="eu.etaxonomy.cdm.api.cache.CdmTermCacher" />
 </beans>
