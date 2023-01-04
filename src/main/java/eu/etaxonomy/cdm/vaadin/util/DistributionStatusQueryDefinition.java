@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2017 EDIT
 * European Distributed Institute of Taxonomy
@@ -14,20 +13,16 @@ import java.util.UUID;
 
 import org.vaadin.addons.lazyquerycontainer.LazyQueryDefinition;
 
-import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.model.location.NamedArea;
 
 /**
  * The {@link LazyQueryDefinition} to be used by {@link DistributionStatusQuery}.
  * @author freimeier
  * @since 22.11.2017
- *
  */
 public class DistributionStatusQueryDefinition extends LazyQueryDefinition {
 
-    private CdmRepository repo;
-    private List<UUID> nodeUuids;
-    private List<NamedArea> namedAreas;
+    private static final long serialVersionUID = -2524259678674589181L;
 
     /**
      * Creates a new {@link LazyQueryDefinition} to be used by {@link DistributionStatusQuery}.

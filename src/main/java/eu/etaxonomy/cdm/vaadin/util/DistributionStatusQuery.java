@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2017 EDIT
 * European Distributed Institute of Taxonomy
@@ -18,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import org.vaadin.addons.lazyquerycontainer.LazyQueryContainer;
 import org.vaadin.addons.lazyquerycontainer.Query;
@@ -48,7 +47,7 @@ import eu.etaxonomy.cdm.model.taxon.TaxonNode;
  */
 public class DistributionStatusQuery implements Query{
 
-    protected static final Logger logger = LoggerFactory.getLogger(DistributionStatusQuery.class);
+    protected static final Logger logger = LogManager.getLogger();
 
     public static final String DTYPE_COLUMN = "DTYPE";
     public static final String ID_COLUMN = "ID";

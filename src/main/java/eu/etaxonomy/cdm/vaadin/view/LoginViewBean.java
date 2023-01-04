@@ -31,7 +31,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 /**
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 @SpringView(name=LoginViewBean.NAME)
 public class LoginViewBean  extends AbstractView<LoginPresenter> implements LoginView, View  {

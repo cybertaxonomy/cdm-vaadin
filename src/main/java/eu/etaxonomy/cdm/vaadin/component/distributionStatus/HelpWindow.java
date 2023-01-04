@@ -1,4 +1,3 @@
-// $Id$
 /**
 * Copyright (C) 2018 EDIT
 * European Distributed Institute of Taxonomy
@@ -31,6 +30,9 @@ import eu.etaxonomy.cdm.vaadin.view.distributionStatus.IDistributionTableView;
  *
  */
 public class HelpWindow extends CustomComponent{
+
+    private static final long serialVersionUID = -7266743532407878043L;
+
     private Window window;
     private AbstractOrderedLayout mainLayout;
     private IDistributionTableView view;

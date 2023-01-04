@@ -64,16 +64,6 @@
         </property>
     </bean>
 
-
-<!--
-   We do not use spelling suggestions anymore. This one relates to spring modules which is
-    somewhat out-dated. Once we work again with spelling suggestions we better use a modern
-    approach, e.g. annotation based.
-    <bean id="taxonSpellingDirectory" class="org.springmodules.lucene.index.support.FSDirectoryFactoryBean">
-      <property name="location" value="file:./target/index/eu.etaxonomy.cdm.model.taxon.TaxonBase_spelling"/>
-      <property name="create" value="true"/>
-    </bean> -->
-
     <bean id="validatorFactory" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
         <property name="mappingLocations">
             <set>
@@ -81,7 +71,6 @@
             </set>
         </property>
     </bean>
-
 
     <!-- equips a new and empty database with the initial set of meta data and admin user   -->
     <bean id="firstDataInserter" class="eu.etaxonomy.cdm.api.application.FirstDataInserter" />
