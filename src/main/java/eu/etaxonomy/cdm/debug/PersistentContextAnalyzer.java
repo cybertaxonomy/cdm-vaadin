@@ -24,7 +24,7 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
 public class PersistentContextAnalyzer extends CdmEntityCache {
 
     @SuppressWarnings("unused")
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final char HASH_SEPARATOR = '.';
 

@@ -75,7 +75,7 @@ public class NameTypeDesignationPresenter
 
     private static final long serialVersionUID = 896305051895903033L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private HashSet<TaxonName> typifiedNamesAsLoaded;
 

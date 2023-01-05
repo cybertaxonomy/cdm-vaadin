@@ -26,7 +26,7 @@ public class AccessRestrictedViewControlBean implements ViewInstanceAccessContro
 
     private static final long serialVersionUID = -5192116600545639108L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     @Override
     public boolean isAccessGranted(UI ui, String beanName, View view) {

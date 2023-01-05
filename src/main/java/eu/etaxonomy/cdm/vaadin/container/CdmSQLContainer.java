@@ -19,7 +19,7 @@ public class CdmSQLContainer extends SQLContainer {
 
     private static final long serialVersionUID = 2828992538007070061L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private DatabaseMetaData databaseMetaData;
 

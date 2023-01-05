@@ -47,7 +47,7 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.application.DummyDataInserter;
 import eu.etaxonomy.cdm.api.application.IRunAs;
 import eu.etaxonomy.cdm.api.application.RunAsAdmin;
-import eu.etaxonomy.cdm.api.cache.CdmCacherBase;
+import eu.etaxonomy.cdm.api.cache.CdmPermanentCacheBase;
 import eu.etaxonomy.cdm.api.config.ApplicationConfiguration;
 import eu.etaxonomy.cdm.api.config.ApplicationConfigurationFile;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
@@ -91,7 +91,7 @@ import eu.etaxonomy.vaadin.ui.annotation.EnableVaadinSpringNavigation;
 @CdmHibernateListener // enable the configuration which activates the TaxonGraphHibernateListener bean
 public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public static final String CDM_VAADIN_UI_ACTIVATED = "cdm-vaadin.ui.activated";
     public static final String CDM_SERVICE_MINTER_REGSTRATION_MINID = "cdm.service.minter.registration.minLocalId";
@@ -120,7 +120,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
 
 
     @Autowired
-    private void  setTermCacher(CdmCacherBase termCacher){
+    private void  setTermCacher(CdmPermanentCacheBase termCacher){
         CdmTransientEntityCacher.setPermanentCacher(termCacher);
     }
 

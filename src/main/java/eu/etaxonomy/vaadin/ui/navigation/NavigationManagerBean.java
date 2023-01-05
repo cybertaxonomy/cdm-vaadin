@@ -46,7 +46,7 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
 
 	private static final long serialVersionUID = 6599898650948333853L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
 	// injecting the viewDisplay as spring bean causes problems with older cdm vaadin code
 	// SingleComponentContainerViewDisplay for example can't be used

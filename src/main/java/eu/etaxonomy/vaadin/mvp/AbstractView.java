@@ -35,7 +35,7 @@ import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
 public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
 		implements ApplicationContextAware, ReleasableResourcesView, DisposableBean {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
 	private P presenter;
 
@@ -50,7 +50,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	@SuppressWarnings("unchecked")
     @PostConstruct
 	protected final void init() {
-		LogManager.getLogger(getClass().getSimpleName()).info("View init");
+	    logger.info("View init");
 		if(!ApplicationView.class.isAssignableFrom(this.getClass())){
 		    throw new RuntimeException("Any view bean must implement the ApplicationView interface: ViewBean ---> ViewInterface ---> ApplicationView");
 		}

@@ -44,7 +44,7 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  */
 public class TaxonNameStringFilterablePagingProvider implements FilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final List<String> DEFAULT_INIT_STRATEGY = Arrays.asList("$");
 

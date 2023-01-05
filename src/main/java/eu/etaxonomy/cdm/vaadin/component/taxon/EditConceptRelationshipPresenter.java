@@ -18,7 +18,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.util.filter.Compare;
 
-import eu.etaxonomy.cdm.api.application.ICdmRepository;
+import eu.etaxonomy.cdm.api.application.ICdmApplication;
 import eu.etaxonomy.cdm.api.service.ITaxonService;
 import eu.etaxonomy.cdm.api.service.ITermService;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -32,7 +32,6 @@ import eu.etaxonomy.cdm.vaadin.util.CdmSpringContextHelper;
 /**
  * @author cmathew
  * @since 13 Apr 2015
- *
  */
 public class EditConceptRelationshipPresenter {
 
@@ -41,7 +40,7 @@ public class EditConceptRelationshipPresenter {
 
     private final ITaxonService taxonService;
     private final ITermService termService;
-    private final ICdmRepository app;
+    private final ICdmApplication app;
 
     public final static String REL_TYPE_KEY = "relTypeIun";
     public final static String TO_TAXON_KEY = "toTaxonIun";
@@ -83,7 +82,6 @@ public class EditConceptRelationshipPresenter {
         return new IdUuidName(tr.getId(), tr.getUuid(), tr.getType().getTitleCache());
     }
 
-
     public void updateRelationship(UUID fromTaxonUuid, UUID taxonRelUuid, UUID newRelTypeUuid , UUID newToTaxonUuid) {
         TransactionStatus tx = app.startTransaction();
         Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
@@ -102,7 +100,6 @@ public class EditConceptRelationshipPresenter {
         app.commitTransaction(tx);
     }
 
-
     public void deleteRelationship(UUID fromTaxonUuid, UUID taxonRelUuid) {
         TransactionStatus tx = app.startTransaction();
         Taxon fromTaxon = CdmBase.deproxy(taxonService.load(fromTaxonUuid), Taxon.class);
@@ -118,7 +115,6 @@ public class EditConceptRelationshipPresenter {
         }
         app.commitTransaction(tx);
     }
-
 
 
     public Map<String, IdUuidName> getRelTypeToTaxonIunMap(UUID fromTaxonUuid, UUID taxonRelUuid) {
@@ -151,5 +147,4 @@ public class EditConceptRelationshipPresenter {
         app.commitTransaction(tx);
         return canCreateRelationship;
     }
-
 }

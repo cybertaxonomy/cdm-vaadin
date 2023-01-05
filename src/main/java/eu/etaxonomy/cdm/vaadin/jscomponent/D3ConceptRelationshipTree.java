@@ -44,7 +44,7 @@ import eu.etaxonomy.cdm.vaadin.component.taxon.ConceptRelationshipComposite;
 public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
 
     private static final long serialVersionUID = 8355509734431610167L;
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     public enum Mode {
         OneToOne,

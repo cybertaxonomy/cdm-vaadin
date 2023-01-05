@@ -17,7 +17,7 @@ import org.springframework.transaction.TransactionStatus;
 
 import com.vaadin.data.util.sqlcontainer.RowId;
 
-import eu.etaxonomy.cdm.api.application.ICdmRepository;
+import eu.etaxonomy.cdm.api.application.ICdmApplication;
 import eu.etaxonomy.cdm.api.service.IClassificationService;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.IReferenceService;
@@ -54,7 +54,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
     private final ITaxonService taxonService;
     private final IClassificationService classificationService;
     private final INameService nameService;
-    private final ICdmRepository app;
+    private final ICdmApplication app;
 
     final boolean includeUnpublished = true;
 
@@ -148,7 +148,7 @@ public class NewTaxonBasePresenter implements INewTaxonBaseComponentListener {
         Taxon accTaxon = CdmBase.deproxy(taxonService.load(accTaxonUuid, includeUnpublished, ACC_TAXON_INIT_STRATEGY), Taxon.class);
         accTaxon.setSec(accTaxonSec);
 
-        accTaxon.addSynonym(newSynonym, SynonymType.SYNONYM_OF());
+        accTaxon.addSynonym(newSynonym, SynonymType.SYNONYM_OF);
 
         UUID newUuid = taxonService.save(newSynonym).getUuid();
         app.commitTransaction(tx);

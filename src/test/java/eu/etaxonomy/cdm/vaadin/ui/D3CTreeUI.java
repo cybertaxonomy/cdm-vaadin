@@ -32,7 +32,7 @@ public class D3CTreeUI extends UI {
     private static final long serialVersionUID = 3370416837565654213L;
 
     @SuppressWarnings("unused")
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     final VerticalLayout layout = new VerticalLayout();
     final D3CTree d3ctree = new D3CTree();

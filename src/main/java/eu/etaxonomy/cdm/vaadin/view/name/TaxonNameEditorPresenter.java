@@ -101,7 +101,7 @@ public class TaxonNameEditorPresenter
 
     private static final long serialVersionUID = -3538980627079389221L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final EnumSet<CRUD> SUB_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 

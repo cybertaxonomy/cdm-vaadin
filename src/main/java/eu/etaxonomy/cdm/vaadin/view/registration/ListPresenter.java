@@ -60,7 +60,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 @ViewScope
 public class ListPresenter extends AbstractPresenter<ListView> {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final String REGISTRATION_LIST_PRESENTER_SEARCH_FILTER = "registration.listPresenter.searchFilter";
 

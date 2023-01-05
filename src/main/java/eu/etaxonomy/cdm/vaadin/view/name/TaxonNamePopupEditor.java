@@ -87,7 +87,7 @@ public class TaxonNamePopupEditor
         implements TaxonNamePopupEditorView{
 
     private static final long serialVersionUID = -7037436241474466359L;
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private final static int GRID_COLS = 4;
 
@@ -834,17 +834,13 @@ public class TaxonNamePopupEditor
         return lastInferredAuthorshipState;
     }
 
-    /**
-     * @param rank
-     * @return
-     */
     private void updateFieldVisibility() {
 
         // TODO use getField() instead and remove field references
         Rank rank = (Rank) rankSelect.getValue();
 
         @SuppressWarnings("deprecation")
-        boolean isSpeciesOrBelow = !rank.isHigher(Rank.SPECIES()) && !rank.getRankClass().equals(RankClass.Unknown);
+        boolean isSpeciesOrBelow =  rank.isLowerOrEqualTo(RankClass.Species);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
         Boolean withOrthographicCorrectionSection = BooleanUtils.isTrue(orthographicVariantToggle.getValue());

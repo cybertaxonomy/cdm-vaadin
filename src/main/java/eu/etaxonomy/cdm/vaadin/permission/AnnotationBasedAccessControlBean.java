@@ -35,7 +35,7 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
 
     private static final long serialVersionUID = -4232241572782673248L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
 
     @Override

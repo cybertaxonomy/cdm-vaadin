@@ -63,7 +63,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 
 /**
  * The presenter of the distribution status editor.
- *
  */
 @SpringComponent
 @ViewScope
@@ -78,9 +77,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
     @Qualifier("cdmRepository")
     private CdmRepository repo; // TODO remove, since this is already in the super class
 
-	/**
-     * {@inheritDoc}
-     */
     @Override
     protected void eventViewBusSubscription(ViewEventBus viewEventBus) {
         // no point subscribing
@@ -238,7 +234,6 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
         List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
                 .listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
         return listTaxonDescription;
-
     }
 
     /**
@@ -275,7 +270,7 @@ public class DistributionTablePresenter extends AbstractPresenter<IDistributionT
 	    TermVocabulary<NamedArea> vocabulary = CdmSpringContextHelper.getVocabularyService().load(vocUUID, Arrays.asList("terms")); //$NON-NLS-1$
 	    vocabulary = CdmBase.deproxy(vocabulary, TermVocabulary.class);
 	    if (vocabulary instanceof OrderedTermVocabulary) {
-	        List<NamedArea> list = new ArrayList<> (((OrderedTermVocabulary)vocabulary).getOrderedTerms());
+	        List<NamedArea> list = new ArrayList<>(((OrderedTermVocabulary)vocabulary).getOrderedTerms());
 	        Collections.reverse(list);
 	        return list;
 	    }else {

@@ -54,7 +54,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     private static final long serialVersionUID = 4670707714503199599L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     protected Class<F> fieldType;
 

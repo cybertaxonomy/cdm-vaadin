@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.util.UserHelper;
-import eu.etaxonomy.cdm.cache.CdmTransientEntityAndUuidCacher;
+import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.debug.PersistentContextAnalyzer;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -47,7 +47,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     private static final long serialVersionUID = 2218185546277084261L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     protected BeanInstantiator<DTO> beanInstantiator = null;
 
@@ -124,7 +124,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      * @param cdmEntitiy the CDM entity to initialize the cache with.
      */
     protected final DTO initializeCache(CDM cdmEntitiy) {
-        cache = new CdmTransientEntityAndUuidCacher(this);
+        cache = new CdmTransientEntityWithUuidCacher(this);
         // need to use load but put see #7214
         cdmEntitiy = cache.load(cdmEntitiy);
         addRootEntity(cdmEntitiy);

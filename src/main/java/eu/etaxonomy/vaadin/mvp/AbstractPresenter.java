@@ -43,7 +43,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, DisposableBean {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private static final long serialVersionUID = 5260910510283481832L;
 

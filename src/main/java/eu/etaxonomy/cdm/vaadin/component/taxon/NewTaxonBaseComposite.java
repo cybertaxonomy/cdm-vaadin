@@ -47,7 +47,7 @@ import eu.etaxonomy.cdm.vaadin.util.CdmVaadinUtilities;
 public class NewTaxonBaseComposite extends CustomComponent implements INewTaxonBaseComposite {
 
     @SuppressWarnings("unused")
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     /*- VaadinEditorProperties={"grid":"RegularGrid,20","showGrid":true,"snapToGrid":true,"snapToObject":true,"movingGuides":false,"snappingDistance":10} */
 

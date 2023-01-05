@@ -74,7 +74,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
 
     private static final long serialVersionUID = 4020699735656994791L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private final static String PROPNAME_USER = "cdm-vaadin.login.usr";
 

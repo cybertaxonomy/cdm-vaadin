@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.converter.Converter;
@@ -25,9 +26,10 @@ import eu.etaxonomy.cdm.model.location.Point.Sexagesimal;
  *
  * @author a.kohlbecker
  * @since Nov 20, 2018
- *
  */
 public class GeoLocationConverterValidator implements Converter<String, Double>, Validator {
+
+    private static final Logger logger = LogManager.getLogger();
 
     public enum Axis {
         LONGITUDE, LATITUDE;
@@ -55,7 +57,7 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
                 return Point.parseLatitude(value);
             }
         } catch (ParseException e) {
-            LogManager.getLogger(getClass()).error(e);
+            logger.error(e);
             throw new ConversionException(e);
         }
     }
@@ -72,7 +74,6 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
         } else {
             return Sexagesimal.valueOf(value, true).toString();
         }
-
     }
 
     @Override
@@ -85,9 +86,6 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
         return String.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Object value) throws InvalidValueException {
         if(value != null && value instanceof String && !((String)value).isEmpty()){
@@ -97,8 +95,5 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
                 throw new InvalidValueException("Invalid " + axis.name().toLowerCase());
             }
         }
-
-
     }
-
 }

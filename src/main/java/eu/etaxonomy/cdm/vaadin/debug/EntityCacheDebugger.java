@@ -47,7 +47,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 @Profile("debug")
 public class EntityCacheDebugger implements ViewChangeListener, EventBusListener<PopEditorOpenedEvent> {
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private UIEventBus uiEventBus;
 

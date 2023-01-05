@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.vaadin.viritin.FilterableListContainer;
 
 import com.vaadin.data.Container;
@@ -46,13 +46,11 @@ import eu.etaxonomy.vaadin.component.CompositeCustomField;
 /**
  * @author a.kohlbecker
  * @since Jun 20, 2018
- *
  */
 public class FilterableAnnotationsField extends CompositeCustomField<List<Annotation>> {
 
-    protected static final Logger logger = LoggerFactory.getLogger(FilterableAnnotationsField.class);
-
     private static final long serialVersionUID = -8258550787601028813L;
+    protected static final Logger logger = LogManager.getLogger();
 
     private CssLayout root = new CssLayout();
 

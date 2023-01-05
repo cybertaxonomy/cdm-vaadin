@@ -68,7 +68,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
 
     private static final long serialVersionUID = -4347633563800758815L;
 
-    private final static Logger logger = LogManager.getLogger();
+    private static final Logger logger = LogManager.getLogger();
 
     private TextField titleField;
 
