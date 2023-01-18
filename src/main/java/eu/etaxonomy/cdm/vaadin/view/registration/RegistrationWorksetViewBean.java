@@ -46,7 +46,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
@@ -235,7 +234,6 @@ public class RegistrationWorksetViewBean
         addNewNameRegistrationButton.addClickListener(
                 e -> {
                     getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this, context));
-
                 }
         );
 
@@ -300,17 +298,17 @@ public class RegistrationWorksetViewBean
     private void reviewExistingName() {
         // call commit to make the selection available
         existingNameCombobox.commit();
-        UUID uuid = existingNameCombobox.getValue().getUuid();
-        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        TaxonName taxonName = existingNameCombobox.getValue();
+        Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(TaxonName.class, uuid),
+                    TypedEntityReference.fromEntity(taxonName),
                     this)
                     );
         getViewEventBus().publish(
                 this,
                 new TaxonNameEditorAction(
                         EditorActionType.EDIT,
-                        uuid,
+                        taxonName.getUuid(),
                         addExistingNameButton,
                         existingNameCombobox,
                         this,

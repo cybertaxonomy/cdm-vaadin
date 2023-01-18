@@ -26,9 +26,9 @@ import eu.etaxonomy.cdm.ref.TypedEntityReference;
 /**
  * @author a.kohlbecker
  * @since Dec 11, 2018
- *
  */
-public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity> implements FilterablePagingProvider<TypedEntityReference<T>>, FilterableCountProvider{
+public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity>
+        implements FilterablePagingProvider<TypedEntityReference<T>>, FilterableCountProvider{
 
     private CdmFilterablePagingProvider<T, T> entityPagingProvider;
 
@@ -39,47 +39,31 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         entityPagingProvider = new CdmFilterablePagingProvider<T, T>(service, matchMode, orderHints);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size(String filter) {
         return entityPagingProvider.size(filter);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<TypedEntityReference<T>> findEntities(int firstRow, String filter) {
         List<T> entities = entityPagingProvider.findEntities(firstRow, filter);
         List<TypedEntityReference<T>> ters = new ArrayList<>(entities.size());
-        for(T e : entities){
-            Class<T> type = (Class<T>)e.getClass();
-            String label = labelProvider.ellypsis(e, filter);
-            TypedEntityReference<T> ter = new TypedEntityReference<T>(type, e.getUuid(), label);
-            ters.add(ter);
+        for(T entity : entities){
+            String label = labelProvider.ellypsis(entity, filter);
+            TypedEntityReference<T> typedEntityReference = TypedEntityReference.fromEntityWithLabel(entity, label);
+            ters.add(typedEntityReference);
         }
         return ters;
     }
 
-    /**
-     * @param restriction
-     */
     public void addRestriction(Restriction restriction) {
         entityPagingProvider.addRestriction(restriction);
     }
 
-    /**
-     * @return
-     */
     public int getPageSize() {
         return entityPagingProvider.getPageSize();
     }
 
-    /**
-     * @param asList
-     */
     public void setInitStrategy(List<String> initStrategy) {
         entityPagingProvider.setInitStrategy(initStrategy);
     }
