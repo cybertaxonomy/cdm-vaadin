@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.HorizontalLayout;

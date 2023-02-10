@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.util.formatter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 
