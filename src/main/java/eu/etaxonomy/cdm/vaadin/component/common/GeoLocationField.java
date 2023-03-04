@@ -51,9 +51,9 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
     private BeanFieldGroup<Point> fieldGroup = new BeanFieldGroup<>(Point.class);
 
-    private TextField longitudeField = new LongLatField("Longitude", Axis.LONGITUDE);
     private TextField latitudeField = new LongLatField("Latitude", Axis.LATITUDE);
-    private Label longLatParsed = new Label();
+    private TextField longitudeField = new LongLatField("Longitude", Axis.LONGITUDE);
+    private Label latLongParsed = new Label();
     private TextField errorRadiusField = new TextFieldNFix("Error radius (m)");
     private NativeSelect referenceSystemSelect;
 
@@ -79,7 +79,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
 
         errorRadiusField.setConverter(new IntegerConverter());
 
-
         map = new LMap();
         // LTileLayer baseLayer = new LOpenStreetMapLayer();
         LTileLayer baseLayer = new LTileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png");
@@ -91,16 +90,16 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         map.addClickListener(e -> refreshMap(e));
         // map.getZoomControl().addListener(ClickEvent.class, target, method);
 
-        mapWrapper = new CssLayout(longLatParsed, map);
+        mapWrapper = new CssLayout(latLongParsed, map);
         mapWrapper.setSizeFull();
         mapWrapper.setStyleName("map-wrapper");
-        longLatParsed.setWidthUndefined();
-
-        longitudeField.setBuffered(false);
-        longitudeField.addValueChangeListener(e -> updateMap());
+        latLongParsed.setWidthUndefined();
 
         latitudeField.setBuffered(false);
         latitudeField.addValueChangeListener(e -> updateMap());
+
+        longitudeField.setBuffered(false);
+        longitudeField.addValueChangeListener(e -> updateMap());
 
         errorRadiusField.addValueChangeListener( e -> updateMap());
 
@@ -121,11 +120,11 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.setColumnExpandRatio(2, 1.0f);
         root.setRowExpandRatio(1, 1.0f);
 
-        addStyledComponents(longitudeField, latitudeField, errorRadiusField, referenceSystemSelect, longLatParsed);
+        addStyledComponents(latitudeField, longitudeField, errorRadiusField, referenceSystemSelect, latLongParsed);
         addSizedComponent(root);
 
-        fieldGroup.bind(longitudeField, "longitude");
         fieldGroup.bind(latitudeField, "latitude");
+        fieldGroup.bind(longitudeField, "longitude");
         fieldGroup.bind(errorRadiusField, "errorRadius");
         fieldGroup.bind(referenceSystemSelect, "referenceSystem");
 
@@ -138,7 +137,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         Double latitude = null;
 
         // using the string representations for UI display
-        longLatParsed.setValue(longitudeField.getValue() + "/" + latitudeField.getValue());
+        latLongParsed.setValue(longitudeField.getValue() + "/" + latitudeField.getValue());
         map.removeComponent(mapMarker);
         if(errorRadiusMarker != null){
             map.removeComponent(errorRadiusMarker);
