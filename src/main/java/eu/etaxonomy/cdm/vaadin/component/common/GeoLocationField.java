@@ -111,8 +111,8 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         root.setRows(2);
         root.setColumns(3);
         root.setStyleName("wrapper");
-        root.addComponent(longitudeField, 0, 0);
-        root.addComponent(latitudeField, 1, 0);
+        root.addComponent(latitudeField, 0, 0);
+        root.addComponent(longitudeField, 1, 0);
         root.addComponent(errorRadiusField, 0, 1);
         root.addComponent(referenceSystemSelect, 1, 1);
         // root.addComponent(map, 2, 1);
@@ -137,7 +137,7 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         Double latitude = null;
 
         // using the string representations for UI display
-        latLongParsed.setValue(longitudeField.getValue() + "/" + latitudeField.getValue());
+        latLongParsed.setValue(latitudeField.getValue() + "/" + longitudeField.getValue());
         map.removeComponent(mapMarker);
         if(errorRadiusMarker != null){
             map.removeComponent(errorRadiusMarker);
