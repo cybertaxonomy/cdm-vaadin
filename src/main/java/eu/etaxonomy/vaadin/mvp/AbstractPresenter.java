@@ -41,7 +41,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @param <V>
  *            type of the view this presenter governs
  */
-public abstract class AbstractPresenter<V extends ApplicationView>
+public abstract class AbstractPresenter<P extends AbstractPresenter<P,V>, V extends ApplicationView<V,P>>
         implements Serializable, DisposableBean {
 
     private static final long serialVersionUID = 5260910510283481832L;
@@ -74,8 +74,6 @@ public abstract class AbstractPresenter<V extends ApplicationView>
 
     /**
      * Override if needed, e.g. to skip subscription
-     *
-     * @param viewEventBus
      */
     protected void eventViewBusSubscription(EventBus.ViewEventBus viewEventBus){
             viewEventBus.subscribe(this);
@@ -113,8 +111,6 @@ public abstract class AbstractPresenter<V extends ApplicationView>
 	/**
 	 * Notifies the presenter that its view is initialized so that presenter can
 	 * start its own initialization if required.
-	 *
-	 * @param view
 	 */
 	protected void init(V view) {
 	    if (logger.isTraceEnabled()) {logger.trace(String.format("Presenter %s init()", _toString()));}
@@ -198,10 +194,6 @@ public abstract class AbstractPresenter<V extends ApplicationView>
      * In case the target field is bound to a bean property the propertyId is available in the {@link BoundField}
      * object and can be used to decide on which bean property to update with the data saved in the popup editor or to
      * act in any other appropriate way.
-     *
-     * @param popupViewClass
-     * @param event
-     * @return
      */
     protected <T extends PopupView> T openPopupEditor(Class<T> popupViewClass, AbstractEditorAction<?> event) {
         Field<?> targetField = event != null? event.getTarget(): null;

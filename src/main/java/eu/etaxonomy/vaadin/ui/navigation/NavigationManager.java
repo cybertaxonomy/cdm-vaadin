@@ -33,7 +33,7 @@ public interface NavigationManager {
 	 */
 	<T extends PopupView> T showInPopup(Class<T> popupType, ApplicationView parentView, Field<?> targetField);
 
-	public List<AbstractEditorPresenter<?,?>> getPopupEditorPresenters();
+	public List<AbstractEditorPresenter<?,?,?>> getPopupEditorPresenters();
 
 	void reloadCurrentView();
 

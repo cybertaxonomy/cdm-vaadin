@@ -20,9 +20,9 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 /**
  * @author a.kohlbecker
  * @since Jan 26, 2018
- *
  */
-public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeDesignationPresenter>, AnnotationsEditor, NomenclaturalActContext  {
+public interface NameTypeDesignationEditorView
+        extends ApplicationView<NameTypeDesignationEditorView,NameTypeDesignationPresenter>, AnnotationsEditor, NomenclaturalActContext  {
 
     ToOneRelatedEntityCombobox<Reference> getDesignationReferenceCombobox();
 
@@ -35,6 +35,4 @@ public interface NameTypeDesignationEditorView extends ApplicationView<NameTypeD
     void setShowTypeFlags(boolean showTypeFlags);
 
     boolean isShowTypeFlags();
-
-
 }

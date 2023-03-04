@@ -46,8 +46,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class NameTypeDesignationPopupEditor extends AbstractCdmPopupEditor<NameTypeDesignation, NameTypeDesignationPresenter>
-    implements NameTypeDesignationEditorView {
+public class NameTypeDesignationPopupEditor
+        extends AbstractCdmPopupEditor<NameTypeDesignation, NameTypeDesignationPresenter,NameTypeDesignationEditorView>
+        implements NameTypeDesignationEditorView {
 
     private static final String TYPE_STATUS_OR_FLAG_MUST_BE_SET = "Either \"Type status\" must be set or any of the \"Conserved type\", \"Rejected type\" or \"Not designated\" flags must be set.";
 

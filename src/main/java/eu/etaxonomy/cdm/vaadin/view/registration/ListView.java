@@ -25,7 +25,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Mar 3, 2017
  *
  */
-public interface ListView extends ApplicationView<ListPresenter>{
+public interface ListView extends ApplicationView<ListView,ListPresenter>{
 
     enum Mode {
         all,

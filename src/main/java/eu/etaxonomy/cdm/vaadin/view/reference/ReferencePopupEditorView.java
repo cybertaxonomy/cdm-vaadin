@@ -22,7 +22,8 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Apr 6, 2017
  *
  */
-public interface ReferencePopupEditorView extends ApplicationView<ReferenceEditorPresenter> {
+public interface ReferencePopupEditorView
+        extends ApplicationView<ReferencePopupEditorView,ReferenceEditorPresenter> {
 
     public NativeSelect getTypeSelect();
 

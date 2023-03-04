@@ -10,7 +10,6 @@ package eu.etaxonomy.cdm.vaadin.view;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.vaadin.spring.events.EventBus;
 
 import com.vaadin.data.validator.RegexpValidator;
@@ -36,15 +35,14 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Nov 11, 2021
  */
 @SpringView(name=AccountRegistrationViewBean.NAME)
-public class AccountRegistrationViewBean extends AbstractView<AccountRegistrationPresenter> implements AccountRegistrationView, View  {
+public class AccountRegistrationViewBean
+        extends AbstractView<AccountRegistrationView,AccountRegistrationPresenter>
+        implements AccountRegistrationView, View  {
 
     private static final long serialVersionUID = 2066153054170511405L;
 
     @Autowired
     private EventBus.UIEventBus uiEventBus;
-
-    @Autowired
-    private Environment env;
 
     public static final String NAME = "accountCreation";
 

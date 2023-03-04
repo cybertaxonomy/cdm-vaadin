@@ -20,6 +20,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * A Page based on a <code>CssLayout</code> expanded to full size having a header and sub-header.
@@ -29,7 +30,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 20, 2017
  */
-public abstract class AbstractPageView<P extends AbstractPresenter> extends AbstractView<P>  {
+public abstract class AbstractPageView<V extends ApplicationView<V,P>, P extends AbstractPresenter<P,V>>
+        extends AbstractView<V,P>  {
 
     private static final long serialVersionUID = -8669483572788112285L;
 

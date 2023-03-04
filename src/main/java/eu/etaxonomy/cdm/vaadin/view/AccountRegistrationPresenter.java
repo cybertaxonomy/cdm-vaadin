@@ -40,7 +40,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegistrationView> {
+public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegistrationPresenter,AccountRegistrationView> {
 
     private static final long serialVersionUID = 2656148780493202130L;
 

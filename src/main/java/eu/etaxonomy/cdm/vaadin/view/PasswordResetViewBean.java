@@ -35,7 +35,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Nov 11, 2021
  */
 @SpringView(name=PasswordResetViewBean.NAME)
-public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> implements PasswordResetView, View  {
+public class PasswordResetViewBean
+        extends AbstractView<PasswordResetView,PasswordResetPresenter>
+        implements PasswordResetView, View  {
 
     private static final long serialVersionUID = -1857662031516326300L;
 

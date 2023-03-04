@@ -59,7 +59,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 @SpringComponent
 @ViewScope
-public class StartRegistrationPresenter extends AbstractEditorPresenter<RegistrationDTO, StartRegistrationView> {
+public class StartRegistrationPresenter
+        extends AbstractEditorPresenter<RegistrationDTO, StartRegistrationPresenter, StartRegistrationView> {
 
     private static final long serialVersionUID = 2283189121081612574L;
 

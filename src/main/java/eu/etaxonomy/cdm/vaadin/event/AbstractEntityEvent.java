@@ -22,9 +22,9 @@ public abstract class AbstractEntityEvent<T extends Enum<?>> {
 
     private UUID entityUuid = null;
 
-    private AbstractView<?> sourceView = null;
+    private AbstractView<?,?> sourceView = null;
 
-    public AbstractEntityEvent(T type, UUID entityUuid, AbstractView<?> sourceView) {
+    public AbstractEntityEvent(T type, UUID entityUuid, AbstractView<?,?> sourceView) {
         this.entityUuid = entityUuid;
         this.type = type;
         this.sourceView = sourceView;
@@ -41,7 +41,7 @@ public abstract class AbstractEntityEvent<T extends Enum<?>> {
         return type;
     }
 
-    public AbstractView<?> getSourceView() {
+    public AbstractView<?,?> getSourceView() {
         return sourceView;
     }
 }

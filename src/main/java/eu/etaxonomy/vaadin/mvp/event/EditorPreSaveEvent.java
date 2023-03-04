@@ -18,37 +18,26 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Apr 5, 2017
  *
  */
-public class EditorPreSaveEvent<DTO extends Object> implements EditorViewEvent, EditorBeanEvent<DTO>{
+public class EditorPreSaveEvent<DTO extends Object>
+        implements EditorViewEvent, EditorBeanEvent<DTO>{
 
     // FIXME this is only a iterim solution for the problem described in https://dev.e-taxonomy.eu/redmine/issues/6562
-    private AbstractView<?> view;
+    private AbstractView<?,?> view;
 
     private DTO bean;
 
-    /**
-     * @param commitEvent
-     */
-    public EditorPreSaveEvent(AbstractView<?> view, DTO bean) {
+    public EditorPreSaveEvent(AbstractView<?,?> view, DTO bean) {
         this.bean = bean;
         this.view = view;
     }
 
-
-    /**
-     * @return the view
-     */
     @Override
-    public AbstractView<?> getView() {
+    public AbstractView<?,?> getView() {
         return view;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DTO getBean() {
         return bean;
     }
-
 }

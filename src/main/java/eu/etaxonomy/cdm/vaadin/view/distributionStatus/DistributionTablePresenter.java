@@ -66,7 +66,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class DistributionTablePresenter extends AbstractPresenter<IDistributionTableView> {
+public class DistributionTablePresenter
+        extends AbstractPresenter<DistributionTablePresenter,IDistributionTableView> {
 
 	private static final long serialVersionUID = 3313043335587777217L;
 

@@ -20,7 +20,8 @@ import eu.etaxonomy.vaadin.mvp.EditorFormConfigurator;
  * @author a.kohlbecker
  * @since Mar 22, 2019
  */
-public class RegistrationUiReferenceEditorFormConfigurator implements EditorFormConfigurator<ReferencePopupEditor> {
+public class RegistrationUiReferenceEditorFormConfigurator
+        implements EditorFormConfigurator<ReferencePopupEditor> {
 
     private boolean limitToSectionEditing;
 
@@ -50,7 +51,7 @@ public class RegistrationUiReferenceEditorFormConfigurator implements EditorForm
     }
 
     @Override
-    public void updateComponentStates(AbstractPopupEditor<?, ?> popupEditor) {
+    public void updateComponentStates(AbstractPopupEditor<?,?,?> popupEditor) {
         ReferencePopupEditor refEditor = (ReferencePopupEditor)popupEditor;
         if(limitToSectionEditing){
             boolean isSection = sectionTypes.contains(refEditor.getBean().getType());

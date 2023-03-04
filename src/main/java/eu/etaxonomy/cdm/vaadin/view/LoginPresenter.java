@@ -70,7 +70,8 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @ViewScope
-public class LoginPresenter extends AbstractPresenter<LoginView> implements EventBusListener<AuthenticationAttemptEvent> {
+public class LoginPresenter extends AbstractPresenter<LoginPresenter,LoginView>
+        implements EventBusListener<AuthenticationAttemptEvent> {
 
     private static final long serialVersionUID = 4020699735656994791L;
 

@@ -34,7 +34,8 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
  */
 @SpringComponent
 @Scope("prototype")
-public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration, RegistrationPopEditorView> {
+public class RegistrationEditorPresenter
+        extends AbstractCdmEditorPresenter<Registration, RegistrationEditorPresenter,RegistrationPopEditorView> {
 
     private static final long serialVersionUID = 6930557602995331944L;
     private RegistrationStatus lastStatus;
@@ -101,7 +102,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     }
 
     private void updateRegStatus(RegistrationStatus status){
-        Registration reg = ((AbstractPopupEditor<Registration, RegistrationEditorPresenter>)getView()).getBean();
+        Registration reg = ((AbstractPopupEditor<Registration,?,?>)getView()).getBean();
         if(lastStatus != null){
             // set last status again to allow updateStatusAndDate() to the job
             reg.setStatus(lastStatus);

@@ -39,7 +39,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
  */
 @SpringComponent
 @ViewScope
-public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView> {
+public class PasswordResetPresenter
+        extends AbstractPresenter<PasswordResetPresenter,PasswordResetView> {
 
     private static final long serialVersionUID = 2656148780493202130L;
 

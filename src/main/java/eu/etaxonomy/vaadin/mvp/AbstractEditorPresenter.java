@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.vaadin.mvp;
 
-import org.hibernate.FlushMode;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.ui.Component;
@@ -33,12 +32,10 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  * @author a.kohlbecker
  * @since Apr 5, 2017
  */
-public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>>
-        extends AbstractPresenter<V> {
+public abstract class AbstractEditorPresenter<DTO extends Object, P extends AbstractEditorPresenter<DTO,P,V>, V extends ApplicationView<V,P>>
+        extends AbstractPresenter<P,V> {
 
     private static final long serialVersionUID = -6677074110764145236L;
-
-    private FlushMode previousPreSaveEvenFlushMode = null;
 
     /**
      * Load the bean to be edited in the editor freshly from the persistent storage.

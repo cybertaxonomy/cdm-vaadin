@@ -39,7 +39,8 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 @SpringComponent
 @Scope("prototype")
-public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<InstitutionDTO, Institution, InstitutionPopupEditorView> {
+public class InstitutionEditorPresenter
+        extends AbstractCdmDTOEditorPresenter<InstitutionDTO, Institution, InstitutionEditorPresenter, InstitutionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
 

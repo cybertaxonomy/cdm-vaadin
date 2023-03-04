@@ -94,8 +94,8 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 @SpringComponent
 @Scope("prototype")
 public class SpecimenTypeDesignationSetEditorPresenter
-    extends AbstractEditorPresenter<SpecimenTypeDesignationSetDTO,SpecimenTypeDesignationSetPopupEditorView>
-    implements CachingPresenter, NomenclaturalActContext {
+        extends AbstractEditorPresenter<SpecimenTypeDesignationSetDTO,SpecimenTypeDesignationSetEditorPresenter,SpecimenTypeDesignationSetPopupEditorView>
+        implements CachingPresenter, NomenclaturalActContext {
 
     private static final long serialVersionUID = 4255636253714476918L;
 
@@ -455,7 +455,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
             Stack<EditorActionContext> context = ((AbstractPopupEditor) event.getSourceView()).getEditorActionContext();
             if(context.size() > 1){
-               AbstractView<?> parentView = context.get(context.size() - 2).getParentView();
+               AbstractView<?,?> parentView = context.get(context.size() - 2).getParentView();
                if(getView().equals(parentView)){
                    Collection newCollection = getRepo().getCollectionService().load(
                            event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})

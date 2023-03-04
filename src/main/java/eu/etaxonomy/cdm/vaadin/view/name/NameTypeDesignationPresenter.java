@@ -71,7 +71,7 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 @SpringComponent
 @Scope("prototype")
 public class NameTypeDesignationPresenter
-        extends AbstractCdmEditorPresenter<NameTypeDesignation, NameTypeDesignationEditorView> {
+        extends AbstractCdmEditorPresenter<NameTypeDesignation,NameTypeDesignationPresenter, NameTypeDesignationEditorView> {
 
     private static final long serialVersionUID = 896305051895903033L;
 
@@ -274,7 +274,7 @@ public class NameTypeDesignationPresenter
         // deleteTypedesignation(uuid, uuid) needs to be called so the name is loaded in the transaction of the method and is saved.
         DeleteResult deletResult = getRepo().getNameService().deleteTypeDesignation(typifiedNameInContext.getUuid(), bean.getUuid());
         if(deletResult.isOk()){
-            EntityChangeEvent<?> changeEvent = new EntityChangeEvent<>(bean, Type.REMOVED, (AbstractView<?>) getView());
+            EntityChangeEvent<?> changeEvent = new EntityChangeEvent<>(bean, Type.REMOVED, (AbstractView<?,?>) getView());
             viewEventBus.publish(this, changeEvent);
         } else {
             CdmStore.handleDeleteResultInError(deletResult);

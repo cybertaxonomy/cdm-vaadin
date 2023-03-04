@@ -58,7 +58,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  */
 @SpringComponent
 @ViewScope
-public class ListPresenter extends AbstractPresenter<ListView> {
+public class ListPresenter extends AbstractPresenter<ListPresenter,ListView> {
 
     private static final Logger logger = LogManager.getLogger();
 

@@ -85,7 +85,7 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
  */
 @SpringView(name=RegistrationWorksetViewBean.NAME)
 public class RegistrationWorksetViewBean
-        extends AbstractPageView<RegistrationWorkingsetPresenter>
+        extends AbstractPageView<RegistrationWorkingsetView,RegistrationWorkingsetPresenter>
         implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
     private static final long serialVersionUID = -213040114015958970L;

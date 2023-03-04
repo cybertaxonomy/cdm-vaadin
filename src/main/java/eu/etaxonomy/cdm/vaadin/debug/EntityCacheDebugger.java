@@ -71,10 +71,10 @@ public class EntityCacheDebugger implements ViewChangeListener, EventBusListener
         if(view != null){
 
                 try {
-                    AbstractPresenter<?> presenter;
+                    AbstractPresenter<?,?> presenter;
                     Method getPresenterMethod = AbstractView.class.getDeclaredMethod("getPresenter");
                     getPresenterMethod.setAccessible(true);
-                    presenter = (AbstractPresenter<?>) getPresenterMethod.invoke(view);
+                    presenter = (AbstractPresenter<?,?>) getPresenterMethod.invoke(view);
                     if(CachingPresenter.class.isAssignableFrom(presenter.getClass())){
                         open(view, (CachingPresenter)presenter);
                     } else {

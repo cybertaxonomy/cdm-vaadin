@@ -15,7 +15,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @author a.kohlbecker
  * @since Apr 25, 2017
  */
-public interface LoginView extends ApplicationView<LoginPresenter>  {
+public interface LoginView extends ApplicationView<LoginView,LoginPresenter>  {
 
     public LoginDialog getLoginDialog();
 

@@ -60,11 +60,12 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 /**
  * @author a.kohlbecker
  * @since Apr 4, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
-public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter> implements ReferencePopupEditorView {
+public class ReferencePopupEditor
+        extends AbstractCdmPopupEditor<Reference, ReferenceEditorPresenter,ReferencePopupEditorView>
+        implements ReferencePopupEditorView {
 
     private static final long serialVersionUID = -4347633563800758815L;
 

@@ -24,7 +24,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Jun 13, 2017
  */
 public interface SpecimenTypeDesignationSetPopupEditorView
-        extends ApplicationView<SpecimenTypeDesignationSetEditorPresenter>,
+        extends ApplicationView<SpecimenTypeDesignationSetPopupEditorView,SpecimenTypeDesignationSetEditorPresenter>,
                 AnnotationsEditor {
 
     public NativeSelect getCountrySelectField();

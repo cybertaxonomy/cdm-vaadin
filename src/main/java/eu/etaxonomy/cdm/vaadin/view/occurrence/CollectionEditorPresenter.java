@@ -43,7 +43,8 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 @SpringComponent
 @Scope("prototype")
-public class CollectionEditorPresenter extends AbstractCdmEditorPresenter<Collection, CollectionPopupEditorView> {
+public class CollectionEditorPresenter
+        extends AbstractCdmEditorPresenter<Collection,CollectionEditorPresenter,CollectionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
 

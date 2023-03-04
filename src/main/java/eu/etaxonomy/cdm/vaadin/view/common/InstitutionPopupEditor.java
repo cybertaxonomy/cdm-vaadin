@@ -29,7 +29,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<InstitutionDTO, Institution, InstitutionEditorPresenter> implements InstitutionPopupEditorView {
+public class InstitutionPopupEditor
+        extends AbstractCdmDTOPopupEditor<InstitutionDTO, Institution, InstitutionEditorPresenter,InstitutionPopupEditorView>
+        implements InstitutionPopupEditorView {
 
     private static final long serialVersionUID = 2019724189877425882L;
 

@@ -83,8 +83,8 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  * @author a.kohlbecker
  * @since Apr 5, 2017
  */
-public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
-        extends AbstractPopupView<P> {
+public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO,P,V>, V extends ApplicationView<V,P>>
+        extends AbstractPopupView<V,P> {
 
     private static final long serialVersionUID = 5944874629527570061L;
     private static final Logger logger = LogManager.getLogger();
@@ -129,7 +129,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Button advancedModeButton;
 
-    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator;
+    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P,V>> editorComponentsConfigurator;
 
     private boolean withDeleteButton;
 
@@ -321,7 +321,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
     public void registerAdvancedModeComponents(Component ... c){
         advancedModeComponents.addAll(Arrays.asList(c));
     }
-
 
     // ------------------------ event handler ------------------------ //
 
@@ -706,9 +705,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         updateDeleteButtonState();
     }
 
-    /**
-     * @param withDelete
-     */
     private void updateDeleteButtonState() {
         deleteBtn.setVisible(withDeleteButton && !isReadOnly());
     }
@@ -803,8 +799,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     /**
      * Returns the bean contained in the itemDatasource of the fieldGroup.
-     *
-     * @return
      */
     public DTO getBean() {
         if(fieldGroup.getItemDataSource() != null){
@@ -924,12 +918,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return newField;
     }
 
-    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> getEditorComponentsConfigurator() {
+    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO,P,V>> getEditorComponentsConfigurator() {
         return editorComponentsConfigurator;
     }
 
     public void setEditorComponentsConfigurator(
-            EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator) {
+            EditorFormConfigurator<? extends AbstractPopupEditor<DTO,P,V>> editorComponentsConfigurator) {
         this.editorComponentsConfigurator = editorComponentsConfigurator;
     }
 }

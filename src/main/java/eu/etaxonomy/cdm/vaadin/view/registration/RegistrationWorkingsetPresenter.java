@@ -105,7 +105,9 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> implements CachingPresenter {
+public class RegistrationWorkingsetPresenter
+        extends AbstractPresenter<RegistrationWorkingsetPresenter,RegistrationWorkingsetView>
+        implements CachingPresenter {
 
     private static final long serialVersionUID = 2618456456539802265L;
 

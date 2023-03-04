@@ -57,8 +57,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class SpecimenTypeDesignationSetPopupEditor
-    extends AbstractPopupEditor<SpecimenTypeDesignationSetDTO, SpecimenTypeDesignationSetEditorPresenter>
-    implements SpecimenTypeDesignationSetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
+        extends AbstractPopupEditor<SpecimenTypeDesignationSetDTO, SpecimenTypeDesignationSetEditorPresenter, SpecimenTypeDesignationSetPopupEditorView>
+        implements SpecimenTypeDesignationSetPopupEditorView, AccessRestrictedView, PerEntityAuthorityGrantingEditor {
 
     private static final String CAN_T_SAVE_AS_LONG_AS_TYPE_DESIGNATIONS_ARE_MISSING = "Can't save as long as type designations are missing.";
 

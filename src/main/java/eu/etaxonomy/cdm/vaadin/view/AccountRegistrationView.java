@@ -17,7 +17,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @author a.kohlbecker
  * @since Nov 22, 2021
  */
-public interface AccountRegistrationView extends ApplicationView<AccountRegistrationPresenter>   {
+public interface AccountRegistrationView extends ApplicationView<AccountRegistrationView,AccountRegistrationPresenter>   {
 
     public TextField getUserName();
 

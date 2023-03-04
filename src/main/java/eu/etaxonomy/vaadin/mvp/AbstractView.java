@@ -32,8 +32,10 @@ import eu.etaxonomy.cdm.vaadin.permission.ReleasableResourcesView;
  * @author Peter / Vaadin
  */
 @SuppressWarnings("serial")
-public abstract class AbstractView<P extends AbstractPresenter> extends CustomComponent
+public abstract class AbstractView<V extends ApplicationView<V,P>, P extends AbstractPresenter<P,V>>
+        extends CustomComponent
 		implements ApplicationContextAware, ReleasableResourcesView, DisposableBean {
+        //also implements ApplicationView<V,P> ??
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -56,7 +58,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 
 		initContent();
 
-		presenter.init((ApplicationView<P>) this);
+		presenter.init((V)this);
 
 		onViewReady();
 	}

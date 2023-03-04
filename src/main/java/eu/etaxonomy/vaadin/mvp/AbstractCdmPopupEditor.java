@@ -23,17 +23,12 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
 /**
  * @author a.kohlbecker
  * @since May 5, 2017
- *
  */
-public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmEditorPresenterBase<CDM, CDM, ? extends ApplicationView>>
-    extends AbstractPopupEditor<CDM, P> implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
+public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmEditorPresenterBase<CDM, CDM, P,V>, V extends ApplicationView<V,P>>
+        extends AbstractPopupEditor<CDM,P,V> implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
 
     private String accessDeniedMessage;
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public AbstractCdmPopupEditor(Layout layout, Class<CDM> dtoType) {
         super(layout, dtoType);
     }
@@ -63,7 +58,5 @@ public abstract class AbstractCdmPopupEditor<CDM extends CdmBase, P extends CdmE
     @Override
     public void setAccessDeniedMessage(String accessDeniedMessage) {
         this.accessDeniedMessage = accessDeniedMessage;
-
     }
-
 }

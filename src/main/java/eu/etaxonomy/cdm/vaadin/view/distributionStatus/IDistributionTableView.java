@@ -13,14 +13,15 @@ import com.vaadin.navigator.View;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
- * 
+ *
  * Interface for the distribution status editor view.
- * 
+ *
  * @author freimeier
  * @since 18.10.2017
  *
  */
-public interface IDistributionTableView extends ApplicationView<DistributionTablePresenter>, View {
+public interface IDistributionTableView
+        extends ApplicationView<IDistributionTableView,DistributionTablePresenter>, View {
 
     /**
      * Updates Distribution Table.

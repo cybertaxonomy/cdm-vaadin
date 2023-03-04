@@ -34,7 +34,7 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
  */
 @SpringView(name=LoginViewBean.NAME)
 public class LoginViewBean
-        extends AbstractView<LoginPresenter>
+        extends AbstractView<LoginView,LoginPresenter>
         implements LoginView, View  {
 
     private static final long serialVersionUID = 8527714663738364972L;

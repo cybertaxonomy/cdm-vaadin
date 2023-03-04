@@ -41,11 +41,11 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
- *
  */
 @SpringView(name=StartRegistrationViewBean.NAME)
-public class StartRegistrationViewBean extends AbstractPageView<StartRegistrationPresenter>
-    implements StartRegistrationView, AccessRestrictedView, View {
+public class StartRegistrationViewBean
+        extends AbstractPageView<StartRegistrationView,StartRegistrationPresenter>
+        implements StartRegistrationView, AccessRestrictedView, View {
 
     private static final long serialVersionUID = -9055865292188732909L;
 
@@ -75,9 +75,6 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -90,8 +87,11 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
         HorizontalLayout publicationLayout = new HorizontalLayout();
         publicationLayout.setSpacing(true);
 
-        Class<TypedEntityReference<Reference>> type = (Class<TypedEntityReference<Reference>>) new TypedEntityReference<Reference>(Reference.class, null).getClass();
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        Class<TypedEntityReference<Reference>> type = (Class)TypedEntityReference.class;
         referenceCombobox = new LazyComboBox<TypedEntityReference<Reference>>(type) {
+
+            private static final long serialVersionUID = 4209637913208388691L;
 
             @Override
             protected void setSelectInstance(AbstractSelect select) {
@@ -102,7 +102,6 @@ public class StartRegistrationViewBean extends AbstractPageView<StartRegistratio
                 }
                 super.setSelectInstance(select);
             }
-
         };
         referenceCombobox.setWidth(ELEMENT_WIDTH);
         referenceCombobox.setBuffered(false);

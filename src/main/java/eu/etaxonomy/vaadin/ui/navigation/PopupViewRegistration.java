@@ -27,7 +27,8 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @author a.kohlbecker
  * @since May 16, 2018
  */
-public class PopupViewRegistration implements DetachListener {
+public class PopupViewRegistration
+        implements DetachListener {
 
     private static final long serialVersionUID = -5946913287379095637L;
 
@@ -35,7 +36,7 @@ public class PopupViewRegistration implements DetachListener {
 
     private Map<PopupView, Window> popupWindowMap = new HashMap<>();
 
-    private Map<ApplicationView<?>, Map<PopupView, Field<?>>> popupViewFieldMap = new HashMap<>();
+    private Map<ApplicationView<?,?>, Map<PopupView, Field<?>>> popupViewFieldMap = new HashMap<>();
 
     /**
      * @param view

@@ -31,7 +31,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class RegistrationPopupEditor extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter>
+public class RegistrationPopupEditor
+        extends AbstractCdmPopupEditor<Registration, RegistrationEditorPresenter,RegistrationPopEditorView>
     implements RegistrationPopEditorView {
 
     private static final long serialVersionUID = 5418275817834009509L;

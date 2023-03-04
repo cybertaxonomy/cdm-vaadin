@@ -13,10 +13,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 /**
  * @author a.kohlbecker
  * @since May 29, 2017
- *
  */
 public interface EditorViewEvent {
 
-    public AbstractView<?> getView();
+    public AbstractView<?,?> getView();
 
 }

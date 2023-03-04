@@ -69,8 +69,9 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
  */
 @ViewScope
 @SpringView(name=DistributionTableViewBean.NAME)
-public class DistributionTableViewBean extends AbstractPageView<DistributionTablePresenter>
-            implements IDistributionTableView, AccessRestrictedView {
+public class DistributionTableViewBean
+        extends AbstractPageView<IDistributionTableView,DistributionTablePresenter>
+        implements IDistributionTableView, AccessRestrictedView {
 
     private static final long serialVersionUID = 3495626893961744083L;
 

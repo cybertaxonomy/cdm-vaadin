@@ -25,8 +25,8 @@ import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
  * @author a.kohlbecker
  * @since May 5, 2017
  */
-public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO, CDM, ? extends ApplicationView>>
-        extends AbstractPopupEditor<DTO, P>
+public abstract class AbstractCdmDTOPopupEditor<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends CdmEditorPresenterBase<DTO,CDM,P,V>, V extends ApplicationView<V,P>>
+        extends AbstractPopupEditor<DTO,P,V>
         implements PerEntityAuthorityGrantingEditor, AccessRestrictedView {
 
     private static final long serialVersionUID = -5025937489746256070L;

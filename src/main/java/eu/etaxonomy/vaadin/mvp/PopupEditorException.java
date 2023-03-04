@@ -17,7 +17,6 @@ import eu.etaxonomy.cdm.vaadin.event.EditorActionContextFormatter;
 /**
  * @author a.kohlbecker
  * @since Nov 8, 2018
- *
  */
 public class PopupEditorException extends RuntimeException {
 
@@ -27,10 +26,7 @@ public class PopupEditorException extends RuntimeException {
 
     private String userName;
 
-    /**
-     * @param message
-     */
-    public PopupEditorException(String message, AbstractPopupEditor<?,?> editor, Throwable e) {
+    public PopupEditorException(String message, AbstractPopupEditor<?,?,?> editor, Throwable e) {
         super(message, e);
 
         EditorActionContextFormatter formatter = new EditorActionContextFormatter();
@@ -41,15 +37,12 @@ public class PopupEditorException extends RuntimeException {
         userName = userName();
     }
 
-    /**
-     * @return
-     */
     public String userName() {
         UserHelper userHelper = UserHelperAccess.userHelper();
         return userHelper != null ? userHelper.userName() : null;
     }
 
-    public PopupEditorException(String message, AbstractPopupEditor<?,?> editor) {
+    public PopupEditorException(String message, AbstractPopupEditor<?,?,?> editor) {
         super(message);
 
         EditorActionContextFormatter formatter = new EditorActionContextFormatter();
@@ -60,8 +53,6 @@ public class PopupEditorException extends RuntimeException {
         userName = userName();
     }
 
-
-
     @Override
     public String getMessage() {
         String userInfo = "";
@@ -71,10 +62,8 @@ public class PopupEditorException extends RuntimeException {
         return super.getMessage() + " -  context" + userInfo + ":" + contextInfo;
     }
 
-
     @Override
     public String getLocalizedMessage() {
         return getMessage();
     }
-
 }

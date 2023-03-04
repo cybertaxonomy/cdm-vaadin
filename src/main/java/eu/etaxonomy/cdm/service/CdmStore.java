@@ -107,7 +107,7 @@ public class CdmStore {
     /**
      * @return a EntityChangeEvent in case the deletion was successful otherwise <code>null</code>.
      */
-    public final <T extends CdmBase> EntityChangeEvent<T> deleteBean(T bean, AbstractView<?> view) {
+    public final <T extends CdmBase> EntityChangeEvent<T> deleteBean(T bean, AbstractView<?,?> view) {
 
         IService<T> typeSpecificService = serviceFor(bean);
 
