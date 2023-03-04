@@ -30,7 +30,7 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @author a.kohlbecker
  * @since Jun 7, 2017
  */
-public class CdmFilterablePagingProvider<T extends IdentifiableEntity<?>, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
+public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -91,7 +91,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity<?>, V exte
     }
 
     public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {
-        super();
         this.type = type;
         this.service = service;
         this.matchMode = matchMode;

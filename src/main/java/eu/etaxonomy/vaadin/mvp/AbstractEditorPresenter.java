@@ -11,7 +11,6 @@ package eu.etaxonomy.vaadin.mvp;
 import org.hibernate.FlushMode;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
-import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 
@@ -33,14 +32,12 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
 public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>> extends AbstractPresenter<V> {
 
-
     private static final long serialVersionUID = -6677074110764145236L;
 
-    FlushMode previousPreSaveEvenFlushMode = null;
+    private FlushMode previousPreSaveEvenFlushMode = null;
 
     /**
      * Load the bean to be edited in the editor freshly from the persistent storage.
@@ -107,21 +104,14 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         saveBean(bean);
     }
 
-   /**
-    * @param saveEvent
-    */
-   @EventBusListenerMethod
-   public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
-       if(!isFromOwnView(deleteEvent)){
-           return;
-       }
-       deleteBean(deleteEvent.getBean());
-   }
+    @EventBusListenerMethod
+    public void onEditorDeleteEvent(EditorDeleteEvent<DTO> deleteEvent){
+        if(!isFromOwnView(deleteEvent)){
+            return;
+        }
+        deleteBean(deleteEvent.getBean());
+    }
 
-    /**
-     * @param saveEvent
-     * @return
-     */
     protected boolean isFromOwnView(EditorViewEvent saveEvent) {
         return saveEvent.getView().equals(getView());
     }
@@ -130,19 +120,16 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         return (Class<V>) super.getView().getClass();
     }
 
-    protected boolean isFromOwnView(AbstractEditorAction action){
+    protected boolean isFromOwnView(AbstractEditorAction<?> action){
         return action.getSourceView() != null && getView().equals(action.getSourceView());
     }
 
-    protected boolean isFromOwnView(FieldReplaceEvent event){
+    protected boolean isFromOwnView(FieldReplaceEvent<?> event){
         return event.getSourceView() != null && getView().equals(event.getSourceView());
     }
 
     protected abstract void saveBean(DTO bean);
 
-    /**
-     * @param bean
-     */
     protected abstract void deleteBean(DTO bean);
 
     /**
@@ -173,14 +160,9 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         return null;
     }
 
-    /**
-     * @param targetField
-     * @return
-     */
     protected Field<?> findBoundField(Field<?> targetField) {
 
         Component parentComponent = targetField;
-        Property<?> p = null;
         while(parentComponent != null){
             if(Field.class.isAssignableFrom(parentComponent.getClass())){
                 Field<?> parentField = (Field<?>)parentComponent;
@@ -192,5 +174,4 @@ public abstract class AbstractEditorPresenter<DTO extends Object, V extends Appl
         }
         return null;
     }
-
 }

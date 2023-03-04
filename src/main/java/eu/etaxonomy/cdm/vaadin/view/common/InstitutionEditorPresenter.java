@@ -36,7 +36,6 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -44,14 +43,10 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
 
     private static final long serialVersionUID = -1996365248431425021L;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Institution loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
-
                 "$",
                 "contact.$",
                 "isPartOf.$",

@@ -35,5 +35,4 @@ public interface ReferencePopupEditorView extends ApplicationView<ReferenceEdito
     public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox();
 
     public ToOneRelatedEntityCombobox<Institution> getSchoolCombobox();
-
 }

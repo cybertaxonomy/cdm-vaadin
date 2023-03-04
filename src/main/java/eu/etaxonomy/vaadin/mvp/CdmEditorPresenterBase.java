@@ -46,7 +46,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         implements CachingPresenter {
 
     private static final long serialVersionUID = 2218185546277084261L;
-
     private static final Logger logger = LogManager.getLogger();
 
     protected BeanInstantiator<DTO> beanInstantiator = null;
@@ -57,13 +56,24 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     @Autowired
     protected CdmFilterablePagingProviderFactory pagingProviderFactory;
 
+    @Autowired
+    protected CdmStore cdmStore;
+
+    protected CdmAuthority newAuthorityCreated;
+
     /**
-     * @param beanInstantiator the beanInstantiator to set
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
+     * granted to the current use as long this grant is not assigned yet.
      */
+    protected EnumSet<CRUD> crud = null;
+
+    private ICdmEntityUuidCacher cache;
+
+    private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
+
     public void setBeanInstantiator(BeanInstantiator<DTO> beanInstantiator) {
         this.beanInstantiator = beanInstantiator;
     }
-
 
     protected DTO createNewBean() {
         if(this.beanInstantiator != null){
@@ -72,31 +82,12 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         return defaultBeanInstantiator().createNewBean();
     }
 
-    /**
-     * @return
-     */
     protected abstract BeanInstantiator<DTO> defaultBeanInstantiator();
-
-    /**
-     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
-     * granted to the current use as long this grant is not assigned yet.
-     */
-    protected EnumSet<CRUD> crud = null;
-
-
-    private ICdmEntityUuidCacher cache;
-
-    private java.util.Collection<CdmBase> rootEntities = new HashSet<>();
 
     public CdmEditorPresenterBase() {
         super();
         logger.trace(this._toString() + " constructor");
     }
-
-    @Autowired
-    protected CdmStore cdmStore;
-
-    protected CdmAuthority newAuthorityCreated;
 
     @Override
     protected DTO loadBeanById(Object identifier) {
@@ -119,7 +110,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         return dto;
     }
 
-
     /**
      * @param cdmEntitiy the CDM entity to initialize the cache with.
      */
@@ -133,15 +123,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
         return dto;
     }
 
-    /**
-     * @param cdmEntitiy
-     * @return
-     */
     protected abstract DTO createDTODecorator(CDM cdmEntitiy);
 
-    /**
-     * @param cdmEntitiy
-     */
     @Override
     protected void adaptToUserPermission(DTO dto) {
 
@@ -163,19 +146,10 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
                 logger.debug("removing delete button");
             }
         }
-
     }
 
-    /**
-     * @param dto
-     * @return
-     */
     protected abstract CDM cdmEntity(DTO dto);
 
-    /**
-     * @param identifier
-     * @return
-     */
     protected abstract CDM loadCdmEntity(UUID uuid);
 
     /**
@@ -188,11 +162,8 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      * Grant per entity CdmAuthority to the current user for the bean which is loaded
      * into the editor. The <code>CRUD</code> to be granted are stored in the <code>crud</code> field.
      */
-     protected abstract void guaranteePerEntityCRUDPermissions(CDM bean);
+    protected abstract void guaranteePerEntityCRUDPermissions(CDM bean);
 
-    /**
-     * @return
-     */
     protected abstract IService<CDM> getService();
 
     @Override
@@ -264,7 +235,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
      *   See {@link https://dev.e-taxonomy.eu/redmine/issues/7390 #7390}
      *   </li>
      * </ol>
-     *
      */
     protected DTO preSaveBean(DTO bean) {
         // blank implementation, to be implemented by sub classes if needed
@@ -300,7 +270,6 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
 
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
-
     }
 
     @Override

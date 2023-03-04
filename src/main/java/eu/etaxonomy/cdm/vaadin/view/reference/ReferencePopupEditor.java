@@ -87,6 +87,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     private TeamOrPersonField authorshipField;
 
     private ToOneRelatedEntityCombobox<Institution> institutionCombobox;
+
     private ToOneRelatedEntityCombobox<Institution> schoolCombobox;
 
     private FilterableAnnotationsField annotationsListField;
@@ -116,10 +117,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         propertyNameLabelMap.put("inBook", "In book");
     }
 
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public ReferencePopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), Reference.class);
     }
@@ -129,7 +126,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         GridLayout grid = (GridLayout)getFieldLayout();
         grid.setSpacing(true);
         grid.setMargin(true);
-
 
         /*
         "type",
@@ -281,7 +277,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         uriField.setWidth(COL_FIELD_WIDTH_STR);
         addField(uriField, "uri", 3, row);
 
-
         variableGridLastRow = row;
 
         row++;
@@ -296,7 +291,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         }
         addField(annotationsListField, "annotations", 0, row, GRID_COLS-1, row);
 
-
 //        titleField.setRequired(true);
 //        publisherField.setRequired(true);
 
@@ -304,10 +298,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         registerAdvancedModeComponents(titleCacheField, abbrevTitleCacheField);
         registerAdvancedModeComponents(authorshipField.getCachFields());
         setAdvancedMode(false);
-
     }
-
-
 
     @Override
     protected void afterItemDataSourceSet() {
@@ -315,10 +306,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         inReferenceCombobox.getSelect().addValidator(new InReferenceTypeValidator(typeSelect));
     }
 
-    /**
-     * @param value
-     * @return
-     */
     private Object updateFieldVisibility(ReferenceType referenceType) {
 
         GridLayout grid = (GridLayout)getFieldLayout();
@@ -381,25 +368,15 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
             // fix inReference label
             getField("inReference").setCaption(propertyNameLabelMap.get("inReference"));
         }
-
-
-
         return null;
     }
 
-    /**
-     * @param inRefCaption
-     * @return
-     */
     public String inReferenceCaption(String inRefCaption) {
         String caption = propertyNameLabelMap.get(inRefCaption);
 
         return caption != null ? caption : inRefCaption;
     }
 
-    /**
-     * @param grid
-     */
     protected void initAdaptiveFields() {
         GridLayout grid = (GridLayout)getFieldLayout();
         // initialize the map of adaptive fields
@@ -436,7 +413,6 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         }
     }
 
-
     @Override
     public void setAdvancedMode(boolean isAdvancedMode) {
         boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION));
@@ -450,34 +426,21 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Reference editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}            // TODO Auto-generated method stub
-     */
     @Override
     public void focusFirst() {
         titleField.focus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isResizable() {
         return false;
@@ -488,17 +451,11 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         return typeSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ToOneRelatedEntityCombobox<Reference> getInReferenceCombobox() {
         return inReferenceCombobox;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public TeamOrPersonField getAuthorshipField() {
         return authorshipField;
@@ -526,6 +483,4 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
     public ToOneRelatedEntityCombobox<Institution> getSchoolCombobox() {
         return schoolCombobox;
     }
-
-
 }

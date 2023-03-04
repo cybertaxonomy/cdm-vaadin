@@ -32,7 +32,6 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint.SortOrder;
 /**
  * @author a.kohlbecker
  * @since Jun 7, 2018
- *
  */
 @Component
 public class CdmFilterablePagingProviderFactory {

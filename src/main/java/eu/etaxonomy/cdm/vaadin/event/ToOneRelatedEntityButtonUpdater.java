@@ -19,9 +19,9 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 /**
  * @author a.kohlbecker
  * @since 19.10.2017
- *
  */
-public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements NestedButtonStateUpdater<CDM> {
+public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase>
+        implements NestedButtonStateUpdater<CDM> {
 
     private static final long serialVersionUID = -915308421870173706L;
 
@@ -43,10 +43,6 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
         this(toOneRelatedEntityField, true);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void valueChange(ValueChangeEvent event) {
 
@@ -54,19 +50,14 @@ public class ToOneRelatedEntityButtonUpdater<CDM extends CdmBase> implements Nes
         updateButtons(value);
     }
 
-    /**
-     * @param value
-     */
     @Override
     public void updateButtons(CDM value) {
 
         boolean userIsAllowedToUpdate = value != null && UserHelperAccess.userHelper().userHasPermission(value, CRUD.UPDATE);
         boolean userIsAllowedToCreate = UserHelperAccess.userHelper().userHasPermission(type, CRUD.CREATE);
-        boolean isReadOnlyField = ((Field)toOneRelatedEntityField).isReadOnly();
+        boolean isReadOnlyField = ((Field<?>)toOneRelatedEntityField).isReadOnly();
 
         toOneRelatedEntityField.setAddButtonEnabled(addNewEntityAllowed && !isReadOnlyField && userIsAllowedToCreate);
         toOneRelatedEntityField.setEditButtonEnabled(!isReadOnlyField && userIsAllowedToUpdate);
-
     }
-
 }

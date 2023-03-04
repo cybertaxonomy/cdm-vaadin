@@ -84,8 +84,4 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
     private SecurityContext currentSecurityContext() {
         return SecurityContextHolder.getContext();
     }
-
-
-
-
 }
