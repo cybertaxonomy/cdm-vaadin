@@ -54,7 +54,7 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
 
     protected EventBus.UIEventBus uiEventBus;
 
-    AccountCreationRequest accountCreationRequest = null;
+    private AccountCreationRequest accountCreationRequest = null;
 
     @Autowired
     protected void setUIEventBus(EventBus.UIEventBus uiEventBus){

@@ -29,7 +29,7 @@ public class ErrorView extends VerticalLayout implements View {
     public static final String NAME = "error";
 
     @Autowired
-    NavigationManager navigationManager;
+    private NavigationManager navigationManager;
 
     private static final long serialVersionUID = -8763747518841365925L;
 
@@ -44,13 +44,8 @@ public class ErrorView extends VerticalLayout implements View {
         setComponentAlignment(header, Alignment.MIDDLE_CENTER);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enter(ViewChangeEvent event) {
 
-
     }
-
 }

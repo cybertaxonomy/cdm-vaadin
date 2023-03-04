@@ -15,32 +15,18 @@ import java.lang.reflect.Method;
  *
  * @author a.kohlbecker
  * @since May 30, 2017
- *
  */
 public class ApplicationListenerPojoMethodAdapter extends ApplicationListenerMethodAdapter {
 
-    PojoEventListenerManager eventListenerManager = null;
-
     private Object o;
 
-    /**
-     * @param beanName
-     * @param targetClass
-     * @param method
-     */
     public ApplicationListenerPojoMethodAdapter(String beanName, Class<?> targetClass, Method method, Object o) {
         super(beanName, targetClass, method);
         this.o = o;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Object getTargetBean() {
         return o;
     }
-
-
-
 }

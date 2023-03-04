@@ -15,17 +15,16 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 /**
  * @author a.kohlbecker
  * @since May 10, 2017
- *
  */
-public abstract class AbstractEntityEvent<T extends Enum> {
-
-    private UUID entityUuid = null;
+public abstract class AbstractEntityEvent<T extends Enum<?>> {
 
     protected T type;
 
-    private AbstractView sourceView = null;
+    private UUID entityUuid = null;
 
-    public AbstractEntityEvent(T type, UUID entityUuid, AbstractView sourceView) {
+    private AbstractView<?> sourceView = null;
+
+    public AbstractEntityEvent(T type, UUID entityUuid, AbstractView<?> sourceView) {
         this.entityUuid = entityUuid;
         this.type = type;
         this.sourceView = sourceView;
@@ -34,9 +33,6 @@ public abstract class AbstractEntityEvent<T extends Enum> {
         }
     }
 
-    /**
-     * @return the entityId
-     */
     public UUID getEntityUuid() {
         return entityUuid;
     }
@@ -45,11 +41,7 @@ public abstract class AbstractEntityEvent<T extends Enum> {
         return type;
     }
 
-    /**
-     * @return the sourceView
-     */
-    public AbstractView getSourceView() {
+    public AbstractView<?> getSourceView() {
         return sourceView;
     }
-
 }

@@ -15,7 +15,6 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 /**
  * @author a.kohlbecker
  * @since May 12, 2017
- *
  */
 public interface NestedFieldGroup {
 
@@ -28,9 +27,6 @@ public interface NestedFieldGroup {
 
     public abstract void registerParentFieldGroup(FieldGroup parent);
 
-    /**
-     * @param parent
-     */
     public abstract void unregisterParentFieldGroup(FieldGroup parent);
 
 }

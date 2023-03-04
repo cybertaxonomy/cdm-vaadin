@@ -8,22 +8,18 @@
 */
 package eu.etaxonomy.cdm.vaadin.view;
 
-import com.vaadin.ui.themes.ValoTheme;
-
 import eu.etaxonomy.cdm.vaadin.component.LoginDialog;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 public interface LoginView extends ApplicationView<LoginPresenter>  {
 
-    LoginDialog getLoginDialog();
+    public LoginDialog getLoginDialog();
 
-    void clearMessage();
+    public void clearMessage();
 
-    void showErrorMessage(String text);
-
+    public void showErrorMessage(String text);
 }

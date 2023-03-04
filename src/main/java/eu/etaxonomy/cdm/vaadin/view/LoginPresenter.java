@@ -176,7 +176,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
     }
 
-    private void requestPasswordReset() throws MalformedURLException, ExecutionException {
+    private void requestPasswordReset() throws MalformedURLException {
         String userNameOrEmail = getView().getLoginDialog().getUserNameOrEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
         logger.debug("UserAccountAction.REQUEST_PASSWORD_RESET for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
@@ -241,11 +241,11 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
     }
 
-    private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException, ExecutionException {
+    private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException {
         String emailAddress = getView().getLoginDialog().getEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
 
-        logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);
+        if (logger.isDebugEnabled()) {logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);}
 
         CountDownLatch finshedSignal = new CountDownLatch(1);
         List<Throwable> asyncExceptions = new ArrayList<>(1);

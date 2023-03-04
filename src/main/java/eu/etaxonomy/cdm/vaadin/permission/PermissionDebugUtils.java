@@ -40,7 +40,6 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
  *
  * @author a.kohlbecker
  * @since Oct 11, 2017
- *
  */
 @SpringComponent
 @Profile("debug")
@@ -79,8 +78,5 @@ public class PermissionDebugUtils implements Serializable {
        button.addClickListener(e -> UserHelperAccess.userHelper().createAuthorityFor(UserHelperAccess.userHelper().userName(), cdmType, entitiyUuid, crud, property));
        button.addStyleName(ValoTheme.BUTTON_DANGER);
        return button;
-
     }
-
-
 }

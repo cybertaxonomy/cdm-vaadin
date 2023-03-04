@@ -385,18 +385,11 @@ public class SpecimenTypeDesignationSetEditorPresenter
         specimenTypeDesignationSetService.save(dto);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void deleteBean(SpecimenTypeDesignationSetDTO bean) {
         specimenTypeDesignationSetService.delete(bean, true);
     }
 
-    /**
-     * @param element
-     * @return
-     */
     private void addTypeDesignation(SpecimenTypeDesignationDTO element) {
         getView().updateAllowDeleteTypeDesignation();
     }
@@ -407,9 +400,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
      * The actual deletion of the SpecimenTypeDesignation and DerivedUnit will take place in {@link #saveBean(SpecimenTypeDesignationSetDTO)}
      *
      * TODO once https://dev.e-taxonomy.eu/redmine/issues/7077 is fixed dissociating from the Registration could be removed here
-     *
-     * @param e
-     * @return
      */
     private void deleteTypeDesignation(SpecimenTypeDesignationDTO element) {
 
@@ -421,16 +411,10 @@ public class SpecimenTypeDesignationSetEditorPresenter
         getView().updateAllowDeleteTypeDesignation();
     }
 
-    /**
-     * @param crud
-     */
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICdmEntityUuidCacher getCache() {
         return cache;
@@ -465,7 +449,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.OccurrenceCollectionFilter.class)
-    public void onCollectionEvent(EntityChangeEvent event){
+    public void onCollectionEvent(EntityChangeEvent<?> event){
 
         if(event.getSourceView() instanceof AbstractPopupEditor) {
 

@@ -45,7 +45,6 @@ import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
  * @since May 12, 2017
  *
  * IMPORTANT see also {@link CompositeStyledComponent} which has almost the same functionality.
- *
  */
 @SuppressWarnings("serial")
 public abstract class CompositeCustomField<T> extends CustomField<T> implements NestedFieldGroup {

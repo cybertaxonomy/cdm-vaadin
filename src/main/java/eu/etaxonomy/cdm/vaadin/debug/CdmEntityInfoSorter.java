@@ -22,12 +22,9 @@ public class CdmEntityInfoSorter implements ItemSorter {
 
     private static final long serialVersionUID = 1008554008146041297L;
 
-    Object[] propertyId;
-    boolean[] ascending;
+    private Object[] propertyId;
+    private boolean[] ascending;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setSortProperties(Sortable container, Object[] propertyId, boolean[] ascending) {
         this.propertyId = propertyId;
@@ -35,9 +32,6 @@ public class CdmEntityInfoSorter implements ItemSorter {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int compare(Object itemId1, Object itemId2) {
         if(! (itemId1 instanceof CdmEntityInfo && itemId2 instanceof CdmEntityInfo) ){
@@ -47,7 +41,5 @@ public class CdmEntityInfoSorter implements ItemSorter {
         CdmEntityInfo infoItem2 = (CdmEntityInfo)itemId2;
 
         return infoItem1.getField().getName().compareToIgnoreCase(infoItem2.getField().getName());
-
     }
-
 }

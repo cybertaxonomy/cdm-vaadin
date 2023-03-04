@@ -17,7 +17,6 @@ import com.vaadin.ui.AbstractField;
  * user to perform the <code>action</code> transported with this event.
  *
  * @author a.kohlbecker
- *
  */
 public class EntityEditorActionEvent<T>  {
 
@@ -26,23 +25,12 @@ public class EntityEditorActionEvent<T>  {
     private AbstractField<T> field;
     private T bean;
 
-    /**
-     * @param type
-     * @param entityId
-     * @param field
-     */
     public EntityEditorActionEvent(EditorActionType action, Class<T> beanType, AbstractField<T> field) {
         this.action = action;
         this.beanType = beanType;
         this.field = field;
     }
 
-    /**
-     *
-     * @param type
-     * @param entityId
-     * @param field
-     */
     public EntityEditorActionEvent(EditorActionType action, Class<T> beanType, T bean, AbstractField<T> field) {
         this.action = action;
         this.beanType = beanType;
@@ -53,16 +41,10 @@ public class EntityEditorActionEvent<T>  {
         this.field = field;
     }
 
-    /**
-     * @return the beanType
-     */
     public Class<?> getBeanType() {
         return beanType;
     }
 
-    /**
-     * @return the action
-     */
     public EditorActionType getAction() {
         return action;
     }
@@ -74,11 +56,7 @@ public class EntityEditorActionEvent<T>  {
         return field;
     }
 
-    /**
-     * @return the bean
-     */
     public T getBean() {
         return bean;
     }
-
 }

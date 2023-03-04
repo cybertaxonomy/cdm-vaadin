@@ -108,7 +108,7 @@ public class CdmFilterablePagingProviderFactory {
     }
 
     public CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase> teamOrPersonPagingProvider() {
-        return  new CdmFilterablePagingProvider<AgentBase, TeamOrPersonBase>(repo.getAgentService(), TeamOrPersonBase.class, MatchMode.BEGINNING, OrderHint.ORDER_BY_TITLE_CACHE.asList());
+        return new CdmFilterablePagingProvider<>(repo.getAgentService(), TeamOrPersonBase.class, MatchMode.BEGINNING, OrderHint.ORDER_BY_TITLE_CACHE.asList());
     }
 
     public CdmFilterablePagingProvider<AgentBase, Person> personPagingProvider() {

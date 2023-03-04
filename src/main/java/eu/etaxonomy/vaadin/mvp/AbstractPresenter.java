@@ -41,11 +41,12 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @param <V>
  *            type of the view this presenter governs
  */
-public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, DisposableBean {
-
-    private static final Logger logger = LogManager.getLogger();
+public abstract class AbstractPresenter<V extends ApplicationView<?>>
+        implements Serializable, DisposableBean {
 
     private static final long serialVersionUID = 5260910510283481832L;
+
+    private static final Logger logger = LogManager.getLogger();
 
 	private V view;
 

@@ -12,7 +12,6 @@ src/main/java/eu/etaxonomy/cdm/vaadin/component/HorizontalToolbar.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/NewTaxonBaseComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/StatusComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainer.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSpringConnectionPool.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/IdAndUuid.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/LeafNodeTaxonContainer.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3ConceptRelationshipTree.java -text

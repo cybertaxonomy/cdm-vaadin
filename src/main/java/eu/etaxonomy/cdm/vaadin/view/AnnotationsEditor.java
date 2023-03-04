@@ -14,12 +14,10 @@ import eu.etaxonomy.cdm.vaadin.component.common.FilterableAnnotationsField;
 /**
  * @author a.kohlbecker
  * @since Jun 25, 2018
- *
  */
 public interface AnnotationsEditor {
 
     /**
-     *
      * @return the EDITABLE_ANOTATION_TYPES
      */
     public AnnotationType[] getEditableAnotationTypes();
@@ -30,9 +28,6 @@ public interface AnnotationsEditor {
      */
     public void setEditableAnotationTypes(AnnotationType... editableAnotationTypes);
 
-    /**
-     * @return
-     */
     public FilterableAnnotationsField getAnnotationsField();
 
 }

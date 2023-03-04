@@ -40,9 +40,8 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  *
  * @author a.kohlbecker
  * @since Jun 7, 2017
- *
  */
-public class TaxonNameStringFilterablePagingProvider implements FilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
+public class TaxonNameStringFilterablePagingProvider implements IFilterableStringRepresentationPagingProvider<UUID>, FilterableCountProvider {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -56,7 +55,7 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
 
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
 
-    List<String> initStrategy = DEFAULT_INIT_STRATEGY;
+    private List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
     private TaxonNamePartsFilter namePartsFilter = new TaxonNamePartsFilter();
 
@@ -93,9 +92,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         registerNullSave(infraSpecificEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue()));
     }
 
-    /**
-     *
-     */
     public void unlistenAllFields() {
         for(AbstractField<String> f : registeredToFields.keySet()){
             f.removeValueChangeListener(registeredToFields.get(f));
@@ -121,9 +117,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         }
     }
 
-    /**
-     * @param genusOrUninomialField
-     */
     protected void registerNullSave(AbstractField<String> field, ValueChangeListener listener) {
         if(field != null){
             registeredToFields.put(field, listener);
@@ -131,30 +124,16 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         }
     }
 
-    /**
-     * @return the matchMode
-     */
     protected MatchMode getMatchMode() {
         return matchMode;
     }
-
-    /**
-     * @param matchMode the matchMode to set
-     */
     protected void setMatchMode(MatchMode matchMode) {
         this.matchMode = matchMode;
     }
 
-    /**
-     * @return the orderHints
-     */
     protected List<OrderHint> getOrderHints() {
         return orderHints;
     }
-
-    /**
-     * @param orderHints the orderHints to set
-     */
     protected void setOrderHints(List<OrderHint> orderHints) {
         this.orderHints = orderHints;
     }
@@ -162,10 +141,6 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
     public TaxonNamePartsFilter getFilter(){
         return namePartsFilter;
     }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<String> findEntities(int firstRow, String filter) {
 
@@ -222,15 +197,10 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         return lastPagedEntityUUIDs;
     }
 
-
     public class UnknownFieldException extends Exception {
-
         private static final long serialVersionUID = 1L;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public UUID idFor(String stringRepresentation) {
         if(stringRepresentation == null){
@@ -245,18 +215,11 @@ public class TaxonNameStringFilterablePagingProvider implements FilterableString
         return lastPagedEntityUUIDs.get(stringRepresentation);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clearIdCache() {
         lastPagedEntityUUIDs = null;
     }
 
-    /**
-     * @param asList
-     * @return
-     */
     public void excludeNames(TaxonName ... excludedTaxonNames) {
         namePartsFilter.getExludedNamesUuids();
         for(TaxonName n : excludedTaxonNames){

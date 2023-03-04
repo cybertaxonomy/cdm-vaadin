@@ -15,7 +15,6 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 /**
  * @author a.kohlbecker
  * @since Mar 27, 2019
- *
  */
 public class TimePeriodCompletenesValidator implements Validator {
 

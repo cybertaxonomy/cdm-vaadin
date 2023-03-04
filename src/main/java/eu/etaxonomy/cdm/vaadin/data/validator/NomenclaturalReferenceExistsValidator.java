@@ -20,10 +20,8 @@ import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
  *
  * @author a.kohlbecker
  * @since Mar 27, 2019
- *
  */
 public class NomenclaturalReferenceExistsValidator implements Validator {
-
 
     private static final long serialVersionUID = -7750232876262922982L;
 
@@ -33,9 +31,6 @@ public class NomenclaturalReferenceExistsValidator implements Validator {
         this.userHint = userHint;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void validate(Object value) throws InvalidValueException {
         if(value != null){
@@ -48,16 +43,11 @@ public class NomenclaturalReferenceExistsValidator implements Validator {
                 validateName(nameRelDto.getOtherName());
             }
         }
-
     }
 
-    /**
-     * @param name
-     */
     public void validateName(TaxonName name) {
         if(name.getNomenclaturalReference() == null) {
             throw new InvalidValueException("The taxon name must have a nomenclatural reference. " + userHint);
         }
     }
-
 }

@@ -20,7 +20,6 @@ import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
  *
  * @author a.kohlbecker
  * @since Jun 7, 2017
- *
  */
 public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToManyRelatedEntitiesListSelect<V, ReloadableLazyComboBox<V>> {
 
@@ -28,11 +27,6 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
 
     private ReloadableLazyComboBoxInstantiator<V> fieldInstantiator;
 
-    /**
-     * @param itemType
-     * @param fieldType
-     * @param caption
-     */
     public ToManyRelatedEntitiesComboboxSelect(Class<V> itemType, String caption) {
         super(itemType, null, caption);
         // TODO this.fieldTyp = LazyComboBox.class does not work
@@ -40,12 +34,9 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         this.fieldType = (Class<ReloadableLazyComboBox<V>>) field.getClass();
         // addEmptyRowOnInitContent is false in this class since adding row is only possible after setting the PagingProviders
         addEmptyRowOnInitContent = false;
-        fieldInstantiator = new ReloadableLazyComboBoxInstantiator<V>(itemType);
+        fieldInstantiator = new ReloadableLazyComboBoxInstantiator<>(itemType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected ReloadableLazyComboBox<V> newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
 
@@ -61,11 +52,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
         setInternalValue(null);
     }
 
-    /**
-     * @param cdmTitleCacheCaptionGenerator
-     */
     public void setCaptionGenerator(CaptionGenerator<V> captionGenerator) {
         fieldInstantiator.setCaptionGenerator(captionGenerator);
     }
-
 }

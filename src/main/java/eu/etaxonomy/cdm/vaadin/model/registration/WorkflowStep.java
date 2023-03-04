@@ -33,16 +33,10 @@ public enum WorkflowStep {
         this.representation = representation;
     }
 
-    /**
-     * @return the representation
-     */
     public String getRepresentation() {
         return representation;
     }
 
-    /**
-     * @return the stepIndex
-     */
     public int getStepIndex() {
         return stepIndex;
     }

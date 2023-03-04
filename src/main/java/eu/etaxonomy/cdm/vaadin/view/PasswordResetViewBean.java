@@ -139,8 +139,4 @@ public class PasswordResetViewBean extends AbstractView<PasswordResetPresenter> 
     public PasswordField getPassword1Field() {
         return password1Field;
     }
-
-
-
-
 }

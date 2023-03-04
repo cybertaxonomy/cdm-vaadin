@@ -37,17 +37,15 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  *
  * @author a.kohlbecker
  * @since Jul 13, 2017
- *
  */
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class RedirectToLoginView extends VerticalLayout implements View {
 
-
     private static final long serialVersionUID = -8763747518841365925L;
 
     @Autowired
-    NavigationManager navigationManager;
+    private NavigationManager navigationManager;
 
     @Autowired
     protected EventBus.UIEventBus uiEventBus;
@@ -63,9 +61,6 @@ public class RedirectToLoginView extends VerticalLayout implements View {
         setComponentAlignment(header, Alignment.MIDDLE_CENTER);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enter(ViewChangeEvent event) {
 
@@ -75,5 +70,4 @@ public class RedirectToLoginView extends VerticalLayout implements View {
             uiEventBus.publish(this, new NavigationEvent(LoginViewBean.NAME, currentState));
         }
     }
-
 }

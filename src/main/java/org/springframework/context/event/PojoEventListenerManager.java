@@ -11,12 +11,10 @@ package org.springframework.context.event;
 /**
  * @author a.kohlbecker
  * @since May 29, 2017
- *
  */
 public interface PojoEventListenerManager {
 
-    void removeEventListeners(Object o);
+    public void removeEventListeners(Object o);
 
-    void addEventListeners(Object o);
-
+    public void addEventListeners(Object o);
 }

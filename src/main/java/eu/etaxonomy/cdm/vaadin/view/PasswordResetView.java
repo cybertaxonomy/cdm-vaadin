@@ -19,9 +19,7 @@ public interface PasswordResetView extends ApplicationView<PasswordResetPresente
 
     public void showErrorMessage(String text);
 
-    void setUserName(String userName);
+    public void setUserName(String userName);
 
-    PasswordField getPassword1Field();
-
-
+    public PasswordField getPassword1Field();
 }

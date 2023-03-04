@@ -104,7 +104,7 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 	    return viewEventBus;
 	}
 
-   @Override
+    @Override
     public void releaseResourcesOnAccessDenied() {
         getPresenter().onViewExit();
     }

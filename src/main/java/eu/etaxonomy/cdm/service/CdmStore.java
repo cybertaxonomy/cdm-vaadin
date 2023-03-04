@@ -41,7 +41,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @since Jun 26, 2017
  *
  * TODO better naming of this class, ServiceWrapper, ServiceOperator, ...?
- *
  */
 @SpringComponent
 @ViewScope
@@ -99,10 +98,6 @@ public class CdmStore {
 
     }
 
-
-    /**
-     * @param txStatus
-     */
     public void transactionRollbackIfNotCompleted(TransactionStatus txStatus) {
         if(!txStatus.isCompleted()){
             repo.getTransactionManager().rollback(txStatus);
@@ -110,11 +105,9 @@ public class CdmStore {
     }
 
     /**
-     *
-     * @param bean
      * @return a EntityChangeEvent in case the deletion was successful otherwise <code>null</code>.
      */
-    public final <T extends CdmBase> EntityChangeEvent deleteBean(T bean, AbstractView view) {
+    public final <T extends CdmBase> EntityChangeEvent<T> deleteBean(T bean, AbstractView<?> view) {
 
         IService<T> typeSpecificService = serviceFor(bean);
 
@@ -122,9 +115,9 @@ public class CdmStore {
             logger.trace(this._toString() + ".deleteBean - deleting" + bean.toString());
             DeleteResult result = typeSpecificService.delete(bean);
             if (result.isOk()) {
-                return new EntityChangeEvent(bean, Type.REMOVED, view);
+                return new EntityChangeEvent<>(bean, Type.REMOVED, view);
             } else {
-                handleDeleteresultInError(result);
+                handleDeleteResultInError(result);
             }
         } finally {
             repo.clearSession(); // #7559
@@ -133,10 +126,7 @@ public class CdmStore {
         return null;
     }
 
-    /**
-     * @param result
-     */
-    public static void handleDeleteresultInError(DeleteResult result) {
+    public static void handleDeleteResultInError(DeleteResult result) {
         String notificationTitle;
         StringBuffer messageBody = new StringBuffer();
         if (result.isAbort()) {
@@ -154,7 +144,7 @@ public class CdmStore {
             result.getRelatedObjects().forEach(e -> {
                 messageBody.append("<li>");
                 if (IdentifiableEntity.class.isAssignableFrom(e.getClass())) {
-                    messageBody.append(((IdentifiableEntity) e).getTitleCache());
+                    messageBody.append(((IdentifiableEntity<?>) e).getTitleCache());
                 } else {
                     messageBody.append(e.toString());
                 }
@@ -192,5 +182,4 @@ public class CdmStore {
              throw new RuntimeException("Implementation to find service for " + cdmType + " still missing.");
          }
     }
-
 }

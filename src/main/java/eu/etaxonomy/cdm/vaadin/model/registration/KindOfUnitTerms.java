@@ -20,10 +20,8 @@ import eu.etaxonomy.cdm.model.term.TermVocabulary;
  * These terms are specific to the phycobank project but are temporarily necessary in
  * cdmlib-services for {@link SpecimenTypeDesignationDTO}
  *
- *
  * @author a.kohlbecker
  * @since Jun 20, 2017
- *
  */
 public class KindOfUnitTerms {
 

@@ -13,16 +13,10 @@ import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 /**
  * @author a.kohlbecker
  * @since Sep 24, 2018
- *
  */
-public interface FilterableStringRepresentationPagingProvider<IDTYPE> extends FilterablePagingProvider<String> {
+public interface IFilterableStringRepresentationPagingProvider<IDTYPE> extends FilterablePagingProvider<String> {
 
     public IDTYPE idFor(String stringRepresentation);
 
-    /**
-     *
-     */
     public void clearIdCache();
-
-
 }

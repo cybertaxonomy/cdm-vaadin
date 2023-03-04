@@ -48,7 +48,6 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         return repo;
     }
 
-
     @Override
     public Registration createRegistration(TaxonName taxonName, List<Registration> preparedBlockingRegistrations) {
 
@@ -68,7 +67,6 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         }
         return reg;
     }
-
 
     @Override
     public boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws TypeDesignationSetException {
@@ -144,10 +142,6 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         return null;
     }
 
-    /**
-     * @param registration
-     * @return
-     */
     @Override
     public Registration reloadRegistration(Registration registration) {
         if(registration.isPersited()){
@@ -176,10 +170,6 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         return !getRepo().getRegistrationService().checkRegistrationExistsFor(name) && checkWokingsetContainsProtologe(workingset, name);
     }
 
-    /**
-     * @param name
-     * @return
-     */
     @Override
     public boolean checkWokingsetContainsProtologe(RegistrationWorkingSet workingset, TaxonName name) {
         Reference nomRef = name.getNomenclaturalReference();
@@ -193,5 +183,4 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
                 );
         // @formatter:on
     }
-
 }

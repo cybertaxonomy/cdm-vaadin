@@ -53,7 +53,7 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
 
     protected EventBus.UIEventBus uiEventBus;
 
-    PasswordResetRequest resetRequest = null;
+    private PasswordResetRequest resetRequest = null;
 
     @Autowired
     protected void setUIEventBus(EventBus.UIEventBus uiEventBus){
@@ -118,7 +118,6 @@ public class PasswordResetPresenter extends AbstractPresenter<PasswordResetView>
                     getView().showErrorMessage("A timeout has occured, please try again.");
                 }
             }
-
         }
     }
 }

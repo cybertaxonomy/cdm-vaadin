@@ -16,7 +16,6 @@ import eu.etaxonomy.cdm.model.permission.CRUD;
 /**
  * @author a.kohlbecker
  * @since 20.10.2017
- *
  */
 public interface PerEntityAuthorityGrantingEditor {
 

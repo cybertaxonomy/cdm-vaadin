@@ -26,7 +26,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -38,55 +37,35 @@ public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<Institutio
 
     private static final int GRID_ROWS = 3;
 
-    TextField codeField;
-    TextField codeStandardField;
-    TextField townOrLocationField;
-    ToOneRelatedEntityCombobox<Institution> partOfCombobox;
+    private TextField codeField;
+    private TextField codeStandardField;
+    private TextField townOrLocationField;
+    private ToOneRelatedEntityCombobox<Institution> partOfCombobox;
 
-
-    /**
-     * @param layout
-     * @param dtoType
-     */
     public InstitutionPopupEditor() {
         super(new GridLayout(GRID_COLS, GRID_ROWS), InstitutionDTO.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Institution editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWindowWidth() {
         return 500;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         codeField.focus();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -103,7 +82,7 @@ public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<Institutio
 
         row++;
 
-        partOfCombobox = new ToOneRelatedEntityCombobox<Institution>("Part of", Institution.class);
+        partOfCombobox = new ToOneRelatedEntityCombobox<>("Part of", Institution.class);
 
 
         partOfCombobox.setWidth(300, Unit.PIXELS);
@@ -134,7 +113,6 @@ public class InstitutionPopupEditor extends AbstractCdmDTOPopupEditor<Institutio
                     );
                 }
             });
-
     }
 
     /* ------------------ View Interface methods -------------------- */

@@ -19,7 +19,6 @@ import eu.etaxonomy.cdm.api.util.UserHelper;
  *
  * @author a.kohlbecker
  * @since May 23, 2017
- *
  */
 @SpringComponent
 public class UserHelperAccess {
@@ -33,13 +32,8 @@ public class UserHelperAccess {
 
     /**
      * Static accessor method to obtain the UserHelper bean
-     *
-     * @return
      */
     public static UserHelper userHelper() {
        return userHelper;
     }
-
-
-
 }

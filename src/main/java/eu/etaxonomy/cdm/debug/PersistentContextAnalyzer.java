@@ -50,10 +50,6 @@ public class PersistentContextAnalyzer extends CdmEntityCache {
 
     }
 
-
-    /**
-     * @param printStream
-     */
     @Override
     protected void printLegend(PrintStream printStream) {
         printStream.println("PersistentContextAnalyzer legend: ");
@@ -80,16 +76,9 @@ public class PersistentContextAnalyzer extends CdmEntityCache {
         return flags;
     }
 
-    /**
-     * @return the showHashCodes
-     */
     public boolean isShowHashCodes() {
         return showHashCodes;
     }
-
-    /**
-     * @param showHashCodes the showHashCodes to set
-     */
     public void setShowHashCodes(boolean showHashCodes) {
         boolean runUpdate = this.showHashCodes != showHashCodes;
         this.showHashCodes = showHashCodes;
@@ -97,5 +86,4 @@ public class PersistentContextAnalyzer extends CdmEntityCache {
             update();
         }
     }
-
 }
