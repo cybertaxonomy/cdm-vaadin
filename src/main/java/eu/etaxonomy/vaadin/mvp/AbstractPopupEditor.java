@@ -692,6 +692,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         saveBtn.setEnabled(enabled);
     }
 
+    protected void setSaveButtonVisible(boolean enabled){
+        saveBtn.setVisible(enabled);
+    }
+
+    protected void setSaveButtonCaption(String caption) {
+        saveBtn.setCaption(caption);
+    }
+
     public void withDeleteButton(boolean withDelete){
 
         this.withDeleteButton = withDelete;

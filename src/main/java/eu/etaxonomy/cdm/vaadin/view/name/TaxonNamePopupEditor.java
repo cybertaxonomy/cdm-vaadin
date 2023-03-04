@@ -1134,6 +1134,12 @@ public class TaxonNamePopupEditor
         nomStatusCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
     }
 
+    public void setToSelect() {
+        this.setSaveButtonCaption("Save & Select");
+        this.setSaveButtonVisible(true);
+    }
+
+
     @Override
     public AbstractField<String> getInfraGenericEpithetField() {
         return infraGenericEpithetField;

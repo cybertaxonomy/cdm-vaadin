@@ -374,6 +374,8 @@ public class RegistrationWorkingsetPresenter
         boolean hasNomRef = popup.getBean().getNomenclaturalReference() != null;
         if(isAddExistingNameRegistration){
             popup.setAllFieldsReadOnly(true);
+            popup.setToSelect();
+
             if(!hasNomRef){
                 // only allow editing the nomenclatural reference, all other
                 // editing need to be done another way.
