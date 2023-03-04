@@ -42,7 +42,8 @@ public abstract class AbstractView<V extends ApplicationView<V,P>, P extends Abs
 	private P presenter;
 
 	//TODO remove?
-	private ApplicationContext applicationContext;
+	@SuppressWarnings("unused")
+    private ApplicationContext applicationContext;
 
 	//this is used by subclasses in same package
     @Autowired

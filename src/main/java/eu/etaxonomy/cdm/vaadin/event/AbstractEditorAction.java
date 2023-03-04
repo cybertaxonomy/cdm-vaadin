@@ -29,7 +29,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  *
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
  */
 public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<EditorActionType> {
 

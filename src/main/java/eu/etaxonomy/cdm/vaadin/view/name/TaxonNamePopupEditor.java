@@ -1115,12 +1115,12 @@ public class TaxonNamePopupEditor
     }
 
     /**
-     * Sets the readonly state of all fields in this editor, but leaving the editor itself untouched.
+     * Sets the read-only state of all fields in this editor, but leaving the editor itself untouched.
      *
      * @param readOnly
      */
     public void setAllFieldsReadOnly(boolean readOnly) {
-        logger.error("Set all fields to readonly");
+        logger.info("Set all fields to readonly");
 
         recursiveReadonly(readOnly, getMainLayout());
         // NOTE:We are using the enabled state instead of read only since

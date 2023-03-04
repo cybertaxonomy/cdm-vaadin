@@ -16,50 +16,40 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
 /**
  * @author a.kohlbecker
  * @since Jan 31, 2018
- *
  */
 public class EditorActionTypeFilter implements EventBusListenerMethodFilter {
 
-    EditorActionType action;
+    private EditorActionType action;
 
     private EditorActionTypeFilter(EditorActionType action) {
         this.action = action;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean filter(Event<?> event) {
         if (event.getPayload() instanceof AbstractEditorAction) {
-            AbstractEditorAction editorAction = (AbstractEditorAction) event.getPayload();
+            AbstractEditorAction<?> editorAction = (AbstractEditorAction<?>) event.getPayload();
             return this.action.equals(editorAction.type);
         }
         return false;
     }
 
     public static class Add extends EditorActionTypeFilter {
-
         public Add() {
             super(EditorActionType.ADD);
         }
-
     }
 
     public static class Edit extends EditorActionTypeFilter {
-
         public Edit() {
             super(EditorActionType.EDIT);
         }
-
     }
 
     public static class Remove extends EditorActionTypeFilter {
-
         public Remove() {
             super(EditorActionType.REMOVE);
         }
-
     }
 
 }

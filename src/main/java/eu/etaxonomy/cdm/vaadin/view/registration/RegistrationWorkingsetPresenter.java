@@ -366,8 +366,8 @@ public class RegistrationWorkingsetPresenter
         }
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
-            // avoid resetting readonly to false
-            logger.error("Set popup to readonly as event source is read only");
+            // avoid resetting read-only to false
+            logger.error("Set popup to read-only as event source is read only");
             popup.setReadOnly(true);
         }
 
@@ -386,7 +386,8 @@ public class RegistrationWorkingsetPresenter
                         + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
             } else {
                 popup.addStatusMessage("You are about to create a registration for this name. "
-                        + "This editor is for reviewing the name only. Therefore, all fields have been switched to readonly state. "
+                        + "This editor is for reviewing the name only. Therefore, all fields have "
+                        + "been switched to read-only state. "
                         + "Click on \"Save\" to proceed with entering the type of this name.");
             }
         }

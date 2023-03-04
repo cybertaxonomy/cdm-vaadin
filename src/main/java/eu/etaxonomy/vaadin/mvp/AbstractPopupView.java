@@ -84,7 +84,7 @@ public abstract class AbstractPopupView<V extends ApplicationView<V,P>, P extend
     }
 
 	/* Methods which existed in the original version of the AbstractPopupView
-	 * There are not needed here since the creation of the window and disposal
+	 * They are not needed here since the creation of the window and disposal
 	 * is done by the NavigationManagerBean
 	@Override
 	protected void onViewReady() {

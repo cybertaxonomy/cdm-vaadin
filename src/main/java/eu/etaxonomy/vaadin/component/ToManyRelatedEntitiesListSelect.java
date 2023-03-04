@@ -442,11 +442,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         if(field.getValue() == null){
             // create
-            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.ADD, null, field));
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<>(EditorActionType.ADD, null, field));
         } else {
             // edit
             V value = field.getValue();
-            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
         }
     }
 

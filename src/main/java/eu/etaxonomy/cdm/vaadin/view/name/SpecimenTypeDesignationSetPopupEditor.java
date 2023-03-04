@@ -331,7 +331,6 @@ public class SpecimenTypeDesignationSetPopupEditor
         getFieldLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
         collectorField.setEditorReadOnly(readOnly);
         typeDesignationsCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
-
     }
 
     @Override
@@ -367,6 +366,4 @@ public class SpecimenTypeDesignationSetPopupEditor
     public GeoLocationField getExactLocationField() {
         return exactLocationField;
     }
-
-
 }
