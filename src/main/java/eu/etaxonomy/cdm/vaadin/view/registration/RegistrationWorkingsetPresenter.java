@@ -256,9 +256,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         getView().getExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
-    /**
-     * @param referenceID
-     */
     protected void loadWorkingSet(UUID referenceUuid) {
 
         try {
@@ -273,10 +270,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     * @param errorDialogCaption
-     * @param errorMessage
-     */
     public void showErrorDialog(String errorDialogCaption, String errorMessage) {
         Window errorDialog = new Window(errorDialogCaption);
         errorDialog.setModal(true);
@@ -304,7 +297,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value.toString(), "NULL"));
         }
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
@@ -397,7 +389,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             }
         }
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
@@ -513,9 +504,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     /**
      * Creates a new Registration for an exiting (previously published) name.
-     *
-     * @param event
-     * @throws TypeDesignationSetException
      */
     @EventBusListenerMethod
     public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws TypeDesignationSetException {
