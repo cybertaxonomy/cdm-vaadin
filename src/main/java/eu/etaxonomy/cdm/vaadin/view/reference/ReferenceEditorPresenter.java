@@ -29,6 +29,7 @@ import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
+import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
@@ -190,6 +191,9 @@ public class ReferenceEditorPresenter extends AbstractCdmEditorPresenter<Referen
                 if(!applicableTypes.isEmpty()){
                     inReferencePopup.withReferenceTypes(EnumSet.copyOf(applicableTypes));
                 }
+                inReferencePopup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
+                inReferencePopup.withDeleteButton(true);
+
                 inReferencePopup.loadInEditor(null);
                 if(!applicableTypes.isEmpty()){
                     inReferencePopup.getTypeSelect().setValue(applicableTypes.iterator().next());
