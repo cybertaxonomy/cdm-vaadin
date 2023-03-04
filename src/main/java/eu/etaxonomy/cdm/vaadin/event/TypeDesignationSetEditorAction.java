@@ -69,7 +69,7 @@ public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDes
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
         this.context = new Stack<>();
-        this.context.push(new EditorActionContext(new TypedEntityReference<Registration>(Registration.class, registrationUuid), sourceView));
+        this.context.push(new EditorActionContext(TypedEntityReference.fromTypeAndId(Registration.class, registrationUuid), sourceView));
     }
 
     public TypeDesignationSetType getWorkingSetType() {

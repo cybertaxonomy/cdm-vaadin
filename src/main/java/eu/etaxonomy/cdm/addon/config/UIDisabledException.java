@@ -27,7 +27,7 @@ public class UIDisabledException extends RuntimeException {
         return String.format("The ui '%s' has been requested but is disabled per configuration in ~/.cdmLibrary/remote-webapp/{bean-id}/%s.properties",
                 uiName,
                 CdmVaadinConfiguration.PROPERTIES_FILE_NAME
-                );
+            );
     }
 
     @Override

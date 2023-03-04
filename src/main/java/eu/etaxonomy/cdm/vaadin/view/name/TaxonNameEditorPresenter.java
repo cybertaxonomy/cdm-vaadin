@@ -483,7 +483,6 @@ public class TaxonNameEditorPresenter
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(TaxonName.class,
                     identifier, crud, null);
         }
-
     }
 
     @Override

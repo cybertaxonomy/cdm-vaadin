@@ -62,7 +62,7 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, V extends
     protected CdmAuthority newAuthorityCreated;
 
     /**
-     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
+     * if not null, this CRUD set is to be used to create a CdmAuthority for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.
      */
     protected EnumSet<CRUD> crud = null;

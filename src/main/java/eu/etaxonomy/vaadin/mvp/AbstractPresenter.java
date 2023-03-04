@@ -85,7 +85,6 @@ public abstract class AbstractPresenter<V extends ApplicationView>
         viewEventBus.unsubscribe(this);
     }
 
-
 	//	protected DefaultTransactionDefinition definition = null;
 
     //	protected TransactionDefinition getTransactionDefinition(){
@@ -96,23 +95,16 @@ public abstract class AbstractPresenter<V extends ApplicationView>
     //	    return definition;
     //	}
 
-
-	/**
-	 * @return the repo
-	 */
 	public CdmRepository getRepo() {
 	    return repo;
 	}
 
 	/**
-     * @return
-     *
      * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
      */
     protected SecurityContext currentSecurityContext() {
         return SecurityContextHolder.getContext();
     }
-
 
     protected String _toString(){
         return this.getClass().getSimpleName() + "@" + this.hashCode();
@@ -125,11 +117,10 @@ public abstract class AbstractPresenter<V extends ApplicationView>
 	 * @param view
 	 */
 	protected void init(V view) {
-	    logger.trace(String.format("Presenter %s init()", _toString()));
+	    if (logger.isTraceEnabled()) {logger.trace(String.format("Presenter %s init()", _toString()));}
 		this.view = view;
 		onPresenterReady();
 	}
-
 
     /**
 	 * Extending classes should overwrite this method in order to perform logic
@@ -175,23 +166,14 @@ public abstract class AbstractPresenter<V extends ApplicationView>
     public void handleViewExit() {
     }
 
-    /**
-     * @return the navigationManager
-     */
     public NavigationManager getNavigationManager() {
         return navigationManager;
     }
 
-    /**
-     * @param repo the repo to set
-     */
     protected void setRepo(CdmRepository repo) {
         this.repo = repo;
     }
 
-    /**
-     * @param navigationManager the navigationManager to set
-     */
     protected void setNavigationManager(NavigationManager navigationManager) {
         this.navigationManager = navigationManager;
     }

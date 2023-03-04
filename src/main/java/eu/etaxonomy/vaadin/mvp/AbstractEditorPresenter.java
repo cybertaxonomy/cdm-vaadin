@@ -33,7 +33,8 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  * @author a.kohlbecker
  * @since Apr 5, 2017
  */
-public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>> extends AbstractPresenter<V> {
+public abstract class AbstractEditorPresenter<DTO extends Object, V extends ApplicationView<?>>
+        extends AbstractPresenter<V> {
 
     private static final long serialVersionUID = -6677074110764145236L;
 

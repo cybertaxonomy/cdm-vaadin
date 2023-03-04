@@ -185,7 +185,7 @@ public class ReferencePopupEditor extends AbstractCdmPopupEditor<Reference, Refe
         addField(authorshipField, "authorship", 0, row, GRID_COLS -1, row);
         row++;
 
-        inReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("In-reference", Reference.class);
+        inReferenceCombobox = new ToOneRelatedEntityCombobox<>("In-reference", Reference.class);
         inReferenceCombobox.setWidth(100, Unit.PERCENTAGE);
         inReferenceCombobox.addClickListenerAddEntity(e -> getViewEventBus().publish(this,
                 new ReferenceEditorAction(EditorActionType.ADD, e.getButton(), inReferenceCombobox, this)

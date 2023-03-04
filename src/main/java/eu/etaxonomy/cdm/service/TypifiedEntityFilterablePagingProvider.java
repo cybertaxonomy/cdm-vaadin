@@ -73,7 +73,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
     }
 
     /**
-     * @deprecated criteria should not be used externally from cdmlib-persistence
+     * @deprecated criteria should not be used outside cdmlib-persistence
      */
     @Deprecated
     public List<Criterion> getCriteria() {
@@ -81,7 +81,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
     }
 
     /**
-     * @deprecated criteria should not be used externally from cdmlib-persistence
+     * @deprecated criteria should not be used outside cdmlib-persistence
      */
     @Deprecated
     public void addCriterion(Criterion criterion){

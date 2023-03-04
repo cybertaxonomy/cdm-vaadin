@@ -133,11 +133,9 @@ public class RegistrationWorksetViewBean
      */
     private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
 
-    private RegistrationStatusFieldInstantiator statusFieldInstantiator;
+    private RegistrationStatusFieldInstantiator<RegistrationDTO> statusFieldInstantiator;
 
     private String accessDeniedMessage;
-
-    private Object existingNameEditor;
 
     public RegistrationWorksetViewBean() {
         super();
@@ -191,16 +189,6 @@ public class RegistrationWorksetViewBean
         if(!blockingRegAdded){
             regItem.itemFooter.addComponent(new RegistrationItemsPanel(this, "Blocked by", blockingRegDTOs, getPresenter().getCache()));
         }
-    }
-
-    @Override
-    @Deprecated // no longer needed
-    public void addBlockingRegistration(RegistrationDTO blocking) {
-        if(registrations == null) {
-            throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
-        }
-        // add the blocking registration
-
     }
 
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {

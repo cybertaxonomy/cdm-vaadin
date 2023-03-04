@@ -8,7 +8,6 @@
 */
 package eu.etaxonomy.cdm.addon.config;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -148,7 +147,7 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
             // Legacy mode to return the value of the property as a string from AbstractProperty.toString()
             closeIdleSessions=true,
             legacyPropertyToStringMode=LegacyProperyToStringMode.ENABLED
-            )
+        )
     @WebServlet(name="CdmVaadinServlet", value = {"/app/*", "/VAADIN/*"}, asyncSupported = true)
     public static class CdmVaadinServlet extends SpringVaadinServlet {
 
@@ -280,12 +279,12 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     }
 
     @Bean
-    public RegistrationIdentifierMinter registrationIdentifierMinter() throws IOException {
+    public RegistrationIdentifierMinter registrationIdentifierMinter() {
         RegistrationIdentifierMinter minter = new RegistrationIdentifierMinter();
 
-        minter.setMinLocalId(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_MINID));
-        minter.setMaxLocalId(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_MAXID));
-        minter.setIdentifierFormatString(appConfig.getProperty(configFile , CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
+        minter.setMinLocalId(appConfig.getProperty(configFile, CDM_SERVICE_MINTER_REGSTRATION_MINID));
+        minter.setMaxLocalId(appConfig.getProperty(configFile, CDM_SERVICE_MINTER_REGSTRATION_MAXID));
+        minter.setIdentifierFormatString(appConfig.getProperty(configFile, CDM_SERVICE_MINTER_REGSTRATION_IDFORMAT));
         return minter;
     }
 
@@ -350,6 +349,4 @@ public class CdmVaadinConfiguration implements ApplicationContextAware  {
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
-
 }

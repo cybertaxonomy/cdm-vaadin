@@ -366,7 +366,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
             ContinueAlternativeCancelDialog editorModifiedDialog = new ContinueAlternativeCancelDialog(
                     "Cancel editor",
-                    "<p>The editor has been modified.<br>Do you want to saveBtn your changes or discard them?<p>",
+                    "<p>The editor has been modified.<br>Do you want to save your changes or discard them?<p>",
                     "Discard",
                     "Save");
             ClickListener saveListener = e -> {editorModifiedDialog.close(); save();};
