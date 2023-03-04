@@ -39,7 +39,6 @@ public abstract class AbstractView<P extends AbstractPresenter> extends CustomCo
 
 	private P presenter;
 
-
 	//TODO remove?
 	private ApplicationContext applicationContext;
 

@@ -29,7 +29,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 20, 2017
  */
-public abstract class AbstractPageView<P extends AbstractPresenter<?>> extends AbstractView<P>  {
+public abstract class AbstractPageView<P extends AbstractPresenter> extends AbstractView<P>  {
 
     private static final long serialVersionUID = -8669483572788112285L;
 
