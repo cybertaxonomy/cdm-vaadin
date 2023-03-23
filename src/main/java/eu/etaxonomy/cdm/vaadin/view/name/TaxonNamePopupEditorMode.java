@@ -27,7 +27,6 @@ public enum TaxonNamePopupEditorMode {
      * change it to a reference of type {@link eu.etaxonomy.cdm.model.reference.ReferenceType.#Section Section} which
      * has the current reference as <code>inReference</code>. Whereas the book or journal can not be modified, the
      * section can be edited via a ReferencePopupEditor.
-     *
      */
     NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY,
 

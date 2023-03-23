@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
-import com.vaadin.server.ClientConnector.DetachEvent;
-import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
@@ -343,27 +341,21 @@ public class RegistrationWorkingsetPresenter
             return;
         }
 
-        boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getExistingNameCombobox());
+        boolean isRegistrationForExistingName = event.getTarget() != null && event.getTarget().equals(getView().getExistingNameCombobox());
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
 
         popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-        popup.withDeleteButton(!isAddExistingNameRegistration);
+        popup.withDeleteButton(!isRegistrationForExistingName);
         TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
-        if(isAddExistingNameRegistration){
+        if(isRegistrationForExistingName){
             // allow saving even if the name parts are not valid
             // the user will need to fix this in a later step
             popup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
-            popup.addDetachListener(new DetachListener() {
-                private static final long serialVersionUID = 836224587615950302L;
-
-                @Override
-                public void detach(DetachEvent event) {
-                    getView().getAddExistingNameRegistrationButton().setEnabled(true);
-
-                }
-            });
+            popup.addDetachListener(ev ->
+                getView().getAddExistingNameRegistrationButton().setEnabled(true)
+            );
         }
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
@@ -373,7 +365,7 @@ public class RegistrationWorkingsetPresenter
         }
 
         boolean hasNomRef = popup.getBean().getNomenclaturalReference() != null;
-        if(isAddExistingNameRegistration){
+        if(isRegistrationForExistingName){
             popup.setAllFieldsReadOnly(true);
             popup.removeStatusMessage(RegistrationUI.CHECK_IN_SEARCH_INDEX);
 

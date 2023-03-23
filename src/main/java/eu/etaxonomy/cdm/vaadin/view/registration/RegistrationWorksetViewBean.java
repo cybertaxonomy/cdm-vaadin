@@ -71,7 +71,6 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -302,21 +301,6 @@ public class RegistrationWorksetViewBean
                         existingNameCombobox,
                         this,
                         context)
-        );
-
-    }
-
-    /**
-     * publishes an event to the {@link RegistrationWorkingsetPresenter}
-     * @deprecated no longer used but kept for reference
-     * TODO remove for version 5.8 when not used again.
-     */
-    @Deprecated
-    private void triggerRegistrationForExistingName() {
-        getViewEventBus().publish(this, new RegistrationWorkingsetAction(
-                citationUuid,
-                RegistrationWorkingsetAction.Action.start
-                )
         );
     }
 

@@ -205,6 +205,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         updateToolBarVisibility();
 
         UI currentUI = UI.getCurrent();
+        //Note AM: why not "currentUI instanceof PopupEditorDefaultStatusMessageSource"
         if(PopupEditorDefaultStatusMessageSource.class.isAssignableFrom(currentUI.getClass())){
             String message = ((PopupEditorDefaultStatusMessageSource)currentUI).defaultStatusMarkup(this.getClass());
             addStatusMessage(message);
