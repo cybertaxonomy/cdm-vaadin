@@ -78,6 +78,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -374,19 +375,30 @@ public class RegistrationWorkingsetPresenter
         boolean hasNomRef = popup.getBean().getNomenclaturalReference() != null;
         if(isAddExistingNameRegistration){
             popup.setAllFieldsReadOnly(true);
-            popup.setToSelect();
+            popup.removeStatusMessage(RegistrationUI.CHECK_IN_SEARCH_INDEX);
 
             if(!hasNomRef){
-                // only allow editing the nomenclatural reference, all other
-                // editing need to be done another way.
-                // Otherwise we would need to be prepared for creating blocking registrations
-                // in turn of creation, modification of related taxon names.
-                popup.disableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-                popup.getNomReferenceCombobox().setReadOnly(false);
-                popup.getNomenclaturalReferenceDetail().setReadOnly(false);
-                popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
-                        + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
+                //#10269 for now we do not allow registrations for names with no nom. ref.
+                // Old code was:
+//                // only allow editing the nomenclatural reference, all other
+//                // editing need to be done another way.
+//                // Otherwise we would need to be prepared for creating blocking registrations
+//                // in turn of creation, modification of related taxon names.
+//                popup.disableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+//                popup.getNomReferenceCombobox().setReadOnly(false);
+//                popup.getNomenclaturalReferenceDetail().setReadOnly(false);
+//                popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
+//                        + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
+
+                //instead we show status message:
+//                popup.setToCancelOnly();
+                popup.addStatusMessage("<p style='color:Tomato;'><strong>The data entry is aborted "
+                        + "due to a data issue that should be fixed "
+                        + "by the curator</strong>.<BR>"
+                        + "Please send an e-mail with the scientific name "
+                        + "to <i>curation@phycobank.org</i></p>");
             } else {
+                popup.setToSelect();  //sets the save button to "save & select"
                 popup.addStatusMessage("You are about to create a registration for this name. "
                         + "This editor is for reviewing the name only. Therefore, all fields have "
                         + "been switched to read-only state. "
