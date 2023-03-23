@@ -52,7 +52,7 @@ public class StartRegistrationViewBean
     public static final String NAME = "regStart";
 
     public static final String SUBHEADER_DEEFAULT = "Any valid nomenclatural act can only be etablished in a publication. "
-            + "To start a new registration process, please choose an existing one or create a new publication.";
+            + "To start a new registration process, please choose from existing publications or create a new one.";
 
     private LazyComboBox<TypedEntityReference<Reference>> referenceCombobox;
 

@@ -367,7 +367,7 @@ public class RegistrationWorkingsetPresenter
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
             // avoid resetting read-only to false
-            logger.error("Set popup to read-only as event source is read only");
+            logger.info("Set popup to read-only as event source is read only");
             popup.setReadOnly(true);
         }
 

@@ -174,7 +174,7 @@ public abstract class AbstractPresenter<P extends AbstractPresenter<P,V>, V exte
         this.navigationManager = navigationManager;
     }
 
-    protected boolean checkFromOwnView(AbstractEditorAction event) {
+    protected boolean checkFromOwnView(AbstractEditorAction<?> event) {
         return getView() != null && getView() == event.getSourceView();
     }
 
@@ -200,19 +200,19 @@ public abstract class AbstractPresenter<P extends AbstractPresenter<P,V>, V exte
         return getNavigationManager().showInPopup(popupViewClass, getView(), targetField);
     }
 
-    protected boolean isFromOwnView(EntityChangeEvent event) {
+    protected boolean isFromOwnView(EntityChangeEvent<?> event) {
         return event.getSourceView() != null && event.getSourceView().equals(getView());
     }
 
     public EditorActionContext editorActionContextRoot(PopupView popupView) {
-        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        Stack<EditorActionContext>context = ((AbstractPopupEditor<?,?,?>)popupView).getEditorActionContext();
         return context.get(0);
     }
 
     public boolean isAtContextRoot(PopupView popupView) {
-        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
+        AbstractPopupEditor<?,?,?> popupEditor = ((AbstractPopupEditor<?,?,?>)popupView);
         if(popupEditor.getEditorActionContext().size() > 1){
-            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
+            EditorActionContext topContext = popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
             return getView().equals(topContext.getParentView());
         } else {
             logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
@@ -220,19 +220,14 @@ public abstract class AbstractPresenter<P extends AbstractPresenter<P,V>, V exte
         }
     }
 
-    /**
-     * @param event
-     */
     public boolean isFromOwnView(DoneWithPopupEvent event) {
         EditorActionContext contextRoot = editorActionContextRoot(event.getPopup());
         return getView().equals(contextRoot.getParentView());
     }
-
 
     @Override
     public void destroy() throws Exception {
         unsubscribeFromEventBuses();
         view = null;
     }
-
 }
