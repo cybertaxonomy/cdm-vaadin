@@ -94,8 +94,8 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 @SpringComponent
 @Scope("prototype")
 public class SpecimenTypeDesignationSetEditorPresenter
-    extends AbstractEditorPresenter<SpecimenTypeDesignationSetDTO,SpecimenTypeDesignationSetPopupEditorView>
-    implements CachingPresenter, NomenclaturalActContext {
+        extends AbstractEditorPresenter<SpecimenTypeDesignationSetDTO,SpecimenTypeDesignationSetEditorPresenter,SpecimenTypeDesignationSetPopupEditorView>
+        implements CachingPresenter, NomenclaturalActContext {
 
     private static final long serialVersionUID = 4255636253714476918L;
 
@@ -385,18 +385,11 @@ public class SpecimenTypeDesignationSetEditorPresenter
         specimenTypeDesignationSetService.save(dto);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void deleteBean(SpecimenTypeDesignationSetDTO bean) {
         specimenTypeDesignationSetService.delete(bean, true);
     }
 
-    /**
-     * @param element
-     * @return
-     */
     private void addTypeDesignation(SpecimenTypeDesignationDTO element) {
         getView().updateAllowDeleteTypeDesignation();
     }
@@ -407,9 +400,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
      * The actual deletion of the SpecimenTypeDesignation and DerivedUnit will take place in {@link #saveBean(SpecimenTypeDesignationSetDTO)}
      *
      * TODO once https://dev.e-taxonomy.eu/redmine/issues/7077 is fixed dissociating from the Registration could be removed here
-     *
-     * @param e
-     * @return
      */
     private void deleteTypeDesignation(SpecimenTypeDesignationDTO element) {
 
@@ -421,16 +411,10 @@ public class SpecimenTypeDesignationSetEditorPresenter
         getView().updateAllowDeleteTypeDesignation();
     }
 
-    /**
-     * @param crud
-     */
     public void setGrantsForCurrentUser(EnumSet<CRUD> crud) {
         this.crud = crud;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ICdmEntityUuidCacher getCache() {
         return cache;
@@ -465,13 +449,13 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
 
     @EventBusListenerMethod(filter = EntityChangeEventFilter.OccurrenceCollectionFilter.class)
-    public void onCollectionEvent(EntityChangeEvent event){
+    public void onCollectionEvent(EntityChangeEvent<?> event){
 
         if(event.getSourceView() instanceof AbstractPopupEditor) {
 
             Stack<EditorActionContext> context = ((AbstractPopupEditor) event.getSourceView()).getEditorActionContext();
             if(context.size() > 1){
-               AbstractView<?> parentView = context.get(context.size() - 2).getParentView();
+               AbstractView<?,?> parentView = context.get(context.size() - 2).getParentView();
                if(getView().equals(parentView)){
                    Collection newCollection = getRepo().getCollectionService().load(
                            event.getEntityUuid(), Arrays.asList(new String[]{"$.institute"})

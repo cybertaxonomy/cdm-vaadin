@@ -11,7 +11,6 @@ package eu.etaxonomy.cdm.vaadin.permission;
 /**
  * @author a.kohlbecker
  * @since 25.10.2017
- *
  */
 public interface ReleasableResourcesView {
 

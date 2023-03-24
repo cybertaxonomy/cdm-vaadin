@@ -39,7 +39,6 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  *
  * @author a.kohlbecker
  * @since Apr 6, 2017
- *
  */
 @Service
 public class CdmBeanItemContainerFactory {
@@ -79,12 +78,11 @@ public class CdmBeanItemContainerFactory {
         return termItemContainer;
     }
 
-
     @Transactional(readOnly=true)
     public BeanItemContainer<DefinedTermBase> buildVocabularyTermsItemContainer(UUID vocabularyUuid) {
 
         clearSession();
-        TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
+        TermVocabulary<?> vocab = repo.getVocabularyService().find(vocabularyUuid);
         Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
         termItemContainer.addAll(terms.getRecords());
@@ -95,7 +93,7 @@ public class CdmBeanItemContainerFactory {
     public <DTO extends Object> BeanItemContainer<DTO> buildVocabularyTermsItemContainer(UUID vocabularyUuid, BeanToDTOConverter<TermBase, DTO> converter) {
 
         clearSession();
-        TermVocabulary vocab = repo.getVocabularyService().find(vocabularyUuid);
+        TermVocabulary<?> vocab = repo.getVocabularyService().find(vocabularyUuid);
         Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
         BeanItemContainer<DTO> termItemContainer = new BeanItemContainer<>(converter.getDTOType());
         termItemContainer.addAll(terms.getRecords().stream().map(b -> converter.toDTO(b)).collect(Collectors.toList()));
@@ -123,7 +121,7 @@ public class CdmBeanItemContainerFactory {
         BeanItemContainer<TypeDesignationStatusBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
         termItemContainer.addAll(terms.stream()
                 .filter(t -> t instanceof TypeDesignationStatusBase)
-                .map(t -> (TypeDesignationStatusBase)t)
+                .map(t -> (TypeDesignationStatusBase<?>)t)
                 .filter(tsb ->
                     !withHasDesignationSource.isPresent()
                     || withHasDesignationSource.get().equals(false)
@@ -148,7 +146,6 @@ public class CdmBeanItemContainerFactory {
         container.addAll(filteredItems);
         return container;
     }
-
 
     @Transactional(readOnly=true)
     public <T extends CdmBase> BeanItemContainer<T> buildBeanItemContainer(Class<T> type, List<OrderHint> orderHints) {
@@ -179,5 +176,4 @@ public class CdmBeanItemContainerFactory {
     public void clearSession() {
         repo.clearSession();
     }
-
 }

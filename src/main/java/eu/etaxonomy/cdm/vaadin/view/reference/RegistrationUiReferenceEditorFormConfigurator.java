@@ -19,15 +19,15 @@ import eu.etaxonomy.vaadin.mvp.EditorFormConfigurator;
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2019
- *
  */
-public class RegistrationUiReferenceEditorFormConfigurator implements EditorFormConfigurator<ReferencePopupEditor> {
+public class RegistrationUiReferenceEditorFormConfigurator
+        implements EditorFormConfigurator<ReferencePopupEditor> {
 
-    boolean limitToSectionEditing;
+    private boolean limitToSectionEditing;
 
-    boolean typeSelectReadonly;
+    private boolean typeSelectReadonly;
 
-    EnumSet<ReferenceType> sectionTypes = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
+    private EnumSet<ReferenceType> sectionTypes = EnumSet.of(ReferenceType.Section, ReferenceType.BookSection);
 
     public static RegistrationUiReferenceEditorFormConfigurator create(boolean limitToSectionEditing) {
         return new RegistrationUiReferenceEditorFormConfigurator(limitToSectionEditing);
@@ -51,7 +51,7 @@ public class RegistrationUiReferenceEditorFormConfigurator implements EditorForm
     }
 
     @Override
-    public void updateComponentStates(AbstractPopupEditor<?, ?> popupEditor) {
+    public void updateComponentStates(AbstractPopupEditor<?,?,?> popupEditor) {
         ReferencePopupEditor refEditor = (ReferencePopupEditor)popupEditor;
         if(limitToSectionEditing){
             boolean isSection = sectionTypes.contains(refEditor.getBean().getType());
@@ -66,5 +66,4 @@ public class RegistrationUiReferenceEditorFormConfigurator implements EditorForm
             refEditor.getTypeSelect().setEnabled(false);
         }
     }
-
 }

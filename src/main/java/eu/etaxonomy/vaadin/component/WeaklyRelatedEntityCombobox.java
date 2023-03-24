@@ -31,7 +31,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.permission.CRUD;
-import eu.etaxonomy.cdm.service.FilterableStringRepresentationPagingProvider;
+import eu.etaxonomy.cdm.service.IFilterableStringRepresentationPagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
@@ -59,7 +59,7 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
 
     private WeaklyRelatedEntityButtonUpdater buttonUpdater;
 
-    private FilterableStringRepresentationPagingProvider<UUID> filterablePagingProvider;
+    private IFilterableStringRepresentationPagingProvider<UUID> filterablePagingProvider;
 
     public WeaklyRelatedEntityCombobox(String caption, Class<V> type){
         this.type = type;
@@ -132,7 +132,7 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
      */
     public void loadFrom(FilterablePagingProvider<String> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength) {
 
-        this.filterablePagingProvider = (FilterableStringRepresentationPagingProvider<UUID>) filterablePagingProvider;
+        this.filterablePagingProvider = (IFilterableStringRepresentationPagingProvider<UUID>) filterablePagingProvider;
         lazySelect.loadFrom(filterablePagingProvider, filterableCountProvider, pageLength);
         buttonUpdater.updateButtons(getValue());
     }

@@ -16,36 +16,22 @@ import com.vaadin.ui.Button.ClickEvent;
  *
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 public class AuthenticationAttemptEvent implements AuthenticationEvent{
 
-    ClickEvent e;
-    String userName;
+    private ClickEvent e;
+    private String userName;
 
-    /**
-     * @param e
-     * @param userName
-     */
     public AuthenticationAttemptEvent(ClickEvent e, String userName) {
         this.e = e;
         this.userName = userName;
     }
 
-    /**
-     * @return the e
-     */
     public ClickEvent getE() {
         return e;
     }
 
-    /**
-     * @return the userName
-     */
     public String getUserName() {
         return userName;
     }
-
-
-
 }

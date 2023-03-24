@@ -24,9 +24,6 @@ public interface BeanToDTOConverter<CDM extends CdmBase, DTO extends Object> {
 
     public DTO toDTO(CDM bean);
 
-    /**
-     * @return
-     */
     public Class<DTO> getDTOType();
 
 }

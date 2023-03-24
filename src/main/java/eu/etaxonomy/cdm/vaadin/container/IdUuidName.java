@@ -31,23 +31,14 @@ public class IdUuidName {
         this.name = name;
     }
 
-    /**
-     * @return the id
-     */
     public Object getId() {
         return id;
     }
 
-    /**
-     * @return the uuid
-     */
     public UUID getUuid() {
         return uuid;
     }
 
-    /**
-     * @return the name
-     */
     public String getName() {
         return name;
     }

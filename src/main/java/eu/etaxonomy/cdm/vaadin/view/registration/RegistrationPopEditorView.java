@@ -18,26 +18,14 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since May 15, 2017
  *
  */
-public interface RegistrationPopEditorView extends ApplicationView<RegistrationEditorPresenter> {
+public interface RegistrationPopEditorView
+        extends ApplicationView<RegistrationPopEditorView,RegistrationEditorPresenter> {
 
-
-    /**
-     * @return the submitterField
-     */
     public NativeSelect getSubmitterField();
 
-    /**
-     * @return the institutionField
-     */
     public NativeSelect getInstitutionField();
 
-    /**
-     * @return
-     */
     public NativeSelect getStatusSelect();
 
-    /**
-     * @return
-     */
     public DateField getRegistrationDateField();
 }

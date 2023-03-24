@@ -17,7 +17,7 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since Dec 21, 2017
  *
  */
-public interface InstitutionPopupEditorView extends ApplicationView<InstitutionEditorPresenter> {
+public interface InstitutionPopupEditorView extends ApplicationView<InstitutionPopupEditorView,InstitutionEditorPresenter> {
 
     ToOneRelatedEntityCombobox<Institution> getPartOfCombobox();
 

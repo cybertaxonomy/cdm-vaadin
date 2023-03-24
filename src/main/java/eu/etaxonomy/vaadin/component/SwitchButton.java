@@ -13,7 +13,6 @@ import org.vaadin.teemu.switchui.Switch;
 /**
  * @author a.kohlbecker
  * @since May 11, 2017
- *
  */
 public class SwitchButton extends Switch {
 
@@ -25,9 +24,6 @@ public class SwitchButton extends Switch {
         super();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setInternalValue(Boolean newValue) {
         super.setInternalValue(newValue);
@@ -39,5 +35,4 @@ public class SwitchButton extends Switch {
     public void setValueSetLister(ValueChangeListener valueSetListener){
         this.valueSetListener = valueSetListener;
     }
-
 }

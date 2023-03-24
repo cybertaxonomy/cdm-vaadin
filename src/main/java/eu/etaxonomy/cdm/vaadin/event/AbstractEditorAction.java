@@ -29,7 +29,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  *
  * @author a.kohlbecker
  * @since Mar 22, 2017
- *
  */
 public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<EditorActionType> {
 
@@ -58,7 +57,6 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
     }
 
     /**
-     *
      * @param action
      *            the action being requested
      * @param entityId
@@ -96,9 +94,6 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
         return source;
     }
 
-    /**
-     * @return the target
-     */
     public Field<V> getTarget() {
         return target;
     }
@@ -117,5 +112,4 @@ public abstract class AbstractEditorAction<V> extends AbstractEntityEvent<Editor
     public Stack<EditorActionContext> getContext() {
         return context;
     }
-
 }

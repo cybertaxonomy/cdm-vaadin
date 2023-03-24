@@ -17,17 +17,16 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
 /**
  * @author a.kohlbecker
  * @since Apr 28, 2017
- *
  */
 public class PartialFormatter {
 
     private DateTimeFormat format;
 
-    private static final DateTimeFormatter dmyDotDayMonthYear =  org.joda.time.format.DateTimeFormat.forPattern("dd.MM.y");
+    private static final DateTimeFormatter dmyDotDayMonthYear = org.joda.time.format.DateTimeFormat.forPattern("dd.MM.y");
 
-    private static final DateTimeFormatter dmyDotMonthYear =  org.joda.time.format.DateTimeFormat.forPattern("MM.y");
+    private static final DateTimeFormatter dmyDotMonthYear = org.joda.time.format.DateTimeFormat.forPattern("MM.y");
 
-    private static final DateTimeFormatter dmyDotYear =  org.joda.time.format.DateTimeFormat.forPattern("y");
+    private static final DateTimeFormatter dmyDotYear = org.joda.time.format.DateTimeFormat.forPattern("y");
 
     public PartialFormatter(DateTimeFormat format) {
         this.format = format;
@@ -43,10 +42,6 @@ public class PartialFormatter {
         }
     }
 
-    /**
-     * @param partial
-     * @return
-     */
     private DateTimeFormatter determine_ISO860_Formatter(Partial partial) {
         if (partial.isSupported(TimePeriod.DAY_TYPE)) {
             return ISODateTimeFormat.yearMonthDay();
@@ -55,13 +50,8 @@ public class PartialFormatter {
             return ISODateTimeFormat.yearMonth();
         }
         return ISODateTimeFormat.year();
-
     }
 
-    /**
-     * @param partial
-     * @return
-     */
     private DateTimeFormatter determine_DMY_DOT_Formatter(Partial partial) {
         if (partial.isSupported(TimePeriod.DAY_TYPE)) {
             return dmyDotDayMonthYear;
@@ -70,7 +60,5 @@ public class PartialFormatter {
             return dmyDotMonthYear;
         }
         return dmyDotYear;
-
     }
-
 }

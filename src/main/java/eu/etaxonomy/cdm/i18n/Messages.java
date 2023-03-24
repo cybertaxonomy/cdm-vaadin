@@ -16,7 +16,6 @@ import com.vaadin.server.VaadinSession;
 /**
  * Internationalization class.
  * @author freimeier
- *
  */
 public class Messages implements Serializable {
 

@@ -83,8 +83,8 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmDTOPopupEditor;
 @SpringComponent
 @Scope("prototype")
 public class TaxonNamePopupEditor
-        extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter>
-        implements TaxonNamePopupEditorView{
+        extends AbstractCdmDTOPopupEditor<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter,TaxonNamePopupEditorView>
+        implements TaxonNamePopupEditorView {
 
     private static final long serialVersionUID = -7037436241474466359L;
     private static final Logger logger = LogManager.getLogger();
@@ -1115,12 +1115,12 @@ public class TaxonNamePopupEditor
     }
 
     /**
-     * Sets the readonly state of all fields in this editor, but leaving the editor itself untouched.
+     * Sets the read-only state of all fields in this editor, but leaving the editor itself untouched.
      *
      * @param readOnly
      */
     public void setAllFieldsReadOnly(boolean readOnly) {
-        logger.error("Set all fields to readonly");
+        logger.info("Set all fields to readonly");
 
         recursiveReadonly(readOnly, getMainLayout());
         // NOTE:We are using the enabled state instead of read only since
@@ -1132,6 +1132,17 @@ public class TaxonNamePopupEditor
         basionymAuthorshipField.setEnabled(!readOnly);
         exBasionymAuthorshipField.setEnabled(!readOnly);
         nomStatusCollectionField.getLayout().iterator().forEachRemaining(c -> c.setReadOnly(readOnly));
+    }
+
+    //#10167
+    public void setToSelect() {
+        this.setSaveButtonCaption("Select");
+        this.setSaveButtonVisible(true);
+    }
+
+    //#10269
+    public void setToCancelOnly() {
+        this.setSaveButtonVisible(false);
     }
 
     @Override

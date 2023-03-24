@@ -17,7 +17,6 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 /**
  * @author a.kohlbecker
  * @since Jul 4, 2018
- *
  */
 public interface RegistrationStatusFieldInstantiator<T> extends Serializable {
 

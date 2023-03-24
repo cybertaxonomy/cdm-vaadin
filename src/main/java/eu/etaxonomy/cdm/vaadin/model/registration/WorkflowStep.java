@@ -8,15 +8,13 @@
 */
 package eu.etaxonomy.cdm.vaadin.model.registration;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import eu.etaxonomy.cdm.model.name.RegistrationStatus;
-
 
 /**
  * @author a.kohlbecker
  * @since Mar 28, 2017
- *
  */
 public enum WorkflowStep {
 
@@ -35,22 +33,16 @@ public enum WorkflowStep {
         this.representation = representation;
     }
 
-    /**
-     * @return the representation
-     */
     public String getRepresentation() {
         return representation;
     }
 
-    /**
-     * @return the stepIndex
-     */
     public int getStepIndex() {
         return stepIndex;
     }
 
     public String getHtml(){
-        return StringEscapeUtils.escapeHtml(getRepresentation());
+        return StringEscapeUtils.escapeHtml4(getRepresentation());
     }
 
     public static WorkflowStep from(RegistrationStatus status, boolean citationDetailsReady) {

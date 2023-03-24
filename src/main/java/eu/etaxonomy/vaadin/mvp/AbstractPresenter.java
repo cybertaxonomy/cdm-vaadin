@@ -41,11 +41,12 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  * @param <V>
  *            type of the view this presenter governs
  */
-public abstract class AbstractPresenter<V extends ApplicationView> implements Serializable, DisposableBean {
-
-    private static final Logger logger = LogManager.getLogger();
+public abstract class AbstractPresenter<P extends AbstractPresenter<P,V>, V extends ApplicationView<V,P>>
+        implements Serializable, DisposableBean {
 
     private static final long serialVersionUID = 5260910510283481832L;
+
+    private static final Logger logger = LogManager.getLogger();
 
 	private V view;
 
@@ -73,8 +74,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 
     /**
      * Override if needed, e.g. to skip subscription
-     *
-     * @param viewEventBus
      */
     protected void eventViewBusSubscription(EventBus.ViewEventBus viewEventBus){
             viewEventBus.subscribe(this);
@@ -83,7 +82,6 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     public void unsubscribeFromEventBuses(){
         viewEventBus.unsubscribe(this);
     }
-
 
 	//	protected DefaultTransactionDefinition definition = null;
 
@@ -95,23 +93,16 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     //	    return definition;
     //	}
 
-
-	/**
-	 * @return the repo
-	 */
 	public CdmRepository getRepo() {
 	    return repo;
 	}
 
 	/**
-     * @return
-     *
      * FIXME is it ok to use the SecurityContextHolder or do we need to hold the context in the vaadin session?
      */
     protected SecurityContext currentSecurityContext() {
         return SecurityContextHolder.getContext();
     }
-
 
     protected String _toString(){
         return this.getClass().getSimpleName() + "@" + this.hashCode();
@@ -120,15 +111,12 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
 	/**
 	 * Notifies the presenter that its view is initialized so that presenter can
 	 * start its own initialization if required.
-	 *
-	 * @param view
 	 */
 	protected void init(V view) {
-	    logger.trace(String.format("Presenter %s init()", _toString()));
+	    if (logger.isTraceEnabled()) {logger.trace(String.format("Presenter %s init()", _toString()));}
 		this.view = view;
 		onPresenterReady();
 	}
-
 
     /**
 	 * Extending classes should overwrite this method in order to perform logic
@@ -174,28 +162,19 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
     public void handleViewExit() {
     }
 
-    /**
-     * @return the navigationManager
-     */
     public NavigationManager getNavigationManager() {
         return navigationManager;
     }
 
-    /**
-     * @param repo the repo to set
-     */
     protected void setRepo(CdmRepository repo) {
         this.repo = repo;
     }
 
-    /**
-     * @param navigationManager the navigationManager to set
-     */
     protected void setNavigationManager(NavigationManager navigationManager) {
         this.navigationManager = navigationManager;
     }
 
-    protected boolean checkFromOwnView(AbstractEditorAction event) {
+    protected boolean checkFromOwnView(AbstractEditorAction<?> event) {
         return getView() != null && getView() == event.getSourceView();
     }
 
@@ -215,29 +194,25 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
      * In case the target field is bound to a bean property the propertyId is available in the {@link BoundField}
      * object and can be used to decide on which bean property to update with the data saved in the popup editor or to
      * act in any other appropriate way.
-     *
-     * @param popupViewClass
-     * @param event
-     * @return
      */
     protected <T extends PopupView> T openPopupEditor(Class<T> popupViewClass, AbstractEditorAction<?> event) {
         Field<?> targetField = event != null? event.getTarget(): null;
         return getNavigationManager().showInPopup(popupViewClass, getView(), targetField);
     }
 
-    protected boolean isFromOwnView(EntityChangeEvent event) {
+    protected boolean isFromOwnView(EntityChangeEvent<?> event) {
         return event.getSourceView() != null && event.getSourceView().equals(getView());
     }
 
     public EditorActionContext editorActionContextRoot(PopupView popupView) {
-        Stack<EditorActionContext>context = ((AbstractPopupEditor)popupView).getEditorActionContext();
+        Stack<EditorActionContext>context = ((AbstractPopupEditor<?,?,?>)popupView).getEditorActionContext();
         return context.get(0);
     }
 
     public boolean isAtContextRoot(PopupView popupView) {
-        AbstractPopupEditor popupEditor = ((AbstractPopupEditor)popupView);
+        AbstractPopupEditor<?,?,?> popupEditor = ((AbstractPopupEditor<?,?,?>)popupView);
         if(popupEditor.getEditorActionContext().size() > 1){
-            EditorActionContext topContext = (EditorActionContext) popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
+            EditorActionContext topContext = popupEditor.getEditorActionContext().get(popupEditor.getEditorActionContext().size() - 2);
             return getView().equals(topContext.getParentView());
         } else {
             logger.error("Invalid EditorActionContext size. A popupeditor should at leaset have the workingset as root");
@@ -245,19 +220,14 @@ public abstract class AbstractPresenter<V extends ApplicationView> implements Se
         }
     }
 
-    /**
-     * @param event
-     */
     public boolean isFromOwnView(DoneWithPopupEvent event) {
         EditorActionContext contextRoot = editorActionContextRoot(event.getPopup());
         return getView().equals(contextRoot.getParentView());
     }
-
 
     @Override
     public void destroy() throws Exception {
         unsubscribeFromEventBuses();
         view = null;
     }
-
 }

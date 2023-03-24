@@ -81,7 +81,7 @@ public class RegistrationItem extends GridLayout {
 
     private static final long serialVersionUID = -211003770452173644L;
 
-    private AbstractView<?> parentView;
+    private AbstractView<?,?> parentView;
 
     private RegistrationDTO regDto;
 
@@ -107,7 +107,7 @@ public class RegistrationItem extends GridLayout {
     /**
      *
      */
-    public RegistrationItem(RegistrationDTO item, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
+    public RegistrationItem(RegistrationDTO item, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
         this.cache = cache;
         init();
@@ -117,7 +117,7 @@ public class RegistrationItem extends GridLayout {
     /**
     *
     */
-   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?> parentView, ICdmEntityUuidCacher cache) {
+   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
        super(GRID_COLS, GRID_ROWS);
        this.cache = cache;
        init();
@@ -188,7 +188,7 @@ public class RegistrationItem extends GridLayout {
 
     }
 
-    public void setItem(RegistrationDTO regDto, AbstractView<?> parentView){
+    public void setItem(RegistrationDTO regDto, AbstractView<?,?> parentView){
 
         this.parentView = parentView;
 
@@ -208,7 +208,7 @@ public class RegistrationItem extends GridLayout {
                 navigationEvent, null, regDto, regDto.getSubmitterUserName());
     }
 
-    public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?> parentView){
+    public void setWorkingSet(RegistrationWorkingSet workingSet, AbstractView<?,?> parentView){
         this.parentView = parentView;
 
         ReferenceEditorAction referenceEditorAction = null;

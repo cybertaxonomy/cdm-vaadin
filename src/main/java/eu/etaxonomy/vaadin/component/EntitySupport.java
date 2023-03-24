@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.vaadin.component;
 
+import com.vaadin.data.Property.ValueChangeListener;
+
 /**
  * Interface to ship around equality problems of entities which have modified data.
  *
@@ -40,6 +42,6 @@ public interface EntitySupport<V> {
      *
      * @param bean
      */
-    void replaceEntityValue(V bean);
+    public void replaceEntityValue(V bean);
 
 }

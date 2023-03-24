@@ -8,7 +8,7 @@
 */
 package eu.etaxonomy.cdm.vaadin.util.formatter;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
 
@@ -18,7 +18,6 @@ import eu.etaxonomy.cdm.model.common.TimePeriod;
  *
  * @author a.kohlbecker
  * @since Apr 26, 2017
- *
  */
 public class TimePeriodFormatter {
 
@@ -46,5 +45,4 @@ public class TimePeriodFormatter {
             return sb.toString();
         }
     }
-
 }

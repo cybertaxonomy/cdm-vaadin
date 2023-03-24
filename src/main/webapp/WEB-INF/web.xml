@@ -26,7 +26,6 @@
         </listener-class>
     </listener>
 
-
     <servlet>
         <description>CDM Remote API</description>
         <servlet-name>cdm-vaadin</servlet-name>
@@ -75,6 +74,5 @@
       <filter-name>springSecurityFilterChain</filter-name>
       <url-pattern>/*</url-pattern>
     </filter-mapping>
- 
-    
+
 </web-app>

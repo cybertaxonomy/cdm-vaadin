@@ -21,17 +21,12 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
 /**
  * @author a.kohlbecker
  * @since Feb 6, 2018
- *
  */
 public class RegistrationItemsPanel extends Panel {
 
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -3763419770580196601L;
 
-    public RegistrationItemsPanel(AbstractView<?> parentView, String caption, Collection<RegistrationDTO> regDtos, ICdmEntityUuidCacher cache){
+    public RegistrationItemsPanel(AbstractView<?,?> parentView, String caption, Collection<RegistrationDTO> regDtos, ICdmEntityUuidCacher cache){
 
         super(caption);
 

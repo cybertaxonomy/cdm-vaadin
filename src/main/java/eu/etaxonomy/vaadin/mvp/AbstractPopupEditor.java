@@ -83,13 +83,13 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
  * @author a.kohlbecker
  * @since Apr 5, 2017
  */
-public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO, ? extends ApplicationView>>
-        extends AbstractPopupView<P> {
+public abstract class AbstractPopupEditor<DTO extends Object, P extends AbstractEditorPresenter<DTO,P,V>, V extends ApplicationView<V,P>>
+        extends AbstractPopupView<V,P> {
 
     private static final long serialVersionUID = 5944874629527570061L;
     private static final Logger logger = LogManager.getLogger();
 
-    private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. Your authorities are not sufficient to edit this data.";
+    private static final String READ_ONLY_MESSAGE_TEXT = "The editor is in read-only mode. You do not have authority to edit this data.";
 
     private BeanFieldGroup<DTO> fieldGroup;
 
@@ -129,7 +129,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     private Button advancedModeButton;
 
-    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator;
+    private EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P,V>> editorComponentsConfigurator;
 
     private boolean withDeleteButton;
 
@@ -205,6 +205,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         updateToolBarVisibility();
 
         UI currentUI = UI.getCurrent();
+        //Note AM: why not "currentUI instanceof PopupEditorDefaultStatusMessageSource"
         if(PopupEditorDefaultStatusMessageSource.class.isAssignableFrom(currentUI.getClass())){
             String message = ((PopupEditorDefaultStatusMessageSource)currentUI).defaultStatusMarkup(this.getClass());
             addStatusMessage(message);
@@ -240,7 +241,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
             statusMessageLabel.setValue(null);
         }
         statusMessageLabel.setVisible(readOnly);
-        logger.error("Set saveBtn.visible to " + !readOnly);
+        logger.info("Set saveBtn.visible to " + !readOnly);
         saveBtn.setVisible(!readOnly);
         updateDeleteButtonState();
         cancelBtn.setCaption(readOnly ? "Close" : "Cancel");
@@ -322,7 +323,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         advancedModeComponents.addAll(Arrays.asList(c));
     }
 
-
     // ------------------------ event handler ------------------------ //
 
     private class SaveHandler implements CommitHandler {
@@ -366,7 +366,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
             ContinueAlternativeCancelDialog editorModifiedDialog = new ContinueAlternativeCancelDialog(
                     "Cancel editor",
-                    "<p>The editor has been modified.<br>Do you want to saveBtn your changes or discard them?<p>",
+                    "<p>The editor has been modified.<br>Do you want to save your changes or discard them?<p>",
                     "Discard",
                     "Save");
             ClickListener saveListener = e -> {editorModifiedDialog.close(); save();};
@@ -693,6 +693,14 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         saveBtn.setEnabled(enabled);
     }
 
+    protected void setSaveButtonVisible(boolean enabled){
+        saveBtn.setVisible(enabled);
+    }
+
+    protected void setSaveButtonCaption(String caption) {
+        saveBtn.setCaption(caption);
+    }
+
     public void withDeleteButton(boolean withDelete){
 
         this.withDeleteButton = withDelete;
@@ -706,9 +714,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         updateDeleteButtonState();
     }
 
-    /**
-     * @param withDelete
-     */
     private void updateDeleteButtonState() {
         deleteBtn.setVisible(withDeleteButton && !isReadOnly());
     }
@@ -803,8 +808,6 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
     /**
      * Returns the bean contained in the itemDatasource of the fieldGroup.
-     *
-     * @return
      */
     public DTO getBean() {
         if(fieldGroup.getItemDataSource() != null){
@@ -924,12 +927,12 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
         return newField;
     }
 
-    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> getEditorComponentsConfigurator() {
+    public EditorFormConfigurator<? extends AbstractPopupEditor<DTO,P,V>> getEditorComponentsConfigurator() {
         return editorComponentsConfigurator;
     }
 
     public void setEditorComponentsConfigurator(
-            EditorFormConfigurator<? extends AbstractPopupEditor<DTO, P>> editorComponentsConfigurator) {
+            EditorFormConfigurator<? extends AbstractPopupEditor<DTO,P,V>> editorComponentsConfigurator) {
         this.editorComponentsConfigurator = editorComponentsConfigurator;
     }
 }

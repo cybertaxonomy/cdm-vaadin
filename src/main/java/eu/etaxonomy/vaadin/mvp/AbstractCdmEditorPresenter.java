@@ -15,17 +15,15 @@ import eu.etaxonomy.cdm.model.common.CdmBase;
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
-public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, V extends ApplicationView<?>>
-        extends CdmEditorPresenterBase<CDM, CDM, V> {
+public abstract class AbstractCdmEditorPresenter<CDM extends CdmBase, P extends AbstractCdmEditorPresenter<CDM,P,V>, V extends ApplicationView<V,P>>
+        extends CdmEditorPresenterBase<CDM, CDM,P,V> {
 
     private static final long serialVersionUID = -6315824180341694825L;
 
-
     @Override
-    protected CDM createDTODecorator(CDM cdmEntitiy) {
-        return cdmEntitiy;
+    protected CDM createDTODecorator(CDM cdmEntity) {
+        return cdmEntity;
     }
 
     @Override

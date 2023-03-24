@@ -77,11 +77,11 @@ public class SpecimenTypeDesignationSetServiceImpl
     );
 
     @Autowired
-    IRegistrationWorkingSetService registrationWorkingSetService;
+    private IRegistrationWorkingSetService registrationWorkingSetService;
 
     @Qualifier("cdmRepository")
     @Autowired
-    CdmRepository repo;
+    private CdmRepository repo;
 
     @Override
     public SpecimenTypeDesignationSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
@@ -109,6 +109,7 @@ public class SpecimenTypeDesignationSetServiceImpl
     protected SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
             RegistrationDTO regDTO, VersionableEntity baseEntity) {
 
+        @SuppressWarnings("rawtypes")
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
         List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(typeDesignations.size());
         typeDesignations.forEach(td -> specimenTypeDesignations.add((SpecimenTypeDesignation)td));
@@ -137,6 +138,7 @@ public class SpecimenTypeDesignationSetServiceImpl
             fieldUnit = repo.getOccurrenceService().save(fieldUnit);
 
             VersionableEntity baseEntity = bean.getBaseEntity();
+            @SuppressWarnings("rawtypes")
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
             for(TypeDesignationBase<?> td : typeDesignations){
                 DerivationEvent de = DerivationEvent.NewInstance(DerivationEventType.GATHERING_IN_SITU());
@@ -193,11 +195,6 @@ public class SpecimenTypeDesignationSetServiceImpl
 
     }
 
-    /**
-     * @param dto
-     * @param specimenDeleteConfigurer
-     * @param std
-     */
     protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
 
 //        if(dto.getOwner() instanceof Registration){
@@ -220,11 +217,6 @@ public class SpecimenTypeDesignationSetServiceImpl
 //      }
     }
 
-    /**
-     * @param session
-     * @param fieldUnit
-     * @param specimenTypeDesignation
-     */
     protected void assureFieldUnit(FieldUnit fieldUnit,
             SpecimenTypeDesignation specimenTypeDesignation) {
         try {
@@ -239,18 +231,14 @@ public class SpecimenTypeDesignationSetServiceImpl
         }
     }
 
-    /**
-     * @param std
-     * @return
-     * @throws Exception
-     */
     private SpecimenOrObservationBase<?> findEarliestOriginal(DerivedUnit du) throws Exception {
 
-        SpecimenOrObservationBase original = du;
+        SpecimenOrObservationBase<?> original = du;
 
         while(du != null && du.getDerivedFrom() != null && !du.getDerivedFrom().getOriginals().isEmpty()) {
+            @SuppressWarnings("rawtypes")
             Iterator<SpecimenOrObservationBase> it = du.getDerivedFrom().getOriginals().iterator();
-            SpecimenOrObservationBase nextOriginal = it.next();
+            SpecimenOrObservationBase<?> nextOriginal = it.next();
             if(nextOriginal == null){
                 break;
             }
@@ -281,9 +269,6 @@ public class SpecimenTypeDesignationSetServiceImpl
         return addCandidates;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional(readOnly=false)
     public void delete(SpecimenTypeDesignationSetDTO bean, boolean deleteFieldUnit) {
@@ -291,11 +276,11 @@ public class SpecimenTypeDesignationSetServiceImpl
         @SuppressWarnings("unchecked")
         List<SpecimenTypeDesignationDTO> specimenTypeDesignationDTOs = bean.getSpecimenTypeDesignationDTOs();
         for(SpecimenTypeDesignationDTO stdDTO : specimenTypeDesignationDTOs){
-          SpecimenTypeDesignation std =  stdDTO.asSpecimenTypeDesignation();
-          deleteSpecimenTypeDesignation(bean, std);
-          if(bean.getOwner() instanceof Registration){
-              ((Registration)bean.getOwner()).getTypeDesignations().remove(std);
-          }
+            SpecimenTypeDesignation std =  stdDTO.asSpecimenTypeDesignation();
+            deleteSpecimenTypeDesignation(bean, std);
+            if(bean.getOwner() instanceof Registration){
+                ((Registration)bean.getOwner()).getTypeDesignations().remove(std);
+            }
         }
 
         if(deleteFieldUnit){
@@ -305,5 +290,4 @@ public class SpecimenTypeDesignationSetServiceImpl
             String msg = result.toString();
         }
     }
-
 }

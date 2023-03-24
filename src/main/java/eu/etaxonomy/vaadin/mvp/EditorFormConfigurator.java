@@ -11,9 +11,9 @@ package eu.etaxonomy.vaadin.mvp;
 /**
  * @author a.kohlbecker
  * @since Mar 22, 2019
- *
  */
-public interface EditorFormConfigurator<T extends AbstractPopupEditor<?,?>> {
+public interface EditorFormConfigurator<T extends AbstractPopupEditor<?,?,?>> {
 
-    public void updateComponentStates(AbstractPopupEditor<?, ?> abstractPopupEditor);
+    //TODO change parameter to T
+    public void updateComponentStates(AbstractPopupEditor<?,?,?> abstractPopupEditor);
 }

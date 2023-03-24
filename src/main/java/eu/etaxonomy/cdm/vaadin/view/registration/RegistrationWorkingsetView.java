@@ -21,15 +21,14 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
-import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
- *
  */
-public interface RegistrationWorkingsetView extends ApplicationView{
+public interface RegistrationWorkingsetView
+        extends ApplicationView<RegistrationWorkingsetView,RegistrationWorkingsetPresenter> {
 
     public static final String ACTION_NEW = "new";
 
@@ -41,7 +40,7 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      *
      * @param nameUuid can be null
      */
-    void openNameEditor(UUID nameUuid);
+    public void openNameEditor(UUID nameUuid);
 
     /**
      * Open a popup editor for an existing Reference if the referenceUuid is
@@ -49,65 +48,31 @@ public interface RegistrationWorkingsetView extends ApplicationView{
      *
      * @param referenceUuid can be null
      */
-    void openReferenceEditor(UUID referenceUuid);
+    public void openReferenceEditor(UUID referenceUuid);
 
-    /**
-     * @param subheaderText
-     */
-    void setSubheaderText(String subheaderText);
+    public void setSubheaderText(String subheaderText);
 
-    /**
-     * @param subheaderText
-     */
-    void setHeaderText(String subheaderText);
+    public void setHeaderText(String subheaderText);
 
-    /**
-     * @param workingset
-     */
-    void setWorkingset(RegistrationWorkingSet workingset);
+    public void setWorkingset(RegistrationWorkingSet workingset);
 
-    @Deprecated // no longer needed
-    void addBlockingRegistration(RegistrationDTO blocking);
+    public void openDetailsPopup(String caption, List<String> messages);
 
-    /**
-     * @param messages
-     */
-    void openDetailsPopup(String caption, List<String> messages);
+    public Button getAddNewNameRegistrationButton();
 
-    Button getAddNewNameRegistrationButton();
-
-    /**
-     * @return
-     */
-    Button getAddExistingNameRegistrationButton();
+    public Button getAddExistingNameRegistrationButton();
 
     public LazyComboBox<TaxonName> getExistingNameCombobox();
 
-    /**
-     * @return
-     */
-    UUID getCitationUuid();
+    public UUID getCitationUuid();
 
-    /**
-     * selecting a type will cause a {@link TypeDesignationSetEditorAction} to be emitted.
-     * On Cancel .. TODO
-     * @param registrationEntityUuid
-     */
-    void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid);
-
-    /**
-     * @param registrationId
-     * @param blockingRegDTOs
-     */
-    void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs);
+    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs);
 
     /**
      * Returns the registrationItemMap as unmodifiableMap.
-     *
-     * @return
      */
-    Map<UUID, RegistrationDetailsItem> getRegistrationItemMap();
+    public Map<UUID, RegistrationDetailsItem> getRegistrationItemMap();
 
-    void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator);
+    public void setStatusComponentInstantiator(RegistrationStatusFieldInstantiator statusComponentInstantiator);
 
 }

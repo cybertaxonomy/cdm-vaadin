@@ -15,7 +15,6 @@ import eu.etaxonomy.cdm.vaadin.design.registration.WorkflowStepsDesign;
 /**
  * @author a.kohlbecker
  * @since Mar 10, 2017
- *
  */
 @Deprecated // FIXME delete also all css styles if any
 public class WorkflowSteps extends WorkflowStepsDesign {

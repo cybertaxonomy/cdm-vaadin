@@ -15,12 +15,10 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
- * @param <P>
  */
 @SuppressWarnings("serial")
-public abstract class AbstractPopupView<P extends AbstractPresenter>
-        extends AbstractView<P>
+public abstract class AbstractPopupView<V extends ApplicationView<V,P>, P extends AbstractPresenter<P,V>>
+        extends AbstractView<V,P>
         implements PopupView  {
 
 	private Window window;
@@ -86,7 +84,7 @@ public abstract class AbstractPopupView<P extends AbstractPresenter>
     }
 
 	/* Methods which existed in the original version of the AbstractPopupView
-	 * There are not needed here since the creation of the window and disposal
+	 * They are not needed here since the creation of the window and disposal
 	 * is done by the NavigationManagerBean
 	@Override
 	protected void onViewReady() {

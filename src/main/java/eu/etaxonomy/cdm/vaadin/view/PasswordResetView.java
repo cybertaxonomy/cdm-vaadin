@@ -13,15 +13,13 @@ import com.vaadin.ui.PasswordField;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 
-public interface PasswordResetView extends ApplicationView<PasswordResetPresenter>  {
+public interface PasswordResetView extends ApplicationView<PasswordResetView,PasswordResetPresenter>  {
 
     public void showSuccessMessage(String text);
 
     public void showErrorMessage(String text);
 
-    void setUserName(String userName);
+    public void setUserName(String userName);
 
-    PasswordField getPassword1Field();
-
-
+    public PasswordField getPassword1Field();
 }

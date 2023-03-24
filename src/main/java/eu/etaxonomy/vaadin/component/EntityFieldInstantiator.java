@@ -11,7 +11,6 @@ package eu.etaxonomy.vaadin.component;
 /**
  * @author a.kohlbecker
  * @since Dec 11, 2017
- *
  */
 public abstract class EntityFieldInstantiator<F> {
 

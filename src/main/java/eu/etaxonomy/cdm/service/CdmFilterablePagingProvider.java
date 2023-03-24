@@ -38,7 +38,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     public static final String QUERY_STRING_PLACEHOLDER = "{query-string}";
 
-
     private int pageSize = 20;
 
     private IIdentifiableEntityService<T> service;
@@ -49,44 +48,28 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     private List<OrderHint> orderHints = OrderHint.ORDER_BY_TITLE_CACHE.asList();
 
-    List<String> initStrategy = DEFAULT_INIT_STRATEGY;
+    private List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
     private List<Criterion> criteria = new ArrayList<>();
 
     private List<Restriction<?>> restrictions = new ArrayList<>();
 
-
-    /**
-     * @return the matchMode
-     */
     protected MatchMode getMatchMode() {
         return matchMode;
     }
-
-    /**
-     * @param matchMode the matchMode to set
-     */
     protected void setMatchMode(MatchMode matchMode) {
         this.matchMode = matchMode;
     }
 
-    /**
-     * @return the orderHints
-     */
     protected List<OrderHint> getOrderHints() {
         return orderHints;
     }
-
-    /**
-     * @param orderHints the orderHints to set
-     */
     protected void setOrderHints(List<OrderHint> orderHints) {
         this.orderHints = orderHints;
     }
 
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
-     *
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
         this(service, null);
@@ -94,7 +77,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
-     *
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type) {
         super();
@@ -109,7 +91,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     }
 
     public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {
-        super();
         this.type = type;
         this.service = service;
         this.matchMode = matchMode;
@@ -225,7 +206,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     values.add(v);
                 }
             }
-            prepared.add(new Restriction(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new Object[values.size()])));
+            prepared.add(new Restriction<>(r.getPropertyName(), r.getOperator(), r.getMatchMode(), values.toArray(new Object[values.size()])));
         }
         return prepared;
     }

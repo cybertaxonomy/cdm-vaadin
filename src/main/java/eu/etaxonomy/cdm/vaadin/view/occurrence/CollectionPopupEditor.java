@@ -35,7 +35,9 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
  */
 @SpringComponent
 @Scope("prototype")
-public class CollectionPopupEditor extends AbstractCdmPopupEditor<Collection, CollectionEditorPresenter> implements CollectionPopupEditorView {
+public class CollectionPopupEditor
+        extends AbstractCdmPopupEditor<Collection, CollectionEditorPresenter,CollectionPopupEditorView>
+        implements CollectionPopupEditorView {
 
     private static final long serialVersionUID = 2019724189877425882L;
 

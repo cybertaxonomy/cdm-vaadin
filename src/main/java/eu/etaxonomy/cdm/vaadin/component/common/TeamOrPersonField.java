@@ -66,7 +66,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private CssLayout toolBar= new CssLayout();
     private CssLayout compositeWrapper = new CssLayout();
 
-    private ReloadableLazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new ReloadableLazyComboBox<TeamOrPersonBase>(TeamOrPersonBase.class);
+    private ReloadableLazyComboBox<TeamOrPersonBase> teamOrPersonSelect = new ReloadableLazyComboBox<>(TeamOrPersonBase.class);
 
     private Button removeButton = ButtonFactory.REMOVE_ALL_ITEMS.createButton();
     private Button personButton = new Button(FontAwesome.USER);
@@ -78,7 +78,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     // Fields for case when value is a Team
     private SwitchableTextField titleField = new SwitchableTextField("Team (bibliographic)");
     private SwitchableTextField nomenclaturalTitleCacheField = new SwitchableTextField("Team (nomenclatural)");
-    private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<Person, PersonField>(Person.class, PersonField.class, "Team members");
+    private ToManyRelatedEntitiesListSelect<Person, PersonField> personsListEditor = new ToManyRelatedEntitiesListSelect<>(Person.class, PersonField.class, "Team members");
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 
@@ -93,14 +93,12 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         this.cacheType = cacheType;
         teamOrPersonSelect.setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<TeamOrPersonBase>(cacheType));
 
-
         addStyledComponent(teamOrPersonSelect);
         addStyledComponent(personField);
         addStyledComponent(titleField);
         addStyledComponent(nomenclaturalTitleCacheField);
         addStyledComponent(personsListEditor);
         addStyledComponents(removeButton, personButton, teamButton);
-
 
         addSizedComponent(root);
         addSizedComponent(compositeWrapper);
@@ -109,14 +107,11 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         addSizedComponent(nomenclaturalTitleCacheField);
         addSizedComponent(personsListEditor);
 
-        setConverter(new CdmBaseDeproxyConverter<TeamOrPersonBase<?>>());
+        setConverter(new CdmBaseDeproxyConverter<>());
 
         updateToolBarButtonStates();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
 
@@ -154,9 +149,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return root;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public Class getType() {
         return TeamOrPersonBase.class;
@@ -173,9 +166,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         teamButton.setEnabled(!isReadOnly() && userCanCreate && val == null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setInternalValue(TeamOrPersonBase<?> newValue) {
 
@@ -194,7 +184,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
                 personField.setValue((Person) newValue);
                 personField.registerParentFieldGroup(fieldGroup);
-
             }
             else if(Team.class.isAssignableFrom(newValue.getClass())){
                 // otherwise it a Team
@@ -240,7 +229,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     }
 
 
-    private void adaptToUserPermissions(TeamOrPersonBase teamOrPerson) {
+    private void adaptToUserPermissions(TeamOrPersonBase<?> teamOrPerson) {
 
         UserHelper userHelper = UserHelperAccess.userHelper();
         boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
@@ -250,18 +239,11 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         // no default styles here
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         return Optional.of(fieldGroup);
@@ -271,16 +253,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return new Component[]{titleField, nomenclaturalTitleCacheField};
     }
 
-    /**
-     * @return the teamOrPersonSelect
-     */
     public LazyComboBox<TeamOrPersonBase> getTeamOrPersonSelect() {
         return teamOrPersonSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     public void commit() throws SourceException, InvalidValueException {
@@ -304,10 +280,8 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         }
 
         TeamOrPersonBase<?> bean = getValue();
-        boolean isTeam = bean != null && bean instanceof Team;
-        if(isTeam){
-            boolean isUnsaved = bean.getId() == 0;
-            if(isUnsaved){
+        if(bean instanceof Team){
+            if(!bean.isPersited()){
                 UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }
@@ -390,10 +364,6 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         return sharedState.readOnly;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
 //        super.setReadOnly(readOnly); // moved into setEditorReadOnly()
@@ -405,11 +375,10 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         for(Component c : editorComponents){
             applyReadOnlyState(c, readOnly);
         }
-
     }
 
     /**
-     * Reset the readonly state of nested components to <code>false</code>.
+     * Reset the read-only state of nested components to <code>false</code>.
      */
     protected void resetReadOnlyComponents() {
         if(!isReadOnly()){
@@ -434,7 +403,4 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         updateCaptionReadonlyNotice(readOnly);
     }
-
-
-
 }

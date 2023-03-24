@@ -89,12 +89,8 @@ public class DefaultPojoEventListenerManager implements PojoEventListenerManager
         listenerMap.get(o).add(applicationListener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
-
 }

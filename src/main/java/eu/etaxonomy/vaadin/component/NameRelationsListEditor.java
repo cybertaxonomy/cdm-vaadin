@@ -30,10 +30,6 @@ public class NameRelationsListEditor extends ToManyRelatedEntitiesListSelect<Nam
 
     private ReloadableLazyComboBoxInstantiator<Reference> referenceSelectInstantiator;
 
-    /**
-     * @param itemType
-     * @param caption
-     */
     public NameRelationsListEditor(String caption) {
         super(NameRelationshipDTO.class, null, caption);
         this.fieldType = NameRelationField.class;
@@ -43,9 +39,6 @@ public class NameRelationsListEditor extends ToManyRelatedEntitiesListSelect<Nam
         referenceSelectInstantiator = new ReloadableLazyComboBoxInstantiator<Reference>(Reference.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
 //    @Override
 //    protected NameRelationField newFieldInstance(NameRelationshipDTO val) throws InstantiationException, IllegalAccessException {
 //
@@ -60,9 +53,6 @@ public class NameRelationsListEditor extends ToManyRelatedEntitiesListSelect<Nam
         setInternalValue(null);
     }
 
-    /**
-     * @param cdmTitleCacheCaptionGenerator
-     */
     public void setTaxonNameCaptionGenerator(CaptionGenerator<TaxonName> captionGenerator) {
         nameSelectInstantiator.setCaptionGenerator(captionGenerator);
     }
@@ -73,12 +63,7 @@ public class NameRelationsListEditor extends ToManyRelatedEntitiesListSelect<Nam
         setInternalValue(null);
     }
 
-    /**
-     * @param cdmTitleCacheCaptionGenerator
-     */
     public void setReferenceCaptionGenerator(CaptionGenerator<Reference> captionGenerator) {
         referenceSelectInstantiator.setCaptionGenerator(captionGenerator);
     }
-
-
 }

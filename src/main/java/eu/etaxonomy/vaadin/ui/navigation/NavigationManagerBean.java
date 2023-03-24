@@ -42,7 +42,9 @@ import eu.etaxonomy.vaadin.ui.view.PopEditorOpenedEvent;
 import eu.etaxonomy.vaadin.ui.view.PopupView;
 
 @UIScope
-public class NavigationManagerBean extends SpringNavigator implements NavigationManager, DisposableBean {
+public class NavigationManagerBean
+        extends SpringNavigator
+        implements NavigationManager, DisposableBean {
 
 	private static final long serialVersionUID = 6599898650948333853L;
 
@@ -274,18 +276,12 @@ public class NavigationManagerBean extends SpringNavigator implements Navigation
         return Arrays.asList(substate.split("/"));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public List<AbstractEditorPresenter<?, ?>> getPopupEditorPresenters() {
+    public List<AbstractEditorPresenter<?,?,?>> getPopupEditorPresenters() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * @return the defaultViewName
-     */
     public String getDefaultViewName() {
         return defaultViewName;
     }

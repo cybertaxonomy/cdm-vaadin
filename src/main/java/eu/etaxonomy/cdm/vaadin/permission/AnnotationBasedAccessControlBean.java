@@ -25,7 +25,6 @@ import com.vaadin.ui.UI;
  * @author a.kohlbecker
  * @since Apr 24, 2017
  *
- *
  * (FIMXE 1. consider renaming this class and its interface, since it is no longer annotation based!!!!)
  *
  * FIMXE 2. this class should implement ViewAccessControl. The view class and annotations can be accessed
@@ -85,8 +84,4 @@ public class AnnotationBasedAccessControlBean implements ViewInstanceAccessContr
     private SecurityContext currentSecurityContext() {
         return SecurityContextHolder.getContext();
     }
-
-
-
-
 }

@@ -12,7 +12,6 @@ src/main/java/eu/etaxonomy/cdm/vaadin/component/HorizontalToolbar.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/NewTaxonBaseComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/component/StatusComposite.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSQLContainer.java -text
-src/main/java/eu/etaxonomy/cdm/vaadin/container/CdmSpringConnectionPool.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/IdAndUuid.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/container/LeafNodeTaxonContainer.java -text
 src/main/java/eu/etaxonomy/cdm/vaadin/jscomponent/D3ConceptRelationshipTree.java -text
@@ -67,7 +66,7 @@ src/main/java/eu/etaxonomy/cdm/vaadin/view/distributionStatus/IDistributionTable
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/css/d3.conceptrelationshiptree.css -text
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/extlib/d3.min.js -text
 src/main/resources/eu/etaxonomy/cdm/vaadin/jscomponent/lib/d3.conceptrelationshiptree_connector.js -text
-src/main/resources/log4j.properties -text
+src/main/resources/log4j2.xml -text
 src/main/resources/test.txt -text
 src/main/webapp/META-INF/MANIFEST.MF -text
 src/main/webapp/META-INF/context.xml -text
@@ -175,7 +174,7 @@ src/test/resources/eu/etaxonomy/cdm/vaadin/presenter/StatusPresenterTest.xml -te
 src/test/resources/eu/etaxonomy/cdm/vaadin/util/CdmSpringContextHelperTest.xml -text
 src/test/resources/h2/cdmTest.h2.db -text
 src/test/resources/h2/cdmTest.trace.db -text
-src/test/resources/log4j.properties -text
+src/test/resources/log4j2.xml -text
 src/test/resources/override.properties -text
 src/test/resources/unitils.properties -text
 src/test/resources/webapp/WEB-INF/applicationContext.xml -text

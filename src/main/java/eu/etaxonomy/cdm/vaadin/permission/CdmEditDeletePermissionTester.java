@@ -19,7 +19,6 @@ import eu.etaxonomy.vaadin.permission.EditPermissionTester;
  *
  * @author a.kohlbecker
  * @since Apr 20, 2018
- *
  */
 public class CdmEditDeletePermissionTester implements EditPermissionTester {
     @Override

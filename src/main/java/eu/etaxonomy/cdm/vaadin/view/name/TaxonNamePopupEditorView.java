@@ -35,7 +35,8 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @since May 22, 2017
  *
  */
-public interface TaxonNamePopupEditorView extends ApplicationView<TaxonNameEditorPresenter>, AnnotationsEditor {
+public interface TaxonNamePopupEditorView
+        extends ApplicationView<TaxonNamePopupEditorView,TaxonNameEditorPresenter>, AnnotationsEditor {
 
     public ToOneRelatedEntityCombobox<Reference> getNomReferenceCombobox();
 

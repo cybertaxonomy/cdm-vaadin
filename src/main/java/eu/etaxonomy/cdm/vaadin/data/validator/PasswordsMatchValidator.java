@@ -23,12 +23,9 @@ public class PasswordsMatchValidator extends AbstractStringValidator {
 
     private static final long serialVersionUID = -9048318480638222817L;
 
-    PasswordField firstField;
-    PasswordField secondField;
+    private PasswordField firstField;
+    private PasswordField secondField;
 
-    /**
-     * @param errorMessage
-     */
     public PasswordsMatchValidator(String errorMessage, PasswordField firstField, PasswordField secondField) {
         super(errorMessage);
         this.firstField = firstField;
@@ -42,5 +39,4 @@ public class PasswordsMatchValidator extends AbstractStringValidator {
     protected boolean isValidValue(String value) {
         return firstField.getValue().equals(secondField.getValue());
     }
-
 }

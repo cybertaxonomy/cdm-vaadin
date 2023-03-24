@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.mail.internet.AddressException;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +70,8 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationManager;
  */
 @SpringComponent
 @ViewScope
-public class LoginPresenter extends AbstractPresenter<LoginView> implements EventBusListener<AuthenticationAttemptEvent> {
+public class LoginPresenter extends AbstractPresenter<LoginPresenter,LoginView>
+        implements EventBusListener<AuthenticationAttemptEvent> {
 
     private static final long serialVersionUID = 4020699735656994791L;
 
@@ -176,7 +177,7 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
     }
 
-    private void requestPasswordReset() throws MalformedURLException, ExecutionException {
+    private void requestPasswordReset() throws MalformedURLException {
         String userNameOrEmail = getView().getLoginDialog().getUserNameOrEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
         logger.debug("UserAccountAction.REQUEST_PASSWORD_RESET for " + servletBaseUrl + ", userNameOrEmail:" + userNameOrEmail);
@@ -241,11 +242,11 @@ public class LoginPresenter extends AbstractPresenter<LoginView> implements Even
         }
     }
 
-    private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException, ExecutionException {
+    private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException {
         String emailAddress = getView().getLoginDialog().getEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
 
-        logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);
+        if (logger.isDebugEnabled()) {logger.debug("UserAccountAction.REGISTER_ACCOUNT for " + servletBaseUrl + ", emailAddress:" + emailAddress);}
 
         CountDownLatch finshedSignal = new CountDownLatch(1);
         List<Throwable> asyncExceptions = new ArrayList<>(1);

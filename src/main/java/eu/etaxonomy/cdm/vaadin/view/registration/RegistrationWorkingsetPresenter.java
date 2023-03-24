@@ -28,8 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
-import com.vaadin.server.ClientConnector.DetachEvent;
-import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
@@ -78,6 +76,7 @@ import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEventEntityTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
+import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
 import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
@@ -105,7 +104,9 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
  */
 @SpringComponent
 @ViewScope
-public class RegistrationWorkingsetPresenter extends AbstractPresenter<RegistrationWorkingsetView> implements CachingPresenter {
+public class RegistrationWorkingsetPresenter
+        extends AbstractPresenter<RegistrationWorkingsetPresenter,RegistrationWorkingsetView>
+        implements CachingPresenter {
 
     private static final long serialVersionUID = 2618456456539802265L;
 
@@ -256,9 +257,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         getView().getExistingNameCombobox().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
     }
 
-    /**
-     * @param referenceID
-     */
     protected void loadWorkingSet(UUID referenceUuid) {
 
         try {
@@ -273,10 +271,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
         }
     }
 
-    /**
-     * @param errorDialogCaption
-     * @param errorMessage
-     */
     public void showErrorDialog(String errorDialogCaption, String errorMessage) {
         Window errorDialog = new Window(errorDialogCaption);
         errorDialog.setModal(true);
@@ -304,7 +298,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value.toString(), "NULL"));
         }
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onReferenceEditorActionAdd(ReferenceEditorAction event) {
@@ -348,56 +341,63 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
             return;
         }
 
-        boolean isAddExistingNameRegistration = event.getTarget() != null && event.getTarget().equals(getView().getExistingNameCombobox());
+        boolean isRegistrationForExistingName = event.getTarget() != null && event.getTarget().equals(getView().getExistingNameCombobox());
 
         TaxonNamePopupEditor popup = openPopupEditor(TaxonNamePopupEditor.class, event);
 
         popup.setParentEditorActionContext(event.getContext(), event.getTarget());
-        popup.withDeleteButton(!isAddExistingNameRegistration);
+        popup.withDeleteButton(!isRegistrationForExistingName);
         TaxonNamePopupEditorConfig.configureForNomenclaturalAct(popup);
-        if(isAddExistingNameRegistration){
+        if(isRegistrationForExistingName){
             // allow saving even if the name parts are not valid
             // the user will need to fix this in a later step
             popup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
             getView().getAddExistingNameRegistrationButton().setEnabled(false);
-            popup.addDetachListener(new DetachListener() {
-                private static final long serialVersionUID = 836224587615950302L;
-
-                @Override
-                public void detach(DetachEvent event) {
-                    getView().getAddExistingNameRegistrationButton().setEnabled(true);
-
-                }
-            });
+            popup.addDetachListener(ev ->
+                getView().getAddExistingNameRegistrationButton().setEnabled(true)
+            );
         }
         popup.loadInEditor(event.getEntityUuid());
         if(event.hasSource() && event.getSource().isReadOnly()){
-            // avoid resetting readonly to false
-            logger.error("Set popup to readonly as event source is read only");
+            // avoid resetting read-only to false
+            logger.info("Set popup to read-only as event source is read only");
             popup.setReadOnly(true);
         }
 
         boolean hasNomRef = popup.getBean().getNomenclaturalReference() != null;
-        if(isAddExistingNameRegistration){
+        if(isRegistrationForExistingName){
             popup.setAllFieldsReadOnly(true);
+            popup.removeStatusMessage(RegistrationUI.CHECK_IN_SEARCH_INDEX);
+
             if(!hasNomRef){
-                // only allow editing the nomenclatural reference, all other
-                // editing need to be done another way.
-                // Otherwise we would need to be prepared for creating blocking registrations
-                // in turn of creation, modification of related taxon names.
-                popup.disableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
-                popup.getNomReferenceCombobox().setReadOnly(false);
-                popup.getNomenclaturalReferenceDetail().setReadOnly(false);
-                popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
-                        + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
+                //#10269 for now we do not allow registrations for names with no nom. ref.
+                // Old code was:
+//                // only allow editing the nomenclatural reference, all other
+//                // editing need to be done another way.
+//                // Otherwise we would need to be prepared for creating blocking registrations
+//                // in turn of creation, modification of related taxon names.
+//                popup.disableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
+//                popup.getNomReferenceCombobox().setReadOnly(false);
+//                popup.getNomenclaturalReferenceDetail().setReadOnly(false);
+//                popup.addStatusMessage("The chosen name needs to be completed before it can be used. "
+//                        + "Please add the nomenclatural reference and click on \"Save\" to proceed with entering the type of this name.");
+
+                //instead we show status message:
+//                popup.setToCancelOnly();
+                popup.addStatusMessage("<p style='color:Tomato;'><strong>The data entry is aborted "
+                        + "due to a data issue that should be fixed "
+                        + "by the curator</strong>.<BR>"
+                        + "Please send an e-mail with the scientific name "
+                        + "to <i>curation@phycobank.org</i></p>");
             } else {
+                popup.setToSelect();  //sets the save button to "save & select"
                 popup.addStatusMessage("You are about to create a registration for this name. "
-                        + "This editor is for reviewing the name only. Therefore, all fields have been switched to readonly state. "
+                        + "This editor is for reviewing the name only. Therefore, all fields have "
+                        + "been switched to read-only state. "
                         + "Click on \"Save\" to proceed with entering the type of this name.");
             }
         }
     }
-
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
     public void onTaxonNameEditorActionAdd(TaxonNameEditorAction event) {
@@ -513,9 +513,6 @@ public class RegistrationWorkingsetPresenter extends AbstractPresenter<Registrat
 
     /**
      * Creates a new Registration for an exiting (previously published) name.
-     *
-     * @param event
-     * @throws TypeDesignationSetException
      */
     @EventBusListenerMethod
     public void onRegistrationWorkflowEventActionStart(RegistrationWorkingsetAction event) throws TypeDesignationSetException {

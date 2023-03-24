@@ -59,7 +59,8 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
  */
 @SpringComponent
 @ViewScope
-public class StartRegistrationPresenter extends AbstractEditorPresenter<RegistrationDTO, StartRegistrationView> {
+public class StartRegistrationPresenter
+        extends AbstractEditorPresenter<RegistrationDTO, StartRegistrationPresenter, StartRegistrationView> {
 
     private static final long serialVersionUID = 2283189121081612574L;
 
@@ -192,7 +193,7 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
                 //      so we reload it using the uuid since new beans will not have an Id at this point.
                 newReference = getRepo().getReferenceService().load(newReference.getUuid());
 
-                getView().getReferenceCombobox().setValue(null);  // deselect
+                getView().getReferenceCombobox().setValue(null);  // de-select
                 getView().getReferenceCombobox().setEnabled(false);
 
                 getView().getContinueButton().setEnabled(true);
@@ -234,29 +235,19 @@ public class StartRegistrationPresenter extends AbstractEditorPresenter<Registra
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RegistrationDTO loadBeanById(Object identifier) {
         // not needed //
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void saveBean(RegistrationDTO bean) {
         // not needed //
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void deleteBean(RegistrationDTO bean) {
         // not needed //
     }
-
 }

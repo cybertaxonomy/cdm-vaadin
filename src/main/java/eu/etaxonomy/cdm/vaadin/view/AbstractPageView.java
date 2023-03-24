@@ -20,6 +20,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.vaadin.mvp.AbstractPresenter;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
+import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * A Page based on a <code>CssLayout</code> expanded to full size having a header and sub-header.
@@ -28,9 +29,11 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  *
  * @author a.kohlbecker
  * @since Mar 20, 2017
- *
  */
-public abstract class AbstractPageView<P extends AbstractPresenter> extends AbstractView<P>  {
+public abstract class AbstractPageView<V extends ApplicationView<V,P>, P extends AbstractPresenter<P,V>>
+        extends AbstractView<V,P>  {
+
+    private static final long serialVersionUID = -8669483572788112285L;
 
     private VerticalLayout layout;
 
@@ -38,10 +41,6 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
 
     private Label header;
 
-
-    /**
-     *
-     */
     public AbstractPageView() {
         layout = new VerticalLayout();
         layout.setSizeFull();
@@ -57,9 +56,6 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
         this.setSizeFull();
     }
 
-    /**
-     *
-     */
     public void updateHeader() {
         header.setValue("<div id=\"header\">" + getHeaderText() + "</div><div id=\"subheader\">" + getSubHeaderText() + "</div>");
     }
@@ -72,7 +68,6 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
         for(Component c : contentComponents){
             layout.removeComponent(c);
         }
-
     }
 
     protected void addContentComponent(Component component, Float expandRatio){
@@ -83,22 +78,14 @@ public abstract class AbstractPageView<P extends AbstractPresenter> extends Abst
         }
     }
 
-
-
     /**
      * Provides the sub header text
-     *
-     * @return
      */
     protected abstract String getHeaderText();
 
     /**
      * Provides the header text
-     *
-     * @return
      */
     protected abstract  String getSubHeaderText();
-
-
 
 }

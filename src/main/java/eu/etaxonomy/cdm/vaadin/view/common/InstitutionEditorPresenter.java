@@ -36,22 +36,18 @@ import eu.etaxonomy.vaadin.ui.view.PopupView;
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
-public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<InstitutionDTO, Institution, InstitutionPopupEditorView> {
+public class InstitutionEditorPresenter
+        extends AbstractCdmDTOEditorPresenter<InstitutionDTO, Institution, InstitutionEditorPresenter, InstitutionPopupEditorView> {
 
     private static final long serialVersionUID = -1996365248431425021L;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Institution loadCdmEntity(UUID identifier) {
 
         List<String> initStrategy = Arrays.asList(new String []{
-
                 "$",
                 "contact.$",
                 "isPartOf.$",
@@ -67,40 +63,26 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
         return bean;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
         }
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(Institution bean) {
         if(crud != null){
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, crud, null);
         }
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IService<Institution> getService() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
@@ -156,33 +138,22 @@ public class InstitutionEditorPresenter extends AbstractCdmDTOEditorPresenter<In
                         getView().getPartOfCombobox().reload();
                     }
                 }
-
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected InstitutionDTO createDTODecorator(Institution cdmEntitiy) {
         return new InstitutionDTO(cdmEntitiy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected BeanInstantiator<Institution> defaultCdmEntityInstantiator() {
-        return new  BeanInstantiator<Institution>(){
+        return new BeanInstantiator<Institution>(){
             @Override
             public Institution createNewBean() {
                 return Institution.NewInstance();
             }
-
         };
     }
-
-
-
 }

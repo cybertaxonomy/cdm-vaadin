@@ -46,7 +46,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationType;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO.RankedNameReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
@@ -71,7 +71,6 @@ import eu.etaxonomy.cdm.vaadin.event.RegistrationEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ShowDetailsEvent;
 import eu.etaxonomy.cdm.vaadin.event.TaxonNameEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.TypeDesignationSetEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
@@ -85,7 +84,7 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
  */
 @SpringView(name=RegistrationWorksetViewBean.NAME)
 public class RegistrationWorksetViewBean
-        extends AbstractPageView<RegistrationWorkingsetPresenter>
+        extends AbstractPageView<RegistrationWorkingsetView,RegistrationWorkingsetPresenter>
         implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
     private static final long serialVersionUID = -213040114015958970L;
@@ -132,13 +131,11 @@ public class RegistrationWorksetViewBean
     /**
      * uses the registrationId as key
      */
-    private Map<UUID, EntityReference> typifiedNamesMap = new HashMap<>();
+    private Map<UUID, RankedNameReference> typifiedNamesMap = new HashMap<>();
 
-    private RegistrationStatusFieldInstantiator statusFieldInstantiator;
+    private RegistrationStatusFieldInstantiator<RegistrationDTO> statusFieldInstantiator;
 
     private String accessDeniedMessage;
-
-    private Object existingNameEditor;
 
     public RegistrationWorksetViewBean() {
         super();
@@ -194,16 +191,6 @@ public class RegistrationWorksetViewBean
         }
     }
 
-    @Override
-    @Deprecated // no longer needed
-    public void addBlockingRegistration(RegistrationDTO blocking) {
-        if(registrations == null) {
-            throw new RuntimeException("A Workingset must be present prior adding blocking registrations.");
-        }
-        // add the blocking registration
-
-    }
-
     public Panel createRegistrationsList(RegistrationWorkingSet workingset) {
 
         registrationsGrid = new GridLayout(3, 1);
@@ -235,7 +222,6 @@ public class RegistrationWorksetViewBean
         addNewNameRegistrationButton.addClickListener(
                 e -> {
                     getViewEventBus().publish(this, new TaxonNameEditorAction(EditorActionType.ADD, null, addNewNameRegistrationButton, null, this, context));
-
                 }
         );
 
@@ -300,46 +286,32 @@ public class RegistrationWorksetViewBean
     private void reviewExistingName() {
         // call commit to make the selection available
         existingNameCombobox.commit();
-        UUID uuid = existingNameCombobox.getValue().getUuid();
-        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        TaxonName taxonName = existingNameCombobox.getValue();
+        Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(TaxonName.class, uuid),
+                    TypedEntityReference.fromEntity(taxonName),
                     this)
                     );
         getViewEventBus().publish(
                 this,
                 new TaxonNameEditorAction(
                         EditorActionType.EDIT,
-                        uuid,
+                        taxonName.getUuid(),
                         addExistingNameButton,
                         existingNameCombobox,
                         this,
                         context)
         );
-
-    }
-
-    /**
-     * publishes an event to the {@link RegistrationWorkingsetPresenter}
-     * @deprecated no longer used but kept for reference
-     * TODO remove for version 5.8 when not used again.
-     */
-    @Deprecated
-    private void triggerRegistrationForExistingName() {
-        getViewEventBus().publish(this, new RegistrationWorkingsetAction(
-                citationUuid,
-                RegistrationWorkingsetAction.Action.start
-                )
-        );
     }
 
     protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
 
-        EntityReference typifiedNameReference = dto.getTypifiedNameRef();
+        RankedNameReference typifiedNameReference = dto.getTypifiedNameRef();
         if(typifiedNameReference == null){
             typifiedNameReference = dto.getNameRef();
         }
         typifiedNamesMap.put(dto.getUuid(), typifiedNameReference);
+        final boolean isSupraSpecific = typifiedNameReference.isSupraGeneric();
 
         RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto, getPresenter().getCache());
         UUID registrationEntityUuid = dto.getUuid();
@@ -353,9 +325,9 @@ public class RegistrationWorksetViewBean
         RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, regItemButtons, footer);
         registrationItemMap.put(registrationEntityUuid, regDetailsItem);
 
-        Stack<EditorActionContext> context = new Stack<EditorActionContext>();
+        Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(Registration.class, registrationEntityUuid),
+                    TypedEntityReference.fromTypeAndId(Registration.class, registrationEntityUuid),
                     this)
                     );
 
@@ -377,7 +349,7 @@ public class RegistrationWorksetViewBean
         for(TypeDesignationSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
                 VersionableEntity baseEntity = workingsetButton.getBaseEntity();
-                EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
+                RankedNameReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
                 TypeDesignationSetType workingsetType = workingsetButton.getType();
                 getViewEventBus().publish(this, new TypeDesignationSetEditorAction(
                         baseEntity,
@@ -393,9 +365,13 @@ public class RegistrationWorksetViewBean
             });
         }
 
-        regItemButtonGroup.getAddTypeDesignationButton().addClickListener(
-                e -> chooseNewTypeRegistrationWorkingset(dto.getUuid())
-                );
+        regItemButtonGroup.getAddTypeDesignationButton().addClickListener(e -> {
+                    TypeDesignationSetType type = isSupraSpecific ?
+                            TypeDesignationSetType.NAME_TYPE_DESIGNATION_SET : TypeDesignationSetType.SPECIMEN_TYPE_DESIGNATION_SET;
+                    addNewTypeDesignationSet(type, registrationEntityUuid, null, e.getButton());
+//                  chooseNewTypeRegistrationWorkingset(dto.getUuid(), null);
+                }
+            );
 
         Button blockingRegistrationButton = regItemButtons.getBlockingRegistrationButton();
         blockingRegistrationButton.setStyleName(ValoTheme.BUTTON_TINY);
@@ -489,8 +465,13 @@ public class RegistrationWorksetViewBean
         return row;
     }
 
-    @Override
-    public void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid){
+    //originally used in regItemButtonGroup.getAddTypeDesignationButton().addClickListener()
+    //to allow selecting the type designation type
+    //now selection is automated by selecting from rank class
+    //TODO can be deleted if the above works as expected #10261
+    // also remove typeDesignationTypeChooser parameter in addNewTypeDesignationSet
+    @Deprecated
+    private void chooseNewTypeRegistrationWorkingset(UUID registrationEntityUuid, UUID nameUuid){
         Window typeDesignationTypeCooser = new Window();
         typeDesignationTypeCooser.setModal(true);
         typeDesignationTypeCooser.setResizable(false);
@@ -510,8 +491,13 @@ public class RegistrationWorksetViewBean
         UI.getCurrent().addWindow(typeDesignationTypeCooser);
     }
 
-    protected void addNewTypeDesignationSet(TypeDesignationSetType newWorkingsetType, UUID registrationEntityUuid, Window typeDesignationTypeCooser, Button sourceButton) {
-        UI.getCurrent().removeWindow(typeDesignationTypeCooser);
+    protected void addNewTypeDesignationSet(TypeDesignationSetType newWorkingsetType, UUID registrationEntityUuid,
+            Window typeDesignationTypeChooser, Button sourceButton) {
+        //TODO typeDesignationTypeCooser parameter can be removed once we remove
+        //chooseNewTypeRegistrationWorkingset()
+        if (typeDesignationTypeChooser != null) {
+            UI.getCurrent().removeWindow(typeDesignationTypeChooser);
+        }
         EntityReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
         getViewEventBus().publish(this, new TypeDesignationSetEditorAction(
                 newWorkingsetType,

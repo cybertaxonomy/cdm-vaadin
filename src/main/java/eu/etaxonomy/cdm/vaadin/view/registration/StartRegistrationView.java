@@ -20,26 +20,16 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
- *
  */
-public interface StartRegistrationView extends ApplicationView<StartRegistrationPresenter>  {
+public interface StartRegistrationView extends ApplicationView<StartRegistrationView,StartRegistrationPresenter>  {
 
-    Button getNewPublicationButton();
+    public Button getNewPublicationButton();
 
-    LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox();
+    public LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox();
 
-    /**
-     * @return
-     */
-    Button getRemoveNewPublicationButton();
+    public Button getRemoveNewPublicationButton();
 
-    /**
-     * @return
-     */
-    Button getContinueButton();
+    public Button getContinueButton();
 
-    Label getNewPublicationLabel();
-
-
-
+    public Label getNewPublicationLabel();
 }

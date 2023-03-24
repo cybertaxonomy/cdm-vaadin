@@ -47,7 +47,10 @@ import eu.etaxonomy.vaadin.ui.view.ToolbarDisplay;
 // @Push
 public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStatusMessageSource {
 
+
     private static final long serialVersionUID = -8626236111335323691L;
+
+    public static final String CHECK_IN_SEARCH_INDEX = "<strong>Check if this name already occurs in the <a href=\"https://www.phycobank.org/index-search\" target=\"index-search\">PhycoBank Index</a> (The link will open in a new window.)</strong>";
 
     public static final String NAME = "registration";
 
@@ -111,7 +114,7 @@ public class RegistrationUI extends AbstractUI implements PopupEditorDefaultStat
     @Override
     public <T extends AbstractPopupEditor> String defaultStatusMarkup(Class<T> popupEditorClass){
         if(popupEditorClass.equals(TaxonNamePopupEditor.class)){
-            return "<strong>Check if this name already occurs in the <a href=\"https://www.phycobank.org/index-search\" target=\"index-search\">PhycoBank Index</a> (The link will open in a new window.)</strong>";
+            return CHECK_IN_SEARCH_INDEX;
         }
         return null;
     }

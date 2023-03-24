@@ -20,7 +20,6 @@ import com.vaadin.ui.CssLayout;
  * @since May 22, 2017
  *
  * IMPORTANT see also {@link CompositeCustomField} which has almost the same functionality.
- *
  */
 @SuppressWarnings("serial")
 public abstract class CompositeStyledComponent extends CssLayout {
@@ -65,12 +64,9 @@ public abstract class CompositeStyledComponent extends CssLayout {
 
     /**
      * Implementations preferably call this method in the constructor
-     *
-     * @param component
-     * @return
      */
-    protected boolean addStyledComponents(Component ... component){
-        List<Component> componentList = Arrays.asList(component);
+    protected boolean addStyledComponents(Component ... components){
+        List<Component> componentList = Arrays.asList(components);
         componentList.forEach(c -> applyCurrentStyleNames(c));
         return styledComponents.addAll(componentList);
     }
@@ -80,6 +76,5 @@ public abstract class CompositeStyledComponent extends CssLayout {
      * to prevent these styles from being overwritten when setStyleName() id called on the composite field.
      */
     protected abstract void addDefaultStyles();
-    //--------
 
 }

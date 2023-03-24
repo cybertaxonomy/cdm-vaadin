@@ -32,7 +32,7 @@ public class GeoLocationConverterValidator implements Converter<String, Double>,
     private static final Logger logger = LogManager.getLogger();
 
     public enum Axis {
-        LONGITUDE, LATITUDE;
+        LATITUDE,LONGITUDE;
     }
 
     private static final long serialVersionUID = -1780028474672132160L;

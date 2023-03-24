@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
@@ -97,7 +97,7 @@ import eu.etaxonomy.vaadin.util.PropertyIdPath;
 @SpringComponent
 @Scope("prototype")
 public class TaxonNameEditorPresenter
-        extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNamePopupEditorView> {
+        extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter, TaxonNamePopupEditorView> {
 
     private static final long serialVersionUID = -3538980627079389221L;
 
@@ -483,7 +483,6 @@ public class TaxonNameEditorPresenter
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(TaxonName.class,
                     identifier, crud, null);
         }
-
     }
 
     @Override
@@ -570,7 +569,7 @@ public class TaxonNameEditorPresenter
 
         PropertyIdPath boundPropertyIdPath = boundPropertyIdPath(event.getNewField());
         if (boundPropertyIdPath != null) {
-            TaxonNameDTO taxonNamedto = ((AbstractPopupEditor<TaxonNameDTO, AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, ?>>) getView())
+            TaxonNameDTO taxonNamedto = ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
                     .getBean();
             if (boundPropertyIdPath.matches("specificEpithet")) {
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
@@ -815,7 +814,7 @@ public class TaxonNameEditorPresenter
                         && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)) {
                     namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
                     namePopup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-                    Reference nomrefPreset = (Reference) ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter>) getView())
+                    Reference nomrefPreset = (Reference) ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
                             .getBean().getNomenclaturalReference();
                     namePopup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
 

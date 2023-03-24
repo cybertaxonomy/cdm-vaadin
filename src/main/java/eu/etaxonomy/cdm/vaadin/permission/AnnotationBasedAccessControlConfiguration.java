@@ -16,7 +16,6 @@ import com.vaadin.spring.annotation.UIScope;
 /**
  * @author a.kohlbecker
  * @since Apr 24, 2017
- *
  */
 @Configuration
 public class AnnotationBasedAccessControlConfiguration {

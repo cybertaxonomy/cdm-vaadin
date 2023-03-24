@@ -56,17 +56,17 @@ import eu.etaxonomy.cdm.vaadin.view.AbstractPageView;
 /**
  * @author a.kohlbecker
  * @since Mar 2, 2017
- *
  */
 @SpringView(name=ListViewBean.NAME)
-public class ListViewBean extends AbstractPageView<ListPresenter> implements ListView, View, AccessRestrictedView {
-
+public class ListViewBean
+        extends AbstractPageView<ListView,ListPresenter>
+        implements ListView, View, AccessRestrictedView {
 
     private static final long serialVersionUID = 3543300933072824713L;
 
     public static final String NAME = "list";
 
-    Mode viewMode = Mode.all;
+    private Mode viewMode = Mode.all;
 
     private CssLayout listContainer;
 

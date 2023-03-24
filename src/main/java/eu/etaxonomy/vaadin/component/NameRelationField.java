@@ -32,17 +32,12 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
 import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 
-
 /**
  * @author a.kohlbecker
  * @since May 3, 2018
- *
  */
 public class NameRelationField extends CompositeCustomField<NameRelationshipDTO> {
 
-    /**
-     *
-     */
     public static final String PRIMARY_STYLE = "v-name-relation-field";
 
     private static final long serialVersionUID = -7080885013120044655L;
@@ -57,15 +52,15 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private BeanFieldGroup<NameRelationshipDTO> fieldGroup = new BeanFieldGroup<>(NameRelationshipDTO.class);
 
-    ToOneRelatedEntityCombobox<TaxonName> relatedNameComboBox;
+    private ToOneRelatedEntityCombobox<TaxonName> relatedNameComboBox;
 
-    ToOneRelatedEntityCombobox<Reference> citatonComboBox;
+    private ToOneRelatedEntityCombobox<Reference> citatonComboBox;
 
-    TextFieldNFix citationMicroReferenceField = new TextFieldNFix();
+    private TextFieldNFix citationMicroReferenceField = new TextFieldNFix();
 
-    TextFieldNFix ruleConsideredField = new TextFieldNFix();
+    private TextFieldNFix ruleConsideredField = new TextFieldNFix();
 
-    NativeSelect codeEditionSelect = new NativeSelect();
+    private NativeSelect codeEditionSelect = new NativeSelect();
 
     private Direction direction;
 
@@ -76,9 +71,6 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
     private String nameFieldCaption;
 
 
-    /**
-     * @param string
-     */
     public NameRelationField(String caption, String nameFieldCaption, Direction direction, NameRelationshipType type) {
         this.direction = direction;
         this.type = type;
@@ -171,17 +163,11 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         return compositeWrapper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<NameRelationshipDTO> getType() {
         return NameRelationshipDTO.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void setInternalValue(NameRelationshipDTO newValue) {
 
@@ -216,23 +202,16 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     }
 
-
    private void updateToolBarButtonStates(){
        boolean hasValue = getValue() != null;
        removeButton.setVisible(hasValue);
        newButton.setVisible(!hasValue);
    }
 
-    /**
-     * @return the relatedNameComboBox
-     */
     public ToOneRelatedEntityCombobox<TaxonName> getRelatedNameComboBox() {
         return relatedNameComboBox;
     }
 
-    /**
-     * @return the citatonComboBox
-     */
     public ToOneRelatedEntityCombobox<Reference> getCitatonComboBox() {
         return citatonComboBox;
     }
@@ -241,15 +220,10 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         return codeEditionSelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         setDeepReadOnly(readOnly, grid, null);
         setDeepReadOnly(readOnly, toolBar, null);
     }
-
-
 }

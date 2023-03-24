@@ -40,6 +40,5 @@ public class InReferenceTypeValidator implements Validator {
                 throw new InvalidValueException(Objects.toString(inReference.getType(), "[NULL]") + " is not a suitable in-reference type for " + Objects.toString(type, "[NULL]") );
             }
         }
-
     }
 }

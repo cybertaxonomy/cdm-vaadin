@@ -16,10 +16,9 @@ import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
  *
  * @author a.kohlbecker
  * @since Apr 5, 2017
- *
  */
-public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, V extends ApplicationView<?>>
-    extends CdmEditorPresenterBase<DTO, CDM, V> {
+public abstract class AbstractCdmDTOEditorPresenter<DTO extends CdmEntityAdapterDTO<CDM>, CDM extends CdmBase, P extends AbstractCdmDTOEditorPresenter<DTO,CDM,P,V>, V extends ApplicationView<V,P>>
+        extends CdmEditorPresenterBase<DTO, CDM, P, V> {
 
     private static final long serialVersionUID = -6315824180341694825L;
 

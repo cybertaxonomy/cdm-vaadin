@@ -9,7 +9,7 @@
 package eu.etaxonomy.cdm.vaadin.component.registration;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.ui.Label;
 

@@ -48,7 +48,6 @@ import eu.etaxonomy.vaadin.permission.EditPermissionTester;
  *
  * @author a.kohlbecker
  * @since May 11, 2017
- *
  */
 public class ToManyRelatedEntitiesListSelect<V extends Object, F extends AbstractField<V>>  extends CompositeCustomField<List<V>> {
 
@@ -116,11 +115,9 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
     }
 
     /**
-     *
      * @return an unmodifiable List of the data Fields
      */
     protected List<F> fields() {
-        Integer row = null;
         List<F> fields = new ArrayList<>();
         for(int r = 0; r < grid.getRows(); r++){
             fields.add((F) grid.getComponent(GRID_X_FIELD, r));
@@ -128,10 +125,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return fields;
     }
 
-    /**
-     * @param field
-     * @return
-     */
     private void addRowAfter(F field) {
 
         List<V> nestedValues = getValueFromNestedFields();
@@ -153,10 +146,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     }
 
-    /**
-     * @param field
-     * @return
-     */
     private void removeRow(F field) {
 
         Integer row = findRow(field);
@@ -401,6 +390,7 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     class ButtonGroup extends CssLayout{
 
+        private static final long serialVersionUID = 8156121271630852750L;
         private Button editOrCreate;
 
         ButtonGroup (F field){
@@ -444,10 +434,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
     }
 
-    /**
-     * @param e
-     * @return
-     */
     private void editOrCreate(F field) {
 
         if(editActionListener == null){
@@ -456,11 +442,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 
         if(field.getValue() == null){
             // create
-            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.ADD, null, field));
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<>(EditorActionType.ADD, null, field));
         } else {
             // edit
             V value = field.getValue();
-            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<V>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
+            editActionListener.onEntityEditorActionEvent(new EntityEditorActionEvent<>(EditorActionType.EDIT, (Class<V>) value.getClass(), value, field));
         }
     }
 
@@ -501,21 +487,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-    /**
-     * @param isWritable
-     * @param field
-     * @return
-     */
     public boolean isWritableField(F field) {
         boolean isWritable = !getState().readOnly;
         return isWritable && (field.getValue() == null
                 || field.getValue() != null && testEditButtonPermission(field.getValue()));
     }
 
-    /**
-     * @param field
-     * @return
-     */
     protected boolean testEditButtonPermission(Object rowValue) {
         if(editPermissionTester != null) {
             return editPermissionTester.userHasEditPermission(rowValue);
@@ -524,11 +501,11 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-
     protected List<F> getNestedFields(){
 
         List<F> nestedFields = new ArrayList<>(grid.getRows());
         for(int r = 0; r < grid.getRows(); r++){
+            @SuppressWarnings("unchecked")
             F f = (F) grid.getComponent(GRID_X_FIELD, r);
             if(f == null){
                 logger.debug(String.format("NULL field at %d,%d", GRID_X_FIELD, r));
@@ -540,13 +517,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return Collections.unmodifiableList(nestedFields);
     }
 
-    /**
-     *
-     * @param val
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     */
     protected F newFieldInstance(V val) throws InstantiationException, IllegalAccessException {
 
         F field;
@@ -644,9 +614,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         parentFieldGroup = parent;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void commit() throws SourceException, InvalidValueException {
 
@@ -684,9 +651,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
 //        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setWidth(String width) {
         super.setWidth(width);
@@ -701,9 +665,6 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         // no default styles
@@ -720,15 +681,12 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasNullContent() {
 
-        for(Field f : getNestedFields()){
+        for(Field<?> f : getNestedFields()){
             if(f instanceof CompositeCustomField){
-                if(!((CompositeCustomField)f).hasNullContent()){
+                if(!((CompositeCustomField<?>)f).hasNullContent()){
                     return false;
                 }
             }
@@ -736,56 +694,30 @@ public class ToManyRelatedEntitiesListSelect<V extends Object, F extends Abstrac
         return true;
     }
 
-    /**
-     * @return the enityFieldInstantiator
-     */
     public EntityFieldInstantiator<F> getEntityFieldInstantiator() {
         return entityFieldInstantiator;
     }
-
-    /**
-     * @param enityFieldInstantiator the enityFieldInstantiator to set
-     */
     public void setEntityFieldInstantiator(EntityFieldInstantiator<F> entityFieldInstantiator) {
         this.entityFieldInstantiator = entityFieldInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
         updateComponentStates();
     }
 
-
-    /**
-     * @return the editPermissionTester
-     */
     public EditPermissionTester getEditPermissionTester() {
         return editPermissionTester;
     }
-
-    /**
-     * @param editPermissionTester the editPermissionTester to set
-     */
     public void setEditPermissionTester(EditPermissionTester editPermissionTester) {
         this.editPermissionTester = editPermissionTester;
     }
 
-    /**
-     * @return the editActionListener
-     */
     public EntityEditorActionListener getEditActionListener() {
         return editActionListener;
     }
-
-    /**
-     * @param editActionListener the editActionListener to set
-     */
     public void setEditActionListener(EntityEditorActionListener editActionListener) {
         this.editActionListener = editActionListener;
     }
-
 }

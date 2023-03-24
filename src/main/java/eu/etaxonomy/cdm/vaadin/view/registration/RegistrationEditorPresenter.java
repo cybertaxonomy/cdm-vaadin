@@ -31,23 +31,19 @@ import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
 /**
  * @author a.kohlbecker
  * @since May 15, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
-public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Registration, RegistrationPopEditorView> {
+public class RegistrationEditorPresenter
+        extends AbstractCdmEditorPresenter<Registration, RegistrationEditorPresenter,RegistrationPopEditorView> {
 
     private static final long serialVersionUID = 6930557602995331944L;
     private RegistrationStatus lastStatus;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IRegistrationService getService() {
         return getRepo().getRegistrationService();
     }
-
 
     protected static BeanInstantiator<Registration> defaultBeanInstantiator = new BeanInstantiator<Registration>() {
 
@@ -57,15 +53,11 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
         }
     };
 
-
     @Override
     protected BeanInstantiator<Registration> defaultBeanInstantiator(){
        return defaultBeanInstantiator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Registration loadCdmEntity(UUID identifier) {
 
@@ -79,22 +71,13 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
         return reg;
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(UUID identifier) {
         if(crud != null){
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(Registration.class, identifier, crud, null);
         }
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void guaranteePerEntityCRUDPermissions(Registration bean) {
         if(crud != null){
@@ -102,9 +85,6 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleViewEntered() {
         super.handleViewEntered();
@@ -114,8 +94,6 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
 
         getView().getSubmitterField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(User.class));
         getView().getSubmitterField().setItemCaptionPropertyId("username");
-
-
     }
 
     @Override
@@ -124,7 +102,7 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
     }
 
     private void updateRegStatus(RegistrationStatus status){
-        Registration reg = ((AbstractPopupEditor<Registration, RegistrationEditorPresenter>)getView()).getBean();
+        Registration reg = ((AbstractPopupEditor<Registration,?,?>)getView()).getBean();
         if(lastStatus != null){
             // set last status again to allow updateStatusAndDate() to the job
             reg.setStatus(lastStatus);
@@ -134,7 +112,4 @@ public class RegistrationEditorPresenter extends AbstractCdmEditorPresenter<Regi
         JodaDateTimeConverter converter = new JodaDateTimeConverter();
         getView().getRegistrationDateField().setValue(converter.convertToPresentation(reg.getRegistrationDate(), Date.class, null));
     }
-
-
-
 }
