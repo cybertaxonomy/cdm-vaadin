@@ -384,7 +384,7 @@ public class RegistrationWorkingsetPresenter
 
                 //instead we show status message:
 //                popup.setToCancelOnly();
-                popup.addStatusMessage("<p style='color:Tomato;'><strong>The data entry is aborted "
+                popup.addStatusMessage("<p style='color:red;'><strong>The data entry is aborted "
                         + "due to a data issue that should be fixed "
                         + "by the curator</strong>.<BR>"
                         + "Please send an e-mail with the scientific name "
