@@ -46,11 +46,11 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
 
     public NomenclaturalStatusRow() {
 
-        citation.setWidth(200, Unit.PIXELS);
+        citation.setWidth(250, Unit.PIXELS);
         citation.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citation));
-        citationMicroReference.setWidth(200, Unit.PIXELS);
-        ruleConsidered.setWidth(200, Unit.PIXELS);
-        codeEdition.setWidth(200, Unit.PIXELS);
+        citationMicroReference.setWidth(100, Unit.PIXELS);
+        ruleConsidered.setWidth(100, Unit.PIXELS);
+        codeEdition.setWidth(110, Unit.PIXELS);
     }
 
     /**
