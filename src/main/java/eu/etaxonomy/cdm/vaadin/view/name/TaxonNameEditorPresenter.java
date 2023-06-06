@@ -204,17 +204,19 @@ public class TaxonNameEditorPresenter
 
         CdmFilterablePagingProvider<Reference, Reference> icbnCodesPagingProvider = pagingProviderFactory
                 .referencePagingProvider();
+        //TODO we do not use this filter anymore as it is not wanted (#10302)
+        //     so we can soon remove this code
         // @formatter:off
         // TODO use markers on references instead of isbn. The marker type
         // MarkerType.NOMENCLATURAL_RELEVANT() has already prepared (#7466)
-        icbnCodesPagingProvider.getCriteria().add(Restrictions.in("isbn", new String[] {
-                "3-904144-22-7",     // Saint Louis Code
-                "3-906166-48-1",     // Vienna Code
-                "978-3-87429-425-6", // Melbourne Code
-                "978-3-946583-16-5", // Shenzhen Code
-                "0-85301-006-4"      // ICZN 1999
-                                     // ICNP
-        }));
+//        icbnCodesPagingProvider.getCriteria().add(Restrictions.in("isbn", Arrays.asList(new String[] {
+//                "3-904144-22-7",     // Saint Louis Code
+//                "3-906166-48-1",     // Vienna Code
+//                "978-3-87429-425-6", // Melbourne Code
+//                "978-3-946583-16-5", // Shenzhen Code
+//                "0-85301-006-4"      // ICZN 1999
+//                                    ICNP
+//        })));
         // @formatter:on
 
         statusTypeReferencePopupEditorsRowMap.clear();
