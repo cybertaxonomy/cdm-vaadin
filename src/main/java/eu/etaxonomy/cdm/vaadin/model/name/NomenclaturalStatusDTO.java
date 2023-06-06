@@ -27,26 +27,24 @@ public class NomenclaturalStatusDTO implements Serializable {
 
     private Integer id = 0;
 
-    NomenclaturalStatusType type;
+    private NomenclaturalStatusType type;
 
-    Reference citation;
+    private String ruleConsidered;
 
-    NomenclaturalCodeEdition codeEdition;
+    private NomenclaturalCodeEdition codeEdition;
 
-    String citationMicroReference;
+    private Reference citation;
 
-    String ruleConsidered;
+    private String citationMicroReference;
 
     public static NomenclaturalStatusDTO from(NomenclaturalStatus nomStatus) {
         return new NomenclaturalStatusDTO(nomStatus.getId(), nomStatus.getType(), nomStatus.getCitation(),
                 nomStatus.getCitationMicroReference(), nomStatus.getRuleConsidered(), nomStatus.getCodeEdition());
-
     }
 
     public static NomenclaturalStatusDTO newInstance() {
         return new NomenclaturalStatusDTO();
     }
-
 
     /**
      * Update an existing or create a new {@link NomenclaturalStatus} for this
@@ -75,7 +73,6 @@ public class NomenclaturalStatusDTO implements Serializable {
         }
         nomStatus.setCodeEdition(codeEdition);
         return nomStatus;
-
     }
 
     public NomenclaturalStatusDTO(Integer id, NomenclaturalStatusType type, Reference citation,
@@ -88,9 +85,6 @@ public class NomenclaturalStatusDTO implements Serializable {
         this.codeEdition = codeEdition;
     }
 
-    /**
-     *
-     */
     public NomenclaturalStatusDTO() {
         // TODO Auto-generated constructor stub
     }

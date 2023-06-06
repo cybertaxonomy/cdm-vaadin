@@ -19,8 +19,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -100,8 +98,6 @@ public class TaxonNameEditorPresenter
         extends AbstractCdmDTOEditorPresenter<TaxonNameDTO, TaxonName, TaxonNameEditorPresenter, TaxonNamePopupEditorView> {
 
     private static final long serialVersionUID = -3538980627079389221L;
-
-    private static final Logger logger = LogManager.getLogger();
 
     private static final EnumSet<CRUD> SUB_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 
@@ -227,12 +223,13 @@ public class TaxonNameEditorPresenter
                     public NomenclaturalStatusRow create() {
                         NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
+                        //type
                         BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(
                                 RegistrationTermLists.NOMENCLATURAL_STATUS_TYPE_UUIDS()
                                 );
                         row.type.setContainerDataSource(statusTypeItemContainer);
                         row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
-                        for (DefinedTermBase term : statusTypeItemContainer.getItemIds()) {
+                        for (DefinedTermBase<?> term : statusTypeItemContainer.getItemIds()) {
                             row.type.setItemCaption(term,
                                     term.getPreferredRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
                         }
