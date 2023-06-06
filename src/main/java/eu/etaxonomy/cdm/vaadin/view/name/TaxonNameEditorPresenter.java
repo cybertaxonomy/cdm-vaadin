@@ -235,6 +235,10 @@ public class TaxonNameEditorPresenter
                         }
                         row.type.setNullSelectionAllowed(false);
 
+                        //code edition
+                        row.codeEdition.setContainerDataSource(codeEditionItemContainer);
+
+                        //citation
                         row.citation.loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider,
                                 icbnCodesPagingProvider.getPageSize());
                         row.citation.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(
@@ -247,7 +251,6 @@ public class TaxonNameEditorPresenter
                                 doReferenceEditorEdit(row);
                             }
                         });
-                        row.codeEdition.setContainerDataSource(codeEditionItemContainer);
 
                         getView().applyDefaultComponentStyle(row.components());
 

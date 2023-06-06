@@ -418,9 +418,9 @@ public class TaxonNamePopupEditor
         nomStatusCollectionField.getLayout().setSpacing(false);
         nomStatusCollectionField.setVisibleProperties(NomenclaturalStatusRow.visibleFields());
         nomStatusCollectionField.setPropertyHeader("type", "Status type");
+        nomStatusCollectionField.setPropertyHeader("ruleConsidered", "Rule considered");
         nomStatusCollectionField.setPropertyHeader("citation", "Reference");
         nomStatusCollectionField.setPropertyHeader("citationMicroReference", "Reference detail");
-        nomStatusCollectionField.setPropertyHeader("ruleConsidered", "Rule considered");
         nomStatusCollectionField.addElementAddedListener( e -> nomStatusCollectionField.setComponentError(null));
         nomStatusCollectionField.getLayout().setMargin(new MarginInfo(false, true));
 

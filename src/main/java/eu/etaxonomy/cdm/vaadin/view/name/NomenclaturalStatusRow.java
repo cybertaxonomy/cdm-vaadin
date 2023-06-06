@@ -54,15 +54,16 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     }
 
     /**
-     * @return
+     * @return the components of this NomenclaturalStatusRow
+     *         in the order to display
      */
     public Component[] components() {
         Component[] components = new Component[]{
                 type,
+                ruleConsidered,
+                codeEdition,
                 citation,
                 citationMicroReference,
-                ruleConsidered,
-                codeEdition
             };
         addAll(Arrays.asList(components));
         return components;
@@ -71,10 +72,10 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     public static List<String> visibleFields() {
         List<String> visibleFields = Arrays.asList(new String[]{
             "type",
+            "ruleConsidered",
+            "codeEdition",
             "citation",
             "citationMicroReference",
-            "ruleConsidered",
-            "codeEdition"
             });
         return visibleFields;
     }
