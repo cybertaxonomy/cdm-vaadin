@@ -36,7 +36,7 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     /*
      * CONVENTION!
      *
-     * The fieldname must match the properties of the SpecimenTypeDesignationDTO
+     * The fieldname must match the properties of the NomenclaturalStatusDTO
      */
     NativeSelect type = new NativeSelect();
     ToOneRelatedEntityCombobox<Reference> citation = new ToOneRelatedEntityCombobox<>(null, Reference.class);
@@ -84,5 +84,4 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     public void updateRowItemsEnablement() {
         // nothing to do
     }
-
 }

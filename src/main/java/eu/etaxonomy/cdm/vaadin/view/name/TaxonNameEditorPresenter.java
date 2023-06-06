@@ -624,7 +624,6 @@ public class TaxonNameEditorPresenter
 
             }
         }
-
     }
 
     @EventBusListenerMethod
@@ -893,5 +892,4 @@ public class TaxonNameEditorPresenter
             }
         };
     }
-
 }
