@@ -137,11 +137,11 @@ public abstract class CdmEditorPresenterBase<DTO, CDM extends CdmBase, P extends
         if(AbstractPopupEditor.class.isAssignableFrom(getView().getClass())){
             AbstractPopupEditor<?,?,?> popupView = ((AbstractPopupEditor<?,?,?>)getView());
 
-            if(cdmEntitiy.isPersited() && !canEdit){
+            if(cdmEntitiy.isPersisted() && !canEdit){
                 popupView.setReadOnly(true); // never reset true to false here!
                 logger.debug("setting editor to readonly");
             }
-            if(!cdmEntitiy.isPersited() || !canDelete){
+            if(!cdmEntitiy.isPersisted() || !canDelete){
                 popupView.withDeleteButton(false);
                 logger.debug("removing delete button");
             }

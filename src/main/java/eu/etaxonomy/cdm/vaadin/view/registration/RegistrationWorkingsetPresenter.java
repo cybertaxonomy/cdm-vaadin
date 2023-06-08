@@ -177,7 +177,7 @@ public class RegistrationWorkingsetPresenter
             }
             List<RegistrationDTO> unpersisted = new ArrayList<>();
             for(RegistrationDTO regDto : workingset.getRegistrationDTOs()){
-                if(!regDto.registration().isPersited()){
+                if(!regDto.registration().isPersisted()){
                     unpersisted.add(regDto);
                 }
             }
@@ -847,7 +847,7 @@ public class RegistrationWorkingsetPresenter
         if(event.getProperty().equals(RegistrationItem.BLOCKED_BY)){
 
             Set<RegistrationDTO> blockingRegs;
-            if(regDto.registration().isPersited()){
+            if(regDto.registration().isPersisted()){
                 blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
             } else {
                 blockingRegs = new HashSet<RegistrationDTO>(getWorkingSetService().makeDTOs(regDto.registration().getBlockedBy()));

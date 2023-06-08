@@ -232,7 +232,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
     private void adaptToUserPermissions(TeamOrPersonBase<?> teamOrPerson) {
 
         UserHelper userHelper = UserHelperAccess.userHelper();
-        boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersited() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
+        boolean canEdit = teamOrPerson == null || !teamOrPerson.isPersisted() || userHelper.userHasPermission(teamOrPerson, CRUD.UPDATE);
         if(!canEdit){
             setReadOnlyComponents(true);
             fieldGroup.setReadOnly(true); // really needed?
@@ -281,7 +281,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
         TeamOrPersonBase<?> bean = getValue();
         if(bean instanceof Team){
-            if(!bean.isPersited()){
+            if(!bean.isPersisted()){
                 UserHelperAccess.userHelper().createAuthorityForCurrentUser(bean, EnumSet.of(CRUD.UPDATE, CRUD.DELETE), null);
             }
         }

@@ -58,11 +58,11 @@ public class EditorActionContextFormatter {
             } else if (CdmEntityAdapterDTO.class.isAssignableFrom(parentEntity.getClass())) {
                 CdmBase cdmEntity = ((CdmEntityAdapterDTO) parentEntity).cdmEntity();
                 className = cdmEntity.getClass().getSimpleName();
-                createOrNew = cdmEntity.isPersited() ? EDIT : NEW;
+                createOrNew = cdmEntity.isPersisted() ? EDIT : NEW;
             } else if (CdmBase.class.isAssignableFrom(parentEntity.getClass())) {
                 CdmBase cdmEntity = ((CdmBase) parentEntity);
                 className = cdmEntity.getClass().getSimpleName();
-                createOrNew = cdmEntity.isPersited() ? EDIT : NEW;
+                createOrNew = cdmEntity.isPersisted() ? EDIT : NEW;
             } else {
                 className = parentEntity.getClass().getSimpleName();
                 className = className.replace("DTO", "");
