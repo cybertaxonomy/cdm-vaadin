@@ -134,7 +134,7 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         citatonComboBox.setCaption("Reference");
         citationMicroReferenceField.setCaption("Reference detail");
         ruleConsideredField.setCaption("Rule considered");
-        codeEditionSelect.setCaption("Nom. code");
+        codeEditionSelect.setCaption("Code Edition");
 
         grid.addComponent(citatonComboBox, 0, 1, 0, 1);
         grid.addComponent(citationMicroReferenceField, 1, 1, 1, 1);

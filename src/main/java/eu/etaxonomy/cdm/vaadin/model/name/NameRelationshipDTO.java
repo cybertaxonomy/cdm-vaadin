@@ -156,9 +156,4 @@ public class NameRelationshipDTO implements Serializable {
     public void setCodeEdition(NomenclaturalCodeEdition codeEdition) {
         this.codeEdition = codeEdition;
     }
-
-
-
-
-
 }

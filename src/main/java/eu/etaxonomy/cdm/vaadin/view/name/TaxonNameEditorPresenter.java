@@ -19,8 +19,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -101,8 +99,6 @@ public class TaxonNameEditorPresenter
 
     private static final long serialVersionUID = -3538980627079389221L;
 
-    private static final Logger logger = LogManager.getLogger();
-
     private static final EnumSet<CRUD> SUB_EDITOR_CRUD = EnumSet.of(CRUD.UPDATE, CRUD.DELETE);
 
     private static final List<String> RELATED_NAME_INIT_STRATEGY = Arrays.asList("$", "nomenclaturalSource.annotations",
@@ -148,8 +144,11 @@ public class TaxonNameEditorPresenter
 
         super.handleViewEntered();
 
-        List<NomenclaturalCodeEdition> nomCodes = NomenclaturalCodeEdition
-                .forCode(RegistrationUIDefaults.NOMENCLATURAL_CODE);
+        List<NomenclaturalCodeEdition> nomCodes =
+                NomenclaturalCodeEdition.forCode(RegistrationUIDefaults.NOMENCLATURAL_CODE);
+        //#10302 use only latest code for now
+        nomCodes = nomCodes.isEmpty() ? nomCodes : nomCodes.subList(0, 1);
+
         BeanItemContainer<NomenclaturalCodeEdition> codeEditionItemContainer = cdmBeanItemContainerFactory
                 .buildEnumTermItemContainer(NomenclaturalCodeEdition.class,
                         nomCodes.toArray(new NomenclaturalCodeEdition[nomCodes.size()]));
@@ -205,17 +204,19 @@ public class TaxonNameEditorPresenter
 
         CdmFilterablePagingProvider<Reference, Reference> icbnCodesPagingProvider = pagingProviderFactory
                 .referencePagingProvider();
+        //TODO we do not use this filter anymore as it is not wanted (#10302)
+        //     so we can soon remove this code
         // @formatter:off
         // TODO use markers on references instead of isbn. The marker type
         // MarkerType.NOMENCLATURAL_RELEVANT() has already prepared (#7466)
-        icbnCodesPagingProvider.getCriteria().add(Restrictions.in("isbn", new String[] {
-                "3-904144-22-7",     // Saint Louis Code
-                "3-906166-48-1",     // Vienna Code
-                "978-3-87429-425-6", // Melbourne Code
-                "978-3-946583-16-5", // Shenzhen Code
-                "0-85301-006-4"      // ICZN 1999
-                                     // ICNP
-        }));
+//        icbnCodesPagingProvider.getCriteria().add(Restrictions.in("isbn", Arrays.asList(new String[] {
+//                "3-904144-22-7",     // Saint Louis Code
+//                "3-906166-48-1",     // Vienna Code
+//                "978-3-87429-425-6", // Melbourne Code
+//                "978-3-946583-16-5", // Shenzhen Code
+//                "0-85301-006-4"      // ICZN 1999
+//                                    ICNP
+//        })));
         // @formatter:on
 
         statusTypeReferencePopupEditorsRowMap.clear();
@@ -227,17 +228,22 @@ public class TaxonNameEditorPresenter
                     public NomenclaturalStatusRow create() {
                         NomenclaturalStatusRow row = new NomenclaturalStatusRow();
 
+                        //type
                         BeanItemContainer<DefinedTermBase> statusTypeItemContainer = cdmBeanItemContainerFactory.buildTermItemContainer(
                                 RegistrationTermLists.NOMENCLATURAL_STATUS_TYPE_UUIDS()
                                 );
                         row.type.setContainerDataSource(statusTypeItemContainer);
                         row.type.setItemCaptionMode(ItemCaptionMode.EXPLICIT);
-                        for (DefinedTermBase term : statusTypeItemContainer.getItemIds()) {
+                        for (DefinedTermBase<?> term : statusTypeItemContainer.getItemIds()) {
                             row.type.setItemCaption(term,
                                     term.getPreferredRepresentation(Language.DEFAULT()).getAbbreviatedLabel());
                         }
                         row.type.setNullSelectionAllowed(false);
 
+                        //code edition
+                        row.codeEdition.setContainerDataSource(codeEditionItemContainer);
+
+                        //citation
                         row.citation.loadFrom(icbnCodesPagingProvider, icbnCodesPagingProvider,
                                 icbnCodesPagingProvider.getPageSize());
                         row.citation.getSelect().setCaptionGenerator(new ReferenceEllypsisCaptionGenerator(
@@ -250,7 +256,6 @@ public class TaxonNameEditorPresenter
                                 doReferenceEditorEdit(row);
                             }
                         });
-                        row.codeEdition.setContainerDataSource(codeEditionItemContainer);
 
                         getView().applyDefaultComponentStyle(row.components());
 
@@ -624,7 +629,6 @@ public class TaxonNameEditorPresenter
 
             }
         }
-
     }
 
     @EventBusListenerMethod
@@ -893,5 +897,4 @@ public class TaxonNameEditorPresenter
             }
         };
     }
-
 }

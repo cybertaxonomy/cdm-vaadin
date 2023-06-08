@@ -23,7 +23,6 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
 /**
  * @author a.kohlbecker
  * @since Mar 3, 2017
- *
  */
 public interface ListView extends ApplicationView<ListView,ListPresenter>{
 
@@ -32,53 +31,25 @@ public interface ListView extends ApplicationView<ListView,ListPresenter>{
         inProgress
     }
 
-    /**
-     * @param page
-     */
     void populate(Pager<RegistrationDTO> registrations);
 
-    /**
-     * @param messages
-     */
     void openDetailsPopup(String caption, List<String> messages);
 
-    /**
-     * @return the identifierFilter
-     */
     public TextField getIdentifierFilter();
 
-    /**
-     * @return the taxonNameFilter
-     */
     public TextField getTaxonNameFilter();
 
-    /**
-     * @return the referenceFilter
-     */
     public TextField getReferenceFilter();
 
-    /**
-     * @return the statusFilter
-     */
     public NativeSelect getRegistrationStatusFilter();
 
-    /**
-     * @return the submitterFilter
-     */
     public NativeSelect getSubmitterFilter();
 
-    /**
-     * @param optionInProgress
-     */
     void setViewMode(Mode mode);
 
-    /**
-     * @return
-     */
     Mode getViewMode();
 
     public RegistrationItem getRegistrationItem(UUID registrationUuid);
 
     AbstractSelect getStatusTypeFilter();
-
 }

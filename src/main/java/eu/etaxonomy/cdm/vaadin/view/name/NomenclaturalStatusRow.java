@@ -36,33 +36,34 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     /*
      * CONVENTION!
      *
-     * The fieldname must match the properties of the SpecimenTypeDesignationDTO
+     * The fieldname must match the properties of the NomenclaturalStatusDTO
      */
     NativeSelect type = new NativeSelect();
-    ToOneRelatedEntityCombobox<Reference> citation = new ToOneRelatedEntityCombobox<Reference>(null, Reference.class);
+    ToOneRelatedEntityCombobox<Reference> citation = new ToOneRelatedEntityCombobox<>(null, Reference.class);
     TextField citationMicroReference = new TextFieldNFix();
     TextField ruleConsidered = new TextFieldNFix();
     NativeSelect codeEdition = new NativeSelect();
 
     public NomenclaturalStatusRow() {
 
-        citation.setWidth(200, Unit.PIXELS);
+        citation.setWidth(250, Unit.PIXELS);
         citation.setNestedButtonStateUpdater(new ToOneRelatedEntityButtonUpdater<Reference>(citation));
-        citationMicroReference.setWidth(200, Unit.PIXELS);
-        ruleConsidered.setWidth(200, Unit.PIXELS);
-        codeEdition.setWidth(200, Unit.PIXELS);
+        citationMicroReference.setWidth(100, Unit.PIXELS);
+        ruleConsidered.setWidth(100, Unit.PIXELS);
+        codeEdition.setWidth(110, Unit.PIXELS);
     }
 
     /**
-     * @return
+     * @return the components of this NomenclaturalStatusRow
+     *         in the order to display
      */
     public Component[] components() {
         Component[] components = new Component[]{
                 type,
+                ruleConsidered,
+                codeEdition,
                 citation,
                 citationMicroReference,
-                ruleConsidered,
-                codeEdition
             };
         addAll(Arrays.asList(components));
         return components;
@@ -71,20 +72,16 @@ public class NomenclaturalStatusRow extends CollectionRowItemCollection implemen
     public static List<String> visibleFields() {
         List<String> visibleFields = Arrays.asList(new String[]{
             "type",
+            "ruleConsidered",
+            "codeEdition",
             "citation",
             "citationMicroReference",
-            "ruleConsidered",
-            "codeEdition"
             });
         return visibleFields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateRowItemsEnablement() {
         // nothing to do
     }
-
 }

@@ -209,7 +209,7 @@ public class TaxonNamePopupEditor
     }
 
     @Override
-    public void applyDefaultComponentStyle(Component ... components){
+    public void applyDefaultComponentStyle(Component[] components){
         for(int i = 0; i <components.length; i++){
             components[i].setStyleName(getDefaultComponentStyles());
         }
@@ -301,7 +301,7 @@ public class TaxonNamePopupEditor
         bindField(rankSelect, "rank");
         applyDefaultComponentStyles(rankSelect);
         applyDefaultComponentStyles(rankSelectFullListToggle);
-        applyDefaultComponentStyle(rankSelectGroup);
+        applyDefaultComponentStyle(new Component[] {rankSelectGroup});
         addComponent(rankSelectGroup, 0, row, 1, row);
         rankSelectGroup.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         grid.setComponentAlignment(rankSelectGroup, Alignment.TOP_RIGHT);
@@ -412,15 +412,14 @@ public class TaxonNamePopupEditor
                         Collection<?> value = getValue();
                         return value == null || value.isEmpty() ;
                     }
-
         };
 
         nomStatusCollectionField.getLayout().setSpacing(false);
         nomStatusCollectionField.setVisibleProperties(NomenclaturalStatusRow.visibleFields());
         nomStatusCollectionField.setPropertyHeader("type", "Status type");
+        nomStatusCollectionField.setPropertyHeader("ruleConsidered", "Rule considered");
         nomStatusCollectionField.setPropertyHeader("citation", "Reference");
         nomStatusCollectionField.setPropertyHeader("citationMicroReference", "Reference detail");
-        nomStatusCollectionField.setPropertyHeader("ruleConsidered", "Rule considered");
         nomStatusCollectionField.addElementAddedListener( e -> nomStatusCollectionField.setComponentError(null));
         nomStatusCollectionField.getLayout().setMargin(new MarginInfo(false, true));
 
@@ -839,7 +838,6 @@ public class TaxonNamePopupEditor
         // TODO use getField() instead and remove field references
         Rank rank = (Rank) rankSelect.getValue();
 
-        @SuppressWarnings("deprecation")
         boolean isSpeciesOrBelow =  rank.isLowerOrEqualTo(RankClass.Species);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
