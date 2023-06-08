@@ -166,8 +166,9 @@ public class CdmBeanItemContainerFactory {
         return buildBeanItemContainer(type, null);
     }
 
-    public <T extends IEnumTerm<T>> BeanItemContainer<T> buildEnumTermItemContainer(Class<T> termType, T ... enumTerms) {
-        BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termType);
+    public <T extends IEnumTerm<T>> BeanItemContainer<T> buildEnumTermItemContainer(
+            Class<T> termClass, T[] enumTerms) {
+        BeanItemContainer<T> termItemContainer = new BeanItemContainer<>(termClass);
         List<T> termList = Arrays.asList(enumTerms);
         termItemContainer.addAll(termList);
         return termItemContainer;
