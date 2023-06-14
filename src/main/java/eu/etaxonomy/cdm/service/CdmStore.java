@@ -66,7 +66,7 @@ public class CdmStore {
     public <T extends CdmBase> EntityChangeEvent saveBean(T bean, AbstractView view) {
 
         Type changeEventType;
-        if(bean.isPersited()){
+        if(bean.isPersisted()){
             changeEventType = Type.MODIFIED;
         } else {
             changeEventType = Type.CREATED;

@@ -51,7 +51,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
     @Override
     public Registration createRegistration(TaxonName taxonName, List<Registration> preparedBlockingRegistrations) {
 
-        if(taxonName.isPersited()){
+        if(taxonName.isPersisted()){
             getRepo().getSession().refresh(taxonName);
         }
 
@@ -133,9 +133,9 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         if(blockingRegistration != null){
             registration = reloadRegistration(registration);
             registration.getBlockedBy().add(blockingRegistration);
-            if(registration.isPersited()){ // shoul't this be !registration.isPersited() ? since the saveOrUpdate might have been hit this code could be useless
+            if(registration.isPersisted()){ // shoul't this be !registration.isPersisted() ? since the saveOrUpdate might have been hit this code could be useless
                 getRepo().getRegistrationService().saveOrUpdate(registration);
-                logger.debug("Blocking registration created, added to registion and persited");
+                logger.debug("Blocking registration created, added to registion and persisted");
             }
             return blockingRegistration;
         }
@@ -144,7 +144,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
 
     @Override
     public Registration reloadRegistration(Registration registration) {
-        if(registration.isPersited()){
+        if(registration.isPersisted()){
              Registration registrationReloaded = getRepo().getRegistrationService().load(registration.getUuid());
              if(registrationReloaded == null){
                  throw new NullPointerException("Registration not found for Registration#" + registration.getUuid() + " which has been hold in the rootContext");

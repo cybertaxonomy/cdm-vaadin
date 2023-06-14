@@ -61,7 +61,7 @@ public class ToOneRelatedEntityReloader<CDM extends CdmBase> implements ValueCha
 
         @SuppressWarnings("unchecked")
         CDM value = (CDM)event.getProperty().getValue();
-        if(value == null || !value.isPersited()) {
+        if(value == null || !value.isPersisted()) {
             return;
         }
         value = HibernateProxyHelper.deproxy(value);

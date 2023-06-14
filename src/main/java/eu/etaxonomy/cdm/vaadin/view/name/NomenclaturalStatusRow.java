@@ -26,10 +26,8 @@ import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 /**
  * @author a.kohlbecker
  * @since Apr 29, 2019
- *
  */
 public class NomenclaturalStatusRow extends CollectionRowItemCollection implements CollectionRow {
-
 
     private static final long serialVersionUID = -4088064849794846181L;
 

@@ -133,7 +133,7 @@ public class PersonField extends CompositeCustomField<Person> {
      *
      */
     private void checkUserPermissions(Person newValue) {
-        boolean userCanEdit = newValue == null || !newValue.isPersited() || UserHelperAccess.userHelper().userHasPermission(newValue, "DELETE", "UPDATE");
+        boolean userCanEdit = newValue == null || !newValue.isPersisted() || UserHelperAccess.userHelper().userHasPermission(newValue, "DELETE", "UPDATE");
         setEnabled(userCanEdit);
     }
 
