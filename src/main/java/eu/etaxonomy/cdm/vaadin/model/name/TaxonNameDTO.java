@@ -52,9 +52,6 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
     private Set<NomenclaturalStatusDTO> nomenclaturalStatusDTOs = new HashSet<>();
 
-    /**
-     * @param entity
-     */
     public TaxonNameDTO(TaxonName entity) {
         super(entity);
         name = entity;
