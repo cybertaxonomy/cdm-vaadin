@@ -432,7 +432,7 @@
               <fail>false</fail>
               <skip>false</skip>
               <rules>
-                <dependencyConvergence/>
+                <dependencyConvergence />
                 <requireMavenVersion>
                   <version>[3.6.3,)</version>
                 </requireMavenVersion>
@@ -526,7 +526,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
