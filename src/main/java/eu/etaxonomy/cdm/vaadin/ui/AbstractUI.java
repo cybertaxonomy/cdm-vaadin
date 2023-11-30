@@ -28,7 +28,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.addon.config.UIDisabledException;
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.event.error.DelegatingErrorHandler;
 import eu.etaxonomy.cdm.vaadin.event.error.ErrorTypeErrorHandlerWrapper;
 import eu.etaxonomy.cdm.vaadin.event.error.PermissionDeniedErrorHandler;

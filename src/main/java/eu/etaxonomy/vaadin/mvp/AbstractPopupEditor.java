@@ -60,7 +60,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;

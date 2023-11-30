@@ -14,8 +14,8 @@ import com.vaadin.server.ErrorEvent;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
 import eu.etaxonomy.cdm.i18n.Messages;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 
 /**
  * @author freimeier

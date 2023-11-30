@@ -14,7 +14,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 
 /**
  * @author a.kohlbecker
