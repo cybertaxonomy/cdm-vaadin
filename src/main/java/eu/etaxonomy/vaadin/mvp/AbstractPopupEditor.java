@@ -290,7 +290,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * The top tool-bar is initially invisible.
      */
     protected void setToolBarVisible(boolean visible){
-        toolBar.setVisible(true);
+        toolBar.setVisible(visible);
     }
 
     public boolean isAdvancedMode() {
