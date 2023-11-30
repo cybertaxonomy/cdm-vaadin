@@ -194,16 +194,4 @@ public abstract class AbstractUI extends UI {
         }
         return state;
     }
-
-//    @Override
-//   public void setEnabled(boolean state) {
-//        this.enabled = state;
-//    }
-//
-//    @Override
-//   public boolean isEnabled() {
-//        return enabled;
-//    }
-
-
 }

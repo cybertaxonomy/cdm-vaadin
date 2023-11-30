@@ -921,7 +921,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         unbindField(oldField);
         addField(newField, propertyId, column1, row1, column2, row2);
-        getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+        getViewEventBus().publish(this, new FieldReplaceEvent<>(this, oldField, newField));
         // important: set newField value at last!
         newField.setValue(value);
         return newField;

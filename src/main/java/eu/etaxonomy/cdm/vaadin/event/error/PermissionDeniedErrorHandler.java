@@ -19,7 +19,6 @@ import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 /**
  * @author a.kohlbecker
  * @since Apr 2, 2019
- *
  */
 public class PermissionDeniedErrorHandler implements ErrorHandler {
 
@@ -30,15 +29,9 @@ public class PermissionDeniedErrorHandler implements ErrorHandler {
         this.ui = ui;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void error(ErrorEvent event) {
         PermissionDeniedException permissionDeniedException = (PermissionDeniedException)event.getThrowable();
-
         Notification.show("Permission denied", permissionDeniedException.getMessage(), Type.ERROR_MESSAGE);
-
     }
-
 }

@@ -19,23 +19,16 @@ import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 
 /**
  * @author freimeier
- *
  */
 public class HibernateExceptionHandler extends ErrorTypeHandler<HibernateException>{
 
     private static final long serialVersionUID = -5703485298578474572L;
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<HibernateException> supports() {
         return HibernateException.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void error(ErrorEvent event) {
         // not needed in this class so far
@@ -55,7 +48,4 @@ public class HibernateExceptionHandler extends ErrorTypeHandler<HibernateExcepti
             notification.show(Page.getCurrent());
         }
     }
-
-
-
 }
