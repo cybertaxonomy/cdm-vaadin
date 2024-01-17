@@ -211,9 +211,11 @@ public class DistributionStatusQuery implements Query{
      * @return The distribution information of the given {@code taxon}.
      */
     private List<Distribution> getDistributions(Taxon taxon) {
+
+        boolean includeUnpublished = true;
         Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
         List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
-                .listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
+                .listDescriptionElementsForTaxon(taxon, setFeature, null, includeUnpublished, null, null, DESCRIPTION_INIT_STRATEGY);
         return listTaxonDescription;
     }
 

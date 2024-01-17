@@ -177,7 +177,10 @@ public class DistributionTablePresenter
      * @return List of {@link DescriptionElementBase}s for the specified {@link Taxon} and {@link Feature} set.
      */
     public List<DescriptionElementBase> listDescriptionElementsForTaxon(Taxon taxon, Set<Feature> setFeature){
-        List<DescriptionElementBase> listDescriptionElementsForTaxon = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
+
+        boolean includeUnpublished = true;
+        List<DescriptionElementBase> listDescriptionElementsForTaxon = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(
+                taxon, setFeature, null, includeUnpublished, null, null, DESCRIPTION_INIT_STRATEGY);
         sort(listDescriptionElementsForTaxon);
         return listDescriptionElementsForTaxon;
     }
@@ -231,9 +234,12 @@ public class DistributionTablePresenter
      * @return {@link Distribution} of the given {@link Taxon}.
      */
     private List<Distribution> getDistributions(Taxon taxon) {
+
+        boolean includeUnpublished = true;
         Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
         List<Distribution> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
-                .listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
+                .listDescriptionElementsForTaxon(taxon, setFeature, null, includeUnpublished,
+                        null, null, DESCRIPTION_INIT_STRATEGY);
         return listTaxonDescription;
     }
 
@@ -407,8 +413,11 @@ private List<String> getAbbreviatedNamedAreas() {
 
 // TODO: Currently unused. Remove?
 private HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
+
+    boolean includeUnpublished = true;
     Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
-    List<DescriptionElementBase> listTaxonDescription = CdmSpringContextHelper.getDescriptionService().listDescriptionElementsForTaxon(taxon, setFeature, null, null, null, DESCRIPTION_INIT_STRATEGY);
+    List<DescriptionElementBase> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
+            .listDescriptionElementsForTaxon(taxon, setFeature, null, includeUnpublished, null, null, DESCRIPTION_INIT_STRATEGY);
     HashMap<DescriptionElementBase, Distribution> map = null;
     for(DescriptionElementBase deb : listTaxonDescription){
         if(deb instanceof Distribution){
