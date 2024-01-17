@@ -76,28 +76,16 @@ public class DistributionStatusQuery implements Query{
         this.definition = definition;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public Item constructItem() {
         return null;
     }
 
-   /**
-    *
-    * {@inheritDoc}
-    */
     @Override
     public boolean deleteAllItems() {
         return false;
     }
 
-	/**
-	 *
-	 * {@inheritDoc}
-	 */
     @Override
     public List<Item> loadItems(int startIndex, int count) {
         List<Item> items = new ArrayList<>();
@@ -123,10 +111,6 @@ public class DistributionStatusQuery implements Query{
         return items;
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public void saveItems(List<Item> addedItems, List<Item> modifiedItems, List<Item> removedItems) {
         logger.debug("Save requested!");
@@ -141,10 +125,6 @@ public class DistributionStatusQuery implements Query{
         }
     }
 
-    /**
-     *
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
         return this.nodeUuids.size();
@@ -156,6 +136,7 @@ public class DistributionStatusQuery implements Query{
      * @return Map of {@link NamedArea}s and the related distribution status for the given {@code taxon}.
      */
     private Map<NamedArea, PresenceAbsenceTerm> getAreaToDistributionStatusMap(Taxon taxon) {
+
         Map<NamedArea, PresenceAbsenceTerm> distributionStatusMap = new HashMap<>();
 
         List<Distribution> distributions = this.getDistributions(taxon);
