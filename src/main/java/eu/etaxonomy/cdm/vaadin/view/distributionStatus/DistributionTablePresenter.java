@@ -47,7 +47,6 @@ import eu.etaxonomy.cdm.model.location.NamedArea;
 import eu.etaxonomy.cdm.model.taxon.Classification;
 import eu.etaxonomy.cdm.model.taxon.Taxon;
 import eu.etaxonomy.cdm.model.taxon.TaxonNode;
-import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.OrderedTermVocabulary;
 import eu.etaxonomy.cdm.model.term.Representation;
 import eu.etaxonomy.cdm.model.term.TermVocabulary;
@@ -337,87 +336,70 @@ public class DistributionTablePresenter
 
 	protected static final List<String> DESCRIPTION_INIT_STRATEGY = Arrays.asList(new String []{
             "$", //$NON-NLS-1$
-"elements.*", //$NON-NLS-1$
-"elements.sources.citation.authorship.$", //$NON-NLS-1$
-"elements.sources.nameUsedInSource.originalInfo", //$NON-NLS-1$
-"elements.area.level", //$NON-NLS-1$
-"elements.modifyingText", //$NON-NLS-1$
-"elements.states.*", //$NON-NLS-1$
-"elements.media", //$NON-NLS-1$
-"elements.multilanguageText", //$NON-NLS-1$
-"multilanguageText", //$NON-NLS-1$
-"stateData.$", //$NON-NLS-1$
-"annotations", //$NON-NLS-1$
-"markers", //$NON-NLS-1$
-"sources.citation.authorship", //$NON-NLS-1$
-"sources.nameUsedInSource", //$NON-NLS-1$
-"multilanguageText", //$NON-NLS-1$
-"media", //$NON-NLS-1$
-"name.$", //$NON-NLS-1$
-"name.rank", //$NON-NLS-1$
-"name.status.type", //$NON-NLS-1$
-"taxon2.name", //$NON-NLS-1$
-});
+            "elements.*", //$NON-NLS-1$
+            "elements.sources.citation.authorship.$", //$NON-NLS-1$
+            "elements.sources.nameUsedInSource.originalInfo", //$NON-NLS-1$
+            "elements.area.level", //$NON-NLS-1$
+            "elements.modifyingText", //$NON-NLS-1$
+            "elements.states.*", //$NON-NLS-1$
+            "elements.media", //$NON-NLS-1$
+            "elements.multilanguageText", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "stateData.$", //$NON-NLS-1$
+            "annotations", //$NON-NLS-1$
+            "markers", //$NON-NLS-1$
+            "sources.citation.authorship", //$NON-NLS-1$
+            "sources.nameUsedInSource", //$NON-NLS-1$
+            "multilanguageText", //$NON-NLS-1$
+            "media", //$NON-NLS-1$
+            "name.$", //$NON-NLS-1$
+            "name.rank", //$NON-NLS-1$
+            "name.status.type", //$NON-NLS-1$
+            "taxon2.name", //$NON-NLS-1$
+        });
 
-/**Helper Methods*/
-private void sort(List<DescriptionElementBase> list){
-	Collections.sort(list, new Comparator<DescriptionElementBase>() {
+    /**Helper Methods*/
+    private void sort(List<DescriptionElementBase> list){
+    	Collections.sort(list, new Comparator<DescriptionElementBase>() {
 
-		@Override
-		public int compare(DescriptionElementBase o1, DescriptionElementBase o2) {
-			String feature1 = o1.getFeature().getTitleCache();
-			String feature2 = o2.getFeature().getTitleCache();
-			if(feature1 !=null && feature2 !=null){
-				return feature1.compareTo(feature2);
-			}else{
-				return 0;
+    		@Override
+    		public int compare(DescriptionElementBase o1, DescriptionElementBase o2) {
+    			String feature1 = o1.getFeature().getTitleCache();
+    			String feature2 = o2.getFeature().getTitleCache();
+    			if(feature1 !=null && feature2 !=null){
+    				return feature1.compareTo(feature2);
+    			}else{
+    				return 0;
 
-			}
-		}
-	});
-}
-
-/**
- *
- * {@inheritDoc}
- */
-@Override
-protected void onPresenterReady() {
-    /*
- * The area and taxon settings window should only be displayed after login
- * and only when no classification and areas are chosen yet.
- */
-    VaadinSession vaadinSession = VaadinSession.getCurrent();
-    if(userHelper.userIsAutheticated()
-            && !userHelper.userIsAnnonymous()
-            && (vaadinSession.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION) == null
-            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID) == null
-            || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS) == null)) {
-        getView().openAreaAndTaxonSettings();
+    			}
+    		}
+    	});
     }
-}
 
-/**Unused Methods*/
-// TODO: Currently unused. Remove?
-private List<String> getAbbreviatedNamedAreas() {
-    List<NamedArea> terms = getChosenAreasFromVoc();
-    List<String> list = new ArrayList<>();
-    for(DefinedTermBase<?> dtb: terms){
-        for(Representation r : dtb.getRepresentations()){
-            list.add(r.getAbbreviatedLabel());
+    @Override
+    protected void onPresenterReady() {
+       /*
+        * The area and taxon settings window should only be displayed after login
+        * and only when no classification and areas are chosen yet.
+        */
+        VaadinSession vaadinSession = VaadinSession.getCurrent();
+        if(userHelper.userIsAutheticated()
+                && !userHelper.userIsAnnonymous()
+                && (vaadinSession.getAttribute(DistributionEditorUtil.SATTR_CLASSIFICATION) == null
+                || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREA_VOCABULARY_UUID) == null
+                || vaadinSession.getAttribute(DistributionEditorUtil.SATTR_SELECTED_AREAS) == null)) {
+            getView().openAreaAndTaxonSettings();
         }
     }
-    return list;
-}
 
-public LazyQueryContainer getAreaDistributionStatusContainer() {
-    List<UUID> nodeUuids = getAllNodes().stream().map(n -> n.getUuid()).collect(Collectors.toCollection(ArrayList::new));
-    List<NamedArea> namedAreas = getChosenAreas();
-    if(namedAreas!=null){
-        QueryFactory factory = new DistributionStatusQueryFactory(this.repo, nodeUuids, namedAreas);
-        QueryDefinition defintion = new DistributionStatusQueryDefinition(namedAreas, true, 50);
-        return new LazyQueryContainer(defintion, factory);
+    public LazyQueryContainer getAreaDistributionStatusContainer() {
+        List<UUID> nodeUuids = getAllNodes().stream().map(n -> n.getUuid()).collect(Collectors.toCollection(ArrayList::new));
+        List<NamedArea> namedAreas = getChosenAreas();
+        if(namedAreas!=null){
+            QueryFactory factory = new DistributionStatusQueryFactory(this.repo, nodeUuids, namedAreas);
+            QueryDefinition defintion = new DistributionStatusQueryDefinition(namedAreas, true, 50);
+            return new LazyQueryContainer(defintion, factory);
+        }
+        return null;
     }
-    return null;
-}
 }
