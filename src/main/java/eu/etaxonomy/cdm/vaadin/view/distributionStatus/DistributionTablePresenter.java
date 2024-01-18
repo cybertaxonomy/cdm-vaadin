@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -409,27 +408,6 @@ private List<String> getAbbreviatedNamedAreas() {
         }
     }
     return list;
-}
-
-// TODO: Currently unused. Remove?
-private HashMap<DescriptionElementBase, Distribution> getDistribution(DefinedTermBase dt, Taxon taxon) {
-
-    boolean includeUnpublished = true;
-    Set<Feature> setFeature = new HashSet<>(Arrays.asList(Feature.DISTRIBUTION()));
-    List<DescriptionElementBase> listTaxonDescription = CdmSpringContextHelper.getDescriptionService()
-            .listDescriptionElementsForTaxon(taxon, setFeature, null, includeUnpublished, null, null, DESCRIPTION_INIT_STRATEGY);
-    HashMap<DescriptionElementBase, Distribution> map = null;
-    for(DescriptionElementBase deb : listTaxonDescription){
-        if(deb instanceof Distribution){
-            Distribution db = (Distribution)deb;
-            String titleCache = dt.getTitleCache();
-            if(db.getArea().getTitleCache().equalsIgnoreCase(titleCache)){
-                map = new HashMap<DescriptionElementBase, Distribution>();
-                map.put(deb, db);
-            }
-        }
-    }
-    return map;
 }
 
 public LazyQueryContainer getAreaDistributionStatusContainer() {
