@@ -90,7 +90,7 @@ public class StartRegistrationPresenter
                 new ReferenceEllypsisFormatter(ReferenceEllypsisFormatter.LabelType.BIBLIOGRAPHIC),
                 ReferenceEllypsisFormatter.INIT_STRATEGY
                 );
-        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
+        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<>();
         // referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
         Criterion criterion = Restrictions.not(Restrictions.or(Restrictions.in("type", new ReferenceType[]{ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries})));
 

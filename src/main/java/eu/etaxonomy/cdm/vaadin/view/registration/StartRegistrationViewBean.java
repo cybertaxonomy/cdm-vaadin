@@ -160,21 +160,21 @@ public class StartRegistrationViewBean
         continueButton.setEnabled(false);
         continueButton.addClickListener(e -> {
 
-            UUID refUuid = null;
-            referenceCombobox.commit();
-            if(referenceCombobox.getValue() != null){
-                refUuid = referenceCombobox.getValue().getUuid();
-            }
-            getViewEventBus().publish(this,
-                new RegistrationEditorAction(EditorActionType.ADD,
-                        // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
-                        refUuid,
-                        continueButton,
-                        null,
-                        StartRegistrationViewBean.this)
+                UUID refUuid = null;
+                referenceCombobox.commit(); //Note by AM: why is this necessary, the data should be read only
+                if(referenceCombobox.getValue() != null){
+                    refUuid = referenceCombobox.getValue().getUuid();
+                }
+                getViewEventBus().publish(this,
+                    new RegistrationEditorAction(EditorActionType.ADD,
+                            // passing the refId is hack, bit for some reason the presenter is always referring to the wrong view
+                            refUuid,
+                            continueButton,
+                            null,
+                            StartRegistrationViewBean.this)
                 );
-              }
-            );
+            }
+        );
 
         vlayout.addComponents(publicationLayout, continueButton);
         vlayout.setComponentAlignment(publicationLayout, Alignment.TOP_CENTER);
@@ -183,17 +183,11 @@ public class StartRegistrationViewBean
         addContentComponent(vlayout, 1f);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean allowAnonymousAccess() {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Collection<GrantedAuthority>> allowedGrantedAuthorities() {
         return null;
@@ -209,75 +203,45 @@ public class StartRegistrationViewBean
         this.accessDeniedMessage = accessDeniedMessage;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getHeaderText() {
         return "New Registration";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getSubHeaderText() {
         return SUBHEADER_DEEFAULT;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enter(ViewChangeEvent event) {
-
         getPresenter().handleViewEntered();
-
     }
 
     // ------- StartRegistrationView interface methods ----- //
 
-    /**
-     * @return the referenceCombobox
-     */
     @Override
     public LazyComboBox<TypedEntityReference<Reference>> getReferenceCombobox() {
         return referenceCombobox;
     }
 
-    /**
-     * @return the newPublicationButton
-     */
     @Override
     public Button getNewPublicationButton() {
         return newPublicationButton;
     }
 
-    /**
-     * @return the newPublicationButton
-     */
     @Override
     public Button getRemoveNewPublicationButton() {
         return removeNewPublicationButton;
     }
 
-    /**
-     * @return the newPublicationButton
-     */
     @Override
     public Button getContinueButton() {
         return continueButton;
     }
 
-    /**
-     * @return the newPublicationLabel
-     */
     @Override
     public Label getNewPublicationLabel() {
         return newPublicationLabel;
     }
-
-
-
 }

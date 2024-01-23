@@ -30,7 +30,8 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @author a.kohlbecker
  * @since Jun 7, 2017
  */
-public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
+public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T>
+        implements FilterablePagingProvider<V>, FilterableCountProvider {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -191,9 +192,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         }
     }
 
-    /**
-     * @return
-     */
     private List<Restriction<?>> prepareRestrictions(String filter, MatchMode matchMode) {
         List<Restriction<?>> prepared = new ArrayList<>(restrictions.size());
         for(Restriction<?> r : restrictions) {
@@ -211,39 +209,24 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         return prepared;
     }
 
-    /**
-     *
-     */
     protected void checkNotMixed() {
         if(!restrictions.isEmpty() && !criteria.isEmpty()){
             throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
         }
     }
 
-    /**
-     * @return the pageSize
-     */
     public int getPageSize() {
         return pageSize;
     }
 
-    /**
-     * @param pageSize the pageSize to set
-     */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    /**
-     * @return the initStrategy
-     */
     public List<String> getInitStrategy() {
         return initStrategy;
     }
 
-    /**
-     * @param initStrategy the initStrategy to set
-     */
     public void setInitStrategy(List<String> initStrategy) {
         this.initStrategy = initStrategy;
     }

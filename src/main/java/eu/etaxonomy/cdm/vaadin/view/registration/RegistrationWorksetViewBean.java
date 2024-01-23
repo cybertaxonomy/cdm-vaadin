@@ -10,7 +10,6 @@ package eu.etaxonomy.cdm.vaadin.view.registration;
 
 import static eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStyles.LABEL_NOWRAP;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -101,8 +100,6 @@ public class RegistrationWorksetViewBean
     public static final String TEXT_TYPIFICATION_ONLY = "covering typifications only";
 
     public static final String NAME = "workingset";
-
-    private List<CssLayout> registrations = new ArrayList<>();
 
     private String headerText = "Registration Workingset Editor";
     private String subheaderText = "";
@@ -507,16 +504,6 @@ public class RegistrationWorksetViewBean
                 null,
                 this
                 ));
-    }
-
-    @Override
-    public void openReferenceEditor(UUID referenceUuid) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void openNameEditor(UUID nameUuid) {
-        // TODO Auto-generated method stub
     }
 
     @Override

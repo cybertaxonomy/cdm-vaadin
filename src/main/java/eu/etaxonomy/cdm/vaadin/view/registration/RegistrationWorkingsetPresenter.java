@@ -235,8 +235,6 @@ public class RegistrationWorkingsetPresenter
                 select.setNullSelectionAllowed(false);
                 return select;
             }
-
-
         });
 
         loadWorkingSet(getView().getCitationUuid());
@@ -290,7 +288,7 @@ public class RegistrationWorkingsetPresenter
         if(value != null && value instanceof RegistrationStatus){
             if(!Objects.equals(value, reg.getStatus())){
                 reg.updateStatusAndDate((RegistrationStatus)value);
-                cdmStore.saveBean(reg, (AbstractView)getView());
+                cdmStore.saveBean(reg, (AbstractView<?,?>)getView());
                 refreshView(true);
             }
         } else {
