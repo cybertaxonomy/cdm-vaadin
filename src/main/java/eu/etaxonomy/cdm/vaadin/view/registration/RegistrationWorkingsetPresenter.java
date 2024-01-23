@@ -698,15 +698,15 @@ public class RegistrationWorkingsetPresenter
             refreshView(isAtContextRoot(event.getPopup()));
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
-
                 Optional<Registration> registrationOpt = Optional.ofNullable(null);
-                UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
+                NameTypeDesignationPopupEditor popup = ((NameTypeDesignationPopupEditor)event.getPopup());
+                UUID typeDesignationUuid = popup.getBean().getUuid();
                 try {
                     clearSession();
-                    registrationOpt = findRegistrationInContext(event.getPopup());
+                    registrationOpt = findRegistrationInContext(popup);
                     registrationOpt.ifPresent(reg -> {
                         registrationWorkflowService.addTypeDesignation(typeDesignationUuid, reg);
-                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
+                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(popup);
                         });
 
                 } finally {
@@ -714,16 +714,14 @@ public class RegistrationWorkingsetPresenter
                 }
 
                 // Check if other names used in the context of the name are registered yet.
-                NameTypeDesignationPopupEditor nameTypeDesignationEditor = (NameTypeDesignationPopupEditor)event.getPopup();
                 Set<TaxonName> namesToCheck = new HashSet<>();
 
-                namesToCheck.add(nameTypeDesignationEditor.getTypeNameField().getValue());
+                namesToCheck.add(popup.getTypeNameField().getValue());
 
                 for(TaxonName name : namesToCheck){
                     if(name != null){
                         assocciateOrQueueBlockingRegistration(registrationOpt, name.getUuid());
                     }
-
                 }
 
             } else if(event.getReason().equals(Reason.CANCEL)){

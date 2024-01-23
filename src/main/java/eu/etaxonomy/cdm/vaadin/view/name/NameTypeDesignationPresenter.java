@@ -142,7 +142,8 @@ public class NameTypeDesignationPresenter
                 && typifiedNameNomRef.getInReference() != null) {
             typifiedNameNomRef = typifiedNameNomRef.getInReference();
         }
-        getView().setInTypedesignationOnlyAct(Optional.of(!typifiedNameNomRef.equals(getPublishedUnit().getCitation())));
+        boolean inTypedesignationOnlyAct = !typifiedNameNomRef.equals(getPublishedUnit().getCitation());
+        getView().setInTypedesignationOnlyAct(Optional.of(inTypedesignationOnlyAct));
 
 
         if (getPublishedUnit() != null) {
