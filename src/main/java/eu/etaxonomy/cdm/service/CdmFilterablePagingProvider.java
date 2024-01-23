@@ -146,40 +146,21 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         checkNotMixed();
 
-        Pager<V> page;
-
         clearSession(); // clear the session from remains of previous service calls, see issue #7559
+        long count = 0;
         if(!restrictions.isEmpty()){
             // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
-            page = service.findByTitleWithRestrictions(
-                    type,
-                    filter,
-                    matchMode,
-                    preparedRestrictions,
-                    1,
-                    0,
-                    null,
-                    null
-                  );
+            count = service.countByTitleWithRestrictions(type, filter, matchMode, preparedRestrictions);
         } else {
-            page = service.findByTitle(
-                    type,
-                    filter,
-                    matchMode,
-                    criteria,
-                    1,
-                    0,
-                    null,
-                    null
-                  );
+            count = service.countByTitle(type, filter, matchMode, criteria);
         }
 
 
         if(logger.isTraceEnabled()){
-            logger.trace("size() -  count: " + page.getCount().intValue());
+            logger.trace("size() -  count: " + count);
         }
-        return page.getCount().intValue();
+        return Long.valueOf(count).intValue();
     }
 
     /**
