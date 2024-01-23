@@ -213,9 +213,13 @@ public class NameTypeDesignationPresenter
     protected BeanItemContainer<NameTypeDesignationStatus> provideTypeStatusTermItemContainer() {
 
         BeanItemContainer<NameTypeDesignationStatus> container = cdmBeanItemContainerFactory.buildBeanItemContainer(NameTypeDesignationStatus.class);
-        List<NameTypeDesignationStatus> filteredItems = container.getItemIds().stream().filter(tsb ->
-                    getView().checkInTypeDesignationOnlyAct()
-                    || tsb.hasDesignationSource() == true
+        List<NameTypeDesignationStatus> filteredItems = container.getItemIds().stream()
+                .filter(tds ->
+                    (!getView().checkInTypeDesignationOnlyAct()
+                       || tds.hasDesignationSource() == true
+                       || tds.equals(NameTypeDesignationStatus.NOT_APPLICABLE())  //#10434
+
+                     ) && !tds.equals(NameTypeDesignationStatus.TAUTONYMY())  //not botanical according to #10434
                 )
                 .collect(Collectors.toList());
         container.removeAllItems();
