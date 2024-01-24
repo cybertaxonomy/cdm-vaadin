@@ -75,9 +75,9 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
         // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
         // to create a typification only registration in the working (publication) set which contains
-        // the protologe. This is known from the nomenclatural reference.
+        // the protolog. This is known from the nomenclatural reference.
         if(canCreateNameRegistrationFor(workingset, typifiedName)){
-            // the citation which is the base for workingset contains the protologe of the name and the name has not
+            // the citation which is the base for workingset contains the protolog of the name and the name has not
             // been registered before:
             // create a registration for the name and the first typifications
             Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
@@ -167,7 +167,8 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
      */
     @Override
     public boolean canCreateNameRegistrationFor(RegistrationWorkingSet workingset, TaxonName name) {
-        return !getRepo().getRegistrationService().checkRegistrationExistsFor(name) && checkWokingsetContainsProtologe(workingset, name);
+        return !getRepo().getRegistrationService().checkRegistrationExistsFor(name)
+                && checkWokingsetContainsProtologe(workingset, name);
     }
 
     @Override

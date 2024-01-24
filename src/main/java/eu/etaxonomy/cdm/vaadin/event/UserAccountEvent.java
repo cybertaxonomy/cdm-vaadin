@@ -13,7 +13,6 @@ import com.vaadin.ui.Button.ClickEvent;
 /**
  * @author a.kohlbecker
  * @since Apr 25, 2017
- *
  */
 public class UserAccountEvent {
 
@@ -27,9 +26,6 @@ public class UserAccountEvent {
 
     private UserAccountAction action;
 
-    /**
-     * @param e
-     */
     public UserAccountEvent(UserAccountAction action, ClickEvent e) {
         this.action = action;
         this.e = e;
@@ -38,5 +34,4 @@ public class UserAccountEvent {
     public UserAccountAction getAction() {
         return action;
     }
-
 }
