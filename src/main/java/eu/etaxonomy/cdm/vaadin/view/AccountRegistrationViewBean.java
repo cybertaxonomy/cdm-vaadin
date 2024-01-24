@@ -122,11 +122,13 @@ public class AccountRegistrationViewBean
     }
 
     @Override
-    public void showErrorMessage(String text) {
+    public void showErrorMessage(String text, boolean disable) {
         messageLabel.setValue(text);
         messageLabel.setStyleName(ValoTheme.LABEL_FAILURE);
         messageLabel.setVisible(true);
-        disableForm();
+        if (disable) {
+            disableForm();
+        }
     }
 
     @Override

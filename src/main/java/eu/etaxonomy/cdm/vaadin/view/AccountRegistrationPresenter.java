@@ -72,7 +72,7 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             List<String> viewParameters = getNavigationManager().getCurrentViewParameters();
             if(viewParameters.size() != 1  || !tokenStore.isEligibleToken(viewParameters.get(0))) {
                 // invalid token show error
-                getView().showErrorMessage("Invalid token");
+                getView().showErrorMessage("Invalid token", true);
             }
             Optional<AccountCreationRequest> resetRequestOpt = tokenStore.findRequest(viewParameters.get(0));
             if(resetRequestOpt.isPresent()) {
@@ -91,7 +91,7 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             String username = getView().getUserName().getValue();
             boolean existsAlready = repo.getUserService().userExists(username);
             if (existsAlready) {
-                getView().showErrorMessage("The username exists already, please try another username.");
+                getView().showErrorMessage("The username exists already, please try another username.", false);
                 return;
             }
 
@@ -119,13 +119,13 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
                 if(asyncException.get(0) instanceof MailException) {
                     getView().showSuccessMessage("Your password has been changed but sending the confirmation email has failed.");
                 } else if(asyncException.get(0) instanceof AccountSelfManagementException) {
-                    getView().showErrorMessage("The password reset token has beceome invalid. Please request gain for a password reset.");
+                    getView().showErrorMessage("The password reset token has beceome invalid. Please request gain for a password reset.", true);
                 }
            } else {
                 if(!asyncTimeout && result) {
                     getView().showSuccessMessage("Your password has been changed and a confirmation email has been sent to you.");
                 } else {
-                    getView().showErrorMessage("A timeout has occured, please try again.");
+                    getView().showErrorMessage("A timeout has occured, please try again.", false);
                 }
             }
 

@@ -25,7 +25,7 @@ public interface AccountRegistrationView extends ApplicationView<AccountRegistra
 
     public void showSuccessMessage(String text);
 
-    public void showErrorMessage(String text);
+    public void showErrorMessage(String text, boolean disable);
 
     public TextField getEmailAddress();
 
