@@ -117,18 +117,17 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             }
             if(!asyncException.isEmpty()) {
                 if(asyncException.get(0) instanceof MailException) {
-                    getView().showSuccessMessage("Your password has been changed but sending the confirmation email has failed.");
+                    getView().showSuccessMessage("Your account has been created but sending the confirmation email has failed.");
                 } else if(asyncException.get(0) instanceof AccountSelfManagementException) {
-                    getView().showErrorMessage("The password reset token has beceome invalid. Please request gain for a password reset.", true);
+                    getView().showErrorMessage("Your account creation token has beceome invalid. Please request again for an account creation.", true);
                 }
            } else {
                 if(!asyncTimeout && result) {
-                    getView().showSuccessMessage("Your password has been changed and a confirmation email has been sent to you.");
+                    getView().showSuccessMessage("Your account has been created and a confirmation email has been sent to you.");
                 } else {
                     getView().showErrorMessage("A timeout has occured, please try again.", false);
                 }
             }
-
         }
     }
 }
