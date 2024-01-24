@@ -912,7 +912,7 @@ public class RegistrationWorkingsetPresenter
         return registrationWorkflowService.canCreateNameRegistrationFor(workingset, name);
     }
 
-    public boolean checkWokingsetContainsProtologe(TaxonName name) {
+    public boolean checkWokingsetContainsProtolog(TaxonName name) {
         return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
     }
 }

@@ -239,7 +239,7 @@ public class RegistrationWorksetViewBean
                             existingNameRegistrationTypeLabel.setValue(TEXT_NAME_TYPIFICATION);
                             addExistingNameButton.setEnabled(true);
                         } else {
-                            if(!getPresenter().checkWokingsetContainsProtologe(name)){
+                            if(!getPresenter().checkWokingsetContainsProtolog(name)){
                                 existingNameRegistrationTypeLabel.setValue(TEXT_TYPIFICATION_ONLY);
                                 addExistingNameButton.setEnabled(true);
                             }
