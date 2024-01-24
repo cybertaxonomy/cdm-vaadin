@@ -92,6 +92,7 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             boolean existsAlready = repo.getUserService().userExists(username);
             if (existsAlready) {
                 getView().showErrorMessage("The username exists already, please try another username.");
+                return;
             }
 
             CountDownLatch passwordChangedSignal = new CountDownLatch(1);
