@@ -88,6 +88,11 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
     public void onRegisterAccountEvent(UserAccountEvent event) throws AccountSelfManagementException, ExecutionException, MailException, AddressException {
 
         if(event.getAction().equals(UserAccountEvent.UserAccountAction.REGISTER_ACCOUNT)) {
+            String username = getView().getUserName().getValue();
+            boolean existsAlready = repo.getUserService().userExists(username);
+            if (existsAlready) {
+                getView().showErrorMessage("The username exists already, please try another username.");
+            }
 
             CountDownLatch passwordChangedSignal = new CountDownLatch(1);
             List<Throwable> asyncException = new ArrayList<>(1);
