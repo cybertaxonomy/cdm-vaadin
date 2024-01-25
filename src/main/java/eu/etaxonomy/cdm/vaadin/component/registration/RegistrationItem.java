@@ -53,7 +53,7 @@ import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkingsetViewBean;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -189,7 +189,7 @@ public class RegistrationItem extends GridLayout {
         NavigationEvent navigationEvent = null;
         if(regDto.getCitationUuid() != null) {
             navigationEvent = new NavigationEvent(
-                    RegistrationWorksetViewBean.NAME,
+                    RegistrationWorkingsetViewBean.NAME,
                     regDto.getCitationUuid().toString()
                     );
         } else {

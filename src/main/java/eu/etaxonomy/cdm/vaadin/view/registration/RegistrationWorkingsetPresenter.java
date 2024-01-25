@@ -913,6 +913,6 @@ public class RegistrationWorkingsetPresenter
     }
 
     public boolean checkWokingsetContainsProtolog(TaxonName name) {
-        return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
+        return registrationWorkflowService.checkWokingsetContainsProtolog(workingset, name);
     }
 }

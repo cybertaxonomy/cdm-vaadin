@@ -81,8 +81,8 @@ import eu.etaxonomy.vaadin.event.EditorActionType;
  * @author a.kohlbecker
  * @since Mar 2, 2017
  */
-@SpringView(name=RegistrationWorksetViewBean.NAME)
-public class RegistrationWorksetViewBean
+@SpringView(name=RegistrationWorkingsetViewBean.NAME)
+public class RegistrationWorkingsetViewBean
         extends AbstractPageView<RegistrationWorkingsetView,RegistrationWorkingsetPresenter>
         implements RegistrationWorkingsetView, View, AccessRestrictedView {
 
@@ -134,7 +134,7 @@ public class RegistrationWorksetViewBean
 
     private String accessDeniedMessage;
 
-    public RegistrationWorksetViewBean() {
+    public RegistrationWorkingsetViewBean() {
         super();
     }
 

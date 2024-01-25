@@ -245,7 +245,7 @@ public class StartRegistrationPresenter
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorksetViewBean.NAME, referenceUuid.toString()));
+        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorkingsetViewBean.NAME, referenceUuid.toString()));
 
     }
 
