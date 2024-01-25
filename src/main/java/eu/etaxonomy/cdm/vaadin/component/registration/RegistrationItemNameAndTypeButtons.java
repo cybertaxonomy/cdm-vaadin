@@ -60,7 +60,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private static final long serialVersionUID = -5059163772392864050L;
 
-    public static final String STYLE_NAMES = "edit-button-group  " + ValoTheme.LAYOUT_COMPONENT_GROUP;
+    private static final String STYLE_NAMES = "edit-button-group  " + ValoTheme.LAYOUT_COMPONENT_GROUP;
 
     private IdButton<TaxonName> nameIdButton = null;
 

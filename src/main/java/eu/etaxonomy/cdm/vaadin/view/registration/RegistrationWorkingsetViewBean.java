@@ -310,7 +310,7 @@ public class RegistrationWorkingsetViewBean
         typifiedNamesMap.put(dto.getUuid(), typifiedNameReference);
         final boolean isSupraSpecific = typifiedNameReference.isSupraGeneric();
 
-        RegistrationItemNameAndTypeButtons regItemButtonGroup = new RegistrationItemNameAndTypeButtons(dto, getPresenter().getCache());
+        RegistrationItemNameAndTypeButtons regItemNameAndTypeButtons = new RegistrationItemNameAndTypeButtons(dto, getPresenter().getCache());
         UUID registrationEntityUuid = dto.getUuid();
 
         RegistrationItemButtons regItemButtons = new RegistrationItemButtons();
@@ -319,7 +319,7 @@ public class RegistrationWorkingsetViewBean
         footer.setWidth(100, Unit.PERCENTAGE);
         footer.setStyleName("item-footer");
 
-        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemButtonGroup, regItemButtons, footer);
+        RegistrationDetailsItem regDetailsItem = new RegistrationDetailsItem(regItemNameAndTypeButtons, regItemButtons, footer);
         registrationItemMap.put(registrationEntityUuid, regDetailsItem);
 
         Stack<EditorActionContext> context = new Stack<>();
@@ -328,9 +328,9 @@ public class RegistrationWorkingsetViewBean
                     this)
                     );
 
-        if(regItemButtonGroup.getNameButton() != null){
-            regItemButtonGroup.getNameButton().getButton().addClickListener(e -> {
-                UUID nameuUuid = regItemButtonGroup.getNameButton().getUuid();
+        if(regItemNameAndTypeButtons.getNameButton() != null){
+            regItemNameAndTypeButtons.getNameButton().getButton().addClickListener(e -> {
+                UUID nameuUuid = regItemNameAndTypeButtons.getNameButton().getUuid();
                 getViewEventBus().publish(this, new TaxonNameEditorAction(
                     EditorActionType.EDIT,
                     nameuUuid,
@@ -343,7 +343,7 @@ public class RegistrationWorkingsetViewBean
             });
         }
 
-        for(TypeDesignationSetButton workingsetButton : regItemButtonGroup.getTypeDesignationButtons()){
+        for(TypeDesignationSetButton workingsetButton : regItemNameAndTypeButtons.getTypeDesignationButtons()){
             workingsetButton.getButton().addClickListener(e -> {
                 VersionableEntity baseEntity = workingsetButton.getBaseEntity();
                 RankedNameReference typifiedNameRef = typifiedNamesMap.get(registrationEntityUuid);
@@ -362,7 +362,7 @@ public class RegistrationWorkingsetViewBean
             });
         }
 
-        regItemButtonGroup.getAddTypeDesignationButton().addClickListener(e -> {
+        regItemNameAndTypeButtons.getAddTypeDesignationButton().addClickListener(e -> {
                     TypeDesignationSetType type = isSupraSpecific ?
                             TypeDesignationSetType.NAME_TYPE_DESIGNATION_SET : TypeDesignationSetType.SPECIMEN_TYPE_DESIGNATION_SET;
                     addNewTypeDesignationSet(type, registrationEntityUuid, null, e.getButton());
@@ -436,13 +436,13 @@ public class RegistrationWorkingsetViewBean
             unlockButton.setStyleName(ValoTheme.BUTTON_TINY);
             unlockButton.setDescription("Unlock");
             unlockButton.addClickListener(e -> {
-                regItemButtonGroup.setLockOverride(!regItemButtonGroup.isLockOverride());
-                if(regItemButtonGroup.isRegistrationLocked()){
-                    unlockButton.setIcon(regItemButtonGroup.isLockOverride() ? FontAwesome.UNLOCK_ALT : FontAwesome.LOCK);
-                    unlockButton.setDescription(regItemButtonGroup.isLockOverride() ? "Click to unlock editing" : "Click to lock editing");
+                regItemNameAndTypeButtons.setLockOverride(!regItemNameAndTypeButtons.isLockOverride());
+                if(regItemNameAndTypeButtons.isRegistrationLocked()){
+                    unlockButton.setIcon(regItemNameAndTypeButtons.isLockOverride() ? FontAwesome.UNLOCK_ALT : FontAwesome.LOCK);
+                    unlockButton.setDescription(regItemNameAndTypeButtons.isLockOverride() ? "Click to unlock editing" : "Click to lock editing");
                 }
             });
-            unlockButton.setEnabled(regItemButtonGroup.isRegistrationLocked());
+            unlockButton.setEnabled(regItemNameAndTypeButtons.isRegistrationLocked());
             regItemButtons.addComponents(unlockButton, editRegistrationButton);
         }
 
@@ -452,7 +452,7 @@ public class RegistrationWorkingsetViewBean
         row++;
         registrationsGrid.addComponent(stateAndSubmitter, COL_INDEX_STATE_LABEL, row);
         // registrationsGrid.setComponentAlignment(stateLabel, Alignment.TOP_LEFT);
-        registrationsGrid.addComponent(regItemButtonGroup, COL_INDEX_REG_ITEM, row);
+        registrationsGrid.addComponent(regItemNameAndTypeButtons, COL_INDEX_REG_ITEM, row);
         registrationsGrid.addComponent(regItemButtons, COL_INDEX_BUTTON_GROUP, row);
         registrationsGrid.setComponentAlignment(regItemButtons, Alignment.TOP_LEFT);
 
