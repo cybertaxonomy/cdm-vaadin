@@ -30,7 +30,8 @@ import eu.etaxonomy.cdm.persistence.query.OrderHint;
  * @author a.kohlbecker
  * @since Jun 7, 2017
  */
-public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T> implements FilterablePagingProvider<V>, FilterableCountProvider {
+public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends T>
+        implements FilterablePagingProvider<V>, FilterableCountProvider {
 
     private static final Logger logger = LogManager.getLogger();
 
@@ -145,40 +146,21 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
         checkNotMixed();
 
-        Pager<V> page;
-
         clearSession(); // clear the session from remains of previous service calls, see issue #7559
+        long count = 0;
         if(!restrictions.isEmpty()){
             // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
-            page = service.findByTitleWithRestrictions(
-                    type,
-                    filter,
-                    matchMode,
-                    preparedRestrictions,
-                    1,
-                    0,
-                    null,
-                    null
-                  );
+            count = service.countByTitleWithRestrictions(type, filter, matchMode, preparedRestrictions);
         } else {
-            page = service.findByTitle(
-                    type,
-                    filter,
-                    matchMode,
-                    criteria,
-                    1,
-                    0,
-                    null,
-                    null
-                  );
+            count = service.countByTitle(type, filter, matchMode, criteria);
         }
 
 
         if(logger.isTraceEnabled()){
-            logger.trace("size() -  count: " + page.getCount().intValue());
+            logger.trace("size() -  count: " + count);
         }
-        return page.getCount().intValue();
+        return Long.valueOf(count).intValue();
     }
 
     /**
@@ -191,9 +173,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         }
     }
 
-    /**
-     * @return
-     */
     private List<Restriction<?>> prepareRestrictions(String filter, MatchMode matchMode) {
         List<Restriction<?>> prepared = new ArrayList<>(restrictions.size());
         for(Restriction<?> r : restrictions) {
@@ -211,39 +190,24 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         return prepared;
     }
 
-    /**
-     *
-     */
     protected void checkNotMixed() {
         if(!restrictions.isEmpty() && !criteria.isEmpty()){
             throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
         }
     }
 
-    /**
-     * @return the pageSize
-     */
     public int getPageSize() {
         return pageSize;
     }
 
-    /**
-     * @param pageSize the pageSize to set
-     */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    /**
-     * @return the initStrategy
-     */
     public List<String> getInitStrategy() {
         return initStrategy;
     }
 
-    /**
-     * @param initStrategy the initStrategy to set
-     */
     public void setInitStrategy(List<String> initStrategy) {
         this.initStrategy = initStrategy;
     }

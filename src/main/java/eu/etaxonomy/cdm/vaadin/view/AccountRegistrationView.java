@@ -17,7 +17,8 @@ import eu.etaxonomy.vaadin.mvp.ApplicationView;
  * @author a.kohlbecker
  * @since Nov 22, 2021
  */
-public interface AccountRegistrationView extends ApplicationView<AccountRegistrationView,AccountRegistrationPresenter>   {
+public interface AccountRegistrationView
+        extends ApplicationView<AccountRegistrationView,AccountRegistrationPresenter>   {
 
     public TextField getUserName();
 
@@ -25,7 +26,7 @@ public interface AccountRegistrationView extends ApplicationView<AccountRegistra
 
     public void showSuccessMessage(String text);
 
-    public void showErrorMessage(String text);
+    public void showErrorMessage(String text, boolean disable);
 
     public TextField getEmailAddress();
 

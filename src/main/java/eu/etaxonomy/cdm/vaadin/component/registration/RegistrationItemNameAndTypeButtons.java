@@ -60,7 +60,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private static final long serialVersionUID = -5059163772392864050L;
 
-    public static final String STYLE_NAMES = "edit-button-group  " + ValoTheme.LAYOUT_COMPONENT_GROUP;
+    private static final String STYLE_NAMES = "edit-button-group  " + ValoTheme.LAYOUT_COMPONENT_GROUP;
 
     private IdButton<TaxonName> nameIdButton = null;
 
@@ -79,6 +79,8 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
     private boolean isRegistrationLocked;
 
     private boolean isLockOverride;
+
+    private boolean userHasAddPermission;
 
     public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto, ICdmEntityUuidCacher entitiyCacher) {
 
@@ -115,7 +117,8 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                 addComponent(nameLabel);
             }
         }
-        boolean userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
+
+        userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
         Map<TypedEntityReference<? extends VersionableEntity>,TypeDesignationSet> typeDesignationSets = regDto.getOrderedTypeDesignationSets();
 
         if(typeDesignationSets != null){
@@ -167,7 +170,6 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         }
         addTypeDesignationButton = ButtonFactory.ADD_ITEM.createButton();
         addTypeDesignationButton.setDescription("Add a new type designation workingset.");
-        addTypeDesignationButton.setVisible(!isRegistrationLocked && userHasAddPermission);
         addComponent(addTypeDesignationButton);
 
         //TODO make responsive and use specificIdentifier in case the space gets too narrow
@@ -190,6 +192,11 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
             b.button.setDescription(impossibleToUnlock ? "Unlock failed due to missing permissions!" : "");
             b.button.setIcon(isLockOverride ? FontAwesome.UNLOCK_ALT : null);
         }
+
+        //by AM to fix #10435
+        boolean addTypeDesignationButtonVisible = (!isRegistrationLocked || isLockOverride)
+                                                    && userHasAddPermission;
+        addTypeDesignationButton.setVisible(addTypeDesignationButtonVisible);
     }
 
     public IdButton<TaxonName> getNameButton() {

@@ -34,22 +34,6 @@ public interface RegistrationWorkingsetView
 
     public static final String ACTION_EDIT = "edit";
 
-    /**
-     * Open a popup editor for an existing TaxonName if the nameUuid is
-     * given otherwise a blank editor will open if the  nameUuid is null.
-     *
-     * @param nameUuid can be null
-     */
-    public void openNameEditor(UUID nameUuid);
-
-    /**
-     * Open a popup editor for an existing Reference if the referenceUuid is
-     * given otherwise a blank editor will open if the  referenceUuid is null.
-     *
-     * @param referenceUuid can be null
-     */
-    public void openReferenceEditor(UUID referenceUuid);
-
     public void setSubheaderText(String subheaderText);
 
     public void setHeaderText(String subheaderText);

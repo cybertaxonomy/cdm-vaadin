@@ -13,7 +13,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.mail.internet.AddressException;
@@ -168,7 +167,7 @@ public class LoginPresenter extends AbstractPresenter<LoginPresenter,LoginView>
     }
 
     @EventBusListenerMethod
-    public void onPasswordRevoveryEvent(UserAccountEvent event) throws MalformedURLException, ExecutionException, MailException, AddressException, AccountSelfManagementException {
+    public void onPasswordRevoveryEvent(UserAccountEvent event) throws MalformedURLException, MailException, AddressException, AccountSelfManagementException {
 
         if(event.getAction().equals(UserAccountEvent.UserAccountAction.REQUEST_PASSWORD_RESET)) {
             requestPasswordReset();
@@ -243,6 +242,7 @@ public class LoginPresenter extends AbstractPresenter<LoginPresenter,LoginView>
     }
 
     private void requestAccountCreation() throws MalformedURLException, MailException, AddressException, AccountSelfManagementException {
+
         String emailAddress = getView().getLoginDialog().getEmail().getValue();
         URL servletBaseUrl = VaadinServletUtilities.getServletBaseUrl();
 

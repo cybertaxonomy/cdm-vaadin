@@ -28,9 +28,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.AbstractField;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -56,6 +59,7 @@ import eu.etaxonomy.cdm.model.name.TypeDesignationBase;
 import eu.etaxonomy.cdm.model.occurrence.FieldUnit;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -235,8 +239,6 @@ public class RegistrationWorkingsetPresenter
                 select.setNullSelectionAllowed(false);
                 return select;
             }
-
-
         });
 
         loadWorkingSet(getView().getCitationUuid());
@@ -245,9 +247,11 @@ public class RegistrationWorkingsetPresenter
     }
 
     private void applyWorkingset(){
-         getView().setWorkingset(workingset);
-        // PagingProviders and CacheGenerator for the existingNameCombobox
-        activateComboboxes();
+        if (workingset != null) {
+            getView().setWorkingset(workingset);
+            // PagingProviders and CacheGenerator for the existingNameCombobox
+            activateComboboxes();
+        }
     }
 
     protected void activateComboboxes() {
@@ -261,9 +265,14 @@ public class RegistrationWorkingsetPresenter
 
         try {
             workingset = getWorkingSetService().loadWorkingSetByReferenceUuid(referenceUuid, true);
+        } catch (PermissionDeniedException error) {
+            logger.warn(error);
+            showErrorDialog("Permission denied", "You are not allowed to access this working set.");
+            return;
         } catch (TypeDesignationSetException error) {
             logger.error(error);
             showErrorDialog("Validation Error", error.getMessage());
+            //NOTE by AM: should we return here, too, or is this error not so
         }
         cache = new CdmTransientEntityWithUuidCacher(this);
         for(Registration registration : workingset.getRegistrations()) {
@@ -272,12 +281,28 @@ public class RegistrationWorkingsetPresenter
     }
 
     public void showErrorDialog(String errorDialogCaption, String errorMessage) {
-        Window errorDialog = new Window(errorDialogCaption);
+
+        final Window errorDialog = new Window(errorDialogCaption);
         errorDialog.setModal(true);
+        errorDialog.setClosable(false);
+        errorDialog.setResizable(false);
         VerticalLayout subContent = new VerticalLayout();
+        subContent.setSpacing(true);
         subContent.setMargin(true);
         errorDialog.setContent(subContent);
         subContent.addComponent(new Label(errorMessage));
+
+        //close button (quick & dirty by AM, to fix #10373)
+        Button cancelButton = new Button("Close");
+        subContent.addComponent(cancelButton);
+        cancelButton.setWidth("-1px");
+        cancelButton.setHeight("-1px");
+        subContent.addComponent(cancelButton);
+        subContent.setComponentAlignment(cancelButton, new Alignment(48));
+        cancelButton.addClickListener((ev)->errorDialog.close());
+        cancelButton.setClickShortcut(KeyCode.ENTER, null);
+        cancelButton.focus();
+
         UI.getCurrent().addWindow(errorDialog);
     }
 
@@ -290,7 +315,7 @@ public class RegistrationWorkingsetPresenter
         if(value != null && value instanceof RegistrationStatus){
             if(!Objects.equals(value, reg.getStatus())){
                 reg.updateStatusAndDate((RegistrationStatus)value);
-                cdmStore.saveBean(reg, (AbstractView)getView());
+                cdmStore.saveBean(reg, (AbstractView<?,?>)getView());
                 refreshView(true);
             }
         } else {
@@ -673,15 +698,15 @@ public class RegistrationWorkingsetPresenter
             refreshView(isAtContextRoot(event.getPopup()));
         } else if(event.getPopup() instanceof NameTypeDesignationPopupEditor){
             if(event.getReason().equals(Reason.SAVE)){
-
                 Optional<Registration> registrationOpt = Optional.ofNullable(null);
-                UUID typeDesignationUuid = ((NameTypeDesignationPopupEditor)event.getPopup()).getBean().getUuid();
+                NameTypeDesignationPopupEditor popup = ((NameTypeDesignationPopupEditor)event.getPopup());
+                UUID typeDesignationUuid = popup.getBean().getUuid();
                 try {
                     clearSession();
-                    registrationOpt = findRegistrationInContext(event.getPopup());
+                    registrationOpt = findRegistrationInContext(popup);
                     registrationOpt.ifPresent(reg -> {
                         registrationWorkflowService.addTypeDesignation(typeDesignationUuid, reg);
-                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(event.getPopup());
+                        nameTypeDesignationPopupEditorRegistrationUUIDMap.remove(popup);
                         });
 
                 } finally {
@@ -689,16 +714,14 @@ public class RegistrationWorkingsetPresenter
                 }
 
                 // Check if other names used in the context of the name are registered yet.
-                NameTypeDesignationPopupEditor nameTypeDesignationEditor = (NameTypeDesignationPopupEditor)event.getPopup();
                 Set<TaxonName> namesToCheck = new HashSet<>();
 
-                namesToCheck.add(nameTypeDesignationEditor.getTypeNameField().getValue());
+                namesToCheck.add(popup.getTypeNameField().getValue());
 
                 for(TaxonName name : namesToCheck){
                     if(name != null){
                         assocciateOrQueueBlockingRegistration(registrationOpt, name.getUuid());
                     }
-
                 }
 
             } else if(event.getReason().equals(Reason.CANCEL)){
@@ -889,7 +912,7 @@ public class RegistrationWorkingsetPresenter
         return registrationWorkflowService.canCreateNameRegistrationFor(workingset, name);
     }
 
-    public boolean checkWokingsetContainsProtologe(TaxonName name) {
-        return registrationWorkflowService.checkWokingsetContainsProtologe(workingset, name);
+    public boolean checkWokingsetContainsProtolog(TaxonName name) {
+        return registrationWorkflowService.checkWokingsetContainsProtolog(workingset, name);
     }
 }

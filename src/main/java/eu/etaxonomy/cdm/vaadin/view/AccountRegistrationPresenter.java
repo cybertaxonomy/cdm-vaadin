@@ -72,7 +72,7 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             List<String> viewParameters = getNavigationManager().getCurrentViewParameters();
             if(viewParameters.size() != 1  || !tokenStore.isEligibleToken(viewParameters.get(0))) {
                 // invalid token show error
-                getView().showErrorMessage("Invalid token");
+                getView().showErrorMessage("Invalid token", true);
             }
             Optional<AccountCreationRequest> resetRequestOpt = tokenStore.findRequest(viewParameters.get(0));
             if(resetRequestOpt.isPresent()) {
@@ -88,6 +88,12 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
     public void onRegisterAccountEvent(UserAccountEvent event) throws AccountSelfManagementException, ExecutionException, MailException, AddressException {
 
         if(event.getAction().equals(UserAccountEvent.UserAccountAction.REGISTER_ACCOUNT)) {
+            String username = getView().getUserName().getValue();
+            boolean existsAlready = repo.getUserService().userExists(username);
+            if (existsAlready) {
+                getView().showErrorMessage("The username exists already, please try another username.", false);
+                return;
+            }
 
             CountDownLatch passwordChangedSignal = new CountDownLatch(1);
             List<Throwable> asyncException = new ArrayList<>(1);
@@ -111,18 +117,17 @@ public class AccountRegistrationPresenter extends AbstractPresenter<AccountRegis
             }
             if(!asyncException.isEmpty()) {
                 if(asyncException.get(0) instanceof MailException) {
-                    getView().showSuccessMessage("Your password has been changed but sending the confirmation email has failed.");
+                    getView().showSuccessMessage("Your account has been created but sending the confirmation email has failed.");
                 } else if(asyncException.get(0) instanceof AccountSelfManagementException) {
-                    getView().showErrorMessage("The password reset token has beceome invalid. Please request gain for a password reset.");
+                    getView().showErrorMessage("Your account creation token has beceome invalid. Please request again for an account creation.", true);
                 }
            } else {
                 if(!asyncTimeout && result) {
-                    getView().showSuccessMessage("Your password has been changed and a confirmation email has been sent to you.");
+                    getView().showSuccessMessage("Your account has been created and a confirmation email has been sent to you.");
                 } else {
-                    getView().showErrorMessage("A timeout has occured, please try again.");
+                    getView().showErrorMessage("A timeout has occured, please try again.", false);
                 }
             }
-
         }
     }
 }

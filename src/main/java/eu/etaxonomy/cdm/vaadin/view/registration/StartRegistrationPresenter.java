@@ -90,36 +90,50 @@ public class StartRegistrationPresenter
                 new ReferenceEllypsisFormatter(ReferenceEllypsisFormatter.LabelType.BIBLIOGRAPHIC),
                 ReferenceEllypsisFormatter.INIT_STRATEGY
                 );
-        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<Reference>();
+        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<>();
         // referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
+        Criterion criterion = getReferenceFilterCriterion();
+        referencePagingProvider.addCriterion(criterion);
+        getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
+        getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+    }
+
+    private Criterion getReferenceFilterCriterion() {
+
+        //never use sections, journals and print series
         Criterion criterion = Restrictions.not(Restrictions.or(Restrictions.in("type", new ReferenceType[]{ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries})));
 
         if(!UserHelperAccess.userHelper().userIsAdmin()){
             Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper().findUserPermissions(Reference.class, Operation.UPDATE);
             boolean generalUpdatePermission = referencePermissions.stream().anyMatch(p -> p.getTargetUUID() == null);
             if(!generalUpdatePermission){
-                // exclude unpublished publications
-                DateTime nowLocal = new DateTime();
-                String dateString = nowLocal.toString("yyyyMMdd");
-                logger.debug("dateString:" + dateString);
-                Criterion pulishedOnly = Restrictions.or(
-                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNull("datePublished.end"), Restrictions.isNull("datePublished.freeText")),
-                        Restrictions.and(Restrictions.isNotNull("datePublished.start"), Restrictions.sqlRestriction("datePublished_start < " + dateString)),
-                        Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNotNull("datePublished.end"), Restrictions.sqlRestriction("datePublished_end < " + dateString))
-                        );
-                // restrict by allowed reference uuids
-                Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
-                if(!allowedUuids.isEmpty()){
-                    Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
-                    criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnly, uuidRestriction));
-                } else {
-                    criterion = Restrictions.and(criterion, pulishedOnly);
-                }
+                criterion = addUuidAndPublicationDateBasedFilter(criterion, referencePermissions);
             }
         }
-        referencePagingProvider.addCriterion(criterion);
-        getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
-        getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
+        return criterion;
+    }
+
+    private Criterion addUuidAndPublicationDateBasedFilter(Criterion criterion,
+            Collection<CdmAuthority> referencePermissions) {
+
+        // exclude unpublished publications
+        DateTime nowLocal = new DateTime();
+        String dateString = nowLocal.toString("yyyyMMdd");
+        logger.debug("dateString:" + dateString);
+        Criterion pulishedOnlyCriterion = Restrictions.or(
+                Restrictions.and(Restrictions.isNotNull("datePublished.start"), Restrictions.sqlRestriction("datePublished_start < " + dateString)),
+                Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNotNull("datePublished.end"), Restrictions.sqlRestriction("datePublished_end < " + dateString))
+                );
+
+        // restrict by allowed reference uuids
+        Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
+        if(!allowedUuids.isEmpty()){
+            Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
+            criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnlyCriterion, uuidRestriction));
+        } else {
+            criterion = Restrictions.and(criterion, pulishedOnlyCriterion);
+        }
+        return criterion;
     }
 
     public void updateReferenceSearchMode(MatchMode value) {
@@ -231,7 +245,7 @@ public class StartRegistrationPresenter
             getView().getContinueButton().setEnabled(false);
         }
         registrationInProgress = true;
-        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorksetViewBean.NAME, referenceUuid.toString()));
+        viewEventBus.publish(EventScope.UI, this, new NavigationEvent(RegistrationWorkingsetViewBean.NAME, referenceUuid.toString()));
 
     }
 

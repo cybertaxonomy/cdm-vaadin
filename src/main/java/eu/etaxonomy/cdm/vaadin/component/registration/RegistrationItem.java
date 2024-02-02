@@ -53,7 +53,7 @@ import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
 import eu.etaxonomy.cdm.vaadin.theme.EditValoTheme;
 import eu.etaxonomy.cdm.vaadin.util.formatter.DateTimeFormat;
 import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
-import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorksetViewBean;
+import eu.etaxonomy.cdm.vaadin.view.registration.RegistrationWorkingsetViewBean;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
@@ -61,7 +61,6 @@ import eu.etaxonomy.vaadin.ui.navigation.NavigationEvent;
 /**
  * @author a.kohlbecker
  * @since Mar 17, 2017
- *
  */
 public class RegistrationItem extends GridLayout {
 
@@ -104,9 +103,6 @@ public class RegistrationItem extends GridLayout {
 
     private ICdmEntityUuidCacher cache;
 
-    /**
-     *
-     */
     public RegistrationItem(RegistrationDTO item, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
         this.cache = cache;
@@ -114,16 +110,13 @@ public class RegistrationItem extends GridLayout {
         setItem(item, parentView);
     }
 
-    /**
-    *
-    */
-   public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
-       super(GRID_COLS, GRID_ROWS);
-       this.cache = cache;
-       init();
-       blockedByButton.setVisible(false);
-       setWorkingSet(workingSet, parentView);
-   }
+    public RegistrationItem(RegistrationWorkingSet workingSet, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
+        super(GRID_COLS, GRID_ROWS);
+        this.cache = cache;
+        init();
+        blockedByButton.setVisible(false);
+        setWorkingSet(workingSet, parentView);
+    }
 
     public void init() {
 
@@ -185,7 +178,6 @@ public class RegistrationItem extends GridLayout {
         releasedLabel.setVisible(false);
         addComponent(releasedLabel, 2, 3);
         setComponentAlignment(releasedLabel, Alignment.BOTTOM_RIGHT);
-
     }
 
     public void setItem(RegistrationDTO regDto, AbstractView<?,?> parentView){
@@ -197,7 +189,7 @@ public class RegistrationItem extends GridLayout {
         NavigationEvent navigationEvent = null;
         if(regDto.getCitationUuid() != null) {
             navigationEvent = new NavigationEvent(
-                    RegistrationWorksetViewBean.NAME,
+                    RegistrationWorkingsetViewBean.NAME,
                     regDto.getCitationUuid().toString()
                     );
         } else {
@@ -232,9 +224,6 @@ public class RegistrationItem extends GridLayout {
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
     }
 
-    /**
-     * @return
-     */
     private UserHelper cdmUserHelper() {
         if(cache != null){
             return UserHelperAccess.userHelper().withCache(cache);
@@ -243,11 +232,6 @@ public class RegistrationItem extends GridLayout {
         }
     }
 
-
-    /**
-     * @param submitterUserName TODO
-     *
-     */
     private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int validationProblemsCount,
             Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto, String submitterUserName) {
 
@@ -258,7 +242,7 @@ public class RegistrationItem extends GridLayout {
             getValidationProblemsButton().setEnabled(true);
             // getMessageButton().addStyleName(RegistrationStyles.STYLE_FRIENDLY_FOREGROUND);
             getValidationProblemsButton().addClickListener(e -> {
-                ShowDetailsEvent detailsEvent;
+                ShowDetailsEvent<?,?> detailsEvent;
                 if(regDto != null){
                     detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
                             e,
@@ -342,7 +326,6 @@ public class RegistrationItem extends GridLayout {
         updateDateLabels(created, datePublished, registrationDate);
     }
 
-
     private void updateDateLabels(DateTime created, TimePeriod datePublished, DateTime released) {
         if(created != null){
             getCreatedLabel().setValue("<span class=\"caption\">" + LABEL_CAPTION_CREATED + "</span>&nbsp;" + created.toString(ISODateTimeFormat.yearMonthDay()));
@@ -370,9 +353,6 @@ public class RegistrationItem extends GridLayout {
         return regDto.getUuid();
     }
 
-    /**
-     * @param showBlockingRelations the showBlockingRelations to set
-     */
     public void showBlockingRegistrations(Set<RegistrationDTO> blockingRegDTOs) {
 
         if(blockingRelationsPanel == null) {
@@ -391,85 +371,48 @@ public class RegistrationItem extends GridLayout {
     }
 
     /* ====== RegistrationItemDesign Getters ====== */
-    /**
-     * @return the typeStateLabel
-     */
+
     public Label getTypeStateLabel() {
         return stateLabel;
     }
 
-    /**
-     * @return the identifierLink
-     */
     public Link getIdentifierLink() {
         return identifierLink;
     }
 
-    /**
-     * @return the citationSummaryLabel
-     */
     public Label getCitationSummaryLabel() {
         return citationSummaryLabel;
     }
 
-    /**
-     * @return the blockedByButton
-     */
     public Button getBlockedByButton() {
         return blockedByButton;
     }
 
-    /**
-     * @return the validationProblemsButton
-     */
     public BadgeButton getValidationProblemsButton() {
         return validationProblemsButton;
     }
 
-    /**
-     * @return the openButton
-     */
     public Button getOpenButton() {
         return openButton;
     }
 
-    /**
-     * @return the createdLabel
-     */
     public Label getCreatedLabel() {
         return createdLabel;
     }
 
-    /**
-     * @return the publishedLabel
-     */
     public Label getPublishedLabel() {
         return publishedLabel;
     }
 
-
-    /**
-     * @return
-     */
     public Label getReleasedLabel() {
         return releasedLabel;
     }
 
-    /**
-     * @return the submitterLabel
-     */
     public Label getSubmitterLabel() {
         return submitterLabel;
     }
 
-    /**
-     * @return the showBlockingRelations
-     */
     public boolean isShowBlockingRelations() {
         return blockingRelationsPanel != null;
     }
-
-
-   /* --------------------------------------- */
-
 }

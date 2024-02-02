@@ -23,33 +23,15 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  */
 public class RegistrationEditorAction extends AbstractEditorAction<Registration> {
 
-    /**
-     * @param eventType
-     */
     public RegistrationEditorAction(EditorActionType type) {
         super(type);
     }
 
-
-    /**
-     * @param action
-     * @param source
-     */
     public RegistrationEditorAction(EditorActionType action, Button source, Field<Registration> target, AbstractView sourceView) {
         super(action, source, target, sourceView);
     }
 
-    /**
-     * @param action
-     * @param entityId
-     * @param source
-     * @param sourceView
-     */
     public RegistrationEditorAction(EditorActionType action, UUID entityUuid, Button source, Field<Registration> target, AbstractView sourceView) {
         super(action, entityUuid, source, target, sourceView);
     }
-
-
-
-
 }

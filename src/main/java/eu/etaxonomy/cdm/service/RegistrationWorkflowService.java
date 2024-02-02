@@ -75,16 +75,16 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
         Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
         // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
         // to create a typification only registration in the working (publication) set which contains
-        // the protologe. This is known from the nomenclatural reference.
+        // the protolog. This is known from the nomenclatural reference.
         if(canCreateNameRegistrationFor(workingset, typifiedName)){
-            // the citation which is the base for workingset contains the protologe of the name and the name has not
+            // the citation which is the base for workingset contains the protolog of the name and the name has not
             // been registered before:
             // create a registration for the name and the first typifications
             Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
             workingset.add(new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation));
             doReloadWorkingSet = true;
         } else {
-            if(!checkWokingsetContainsProtologe(workingset, typifiedName)){
+            if(!checkWokingsetContainsProtolog(workingset, typifiedName)){
                 // create a typification only registration
                 Registration typificationOnlyRegistration = getRepo().getRegistrationService().newRegistration();
                 if(!getRepo().getRegistrationService().checkRegistrationExistsFor(typifiedName)){
@@ -167,20 +167,25 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
      */
     @Override
     public boolean canCreateNameRegistrationFor(RegistrationWorkingSet workingset, TaxonName name) {
-        return !getRepo().getRegistrationService().checkRegistrationExistsFor(name) && checkWokingsetContainsProtologe(workingset, name);
+        return !getRepo().getRegistrationService().checkRegistrationExistsFor(name)
+                && checkWokingsetContainsProtolog(workingset, name);
     }
 
     @Override
-    public boolean checkWokingsetContainsProtologe(RegistrationWorkingSet workingset, TaxonName name) {
+    public boolean checkWokingsetContainsProtolog(RegistrationWorkingSet workingset, TaxonName name) {
         Reference nomRef = name.getNomenclaturalReference();
         UUID citationUuid = workingset.getCitationUuid();
         // @formatter:off
-        return nomRef != null && (
+        return nomRef != null
                 // nomref matches
-                nomRef.getUuid().equals(citationUuid) ||
-                // nomref.inreference matches
-                (nomRef.getType() != null && nomRef.getType() == ReferenceType.Section && nomRef.getInReference() != null && nomRef.getInReference().getUuid().equals(citationUuid))
-                );
+                && (nomRef.getUuid().equals(citationUuid)
+                    // nomref.inreference matches
+                    || (nomRef.getType() != null
+                         && nomRef.getType() == ReferenceType.Section
+                         && nomRef.getInReference() != null
+                         && nomRef.getInReference().getUuid().equals(citationUuid)
+                )
+            );
         // @formatter:on
     }
 }

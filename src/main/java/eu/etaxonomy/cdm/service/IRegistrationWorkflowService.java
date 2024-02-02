@@ -74,7 +74,7 @@ public interface IRegistrationWorkflowService {
     @Transactional(readOnly=true)
     boolean canCreateNameRegistrationFor(RegistrationWorkingSet workingset, TaxonName name);
 
-    boolean checkWokingsetContainsProtologe(RegistrationWorkingSet workingset, TaxonName name);
+    boolean checkWokingsetContainsProtolog(RegistrationWorkingSet workingset, TaxonName name);
 
 
 }

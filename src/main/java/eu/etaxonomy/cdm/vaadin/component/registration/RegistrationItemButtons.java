@@ -22,12 +22,11 @@ import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
  */
 public class RegistrationItemButtons extends CssLayout {
 
-
     private static final long serialVersionUID = 6807283645907730475L;
 
-    Button blockingRegistrationButton;
+    private Button blockingRegistrationButton;
 
-    BadgeButton validationProblemsButton;
+    private BadgeButton validationProblemsButton;
 
     public RegistrationItemButtons() {
 
@@ -42,18 +41,11 @@ public class RegistrationItemButtons extends CssLayout {
           addComponents(blockingRegistrationButton, validationProblemsButton);
     }
 
-    /**
-     * @return the blockingRegistrationButton
-     */
     public Button getBlockingRegistrationButton() {
         return blockingRegistrationButton;
     }
 
-    /**
-     * @return the validationProblemsButton
-     */
     public BadgeButton getValidationProblemsButton() {
         return validationProblemsButton;
     }
-
 }

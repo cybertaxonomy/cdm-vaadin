@@ -60,7 +60,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.database.PermissionDeniedException;
+import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.component.dialog.ContinueAlternativeCancelDialog;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionContext;
@@ -290,7 +290,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
      * The top tool-bar is initially invisible.
      */
     protected void setToolBarVisible(boolean visible){
-        toolBar.setVisible(true);
+        toolBar.setVisible(visible);
     }
 
     public boolean isAdvancedMode() {
@@ -921,7 +921,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
 
         unbindField(oldField);
         addField(newField, propertyId, column1, row1, column2, row2);
-        getViewEventBus().publish(this, new FieldReplaceEvent(this, oldField, newField));
+        getViewEventBus().publish(this, new FieldReplaceEvent<>(this, oldField, newField));
         // important: set newField value at last!
         newField.setValue(value);
         return newField;
