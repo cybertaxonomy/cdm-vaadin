@@ -17,7 +17,7 @@ import org.vaadin.viritin.fields.LazyComboBox;
 
 import com.vaadin.ui.Button;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationStatusFieldInstantiator;
@@ -50,7 +50,7 @@ public interface RegistrationWorkingsetView
 
     public UUID getCitationUuid();
 
-    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs);
+    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationWrapperDTO> blockingRegDTOs);
 
     /**
      * Returns the registrationItemMap as unmodifiableMap.

@@ -44,9 +44,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO.RankedNameReference;
+import eu.etaxonomy.cdm.api.dto.RegistrationDTO.RankedNameReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -130,7 +130,7 @@ public class RegistrationWorkingsetViewBean
      */
     private Map<UUID, RankedNameReference> typifiedNamesMap = new HashMap<>();
 
-    private RegistrationStatusFieldInstantiator<RegistrationDTO> statusFieldInstantiator;
+    private RegistrationStatusFieldInstantiator<RegistrationWrapperDTO> statusFieldInstantiator;
 
     private String accessDeniedMessage;
 
@@ -172,7 +172,7 @@ public class RegistrationWorkingsetViewBean
     }
 
     @Override
-    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs) {
+    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationWrapperDTO> blockingRegDTOs) {
 
         RegistrationDetailsItem regItem = registrationItemMap.get(registrationUuid);
 
@@ -199,9 +199,9 @@ public class RegistrationWorkingsetViewBean
         registrationsGrid.setColumnExpandRatio(1, 1f);
 
         registrationItemMap.clear();
-        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 3);
+        registrationsGrid.setRows(workingset.getRegistrationWrapperDTOs().size() * 2  + 3);
         int row = 0;
-        for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
+        for(RegistrationWrapperDTO dto : workingset.getRegistrationWrapperDTOs()) {
             row = putRegistrationListComponent(row, dto);
         }
 
@@ -301,7 +301,7 @@ public class RegistrationWorkingsetViewBean
         );
     }
 
-    protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
+    protected int putRegistrationListComponent(int row, RegistrationWrapperDTO dto) {
 
         RankedNameReference typifiedNameReference = dto.getTypifiedNameRef();
         if(typifiedNameReference == null){
@@ -379,9 +379,9 @@ public class RegistrationWorkingsetViewBean
             blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
+                    new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(
                             e,
-                            RegistrationDTO.class,
+                            RegistrationWrapperDTO.class,
                             dto.getUuid(),
                             RegistrationItem.BLOCKED_BY
                             )
@@ -394,9 +394,9 @@ public class RegistrationWorkingsetViewBean
         if(!dto.getValidationProblems().isEmpty()){
             validationProblemsButton.setEnabled(true);
             validationProblemsButton.addClickListener(e -> getViewEventBus().publish(this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
+                    new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(
                         e,
-                        RegistrationDTO.class,
+                        RegistrationWrapperDTO.class,
                         dto.getUuid(),
                         RegistrationItem.VALIDATION_PROBLEMS
                         )

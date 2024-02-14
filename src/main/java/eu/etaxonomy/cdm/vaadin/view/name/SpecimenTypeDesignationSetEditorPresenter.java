@@ -31,7 +31,6 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
@@ -193,7 +192,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
             rootEntities.add(registration);
             setInTypedesignationOnlyAct(Optional.of(Boolean.valueOf(registration.getName() == null)));
             try {
-                NamedSourceBase pubUnitSource = RegistrationDTO.findPublishedUnit(registration);
+                NamedSourceBase pubUnitSource = registration.findPublishedUnit();
                 if(pubUnitSource == null) {
                     Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
                     pubUnitSource = NamedSource.NewPrimarySourceInstance(reference, null);

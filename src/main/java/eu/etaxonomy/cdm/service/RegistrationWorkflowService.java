@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import eu.etaxonomy.cdm.api.application.CdmRepository;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.api.service.idminter.RegistrationIdentifierMinter;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -81,7 +81,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
             // been registered before:
             // create a registration for the name and the first typifications
             Registration newRegistrationWithExistingName = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
-            workingset.add(new RegistrationDTO(newRegistrationWithExistingName, typifiedName, citation));
+            workingset.add(new RegistrationWrapperDTO(newRegistrationWithExistingName, typifiedName, citation));
             doReloadWorkingSet = true;
         } else {
             if(!checkWokingsetContainsProtolog(workingset, typifiedName)){
@@ -92,7 +92,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
                     Registration blockingNameRegistration = getRepo().getRegistrationService().createRegistrationForName(typifiedName.getUuid());
                     typificationOnlyRegistration.getBlockedBy().add(blockingNameRegistration);
                 }
-                RegistrationDTO regDTO = new RegistrationDTO(typificationOnlyRegistration, typifiedName, citation);
+                RegistrationWrapperDTO regDTO = new RegistrationWrapperDTO(typificationOnlyRegistration, typifiedName, citation);
                 workingset.add(regDTO);
             }
         }

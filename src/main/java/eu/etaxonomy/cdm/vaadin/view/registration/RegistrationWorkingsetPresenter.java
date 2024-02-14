@@ -40,8 +40,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
@@ -179,15 +179,15 @@ public class RegistrationWorkingsetPresenter
             if(logger.isDebugEnabled()){
                 logger.debug("refreshView() - workingset:\n" + workingset.toString());
             }
-            List<RegistrationDTO> unpersisted = new ArrayList<>();
-            for(RegistrationDTO regDto : workingset.getRegistrationDTOs()){
+            List<RegistrationWrapperDTO> unpersisted = new ArrayList<>();
+            for(RegistrationWrapperDTO regDto : workingset.getRegistrationWrapperDTOs()){
                 if(!regDto.registration().isPersisted()){
                     unpersisted.add(regDto);
                 }
             }
             loadWorkingSet(workingset.getCitationUuid());
-            for(RegistrationDTO regDtoUnpersisted : unpersisted){
-                if(!workingset.getRegistrationDTOs().stream().anyMatch(dto -> dto.getUuid().equals(regDtoUnpersisted.getUuid()))){
+            for(RegistrationWrapperDTO regDtoUnpersisted : unpersisted){
+                if(!workingset.getRegistrationWrapperDTOs().stream().anyMatch(dto -> dto.getUuid().equals(regDtoUnpersisted.getUuid()))){
                     // only add if the regDtoUnpersisted has not been persisted meanwhile
                     try {
                         workingset.add(regDtoUnpersisted);
@@ -213,7 +213,7 @@ public class RegistrationWorkingsetPresenter
             private static final long serialVersionUID = 7099181280977511048L;
 
             @Override
-            public AbstractField<Object> create(RegistrationDTO regDto) {
+            public AbstractField<Object> create(RegistrationWrapperDTO regDto) {
 
                 // submitters have GrantedAuthorities like REGISTRATION(PREPARATION).[UPDATE]{ab4459eb-3b96-40ba-bfaa-36915107d59e}
                 UserHelper userHelper = UserHelperAccess.userHelper().withCache(getCache());
@@ -570,7 +570,7 @@ public class RegistrationWorkingsetPresenter
             return;
         }
 
-        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+        RegistrationWrapperDTO registrationWrapperDTO = workingset.getRegistrationWrapperDTO(event.getRegistrationUuid()).get();
 
         if(event.getWorkingSetType() == TypeDesignationSetType.SPECIMEN_TYPE_DESIGNATION_SET ){
             SpecimenTypeDesignationSetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationSetPopupEditor.class, event);
@@ -589,7 +589,7 @@ public class RegistrationWorkingsetPresenter
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(NameTypeDesignationSetIds.forExistingTypeDesignation(
-                    registrationDTO.getCitationUuid(),
+                    registrationWrapperDTO.getCitationUuid(),
                     CdmBase.deproxy(event.getBaseEntity(), NameTypeDesignation.class))
                     );
             popup.getTypifiedNamesComboboxSelect().setEnabled(false);
@@ -608,18 +608,18 @@ public class RegistrationWorkingsetPresenter
             return;
         }
 
-        RegistrationDTO registrationDTO = workingset.getRegistrationDTO(event.getRegistrationUuid()).get();
+        RegistrationWrapperDTO registrationWrapperDTO = workingset.getRegistrationWrapperDTO(event.getRegistrationUuid()).get();
 
         if(event.getWorkingSetType() == TypeDesignationSetType.SPECIMEN_TYPE_DESIGNATION_SET){
             SpecimenTypeDesignationSetPopupEditor popup = openPopupEditor(SpecimenTypeDesignationSetPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             TypedEntityReference<TaxonName> typifiedNameRef;
-            if(registrationDTO.getTypifiedNameRef() != null){
+            if(registrationWrapperDTO.getTypifiedNameRef() != null){
                 // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
-                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationDTO.getTypifiedNameRef().getUuid());
+                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationWrapperDTO.getTypifiedNameRef().getUuid());
             } else {
                 // case of registrations with a name in the nomenclatural act.
-                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationDTO.getNameRef().getUuid());
+                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationWrapperDTO.getNameRef().getUuid());
             }
 
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
@@ -657,7 +657,7 @@ public class RegistrationWorkingsetPresenter
             });
             popup.withDeleteButton(false);
             popup.loadInEditor(NameTypeDesignationSetIds.forNewTypeDesignation(
-                    registrationDTO.getCitationUuid(),
+                    registrationWrapperDTO.getCitationUuid(),
                     event.getTypifiedNameUuid()
                     )
                 );
@@ -756,7 +756,7 @@ public class RegistrationWorkingsetPresenter
 
         if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
             List<String> messages = new ArrayList<>();
-            for(RegistrationDTO dto : workingset.getRegistrationDTOs()){
+            for(RegistrationWrapperDTO dto : workingset.getRegistrationWrapperDTOs()){
                 dto.getValidationProblems().forEach(m -> messages.add(dto.getSummary() + ": " + m));
             }
             getView().openDetailsPopup("Validation Problems", messages);
@@ -810,14 +810,14 @@ public class RegistrationWorkingsetPresenter
                     logger.debug("Non blocking registration, since a new name for a new registration has been created");
                 }
             }
-            if(workingset.getRegistrationDTOs().stream().anyMatch(reg ->
+            if(workingset.getRegistrationWrapperDTOs().stream().anyMatch(reg ->
                 reg.getTypifiedNameRef() != null
                 && reg.getTypifiedNameRef().getUuid().equals(event.getEntityUuid()))){
                     //refreshView(true);
             }
         } else
         if(TypeDesignationBase.class.isAssignableFrom(event.getEntityType())){
-            if(workingset.getRegistrationDTOs().stream().anyMatch(
+            if(workingset.getRegistrationWrapperDTOs().stream().anyMatch(
                     reg -> reg.typeDesignations() != null && reg.typeDesignations().stream().anyMatch(
                             td -> td.getUuid() == event.getEntityUuid()
                             )
@@ -839,16 +839,16 @@ public class RegistrationWorkingsetPresenter
     public Optional<Registration> findRegistrationInContext(Stack<EditorActionContext> context) {
         EditorActionContext rootCtx = context.get(0);
         TypedEntityReference<Registration> regReference = (TypedEntityReference<Registration>)rootCtx.getParentEntity();
-        Optional<RegistrationDTO> registrationDTOOptional = workingset.getRegistrationDTO(regReference.getUuid());
+        Optional<RegistrationWrapperDTO> registrationWrapperDTOOptional = workingset.getRegistrationWrapperDTO(regReference.getUuid());
         Optional<Registration> registrationOptional;
-        if(!registrationDTOOptional.isPresent()){
-            logger.debug("No RegistrationDTO in found rootCtx -> user is about to create a registration for a new name.");
+        if(!registrationWrapperDTOOptional.isPresent()){
+            logger.debug("No RegistrationWrapperDTO in found rootCtx -> user is about to create a registration for a new name.");
             registrationOptional = Optional.ofNullable(null);
         }
 
         Optional<Registration> regOpt;
-        if(registrationDTOOptional.isPresent()){
-            regOpt = Optional.of(registrationDTOOptional.get().registration());
+        if(registrationWrapperDTOOptional.isPresent()){
+            regOpt = Optional.of(registrationWrapperDTOOptional.get().registration());
         } else {
             regOpt = Optional.ofNullable(null);
         }
@@ -856,8 +856,8 @@ public class RegistrationWorkingsetPresenter
         return regOpt;
     }
 
-    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationDTO.class)
-    public void onShowDetailsEventForRegistrationDTO(ShowDetailsEvent<RegistrationDTO, UUID> event) {
+    @EventBusListenerMethod(filter = ShowDetailsEventEntityTypeFilter.RegistrationWrapperDTO.class)
+    public void onShowDetailsEventForRegistrationWrapperDTO(ShowDetailsEvent<RegistrationWrapperDTO, UUID> event) {
 
         // FIXME check from own view!!!
         if(getView() == null){
@@ -866,14 +866,14 @@ public class RegistrationWorkingsetPresenter
 
         UUID registrationUuid = event.getIdentifier();
 
-        RegistrationDTO regDto = workingset.getRegistrationDTO(registrationUuid).get();
+        RegistrationWrapperDTO regDto = workingset.getRegistrationWrapperDTO(registrationUuid).get();
         if(event.getProperty().equals(RegistrationItem.BLOCKED_BY)){
 
-            Set<RegistrationDTO> blockingRegs;
+            Set<RegistrationWrapperDTO> blockingRegs;
             if(regDto.registration().isPersisted()){
                 blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
             } else {
-                blockingRegs = new HashSet<RegistrationDTO>(getWorkingSetService().makeDTOs(regDto.registration().getBlockedBy()));
+                blockingRegs = new HashSet<RegistrationWrapperDTO>(getWorkingSetService().makeDTOs(regDto.registration().getBlockedBy()));
             }
             getView().setBlockingRegistrations(registrationUuid, blockingRegs);
         } else if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){

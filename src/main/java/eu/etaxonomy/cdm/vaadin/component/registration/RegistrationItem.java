@@ -35,8 +35,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.TimePeriod;
@@ -82,7 +82,7 @@ public class RegistrationItem extends GridLayout {
 
     private AbstractView<?,?> parentView;
 
-    private RegistrationDTO regDto;
+    private RegistrationWrapperDTO regDto;
 
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
@@ -103,7 +103,7 @@ public class RegistrationItem extends GridLayout {
 
     private ICdmEntityUuidCacher cache;
 
-    public RegistrationItem(RegistrationDTO item, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
+    public RegistrationItem(RegistrationWrapperDTO item, AbstractView<?,?> parentView, ICdmEntityUuidCacher cache) {
         super(GRID_COLS, GRID_ROWS);
         this.cache = cache;
         init();
@@ -180,7 +180,7 @@ public class RegistrationItem extends GridLayout {
         setComponentAlignment(releasedLabel, Alignment.BOTTOM_RIGHT);
     }
 
-    public void setItem(RegistrationDTO regDto, AbstractView<?,?> parentView){
+    public void setItem(RegistrationWrapperDTO regDto, AbstractView<?,?> parentView){
 
         this.parentView = parentView;
 
@@ -216,9 +216,9 @@ public class RegistrationItem extends GridLayout {
         }
         TimePeriod datePublished = null;
         String submitterName = null;
-        if(workingSet.getRegistrationDTOs().size() > 0){
-            datePublished = workingSet.getRegistrationDTOs().get(0).getDatePublished();
-            // submitterName = workingSet.getRegistrationDTOs().get(0).getSubmitterUserName();
+        if(workingSet.getRegistrationWrapperDTOs().size() > 0){
+            datePublished = workingSet.getRegistrationWrapperDTOs().get(0).getDatePublished();
+            // submitterName = workingSet.getRegistrationWrapperDTOs().get(0).getSubmitterUserName();
         }
         updateUI(workingSet.getCitation(), workingSet.getCreated(), datePublished, workingSet.validationProblemsCount(),
                 referenceEditorAction, FontAwesome.EDIT, null, submitterName);
@@ -233,7 +233,7 @@ public class RegistrationItem extends GridLayout {
     }
 
     private void updateUI(String citationString,  DateTime created, TimePeriod datePublished,  int validationProblemsCount,
-            Object openButtonEvent, Resource openButtonIcon, RegistrationDTO regDto, String submitterUserName) {
+            Object openButtonEvent, Resource openButtonIcon, RegistrationWrapperDTO regDto, String submitterUserName) {
 
         StringBuffer labelMarkup = new StringBuffer();
         DateTime registrationDate = null;
@@ -244,9 +244,9 @@ public class RegistrationItem extends GridLayout {
             getValidationProblemsButton().addClickListener(e -> {
                 ShowDetailsEvent<?,?> detailsEvent;
                 if(regDto != null){
-                    detailsEvent = new ShowDetailsEvent<RegistrationDTO, UUID>(
+                    detailsEvent = new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(
                             e,
-                            RegistrationDTO.class,
+                            RegistrationWrapperDTO.class,
                             regDto.getUuid(),
                             VALIDATION_PROBLEMS);
                 } else {
@@ -353,7 +353,7 @@ public class RegistrationItem extends GridLayout {
         return regDto.getUuid();
     }
 
-    public void showBlockingRegistrations(Set<RegistrationDTO> blockingRegDTOs) {
+    public void showBlockingRegistrations(Set<RegistrationWrapperDTO> blockingRegDTOs) {
 
         if(blockingRelationsPanel == null) {
 

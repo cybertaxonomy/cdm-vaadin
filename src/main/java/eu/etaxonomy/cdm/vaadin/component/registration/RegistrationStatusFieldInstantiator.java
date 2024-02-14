@@ -12,7 +12,7 @@ import java.io.Serializable;
 
 import com.vaadin.ui.AbstractField;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 
 /**
  * @author a.kohlbecker
@@ -20,6 +20,6 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
  */
 public interface RegistrationStatusFieldInstantiator<T> extends Serializable {
 
-    public AbstractField<T> create(RegistrationDTO regDto);
+    public AbstractField<T> create(RegistrationWrapperDTO regDto);
 
 }

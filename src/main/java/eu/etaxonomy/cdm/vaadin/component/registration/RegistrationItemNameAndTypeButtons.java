@@ -27,7 +27,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
@@ -82,7 +82,7 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
 
     private boolean userHasAddPermission;
 
-    public RegistrationItemNameAndTypeButtons(RegistrationDTO regDto, ICdmEntityUuidCacher entitiyCacher) {
+    public RegistrationItemNameAndTypeButtons(RegistrationWrapperDTO regDto, ICdmEntityUuidCacher entitiyCacher) {
 
         isRegistrationLocked = EnumSet.of(
                 RegistrationStatus.PUBLISHED, RegistrationStatus.REJECTED)

@@ -37,7 +37,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -182,20 +182,20 @@ public class ListViewBean
     }
 
     @Override
-    public void populate(Pager<RegistrationDTO> regDtoPager) {
+    public void populate(Pager<RegistrationWrapperDTO> regDtoPager) {
 
-        ArrayList<RegistrationDTO> regDtos = new ArrayList<RegistrationDTO>(regDtoPager.getRecords());
+        ArrayList<RegistrationWrapperDTO> regDtos = new ArrayList<RegistrationWrapperDTO>(regDtoPager.getRecords());
 
         pagerTop.updatePager(regDtoPager);
 
         populateList(regDtos);
     }
 
-    public void populateList(Collection<RegistrationDTO> registrations) {
+    public void populateList(Collection<RegistrationWrapperDTO> registrations) {
 
         listContainer.removeAllComponents();
         boolean isCurator = UserHelperAccess.userHelper().userIs(new RoleProberImpl(RolesAndPermissions.ROLE_CURATION)) || UserHelperAccess.userHelper().userIsAdmin();
-        for(RegistrationDTO regDto : registrations) {
+        for(RegistrationWrapperDTO regDto : registrations) {
             RegistrationItem item = new RegistrationItem(regDto, this, null);
             item.getSubmitterLabel().setVisible(isCurator);
             item.setWidth(100, Unit.PERCENTAGE);
@@ -225,7 +225,7 @@ public class ListViewBean
      */
     @Deprecated
     private GeneratedPropertyContainer buildGeneratedProperties(
-            BeanContainer<String, RegistrationDTO> registrationItems) {
+            BeanContainer<String, RegistrationWrapperDTO> registrationItems) {
         GeneratedPropertyContainer gpContainer = new GeneratedPropertyContainer(registrationItems);
 
         gpContainer.addGeneratedProperty("operation", new PropertyValueGenerator<String>() {

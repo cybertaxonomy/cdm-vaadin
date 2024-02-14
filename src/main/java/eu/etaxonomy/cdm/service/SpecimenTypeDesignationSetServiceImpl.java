@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.config.SpecimenDeleteConfigurator;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.compare.name.TypeDesignationComparator;
@@ -100,14 +100,14 @@ public class SpecimenTypeDesignationSetServiceImpl
     @Transactional(readOnly=true)
     public SpecimenTypeDesignationSetDTO<Registration> load(UUID registrationUuid, IdentifiableEntity<?> baseEntity) {
 
-        RegistrationDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
+        RegistrationWrapperDTO regDTO = registrationWorkingSetService.loadDtoByUuid(registrationUuid);
         // find the working set
         SpecimenTypeDesignationSetDTO<Registration> workingSetDto = specimenTypeDesignationSetDTO(regDTO, baseEntity);
         return workingSetDto;
     }
 
     protected SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
-            RegistrationDTO regDTO, VersionableEntity baseEntity) {
+            RegistrationWrapperDTO regDTO, VersionableEntity baseEntity) {
 
         @SuppressWarnings("rawtypes")
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
@@ -130,7 +130,7 @@ public class SpecimenTypeDesignationSetServiceImpl
             // so that they are based on an empty FieldUnit with an associated Gathering Event
 
             Registration reg = repo.getRegistrationService().find(bean.getOwner().getUuid());
-            RegistrationDTO regDTO = new RegistrationDTO(reg);
+            RegistrationWrapperDTO regDTO = new RegistrationWrapperDTO(reg);
 
             FieldUnit fieldUnit = FieldUnit.NewInstance();
             GatheringEvent gatheringEvent = GatheringEvent.NewInstance();
