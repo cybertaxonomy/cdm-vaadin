@@ -61,6 +61,7 @@ import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.persistence.permission.PermissionDeniedException;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
@@ -616,10 +617,10 @@ public class RegistrationWorkingsetPresenter
             TypedEntityReference<TaxonName> typifiedNameRef;
             if(registrationWrapperDTO.getTypifiedNameRef() != null){
                 // case for registrations without name, in which case the typifiedName is only defined via the typedesignations
-                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationWrapperDTO.getTypifiedNameRef().getUuid());
+                typifiedNameRef = TypedEntityReferenceFactory.fromTypeAndId(TaxonName.class, registrationWrapperDTO.getTypifiedNameRef().getUuid());
             } else {
                 // case of registrations with a name in the nomenclatural act.
-                typifiedNameRef = new TypedEntityReference(TaxonName.class, registrationWrapperDTO.getNameRef().getUuid());
+                typifiedNameRef = TypedEntityReferenceFactory.fromTypeAndId(TaxonName.class, registrationWrapperDTO.getNameRef().getUuid());
             }
 
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));

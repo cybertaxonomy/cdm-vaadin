@@ -55,7 +55,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
@@ -213,7 +213,7 @@ public class RegistrationWorkingsetViewBean
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         Stack<EditorActionContext> context = new Stack<EditorActionContext>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(Registration.class, null),
+                    TypedEntityReferenceFactory.fromTypeAndId(Registration.class, null),
                     this)
                     );
         addNewNameRegistrationButton.addClickListener(
@@ -286,7 +286,7 @@ public class RegistrationWorkingsetViewBean
         TaxonName taxonName = existingNameCombobox.getValue();
         Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    TypedEntityReference.fromEntity(taxonName),
+                    TypedEntityReferenceFactory.fromEntity(taxonName),
                     this)
                     );
         getViewEventBus().publish(
@@ -324,7 +324,7 @@ public class RegistrationWorkingsetViewBean
 
         Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    TypedEntityReference.fromTypeAndId(Registration.class, registrationEntityUuid),
+                    TypedEntityReferenceFactory.fromTypeAndId(Registration.class, registrationEntityUuid),
                     this)
                     );
 

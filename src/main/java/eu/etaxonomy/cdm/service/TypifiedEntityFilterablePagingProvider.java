@@ -22,6 +22,7 @@ import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
 
 /**
  * @author a.kohlbecker
@@ -50,7 +51,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         List<TypedEntityReference<T>> ters = new ArrayList<>(entities.size());
         for(T entity : entities){
             String label = labelProvider.ellypsis(entity, filter);
-            TypedEntityReference<T> typedEntityReference = TypedEntityReference.fromEntityWithLabel(entity, label);
+            TypedEntityReference<T> typedEntityReference = TypedEntityReferenceFactory.fromEntityWithLabel(entity, label);
             ters.add(typedEntityReference);
         }
         return ters;

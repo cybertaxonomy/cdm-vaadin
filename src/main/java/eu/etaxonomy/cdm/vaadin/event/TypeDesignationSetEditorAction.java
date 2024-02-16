@@ -18,7 +18,7 @@ import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
 import eu.etaxonomy.vaadin.event.EditorActionType;
 import eu.etaxonomy.vaadin.mvp.AbstractView;
 
@@ -69,7 +69,8 @@ public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDes
         this.registrationUuid = registrationUuid;
         this.typifiedNameUuid = typifiedNameUuid;
         this.context = new Stack<>();
-        this.context.push(new EditorActionContext(TypedEntityReference.fromTypeAndId(Registration.class, registrationUuid), sourceView));
+        this.context.push(new EditorActionContext(
+                TypedEntityReferenceFactory.fromTypeAndId(Registration.class, registrationUuid), sourceView));
     }
 
     public TypeDesignationSetType getWorkingSetType() {
