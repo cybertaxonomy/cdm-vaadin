@@ -42,7 +42,7 @@ import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.strategy.cache.TagEnum;
-import eu.etaxonomy.cdm.strategy.cache.TaggedCacheHelper;
+import eu.etaxonomy.cdm.strategy.cache.TaggedTextFormatter;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.model.registration.RegistrationTermLists.RegistrationTypeDesignationStatusComparator;
 import eu.etaxonomy.cdm.vaadin.permission.PermissionDebugUtils;
@@ -156,8 +156,8 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                     labelText += " <strong>" + typeStatus.getLabel() +  (tdPerStatus.size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
                     for(TypeDesignationDTO<?> dtDTO : tdPerStatus) {
-                        labelText += ( isFirst ? "" : ", ") + TaggedCacheHelper.createString(
-                                TaggedCacheHelper.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\\s+[bB]y"));
+                        labelText += ( isFirst ? "" : ", ") + TaggedTextFormatter.createString(
+                                TaggedTextFormatter.cropAt(dtDTO.getTaggedText(), TagEnum.separator, "designated\\s+[bB]y"));
                         isFirst = false;
                     }
                 }
