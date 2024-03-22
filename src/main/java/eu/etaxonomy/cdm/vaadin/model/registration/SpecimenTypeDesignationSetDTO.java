@@ -29,31 +29,27 @@ import eu.etaxonomy.cdm.model.occurrence.GatheringEvent;
 /**
  * @author a.kohlbecker
  * @since Jun 16, 2017
- *
  */
 public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
 
-    FieldUnit fieldUnit;
+    private FieldUnit fieldUnit;
 
-    VersionableEntity baseEntity;
+    private VersionableEntity baseEntity;
 
     /**
      * List of all SpecimenTypeDesignation that have been loaded into the
      * DTO. By comparing this list with <code>specimenTypeDesignations</code>
      * it is possible to find those that have been deleted.
      */
-    List<SpecimenTypeDesignation> specimenTypeDesignationsLoaded = new ArrayList<>();
+    private List<SpecimenTypeDesignation> specimenTypeDesignationsLoaded = new ArrayList<>();
 
-    List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
+    private List<SpecimenTypeDesignationDTO> specimenTypeDesignationsDTOs = new ArrayList<>();
 
-    OWNER owner;
+    private OWNER owner;
 
     private TaxonName typifiedName;
 
     /**
-     *
-     * @param owner
-     * @param baseEntity
      * @param specimenTypeDesignations can be <code>null</code>
      */
     public SpecimenTypeDesignationSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
@@ -76,12 +72,6 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
         }
     }
 
-    /**
-     * @param reg
-     * @param newfieldUnit
-     * @param citationEntityID
-     * @param typifiedNameEntityID
-     */
     public SpecimenTypeDesignationSetDTO(OWNER reg, FieldUnit newfieldUnit, TaxonName typifiedName) {
         this(reg, newfieldUnit, null, typifiedName);
     }
@@ -108,7 +98,7 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
      * @return the typeDesignation entities managed in this workingset
      */
     protected List<SpecimenTypeDesignation> getSpecimenTypeDesignations() {
-        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList(specimenTypeDesignationsDTOs.size());
+        List<SpecimenTypeDesignation> specimenTypeDesignations = new ArrayList<>(specimenTypeDesignationsDTOs.size());
         for(SpecimenTypeDesignationDTO dto : specimenTypeDesignationsDTOs){
             specimenTypeDesignations.add(dto.asSpecimenTypeDesignation());
         }
@@ -122,15 +112,12 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
     /**
      * The {@link VersionableEntity} which contains the DerivedUnit in this working set.
      * This can be for example a {@link Registration} entity
-     *
-     * @return
      */
     public OWNER getOwner() {
         return owner;
     }
 
     // ====== FieldUnit Wrapper methods ====== //
-
 
     public String getFieldNumber() {
         return fieldUnit.getFieldNumber();
@@ -343,5 +330,4 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
             }
         }
     }
-
 }
