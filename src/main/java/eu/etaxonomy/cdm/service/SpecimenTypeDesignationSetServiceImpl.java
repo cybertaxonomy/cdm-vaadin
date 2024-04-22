@@ -106,7 +106,7 @@ public class SpecimenTypeDesignationSetServiceImpl
         return workingSetDto;
     }
 
-    protected SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
+    private SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
             RegistrationWrapperDTO regDTO, VersionableEntity baseEntity) {
 
         @SuppressWarnings("rawtypes")
@@ -195,7 +195,7 @@ public class SpecimenTypeDesignationSetServiceImpl
 
     }
 
-    protected void deleteSpecimenTypeDesignation(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
+    private void deleteSpecimenTypeDesignation(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
 
 //        if(dto.getOwner() instanceof Registration){
 //            Registration registration = (Registration) dto.getOwner();
@@ -217,7 +217,7 @@ public class SpecimenTypeDesignationSetServiceImpl
 //      }
     }
 
-    protected void assureFieldUnit(FieldUnit fieldUnit,
+    private void assureFieldUnit(FieldUnit fieldUnit,
             SpecimenTypeDesignation specimenTypeDesignation) {
         try {
             SpecimenOrObservationBase<?> original = findEarliestOriginal(specimenTypeDesignation.getTypeSpecimen());

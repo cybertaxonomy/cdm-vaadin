@@ -53,7 +53,6 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
      * @param specimenTypeDesignations can be <code>null</code>
      */
     public SpecimenTypeDesignationSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
-        super();
         this.owner = owner;
         this.baseEntity = baseEntity;
         if(typifiedName == null){
