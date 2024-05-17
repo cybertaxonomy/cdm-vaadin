@@ -18,16 +18,11 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 /**
  * @author a.kohlbecker
  * @since May 4, 2017
- *
  */
 public interface ISpecimenTypeDesignationSetService {
 
     public SpecimenTypeDesignationSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid);
 
-    /**
-     * @param id the CDM Entity id
-     * @return
-     */
     public SpecimenTypeDesignationSetDTO<Registration> load(UUID registrationUuid,
             IdentifiableEntity<?> baseEntityRef);
 
