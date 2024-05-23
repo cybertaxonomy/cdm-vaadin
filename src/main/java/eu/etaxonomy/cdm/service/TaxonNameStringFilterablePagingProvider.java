@@ -73,7 +73,6 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
     }
 
     public TaxonNameStringFilterablePagingProvider(INameService service, Rank rank, MatchMode matchMode) {
-        super();
         this.service = service;
         if(matchMode != null){
             this.matchMode = matchMode;
@@ -163,9 +162,6 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
         return namePartStrings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size(String filter) {
 
@@ -176,23 +172,14 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
         return taxonNamePager.getCount().intValue();
     }
 
-    /**
-     * @return the pageSize
-     */
     public int getPageSize() {
         return pageSize;
     }
 
-    /**
-     * @param pageSize the pageSize to set
-     */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    /**
-     * @return the lastPagedEntityUUIDs
-     */
     public Map<String, UUID> getLastPagedEntityUUIDs() {
         return lastPagedEntityUUIDs;
     }

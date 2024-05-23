@@ -838,7 +838,7 @@ public class TaxonNamePopupEditor
         // TODO use getField() instead and remove field references
         Rank rank = (Rank) rankSelect.getValue();
 
-        boolean isSpeciesOrBelow =  rank.isLowerOrEqualTo(RankClass.Species);
+        boolean isSpeciesOrBelow = rank.isLowerOrEqualTo(RankClass.Species);
         Boolean withBasionymSection = BooleanUtils.isTrue(basionymToggle.getValue());
         Boolean withValidationSection = BooleanUtils.isTrue(validationToggle.getValue());
         Boolean withOrthographicCorrectionSection = BooleanUtils.isTrue(orthographicVariantToggle.getValue());
@@ -846,30 +846,30 @@ public class TaxonNamePopupEditor
         if(isModeEnabled(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART)){
             if(isSpeciesOrBelow) {
                 if(TextField.class.isAssignableFrom(genusOrUninomialField.getClass())){
-                    WeaklyRelatedEntityCombobox<TaxonName> combobox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
-                    combobox.addClickListenerAddEntity(e -> getViewEventBus().publish(
+                    WeaklyRelatedEntityCombobox<TaxonName> genusOrUninomialComboBox = new WeaklyRelatedEntityCombobox<TaxonName>("-> this caption will be replaced <-", TaxonName.class);
+                    genusOrUninomialComboBox.addClickListenerAddEntity(e -> getViewEventBus().publish(
                             this,
                             new TaxonNameEditorActionStrRep(
                                     EditorActionType.ADD,
                                     e.getButton(),
-                                    combobox,
+                                    genusOrUninomialComboBox,
                                     this)
                         ));
-                    combobox.addClickListenerEditEntity(e -> {
+                    genusOrUninomialComboBox.addClickListenerEditEntity(e -> {
                         //WeaklyRelatedEntityCombobox<TaxonName> wrcbbx = combobox;
-                        if(combobox.getValue() != null){
+                        if(genusOrUninomialComboBox.getValue() != null){
                             getViewEventBus().publish(this,
                                 new TaxonNameEditorActionStrRep(
                                         EditorActionType.EDIT,
-                                        combobox.getIdForValue(),
+                                        genusOrUninomialComboBox.getIdForValue(),
                                         e.getButton(),
-                                        combobox,
+                                        genusOrUninomialComboBox,
                                         this)
                             );
                         }
                     });
-                    combobox.getSelect().setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
-                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, combobox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
+                    genusOrUninomialComboBox.getSelect().setRequiredError(UIMessages.REQUIRED_SELECT_MISSING);
+                    genusOrUninomialField = replaceComponent("genusOrUninomial", genusOrUninomialField, genusOrUninomialComboBox, 0, genusOrUninomialRow, 1, genusOrUninomialRow);
                 }
             } else {
                 if(WeaklyRelatedEntityCombobox.class.isAssignableFrom(genusOrUninomialField.getClass())) {
