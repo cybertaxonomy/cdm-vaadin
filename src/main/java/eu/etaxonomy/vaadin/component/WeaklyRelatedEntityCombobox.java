@@ -37,7 +37,7 @@ import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 
 /**
- * By AM: Combobox with buttons for switching back and force from a TextBox.
+ * By AM: Combobox (with buttons) for switching back and forth from a TextBox.
  *
  * @author a.kohlbecker
  * @since May 24, 2017
@@ -170,6 +170,7 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>>
     @Override
     public void setValue(String newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         if(!Objects.equals(newFieldValue, lazySelect.getValue())){
+            //if value changed...
             if(contains(newFieldValue)){
                 lazySelect.setValue(newFieldValue);
                 lazySelect.markAsDirty();
