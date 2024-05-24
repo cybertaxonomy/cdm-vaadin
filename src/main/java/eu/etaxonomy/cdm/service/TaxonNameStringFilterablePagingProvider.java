@@ -85,10 +85,18 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
 
         unlistenAllFields();
 
-        registerNullSave(genusOrUninomialField, e -> namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue()));
-        registerNullSave(infraGenericEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraGenericEpithetField.getValue()));
-        registerNullSave(specificEpithetField, e -> namePartsFilter.setGenusOrUninomial(specificEpithetField.getValue()));
-        registerNullSave(infraSpecificEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue()));
+        registerNullSave(genusOrUninomialField, e -> {
+            namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue());
+        });
+        registerNullSave(infraGenericEpithetField, e -> {
+            namePartsFilter.setGenusOrUninomial(infraGenericEpithetField.getValue());
+        });
+        registerNullSave(specificEpithetField, e -> {
+            namePartsFilter.setGenusOrUninomial(specificEpithetField.getValue());
+        });
+        registerNullSave(infraSpecificEpithetField, e -> {
+            namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue());
+        });
     }
 
     public void unlistenAllFields() {
