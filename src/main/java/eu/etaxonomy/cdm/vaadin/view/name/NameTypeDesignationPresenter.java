@@ -227,7 +227,6 @@ public class NameTypeDesignationPresenter
                     (!getView().checkInTypeDesignationOnlyAct()
                        || tds.hasDesignationSource() == true
                        || tds.equals(NameTypeDesignationStatus.NOT_APPLICABLE())  //#10434
-
                      ) && !tds.equals(NameTypeDesignationStatus.TAUTONYMY())  //not botanical according to #10434
                 )
                 .collect(Collectors.toList());
@@ -450,7 +449,6 @@ public class NameTypeDesignationPresenter
      *
      *  NOTE by AM: according to {@link #publishedUnit} the published unit must never be a
      *   {@link ReferenceType#Section}. However, this method allows sections. This has implications.
-     *
      */
     protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
         if(publishedUnit == null) {
@@ -462,7 +460,7 @@ public class NameTypeDesignationPresenter
         if(!RegistrationUIDefaults.NOMECLATURAL_PUBLICATION_UNIT_TYPES.contains(publishedUnit.getCitation().getType())) {
             throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
         }
+
         this.publishedUnit = publishedUnit;
     }
-
 }
