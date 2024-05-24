@@ -28,6 +28,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
@@ -142,7 +143,7 @@ public class NameTypeDesignationPresenter
                 && typifiedNameNomRef.getInReference() != null) {
             typifiedNameNomRef = typifiedNameNomRef.getInReference();
         }
-        boolean inTypedesignationOnlyAct = !typifiedNameNomRef.equals(getPublishedUnit().getCitation());
+        boolean inTypedesignationOnlyAct = !typifiedNameNomRef.equals(getNoSectionPublishedUnit());
         getView().setInTypedesignationOnlyAct(Optional.of(inTypedesignationOnlyAct));
 
 
@@ -175,6 +176,14 @@ public class NameTypeDesignationPresenter
         getView().getTypeStatusSelect().setContainerDataSource(provideTypeStatusTermItemContainer());
 
         return bean;
+    }
+
+    /**
+     * @return the published unit, but resolved in case it is a {@link ReferenceType#isSection()}
+     */
+    private Reference getNoSectionPublishedUnit() {
+        Reference ref = getPublishedUnit().getCitation();
+        return RegistrationWorkingSet.sectionSafePublicationUnit(ref);
     }
 
     @Override
@@ -438,6 +447,10 @@ public class NameTypeDesignationPresenter
      * @param publishedUnit
      *  The unit of publication in which the type designation has been published.
      *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     *
+     *  NOTE by AM: according to {@link #publishedUnit} the published unit must never be a
+     *   {@link ReferenceType#Section}. However, this method allows sections. This has implications.
+     *
      */
     protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
         if(publishedUnit == null) {
