@@ -85,6 +85,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>>
         });
     }
 
+    @Override
+    public void addValueChangeListener(ValueChangeListener valueChangeListener){
+        super.addValueChangeListener(valueChangeListener);
+        lazySelect.addValueChangeListener(valueChangeListener);
+    }
 
     @Override
     protected Component initContent() {
@@ -167,6 +172,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>>
         if(!Objects.equals(newFieldValue, lazySelect.getValue())){
             if(contains(newFieldValue)){
                 lazySelect.setValue(newFieldValue);
+                lazySelect.markAsDirty();
+            }else if (lazySelect.getValue() != null) {
+                //if new suggested value does not exist in the list,
+                //set the value of the combobox to null, if it it not yet null
+                lazySelect.setValue(null);
                 lazySelect.markAsDirty();
             }
         }
