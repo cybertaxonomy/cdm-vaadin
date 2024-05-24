@@ -89,13 +89,13 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
             namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue());
         });
         registerNullSave(infraGenericEpithetField, e -> {
-            namePartsFilter.setGenusOrUninomial(infraGenericEpithetField.getValue());
+            namePartsFilter.setInfraGenericEpithet(infraGenericEpithetField.getValue());
         });
         registerNullSave(specificEpithetField, e -> {
-            namePartsFilter.setGenusOrUninomial(specificEpithetField.getValue());
+            namePartsFilter.setSpecificEpithet(specificEpithetField.getValue());
         });
         registerNullSave(infraSpecificEpithetField, e -> {
-            namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue());
+            namePartsFilter.setInfraGenericEpithet(infraSpecificEpithetField.getValue());
         });
     }
 
