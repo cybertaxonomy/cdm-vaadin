@@ -186,7 +186,7 @@ public class RegistrationWorkingsetPresenter
                     unpersisted.add(regDto);
                 }
             }
-            loadWorkingSet(workingset.getCitationUuid());
+            loadWorkingSet(workingset.getPublicationUnitUuid());
             for(RegistrationWrapperDTO regDtoUnpersisted : unpersisted){
                 if(!workingset.getRegistrationWrapperDTOs().stream().anyMatch(dto -> dto.getUuid().equals(regDtoUnpersisted.getUuid()))){
                     // only add if the regDtoUnpersisted has not been persisted meanwhile
@@ -444,7 +444,7 @@ public class RegistrationWorkingsetPresenter
                 @Override
                 public TaxonName createNewBean() {
                     TaxonName newTaxonName = TaxonNameFactory.NewNameInstance(RegistrationUIDefaults.NOMENCLATURAL_CODE, Rank.SPECIES());
-                    newTaxonName.setNomenclaturalReference(getRepo().getReferenceService().load(workingset.getCitationUuid(), TaxonNameEditorPresenter.REFERENCE_INIT_STRATEGY ));
+                    newTaxonName.setNomenclaturalReference(getRepo().getReferenceService().load(workingset.getPublicationUnitUuid(), TaxonNameEditorPresenter.REFERENCE_INIT_STRATEGY ));
                     return newTaxonName;
                 }
             });
@@ -482,7 +482,7 @@ public class RegistrationWorkingsetPresenter
 
             if(isAddExistingNameRegistration){
                 if(event.getReason().equals(Reason.SAVE)){
-                onRegistrationWorkflowEventActionStart(new RegistrationWorkingsetAction(workingset.getCitationUuid(),
+                onRegistrationWorkflowEventActionStart(new RegistrationWorkingsetAction(workingset.getPublicationUnitUuid(),
                         RegistrationWorkingsetAction.Action.start));
                 }
                 // just ignore on CANCEL
@@ -493,7 +493,7 @@ public class RegistrationWorkingsetPresenter
                         try {
                             TaxonName taxonName = newNameForRegistrationPopupEditor.getBean().cdmEntity();
                             registrationOpt = Optional.of(registrationWorkflowService.createRegistration(taxonName, newNameBlockingRegistrations));
-                            loadWorkingSet(workingset.getCitationUuid());
+                            loadWorkingSet(workingset.getPublicationUnitUuid());
                         } finally {
                             clearSession();
                             getView().getAddNewNameRegistrationButton().setEnabled(true);
@@ -578,7 +578,7 @@ public class RegistrationWorkingsetPresenter
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.withDeleteButton(true);
             popup.loadInEditor(new SpecimenTypeDesignationSetIds(
-                    workingset.getCitationUuid(),
+                    workingset.getPublicationUnitUuid(),
                     event.getRegistrationUuid(),
                     CdmBase.deproxy(event.getBaseEntity(), FieldUnit.class), null));
             if(event.hasSource()){
@@ -626,7 +626,7 @@ public class RegistrationWorkingsetPresenter
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
             popup.withDeleteButton(false);
             popup.loadInEditor(new SpecimenTypeDesignationSetIds(
-                        workingset.getCitationUuid(),
+                        workingset.getPublicationUnitUuid(),
                         event.getRegistrationUuid(),
                         null,
                         typifiedNameRef.getUuid()
@@ -636,7 +636,7 @@ public class RegistrationWorkingsetPresenter
                 // propagate readonly state from source component to popup
                 popup.setReadOnly(event.getSource().isReadOnly());
             }
-        } else {
+        } else { //NameTypeDesignations
             NameTypeDesignationPopupEditor popup = openPopupEditor(NameTypeDesignationPopupEditor.class, event);
             popup.setParentEditorActionContext(event.getContext(), event.getTarget());
             popup.grantToCurrentUser(EnumSet.of(CRUD.UPDATE, CRUD.DELETE));
@@ -776,7 +776,7 @@ public class RegistrationWorkingsetPresenter
         }
         if(Reference.class.isAssignableFrom(event.getEntityType())){
 
-            if(workingset.getCitationUuid().equals(event.getEntityUuid())){
+            if(workingset.getPublicationUnitUuid().equals(event.getEntityUuid())){
                 if(event.isRemovedType()){
                     viewEventBus.publish(EventScope.UI, this, new NavigationEvent(StartRegistrationViewBean.NAME));
                 } else {

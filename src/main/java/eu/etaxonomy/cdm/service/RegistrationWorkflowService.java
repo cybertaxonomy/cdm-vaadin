@@ -72,7 +72,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
     public boolean createRegistrationforExistingName(RegistrationWorkingSet workingset, TaxonName typifiedName) throws TypeDesignationSetException {
 
         boolean doReloadWorkingSet = false;
-        Reference citation = getRepo().getReferenceService().load(workingset.getCitationUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
+        Reference citation = getRepo().getReferenceService().load(workingset.getPublicationUnitUuid(), Arrays.asList("authorship.$", "inReference.authorship.$"));
         // here we completely ignore the ExistingNameRegistrationType since the user should not have the choice
         // to create a typification only registration in the working (publication) set which contains
         // the protolog. This is known from the nomenclatural reference.
@@ -174,7 +174,7 @@ public class RegistrationWorkflowService implements IRegistrationWorkflowService
     @Override
     public boolean checkWokingsetContainsProtolog(RegistrationWorkingSet workingset, TaxonName name) {
         Reference nomRef = name.getNomenclaturalReference();
-        UUID citationUuid = workingset.getCitationUuid();
+        UUID citationUuid = workingset.getPublicationUnitUuid();
         // @formatter:off
         return nomRef != null
                 // nomref matches

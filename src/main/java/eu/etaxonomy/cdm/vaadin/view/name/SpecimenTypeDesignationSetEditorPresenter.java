@@ -192,12 +192,12 @@ public class SpecimenTypeDesignationSetEditorPresenter
             rootEntities.add(registration);
             setInTypedesignationOnlyAct(Optional.of(Boolean.valueOf(registration.getName() == null)));
             try {
-                NamedSourceBase pubUnitSource = registration.findPublishedUnit();
-                if(pubUnitSource == null) {
+                NamedSourceBase citedSource = registration.findCitedSource();
+                if(citedSource == null) {
                     Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
-                    pubUnitSource = NamedSource.NewPrimarySourceInstance(reference, null);
+                    citedSource = NamedSource.NewPrimarySourceInstance(reference, null);
                 }
-                setPublishedUnit(pubUnitSource);
+                setPublishedUnit(citedSource);
             } catch (Exception e) {
                 // FIXME report error state instead
                 logger.error("Error on finding published unit in " + registration.toString(), e);

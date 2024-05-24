@@ -16,8 +16,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -59,7 +59,7 @@ public class RegistrationWorkingSetTest {
         dtos.add(new RegistrationWrapperDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
+        Assert.assertEquals(article.getUuid(), ws.getPublicationUnitUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
 
@@ -96,8 +96,7 @@ public class RegistrationWorkingSetTest {
         dtos.add(new RegistrationWrapperDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
+        Assert.assertEquals(article.getUuid(), ws.getPublicationUnitUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
-
 }
