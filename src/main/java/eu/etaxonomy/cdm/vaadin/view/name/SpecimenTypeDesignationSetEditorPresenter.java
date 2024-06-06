@@ -31,7 +31,6 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
@@ -193,12 +192,12 @@ public class SpecimenTypeDesignationSetEditorPresenter
             rootEntities.add(registration);
             setInTypedesignationOnlyAct(Optional.of(Boolean.valueOf(registration.getName() == null)));
             try {
-                NamedSourceBase pubUnitSource = RegistrationDTO.findPublishedUnit(registration);
-                if(pubUnitSource == null) {
+                NamedSourceBase citedSource = registration.findCitedSource();
+                if(citedSource == null) {
                     Reference reference = getRepo().getReferenceService().load(idset.getPublishedUnitUuid());
-                    pubUnitSource = NamedSource.NewPrimarySourceInstance(reference, null);
+                    citedSource = NamedSource.NewPrimarySourceInstance(reference, null);
                 }
-                setPublishedUnit(pubUnitSource);
+                setPublishedUnit(citedSource);
             } catch (Exception e) {
                 // FIXME report error state instead
                 logger.error("Error on finding published unit in " + registration.toString(), e);
@@ -241,10 +240,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
         return workingSetDto;
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
@@ -363,9 +358,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
         return container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void saveBean(SpecimenTypeDesignationSetDTO dto) {
 
@@ -525,8 +517,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
         referencePopupEditorsCombobox.put(referencePopupEditor, referenceComobox);
     }
 
-
-
     @EventBusListenerMethod(filter = EntityChangeEventFilter.ReferenceFilter.class)
     public void onReferenceEvent(EntityChangeEvent event){
 
@@ -543,17 +533,11 @@ public class SpecimenTypeDesignationSetEditorPresenter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addRootEntity(CdmBase entity) {
         rootEntities.add(entity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public java.util.Collection<CdmBase> getRootEntities() {
         return rootEntities ;
@@ -577,6 +561,9 @@ public class SpecimenTypeDesignationSetEditorPresenter
      * @param publishedUnit
      *  The unit of publication in which the type designation has been published.
      *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
+     *
+     *  NOTE by AM: according to {@link #publishedUnit} the published unit must never be a
+     *   {@link ReferenceType#Section}. However, this method allows sections. This has implications.
      */
     protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
         if(publishedUnit == null) {

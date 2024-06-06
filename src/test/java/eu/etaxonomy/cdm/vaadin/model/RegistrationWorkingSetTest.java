@@ -16,8 +16,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
 import eu.etaxonomy.cdm.model.name.NomenclaturalCode;
 import eu.etaxonomy.cdm.model.name.Rank;
@@ -54,12 +54,12 @@ public class RegistrationWorkingSetTest {
         Registration reg1 = Registration.NewInstance("http://phycobank/0001", "0001", name1, null);
         Registration reg2 = Registration.NewInstance("http://phycobank/0002", "0002", name2, null);
 
-        List<RegistrationDTO> dtos = new ArrayList<>();
-        dtos.add(new RegistrationDTO(reg1));
-        dtos.add(new RegistrationDTO(reg2));
+        List<RegistrationWrapperDTO> dtos = new ArrayList<>();
+        dtos.add(new RegistrationWrapperDTO(reg1));
+        dtos.add(new RegistrationWrapperDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
+        Assert.assertEquals(article.getUuid(), ws.getPublicationUnitUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
 
@@ -91,13 +91,12 @@ public class RegistrationWorkingSetTest {
         Registration reg1 = Registration.NewInstance("http://phycobank/0001", "0001", null, typeDesignations);
         Registration reg2 = Registration.NewInstance("http://phycobank/0002", "0002", name2, null);
 
-        List<RegistrationDTO> dtos = new ArrayList<>();
-        dtos.add(new RegistrationDTO(reg1));
-        dtos.add(new RegistrationDTO(reg2));
+        List<RegistrationWrapperDTO> dtos = new ArrayList<>();
+        dtos.add(new RegistrationWrapperDTO(reg1));
+        dtos.add(new RegistrationWrapperDTO(reg2));
 
         RegistrationWorkingSet ws = new RegistrationWorkingSet(dtos);
-        Assert.assertEquals(article.getUuid(), ws.getCitationUuid());
+        Assert.assertEquals(article.getUuid(), ws.getPublicationUnitUuid());
         Assert.assertEquals(2, ws.getRegistrations().size());
     }
-
 }

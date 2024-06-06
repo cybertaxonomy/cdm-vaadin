@@ -15,7 +15,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
@@ -31,7 +31,7 @@ public interface ListView extends ApplicationView<ListView,ListPresenter>{
         inProgress
     }
 
-    void populate(Pager<RegistrationDTO> registrations);
+    void populate(Pager<RegistrationWrapperDTO> registrations);
 
     void openDetailsPopup(String caption, List<String> messages);
 

@@ -37,12 +37,14 @@ import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.NestedButtonStateUpdater;
 
 /**
+ * By AM: Combobox (with buttons) for switching back and forth from a TextBox.
+ *
  * @author a.kohlbecker
  * @since May 24, 2017
- *
  */
-public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extends CompositeCustomField<String>
-    implements WeaklyRelatedEntityField<V>, ReloadableSelect {
+public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>>
+        extends CompositeCustomField<String>
+        implements WeaklyRelatedEntityField<V>, ReloadableSelect {
 
     private static final long serialVersionUID = 6277565876657520311L;
 
@@ -73,7 +75,7 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         lazySelect.addValueChangeListener(e -> {
             // update the itemContainer immediately so that the edit button acts on the chosen item
             // TODO In contrast to ToOneRelatedEntityCombobox where getValue() is overwritten to call
-            // commitSelect() calling this method would most probably remove all strings witch do not have a
+            // commitSelect() calling this method would most probably remove all strings which do not have a
             // weakly related entity. Such behavior would be very unfriendly to users.
             try {
               lazySelect.commit();
@@ -83,10 +85,12 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         });
     }
 
+    @Override
+    public void addValueChangeListener(ValueChangeListener valueChangeListener){
+        super.addValueChangeListener(valueChangeListener);
+        lazySelect.addValueChangeListener(valueChangeListener);
+    }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
         container.addComponents(lazySelect, addButton, editButton);
@@ -95,41 +99,25 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         return container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-
     @Override
     public Class<String> getType() {
         return String.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         container.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         return Optional.empty();
     }
 
-    /**
-     * @return the select
-     */
     public ReloadableLazyComboBox<String> getSelect() {
         return lazySelect;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void loadFrom(FilterablePagingProvider<String> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength) {
 
         this.filterablePagingProvider = (IFilterableStringRepresentationPagingProvider<UUID>) filterablePagingProvider;
@@ -146,36 +134,21 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         getSelect().reload();
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setAddButtonEnabled(boolean enabled) {
         addButton.setEnabled(enabled);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addClickListenerAddEntity(ClickListener listener) {
         addButton.addClickListener(listener);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setEditButtonEnabled(boolean enabled) {
         editButton.setEnabled(enabled);
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addClickListenerEditEntity(ClickListener listener) {
         editButton.addClickListener(listener);
@@ -186,22 +159,25 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         setValue(bean);
     }
 
-
     public UUID getIdForValue(){
         return filterablePagingProvider.idFor(getValue());
     }
 
-
     /**
      * sets the selection to the <code>newFieldValue</code> only if the value can
      * be provided by the FilterablePagingProvider
-     *
      */
     @Override
     public void setValue(String newFieldValue) throws com.vaadin.data.Property.ReadOnlyException, ConversionException {
         if(!Objects.equals(newFieldValue, lazySelect.getValue())){
+            //if value changed...
             if(contains(newFieldValue)){
                 lazySelect.setValue(newFieldValue);
+                lazySelect.markAsDirty();
+            }else if (lazySelect.getValue() != null) {
+                //if new suggested value does not exist in the list,
+                //set the value of the combobox to null, if it it not yet null
+                lazySelect.setValue(null);
                 lazySelect.markAsDirty();
             }
         }
@@ -213,15 +189,10 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
 
     }
 
-    /**
-     * @param newFieldValue
-     * @return
-     */
     private boolean contains(String newFieldValue) {
         UUID id = filterablePagingProvider.idFor(newFieldValue);
         return id != null;
     }
-
 
     @Override
     public boolean isValueInOptions(){
@@ -236,17 +207,11 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Property getPropertyDataSource() {
         return lazySelect.getPropertyDataSource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -278,9 +243,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
         lazySelect.commit();
     }
 
-    /**
-    *
-    */
    public void commitSelect() {
        try {
            setComponentError(null);
@@ -315,10 +277,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
             toOneRelatedEntityField.setEditButtonEnabled(false);
         }
 
-
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public void valueChange(com.vaadin.data.Property.ValueChangeEvent event) {
 
@@ -326,9 +284,6 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
             updateButtons(value);
         }
 
-        /**
-         * @param value
-         */
         @Override
         public void updateButtons(String value) {
 
@@ -344,5 +299,4 @@ public class WeaklyRelatedEntityCombobox<V extends IdentifiableEntity<?>> extend
             toOneRelatedEntityField.setEditButtonEnabled(!isReadOnlyField && userIsAllowedToUpdate);
         }
     }
-
 }

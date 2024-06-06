@@ -73,7 +73,6 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
     }
 
     public TaxonNameStringFilterablePagingProvider(INameService service, Rank rank, MatchMode matchMode) {
-        super();
         this.service = service;
         if(matchMode != null){
             this.matchMode = matchMode;
@@ -86,10 +85,18 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
 
         unlistenAllFields();
 
-        registerNullSave(genusOrUninomialField, e -> namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue()));
-        registerNullSave(infraGenericEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraGenericEpithetField.getValue()));
-        registerNullSave(specificEpithetField, e -> namePartsFilter.setGenusOrUninomial(specificEpithetField.getValue()));
-        registerNullSave(infraSpecificEpithetField, e -> namePartsFilter.setGenusOrUninomial(infraSpecificEpithetField.getValue()));
+        registerNullSave(genusOrUninomialField, e -> {
+            namePartsFilter.setGenusOrUninomial(genusOrUninomialField.getValue());
+        });
+        registerNullSave(infraGenericEpithetField, e -> {
+            namePartsFilter.setInfraGenericEpithet(infraGenericEpithetField.getValue());
+        });
+        registerNullSave(specificEpithetField, e -> {
+            namePartsFilter.setSpecificEpithet(specificEpithetField.getValue());
+        });
+        registerNullSave(infraSpecificEpithetField, e -> {
+            namePartsFilter.setInfraGenericEpithet(infraSpecificEpithetField.getValue());
+        });
     }
 
     public void unlistenAllFields() {
@@ -163,9 +170,6 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
         return namePartStrings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size(String filter) {
 
@@ -176,23 +180,14 @@ public class TaxonNameStringFilterablePagingProvider implements IFilterableStrin
         return taxonNamePager.getCount().intValue();
     }
 
-    /**
-     * @return the pageSize
-     */
     public int getPageSize() {
         return pageSize;
     }
 
-    /**
-     * @param pageSize the pageSize to set
-     */
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
-    /**
-     * @return the lastPagedEntityUUIDs
-     */
     public Map<String, UUID> getLastPagedEntityUUIDs() {
         return lastPagedEntityUUIDs;
     }

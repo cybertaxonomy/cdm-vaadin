@@ -30,7 +30,7 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
 import eu.etaxonomy.cdm.api.service.DeleteResult;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -60,7 +60,7 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 @SpringComponent
 @ViewScope
 public class StartRegistrationPresenter
-        extends AbstractEditorPresenter<RegistrationDTO, StartRegistrationPresenter, StartRegistrationView> {
+        extends AbstractEditorPresenter<RegistrationWrapperDTO, StartRegistrationPresenter, StartRegistrationView> {
 
     private static final long serialVersionUID = 2283189121081612574L;
 
@@ -250,18 +250,18 @@ public class StartRegistrationPresenter
     }
 
     @Override
-    protected RegistrationDTO loadBeanById(Object identifier) {
+    protected RegistrationWrapperDTO loadBeanById(Object identifier) {
         // not needed //
         return null;
     }
 
     @Override
-    protected void saveBean(RegistrationDTO bean) {
+    protected void saveBean(RegistrationWrapperDTO bean) {
         // not needed //
     }
 
     @Override
-    protected void deleteBean(RegistrationDTO bean) {
+    protected void deleteBean(RegistrationWrapperDTO bean) {
         // not needed //
     }
 }

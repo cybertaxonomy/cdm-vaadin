@@ -44,9 +44,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO.RankedNameReference;
+import eu.etaxonomy.cdm.api.dto.RegistrationDTO.RankedNameReference;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -55,7 +55,7 @@ import eu.etaxonomy.cdm.model.name.RegistrationStatus;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.ref.EntityReference;
-import eu.etaxonomy.cdm.ref.TypedEntityReference;
+import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.BadgeButton;
 import eu.etaxonomy.cdm.vaadin.component.registration.RegistrationItem;
@@ -130,7 +130,7 @@ public class RegistrationWorkingsetViewBean
      */
     private Map<UUID, RankedNameReference> typifiedNamesMap = new HashMap<>();
 
-    private RegistrationStatusFieldInstantiator<RegistrationDTO> statusFieldInstantiator;
+    private RegistrationStatusFieldInstantiator<RegistrationWrapperDTO> statusFieldInstantiator;
 
     private String accessDeniedMessage;
 
@@ -172,7 +172,7 @@ public class RegistrationWorkingsetViewBean
     }
 
     @Override
-    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationDTO> blockingRegDTOs) {
+    public void setBlockingRegistrations(UUID registrationUuid, Set<RegistrationWrapperDTO> blockingRegDTOs) {
 
         RegistrationDetailsItem regItem = registrationItemMap.get(registrationUuid);
 
@@ -199,9 +199,9 @@ public class RegistrationWorkingsetViewBean
         registrationsGrid.setColumnExpandRatio(1, 1f);
 
         registrationItemMap.clear();
-        registrationsGrid.setRows(workingset.getRegistrationDTOs().size() * 2  + 3);
+        registrationsGrid.setRows(workingset.getRegistrationWrapperDTOs().size() * 2  + 3);
         int row = 0;
-        for(RegistrationDTO dto : workingset.getRegistrationDTOs()) {
+        for(RegistrationWrapperDTO dto : workingset.getRegistrationWrapperDTOs()) {
             row = putRegistrationListComponent(row, dto);
         }
 
@@ -213,7 +213,7 @@ public class RegistrationWorkingsetViewBean
         addNewNameRegistrationButton.setDescription("A name which is newly published in this publication.");
         Stack<EditorActionContext> context = new Stack<EditorActionContext>();
         context.push(new EditorActionContext(
-                    new TypedEntityReference<>(Registration.class, null),
+                    TypedEntityReferenceFactory.fromTypeAndId(Registration.class, null),
                     this)
                     );
         addNewNameRegistrationButton.addClickListener(
@@ -286,7 +286,7 @@ public class RegistrationWorkingsetViewBean
         TaxonName taxonName = existingNameCombobox.getValue();
         Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    TypedEntityReference.fromEntity(taxonName),
+                    TypedEntityReferenceFactory.fromEntity(taxonName),
                     this)
                     );
         getViewEventBus().publish(
@@ -301,7 +301,7 @@ public class RegistrationWorkingsetViewBean
         );
     }
 
-    protected int putRegistrationListComponent(int row, RegistrationDTO dto) {
+    protected int putRegistrationListComponent(int row, RegistrationWrapperDTO dto) {
 
         RankedNameReference typifiedNameReference = dto.getTypifiedNameRef();
         if(typifiedNameReference == null){
@@ -324,7 +324,7 @@ public class RegistrationWorkingsetViewBean
 
         Stack<EditorActionContext> context = new Stack<>();
         context.push(new EditorActionContext(
-                    TypedEntityReference.fromTypeAndId(Registration.class, registrationEntityUuid),
+                    TypedEntityReferenceFactory.fromTypeAndId(Registration.class, registrationEntityUuid),
                     this)
                     );
 
@@ -379,9 +379,9 @@ public class RegistrationWorkingsetViewBean
             blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
+                    new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(
                             e,
-                            RegistrationDTO.class,
+                            RegistrationWrapperDTO.class,
                             dto.getUuid(),
                             RegistrationItem.BLOCKED_BY
                             )
@@ -394,9 +394,9 @@ public class RegistrationWorkingsetViewBean
         if(!dto.getValidationProblems().isEmpty()){
             validationProblemsButton.setEnabled(true);
             validationProblemsButton.addClickListener(e -> getViewEventBus().publish(this,
-                    new ShowDetailsEvent<RegistrationDTO, UUID>(
+                    new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(
                         e,
-                        RegistrationDTO.class,
+                        RegistrationWrapperDTO.class,
                         dto.getUuid(),
                         RegistrationItem.VALIDATION_PROBLEMS
                         )

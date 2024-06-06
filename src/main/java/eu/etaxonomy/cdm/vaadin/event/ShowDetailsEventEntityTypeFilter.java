@@ -14,20 +14,15 @@ import org.vaadin.spring.events.EventBusListenerMethodFilter;
 /**
  * @author a.kohlbecker
  * @since Jan 31, 2018
- *
  */
 public class ShowDetailsEventEntityTypeFilter implements EventBusListenerMethodFilter {
 
-
-    Class entityType;
+    private Class entityType;
 
     private ShowDetailsEventEntityTypeFilter(Class entityType){
         this.entityType = entityType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean filter(Event<?> event) {
 
@@ -45,10 +40,10 @@ public class ShowDetailsEventEntityTypeFilter implements EventBusListenerMethodF
         }
     }
 
-    public static class RegistrationDTO extends ShowDetailsEventEntityTypeFilter{
+    public static class RegistrationWrapperDTO extends ShowDetailsEventEntityTypeFilter{
 
-        public RegistrationDTO(){
-            super(eu.etaxonomy.cdm.api.service.dto.RegistrationDTO.class);
+        public RegistrationWrapperDTO(){
+            super(eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO.class);
         }
     }
 }

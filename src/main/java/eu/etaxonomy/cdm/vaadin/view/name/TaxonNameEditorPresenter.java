@@ -574,7 +574,7 @@ public class TaxonNameEditorPresenter
 
         PropertyIdPath boundPropertyIdPath = boundPropertyIdPath(event.getNewField());
         if (boundPropertyIdPath != null) {
-            TaxonNameDTO taxonNamedto = ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
+            TaxonNameDTO taxonNameDto = ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
                     .getBean();
             if (boundPropertyIdPath.matches("specificEpithet")) {
                 AbstractField<String> genusOrUninomialField = getView().getGenusOrUninomialField();
@@ -584,7 +584,7 @@ public class TaxonNameEditorPresenter
                                 getRepo().getNameService(), Rank.SPECIES());
                     }
                     specificEpithetPartPagingProvider.listenToFields(genusOrUninomialField, null, null, null);
-                    specificEpithetPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
+                    specificEpithetPartPagingProvider.excludeNames(taxonNameDto.cdmEntity());
                     specificEpithetPartPagingProvider.updateFromFields();
                     WeaklyRelatedEntityCombobox<TaxonName> specificEpithetField = (WeaklyRelatedEntityCombobox<TaxonName>) event
                             .getNewField();
@@ -614,9 +614,10 @@ public class TaxonNameEditorPresenter
                     }
                     genusOrUninomialPartPagingProvider.listenToFields(null, getView().getInfraGenericEpithetField(),
                             getView().getSpecificEpithetField(), getView().getInfraSpecificEpithetField());
-                    genusOrUninomialPartPagingProvider.excludeNames(taxonNamedto.cdmEntity());
+                    genusOrUninomialPartPagingProvider.excludeNames(taxonNameDto.cdmEntity());
                     WeaklyRelatedEntityCombobox<TaxonName> genusOrUninomialField = (WeaklyRelatedEntityCombobox<TaxonName>) event
                             .getNewField();
+                    //load all genusOrUninomial from DB
                     genusOrUninomialField.loadFrom(genusOrUninomialPartPagingProvider,
                             genusOrUninomialPartPagingProvider, genusOrUninomialPartPagingProvider.getPageSize());
                     genusOrUninomialField.setValue(event.getOldField().getValue());

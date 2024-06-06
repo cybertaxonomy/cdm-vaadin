@@ -33,7 +33,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
-import eu.etaxonomy.cdm.api.service.dto.RegistrationDTO;
+import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.dto.TypeDesignationStatusFilter;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
@@ -146,7 +146,7 @@ public class ListPresenter extends AbstractPresenter<ListPresenter,ListView> {
      *
      * @return
      */
-    private Pager<RegistrationDTO> pageRegistrations(TextField textFieldOverride, String alternativeText) {
+    private Pager<RegistrationWrapperDTO> pageRegistrations(TextField textFieldOverride, String alternativeText) {
 
         // prepare the filters
         RegistrationSearchFilter filter = loadFilterFromView();
@@ -177,7 +177,7 @@ public class ListPresenter extends AbstractPresenter<ListPresenter,ListView> {
 
         List<UUID> typeDesignationStatus = new ArrayList<>(TypeDesignationStatusFilter.toTypeDesignationStatusUuids(filter.getTypeStatus()));
 
-        Pager<RegistrationDTO> dtoPager = getWorkingSetService().pageDTOs(
+        Pager<RegistrationWrapperDTO> dtoPager = getWorkingSetService().pageDTOs(
                 filter.getSubmitter() != null ? filter.getSubmitter().getUuid() : null,
                 filter.getRegistrationStatus() != null ? new ArrayList<>(filter.getRegistrationStatus()): null,
                 StringUtils.trimToNull(filter.getIdentifierPattern()),
@@ -191,7 +191,7 @@ public class ListPresenter extends AbstractPresenter<ListPresenter,ListView> {
     }
 
     @EventBusListenerMethod
-    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationDTO, UUID> event) {
+    public void onShowDetailsEvent(ShowDetailsEvent<RegistrationWrapperDTO, UUID> event) {
 
         // FIXME check from own view!!!
         if(getView() == null){
@@ -200,14 +200,14 @@ public class ListPresenter extends AbstractPresenter<ListPresenter,ListView> {
 
         UUID registrationUuid = event.getIdentifier();
 
-        RegistrationDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
+        RegistrationWrapperDTO regDto = getWorkingSetService().loadDtoByUuid(registrationUuid);
         if(event.getProperty().equals(RegistrationItem.VALIDATION_PROBLEMS)){
 
             getView().openDetailsPopup("Validation Problems", regDto.getValidationProblems());
 
         } else if(event.getProperty().equals("blockedBy")){
 
-            Set<RegistrationDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
+            Set<RegistrationWrapperDTO> blockingRegs = getWorkingSetService().loadBlockingRegistrations(registrationUuid);
             RegistrationItem regItem = getView().getRegistrationItem(registrationUuid);
             regItem.showBlockingRegistrations(blockingRegs);
         }
