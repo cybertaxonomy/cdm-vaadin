@@ -819,7 +819,7 @@ public class TaxonNameEditorPresenter
                         && getView().isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)) {
                     namePopup.enableMode(TaxonNamePopupEditorMode.NOMENCLATURALREFERENCE_SECTION_EDITING_ONLY);
                     namePopup.disableMode(TaxonNamePopupEditorMode.VALIDATE_AGAINST_HIGHER_NAME_PART);
-                    Reference nomrefPreset = (Reference) ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
+                    Reference nomrefPreset = ((AbstractPopupEditor<TaxonNameDTO, TaxonNameEditorPresenter,TaxonNamePopupEditorView>) getView())
                             .getBean().getNomenclaturalReference();
                     namePopup.setCdmEntityInstantiator(new BeanInstantiator<TaxonName>() {
 
