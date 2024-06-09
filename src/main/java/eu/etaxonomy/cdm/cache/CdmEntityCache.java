@@ -200,17 +200,10 @@ public class CdmEntityCache implements EntityCache {
 
     /**
      * Empty method which can be implemented by subclasses which do further analysis.
-     *
-     * @param bean
-     * @param entityKey
-     * @param flags
-     * @param mappedEntity
-     * @return
      */
     protected String analyzeMore(CdmBase bean, EntityKey entityKey, String flags, CdmBase mappedEntity) {
         return flags;
     }
-
 
     public void printEntityGraph(PrintStream printStream){
         printLegend(printStream);
@@ -252,23 +245,14 @@ public class CdmEntityCache implements EntityCache {
             id = entity.getId();
         }
 
-        /**
-         * @return the type
-         */
         public Class getType() {
             return type;
         }
 
-        /**
-         * @return the id
-         */
         public int getId() {
             return id;
         }
 
-        /**
-         * {@inheritDoc}
-         */
         @Override
         public int hashCode() {
             return new HashCodeBuilder(15, 33)
@@ -430,14 +414,9 @@ public class CdmEntityCache implements EntityCache {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <CDM extends CdmBase> void add(CDM value) {
         entities.add(value);
         analyzeEntity(value, "");
     }
-
-
 }
