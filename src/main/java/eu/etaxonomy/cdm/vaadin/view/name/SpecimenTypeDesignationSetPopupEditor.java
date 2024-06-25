@@ -318,7 +318,7 @@ public class SpecimenTypeDesignationSetPopupEditor
     public void updateAllowDeleteTypeDesignation(){
         // disable the delete button if there is only one typeDesignation
         // if this typeDesignation is deleted the fieldUnit would become orphan in the
-        // TypeDesignationSet
+        // TypeDesignationGroup
         GridLayout gridLayout = this.typeDesignationsCollectionField.getLayout();
         if(gridLayout.getRows() == 3){ // first row is header, last row is next new item
             gridLayout.getComponent(gridLayout.getColumns() - 1, 1).setEnabled(false);

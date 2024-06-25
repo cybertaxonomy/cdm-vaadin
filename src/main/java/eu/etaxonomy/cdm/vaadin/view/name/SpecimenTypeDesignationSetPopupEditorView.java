@@ -36,7 +36,7 @@ public interface SpecimenTypeDesignationSetPopupEditorView
     /**
      *  Disable the delete button if there is only one typeDesignation
      *  if this typeDesignation is deleted the fieldUnit would become orphan in the
-     *  TypeDesignationSet
+     *  TypeDesignationGroup
      */
     public void updateAllowDeleteTypeDesignation();
 
