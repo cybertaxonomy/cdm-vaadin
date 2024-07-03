@@ -117,6 +117,7 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                     field = ta;
                 } else if(propertyId.equals("annotationType")) {
                     NativeSelect select = new NativeSelect();
+                    select.setNullSelectionAllowed(false); //#10538
                     select.setContainerDataSource(typeSelectItemContainer);
                     select.setWidth(100, Unit.PIXELS);
                     field = select;
