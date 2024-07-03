@@ -20,7 +20,6 @@ import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 /**
  * @author a.kohlbecker
  * @since May 3, 2018
- *
  */
 public class NameRelationsListEditor extends ToManyRelatedEntitiesListSelect<NameRelationshipDTO, NameRelationField> {
 
