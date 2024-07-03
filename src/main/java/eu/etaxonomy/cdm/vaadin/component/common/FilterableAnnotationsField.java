@@ -122,7 +122,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                     select.setWidth(100, Unit.PIXELS);
                     field = select;
                 }
-                field.setStyleName(table.getStyleName());
+                if(field != null) {
+                    field.setStyleName(table.getStyleName());
+                }
                 return field;
             }
         });
