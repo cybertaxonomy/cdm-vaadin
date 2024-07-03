@@ -134,17 +134,11 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         typesFilter = Arrays.asList(types);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         // no default styles here
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         // holds a Container instead
@@ -162,11 +156,6 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         logger.debug("container.size: " + container.size());
     }
 
-
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected List<Annotation> getInternalValue() {
         if(container == null || container.getItemIds() == null){
@@ -189,9 +178,9 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                 emptyDefaultAnnotation.setAnnotationType(typesFilter.get(0));
             }
         }
-        container = new FilterableListContainer<Annotation>(newValue);
+        container = new FilterableListContainer<>(newValue);
         if(hasIncludeFilter){
-            container.addContainerFilter(new CdmTermFilter<AnnotationType>("annotationType", typesFilter));
+            container.addContainerFilter(new CdmTermFilter<>("annotationType", typesFilter));
         }
         table.setContainerDataSource(container);
         if(onlyOneType){
@@ -205,9 +194,6 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
         root.addComponentAsFirst(table);
@@ -217,10 +203,6 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         return root;
     }
 
-
-    /**
-     * @return
-     */
     private void addAnnotation() {
         container.addItem(newInstance());
         if(container.size() > 1){
@@ -228,31 +210,19 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
         }
     }
 
-    /**
-     * @return
-     */
     private Annotation newInstance() {
         return Annotation.NewInstance(null, Language.DEFAULT());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<? extends List<Annotation>> getType() {
-        return (Class<? extends List<Annotation>>) new ArrayList<Annotation>().getClass();
+        return (Class<? extends List<Annotation>>) new ArrayList<>().getClass();
     }
 
-    /**
-     * @param buildTermItemContainer
-     */
     public void setAnnotationTypeItemContainer(BeanItemContainer<DefinedTermBase> typeSelectItemContainer) {
         this.typeSelectItemContainer = typeSelectItemContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setReadOnly(boolean readOnly) {
         super.setReadOnly(readOnly);
@@ -269,10 +239,4 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
             this.withNewButton = withNewButton;
         }
     }
-
-
-
-
-
-
 }
