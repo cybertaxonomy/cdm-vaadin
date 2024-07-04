@@ -43,7 +43,7 @@ import eu.etaxonomy.cdm.api.service.config.RegistrationStatusTransitions;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.exception.TypeDesignationSetException;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationGroup.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;

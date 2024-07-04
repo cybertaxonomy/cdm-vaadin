@@ -29,8 +29,8 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.name.TypeDesignationDTO;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationGroup;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationGroup.TypeDesignationSetType;
 import eu.etaxonomy.cdm.api.util.UserHelper;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -119,21 +119,21 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
         }
 
         userHasAddPermission = !regDto.isPersisted() || userHelper.userHasPermission(regDto.registration(), CRUD.UPDATE);
-        Map<TypedEntityReference<? extends VersionableEntity>,TypeDesignationSet> typeDesignationSets = regDto.getOrderedTypeDesignationSets();
+        Map<TypedEntityReference<? extends VersionableEntity>,TypeDesignationGroup> typeDesignationGroups = regDto.getOrderedTypeDesignationSets();
 
-        if(typeDesignationSets != null){
+        if(typeDesignationGroups != null){
             // order the typeDesignationSet keys so that holotypes come first, etc
             List<TypedEntityRefWithStatus> baseRefsByHighestStatus = new ArrayList<>();
-            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationSets.keySet()) {
-                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationSets.get(baseEntityRef).highestTypeStatus(new RegistrationTypeDesignationStatusComparator())));
+            for(TypedEntityReference<? extends VersionableEntity> baseEntityRef : typeDesignationGroups.keySet()) {
+                baseRefsByHighestStatus.add(new TypedEntityRefWithStatus(baseEntityRef, typeDesignationGroups.get(baseEntityRef).highestTypeStatus(new RegistrationTypeDesignationStatusComparator())));
             }
 
             Collections.sort(baseRefsByHighestStatus);
 
             for(TypedEntityRefWithStatus typedEntityRefWithStatus : baseRefsByHighestStatus) {
                 TypedEntityReference<? extends VersionableEntity> baseEntity = typedEntityRefWithStatus.typedEntity;
-                TypeDesignationSet typeDesignationSet = typeDesignationSets.get(baseEntity);
-                if (logger.isDebugEnabled()) {logger.debug("WorkingSet:" + typeDesignationSet.getWorkingsetType() + ">" + typeDesignationSet.getBaseEntity().toString());}
+                TypeDesignationGroup typeDesignationGroup = typeDesignationGroups.get(baseEntity);
+                if (logger.isDebugEnabled()) {logger.debug("WorkingSet:" + typeDesignationGroup.getWorkingsetType() + ">" + typeDesignationGroup.getBaseEntity().toString());}
                 String buttonLabel = SpecimenOrObservationBase.class.isAssignableFrom(baseEntity.getType()) ? "Type": "NameType";
                 Button tdButton = new Button(buttonLabel + ":");
                 tdButton.setDescription("Edit the type designation working set");
@@ -145,14 +145,14 @@ public class RegistrationItemNameAndTypeButtons extends CompositeStyledComponent
                         baseEntity.getUuid(), EnumSet.of(CRUD.UPDATE, CRUD.DELETE), RegistrationStatus.PREPARATION.name());
 
                 typeDesignationButtons.add(new TypeDesignationSetButton(
-                        typeDesignationSet.getWorkingsetType(),
-                        typeDesignationSet.getBaseEntity(),
+                        typeDesignationGroup.getWorkingsetType(),
+                        typeDesignationGroup.getBaseEntity(),
                         tdButton)
                         );
 
                 String labelText = "<span class=\"field-unit-label\">" + baseEntity.getLabel() + "</span>"; // renders the FieldUnit label
-                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationSet.keySet()){
-                    Collection<TypeDesignationDTO> tdPerStatus = typeDesignationSet.get(typeStatus);
+                for(TypeDesignationStatusBase<?> typeStatus : typeDesignationGroup.keySet()){
+                    Collection<TypeDesignationDTO> tdPerStatus = typeDesignationGroup.get(typeStatus);
                     labelText += " <strong>" + typeStatus.getLabel() +  (tdPerStatus.size() > 1 ? "s":"" ) + "</strong>: ";
                     boolean isFirst = true;
                     for(TypeDesignationDTO<?> dtDTO : tdPerStatus) {

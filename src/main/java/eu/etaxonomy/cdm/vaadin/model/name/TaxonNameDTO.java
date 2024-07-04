@@ -31,7 +31,6 @@ import eu.etaxonomy.cdm.model.name.NomenclaturalStatus;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.model.permission.User;
-import eu.etaxonomy.cdm.model.reference.INomenclaturalReference;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 
@@ -320,7 +319,7 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
         return name.getNomenclaturalMicroReference();
     }
 
-    public INomenclaturalReference getNomenclaturalReference() {
+    public Reference getNomenclaturalReference() {
         return name.getNomenclaturalReference();
     }
 

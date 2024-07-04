@@ -13,7 +13,6 @@ import java.util.UUID;
 /**
  * @author cmathew
  * @since 7 Apr 2015
- *
  */
 public class IdUuidName {
 

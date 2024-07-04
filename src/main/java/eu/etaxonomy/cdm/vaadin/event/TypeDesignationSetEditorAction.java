@@ -14,8 +14,8 @@ import java.util.UUID;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Field;
 
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet;
-import eu.etaxonomy.cdm.api.service.name.TypeDesignationSet.TypeDesignationSetType;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationGroup;
+import eu.etaxonomy.cdm.api.service.name.TypeDesignationGroup.TypeDesignationSetType;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
 import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
@@ -26,7 +26,7 @@ import eu.etaxonomy.vaadin.mvp.AbstractView;
  * @author a.kohlbecker
  * @since Mar 22, 2017
  */
-public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDesignationSet> {
+public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDesignationGroup> {
 
     private TypeDesignationSetType workingSetType;
 
@@ -42,7 +42,7 @@ public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDes
     public TypeDesignationSetEditorAction(VersionableEntity baseEntity,
             TypeDesignationSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Button source, Field<TypeDesignationSet> target, AbstractView sourceView, Stack<EditorActionContext> context) {
+            Button source, Field<TypeDesignationGroup> target, AbstractView sourceView, Stack<EditorActionContext> context) {
 
         super(EditorActionType.EDIT, null, source, target, sourceView);
         this.baseEntity = baseEntity;
@@ -62,7 +62,7 @@ public class TypeDesignationSetEditorAction extends AbstractEditorAction<TypeDes
      */
     public TypeDesignationSetEditorAction(TypeDesignationSetType workingSetType,
             UUID registrationUuid, UUID typifiedNameUuid,
-            Button source, Field<TypeDesignationSet> target, AbstractView sourceView) {
+            Button source, Field<TypeDesignationGroup> target, AbstractView sourceView) {
 
         super(EditorActionType.ADD, null, source, target, sourceView);
         this.workingSetType = workingSetType;

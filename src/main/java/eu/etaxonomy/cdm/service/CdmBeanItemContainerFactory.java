@@ -83,7 +83,9 @@ public class CdmBeanItemContainerFactory {
 
         clearSession();
         TermVocabulary<?> vocab = repo.getVocabularyService().find(vocabularyUuid);
+        @SuppressWarnings("rawtypes")
         Pager<DefinedTermBase> terms = repo.getVocabularyService().getTerms(vocab, null, null, orderHints, INIT_STRATEGY);
+        @SuppressWarnings("rawtypes")
         BeanItemContainer<DefinedTermBase> termItemContainer = new BeanItemContainer<>(DefinedTermBase.class);
         termItemContainer.addAll(terms.getRecords());
         return termItemContainer;

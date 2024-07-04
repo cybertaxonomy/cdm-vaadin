@@ -18,7 +18,6 @@ import com.vaadin.ui.AbstractSelect;
 
 public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements ReloadableSelect, EntitySupport<T> {
 
-
     private static final long serialVersionUID = -4833661351090992884L;
 
     static Field lazySelectInternalValueField;
@@ -38,16 +37,10 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
         }
     }
 
-    /**
-     * @param itemType
-     */
     public ReloadableLazyComboBox(Class<T> itemType) {
         super(itemType);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void reload() {
         refresh(); // reload from persistence
@@ -101,9 +94,6 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
         setValue(bean);
     }
 
-    /**
-     *
-     */
     private T internalValueByFieldAccess(){
         try {
             return (T) lazySelectInternalValueField.get(this);
@@ -130,5 +120,4 @@ public class ReloadableLazyComboBox<T> extends LazyComboBox<T> implements Reload
             throw new RuntimeException(e);
         }
     }
-
 }
