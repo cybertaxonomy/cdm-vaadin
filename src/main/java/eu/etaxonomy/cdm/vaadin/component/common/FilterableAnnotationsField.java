@@ -120,6 +120,10 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
                     select.setNullSelectionAllowed(false); //#10538
                     select.setContainerDataSource(typeSelectItemContainer);
                     select.setWidth(100, Unit.PIXELS);
+                    //#10552
+                    //the value is overriden by the row record new value setting of the surrounding table, so no need to set the value here
+//                  select.select(AnnotationType.INTERNAL());  //AnnotationType.TECHNICAL()
+                    select.focus();
                     field = select;
                 }
                 if(field != null) {
@@ -214,7 +218,8 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
     }
 
     private Annotation newInstance() {
-        return Annotation.NewInstance(null, Language.DEFAULT());
+        //internal according to #10522
+        return Annotation.NewInstance(null, AnnotationType.INTERNAL(), Language.DEFAULT());
     }
 
     @Override
