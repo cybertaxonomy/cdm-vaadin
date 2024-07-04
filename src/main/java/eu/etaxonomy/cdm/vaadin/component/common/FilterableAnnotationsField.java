@@ -74,7 +74,7 @@ public class FilterableAnnotationsField extends CompositeCustomField<List<Annota
 
         setCaption(caption);
         // annotations are always sets
-        setConverter(new SetToListConverter<Annotation>());
+        setConverter(new SetToListConverter<>());
 
         root.setWidth(100, Unit.PERCENTAGE);
 
