@@ -110,7 +110,7 @@ public class ReferenceEditorPresenter
         getView().getSchoolCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getSchoolCombobox(), this));
 
         getView().getAnnotationsField().setAnnotationTypeItemContainer(cdmBeanItemContainerFactory.buildTermItemContainer(
-                AnnotationType.EDITORIAL().getUuid(), AnnotationType.TECHNICAL().getUuid()));
+                AnnotationType.EDITORIAL().getUuid(), AnnotationType.INTERNAL().getUuid()));
     }
 
     public void updateInReferencePageProvider() {
