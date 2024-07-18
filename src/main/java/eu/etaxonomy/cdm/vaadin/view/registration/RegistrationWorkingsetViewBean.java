@@ -376,7 +376,7 @@ public class RegistrationWorkingsetViewBean
         if(dto.isBlocked()){
             blockingRegistrationButton.setEnabled(true);
             blockingRegistrationButton.setDescription("This registration is currently blocked by other registrations");
-            blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLITE);
+            blockingRegistrationButton.addStyleName(EditValoTheme.BUTTON_HIGHLIGHT);
             blockingRegistrationButton.addClickListener(e -> getViewEventBus().publish(
                     this,
                     new ShowDetailsEvent<RegistrationWrapperDTO, UUID>(

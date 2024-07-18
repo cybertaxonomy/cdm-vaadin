@@ -13,14 +13,12 @@ import com.vaadin.ui.themes.ValoTheme;
 /**
  * @author a.kohlbecker
  * @since Mar 20, 2018
- *
  */
 public class EditValoTheme extends ValoTheme {
 
-    public static final String BUTTON_HIGHLITE = "highlite";
+    public static final String BUTTON_HIGHLIGHT = "highlight";
 
     public static final String PANEL_CONTENT_PADDING_LEFT = "padding-left";
 
     public static final String OPTIONGROUP_CAPTION_FIX = "optiongroup-caption-fix";
-
 }

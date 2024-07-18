@@ -264,7 +264,7 @@ public class RegistrationItem extends GridLayout {
 
         if(regDto != null && regDto.isBlocked()){
             getBlockedByButton().setEnabled(true);
-            getBlockedByButton().addStyleName(EditValoTheme.BUTTON_HIGHLITE);
+            getBlockedByButton().addStyleName(EditValoTheme.BUTTON_HIGHLIGHT);
         }
 
         labelMarkup.append(citationString);
