@@ -31,6 +31,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.compare.name.TypeDesignationComparator;
+import eu.etaxonomy.cdm.model.common.AnnotatableEntity;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
 import eu.etaxonomy.cdm.model.name.Registration;
@@ -107,7 +108,7 @@ public class SpecimenTypeDesignationSetServiceImpl
     }
 
     private SpecimenTypeDesignationSetDTO<Registration> specimenTypeDesignationSetDTO(
-            RegistrationWrapperDTO regDTO, VersionableEntity baseEntity) {
+            RegistrationWrapperDTO regDTO, AnnotatableEntity baseEntity) {
 
         @SuppressWarnings("rawtypes")
         Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
@@ -137,7 +138,7 @@ public class SpecimenTypeDesignationSetServiceImpl
             fieldUnit.setGatheringEvent(gatheringEvent);
             fieldUnit = repo.getOccurrenceService().save(fieldUnit);
 
-            VersionableEntity baseEntity = bean.getBaseEntity();
+            AnnotatableEntity baseEntity = bean.getBaseEntity();
             @SuppressWarnings("rawtypes")
             Set<TypeDesignationBase> typeDesignations = regDTO.getTypeDesignationsInWorkingSet(baseEntity);
             for(TypeDesignationBase<?> td : typeDesignations){
