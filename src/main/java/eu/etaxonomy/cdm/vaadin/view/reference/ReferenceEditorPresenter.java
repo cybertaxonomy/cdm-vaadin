@@ -304,7 +304,7 @@ public class ReferenceEditorPresenter
             annotationsSeen.add(a);
         }
         for(Annotation a : currentAnnotations){
-            if(!annotationsSeen.contains(a)){
+            if(!annotationsSeen.contains(a) || a.checkEmpty(true)){
                 bean.removeAnnotation(a);
             }
         }
