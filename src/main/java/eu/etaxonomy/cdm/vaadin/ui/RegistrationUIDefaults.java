@@ -84,7 +84,7 @@ public class RegistrationUIDefaults {
     /**
      * should be configurable per UI
      */
-    public static final AnnotationType[] EDITABLE_ANOTATION_TYPES = new AnnotationType[]{AnnotationType.EDITORIAL()};
+    public static final AnnotationType[] EDITABLE_ANOTATION_TYPES = new AnnotationType[]{AnnotationType.INTERNAL()};
 
     public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:editsupport@bgbm.org\">editsupport@bgbm.org</a> for support and more information.";
 

@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Restrictions;
@@ -39,6 +40,7 @@ import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.Language;
@@ -479,6 +481,12 @@ public class TaxonNameEditorPresenter
         for(NomenclaturalStatus toBeRemoved : removeCandidates) {
             bean.cdmEntity().removeStatus(toBeRemoved);
         }
+
+        //remove empty annotations
+        Set<Annotation> annotations = bean.cdmEntity().getAnnotations();
+        List<Annotation> emptyAnnotations = annotations.stream().filter(a->a.checkEmpty(true)).collect(Collectors.toList());
+        emptyAnnotations.stream().forEach(a->bean.cdmEntity().removeAnnotation(a));
+
         return super.preSaveBean(bean);
     }
 

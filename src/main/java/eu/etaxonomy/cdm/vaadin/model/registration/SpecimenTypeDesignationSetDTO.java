@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.common.AnnotatableEntity;
 import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.Language;
 import eu.etaxonomy.cdm.model.common.LanguageString;
@@ -34,7 +35,7 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
 
     private FieldUnit fieldUnit;
 
-    private VersionableEntity baseEntity;
+    private AnnotatableEntity baseEntity;
 
     /**
      * List of all SpecimenTypeDesignation that have been loaded into the
@@ -52,7 +53,8 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
     /**
      * @param specimenTypeDesignations can be <code>null</code>
      */
-    public SpecimenTypeDesignationSetDTO(OWNER owner, VersionableEntity baseEntity, List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
+    public SpecimenTypeDesignationSetDTO(OWNER owner, AnnotatableEntity baseEntity,
+            List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
         this.owner = owner;
         this.baseEntity = baseEntity;
         if(typifiedName == null){
@@ -83,13 +85,11 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
         return fieldUnit;
     }
 
-
     /**
-     *
      * @return the baseEntity
      *   <code>null</code> if the base baseEntity is a fieldUnit
      */
-    public VersionableEntity getBaseEntity() {
+    public AnnotatableEntity getBaseEntity() {
         return baseEntity;
     }
 

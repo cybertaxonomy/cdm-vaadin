@@ -37,6 +37,7 @@ import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
+import eu.etaxonomy.cdm.model.common.Annotation;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.location.Country;
@@ -373,6 +374,12 @@ public class SpecimenTypeDesignationSetEditorPresenter
                 stddto.setDesignationReferenceDetail(null);
             }
         }
+
+        //remove empty annotations
+        @SuppressWarnings("unchecked")
+        Set<Annotation> as = dto.getAnnotations();
+        List<Annotation> emptyAnnotations = as.stream().filter(a->a.checkEmpty(true)).collect(Collectors.toList());
+        emptyAnnotations.forEach(a->dto.getAnnotations().remove(a));
 
         specimenTypeDesignationSetService.save(dto);
     }
