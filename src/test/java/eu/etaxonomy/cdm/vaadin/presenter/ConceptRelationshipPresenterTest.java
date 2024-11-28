@@ -86,7 +86,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         name = CdmBase.deproxy(name);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
-        Assert.assertEquals("T. " + UTF8.HYBRID_SPACE + "withverylongspecificepithet subsp.", abbreviatedName);
+        Assert.assertEquals("T. " + UTF8.HYBRID + "withverylongspecificepithet subsp.", abbreviatedName);
         // app.commitTransaction(tx);
 
     }
