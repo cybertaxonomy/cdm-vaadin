@@ -236,14 +236,12 @@ public class D3ConceptRelationshipTree extends AbstractJavaScriptComponent {
                     nameSb.append(tt.getText().charAt(0) + ".");
                     foundGenusOrUninomial = true;
                 } else {
-                    if(!previousTagSeparator) {
+                    boolean isSeparator = tt.getType() == TagEnum.separator;
+                    if(!isSeparator && !previousTagSeparator) {
                         nameSb.append(" ");
                     }
                     nameSb.append(tt.getText());
-                    previousTagSeparator = false;
-                    if(tt.getType() == TagEnum.separator) {
-                        previousTagSeparator = true;
-                    }
+                    previousTagSeparator = isSeparator;
                 }
             }
         }

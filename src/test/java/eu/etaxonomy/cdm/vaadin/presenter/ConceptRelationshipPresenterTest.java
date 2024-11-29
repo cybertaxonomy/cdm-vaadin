@@ -22,6 +22,7 @@ import org.unitils.dbunit.annotation.DataSets;
 
 import eu.etaxonomy.cdm.api.application.ICdmRepository;
 import eu.etaxonomy.cdm.api.service.INameService;
+import eu.etaxonomy.cdm.common.UTF8;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.test.unitils.CleanSweepInsertLoadStrategy;
@@ -85,7 +86,7 @@ public class ConceptRelationshipPresenterTest extends CdmVaadinBaseTest {
         name = CdmBase.deproxy(name);
 
         String abbreviatedName = crTree.getAbbreviatedName(name);
-        Assert.assertEquals("T. × withverylongspecificepithet subsp.", abbreviatedName);
+        Assert.assertEquals("T. " + UTF8.HYBRID + "withverylongspecificepithet subsp.", abbreviatedName);
         // app.commitTransaction(tx);
 
     }

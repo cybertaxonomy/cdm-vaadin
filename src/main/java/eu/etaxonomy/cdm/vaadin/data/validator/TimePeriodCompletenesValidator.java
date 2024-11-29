@@ -20,14 +20,14 @@ public class TimePeriodCompletenesValidator implements Validator {
 
     private static final long serialVersionUID = 4651375734846907644L;
 
-    PartialCompletenesValidator partialValidator = new PartialCompletenesValidator();
+    private PartialCompletenesValidator partialValidator = new PartialCompletenesValidator();
 
     @Override
     public void validate(Object value) throws InvalidValueException {
         if(value != null){
             TimePeriod timePeriod = (TimePeriod)value;
-            if(timePeriod .getStart() != null){
-                partialValidator.validate(timePeriod.getEndDay());
+            if(timePeriod.getStart() != null){
+                partialValidator.validate(timePeriod.getStart());
             }
             if(timePeriod.getEnd() != null){
                 partialValidator.validate(timePeriod.getEnd());
