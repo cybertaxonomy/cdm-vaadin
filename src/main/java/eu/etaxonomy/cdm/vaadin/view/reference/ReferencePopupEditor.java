@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Scope;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
@@ -75,7 +76,7 @@ public class ReferencePopupEditor
 
     private final static int GRID_COLS = 4; // 12 would fit for 2,3, and 4 Components per row
 
-    private final static int GRID_ROWS = 14;
+    private final static int GRID_ROWS = 15;
 
     private final static int COL_FIELD_WIDTH_PX = 160;
 
@@ -86,6 +87,8 @@ public class ReferencePopupEditor
     private ToOneRelatedEntityCombobox<Reference> inReferenceCombobox;
 
     private TeamOrPersonField authorshipField;
+
+    private CheckBox authorIsEditorCheckbox;
 
     private ToOneRelatedEntityCombobox<Institution> institutionCombobox;
 
@@ -135,10 +138,10 @@ public class ReferencePopupEditor
         "protectedAbbrevTitleCache",
         "nomenclaturallyRelevant",
         "authorship",
+        "editorIsEditor",
         "referenceAbstract",
         "title",
         "abbrevTitle",
-        "editor",
         "volume",
         "pages",
         "edition",
@@ -184,6 +187,10 @@ public class ReferencePopupEditor
         authorshipField = new TeamOrPersonField("Author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.BIBLIOGRAPHIC_TITLE);
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, GRID_COLS -1, row);
+        row++;
+        authorIsEditorCheckbox = new CheckBox("Author is editor", false);
+        authorIsEditorCheckbox.setWidth("200");
+        addField(authorIsEditorCheckbox, "authorIsEditor", 0, row, GRID_COLS-1, row);
         row++;
 
         inReferenceCombobox = new ToOneRelatedEntityCombobox<>("In-reference", Reference.class);
@@ -264,7 +271,6 @@ public class ReferencePopupEditor
         addTextField("Place published", "placePublished", 0, row, 0, row).setWidth(COL_FIELD_WIDTH_STR);
         TextField publisherField = addTextField("Publisher", "publisher", 1, row, 1, row);
         publisherField.setWidth(COL_FIELD_WIDTH_STR);
-        addTextField("Editor", "editor", 2, row).setWidth(COL_FIELD_WIDTH_STR);
         row++;
 
         addTextField("ISSN", "issn", 0, row).setWidth(COL_FIELD_WIDTH_STR);
@@ -331,6 +337,7 @@ public class ReferencePopupEditor
 
             datePublishedField.setVisible(fieldPropertyDefinition.containsKey("datePublished"));
             authorshipField.setVisible(fieldPropertyDefinition.containsKey("authorship"));
+            authorIsEditorCheckbox.setVisible(fieldPropertyDefinition.containsKey("authorIsEditor"));
             String inRefCaption = fieldPropertyDefinition.get("inReference");
             inReferenceCombobox.setVisible(inRefCaption != null);
             inReferenceCombobox.setRequired(EnumSet.of(ReferenceType.Article, ReferenceType.BookSection, ReferenceType.Section, ReferenceType.InProceedings).contains(referenceType));
