@@ -55,6 +55,7 @@ public class SpecimenTypeDesignationSetDTO<OWNER extends VersionableEntity> {
      */
     public SpecimenTypeDesignationSetDTO(OWNER owner, AnnotatableEntity baseEntity,
             List<SpecimenTypeDesignation> specimenTypeDesignations, TaxonName typifiedName) {
+
         this.owner = owner;
         this.baseEntity = baseEntity;
         if(typifiedName == null){

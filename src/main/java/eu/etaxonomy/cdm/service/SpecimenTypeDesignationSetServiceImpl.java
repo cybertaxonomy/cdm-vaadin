@@ -154,31 +154,32 @@ public class SpecimenTypeDesignationSetServiceImpl
 
     @Override
     @Transactional(readOnly=false)
-    public void save(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto) {
+    public void save(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> stdSetDto) {
 
-        if(dto.getOwner() instanceof Registration){
-            Registration regPremerge = (Registration) dto.getOwner();
+        if(stdSetDto.getOwner() instanceof Registration){
+            Registration regPremerge = (Registration) stdSetDto.getOwner();
 
             regPremerge = repo.getRegistrationService().assureIsPersisted(regPremerge);
 
             // find the newly created type designations
-            Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationSetDTO<Registration>) dto);
+            Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationSetDTO<Registration>) stdSetDto);
 
-            FieldUnit fieldUnit = (FieldUnit) dto.getBaseEntity();
+            FieldUnit fieldUnit = (FieldUnit) stdSetDto.getBaseEntity();
 
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
                 // here the TypeDesignation.typifiedName is also set internally
-                dto.getTypifiedName().addTypeDesignation(std, false);
+                stdSetDto.getTypifiedName().addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }
 
-            for(SpecimenTypeDesignationDTO stdDTO : dto.getSpecimenTypeDesignationDTOs()){
+            for(SpecimenTypeDesignationDTO stdDTO : stdSetDto.getSpecimenTypeDesignationDTOs()){
                 SpecimenTypeDesignation specimenTypeDesignation = stdDTO.asSpecimenTypeDesignation();
                 // associate all type designations with the fieldUnit
                 assureFieldUnit(fieldUnit, specimenTypeDesignation);
             }
+
 
             Session session = repo.getSession();
 
@@ -188,12 +189,10 @@ public class SpecimenTypeDesignationSetServiceImpl
             // ------------------------ perform delete of removed SpecimenTypeDesignations
             // this step also includes the deletion of DerivedUnits which have been converted by
             // the DerivedUnitConverter in turn of a kindOfUnit change
-            for(SpecimenTypeDesignation std : dto.deletedSpecimenTypeDesignations()){
-                deleteSpecimenTypeDesignation(dto, std);
+            for(SpecimenTypeDesignation std : stdSetDto.deletedSpecimenTypeDesignations()){
+                deleteSpecimenTypeDesignation(stdSetDto, std);
             }
         }
-
-
     }
 
     private void deleteSpecimenTypeDesignation(SpecimenTypeDesignationSetDTO<? extends VersionableEntity> dto, SpecimenTypeDesignation std) {
@@ -220,6 +219,7 @@ public class SpecimenTypeDesignationSetServiceImpl
 
     private void assureFieldUnit(FieldUnit fieldUnit,
             SpecimenTypeDesignation specimenTypeDesignation) {
+
         try {
             SpecimenOrObservationBase<?> original = findEarliestOriginal(specimenTypeDesignation.getTypeSpecimen());
             if(original instanceof DerivedUnit){
