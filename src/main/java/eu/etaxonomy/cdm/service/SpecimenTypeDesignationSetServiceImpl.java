@@ -31,6 +31,7 @@ import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.api.service.registration.IRegistrationWorkingSetService;
 import eu.etaxonomy.cdm.api.service.registration.RegistrationWorkingSetService;
 import eu.etaxonomy.cdm.compare.name.TypeDesignationComparator;
+import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.common.AnnotatableEntity;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.common.VersionableEntity;
@@ -178,6 +179,17 @@ public class SpecimenTypeDesignationSetServiceImpl
                 SpecimenTypeDesignation specimenTypeDesignation = stdDTO.asSpecimenTypeDesignation();
                 // associate all type designations with the fieldUnit
                 assureFieldUnit(fieldUnit, specimenTypeDesignation);
+                //#10524
+                DerivedUnit specimen = specimenTypeDesignation.getTypeSpecimen();
+                if (!specimen.isPersisted()) {
+                    repo.getOccurrenceService().save(specimen);
+                }
+                if (fieldUnit != null && fieldUnit.getGatheringEvent() != null && fieldUnit.getGatheringEvent().getActor() != null) {
+                    AgentBase<?> collector = fieldUnit.getGatheringEvent().getActor();
+                    if (!collector.isPersisted()) {
+                        repo.getAgentService().save(collector);
+                    }
+                }
             }
 
 
