@@ -24,6 +24,8 @@ import eu.etaxonomy.cdm.api.application.CdmRepository;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
+import eu.etaxonomy.cdm.model.agent.Person;
+import eu.etaxonomy.cdm.model.agent.Team;
 import eu.etaxonomy.cdm.model.common.CdmBase;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
 import eu.etaxonomy.cdm.model.name.NameTypeDesignation;
@@ -84,6 +86,7 @@ public class CdmStore {
                     session.evict(bean);
                 }
                 logger.trace(this._toString() + ".mergedBean() - doing merge of" + bean.toString());
+                handleTransientBeans(bean, session);
                 @SuppressWarnings("unchecked")
                 T mergedBean = (T) session.merge(bean);
                 repo.commitTransaction(txStatus);
@@ -96,6 +99,26 @@ public class CdmStore {
             repo.clearSession(); // #7559
         }
 
+    }
+
+    //FIXME #10524 this is only a preliminary workaround to save transient objects
+    private <T extends CdmBase> void handleTransientBeans(T bean, Session session) {
+        if (!bean.isPersisted()) {
+            session.save(bean);
+        }
+        if (bean instanceof Reference) {
+            Reference ref = (Reference)bean;
+            if (ref.getAuthorship() != null && !ref.getAuthorship().isPersisted()) {
+                handleTransientBeans(ref.getAuthorship(), session);
+            }
+        }else if (bean instanceof Team) {
+            Team team = (Team)bean;
+            team.getTeamMembers().forEach(m->handleTransientBeans(m, session));
+        }else if (bean instanceof Person) {
+            System.out.println("Nope");
+        }else {
+            System.out.println("Not yet implemented");
+        }
     }
 
     public void transactionRollbackIfNotCompleted(TransactionStatus txStatus) {

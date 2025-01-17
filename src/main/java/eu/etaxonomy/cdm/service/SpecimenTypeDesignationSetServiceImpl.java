@@ -166,15 +166,17 @@ public class SpecimenTypeDesignationSetServiceImpl
             Set<SpecimenTypeDesignation> newTypeDesignations = findNewTypeDesignations((SpecimenTypeDesignationSetDTO<Registration>) stdSetDto);
 
             FieldUnit fieldUnit = (FieldUnit) stdSetDto.getBaseEntity();
+            TaxonName typifiedName = stdSetDto.getTypifiedName();
 
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
                 // here the TypeDesignation.typifiedName is also set internally
-                stdSetDto.getTypifiedName().addTypeDesignation(std, false);
+                typifiedName.addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }
 
+            Session session = repo.getSession();
             for(SpecimenTypeDesignationDTO stdDTO : stdSetDto.getSpecimenTypeDesignationDTOs()){
                 SpecimenTypeDesignation specimenTypeDesignation = stdDTO.asSpecimenTypeDesignation();
                 // associate all type designations with the fieldUnit
@@ -190,13 +192,12 @@ public class SpecimenTypeDesignationSetServiceImpl
                         repo.getAgentService().save(collector);
                     }
                 }
+                //NOTE: activate when removing TaxonName.typeDesignation cascading
+//              session.save(specimenTypeDesignation);  or merge?
             }
-
-
-            Session session = repo.getSession();
-
+            session.merge(typifiedName);
             session.merge(regPremerge);
-            session.flush();
+//            session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
             // this step also includes the deletion of DerivedUnits which have been converted by
