@@ -62,7 +62,6 @@ public class SpecimenTypeDesignationSetServiceImpl
     static SpecimenDeleteConfigurator specimenDeleteConfigurer = new SpecimenDeleteConfigurator();
     static {
         specimenDeleteConfigurer.setDeleteChildren(true);
-        specimenDeleteConfigurer.setDeleteFromDescription(true);
         specimenDeleteConfigurer.setDeleteFromIndividualsAssociation(true);
         specimenDeleteConfigurer.setDeleteFromTypeDesignation(true);
         specimenDeleteConfigurer.setDeleteMolecularData(true);
