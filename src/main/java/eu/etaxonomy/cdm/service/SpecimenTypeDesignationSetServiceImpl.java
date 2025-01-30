@@ -86,14 +86,14 @@ public class SpecimenTypeDesignationSetServiceImpl
 
     @Override
     public SpecimenTypeDesignationSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
-        FieldUnit newfieldUnit = FieldUnit.NewInstance();
+        FieldUnit newFieldUnit = FieldUnit.NewInstance();
         Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY.getPropertyPaths());
         if(reg == null){
             reg = repo.getRegistrationService().newRegistration();
             reg.setUuid(registrationUuid);
         }
         TaxonName typifiedName = repo.getNameService().load(typifiedNameUuid, TAXON_NAME_INIT_STRATEGY);
-        SpecimenTypeDesignationSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationSetDTO<>(reg, newfieldUnit, typifiedName);
+        SpecimenTypeDesignationSetDTO<Registration> workingSetDto = new SpecimenTypeDesignationSetDTO<>(reg, newFieldUnit, typifiedName);
         return workingSetDto;
     }
 
@@ -263,7 +263,7 @@ public class SpecimenTypeDesignationSetServiceImpl
                break;
             }
             if(it.hasNext()){
-                throw new Exception(String.format("%s has more than one originals", du.toString()));
+                throw new Exception(String.format("%s has more than one original", du.toString()));
             }
         }
         return original;
@@ -275,7 +275,8 @@ public class SpecimenTypeDesignationSetServiceImpl
         Set<SpecimenTypeDesignation> addCandidates = new HashSet<>();
         for(SpecimenTypeDesignationDTO stdDTO : workingSetDto.getSpecimenTypeDesignationDTOs()){
             SpecimenTypeDesignation std = stdDTO.asSpecimenTypeDesignation();
-            if(reg.getTypeDesignations().isEmpty() || !reg.getTypeDesignations().stream().filter(td -> td.equals(std)).findFirst().isPresent()){
+            if(reg.getTypeDesignations().isEmpty() ||
+                    !reg.getTypeDesignations().stream().filter(td -> td.equals(std)).findFirst().isPresent()){
                 addCandidates.add(std);
             }
         }
