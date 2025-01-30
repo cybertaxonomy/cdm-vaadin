@@ -167,15 +167,21 @@ public class SpecimenTypeDesignationSetServiceImpl
             FieldUnit fieldUnit = (FieldUnit) stdSetDto.getBaseEntity();
             TaxonName typifiedName = stdSetDto.getTypifiedName();
 
+            Session session = repo.getSession();
             // associate the new typeDesignations with the registration
             for(SpecimenTypeDesignation std : newTypeDesignations){
                 assureFieldUnit(fieldUnit, std);
                 // here the TypeDesignation.typifiedName is also set internally
+                if (!std.isPersisted()) {
+                    session.save(std);
+                }
+                if (std.getTypeSpecimen() != null && !std.getTypeSpecimen().isPersisted()) {
+                    session.save(std.getTypeSpecimen());
+                }
                 typifiedName.addTypeDesignation(std, false);
                 regPremerge.addTypeDesignation(std);
             }
 
-            Session session = repo.getSession();
             for(SpecimenTypeDesignationDTO stdDTO : stdSetDto.getSpecimenTypeDesignationDTOs()){
                 SpecimenTypeDesignation specimenTypeDesignation = stdDTO.asSpecimenTypeDesignation();
                 // associate all type designations with the fieldUnit
