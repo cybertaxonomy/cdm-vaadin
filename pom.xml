@@ -4,7 +4,7 @@
   <groupId>eu.etaxonomy</groupId>
   <artifactId>cdm-vaadin</artifactId>
   <packaging>war</packaging>
-  <version>5.49.0-SNAPSHOT</version>
+  <version>5.50.0-SNAPSHOT</version>
   <name>Vaadin Web Application</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -441,7 +441,7 @@
               <fail>false</fail>
               <skip>false</skip>
               <rules>
-                <dependencyConvergence/>
+                <dependencyConvergence />
                 <requireMavenVersion>
                   <version>[3.6.3,)</version>
                 </requireMavenVersion>
@@ -544,7 +544,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
