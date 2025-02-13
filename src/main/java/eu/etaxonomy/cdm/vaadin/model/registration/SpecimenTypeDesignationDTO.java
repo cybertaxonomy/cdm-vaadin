@@ -123,7 +123,6 @@ public class SpecimenTypeDesignationDTO {
             if(typeSpecimen.getId() != 0){
                 replacedTypeSpecimen = typeSpecimen;
             }
-
         }
     }
 

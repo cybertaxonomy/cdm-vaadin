@@ -531,12 +531,16 @@ public class SpecimenTypeDesignationSetEditorPresenter
         cache.load(newRef);
 
         ToOneRelatedEntityCombobox<Reference> combobox = referencePopupEditorsCombobox.get(event.getSourceView());
-        if(event.isCreatedType()){
-            combobox.setValue((Reference) event.getEntity());
-        } else {
-            for( CollectionRowItemCollection row : typeDesignationEditorRows) {
-                combobox.reload();
+        if (combobox != null) {
+            if(event.isCreatedType()){
+                combobox.setValue((Reference) event.getEntity());
+            } else {
+                for( CollectionRowItemCollection row : typeDesignationEditorRows) {
+                    combobox.reload();
+                }
             }
+        }else {
+            logger.info("No combobox");
         }
     }
 

@@ -70,9 +70,7 @@ public class ReferenceEditorPresenter
 
     private Restriction<UUID> includeCurrentInReference;
 
-    public ReferenceEditorPresenter() {
-
-    }
+    public ReferenceEditorPresenter() {}
 
     @Override
     public void handleViewEntered() {

@@ -343,7 +343,7 @@ public abstract class AbstractPopupEditor<DTO extends Object, P extends Abstract
                     logger.trace("postCommit() publishing EditorSaveEvent for " + getBean().toString());
                 }
                 // notify the presenter to persist the bean and to commit the transaction
-                viewEventBus.publish(this, new EditorSaveEvent<DTO>(AbstractPopupEditor.this, getBean()));
+                viewEventBus.publish(this, new EditorSaveEvent<>(AbstractPopupEditor.this, getBean()));
                 if(logger.isTraceEnabled()){
                     logger.trace("postCommit() publishing DoneWithPopupEvent");
                 }
