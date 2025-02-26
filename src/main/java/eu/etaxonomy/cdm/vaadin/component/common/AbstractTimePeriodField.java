@@ -284,9 +284,6 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         buttonTextField.iterator().forEachRemaining(c -> c.addStyleName(style));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void commit() throws SourceException, InvalidValueException {
         super.commit();

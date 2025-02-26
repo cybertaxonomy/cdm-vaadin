@@ -30,7 +30,7 @@ public class ToManyRelatedEntitiesComboboxSelect<V extends Object> extends ToMan
     public ToManyRelatedEntitiesComboboxSelect(Class<V> itemType, String caption) {
         super(itemType, null, caption);
         // TODO this.fieldTyp = LazyComboBox.class does not work
-        LazyComboBox<V> field = new LazyComboBox<V>(itemType);
+        LazyComboBox<V> field = new LazyComboBox<>(itemType);
         this.fieldType = (Class<ReloadableLazyComboBox<V>>) field.getClass();
         // addEmptyRowOnInitContent is false in this class since adding row is only possible after setting the PagingProviders
         addEmptyRowOnInitContent = false;
