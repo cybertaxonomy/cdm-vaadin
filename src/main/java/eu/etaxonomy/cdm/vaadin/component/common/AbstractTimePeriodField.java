@@ -293,9 +293,4 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
             throw new RuntimeException(e);
         }
     }
-
-
-
-
-
 }
