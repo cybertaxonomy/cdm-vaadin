@@ -115,10 +115,17 @@ public class CdmStore {
             Team team = (Team)bean;
             team.getTeamMembers().forEach(m->handleTransientBeans(m, session));
         }else if (bean instanceof Person) {
-            System.out.println("Nope");
+//          NOPE
+        }else if (bean instanceof NameTypeDesignation) {
+            NameTypeDesignation nameTypeDesig = (NameTypeDesignation)bean;
+            nameTypeDesig.getTypifiedNames().forEach(n->updateName(n, session)); //to save type designations in NameTypeDesignationPopupEditor
         }else {
-            System.out.println("Not yet implemented");
+            System.out.println("Transient bean handling for non Reference, Team, Person or NameTypeDesignation handling not yet implemented");
         }
+    }
+
+    private <T extends CdmBase> void updateName(TaxonName name, Session session) {
+        session.update(name);
     }
 
     public void transactionRollbackIfNotCompleted(TransactionStatus txStatus) {

@@ -180,8 +180,8 @@ public class NameTypeDesignationPopupEditor
         });
 
         row++;
-        typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<TaxonName>(TaxonName.class, "Typified names");
-        typifiedNamesComboboxSelect.setConverter(new SetToListConverter<TaxonName>());
+        typifiedNamesComboboxSelect = new ToManyRelatedEntitiesComboboxSelect<>(TaxonName.class, "Typified names");
+        typifiedNamesComboboxSelect.setConverter(new SetToListConverter<>());
         typifiedNamesComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
         typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
