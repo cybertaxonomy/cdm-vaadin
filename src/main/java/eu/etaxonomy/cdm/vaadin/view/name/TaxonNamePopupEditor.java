@@ -377,7 +377,7 @@ public class TaxonNamePopupEditor
 
         row++;
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 2, row);
-        nomenclaturalReferenceDetail.setDescription("page, fig.; Schema: 111, t. 1, fig. 1-4");
+        nomenclaturalReferenceDetail.setDescription("page, fig.; Schema: 111, t. 1, fig. 1-4");   //#10738
         nomenclaturalReferenceDetail.setWidth(100, Unit.PERCENTAGE);
 
         // --------------- nom status
