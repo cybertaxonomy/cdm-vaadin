@@ -190,6 +190,8 @@ public class SpecimenTypeDesignationSetServiceImpl
                 DerivedUnit specimen = specimenTypeDesignation.getTypeSpecimen();
                 if (!specimen.isPersisted()) {
                     repo.getOccurrenceService().save(specimen);
+                }else {
+                    repo.getOccurrenceService().merge(specimen);  //#10737
                 }
                 if (fieldUnit != null && fieldUnit.getGatheringEvent() != null && fieldUnit.getGatheringEvent().getActor() != null) {
                     AgentBase<?> collector = fieldUnit.getGatheringEvent().getActor();
