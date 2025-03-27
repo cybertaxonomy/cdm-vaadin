@@ -90,7 +90,7 @@ public class CdmStore {
                 @SuppressWarnings("unchecked")
                 T mergedBean = (T) session.merge(bean);
                 repo.commitTransaction(txStatus);
-                return new EntityChangeEvent(mergedBean, changeEventType, view);
+                return new EntityChangeEvent<>(mergedBean, changeEventType, view);
             } catch(Exception e){
                 transactionRollbackIfNotCompleted(txStatus);
                 throw e;
