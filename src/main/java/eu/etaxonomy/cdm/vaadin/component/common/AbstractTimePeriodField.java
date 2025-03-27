@@ -8,9 +8,6 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -38,7 +35,6 @@ import eu.etaxonomy.cdm.vaadin.util.formatter.TimePeriodFormatter;
 /**
  * @author a.kohlbecker
  * @since Apr 6, 2017
- *
  */
 public abstract class AbstractTimePeriodField<T extends TimePeriod> extends CustomField<T> {
 
@@ -48,45 +44,33 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
     private BeanFieldGroup<TimePeriod> fieldGroup = new BeanFieldGroup<>(TimePeriod.class);
 
-    TextField parseField = null;
+    private TextField parseField = null;
 
-    TextField freeText = null;
+    private TextField freeText = null;
 
-    Label toLabel = null;
+    private Label toLabel = null;
 
-    GridLayout detailsViewGrid = new GridLayout(3, 4);
+    private GridLayout detailsViewGrid = new GridLayout(3, 4);
 
-    CssLayout detailsView = new CssLayout();
+    private CssLayout detailsView = new CssLayout();
 
     //TODO implement custom button textfield which does not require a gridLayout
-    GridLayout buttonTextField = new GridLayout(2, 1);
-    GridLayout simpleView = new GridLayout(2, 1);
+    private GridLayout buttonTextField = new GridLayout(2, 1);
+    private GridLayout simpleView = new GridLayout(2, 1);
 
-    TextField cacheField = new TextFieldNFix();
-
-    Set<Component> styledComponents = new HashSet<>();
+    private TextField cacheField = new TextFieldNFix();
 
     private TimePeriodFormatter timePeriodFormatter = new TimePeriodFormatter(DateTimeFormat.ISO8601_DATE);
 
-    /**
-     *
-     */
     public AbstractTimePeriodField() {
         super();
-
     }
 
-    /**
-     * @param string
-     */
     public AbstractTimePeriodField(String string) {
         this();
         setCaption(string);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
 
@@ -96,7 +80,6 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
         initSimpleView();
         initDetailsView();
-
 
         detailsView.setWidth(100, Unit.PERCENTAGE);
         simpleView.setWidth(100, Unit.PERCENTAGE);
@@ -115,9 +98,6 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         return root;
     }
 
-    /**
-     *
-     */
     private void initSimpleView() {
 
         Button showDetailsButton = new Button(FontAwesome.CALENDAR);
@@ -131,9 +111,6 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         simpleView.setColumnExpandRatio(1, 0.9f);
     }
 
-    /**
-     *
-     */
     private void initDetailsView() {
 
         parseField = new TextFieldNFix();
@@ -190,36 +167,23 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         detailsViewGrid.setColumnExpandRatio(1,  1);
         detailsViewGrid.setColumnExpandRatio(2,  5);
 
-
         // apply the style of the container to all child components. E.g. make all tiny
         addStyleName((getStyleName()));
 
         detailsView.setStyleName("margin-wrapper");
         detailsView.addComponent(detailsViewGrid);
-
     }
 
-
-    /**
-     * @return
-     */
     private void showSimple() {
         detailsView.setVisible(false);
         simpleView.setVisible(true);
     }
 
-    /**
-     * @return
-     */
     private void showDetails() {
         detailsView.setVisible(true);
         simpleView.setVisible(false);
     }
 
-    /**
-     * @param e
-     * @return
-     */
     private void parseInput(TextChangeEvent e) {
         if(!e.getText().isEmpty()){
             TimePeriod parsedPeriod = TimePeriodParser.parseString(e.getText());
@@ -227,16 +191,12 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         }
     }
 
-    /**
-     *
-     */
     private void applyDefaultStyles() {
         if(parseField != null) {
             parseField.addStyleName(RegistrationStyles.HELPER_FIELD);
             toLabel.addStyleName("to-label");
             buttonTextField.addStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
         }
-
     }
 
     @Override
@@ -249,14 +209,8 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         updateCacheField();
     }
 
-    /**
-     * @return
-     */
     protected abstract T newModelInstance();
 
-    /**
-     * @param newValue
-     */
     private void updateCacheField() {
         TimePeriod newValue = fieldGroup.getItemDataSource().getBean();
         cacheField.setReadOnly(false);

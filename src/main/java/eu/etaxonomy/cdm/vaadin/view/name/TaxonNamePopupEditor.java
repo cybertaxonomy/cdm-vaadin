@@ -616,7 +616,7 @@ public class TaxonNamePopupEditor
         }
     }
 
-    protected TeamOrPersonBase inferBasiomynAuthors() {
+    protected TeamOrPersonBase<?> inferBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
         if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
@@ -629,7 +629,7 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferExBasiomynAuthors() {
+    protected TeamOrPersonBase<?> inferExBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
         if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
@@ -638,7 +638,7 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferCombinationAuthors() {
+    protected TeamOrPersonBase<?> inferCombinationAuthors() {
         Reference nomRef = nomReferenceCombobox.getValue();
         if(nomRef != null) {
             return nomRef.getAuthorship();
@@ -646,10 +646,10 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferExCombinationAuthors() {
+    protected TeamOrPersonBase<?> inferExCombinationAuthors() {
         NameRelationshipDTO nameRelationDTO = validationField.getValue();
 
-        TeamOrPersonBase inferredExAuthor = null;
+        TeamOrPersonBase<?> inferredExAuthor = null;
         if(nameRelationDTO != null && nameRelationDTO.getOtherName() != null){
             TaxonName validatedName = nameRelationDTO.getOtherName();
             if(validatedName.getCombinationAuthorship() != null) {
