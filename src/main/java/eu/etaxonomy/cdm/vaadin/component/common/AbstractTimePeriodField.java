@@ -138,8 +138,10 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         buttonTextField.setColumnExpandRatio(1, 1.0f);
 
         PartialDateField startDate = new PartialDateField("Start");
+        startDate.setDescription("date published as yyyy, mm.yyyy, or dd.mm.yyyy");  //#10738
         startDate.setInputPrompt("dd.mm.yyyy");
         PartialDateField endDate = new PartialDateField("End");
+        endDate.setDescription("use only if a concrete time span is available");  //#10738
         endDate.setInputPrompt("dd.mm.yyyy");
         freeText = new TextFieldNFix("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
