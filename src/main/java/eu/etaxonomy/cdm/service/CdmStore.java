@@ -102,13 +102,22 @@ public class CdmStore {
     }
 
     //FIXME #10524 this is only a preliminary workaround to save transient objects
+    //      A better solution would be to save those beans separately in the presenter
+    //      in which they are edited. Currently the presenter only "saves" the main bean
     private <T extends CdmBase> void handleTransientBeans(T bean, Session session) {
 
+        if (bean == null) {
+            return;
+        }
         if (bean instanceof Reference) {
             Reference ref = (Reference)bean;
-            if (ref.getAuthorship() != null ) {   //removed && !ref.getAuthorship().isPersisted( since #10736
-                handleTransientBeans(ref.getAuthorship(), session);
-            }
+            handleTransientBeans(ref.getAuthorship(), session);
+        }else if (bean instanceof TaxonName) {
+            TaxonName name = (TaxonName)bean;
+            handleTransientBeans(name.getCombinationAuthorship(), session);
+            handleTransientBeans(name.getExCombinationAuthorship(), session);
+            handleTransientBeans(name.getBasionymAuthorship(), session);
+            handleTransientBeans(name.getExBasionymAuthorship(), session);
         }else if (bean instanceof Team) {
             Team team = (Team)bean;
             team.getTeamMembers().forEach(m->handleTransientBeans(m, session));
