@@ -103,12 +103,10 @@ public class CdmStore {
 
     //FIXME #10524 this is only a preliminary workaround to save transient objects
     private <T extends CdmBase> void handleTransientBeans(T bean, Session session) {
-        if (!bean.isPersisted()) {
-            session.save(bean);
-        }
+
         if (bean instanceof Reference) {
             Reference ref = (Reference)bean;
-            if (ref.getAuthorship() != null && !ref.getAuthorship().isPersisted()) {
+            if (ref.getAuthorship() != null ) {   //removed && !ref.getAuthorship().isPersisted( since #10736
                 handleTransientBeans(ref.getAuthorship(), session);
             }
         }else if (bean instanceof Team) {
@@ -121,6 +119,13 @@ public class CdmStore {
             nameTypeDesig.getTypifiedNames().forEach(n->updateName(n, session)); //to save type designations in NameTypeDesignationPopupEditor
         }else {
             System.out.println("Transient bean handling for non Reference, Team, Person or NameTypeDesignation handling not yet implemented");
+        }
+
+        //we save the bean at the end so that collections (e.g. team members) are already saved and merge does not create problems //related to #10736#note-2
+        if (!bean.isPersisted()) {
+            session.save(bean);
+        }else {
+            session.merge(bean);
         }
     }
 
