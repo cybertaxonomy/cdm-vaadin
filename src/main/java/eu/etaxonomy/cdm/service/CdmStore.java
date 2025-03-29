@@ -104,7 +104,7 @@ public class CdmStore {
     //FIXME #10524 this is only a preliminary workaround to save transient objects
     //      A better solution would be to save those beans separately in the presenter
     //      in which they are edited. Currently the presenter only "saves" the main bean
-    private <T extends CdmBase> void handleTransientBeans(T bean, Session session) {
+    static public <T extends CdmBase>void handleTransientBeans(T bean, Session session) {
 
         if (bean == null) {
             return;
@@ -138,7 +138,7 @@ public class CdmStore {
         }
     }
 
-    private <T extends CdmBase> void updateName(TaxonName name, Session session) {
+    static private <T extends CdmBase> void updateName(TaxonName name, Session session) {
         session.update(name);
     }
 
