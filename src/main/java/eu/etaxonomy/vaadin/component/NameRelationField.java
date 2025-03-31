@@ -70,7 +70,6 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
 
     private String nameFieldCaption;
 
-
     public NameRelationField(String caption, String nameFieldCaption, Direction direction, NameRelationshipType type) {
         this.direction = direction;
         this.type = type;
@@ -89,26 +88,16 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         setValidationVisible(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         // TODO Auto-generated method stub
-
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         return Optional.of(fieldGroup);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Component initContent() {
 
@@ -145,8 +134,6 @@ public class NameRelationField extends CompositeCustomField<NameRelationshipDTO>
         ruleConsideredField.setWidth(100, Unit.PERCENTAGE);
         citatonComboBox.setWidth(100, Unit.PERCENTAGE);
         codeEditionSelect.setWidth(100, Unit.PERCENTAGE);
-
-
 
         grid.setColumnExpandRatio(0, 7);
         grid.setWidth(100, Unit.PERCENTAGE);

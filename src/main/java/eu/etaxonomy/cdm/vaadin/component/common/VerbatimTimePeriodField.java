@@ -19,37 +19,21 @@ public class VerbatimTimePeriodField extends AbstractTimePeriodField<VerbatimTim
 
     private static final long serialVersionUID = -8399562684225562651L;
 
-
-
-    /**
-     *
-     */
     public VerbatimTimePeriodField() {
         super();
     }
 
-    /**
-     * @param string
-     */
     public VerbatimTimePeriodField(String string) {
         super(string);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<? extends VerbatimTimePeriod> getType() {
         return VerbatimTimePeriod.class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected VerbatimTimePeriod newModelInstance() {
-
         return VerbatimTimePeriod.NewVerbatimInstance();
     }
-
 }

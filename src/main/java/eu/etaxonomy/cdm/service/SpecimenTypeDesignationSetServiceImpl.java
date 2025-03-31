@@ -190,12 +190,12 @@ public class SpecimenTypeDesignationSetServiceImpl
                 DerivedUnit specimen = specimenTypeDesignation.getTypeSpecimen();
                 if (!specimen.isPersisted()) {
                     repo.getOccurrenceService().save(specimen);
+                }else {
+                    repo.getOccurrenceService().merge(specimen);  //#10737
                 }
                 if (fieldUnit != null && fieldUnit.getGatheringEvent() != null && fieldUnit.getGatheringEvent().getActor() != null) {
                     AgentBase<?> collector = fieldUnit.getGatheringEvent().getActor();
-                    if (!collector.isPersisted()) {
-                        repo.getAgentService().save(collector);
-                    }
+                    CdmStore.handleTransientBeans(collector, session);
                 }
                 //NOTE: activate when removing TaxonName.typeDesignation cascading
 //              session.save(specimenTypeDesignation);  or merge?

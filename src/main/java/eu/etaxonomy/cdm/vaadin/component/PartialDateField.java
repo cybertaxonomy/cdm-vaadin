@@ -20,56 +20,35 @@ import eu.etaxonomy.cdm.vaadin.util.converter.JodaTimePartialConverter;
  *
  * @author a.kohlbecker
  * @since Apr 7, 2017
- *
  */
 public class PartialDateField extends TextFieldNFix {
 
     private static final long serialVersionUID = -347319052346135100L;
 
-    JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.ISO8601;
+   private JodaTimePartialConverter.DateFormat format = JodaTimePartialConverter.DateFormat.ISO8601;
 
-    /**
-     *
-     */
     public PartialDateField() {
         super();
         setConverter(new JodaTimePartialConverter(format));
     }
 
-    /**
-     * @param dataSource
-     */
     public PartialDateField(Property dataSource) {
         super(dataSource);
         setConverter(new JodaTimePartialConverter(format));
     }
 
-    /**
-     * @param caption
-     * @param dataSource
-     */
     public PartialDateField(String caption, Property dataSource) {
         super(caption, dataSource);
         setConverter(new JodaTimePartialConverter(format));
     }
 
-    /**
-     * @param caption
-     * @param value
-     */
     public PartialDateField(String caption, String value) {
         super(caption, value);
         setConverter(new JodaTimePartialConverter(format));
     }
 
-    /**
-     * @param caption
-     */
     public PartialDateField(String caption) {
         super(caption);
         setConverter(new JodaTimePartialConverter(format));
     }
-
-
-
 }

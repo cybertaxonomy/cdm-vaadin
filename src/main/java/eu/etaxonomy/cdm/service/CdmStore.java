@@ -90,7 +90,7 @@ public class CdmStore {
                 @SuppressWarnings("unchecked")
                 T mergedBean = (T) session.merge(bean);
                 repo.commitTransaction(txStatus);
-                return new EntityChangeEvent(mergedBean, changeEventType, view);
+                return new EntityChangeEvent<>(mergedBean, changeEventType, view);
             } catch(Exception e){
                 transactionRollbackIfNotCompleted(txStatus);
                 throw e;
@@ -102,15 +102,22 @@ public class CdmStore {
     }
 
     //FIXME #10524 this is only a preliminary workaround to save transient objects
-    private <T extends CdmBase> void handleTransientBeans(T bean, Session session) {
-        if (!bean.isPersisted()) {
-            session.save(bean);
+    //      A better solution would be to save those beans separately in the presenter
+    //      in which they are edited. Currently the presenter only "saves" the main bean
+    static public <T extends CdmBase>void handleTransientBeans(T bean, Session session) {
+
+        if (bean == null) {
+            return;
         }
         if (bean instanceof Reference) {
             Reference ref = (Reference)bean;
-            if (ref.getAuthorship() != null && !ref.getAuthorship().isPersisted()) {
-                handleTransientBeans(ref.getAuthorship(), session);
-            }
+            handleTransientBeans(ref.getAuthorship(), session);
+        }else if (bean instanceof TaxonName) {
+            TaxonName name = (TaxonName)bean;
+            handleTransientBeans(name.getCombinationAuthorship(), session);
+            handleTransientBeans(name.getExCombinationAuthorship(), session);
+            handleTransientBeans(name.getBasionymAuthorship(), session);
+            handleTransientBeans(name.getExBasionymAuthorship(), session);
         }else if (bean instanceof Team) {
             Team team = (Team)bean;
             team.getTeamMembers().forEach(m->handleTransientBeans(m, session));
@@ -122,9 +129,16 @@ public class CdmStore {
         }else {
             System.out.println("Transient bean handling for non Reference, Team, Person or NameTypeDesignation handling not yet implemented");
         }
+
+        //we save the bean at the end so that collections (e.g. team members) are already saved and merge does not create problems //related to #10736#note-2
+        if (!bean.isPersisted()) {
+            session.save(bean);
+        }else {
+            session.merge(bean);
+        }
     }
 
-    private <T extends CdmBase> void updateName(TaxonName name, Session session) {
+    static private <T extends CdmBase> void updateName(TaxonName name, Session session) {
         session.update(name);
     }
 

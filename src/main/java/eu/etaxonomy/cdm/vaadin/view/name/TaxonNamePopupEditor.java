@@ -377,6 +377,7 @@ public class TaxonNamePopupEditor
 
         row++;
         nomenclaturalReferenceDetail = addTextField("Reference detail", "nomenclaturalMicroReference", 0, row, 2, row);
+        nomenclaturalReferenceDetail.setDescription("page, fig.; Schema: 111, t. 1, fig. 1-4");   //#10738
         nomenclaturalReferenceDetail.setWidth(100, Unit.PERCENTAGE);
 
         // --------------- nom status
@@ -616,7 +617,7 @@ public class TaxonNamePopupEditor
         }
     }
 
-    protected TeamOrPersonBase inferBasiomynAuthors() {
+    protected TeamOrPersonBase<?> inferBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
         if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
@@ -629,7 +630,7 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferExBasiomynAuthors() {
+    protected TeamOrPersonBase<?> inferExBasiomynAuthors() {
         List<TaxonName> basionyms = basionymsComboboxSelect.getValue();
         if(!basionyms.isEmpty() && basionyms.get(0) != null){
             TaxonName basionym = basionyms.get(0);
@@ -638,7 +639,7 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferCombinationAuthors() {
+    protected TeamOrPersonBase<?> inferCombinationAuthors() {
         Reference nomRef = nomReferenceCombobox.getValue();
         if(nomRef != null) {
             return nomRef.getAuthorship();
@@ -646,10 +647,10 @@ public class TaxonNamePopupEditor
         return null;
     }
 
-    protected TeamOrPersonBase inferExCombinationAuthors() {
+    protected TeamOrPersonBase<?> inferExCombinationAuthors() {
         NameRelationshipDTO nameRelationDTO = validationField.getValue();
 
-        TeamOrPersonBase inferredExAuthor = null;
+        TeamOrPersonBase<?> inferredExAuthor = null;
         if(nameRelationDTO != null && nameRelationDTO.getOtherName() != null){
             TaxonName validatedName = nameRelationDTO.getOtherName();
             if(validatedName.getCombinationAuthorship() != null) {

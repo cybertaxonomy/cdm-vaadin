@@ -146,10 +146,11 @@ public class TaxonNameEditorPresenter
 
         super.handleViewEntered();
 
+        int countNomCodes = 2; //the number of code editions to be shown //#10734
         List<NomenclaturalCodeEdition> nomCodes =
                 NomenclaturalCodeEdition.forCode(RegistrationUIDefaults.NOMENCLATURAL_CODE);
         //#10302 use only latest code for now
-        nomCodes = nomCodes.isEmpty() ? nomCodes : nomCodes.subList(0, 1);
+        nomCodes = nomCodes.isEmpty() ? nomCodes : nomCodes.subList(0, countNomCodes);
 
         BeanItemContainer<NomenclaturalCodeEdition> codeEditionItemContainer = cdmBeanItemContainerFactory
                 .buildEnumTermItemContainer(NomenclaturalCodeEdition.class,
