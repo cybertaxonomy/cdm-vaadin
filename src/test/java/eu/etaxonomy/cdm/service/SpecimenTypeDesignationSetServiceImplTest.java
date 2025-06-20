@@ -229,7 +229,7 @@ public class SpecimenTypeDesignationSetServiceImplTest extends CdmVaadinIntegrat
         Assert.assertEquals("All TypeDesignations should have been deleted", 0, cdmRepository.getNameService().getAllTypeDesignations(10, 0).size());
         Assert.assertEquals("All derived units should have been deleted", 0, cdmRepository.getOccurrenceService().count(DerivedUnit.class));
         Assert.assertEquals("FieldUnit should have been deleted", 0, cdmRepository.getOccurrenceService().count(FieldUnit.class));
-        Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getEventBaseService().count(GatheringEvent.class));
+        Assert.assertEquals("Gathering event should have been deleted by orphan remove", 0, cdmRepository.getCommonService().count(GatheringEvent.class));
         // FIXME Assert.assertEquals("Media should have been deleted ", 0, cdmRepository.getMediaService().count(null));
 
         // printDataSet(System.err, includeTableNames_delete);

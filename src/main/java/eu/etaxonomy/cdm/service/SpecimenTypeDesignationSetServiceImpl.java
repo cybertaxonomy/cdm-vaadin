@@ -230,9 +230,6 @@ public class SpecimenTypeDesignationSetServiceImpl
         std.setTypeSpecimen(null);
         repo.getOccurrenceService().delete(du, specimenDeleteConfigurer);
         repo.getNameService().deleteTypeDesignation(dto.getTypifiedName(), std);
-//        if(derivationEvent.getDerivatives().size() == 0){
-//          getRepo().getEventBaseService().delete(derivationEvent);
-//      }
     }
 
     private void assureFieldUnit(FieldUnit fieldUnit,
