@@ -80,10 +80,8 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type) {
-        super();
         this.type = type;
         this.service = service;
-
         // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
     }
 

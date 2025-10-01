@@ -273,7 +273,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
         designationReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
         mediaReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
-        typeDesignationsCollectionFieldHelper = new ElementCollectionHelper(getView().getTypeDesignationsCollectionField());
+        typeDesignationsCollectionFieldHelper = new ElementCollectionHelper<>(getView().getTypeDesignationsCollectionField());
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             @Override

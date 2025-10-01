@@ -177,7 +177,6 @@ public class SpecimenTypeDesignationSetPopupEditor
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
         addTextField("Field or sample number", "fieldNumber", endColumnIndex, row);
 
-
         row++;
 
         // FIXME: can we use the Grid instead?
@@ -194,7 +193,7 @@ public class SpecimenTypeDesignationSetPopupEditor
 
                     @Override
                     public boolean isEmpty() {
-                        Collection value = getValue();
+                        Collection<?> value = getValue();
                         return value == null || value.isEmpty() ;
                     }
 

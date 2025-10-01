@@ -91,9 +91,6 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         return Optional.empty();
     }
 
-    /**
-     * @return the select
-     */
     public ReloadableLazyComboBox<V> getSelect() {
         return lazySelect;
     }
@@ -104,11 +101,10 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
 
     public void loadFrom(FilterablePagingProvider<V> filterablePagingProvider, FilterableCountProvider filterableCountProvider, int pageLength) {
         lazySelect.loadFrom(filterablePagingProvider, filterableCountProvider, pageLength);
-
     }
 
     /**
-     * reload the selected entity from the persistent storage
+     * Reload the selected entity from the persistent storage
      */
     @Override
     public void reload() {
@@ -190,7 +186,7 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
     }
 
     @Override
-    public Property getPropertyDataSource() {
+    public Property<?> getPropertyDataSource() {
         return lazySelect.getPropertyDataSource();
     }
 
@@ -253,5 +249,4 @@ public class ToOneRelatedEntityCombobox<V extends Object> extends CompositeCusto
         lazySelect.setComponentError(componentError);
         super.setComponentError(componentError);
     }
-
 }
