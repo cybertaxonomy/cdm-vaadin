@@ -18,19 +18,12 @@ import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.service.IService;
-import eu.etaxonomy.cdm.model.agent.AgentBase;
-import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.occurrence.Collection;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
-import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.CollectionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
-import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
 import eu.etaxonomy.vaadin.mvp.BeanInstantiator;
@@ -67,8 +60,8 @@ public class CollectionEditorPresenter
 
         List<String> initStrategy = Arrays.asList(new String []{
                 "$",
-                "institute.$",
-                "superCollection.$",
+//                "institute.$",
+//                "superCollection.$",
                 }
         );
 
@@ -86,7 +79,6 @@ public class CollectionEditorPresenter
         if(crud != null){
             newAuthorityCreated = UserHelperAccess.userHelper().createAuthorityForCurrentUser(Collection.class, identifier, crud, null);
         }
-
     }
 
     @Override
@@ -100,20 +92,6 @@ public class CollectionEditorPresenter
     protected IService<Collection> getService() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public void handleViewEntered() {
-        super.handleViewEntered();
-
-        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
-        collectionPagingProvider.getRestrictions().add(new Restriction<String>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
-        getView().getSuperCollectionCombobox().getSelect().loadFrom(collectionPagingProvider, collectionPagingProvider, collectionPagingProvider.getPageSize());
-        getView().getSuperCollectionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Collection>(getView().getSuperCollectionCombobox(), this));
-
-        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<AgentBase, Institution>(getRepo().getAgentService(), Institution.class);
-        getView().getInstitutionCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
-        getView().getInstitutionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getInstitutionCombobox(), this));
     }
 
     @EventBusListenerMethod(filter = EditorActionTypeFilter.Add.class)
@@ -178,34 +156,7 @@ public class CollectionEditorPresenter
         BoundField boundTargetField = boundTargetField((PopupView) event.getSourceView());
 
         if(boundTargetField != null){
-            if(boundTargetField.matchesPropertyIdPath("superCollection")){
-                if(event.isCreateOrModifiedType()){
-
-                    Collection newCollection = (Collection) event.getEntity();
-                    getCache().load(newCollection);
-                    if(event.isCreatedType()){
-                        getView().getSuperCollectionCombobox().setValue(newCollection);
-                    } else {
-                        getView().getSuperCollectionCombobox().reload();
-                    }
-                }
-
-            } else if(boundTargetField.matchesPropertyIdPath("institute")){
-                if(event.isCreateOrModifiedType()){
-
-                    Institution newInstitution = (Institution) event.getEntity();
-                    getCache().load(newInstitution);
-                    if(event.isCreatedType()){
-                        getView().getInstitutionCombobox().setValue(newInstitution);
-                    } else {
-                        getView().getInstitutionCombobox().reload();
-                    }
-                }
-
-            }
+            //no change since in-collection and institution were removed from collection editor
         }
     }
-
-
-
 }
