@@ -175,7 +175,7 @@ public class SpecimenTypeDesignationSetPopupEditor
         TimePeriodField collectionDateField = new TimePeriodField("Collection date");
         // collectionDateField.setInputPrompt("dd.mm.yyyy");
         addField(collectionDateField, "gatheringDate", 0, row, 1, row);
-        addTextField("Field number", "fieldNumber", endColumnIndex, row);
+        addTextField("Field or sample number", "fieldNumber", endColumnIndex, row);
 
 
         row++;
