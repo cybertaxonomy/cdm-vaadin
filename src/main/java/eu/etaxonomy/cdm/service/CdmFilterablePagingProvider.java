@@ -65,7 +65,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     protected List<OrderHint> getOrderHints() {
         return orderHints;
     }
-    protected void setOrderHints(List<OrderHint> orderHints) {
+    public void setOrderHints(List<OrderHint> orderHints) {
         this.orderHints = orderHints;
     }
 

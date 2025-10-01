@@ -58,6 +58,7 @@ import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
@@ -265,6 +266,8 @@ public class SpecimenTypeDesignationSetEditorPresenter
 
         typeDesignationEditorRows.clear();
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
+        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.BY_CODE_NULL_LAST, OrderHint.ORDER_BY_NAME, OrderHint.BY_TOWN_OR_LOCATION});
+        collectionPagingProvider.setOrderHints(collectionOrderHints);
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
         designationReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
