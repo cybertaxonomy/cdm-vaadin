@@ -72,8 +72,9 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
-        this(service, null);
+        this(service, (Class)null);
     }
 
     /**
@@ -87,6 +88,11 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
         this(service, null, matchMode, orderHints);
+    }
+
+    public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, List<OrderHint> orderHints) {
+        this.service = service;
+        this.orderHints = orderHints;
     }
 
     public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {

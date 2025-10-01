@@ -265,9 +265,10 @@ public class SpecimenTypeDesignationSetEditorPresenter
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
         typeDesignationEditorRows.clear();
-        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
-        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.BY_CODE, OrderHint.ORDER_BY_NAME, OrderHint.BY_TOWN_OR_LOCATION});
-        collectionPagingProvider.setOrderHints(collectionOrderHints);
+        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.BY_CODE_NULL_LAST,
+                OrderHint.ORDER_BY_NAME_NULL_LAST, OrderHint.BY_TOWN_OR_LOCATION});
+        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider
+            = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService(), collectionOrderHints);
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
         designationReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
