@@ -26,7 +26,6 @@ import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 /**
  * @author a.kohlbecker
  * @since Jan 12, 2018
- *
  */
 public class RegistrationUIDefaults {
 
@@ -48,7 +47,6 @@ public class RegistrationUIDefaults {
 //            ReferenceType.Thesis,
             ReferenceType.Section
             );
-
 
     public static final EnumSet<ReferenceType> MEDIA_REFERENCE_TYPES = EnumSet.of(
             // same as for print
