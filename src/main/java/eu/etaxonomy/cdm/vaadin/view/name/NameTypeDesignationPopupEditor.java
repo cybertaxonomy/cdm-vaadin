@@ -184,7 +184,7 @@ public class NameTypeDesignationPopupEditor
         typifiedNamesComboboxSelect.setConverter(new SetToListConverter<>());
         typifiedNamesComboboxSelect.setEditPermissionTester(new CdmEditDeletePermissionTester());
         addField(typifiedNamesComboboxSelect, "typifiedNames", 0, row, 3, row);
-        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
+//        typifiedNamesComboboxSelect.setReadOnly(false); // FIXME this does not help, see #7389
 
         row++;
         designationReferenceCombobox = new ToOneRelatedEntityCombobox<Reference>("Designation reference", Reference.class);
