@@ -44,7 +44,7 @@ public class RegistrationUIDefaults {
             ReferenceType.Article,
             ReferenceType.Book,
             ReferenceType.BookSection,
-//            ReferenceType.Thesis,
+//            ReferenceType.Thesis, #10824
             ReferenceType.Section
             );
 
