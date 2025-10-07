@@ -27,7 +27,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 /**
  * @author a.kohlbecker
  * @since May 15, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -37,9 +36,9 @@ public class RegistrationPopupEditor
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-    TextField identifierField;
+    private TextField identifierField;
 
-    TextField specificIdentifierField;
+    private TextField specificIdentifierField;
 
     private NativeSelect submitterField;
 
@@ -53,9 +52,6 @@ public class RegistrationPopupEditor
         super(new FormLayout(), Registration.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -86,7 +82,6 @@ public class RegistrationPopupEditor
         registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
-
     }
 
     @Override
@@ -95,41 +90,26 @@ public class RegistrationPopupEditor
         specificIdentifierField.setEnabled(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Registration editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         // none
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * @return the submitterField
-     */
     @Override
     public NativeSelect getSubmitterField() {
         return submitterField;
     }
 
-    /**
-     * @return the institutionField
-     */
     @Override
     public NativeSelect getInstitutionField() {
         return institutionField;
