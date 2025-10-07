@@ -78,7 +78,7 @@ public class RegistrationPopupEditor
         submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
-        institutionField = new NativeSelect("Institution");
+        institutionField = new NativeSelect("Registration Center");
         institutionField.setEnabled(false);
         institutionField.setWidth(100, Unit.PERCENTAGE);
         addField(institutionField, "institution");
