@@ -98,7 +98,7 @@ public class ReferencePopupEditor
 
     private AnnotationType[] editableAnotationTypes = RegistrationUIDefaults.EDITABLE_ANOTATION_TYPES;
 
-    private EnumSet<ReferenceType> referenceTypes = EnumSet.of(ReferenceType.Article, ReferenceType.Book, ReferenceType.BookSection); //see #10824
+    private EnumSet<ReferenceType> referenceTypes = EnumSet.allOf(ReferenceType.class);
 
     private static Map<String,String> propertyNameLabelMap = new HashMap<>();
 
