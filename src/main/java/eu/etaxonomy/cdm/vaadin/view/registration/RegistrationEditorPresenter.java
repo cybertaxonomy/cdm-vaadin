@@ -89,8 +89,8 @@ public class RegistrationEditorPresenter
     public void handleViewEntered() {
         super.handleViewEntered();
 
-        getView().getInstitutionField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Institution.class));
-        getView().getInstitutionField().setItemCaptionPropertyId("titleCache");
+        getView().getRegistrationCenterField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(Institution.class));
+        getView().getRegistrationCenterField().setItemCaptionPropertyId("titleCache");
 
         getView().getSubmitterField().setContainerDataSource(cdmBeanItemContainerFactory.buildBeanItemContainer(User.class));
         getView().getSubmitterField().setItemCaptionPropertyId("username");

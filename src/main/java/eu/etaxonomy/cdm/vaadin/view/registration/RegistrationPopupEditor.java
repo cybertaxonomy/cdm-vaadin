@@ -42,7 +42,7 @@ public class RegistrationPopupEditor
 
     private NativeSelect submitterField;
 
-    private NativeSelect institutionField;
+    private NativeSelect registrationCenterField;
 
     private NativeSelect statusSelect;
 
@@ -74,10 +74,10 @@ public class RegistrationPopupEditor
         submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
-        institutionField = new NativeSelect("Registration Center");
-        institutionField.setEnabled(false);
-        institutionField.setWidth(100, Unit.PERCENTAGE);
-        addField(institutionField, "institution");
+        registrationCenterField = new NativeSelect("Registration Center");
+        registrationCenterField.setEnabled(false);
+        registrationCenterField.setWidth(100, Unit.PERCENTAGE);
+        addField(registrationCenterField, "registrationCenter");
 
         registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
@@ -111,8 +111,8 @@ public class RegistrationPopupEditor
     }
 
     @Override
-    public NativeSelect getInstitutionField() {
-        return institutionField;
+    public NativeSelect getRegistrationCenterField() {
+        return registrationCenterField;
     }
 
     @Override

@@ -91,7 +91,7 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 
 //    private ExtensionType extensionTypeIAPTRegData;
 
-    private Map<String, Institution> instituteMap = new HashMap<>();
+    private Map<String, Institution> registrationCenterMap = new HashMap<>();
 
     public static boolean commandsExecuted = false;
 
@@ -503,11 +503,6 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 //
 //    }
 
-
-//    /**
-//     * @param datePublished
-//     * @return
-//     */
 //    private Partial partial(TimePeriod datePublished) {
 //        if(datePublished != null){
 //            if(datePublished.getEnd() != null){
@@ -524,22 +519,21 @@ public class RegistrationRequiredDataInserter extends AbstractDataInserter {
 //     * @param office
 //     * @return
 //     */
-//    private Institution getInstitution(String office) {
-//        Institution institution;
-//        if(instituteMap.containsKey(office)){
-//            institution = instituteMap.get(office);
+//    private Institution getRegistrationCenter(String office) {
+//        Institution registrationCenter;
+//        if(registrationCenterMap.containsKey(office)){
+//            registrationCenter = registrationCenterMap.get(office);
 //        } else {
 //
 //            Pager<Institution> pager = repo.getAgentService().findByTitleWithRestrictions(Institution.class, office, MatchMode.EXACT, null, null, null, null, null);
 //   )         if(!pager.getRecords().isEmpty()){
-//                institution =  pager.getRecords().get(0);
+//                registrationCenter = pager.getRecords().get(0);
 //            } else {
-//                Institution institute = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
-//                institution = institute;
+//                registrationCenter = (Institution) repo.getAgentService().save(Institution.NewNamedInstance(office));
 //            }
-//            instituteMap.put(office, institution);
+//            registrationCenterMap.put(office, registrationCenter);
 //        }
-//        return institution;
+//        return registrationCenter;
 //    }
 
 
