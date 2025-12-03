@@ -242,7 +242,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
         return workingSetDto;
     }
 
-    @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
 
@@ -265,10 +264,10 @@ public class SpecimenTypeDesignationSetEditorPresenter
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
         typeDesignationEditorRows.clear();
-        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.BY_CODE_NULL_LAST,
-                OrderHint.ORDER_BY_NAME_NULL_LAST, OrderHint.BY_TOWN_OR_LOCATION});
+        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.ORDER_BY_TITLE_CACHE});
         CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider
             = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService(), collectionOrderHints);
+        //TODO not really necessary anymore as we removed collection.institute from Phycobank #10827
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
         designationReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
