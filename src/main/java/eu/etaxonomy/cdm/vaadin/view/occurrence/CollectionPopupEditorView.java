@@ -8,19 +8,15 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.occurrence;
 
-import eu.etaxonomy.cdm.model.agent.Institution;
-import eu.etaxonomy.cdm.model.occurrence.Collection;
-import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.mvp.ApplicationView;
 
 /**
  * @author a.kohlbecker
  * @since Dec 21, 2017
+ *
+ * TODO remove? Not really needed anymore
  */
 public interface CollectionPopupEditorView extends ApplicationView<CollectionPopupEditorView,CollectionEditorPresenter> {
 
-    public ToOneRelatedEntityCombobox<Collection> getSuperCollectionCombobox();
-
-    public ToOneRelatedEntityCombobox<Institution> getInstitutionCombobox();
 
 }

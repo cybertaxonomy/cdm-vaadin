@@ -14,7 +14,6 @@ import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 /**
  * @author a.kohlbecker
  * @since Jul 25, 2018
- *
  */
 public class InstitutionDTO extends CdmEntityAdapterDTO<Institution> {
 
@@ -67,6 +66,4 @@ public class InstitutionDTO extends CdmEntityAdapterDTO<Institution> {
     public void setIsPartOf(Institution parentInstitution){
         entity.setIsPartOf(parentInstitution);
     }
-
-
 }

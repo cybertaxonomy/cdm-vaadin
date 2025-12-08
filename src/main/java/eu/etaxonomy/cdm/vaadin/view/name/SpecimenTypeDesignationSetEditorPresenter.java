@@ -58,6 +58,7 @@ import eu.etaxonomy.cdm.model.term.TermType;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
 import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.query.MatchMode;
+import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
@@ -241,7 +242,6 @@ public class SpecimenTypeDesignationSetEditorPresenter
         return workingSetDto;
     }
 
-    @SuppressWarnings("serial")
     @Override
     public void handleViewEntered() {
 
@@ -264,13 +264,16 @@ public class SpecimenTypeDesignationSetEditorPresenter
                 AnnotationType.EDITORIAL().getVocabulary().getUuid()));
 
         typeDesignationEditorRows.clear();
-        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService());
+        List<OrderHint> collectionOrderHints = Arrays.asList(new OrderHint[] {OrderHint.ORDER_BY_TITLE_CACHE});
+        CdmFilterablePagingProvider<Collection, Collection> collectionPagingProvider
+            = new CdmFilterablePagingProvider<Collection, Collection>(getRepo().getCollectionService(), collectionOrderHints);
+        //TODO not really necessary anymore as we removed collection.institute from Phycobank #10827
         collectionPagingProvider.getRestrictions().add(new Restriction<>("institute.titleCache", Operator.OR, MatchMode.ANYWHERE, CdmFilterablePagingProvider.QUERY_STRING_PLACEHOLDER));
 
         designationReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
         mediaReferencePagingProvider = pagingProviderFactory.referencePagingProvider();
 
-        typeDesignationsCollectionFieldHelper = new ElementCollectionHelper(getView().getTypeDesignationsCollectionField());
+        typeDesignationsCollectionFieldHelper = new ElementCollectionHelper<>(getView().getTypeDesignationsCollectionField());
         getView().getTypeDesignationsCollectionField().setEditorInstantiator(new AbstractElementCollection.Instantiator<SpecimenTypeDesignationDTORow>() {
 
             @Override

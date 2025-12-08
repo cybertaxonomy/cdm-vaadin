@@ -147,9 +147,6 @@ public class RegistrationWorkingsetPresenter
      */
     private TaxonNamePopupEditor newNameForRegistrationPopupEditor = null;
 
-    /**
-     * Contains
-     */
     private List<Registration> newNameBlockingRegistrations = new ArrayList<>();
 
     /**
@@ -158,18 +155,16 @@ public class RegistrationWorkingsetPresenter
      */
     private Map<NameTypeDesignationPopupEditor, UUID> nameTypeDesignationPopupEditorRegistrationUUIDMap = new HashMap<>();
 
-
     private ICdmEntityUuidCacher cache;
 
     private Collection<CdmBase> rootEntities = new HashSet<>();
-
 
     public RegistrationWorkingsetPresenter() {
     }
 
     /**
      * @param doReload reload the workingset from the persistent storage.
-     *  Workingsets which are not yet persisted are preserved.
+     * Workingsets which are not yet persisted are preserved.
      */
     protected void refreshView(boolean doReload) {
 
@@ -244,7 +239,6 @@ public class RegistrationWorkingsetPresenter
 
         loadWorkingSet(getView().getCitationUuid());
         applyWorkingset();
-
     }
 
     private void applyWorkingset(){
@@ -321,7 +315,7 @@ public class RegistrationWorkingsetPresenter
             }
         } else {
             // only log here as error
-            logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value.toString(), "NULL"));
+            logger.error("Ivalid attempt to set RegistrationStatus to " + Objects.toString(value, "NULL"));
         }
     }
 

@@ -65,30 +65,34 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     protected List<OrderHint> getOrderHints() {
         return orderHints;
     }
-    protected void setOrderHints(List<OrderHint> orderHints) {
+    public void setOrderHints(List<OrderHint> orderHints) {
         this.orderHints = orderHints;
     }
 
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service) {
-        this(service, null);
+        this(service, (Class)null);
     }
 
     /**
      * With defaults for matchMode = MatchMode.ANYWHERE and orderHints = OrderHint.ORDER_BY_TITLE_CACHE
      */
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type) {
-        super();
         this.type = type;
         this.service = service;
-
         // LogUtils.setLevel("org.hibernate.SQL", Level.TRACE);
     }
 
     public CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints) {
         this(service, null, matchMode, orderHints);
+    }
+
+    public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, List<OrderHint> orderHints) {
+        this.service = service;
+        this.orderHints = orderHints;
     }
 
     public <S extends T> CdmFilterablePagingProvider(IIdentifiableEntityService<T> service, Class<V> type, MatchMode matchMode, List<OrderHint> orderHints) {

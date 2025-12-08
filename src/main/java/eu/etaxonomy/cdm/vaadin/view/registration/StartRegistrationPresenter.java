@@ -161,7 +161,7 @@ public class StartRegistrationPresenter
         }
 
         newReferencePopup = openPopupEditor(ReferencePopupEditor.class, event);
-        EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.PRINTPUB_REFERENCE_TYPES.clone();
+        EnumSet<ReferenceType> refTypes = RegistrationUIDefaults.NOMECLATURAL_PUBLICATION_UNIT_TYPES.clone();
         refTypes.remove(ReferenceType.Section);
         newReferencePopup.withReferenceTypes(refTypes);
 

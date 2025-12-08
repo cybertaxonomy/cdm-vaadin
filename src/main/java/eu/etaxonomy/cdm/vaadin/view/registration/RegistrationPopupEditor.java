@@ -27,7 +27,6 @@ import eu.etaxonomy.vaadin.mvp.AbstractCdmPopupEditor;
 /**
  * @author a.kohlbecker
  * @since May 15, 2017
- *
  */
 @SpringComponent
 @Scope("prototype")
@@ -37,13 +36,13 @@ public class RegistrationPopupEditor
 
     private static final long serialVersionUID = 5418275817834009509L;
 
-    TextField identifierField;
+    private TextField identifierField;
 
-    TextField specificIdentifierField;
+    private TextField specificIdentifierField;
 
     private NativeSelect submitterField;
 
-    private NativeSelect institutionField;
+    private NativeSelect registrationCenterField;
 
     private NativeSelect statusSelect;
 
@@ -53,9 +52,6 @@ public class RegistrationPopupEditor
         super(new FormLayout(), Registration.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void initContent() {
 
@@ -78,15 +74,14 @@ public class RegistrationPopupEditor
         submitterField.setWidth(100, Unit.PERCENTAGE);
         addField(submitterField, "submitter");
 
-        institutionField = new NativeSelect("Institution");
-        institutionField.setEnabled(false);
-        institutionField.setWidth(100, Unit.PERCENTAGE);
-        addField(institutionField, "institution");
+        registrationCenterField = new NativeSelect("Registration Center");
+        registrationCenterField.setEnabled(false);
+        registrationCenterField.setWidth(100, Unit.PERCENTAGE);
+        addField(registrationCenterField, "registrationCenter");
 
         registrationDateField = new DateField("Registration date");
         addField(registrationDateField, "registrationDate");
         registrationDateField.setConverter(new JodaDateTimeConverter());
-
     }
 
     @Override
@@ -95,44 +90,29 @@ public class RegistrationPopupEditor
         specificIdentifierField.setEnabled(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getWindowCaption() {
         return "Registration editor";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void focusFirst() {
         // none
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String getDefaultComponentStyles() {
         return "tiny";
     }
 
-    /**
-     * @return the submitterField
-     */
     @Override
     public NativeSelect getSubmitterField() {
         return submitterField;
     }
 
-    /**
-     * @return the institutionField
-     */
     @Override
-    public NativeSelect getInstitutionField() {
-        return institutionField;
+    public NativeSelect getRegistrationCenterField() {
+        return registrationCenterField;
     }
 
     @Override

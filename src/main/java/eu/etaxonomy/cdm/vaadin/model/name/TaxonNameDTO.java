@@ -18,7 +18,6 @@ import org.joda.time.DateTime;
 
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.Annotation;
-import eu.etaxonomy.cdm.model.common.Credit;
 import eu.etaxonomy.cdm.model.common.Extension;
 import eu.etaxonomy.cdm.model.common.Identifier;
 import eu.etaxonomy.cdm.model.common.RelationshipBase.Direction;
@@ -37,7 +36,6 @@ import eu.etaxonomy.cdm.vaadin.model.CdmEntityAdapterDTO;
 /**
  * @author a.kohlbecker
  * @since Apr 23, 2018
- *
  */
 public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
 
@@ -263,10 +261,6 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
         return name.getCombinationAuthorship();
     }
 
-    public List<Credit> getCredits() {
-        return name.getCredits();
-    }
-
     public String getCultivarName() {
         return name.getCultivarEpithet();
     }
@@ -479,5 +473,4 @@ public class TaxonNameDTO extends CdmEntityAdapterDTO<TaxonName> {
     public void setUpdatedBy(User updatedBy) {
         name.setUpdatedBy(updatedBy);
     }
-
 }
