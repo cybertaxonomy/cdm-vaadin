@@ -84,7 +84,7 @@ public class RegistrationUIDefaults {
      */
     public static final AnnotationType[] EDITABLE_ANOTATION_TYPES = new AnnotationType[]{AnnotationType.INTERNAL()};
 
-    public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:support@phycobank.org\">support@phycobank.org</a> for support and more information.";
+    public static final String ERROR_CONTACT_MESSAGE_LINE = "Please contact <a href=\"mailto:editsupport@bgbm.org\">editsupport@bgbm.org</a> for support and more information.";
 
     public static final List<Role> COLLECTION_EDITOR_SUB_COLLECTION_VISIBILITY_RESTRICTION = Arrays.asList(Role.ROLE_ADMIN, RolesAndPermissions.ROLE_CURATION);
 
