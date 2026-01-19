@@ -135,6 +135,7 @@
     
     
     
+    
         <!-- 
       <dependency>
             updating to same version as in vaadin-server 7.7.28 due to https://vaadin.com/security/2021-10-27 
@@ -483,6 +484,7 @@
             
             
             
+            
  
               <!-- Binds by default to the lifecycle phase: validate -->
             </goals>
@@ -585,6 +587,7 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
+    
     
     
     
