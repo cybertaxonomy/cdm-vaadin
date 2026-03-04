@@ -179,9 +179,6 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         logger.debug("map click");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Class<? extends Point> getType() {
         return Point.class;
@@ -197,18 +194,12 @@ public class GeoLocationField extends CompositeCustomField<Point> {
         updateMap();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void addDefaultStyles() {
         // no default styles so far
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<FieldGroup> getFieldGroup() {
         return Optional.of(fieldGroup);
@@ -217,7 +208,4 @@ public class GeoLocationField extends CompositeCustomField<Point> {
     public NativeSelect getReferenceSystemSelect() {
         return referenceSystemSelect;
     }
-
-
-
 }

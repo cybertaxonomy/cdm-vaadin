@@ -190,7 +190,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 compositeWrapper.addComponents(titleField, nomenclaturalTitleCacheField, personsListEditor);
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
                 nomenclaturalTitleCacheField.bindTo(fieldGroup, "nomenclaturalTitleCache", "protectedNomenclaturalTitleCache");
-                fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+                fieldGroup.setItemDataSource(new BeanItem<>((Team)newValue));
                 fieldGroup.bind(personsListEditor, "teamMembers");
                 personsListEditor.registerParentFieldGroup(fieldGroup);
             } else {

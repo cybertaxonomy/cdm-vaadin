@@ -207,7 +207,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
             newValue = newModelInstance();
         }
         super.setInternalValue(newValue);
-            fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
+        fieldGroup.setItemDataSource(new BeanItem<>(newValue));
         updateCacheField();
     }
 

@@ -13,7 +13,6 @@ import eu.etaxonomy.cdm.model.common.VerbatimTimePeriod;
 /**
  * @author a.kohlbecker
  * @since May 17, 2018
- *
  */
 public class VerbatimTimePeriodField extends AbstractTimePeriodField<VerbatimTimePeriod> {
 
