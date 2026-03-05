@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.vaadin.viritin.fields.CaptionGenerator;
 
+import eu.etaxonomy.cdm.common.CdmUtils;
 import eu.etaxonomy.cdm.format.agent.AgentSearchFormatter;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 
@@ -22,9 +23,10 @@ import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase>
             implements CaptionGenerator<T> {
 
-    private List<AgentSearchFormatter.CacheType> cacheTypes;
-
     private static final long serialVersionUID = 116448502301429773L;
+
+    private List<AgentSearchFormatter.CacheType> cacheTypes;
+    private int maxLength = 150;
 
     public TeamOrPersonBaseCaptionGenerator(List<AgentSearchFormatter.CacheType> cacheTypes){
         this.cacheTypes = cacheTypes;
@@ -32,6 +34,7 @@ public final class TeamOrPersonBaseCaptionGenerator<T extends TeamOrPersonBase>
 
     @Override
     public String getCaption(T option) {
-        return AgentSearchFormatter.INSTANCE().format(option, cacheTypes);
+        String result = AgentSearchFormatter.INSTANCE().format(option, cacheTypes);
+        return CdmUtils.truncateWithEllipsis(result, maxLength);
     }
 }
