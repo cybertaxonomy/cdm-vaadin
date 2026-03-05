@@ -31,6 +31,7 @@ import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.TextField;
 
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
+import eu.etaxonomy.cdm.format.agent.AgentSearchFormatter;
 import eu.etaxonomy.cdm.model.agent.Institution;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.reference.Reference;
@@ -48,10 +49,9 @@ import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
-import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoiConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.UriConverter;
+import eu.etaxonomy.cdm.vaadin.util.formatter.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.vaadin.component.SwitchableTextField;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityCombobox;
 import eu.etaxonomy.vaadin.event.EditorActionType;
@@ -184,7 +184,7 @@ public class ReferencePopupEditor
         addTextField("Nomenclatural title", "abbrevTitle", 0, row, GRID_COLS-1, row).setWidth(100, Unit.PERCENTAGE);
         row++;
 
-        authorshipField = new TeamOrPersonField("Author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.BIBLIOGRAPHIC_TITLE);
+        authorshipField = new TeamOrPersonField("Author(s)", AgentSearchFormatter.TITLECACHE_AND_NOM_TITLE);
         authorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(authorshipField, "authorship", 0, row, GRID_COLS -1, row);
         row++;
