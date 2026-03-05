@@ -108,6 +108,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     public List<V> findEntities(int firstRow, String filter) {
 
         checkNotMixed();
+        filter = normalizeFilter(filter);
 
         Integer pageIndex = firstRow / pageSize;
         Pager<V> page;
@@ -145,10 +146,18 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
         return page.getRecords();
     }
 
+    /**
+     * Replaces an * by an %
+     */
+    private String normalizeFilter(String filter) {
+        return filter == null ? filter : filter.replace("*", "%");
+    }
+
     @Override
     public int size(String filter) {
 
         checkNotMixed();
+        filter = normalizeFilter(filter);
 
         clearSession(); // clear the session from remains of previous service calls, see issue #7559
         long count = 0;
