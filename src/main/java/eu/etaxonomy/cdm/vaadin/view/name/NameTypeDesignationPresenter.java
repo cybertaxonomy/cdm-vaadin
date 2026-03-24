@@ -56,7 +56,7 @@ import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
-import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.formatter.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.reference.ReferencePopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.reference.RegistrationUiReferenceEditorFormConfigurator;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;

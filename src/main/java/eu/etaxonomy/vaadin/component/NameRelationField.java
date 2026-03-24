@@ -30,7 +30,7 @@ import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.model.name.NameRelationshipDTO;
-import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.formatter.ReferenceEllypsisCaptionGenerator;
 
 /**
  * @author a.kohlbecker

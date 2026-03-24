@@ -31,6 +31,7 @@ import com.vaadin.ui.Field;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.util.UserHelper;
+import eu.etaxonomy.cdm.format.agent.AgentSearchFormatter;
 import eu.etaxonomy.cdm.hibernate.HibernateProxyHelper;
 import eu.etaxonomy.cdm.model.agent.AgentBase;
 import eu.etaxonomy.cdm.model.agent.Person;
@@ -41,8 +42,8 @@ import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.component.ButtonFactory;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.CdmBaseDeproxyConverter;
+import eu.etaxonomy.cdm.vaadin.util.formatter.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.vaadin.component.CompositeCustomField;
 import eu.etaxonomy.vaadin.component.EntityFieldInstantiator;
@@ -82,16 +83,16 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
 
     private BeanFieldGroup<Team> fieldGroup  = new BeanFieldGroup<>(Team.class);
 
-    private TeamOrPersonBaseCaptionGenerator.CacheType cacheType;
+    private List<AgentSearchFormatter.CacheType> cacheTypes;
 
     protected List<Component> editorComponents = Arrays.asList(removeButton, personButton, teamButton, teamOrPersonSelect);
 
-    public TeamOrPersonField(String caption, TeamOrPersonBaseCaptionGenerator.CacheType cacheType){
+    public TeamOrPersonField(String caption, List<AgentSearchFormatter.CacheType> cacheTypes){
 
         setCaption(caption);
 
-        this.cacheType = cacheType;
-        teamOrPersonSelect.setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<TeamOrPersonBase>(cacheType));
+        this.cacheTypes = cacheTypes;
+        teamOrPersonSelect.setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<>(cacheTypes));
 
         addStyledComponent(teamOrPersonSelect);
         addStyledComponent(personField);
@@ -190,7 +191,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 compositeWrapper.addComponents(titleField, nomenclaturalTitleCacheField, personsListEditor);
                 titleField.bindTo(fieldGroup, "titleCache", "protectedTitleCache");
                 nomenclaturalTitleCacheField.bindTo(fieldGroup, "nomenclaturalTitleCache", "protectedNomenclaturalTitleCache");
-                fieldGroup.setItemDataSource(new BeanItem<Team>((Team)newValue));
+                fieldGroup.setItemDataSource(new BeanItem<>((Team)newValue));
                 fieldGroup.bind(personsListEditor, "teamMembers");
                 personsListEditor.registerParentFieldGroup(fieldGroup);
             } else {
@@ -330,7 +331,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
         // NOTE:
         //   it is important to add the ToOneRelatedEntityReloader to the TeamOrPersonField directly
         //   since the value of the select will be immediately passed to the TeamOrPersonField
-        ToOneRelatedEntityReloader<TeamOrPersonBase<?>> teamOrPersonReloader = new ToOneRelatedEntityReloader<TeamOrPersonBase<?>>(this, cachingPresenter);
+        ToOneRelatedEntityReloader<TeamOrPersonBase<?>> teamOrPersonReloader = new ToOneRelatedEntityReloader<>(this, cachingPresenter);
         this.addValueChangeListener(teamOrPersonReloader);
     }
 
@@ -343,7 +344,7 @@ public class TeamOrPersonField extends CompositeCustomField<TeamOrPersonBase<?>>
                 PersonField f = new PersonField();
                 f.setAllowNewEmptyEntity(true); // otherwise new entities can not be added to the personsListEditor
                 f.getPersonSelect().loadFrom(pagingProvider, pagingProvider, pagingProvider.getPageSize());
-                f.getPersonSelect().setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<Person>(cacheType));
+                f.getPersonSelect().setCaptionGenerator(new TeamOrPersonBaseCaptionGenerator<Person>(cacheTypes));
                 // NOTE:
                 //   it is important to add the ToOneRelatedEntityReloader to the PersonField directly
                 //   since the value of the select will be immediately passed to the PersonField:

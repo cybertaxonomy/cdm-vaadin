@@ -8,6 +8,8 @@
 */
 package eu.etaxonomy.cdm.vaadin.component.common;
 
+import java.util.Objects;
+
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup.CommitException;
@@ -19,12 +21,14 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.CustomField;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.model.common.TimePeriod;
+import eu.etaxonomy.cdm.model.common.VerbatimTimePeriod;
 import eu.etaxonomy.cdm.strategy.parser.TimePeriodParser;
 import eu.etaxonomy.cdm.vaadin.component.PartialDateField;
 import eu.etaxonomy.cdm.vaadin.component.TextFieldNFix;
@@ -115,7 +119,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
         parseField = new TextFieldNFix();
         // parseField.setWidth(100, Unit.PERCENTAGE);
-        parseField.setInputPrompt("This field will parse the entered time period");
+        parseField.setInputPrompt("Parses the entered date or period");
         parseField.addTextChangeListener(e -> parseInput(e));
         parseField.setWidth(100, Unit.PERCENTAGE);
 
@@ -138,11 +142,11 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
         buttonTextField.setColumnExpandRatio(1, 1.0f);
 
         PartialDateField startDate = new PartialDateField("Start");
-        startDate.setDescription("date published as yyyy, mm.yyyy, or dd.mm.yyyy");  //#10738
+        startDate.setDescription("date published as YYYY, YYYY-MM, or YYYY-MM-DD");  //#10738
         startDate.setInputPrompt("dd.mm.yyyy");
         PartialDateField endDate = new PartialDateField("End");
         endDate.setDescription("use only if a concrete time span is available");  //#10738
-        endDate.setInputPrompt("dd.mm.yyyy");
+        endDate.setInputPrompt("YYYY, YYYY-MM, or YYYY-MM-DD");
         freeText = new TextFieldNFix("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 
@@ -188,9 +192,32 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
     private void parseInput(TextChangeEvent e) {
         if(!e.getText().isEmpty()){
-            TimePeriod parsedPeriod = TimePeriodParser.parseString(e.getText());
-            fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(parsedPeriod));
+            VerbatimTimePeriod parsedPeriod = TimePeriodParser.parseStringVerbatim(e.getText());
+
+            //workaround to fill form with parsed data and support saving the data, see #10823
+            getField(fieldGroup, "start").setValue(nullSafeToString(parsedPeriod.getStart()));
+
+            getField(fieldGroup, "end").setValue(nullSafeToString(parsedPeriod.getEnd()));
+
+            getField(fieldGroup, "freeText").setValue(parsedPeriod.getFreeText());
+
+            //the prior solution was not persisted as a new TimePeriod was created
+            //which is not attached to the parent object (e.g. Reference)
+            //old solution: fieldGroup.setItemDataSource(new BeanItem<>(parsedPeriod));
+
+            //also setting the datasource in other ways
+            //(e.g. this.getPropertyDataSource().setValue(parsedPeriod);
+            //was never successful
         }
+    }
+
+    private String nullSafeToString(Object obj) {
+        return Objects.toString(obj, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Field<String> getField(BeanFieldGroup<TimePeriod> fieldGroup, String propertyId) {
+        return (Field<String>) fieldGroup.getField(propertyId);
     }
 
     private void applyDefaultStyles() {
@@ -207,7 +234,7 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
             newValue = newModelInstance();
         }
         super.setInternalValue(newValue);
-            fieldGroup.setItemDataSource(new BeanItem<TimePeriod>(newValue));
+        fieldGroup.setItemDataSource(new BeanItem<>(newValue));
         updateCacheField();
     }
 

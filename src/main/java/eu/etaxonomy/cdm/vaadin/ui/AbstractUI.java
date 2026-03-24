@@ -167,7 +167,7 @@ public abstract class AbstractUI extends UI {
                 this,
                 RegistrationUIDefaults.ERROR_CONTACT_MESSAGE_LINE + "</br></br>"
                 + "<i>To help analyzing the problem please describe your actions that lead to this error and provide the error details from below in your email. "
-                + "You also might want to add a sreenshot of the browser page in error.</i>");
+                + "You also might want to add a screenshot of the browser page in error.</i>");
         delegatingErrorHander.registerHandler(
                 new ErrorTypeErrorHandlerWrapper<PermissionDeniedException>(PermissionDeniedException.class, new PermissionDeniedErrorHandler(this))
                 );

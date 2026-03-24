@@ -84,7 +84,7 @@ import eu.etaxonomy.cdm.vaadin.event.registration.RegistrationWorkingsetAction;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUI;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.config.TaxonNamePopupEditorConfig;
-import eu.etaxonomy.cdm.vaadin.util.CdmTitleCacheCaptionGenerator;
+import eu.etaxonomy.cdm.vaadin.util.formatter.CdmTitleCacheCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.name.CachingPresenter;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationPopupEditor;
 import eu.etaxonomy.cdm.vaadin.view.name.NameTypeDesignationSetIds;

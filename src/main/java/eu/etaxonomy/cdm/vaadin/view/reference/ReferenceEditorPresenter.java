@@ -41,11 +41,11 @@ import eu.etaxonomy.cdm.service.UserHelperAccess;
 import eu.etaxonomy.cdm.vaadin.event.EditorActionTypeFilter;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent;
 import eu.etaxonomy.cdm.vaadin.event.EntityChangeEvent.Type;
+import eu.etaxonomy.cdm.vaadin.util.formatter.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.event.InstitutionEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ReferenceEditorAction;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityButtonUpdater;
 import eu.etaxonomy.cdm.vaadin.event.ToOneRelatedEntityReloader;
-import eu.etaxonomy.cdm.vaadin.util.ReferenceEllypsisCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.view.common.InstitutionPopupEditor;
 import eu.etaxonomy.vaadin.component.ToOneRelatedEntityField;
 import eu.etaxonomy.vaadin.mvp.AbstractCdmEditorPresenter;
@@ -100,7 +100,7 @@ public class ReferenceEditorPresenter
         getView().getAuthorshipField().setFilterablePersonPagingProvider(personPagingProvider, this);
 
         @SuppressWarnings("rawtypes")
-        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<AgentBase, Institution>(getRepo().getAgentService(), Institution.class);
+        CdmFilterablePagingProvider<AgentBase, Institution> institutionPagingProvider = new CdmFilterablePagingProvider<>(getRepo().getAgentService(), Institution.class);
         getView().getInstitutionCombobox().getSelect().loadFrom(institutionPagingProvider, institutionPagingProvider, institutionPagingProvider.getPageSize());
         getView().getInstitutionCombobox().getSelect().addValueChangeListener(new ToOneRelatedEntityReloader<Institution>(getView().getInstitutionCombobox(), this));
 

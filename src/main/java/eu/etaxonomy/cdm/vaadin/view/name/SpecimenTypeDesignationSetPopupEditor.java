@@ -28,6 +28,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
+import eu.etaxonomy.cdm.format.agent.AgentSearchFormatter;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.service.UserHelperAccess;
@@ -42,7 +43,6 @@ import eu.etaxonomy.cdm.vaadin.model.registration.SpecimenTypeDesignationSetDTO;
 import eu.etaxonomy.cdm.vaadin.permission.AccessRestrictedView;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
-import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.DoubleConverter;
 import eu.etaxonomy.cdm.vaadin.util.converter.IntegerConverter;
 import eu.etaxonomy.cdm.vaadin.view.PerEntityAuthorityGrantingEditor;
@@ -167,7 +167,7 @@ public class SpecimenTypeDesignationSetPopupEditor
         distanceToGroundMinMax.getMinField().setConverter(new DoubleConverter());
 
         row++;
-        collectorField = new TeamOrPersonField("Collector", TeamOrPersonBaseCaptionGenerator.CacheType.COLLECTOR_TITLE);
+        collectorField = new TeamOrPersonField("Collector", AgentSearchFormatter.COLLECTOR_TITLE_FIRST);
         addField(collectorField, "collector", 0, row, endColumnIndex, row);
 
         row++;

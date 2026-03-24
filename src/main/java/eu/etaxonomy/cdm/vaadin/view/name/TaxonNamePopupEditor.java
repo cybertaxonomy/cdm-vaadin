@@ -41,6 +41,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 import eu.etaxonomy.cdm.api.util.RoleProberImpl;
+import eu.etaxonomy.cdm.format.agent.AgentSearchFormatter;
 import eu.etaxonomy.cdm.model.agent.TeamOrPersonBase;
 import eu.etaxonomy.cdm.model.common.AnnotationType;
 import eu.etaxonomy.cdm.model.common.CdmBase;
@@ -65,7 +66,6 @@ import eu.etaxonomy.cdm.vaadin.permission.CdmEditDeletePermissionTester;
 import eu.etaxonomy.cdm.vaadin.permission.RolesAndPermissions;
 import eu.etaxonomy.cdm.vaadin.ui.RegistrationUIDefaults;
 import eu.etaxonomy.cdm.vaadin.ui.UIMessages;
-import eu.etaxonomy.cdm.vaadin.util.TeamOrPersonBaseCaptionGenerator;
 import eu.etaxonomy.cdm.vaadin.util.converter.SetToListConverter;
 import eu.etaxonomy.vaadin.component.NameRelationField;
 import eu.etaxonomy.vaadin.component.ReloadableLazyComboBox;
@@ -346,7 +346,7 @@ public class TaxonNamePopupEditor
         infraSpecificEpithetField.setWidth(200, Unit.PIXELS);
 
         row++;
-        combinationAuthorshipField = new TeamOrPersonField("Combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
+        combinationAuthorshipField = new TeamOrPersonField("Combination author(s)", AgentSearchFormatter.NOMENCLATURAL_TITLE_AND_TITLECACHE);
         combinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(combinationAuthorshipField, "combinationAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -453,11 +453,11 @@ public class TaxonNamePopupEditor
         grid.setComponentAlignment(basionymsComboboxSelect, Alignment.TOP_RIGHT);
 
         row++;
-        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
+        basionymAuthorshipField = new TeamOrPersonField("Basionym author(s)", AgentSearchFormatter.NOMENCLATURAL_TITLE_FIRST);
         basionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(basionymAuthorshipField, "basionymAuthorship", 0, row, GRID_COLS-1, row);
         row++;
-        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
+        exBasionymAuthorshipField = new TeamOrPersonField("Ex-basionym author(s)", AgentSearchFormatter.NOMENCLATURAL_TITLE_FIRST);
         exBasionymAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exBasionymAuthorshipField, "exBasionymAuthorship", 0, row, GRID_COLS-1, row);
 
@@ -568,7 +568,7 @@ public class TaxonNamePopupEditor
         grid.setComponentAlignment(orthographicVariantField, Alignment.TOP_RIGHT);
 
         row++;
-        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", TeamOrPersonBaseCaptionGenerator.CacheType.NOMENCLATURAL_TITLE);
+        exCombinationAuthorshipField = new TeamOrPersonField("Ex-combination author(s)", AgentSearchFormatter.NOMENCLATURAL_TITLE_FIRST);
         exCombinationAuthorshipField.setWidth(100,  Unit.PERCENTAGE);
         addField(exCombinationAuthorshipField, "exCombinationAuthorship", 0, row, GRID_COLS-1, row);
 
