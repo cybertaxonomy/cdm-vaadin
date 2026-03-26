@@ -143,10 +143,10 @@ public abstract class AbstractTimePeriodField<T extends TimePeriod> extends Cust
 
         PartialDateField startDate = new PartialDateField("Start");
         startDate.setDescription("date published as YYYY, YYYY-MM, or YYYY-MM-DD");  //#10738
-        startDate.setInputPrompt("dd.mm.yyyy");
+        startDate.setInputPrompt("YYYY-MM-DD");
         PartialDateField endDate = new PartialDateField("End");
-        endDate.setDescription("use only if a concrete time span is available");  //#10738
-        endDate.setInputPrompt("YYYY, YYYY-MM, or YYYY-MM-DD");
+        endDate.setDescription("use only if a concrete time span is available (YYYY, YYYY-MM, or YYYY-MM-DD)");  //#10738
+        endDate.setInputPrompt("YYYY-MM-DD");
         freeText = new TextFieldNFix("FreeText");
         freeText.setWidth(100, Unit.PERCENTAGE);
 

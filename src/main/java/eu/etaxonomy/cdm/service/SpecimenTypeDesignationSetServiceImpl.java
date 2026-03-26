@@ -87,6 +87,7 @@ public class SpecimenTypeDesignationSetServiceImpl
     @Override
     public SpecimenTypeDesignationSetDTO<Registration> create(UUID registrationUuid, UUID typifiedNameUuid) {
         FieldUnit newFieldUnit = FieldUnit.NewInstance();
+//        repo.getOccurrenceService().save(newFieldUnit);
         Registration reg = repo.getRegistrationService().load(registrationUuid, RegistrationWorkingSetService.REGISTRATION_DTO_INIT_STRATEGY.getPropertyPaths());
         if(reg == null){
             reg = repo.getRegistrationService().newRegistration();
@@ -201,11 +202,10 @@ public class SpecimenTypeDesignationSetServiceImpl
                 }
 
                 //NOTE: activate when removing TaxonName.typeDesignation cascading
-//              session.save(specimenTypeDesignation);  or merge?
+//              ??  session.save(specimenTypeDesignation);  // or merge?
             }
             session.merge(typifiedName);
             session.merge(regPremerge);
-//            session.flush();
 
             // ------------------------ perform delete of removed SpecimenTypeDesignations
             // this step also includes the deletion of DerivedUnits which have been converted by

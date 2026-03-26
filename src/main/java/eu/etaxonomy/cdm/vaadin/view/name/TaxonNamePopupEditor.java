@@ -911,15 +911,9 @@ public class TaxonNamePopupEditor
             }
         }
 
-        if(isModeEnabled(TaxonNamePopupEditorMode.ORTHOGRAPHIC_CORRECTION)){
-            orthographicVariantField.setCaption("Orthographical correction");
-            orthographicVariantField.getRelatedNameComboBox().setCaption("Incorrect name");
-            orthographicVariantToggle.setCaption("Orthographical correction");
-        } else {
-            orthographicVariantField.setCaption("Orthographical variant");
-            orthographicVariantField.getRelatedNameComboBox().setCaption("Name variant");
-            orthographicVariantToggle.setCaption("Orthographical variant");
-        }
+        orthographicVariantField.setCaption("Orthographical correction");
+        orthographicVariantField.getRelatedNameComboBox().setCaption("Incorrect name");
+        orthographicVariantToggle.setCaption("Orthographical correction");
 
         genusOrUninomialField.setRequired(true);
         specificEpithetField.setVisible(isSpeciesOrBelow);
