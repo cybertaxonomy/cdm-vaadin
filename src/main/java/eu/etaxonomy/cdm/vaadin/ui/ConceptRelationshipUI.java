@@ -54,12 +54,10 @@ public class ConceptRelationshipUI extends AbstractAuthenticatedUI {
 
         ConceptRelationshipView crEditor = new ConceptRelationshipView(oc,cc);
         UI.getCurrent().getNavigator().addView(FIRST_VIEW, crEditor);
-
     }
 
     @Override
     public String getFirstViewName() {
         return FIRST_VIEW;
     }
-
 }

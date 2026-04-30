@@ -103,44 +103,6 @@
         <artifactId>json</artifactId>
         <version>20220320</version>
       </dependency>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
         <!-- 
       <dependency>
             updating to same version as in vaadin-server 7.7.28 due to https://vaadin.com/security/2021-10-27 
@@ -150,24 +112,6 @@
         <version>1.14.3</version>
       </dependency>
         -->
-      <!-- 
-      <dependency>
-        < ! - - FIXME move to cdmlib-test - - >
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-mock</artifactId>
-        <version>4.2.3.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-api</artifactId>
-        <version>3.5.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.seleniumhq.selenium</groupId>
-        <artifactId>selenium-support</artifactId>
-        <version>3.5.3</version>
-      </dependency>
-      -->
     </dependencies>
   </dependencyManagement>
   <distributionManagement>
@@ -458,44 +402,6 @@
             </configuration>
             <goals>
               <goal>enforce</goal>
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
- 
               <!-- Binds by default to the lifecycle phase: validate -->
             </goals>
           </execution>
@@ -597,44 +503,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
       <!-- 
         vaadin-server dependency jsoup upgraded due to https://vaadin.com/security/2021-10-27
         further updating of vaadin 7 is no longer possible without purchasing the pro license 
@@ -751,22 +619,6 @@
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
     </dependency>
-    <!--    <dependency>
-      <groupId>org.springmodules</groupId>
-      <artifactId>spring-modules-cache</artifactId>
-      <version>0.7</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-mock</artifactId>
-        </exclusion>
-      </exclusions>
-      <scope>test</scope>
-    </dependency>  -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
