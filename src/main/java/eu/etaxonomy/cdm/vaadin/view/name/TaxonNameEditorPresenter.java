@@ -33,6 +33,7 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Field;
 
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
 import eu.etaxonomy.cdm.api.filter.Restriction;
 import eu.etaxonomy.cdm.api.filter.Restriction.Operator;
 import eu.etaxonomy.cdm.api.service.INameService;
@@ -430,12 +431,8 @@ public class TaxonNameEditorPresenter
 
                 // reduce available references to those which are sections of
                 // the publishedUnit and the publishedUnit itself
-                // nomReferencePagingProvider
-                nomReferencePagingProvider.getCriteria()
-                        .add(Restrictions.or(
-                                Restrictions.and(Restrictions.eq("inReference", publishedUnit),
-                                        Restrictions.eq("type", ReferenceType.Section)),
-                                Restrictions.idEq(publishedUnit.getId())));
+                nomReferencePagingProvider.addEntityFilter(
+                        ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
             }
             // and remove the empty option
             getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);

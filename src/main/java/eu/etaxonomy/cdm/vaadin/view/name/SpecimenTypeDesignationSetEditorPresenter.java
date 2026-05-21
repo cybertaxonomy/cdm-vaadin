@@ -31,6 +31,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
 import eu.etaxonomy.cdm.api.filter.MatchMode;
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
 import eu.etaxonomy.cdm.api.filter.Restriction;
 import eu.etaxonomy.cdm.api.filter.Restriction.Operator;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
@@ -210,13 +211,8 @@ public class SpecimenTypeDesignationSetEditorPresenter
         if (getPublishedUnit() != null) {
             // reduce available references to those which are sections of
             // the publicationUnit and the publishedUnit itself
-            designationReferencePagingProvider.getCriteria()
-                    .add(Restrictions.or(
-                            Restrictions.and(
-                                    Restrictions.eq("inReference", publishedUnit.getCitation()),
-                                    Restrictions.eq("type", ReferenceType.Section)),
-                            Restrictions.idEq(publishedUnit.getCitation().getId()))
-                         );
+            designationReferencePagingProvider.addEntityFilter(ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
+
             // new Reference only a sub sections of the publishedUnit
             newReferenceInstantiator = new BeanInstantiator<Reference>() {
                 @Override

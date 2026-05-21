@@ -15,10 +15,10 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
+import eu.etaxonomy.cdm.api.filter.EntityFilter;
 import eu.etaxonomy.cdm.api.filter.MatchMode;
 import eu.etaxonomy.cdm.api.filter.Restriction;
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
@@ -51,9 +51,10 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     private List<String> initStrategy = DEFAULT_INIT_STRATEGY;
 
-    private List<Criterion> criteria = new ArrayList<>();
-
     private List<Restriction<?>> restrictions = new ArrayList<>();
+
+    private List<EntityFilter<V>> entityFilters = new ArrayList<>();
+
 
     protected MatchMode getMatchMode() {
         return matchMode;
@@ -130,7 +131,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
                     type,
                     filter,
                     matchMode,
-                    criteria,
+                    entityFilters,
                     pageSize,
                     pageIndex ,
                     orderHints,
@@ -166,7 +167,7 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
             List<Restriction<?>> preparedRestrictions = prepareRestrictions(filter, matchMode);
             count = service.countByTitleWithRestrictions(type, filter, matchMode, preparedRestrictions);
         } else {
-            count = service.countByTitle(type, filter, matchMode, criteria);
+            count = service.countByTitle(type, filter, matchMode, entityFilters);
         }
 
 
@@ -204,8 +205,9 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
     }
 
     protected void checkNotMixed() {
-        if(!restrictions.isEmpty() && !criteria.isEmpty()){
-            throw new RuntimeException("Citeria and Restrictions must not be used at the same time");
+        if(!restrictions.isEmpty() && !entityFilters.isEmpty()){
+            //TODO is this really still true?
+            throw new RuntimeException("EntityFilters and Restrictions must not be used at the same time");
         }
     }
 
@@ -223,19 +225,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
 
     public void setInitStrategy(List<String> initStrategy) {
         this.initStrategy = initStrategy;
-    }
-
-    /**
-     * The list of criteria is initially empty.
-     *
-     * @return the criteria
-     */
-    public List<Criterion> getCriteria() {
-        return criteria;
-    }
-
-    public void addCriterion(Criterion criterion){
-        criteria.add(criterion);
     }
 
     /**
@@ -259,5 +248,13 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      */
     public void addRestriction(Restriction<?> restriction){
         restrictions.add(restriction);
+    }
+
+    public List<EntityFilter<V>> getEntityFilters() {
+        return entityFilters;
+    }
+
+    public void addEntityFilter(EntityFilter<V> filter){
+        entityFilters.add(filter);
     }
 }

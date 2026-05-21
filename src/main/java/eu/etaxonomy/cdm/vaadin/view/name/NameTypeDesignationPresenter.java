@@ -19,13 +19,13 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWorkingSet;
@@ -150,13 +150,7 @@ public class NameTypeDesignationPresenter
         if (getPublishedUnit() != null) {
             // reduce available references to those which are sections of
             // the publicationUnit and the publishedUnit itself
-            referencePagingProvider.getCriteria()
-                    .add(Restrictions.or(
-                            Restrictions.and(
-                                    Restrictions.eq("inReference", getPublishedUnit().getCitation()),
-                                    Restrictions.eq("type", ReferenceType.Section)),
-                            Restrictions.idEq(publishedUnit.getCitation().getId()))
-                         );
+            referencePagingProvider.addEntityFilter(ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
 
             // new Reference only a sub sections of the publishedUnit
             newReferenceInstantiator = new BeanInstantiator<Reference>() {
