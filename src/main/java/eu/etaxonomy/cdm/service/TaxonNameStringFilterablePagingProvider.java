@@ -23,13 +23,13 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Field;
 
+import eu.etaxonomy.cdm.api.filter.MatchMode;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.api.util.TaxonNamePartsFilter;
 import eu.etaxonomy.cdm.model.name.Rank;
 import eu.etaxonomy.cdm.model.name.TaxonName;
 import eu.etaxonomy.cdm.persistence.dto.TaxonNameParts;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 
 /**

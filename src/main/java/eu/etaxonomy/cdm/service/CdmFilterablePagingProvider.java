@@ -19,12 +19,12 @@ import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
+import eu.etaxonomy.cdm.api.filter.MatchMode;
+import eu.etaxonomy.cdm.api.filter.Restriction;
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
 import eu.etaxonomy.cdm.api.service.pager.Pager;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
-import eu.etaxonomy.cdm.persistence.query.Restriction;
 
 /**
  * @author a.kohlbecker

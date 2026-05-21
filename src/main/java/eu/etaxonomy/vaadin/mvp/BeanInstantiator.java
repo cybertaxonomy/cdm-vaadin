@@ -11,7 +11,6 @@ package eu.etaxonomy.vaadin.mvp;
 /**
  * @author a.kohlbecker
  * @since Jan 12, 2018
- *
  */
 public abstract class BeanInstantiator<T> {
 
