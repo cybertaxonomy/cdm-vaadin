@@ -33,11 +33,11 @@ public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
     @SuppressWarnings("unused")
     private static final Logger logger = LogManager.getLogger();
 
-    private static AuthenticationPresenter ap;
+    private static AuthenticationPresenter authenticationPresenter;
 
     @BeforeClass
     public static void init() {
-        ap = new AuthenticationPresenter();
+        authenticationPresenter = new AuthenticationPresenter();
     }
 
     @Test
@@ -46,13 +46,13 @@ public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
         String context = "/cdm-vaadin";
         boolean isAuthenticated = false;
         try {
-            isAuthenticated = ap.login(uri, context, "admin", "000");
+            isAuthenticated = authenticationPresenter.login(uri, context, "admin", "000");
             Assert.fail("BadCredentialsException should be thrown here");
         } catch(BadCredentialsException e){
 
         }
 
-        isAuthenticated = ap.login(uri, context, "admin", "00000");
+        isAuthenticated = authenticationPresenter.login(uri, context, "admin", "00000");
         Assert.assertTrue(isAuthenticated);
 
         CdmVaadinAuthentication authentication = (CdmVaadinAuthentication) VaadinSession.getCurrent().getAttribute(CdmVaadinAuthentication.KEY);
@@ -64,7 +64,7 @@ public class AuthenticationPresenterTest extends CdmVaadinBaseTest {
         String anotherContext = "/cdm-edit";
         Assert.assertFalse(authentication.isAuthenticated(uri, anotherContext));
 
-        isAuthenticated = ap.login(anotherUri, anotherContext, "admin", "00000");
+        isAuthenticated = authenticationPresenter.login(anotherUri, anotherContext, "admin", "00000");
         Assert.assertTrue(isAuthenticated);
 
         Assert.assertTrue(authentication.isAuthenticated(anotherUri, anotherContext));

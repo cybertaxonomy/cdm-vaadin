@@ -20,6 +20,8 @@ import org.vaadin.viritin.fields.CaptionGenerator;
 
 import com.vaadin.spring.annotation.SpringComponent;
 
+import eu.etaxonomy.cdm.api.filter.Restriction;
+import eu.etaxonomy.cdm.api.filter.Restriction.Operator;
 import eu.etaxonomy.cdm.api.service.IService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
@@ -33,8 +35,6 @@ import eu.etaxonomy.cdm.model.permission.CRUD;
 import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.UserHelperAccess;

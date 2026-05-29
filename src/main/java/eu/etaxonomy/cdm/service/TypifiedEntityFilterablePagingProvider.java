@@ -11,15 +11,15 @@ package eu.etaxonomy.cdm.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.criterion.Criterion;
 import org.vaadin.viritin.fields.LazyComboBox.FilterableCountProvider;
 import org.vaadin.viritin.fields.LazyComboBox.FilterablePagingProvider;
 
+import eu.etaxonomy.cdm.api.filter.EntityFilter;
+import eu.etaxonomy.cdm.api.filter.MatchMode;
+import eu.etaxonomy.cdm.api.filter.Restriction;
 import eu.etaxonomy.cdm.api.service.IIdentifiableEntityService;
 import eu.etaxonomy.cdm.format.IEllypsisFormatter;
 import eu.etaxonomy.cdm.model.common.IdentifiableEntity;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.ref.TypedEntityReferenceFactory;
@@ -37,7 +37,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
 
     public TypifiedEntityFilterablePagingProvider(IIdentifiableEntityService<T> service, MatchMode matchMode, List<OrderHint> orderHints, IEllypsisFormatter<T> labelProvider){
         this.labelProvider = labelProvider;
-        entityPagingProvider = new CdmFilterablePagingProvider<T, T>(service, matchMode, orderHints);
+        entityPagingProvider = new CdmFilterablePagingProvider<>(service, matchMode, orderHints);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         return ters;
     }
 
-    public void addRestriction(Restriction restriction) {
+    public void addRestriction(Restriction<?> restriction) {
         entityPagingProvider.addRestriction(restriction);
     }
 
@@ -73,20 +73,10 @@ public class TypifiedEntityFilterablePagingProvider<T extends IdentifiableEntity
         entityPagingProvider.setMatchMode(matchMode);
     }
 
-    /**
-     * @deprecated criteria should not be used outside cdmlib-persistence
-     */
-    @Deprecated
-    public List<Criterion> getCriteria() {
-        return entityPagingProvider.getCriteria();
+    public List<EntityFilter<T>> getEntityFilters() {
+        return entityPagingProvider.getEntityFilters();
     }
-
-    /**
-     * @deprecated criteria should not be used outside cdmlib-persistence
-     */
-    @Deprecated
-    public void addCriterion(Criterion criterion){
-        entityPagingProvider.addCriterion(criterion);
+    public void addEntityFilter(EntityFilter<T> entityFilter){
+        entityPagingProvider.addEntityFilter(entityFilter);
     }
-
 }

@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 import org.vaadin.viritin.fields.AbstractElementCollection;
@@ -34,6 +33,9 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Field;
 
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
+import eu.etaxonomy.cdm.api.filter.Restriction;
+import eu.etaxonomy.cdm.api.filter.Restriction.Operator;
 import eu.etaxonomy.cdm.api.service.INameService;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
@@ -55,8 +57,6 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
 import eu.etaxonomy.cdm.persistence.dao.initializer.EntityInitStrategy;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
 import eu.etaxonomy.cdm.service.TaxonNameStringFilterablePagingProvider;
@@ -428,14 +428,11 @@ public class TaxonNameEditorPresenter
                 while (publishedUnit.isOfType(ReferenceType.Section) && publishedUnit.getInReference() != null) {
                     publishedUnit = nomRef.getInReference();
                 }
+
                 // reduce available references to those which are sections of
                 // the publishedUnit and the publishedUnit itself
-                // nomReferencePagingProvider
-                nomReferencePagingProvider.getCriteria()
-                        .add(Restrictions.or(
-                                Restrictions.and(Restrictions.eq("inReference", publishedUnit),
-                                        Restrictions.eq("type", ReferenceType.Section)),
-                                Restrictions.idEq(publishedUnit.getId())));
+                nomReferencePagingProvider.addEntityFilter(
+                        ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
             }
             // and remove the empty option
             getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);

@@ -8,16 +8,16 @@
 */
 package eu.etaxonomy.cdm.vaadin.view.registration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventScope;
@@ -29,6 +29,10 @@ import com.vaadin.server.UserError;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.ViewScope;
 
+import eu.etaxonomy.cdm.api.filter.CdmBaseFilters;
+import eu.etaxonomy.cdm.api.filter.EntityFilter;
+import eu.etaxonomy.cdm.api.filter.MatchMode;
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
 import eu.etaxonomy.cdm.api.service.DeleteResult;
 import eu.etaxonomy.cdm.api.service.dto.RegistrationWrapperDTO;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter;
@@ -37,7 +41,6 @@ import eu.etaxonomy.cdm.model.reference.Reference;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.persistence.permission.CdmAuthority;
 import eu.etaxonomy.cdm.persistence.permission.Operation;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.ref.TypedEntityReference;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProviderFactory;
 import eu.etaxonomy.cdm.service.TypifiedEntityFilterablePagingProvider;
@@ -86,54 +89,49 @@ public class StartRegistrationPresenter
 
         super.handleViewEntered();
 
+        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<>();
+        getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
+
         referencePagingProvider = pagingProviderFactory.referenceEntityReferencePagingProvider(
                 new ReferenceEllypsisFormatter(ReferenceEllypsisFormatter.LabelType.BIBLIOGRAPHIC),
                 ReferenceEllypsisFormatter.INIT_STRATEGY
                 );
-        TypedEntityCaptionGenerator<Reference> titleCacheGenrator = new TypedEntityCaptionGenerator<>();
         // referencePagingProvider.addRestriction(new Restriction("type", Operator.AND_NOT, null, ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries));
-        Criterion criterion = getReferenceFilterCriterion();
-        referencePagingProvider.addCriterion(criterion);
-        getView().getReferenceCombobox().setCaptionGenerator(titleCacheGenrator);
+        List<EntityFilter<Reference>> filters = getReferenceFilters();
+        filters.forEach(referencePagingProvider::addEntityFilter);
         getView().getReferenceCombobox().loadFrom(referencePagingProvider, referencePagingProvider, referencePagingProvider.getPageSize());
     }
 
-    private Criterion getReferenceFilterCriterion() {
+    private List<EntityFilter<Reference>> getReferenceFilters() {
 
-        //never use sections, journals and print series
-        Criterion criterion = Restrictions.not(Restrictions.or(Restrictions.in("type", new ReferenceType[]{ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries})));
+        List<EntityFilter<Reference>> filters = new ArrayList<>();
 
-        if(!UserHelperAccess.userHelper().userIsAdmin()){
-            Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper().findUserPermissions(Reference.class, Operation.UPDATE);
+        // never use sections, journals and print series
+        filters.add(ReferenceFilters.isNotOfType(EnumSet.of(ReferenceType.Section, ReferenceType.Journal, ReferenceType.PrintSeries)));
+
+        if (!UserHelperAccess.userHelper().userIsAdmin()) {
+            Collection<CdmAuthority> referencePermissions = UserHelperAccess.userHelper()
+                    .findUserPermissions(Reference.class, Operation.UPDATE);
             boolean generalUpdatePermission = referencePermissions.stream().anyMatch(p -> p.getTargetUUID() == null);
-            if(!generalUpdatePermission){
-                criterion = addUuidAndPublicationDateBasedFilter(criterion, referencePermissions);
+
+            if (!generalUpdatePermission) {
+
+                // exclude unpublished publications
+                DateTime datePublishedBefore = new DateTime();
+                EntityFilter<Reference> publishedOnlyFilter = ReferenceFilters.isBeforeDatePublished(datePublishedBefore);
+
+                // restrict by allowed reference uuids
+                Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null)
+                        .map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
+                if (!allowedUuids.isEmpty()) {
+                    EntityFilter<Reference> uuidFilter = CdmBaseFilters.uuidsFilter(allowedUuids, Reference.class);
+                    filters.add(CdmBaseFilters.or(publishedOnlyFilter, uuidFilter));
+                } else {
+                    filters.add(publishedOnlyFilter);
+                }
             }
         }
-        return criterion;
-    }
-
-    private Criterion addUuidAndPublicationDateBasedFilter(Criterion criterion,
-            Collection<CdmAuthority> referencePermissions) {
-
-        // exclude unpublished publications
-        DateTime nowLocal = new DateTime();
-        String dateString = nowLocal.toString("yyyyMMdd");
-        logger.debug("dateString:" + dateString);
-        Criterion pulishedOnlyCriterion = Restrictions.or(
-                Restrictions.and(Restrictions.isNotNull("datePublished.start"), Restrictions.sqlRestriction("datePublished_start < " + dateString)),
-                Restrictions.and(Restrictions.isNull("datePublished.start"), Restrictions.isNotNull("datePublished.end"), Restrictions.sqlRestriction("datePublished_end < " + dateString))
-                );
-
-        // restrict by allowed reference uuids
-        Set<UUID> allowedUuids = referencePermissions.stream().filter(p -> p.getTargetUUID() != null).map(CdmAuthority::getTargetUUID).collect(Collectors.toSet());
-        if(!allowedUuids.isEmpty()){
-            Criterion uuidRestriction = Restrictions.in("uuid", allowedUuids);
-            criterion = Restrictions.and(criterion, Restrictions.or(pulishedOnlyCriterion, uuidRestriction));
-        } else {
-            criterion = Restrictions.and(criterion, pulishedOnlyCriterion);
-        }
-        return criterion;
+        return filters;
     }
 
     public void updateReferenceSearchMode(MatchMode value) {

@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.vaadin.spring.events.annotation.EventBusListenerMethod;
@@ -31,6 +30,10 @@ import org.vaadin.viritin.fields.ElementCollectionField;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.spring.annotation.SpringComponent;
 
+import eu.etaxonomy.cdm.api.filter.MatchMode;
+import eu.etaxonomy.cdm.api.filter.ReferenceFilters;
+import eu.etaxonomy.cdm.api.filter.Restriction;
+import eu.etaxonomy.cdm.api.filter.Restriction.Operator;
 import eu.etaxonomy.cdm.cache.CdmTransientEntityWithUuidCacher;
 import eu.etaxonomy.cdm.format.reference.ReferenceEllypsisFormatter.LabelType;
 import eu.etaxonomy.cdm.model.ICdmEntityUuidCacher;
@@ -55,9 +58,6 @@ import eu.etaxonomy.cdm.model.reference.ReferenceFactory;
 import eu.etaxonomy.cdm.model.reference.ReferenceType;
 import eu.etaxonomy.cdm.model.term.DefinedTermBase;
 import eu.etaxonomy.cdm.model.term.TermType;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction;
-import eu.etaxonomy.cdm.persistence.dao.common.Restriction.Operator;
-import eu.etaxonomy.cdm.persistence.query.MatchMode;
 import eu.etaxonomy.cdm.persistence.query.OrderHint;
 import eu.etaxonomy.cdm.service.CdmBeanItemContainerFactory;
 import eu.etaxonomy.cdm.service.CdmFilterablePagingProvider;
@@ -118,7 +118,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
     private CdmBeanItemContainerFactory cdmBeanItemContainerFactory;
 
     /**
-     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entitiy which will be
+     * if not null, this CRUD set is to be used to create a CdmAuthoritiy for the base entity which will be
      * granted to the current use as long this grant is not assigned yet.
      */
     private EnumSet<CRUD> crud = null;
@@ -211,13 +211,8 @@ public class SpecimenTypeDesignationSetEditorPresenter
         if (getPublishedUnit() != null) {
             // reduce available references to those which are sections of
             // the publicationUnit and the publishedUnit itself
-            designationReferencePagingProvider.getCriteria()
-                    .add(Restrictions.or(
-                            Restrictions.and(
-                                    Restrictions.eq("inReference", publishedUnit.getCitation()),
-                                    Restrictions.eq("type", ReferenceType.Section)),
-                            Restrictions.idEq(publishedUnit.getCitation().getId()))
-                         );
+            designationReferencePagingProvider.addEntityFilter(ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
+
             // new Reference only a sub sections of the publishedUnit
             newReferenceInstantiator = new BeanInstantiator<Reference>() {
                 @Override
