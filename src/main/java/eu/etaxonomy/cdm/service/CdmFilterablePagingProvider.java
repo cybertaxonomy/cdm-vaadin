@@ -233,7 +233,6 @@ public class CdmFilterablePagingProvider<T extends IdentifiableEntity, V extends
      * Occurrences of the {@link QUERY_STRING_PLACEHOLDER} in the value
      * of String type Restrictions will be replaced by the <code>filter</code> parameter passed to the paging provider.
      *
-     *
      * @return the restrictions
      */
     public List<Restriction<?>> getRestrictions() {

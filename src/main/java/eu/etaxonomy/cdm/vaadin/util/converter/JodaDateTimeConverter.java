@@ -18,9 +18,9 @@ import com.vaadin.data.util.converter.Converter;
 /**
  * @author a.kohlbecker
  * @since Mar 7, 2017
- *
  */
 public final class JodaDateTimeConverter implements Converter<Date, DateTime> {
+
     @Override
     public DateTime convertToModel(Date value, Class<? extends DateTime> targetType, Locale locale)
             throws com.vaadin.data.util.converter.Converter.ConversionException {
