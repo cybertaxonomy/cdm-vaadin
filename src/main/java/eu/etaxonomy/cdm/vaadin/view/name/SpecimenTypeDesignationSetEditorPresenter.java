@@ -211,7 +211,7 @@ public class SpecimenTypeDesignationSetEditorPresenter
         if (getPublishedUnit() != null) {
             // reduce available references to those which are sections of
             // the publicationUnit and the publishedUnit itself
-            designationReferencePagingProvider.addEntityFilter(ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
+            designationReferencePagingProvider.addEntityFilter(ReferenceFilters.publishedUnitOrSectionOfPubishedUnit(publishedUnit));
 
             // new Reference only a sub sections of the publishedUnit
             newReferenceInstantiator = new BeanInstantiator<Reference>() {

@@ -432,7 +432,7 @@ public class TaxonNameEditorPresenter
                 // reduce available references to those which are sections of
                 // the publishedUnit and the publishedUnit itself
                 nomReferencePagingProvider.addEntityFilter(
-                        ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
+                        ReferenceFilters.publishedUnitOrSectionOfPubishedUnit(publishedUnit));
             }
             // and remove the empty option
             getView().getNomReferenceCombobox().getSelect().setNullSelectionAllowed(false);
