@@ -87,7 +87,7 @@ public class NameTypeDesignationPresenter
      * This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      * but never a {@link ReferenceType#Section}
      */
-    private NamedSourceBase publishedUnit;
+    private NamedSourceBase publishedUnitSource;
 
     protected static BeanInstantiator<NameTypeDesignation> defaultBeanInstantiator = new BeanInstantiator<NameTypeDesignation>() {
 
@@ -147,10 +147,10 @@ public class NameTypeDesignationPresenter
         getView().setInTypedesignationOnlyAct(Optional.of(inTypedesignationOnlyAct));
 
 
-        if (getPublishedUnit() != null) {
+        if (getPublishedUnitSource() != null) {
             // reduce available references to those which are sections of
             // the publicationUnit and the publishedUnit itself
-            referencePagingProvider.addEntityFilter(ReferenceFilters.isPublishedUnitOrSectionOfPubishedUnit(publishedUnit));
+            referencePagingProvider.addEntityFilter(ReferenceFilters.publishedUnitOrSectionOfPubishedUnit(publishedUnitSource));
 
             // new Reference only a sub sections of the publishedUnit
             newReferenceInstantiator = new BeanInstantiator<Reference>() {
@@ -158,7 +158,7 @@ public class NameTypeDesignationPresenter
                 public Reference createNewBean() {
                     Reference newRef = ReferenceFactory.newSection();
                     Reference reference = getRepo().getReferenceService().load(
-                            getPublishedUnit().getCitation().getUuid(),
+                            getPublishedUnitSource().getCitation().getUuid(),
                             ReferenceEllypsisFormatter.INIT_STRATEGY
                             );
                     newRef.setInReference(reference);
@@ -176,7 +176,7 @@ public class NameTypeDesignationPresenter
      * @return the published unit, but resolved in case it is a {@link ReferenceType#isSection()}
      */
     private Reference getNoSectionPublishedUnit() {
-        Reference ref = getPublishedUnit().getCitation();
+        Reference ref = getPublishedUnitSource().getCitation();
         return RegistrationWorkingSet.sectionSafePublicationUnit(ref);
     }
 
@@ -430,10 +430,10 @@ public class NameTypeDesignationPresenter
 
     /**
      * @return
-     *  the {@link #publishedUnit}
+     *  the {@link #publishedUnitSource}
      */
-    public NamedSourceBase getPublishedUnit() {
-        return publishedUnit;
+    public NamedSourceBase getPublishedUnitSource() {
+        return publishedUnitSource;
     }
 
     /**
@@ -441,7 +441,7 @@ public class NameTypeDesignationPresenter
      *  The unit of publication in which the type designation has been published.
      *  This may be any type listed in {@link RegistrationUIDefaults#NOMECLATURAL_PUBLICATION_UNIT_TYPES}
      *
-     *  NOTE by AM: according to {@link #publishedUnit} the published unit must never be a
+     *  NOTE by AM: according to {@link #publishedUnitSource} the published unit must never be a
      *   {@link ReferenceType#Section}. However, this method allows sections. This has implications.
      */
     protected void setPublishedUnit(NamedSourceBase publishedUnit) throws Exception {
@@ -455,6 +455,6 @@ public class NameTypeDesignationPresenter
             throw new Exception("The referrence type '"  + publishedUnit.getType() + "'is not allowed for publishedUnit.");
         }
 
-        this.publishedUnit = publishedUnit;
+        this.publishedUnitSource = publishedUnit;
     }
 }
