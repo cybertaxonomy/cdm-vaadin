@@ -58,7 +58,6 @@ import eu.etaxonomy.vaadin.ui.view.DoneWithPopupEvent.Reason;
 /**
  * @author a.kohlbecker
  * @since Jul 11, 2017
- *
  */
 @SpringComponent
 @ViewScope
