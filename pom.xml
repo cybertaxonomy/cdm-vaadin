@@ -27,7 +27,8 @@
     <doclint>none</doclint>
   </properties>
   <prerequisites>
-    <maven>3.6.3</maven>
+    <!-- TODO move to enforcer plugin -->
+    <maven>3.9.16</maven>
   </prerequisites>
   <repositories>
     <!-- the cdm internal repository -->
